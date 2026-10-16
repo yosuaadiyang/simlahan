@@ -12,7 +12,7 @@ ENV PYTHONUNBUFFERED=1 \
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         gdal-bin libgdal32 libgeos-c1v5 libproj25 \
-        gettext libpq5 \
+        gettext libpq5 libpcre3 \
         build-essential libpcre3-dev \
     && rm -rf /var/lib/apt/lists/*
 

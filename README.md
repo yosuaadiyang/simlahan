@@ -73,7 +73,8 @@ Grup bawaan (atur di `/admin/` → Pengguna):
 | Penelusur, Penyusun, Penyusun Kontrak, Operator Entri Data | baca | tidak (tersamar) |
 
 Setiap pengguna juga perlu minimal satu **unit layanan** (untuk modul sewa).
-Ganti kerugian uang wajib divalidasi Ketua Pelaksana sebelum dapat dibayar;
+Ganti kerugian wajib divalidasi Ketua Pelaksana (izin *validasi ganti
+kerugian*, dimiliki grup Administrator dan Pelaksana) sebelum dapat dibayar;
 pelepasan hak hanya bisa dicatat setelah ganti kerugian lunas atau dititipkan.
 
 ## Konfigurasi utama (`.env`)
