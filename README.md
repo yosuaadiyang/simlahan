@@ -85,7 +85,7 @@ pelepasan hak hanya bisa dicatat setelah ganti kerugian lunas atau dititipkan.
 | `SECRET_KEY`, `FIELD_ENCRYPTION_KEY`, `POSTGRES_PASSWORD` | Rahasia (dibuat `setup-env.sh`) |
 | `ORGANIZATION_NAME`, `APP_NAME` | Nama instansi/aplikasi di layar & surel |
 | `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS` | Domain akses |
-| `MAP_CENTER_LAT/LNG`, `MAP_DEFAULT_ZOOM`, `PRIMARY_MUNICIPALITY` | Tampilan peta & pencarian (mis. Batam: `1.08`, `104.03`, `11`, `Kota Batam`) |
+| `MAP_CENTER_LAT/LNG`, `MAP_DEFAULT_ZOOM`, `PRIMARY_MUNICIPALITY` | Tampilan peta & pencarian (bawaan Pulau Rempang: `0.87`, `104.15`, `12`, `Kota Batam`; seluruh Indonesia: `-2.5`, `118`, `5`) |
 | `MAP_WMS_URL`, `MAP_WMS_LAYERS` | Layer WMS instansi (peta bidang, RDTR) |
 | `EMAIL_URL`, `DEFAULT_FROM_EMAIL` | Surel keluar |
 | `JWT_ACCESS_TOKEN_MINUTES`, `JWT_REFRESH_TOKEN_HOURS` | Masa berlaku sesi |
@@ -99,6 +99,20 @@ Di tab **Bidang & peta** sebuah proyek, unggah GeoJSON atau shapefile (.zip
 berisi .shp/.shx/.dbf/.prj). Koordinat otomatis diubah ke WGS84; atribut nomor
 bidang (default `parcel_number`) dan luas dapat dipilih. Bidang bernomor sama
 diperbarui, bukan digandakan. Daftar nominatif dapat diunduh sebagai .xlsx.
+
+## Data contoh Rempang
+
+Untuk uji coba, buat proyek contoh `[CONTOH] Pengadaan Tanah Pulau Rempang`
+berisi 6 bidang fiktif di Kel. Rempang Cate & Sembulang (Kec. Galang):
+
+```sh
+docker compose exec backend python manage.py pengadaan_contoh_rempang          # buat
+docker compose exec backend python manage.py pengadaan_contoh_rempang --hapus  # hapus
+```
+
+Nama pihak, luas, dan batas bidang bukan data resmi atau hasil ukur. `--hapus`
+menghapus permanen proyek contoh beserta **semua** data di bawahnya, termasuk
+yang ditambahkan manual ke proyek itu.
 
 ## Pengembangan
 
