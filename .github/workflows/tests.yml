@@ -1,0 +1,109 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (pytest, PostGIS 16)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: backend
+
+    services:
+      db:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_DB: simlahan
+          POSTGRES_USER: simlahan
+          POSTGRES_PASSWORD: simlahan
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U simlahan -d simlahan"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+
+    env:
+      DATABASE_URL: postgis://simlahan:simlahan@localhost:5432/simlahan
+      DEBUG: "1"
+      SECRET_KEY: ci-only-insecure-key
+      # Test-only Fernet key (not a secret): base64 of 32 zero bytes.
+      FIELD_ENCRYPTION_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install GDAL, GEOS, PROJ and gettext
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends gdal-bin libgdal-dev gettext
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            backend/requirements.txt
+            backend/requirements-dev.txt
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Compile translations
+        run: python manage.py compilemessages -l id -v0
+
+      - name: Run pengadaan tests
+        run: pytest pengadaan/tests -p no:cacheprovider
+
+  frontend:
+    name: Frontend (vitest)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: frontend
+
+    env:
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: frontend/.nvmrc
+          # Yarn cache is handled below, after Corepack provides yarn 4.
+          package-manager-cache: false
+
+      - name: Enable Corepack (yarn 4)
+        run: corepack enable
+
+      - name: Get yarn cache directory
+        id: yarn-cache
+        run: echo "dir=$(yarn config get cacheFolder)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v6
+        with:
+          path: ${{ steps.yarn-cache.outputs.dir }}
+          key: yarn-${{ runner.os }}-${{ hashFiles('frontend/yarn.lock') }}
+          restore-keys: yarn-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Run tests
+        run: yarn vitest run
