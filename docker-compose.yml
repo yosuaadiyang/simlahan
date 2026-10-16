@@ -1,0 +1,91 @@
+# SimLahan – Sistem Informasi Manajemen Lahan & Pengadaan Tanah
+# Jalankan:  cp .env.example .env  (lalu isi rahasia)  &&  docker compose up -d --build
+name: simlahan
+
+x-backend: &backend
+  build:
+    context: ./backend
+  image: simlahan-backend:latest
+  env_file: .env
+  environment:
+    DATABASE_URL: postgis://${POSTGRES_USER:-simlahan}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-simlahan}
+    PRIVATE_FILES_LOCATION: /app/private_files
+    MEDIA_ROOT: /app/media
+    TRUST_PROXY_HEADERS: "true"
+  volumes:
+    - private_files:/app/private_files
+    - media:/app/media
+  depends_on:
+    db:
+      condition: service_healthy
+  restart: unless-stopped
+
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-simlahan}
+      POSTGRES_USER: ${POSTGRES_USER:-simlahan}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Isi POSTGRES_PASSWORD di .env}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  backend:
+    <<: *backend
+    command: ["api"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8080/healthz').status==200 else 1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 120s
+
+  qcluster:
+    <<: *backend
+    command: ["qcluster"]
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  batchrun:
+    <<: *backend
+    command: ["batchrun"]
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: ""
+        VITE_APP_NAME: ${APP_NAME:-SimLahan}
+        VITE_ORGANIZATION_NAME: ${ORGANIZATION_NAME:-Sistem Informasi Manajemen Lahan}
+        VITE_MAP_CENTER_LAT: ${MAP_CENTER_LAT:-}
+        VITE_MAP_CENTER_LNG: ${MAP_CENTER_LNG:-}
+        VITE_MAP_DEFAULT_ZOOM: ${MAP_DEFAULT_ZOOM:-}
+        VITE_PRIMARY_MUNICIPALITY: ${PRIMARY_MUNICIPALITY:-}
+        VITE_MAP_WMS_URL: ${MAP_WMS_URL:-}
+        VITE_MAP_WMS_LAYERS: ${MAP_WMS_LAYERS:-}
+        VITE_MAP_WMS_NAME: ${MAP_WMS_NAME:-}
+        VITE_FLAG_PLOTSEARCH: ${FLAG_PLOTSEARCH:-false}
+    image: simlahan-frontend:latest
+    environment:
+      BACKEND_URL: http://backend:8080
+    ports:
+      - "${HTTP_PORT:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  db_data:
+  private_files:
+  media:
