@@ -1,107 +1,17 @@
 [
-  {
-    "model": "leasing.BasisOfRentBuildPermissionType",
-    "pk": 1,
-    "fields": {
-      "name": "Asunto"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentBuildPermissionType",
-    "pk": 2,
-    "fields": {
-      "name": "Asunto, 2 peruste"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentBuildPermissionType",
-    "pk": 3,
-    "fields": {
-      "name": "Asunto, 3 peruste"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentBuildPermissionType",
-    "pk": 4,
-    "fields": {
-      "name": "Erittelemätön"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentBuildPermissionType",
-    "pk": 5,
-    "fields": {
-      "name": "Liike"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentBuildPermissionType",
-    "pk": 6,
-    "fields": {
-      "name": "Liike/toimisto/teoll"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentBuildPermissionType",
-    "pk": 7,
-    "fields": {
-      "name": "Muu"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentBuildPermissionType",
-    "pk": 8,
-    "fields": {
-      "name": "Pys. I-taso"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentBuildPermissionType",
-    "pk": 9,
-    "fields": {
-      "name": "Pys. muut tasot"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentBuildPermissionType",
-    "pk": 10,
-    "fields": {
-      "name": "Pysäköinti"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentBuildPermissionType",
-    "pk": 11,
-    "fields": {
-      "name": "Päiväkoti"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentBuildPermissionType",
-    "pk": 12,
-    "fields": {
-      "name": "Teoll./toimisto"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentBuildPermissionType",
-    "pk": 13,
-    "fields": {
-      "name": "Teoll./varasto"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentBuildPermissionType",
-    "pk": 14,
-    "fields": {
-      "name": "Toimisto"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentBuildPermissionType",
-    "pk": 15,
-    "fields": {
-      "name": "Yleinen"
-    }
-  }
+{"model": "leasing.BasisOfRentBuildPermissionType", "pk": 1, "fields": {"name": "Hunian"}},
+{"model": "leasing.BasisOfRentBuildPermissionType", "pk": 2, "fields": {"name": "Hunian, dasar 2"}},
+{"model": "leasing.BasisOfRentBuildPermissionType", "pk": 3, "fields": {"name": "Hunian, dasar 3"}},
+{"model": "leasing.BasisOfRentBuildPermissionType", "pk": 4, "fields": {"name": "Tidak dirinci"}},
+{"model": "leasing.BasisOfRentBuildPermissionType", "pk": 5, "fields": {"name": "Komersial"}},
+{"model": "leasing.BasisOfRentBuildPermissionType", "pk": 6, "fields": {"name": "Komersial/kantor/industri"}},
+{"model": "leasing.BasisOfRentBuildPermissionType", "pk": 7, "fields": {"name": "Lainnya"}},
+{"model": "leasing.BasisOfRentBuildPermissionType", "pk": 8, "fields": {"name": "Parkir lantai dasar"}},
+{"model": "leasing.BasisOfRentBuildPermissionType", "pk": 9, "fields": {"name": "Parkir lantai lain"}},
+{"model": "leasing.BasisOfRentBuildPermissionType", "pk": 10, "fields": {"name": "Parkir"}},
+{"model": "leasing.BasisOfRentBuildPermissionType", "pk": 11, "fields": {"name": "Tempat penitipan anak"}},
+{"model": "leasing.BasisOfRentBuildPermissionType", "pk": 12, "fields": {"name": "Industri/kantor"}},
+{"model": "leasing.BasisOfRentBuildPermissionType", "pk": 13, "fields": {"name": "Industri/gudang"}},
+{"model": "leasing.BasisOfRentBuildPermissionType", "pk": 14, "fields": {"name": "Kantor"}},
+{"model": "leasing.BasisOfRentBuildPermissionType", "pk": 15, "fields": {"name": "Fasilitas umum"}}
 ]

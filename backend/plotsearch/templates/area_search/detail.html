@@ -3,12 +3,11 @@
 {% load entry_filter %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="UTF-8">
     <title>{% trans "Area search application" %} {{ object.identifier }}</title>
-    <link rel="stylesheet" href="https://makasiini.hel.ninja/delivery/HelsinkiGrotesk/HelsinkiGrotesk.css">
     <style>
 @page {
   size: letter portrait;
@@ -16,7 +15,7 @@
 }
 
 body {
-  font-family: 'HelsinkiGrotesk', Arial, 'Liberation Sans';
+  font-family: Arial, 'Liberation Sans', sans-serif;
   font-size: small;
 }
 
@@ -60,7 +59,7 @@ th {
         <table>
             <tr>
                 <th>{% trans "Lessor" %}</th>
-                <td>{% trans "City of Helsinki" %}</td>
+                <td>{% organization_name %}</td>
             </tr>
             <tr>
                 <th>{% trans "Description area" %}</th>

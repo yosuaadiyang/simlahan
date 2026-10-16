@@ -5,7 +5,7 @@ class WmsRequestSerializer(serializers.Serializer):
     """Serializer for validating WMS request parameters."""
 
     bbox = serializers.CharField(required=True)
-    srs = serializers.CharField(required=False, default="EPSG:3879")
+    srs = serializers.CharField(required=False, default="EPSG:3857")
     width = serializers.IntegerField(
         required=False, min_value=1, max_value=4096, default=256
     )

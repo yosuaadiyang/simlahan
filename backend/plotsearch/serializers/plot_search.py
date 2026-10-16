@@ -1,11 +1,10 @@
-import requests
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import BadRequest, ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from enumfields.drf import EnumSupportSerializerMixin
-from pyproj import Transformer
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework_gis.fields import GeometryField
@@ -831,10 +830,20 @@ class FavouriteSerializer(serializers.ModelSerializer):
         return instance
 
 
+def _get_authentication_methods(request) -> str | None:
+    """Daftar metode autentikasi (klaim ``amr``) dari token, bila tersedia."""
+    auth = getattr(request, "auth", None)
+    claims = getattr(auth, "payload", None) or getattr(auth, "data", None) or {}
+    amr = claims.get("amr") if hasattr(claims, "get") else None
+    if isinstance(amr, (list, tuple)):
+        return ",".join(str(method) for method in amr) or None
+    return amr or None
+
+
 class AreaSearchAttachmentSerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField(read_only=True)
     user = UserSerializer(read_only=True)
-    is_user_helsinki_ad = serializers.SerializerMethodField(read_only=True)
+    is_user_officer = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = AreaSearchAttachment
@@ -845,21 +854,17 @@ class AreaSearchAttachmentSerializer(serializers.ModelSerializer):
             "area_search",
             "created_at",
             "attachment",
-            "is_user_helsinki_ad",
+            "is_user_officer",
         )
 
-    def get_is_user_helsinki_ad(self, areasearch_attachment: AreaSearchAttachment):
+    def get_is_user_officer(self, areasearch_attachment: AreaSearchAttachment):
         """
-        Check if the user is a Helsinki AD user.
+        Check if the user is an internal officer.
         """
-        return areasearch_attachment.is_user_helsinki_ad()
+        return areasearch_attachment.is_user_officer()
 
     def create(self, validated_data):
-        try:
-            amrs_list = self.context["request"].auth.data.get("amr")
-            amrs = ",".join(amrs_list)
-        except AttributeError:
-            amrs = None
+        amrs = _get_authentication_methods(self.context["request"])
 
         attachment = AreaSearchAttachment.objects.create(
             name=validated_data["name"],
@@ -1015,67 +1020,30 @@ class AreaSearchSerializer(EnumSupportSerializerMixin, serializers.ModelSerializ
         """
         geometry = validated_data.get("geometry")
         if geometry is not None:
-            return AreaSearchSerializer.get_address_and_district_from_kartta_hel(
-                geometry
+            address, district = (
+                AreaSearchSerializer.get_address_and_district_from_geometry(geometry)
             )
+            if address or district:
+                return address, district
 
-        address = self.data.get("address", None)
-        district = self.data.get("district", None)
+        address = validated_data.get("address") or self.data.get("address", None)
+        district = validated_data.get("district") or self.data.get("district", None)
         return (
             address if address else None,
             district if district else None,
         )
 
     @staticmethod
-    def get_address_and_district_from_kartta_hel(geometry):
+    def get_address_and_district_from_geometry(geometry):
         """
-        Fetches address and district data from kartta.hel.fi
+        Mencari kecamatan (District) dan alamat berdasarkan geometri.
+
+        Tidak ada layanan geokoding eksternal yang dipanggil: alamat/kecamatan
+        diambil dari data yang dikirim pengguna. Fungsi ini disediakan sebagai
+        titik integrasi bila instansi memiliki layanan geokoding sendiri.
         Returns tuple with address as first element and district as second
         """
-        # EPSG:4326 WGS84 - World Geodetic System 1984, used in GPS
-        # EPSG:3879 GK25FIN - Helsinki local coordinate system
-        transformer = Transformer.from_crs("EPSG:4326", "EPSG:3879", always_xy=True)
-        multipolygon = list()
-
-        for lon, lat in geometry.coords[0][0]:
-            # EPSG:4326 uses longitude, latitude
-            # EPSG:3879 uses easting, northing
-            easting, northing = transformer.transform(lon, lat)
-            multipolygon.append((easting, northing))
-
-        # Swap order of coordinates for WFS, as it expects coordinates in (y,x) or (lat,lon) or (northing,easting)
-        multipolygon_str = ",".join(
-            [f"{northing} {easting}" for easting, northing in multipolygon]
-        )
-
-        url = "https://kartta.hel.fi/ws/geoserver/avoindata/wfs"
-        params = {
-            "service": "wfs",
-            "version": "2.0.0",
-            "request": "getFeature",
-            "typeName": "avoindata:Osoiteluettelo_piste_rekisteritiedot",
-            "srsName": "EPSG:4326",
-            "outputFormat": "application/json",
-            "cql_filter": f"intersects(geom,MULTIPOLYGON((({multipolygon_str}))))",
-        }
-        response = requests.get(url, params=params)
-
-        results = response.json()
-        if results["numberReturned"] == 0:
-            params.update({"typeName": "avoindata:Kaupunginosajako"})
-
-            response = requests.get(url, params=params)
-
-            results = response.json()
-
-        address = results["features"][0]["properties"].get("katuosoite", None)
-        district = results["features"][0]["properties"].get(
-            "kaupunginosa_nimi_fi", None
-        )
-
-        if district is None:
-            district = results["features"][0]["properties"].get("nimi_fi", None)
-        return (address, district)
+        return (None, None)
 
     def create(self, validated_data):
         area_form_qs = Form.objects.filter(is_area_form=True)
@@ -1089,9 +1057,9 @@ class AreaSearchSerializer(EnumSupportSerializerMixin, serializers.ModelSerializ
 
         geometry = validated_data.get("geometry")
         if geometry is not None:
-            validated_data["address"], validated_data["district"] = (
-                self.get_address_and_district_from_kartta_hel(geometry)
-            )
+            address, district = self.get_address_and_district_from_geometry(geometry)
+            validated_data["address"] = address or validated_data.get("address")
+            validated_data["district"] = district or validated_data.get("district")
 
         area_search = AreaSearch.objects.create(**validated_data)
         area_search.lessor = map_intended_use_to_lessor(
@@ -1155,7 +1123,9 @@ class AreaSearchSerializer(EnumSupportSerializerMixin, serializers.ModelSerializ
         instance.save()
 
         if lessor_was_changed:
-            send_areasearch_lessor_changed_email(instance, new_lessor, old_lessor, "fi")
+            send_areasearch_lessor_changed_email(
+                instance, new_lessor, old_lessor, settings.LANGUAGE_CODE
+            )
 
         return instance
 

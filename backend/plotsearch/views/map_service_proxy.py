@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 @require_http_methods(["GET", "OPTIONS"])
-def helsinki_owned_areas_wms_proxy(request):
+def owned_areas_wms_proxy(request):
     """
     One may wonder why this is a function based view, but there is a reason for that.
     Django rest framework based views take a query parameter `format` and use that for router route matching.
@@ -31,12 +31,10 @@ def helsinki_owned_areas_wms_proxy(request):
     map_service_url = settings.MAP_SERVICE_WMS_URL
     username = settings.MAP_SERVICE_WMS_USERNAME
     password = settings.MAP_SERVICE_WMS_PASSWORD
-    layer = settings.MAP_SERVICE_WMS_HELSINKI_OWNED_AREAS_LAYER
+    layer = settings.MAP_SERVICE_WMS_OWNED_AREAS_LAYER
 
     if not all([username, password, map_service_url, layer]):
-        logger.error(
-            "Helsinki Owned Areas WMS Proxy Public: Missing configuration settings."
-        )
+        logger.error("Owned Areas WMS Proxy Public: Missing configuration settings.")
         return Response(
             "Service misconfigured.",
             status=HTTP_500_INTERNAL_SERVER_ERROR,

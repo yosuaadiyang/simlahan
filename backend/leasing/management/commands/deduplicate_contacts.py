@@ -9,7 +9,6 @@ from django.db import transaction
 from django.db.models import QuerySet
 from safedelete import HARD_DELETE
 
-from credit_integration.models import CreditDecision
 from leasing.models.contact import Contact
 from leasing.models.invoice import Invoice
 from leasing.models.lease import Lease
@@ -42,11 +41,6 @@ class _TenantContactRef(TypedDict):
     tenant_id: int
 
 
-class _CreditDecisionRef(TypedDict):
-    credit_decision_id: int
-    customer_id: int | None
-
-
 class _InvoiceRef(TypedDict):
     invoice_id: int
     recipient_id: int
@@ -54,7 +48,6 @@ class _InvoiceRef(TypedDict):
 
 class _References(TypedDict):
     tenant_contacts: list[_TenantContactRef]
-    credit_decisions: list[_CreditDecisionRef]
     invoices: list[_InvoiceRef]
 
 
@@ -237,15 +230,6 @@ class Command(BaseCommand):
                     }
                     for tc in TenantContact.objects.filter(contact_id__in=duplicate_ids)
                 ],
-                "credit_decisions": [
-                    {
-                        "credit_decision_id": cd.pk,
-                        "customer_id": cd.customer.pk,
-                    }
-                    for cd in CreditDecision.objects.filter(
-                        customer_id__in=duplicate_ids
-                    )
-                ],
                 "invoices": [
                     {
                         "invoice_id": inv.pk,
@@ -318,16 +302,6 @@ class Command(BaseCommand):
                     logger.info(
                         "Updated %d TenantContact(s) for original contact %d",
                         tc_updated,
-                        original_id,
-                    )
-
-                cd_updated = CreditDecision.objects.filter(
-                    customer_id__in=duplicate_ids
-                ).update(customer_id=original_id)
-                if cd_updated:
-                    logger.info(
-                        "Updated %d CreditDecision(s) for original contact %d",
-                        cd_updated,
                         original_id,
                     )
 

@@ -346,8 +346,8 @@ class LeaseIdentifier(TimeStampedSafeDeleteModel):
 
         The lease identifier is constructed out of type, municipality,
         district, and sequence, in that order. For example, the identifier
-        for a residence (A1) in Helsinki (1), Vallila (22), and sequence
-        number 1 would be A1122-1.
+        for a residence (A1) in Kota Batam (2171), Sekupang (03), and sequence
+        number 1 would be A1217103-1.
         """
         return "{}{}{:02}-{}".format(
             self.type.identifier,
@@ -433,7 +433,7 @@ class LeaseManager(SafeDeleteManager):
 
     def get_by_identifier(self, identifier):
         id_match = re.match(
-            r"(?P<lease_type>\w\d)(?P<municipality>\d)(?P<district>\d{2})-(?P<sequence>\d+)$",
+            r"(?P<lease_type>[A-Za-z][A-Za-z0-9])(?P<municipality>\d+?)(?P<district>\d{2})-(?P<sequence>\d+)$",
             identifier,
         )
 
@@ -741,8 +741,6 @@ class Lease(TimeStampedSafeDeleteModel):
         verbose_name_plural = pgettext_lazy("Model name", "Leases")
         permissions = [
             ("delete_nonempty_lease", "Can delete non-empty Lease"),
-            # Access to the model via Export API
-            ("export_api_expired_lease", "Can access export API expired leases"),
         ]
 
     def __str__(self):

@@ -33,8 +33,7 @@ class VipunenMapLayer(models.Model):
         related_name="children",
     )
     order_in_parent = models.IntegerField(blank=True, null=True)
-    name_fi = models.CharField(max_length=255)
-    name_sv = models.CharField(max_length=255, blank=True, null=True)
+    name_ind = models.CharField(max_length=255)
     name_en = models.CharField(max_length=255, blank=True, null=True)
     keywords = models.CharField(max_length=255, blank=True, null=True)
     hex_color = models.CharField(
@@ -52,12 +51,6 @@ class VipunenMapLayer(models.Model):
         "children",
     ]
 
-    class Meta:
-        permissions = [
-            # Access to the model via Export API
-            ("export_api_vipunen_map_layer", "Can access export API vipunen map layer"),
-        ]
-
     def __str__(self):
         name = self.get_name()
         layer = self
@@ -68,13 +61,9 @@ class VipunenMapLayer(models.Model):
 
     def get_name(self):
         language = get_language()
-        if language == "fi" and self.name_fi is not None:
-            return self.name_fi
-        elif language == "sv" and self.name_sv is not None:
-            return self.name_sv
-        elif language == "en" and self.name_en is not None:
+        if language == "en" and self.name_en:
             return self.name_en
-        return self.name_fi or ""
+        return self.name_ind or ""
 
     @classmethod
     def get_map_layer_ids_for_lease_area(cls, lease_area: LeaseArea):

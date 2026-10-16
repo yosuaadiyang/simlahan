@@ -6,33 +6,33 @@ from leasing.models import Contact, ServiceUnit
 SERVICE_UNITS = [
     {
         "id": ServiceUnitId.MAKE.value,
-        "contact_name": "KYMP/MAKE ja Tontit",
+        "contact_name": "Unit Pengelolaan Aset Lahan dan Kavling",
         "sap_sales_office": SapSalesOfficeNumber.MAKE.value,
-        "email": "MAKE@example.com",
+        "email": "aset-lahan@example.go.id",
     },
     {
         "id": ServiceUnitId.KAMA.value,
-        "contact_name": "KYMP/Kaupunkitilan käyttö ja maanvuokraus",
+        "contact_name": "Unit Pemanfaatan Ruang dan Sewa Lahan",
         "sap_sales_office": SapSalesOfficeNumber.KAMA.value,
-        "email": "KAMA@example.com",
+        "email": "sewa-lahan@example.go.id",
     },
     {
         "id": ServiceUnitId.KUVA_LIPA.value,
-        "contact_name": "KUVA/Liikuntapaikkapalvelut",
+        "contact_name": "Unit Fasilitas Olahraga",
         "sap_sales_office": SapSalesOfficeNumber.KUVA.value,
-        "email": "KUVA@example.com",
+        "email": "fasilitas@example.go.id",
     },
     {
         "id": ServiceUnitId.KUVA_UPA.value,
-        "contact_name": "KUVA/Ulkoilupalvelut",
+        "contact_name": "Unit Ruang Terbuka dan Rekreasi",
         "sap_sales_office": SapSalesOfficeNumber.KUVA.value,
-        "email": "KUVA@example.com",
+        "email": "fasilitas@example.go.id",
     },
     {
         "id": ServiceUnitId.KUVA_NUP.value,
-        "contact_name": "KUVA/Nuorisopalvelut",
+        "contact_name": "Unit Fasilitas Kepemudaan",
         "sap_sales_office": SapSalesOfficeNumber.KUVA.value,
-        "email": "KUVA@example.com",
+        "email": "fasilitas@example.go.id",
     },
 ]
 
@@ -66,9 +66,9 @@ class Command(BaseCommand):
                 email=service_unit_data["email"],
                 defaults={
                     "type": ContactType.UNIT,
-                    "address": "PL2214",
-                    "postal_code": "00099",
-                    "city": "Helsingin kaupunki",
+                    "address": "",
+                    "postal_code": "",
+                    "city": "",
                     "business_id": "",
                 },
             )

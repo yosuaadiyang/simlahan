@@ -7,9 +7,9 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Model
 
 from batchrun.permissions import BATCHRUN_GROUP_MODEL_PERMISSIONS
-from credit_integration.permissions import CREDIT_INTEGRATION_GROUP_MODEL_PERMISSIONS
 from forms.permissions import FORMS_GROUP_MODEL_PERMISSIONS
 from leasing.permissions import LEASING_GROUP_MODEL_PERMISSIONS
+from pengadaan.permissions import PENGADAAN_GROUP_MODEL_PERMISSIONS
 from plotsearch.permissions import PLOTSEARCH_GROUP_MODEL_PERMISSIONS
 from users.permissions import USERS_GROUP_MODEL_PERMISSIONS
 from utils.group_permissions import (
@@ -22,9 +22,9 @@ DEFAULT_FIELD_PERMISSIONS_KEY = "_default"
 
 FIELD_PERMISSION_CONFIGS: tuple[GroupModelPermissions, ...] = (
     BATCHRUN_GROUP_MODEL_PERMISSIONS,
-    CREDIT_INTEGRATION_GROUP_MODEL_PERMISSIONS,
     FORMS_GROUP_MODEL_PERMISSIONS,
     LEASING_GROUP_MODEL_PERMISSIONS,
+    PENGADAAN_GROUP_MODEL_PERMISSIONS,
     PLOTSEARCH_GROUP_MODEL_PERMISSIONS,
     USERS_GROUP_MODEL_PERMISSIONS,
 )

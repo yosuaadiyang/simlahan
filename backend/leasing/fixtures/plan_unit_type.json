@@ -1,73 +1,12 @@
 [
-  {
-    "model": "leasing.PlanUnitType",
-    "pk": 1,
-    "fields": {
-      "name": "Rekisteröity yleinen alue"
-    }
-  },
-  {
-    "model": "leasing.PlanUnitType",
-    "pk": 2,
-    "fields": {
-      "name": "Ohjeellinen kaavatontti"
-    }
-  },
-  {
-    "model": "leasing.PlanUnitType",
-    "pk": 3,
-    "fields": {
-      "name": "Vireillä olevan tonttijaon/-muutoksen mukainen tontti"
-    }
-  },
-  {
-    "model": "leasing.PlanUnitType",
-    "pk": 4,
-    "fields": {
-      "name": "Vireillä olevan tonttijaonmuutoksen mukainen tontti"
-    }
-  },
-  {
-    "model": "leasing.PlanUnitType",
-    "pk": 5,
-    "fields": {
-      "name": "Hyväksytyn tonttijaon mukainen tontti"
-    }
-  },
-  {
-    "model": "leasing.PlanUnitType",
-    "pk": 6,
-    "fields": {
-      "name": "Muodostusluetteloon merkitty tontti"
-    }
-  },
-  {
-    "model": "leasing.PlanUnitType",
-    "pk": 7,
-    "fields": {
-      "name": "Tonttirekisteritontti"
-    }
-  },
-  {
-    "model": "leasing.PlanUnitType",
-    "pk": 8,
-    "fields": {
-      "name": "Muun kuin korttelialueen yksikkö"
-    }
-  },
-  {
-    "model": "leasing.PlanUnitType",
-    "pk": 9,
-    "fields": {
-      "name": "Keinoyksikkö (maarekisterialue)"
-    }
-  },
-  {
-    "model": "leasing.PlanUnitType",
-    "pk": 10,
-    "fields": {
-      "name": "Keinokaavayksikkö (yleisen alueen lisäosa)"
-    }
-  }
+{"model": "leasing.PlanUnitType", "pk": 1, "fields": {"name": "Area umum terdaftar"}},
+{"model": "leasing.PlanUnitType", "pk": 2, "fields": {"name": "Kavling rencana indikatif"}},
+{"model": "leasing.PlanUnitType", "pk": 3, "fields": {"name": "Kavling sesuai rencana pemecahan/perubahan dalam proses"}},
+{"model": "leasing.PlanUnitType", "pk": 4, "fields": {"name": "Kavling sesuai perubahan pemecahan dalam proses"}},
+{"model": "leasing.PlanUnitType", "pk": 5, "fields": {"name": "Kavling sesuai pemecahan yang disetujui"}},
+{"model": "leasing.PlanUnitType", "pk": 6, "fields": {"name": "Kavling tercatat dalam daftar pembentukan"}},
+{"model": "leasing.PlanUnitType", "pk": 7, "fields": {"name": "Kavling terdaftar"}},
+{"model": "leasing.PlanUnitType", "pk": 8, "fields": {"name": "Unit di luar blok"}},
+{"model": "leasing.PlanUnitType", "pk": 9, "fields": {"name": "Unit buatan (area pendaftaran tanah)"}},
+{"model": "leasing.PlanUnitType", "pk": 10, "fields": {"name": "Unit rencana buatan (tambahan area umum)"}}
 ]
-

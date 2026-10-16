@@ -1,16 +1,4 @@
 [
-  {
-    "model": "leasing.SpecialProject",
-    "pk": 1,
-    "fields": {
-      "name": "Kehittyväkerrostalo"
-    }
-  },
-  {
-    "model": "leasing.SpecialProject",
-    "pk": 2,
-    "fields": {
-      "name": "Ryhmärakennuttaminen"
-    }
-  }
+{"model": "leasing.SpecialProject", "pk": 1, "fields": {"name": "Rumah susun bertahap"}},
+{"model": "leasing.SpecialProject", "pk": 2, "fields": {"name": "Pembangunan berkelompok"}}
 ]

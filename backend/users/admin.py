@@ -9,7 +9,7 @@ User = get_user_model()
 class UserAdmin(DjangoUserAdmin):
     fieldsets = DjangoUserAdmin.fieldsets + (
         (None, {"fields": ("service_units",)}),
-        (None, {"fields": ("department_name", "uuid")}),
+        (None, {"fields": ("department_name",)}),
     )
     list_display = (
         "username",

@@ -1,46 +1,6 @@
 [
-  {
-    "model": "plotsearch.plotsearchtype",
-    "pk": 1,
-    "fields": {
-      "name": "Asuntorakentamisen haut",
-      "name_fi": "Asuntorakentamisen haut",
-      "name_sv": null,
-      "name_en": "Asuntorakentamisen haut",
-      "ordering": 0
-    }
-  },
-  {
-    "model": "plotsearch.plotsearchtype",
-    "pk": 2,
-    "fields": {
-      "name": "Pientalotonttien haut",
-      "name_fi": "Pientalotonttien haut",
-      "name_sv": null,
-      "name_en": "Pientalotonttien haut",
-      "ordering": 0
-    }
-  },
-  {
-    "model": "plotsearch.plotsearchtype",
-    "pk": 3,
-    "fields": {
-      "name": "Yritystonttihaku",
-      "name_fi": "Yritystonttihaku",
-      "name_sv": null,
-      "name_en": "Yritystonttihaku",
-      "ordering": 0
-    }
-  },
-  {
-    "model": "plotsearch.plotsearchtype",
-    "pk": 4,
-    "fields": {
-      "name": "Muun alueen haku",
-      "name_fi": "Muun alueen haku",
-      "name_sv": null,
-      "name_en": "Muun alueen haku",
-      "ordering": 0
-    }
-  }
+{"model": "plotsearch.plotsearchtype", "pk": 1, "fields": {"name": "Permohonan pembangunan hunian", "name_en": "Asuntorakentamisen haut", "ordering": 0, "name_ind": "Permohonan pembangunan hunian"}},
+{"model": "plotsearch.plotsearchtype", "pk": 2, "fields": {"name": "Permohonan kavling rumah tapak", "name_en": "Pientalotonttien haut", "ordering": 0, "name_ind": "Permohonan kavling rumah tapak"}},
+{"model": "plotsearch.plotsearchtype", "pk": 3, "fields": {"name": "Permohonan kavling usaha", "name_en": "Yritystonttihaku", "ordering": 0, "name_ind": "Permohonan kavling usaha"}},
+{"model": "plotsearch.plotsearchtype", "pk": 4, "fields": {"name": "Permohonan area lainnya", "name_en": "Muun alueen haku", "ordering": 0, "name_ind": "Permohonan area lainnya"}}
 ]

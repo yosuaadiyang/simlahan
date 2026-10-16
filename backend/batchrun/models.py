@@ -211,7 +211,7 @@ class Timezone(CleansOnSave, models.Model):
         unique=True,
         verbose_name=_("name"),
         help_text=_(
-            'Name of the timezone, e.g. "Europe/Helsinki" or "UTC". See '
+            'Name of the timezone, e.g. "Asia/Jakarta" or "UTC". See '
             "https://en.wikipedia.org/wiki/List_of_tz_database_time_zones "
             "for a list of possible values."
         ),

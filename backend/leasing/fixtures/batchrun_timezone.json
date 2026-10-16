@@ -1,9 +1,3 @@
 [
-  {
-    "model": "batchrun.timezone",
-    "pk": 1,
-    "fields": {
-      "name": "Europe/Helsinki"
-    }
-  }
+{"model": "batchrun.timezone", "pk": 1, "fields": {"name": "Asia/Jakarta"}}
 ]

@@ -1,4 +1,4 @@
-{% load i18n %}{% load entry_filter %}{% trans "This is a copy of your area search application sent to the City of Helsinki." %}
+{% load i18n %}{% load entry_filter %}{% organization_name as org %}{% blocktrans %}This is a copy of your area search application sent to {{ org }}.{% endblocktrans %}
 {% trans "You can find a detailed copy of your application as an attachment in this email." %}
 
 {% trans "Area search information" %}

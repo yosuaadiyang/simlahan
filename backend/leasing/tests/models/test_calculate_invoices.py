@@ -364,7 +364,7 @@ def test_calculate_invoices_uses_correct_receivable_type(
 
     for service_unit in service_units:
         receivable_type = receivable_type_factory(
-            name="Maanvuokraus", service_unit=service_unit
+            name="Sewa tanah", service_unit=service_unit
         )
         service_unit.default_receivable_type_rent = receivable_type
 
@@ -463,7 +463,7 @@ def test_calculate_invoices_uses_override_receivable_type(
     # Mandatory set up
     service_unit: ServiceUnit = service_unit_factory(name="ServiceUnitName")
     service_unit.default_receivable_type_rent = receivable_type_factory(
-        name="Maanvuokraus", service_unit=service_unit
+        name="Sewa tanah", service_unit=service_unit
     )
     lease: Lease = lease_factory(
         type_id=1,

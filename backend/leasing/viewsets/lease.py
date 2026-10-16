@@ -70,6 +70,73 @@ from leasing.serializers.lease import (
 from ..permissions import IsMemberOfSameServiceUnit, MvjDjangoModelPermissions
 from .utils import AtomicTransactionModelViewSet
 
+# Tunnus sewa: <jenis 2 karakter><kode kab/kota (1+ digit)><kode kecamatan 2 digit>-<urutan>
+# contoh: A1 + 2171 + 05 + -12  ->  "A1217105-12"
+LEASE_IDENTIFIER_FULL_RE = re.compile(
+    r"^(?P<type>[A-Za-z][A-Za-z0-9])(?P<municipality>\d+?)(?P<district>\d{2})-(?P<sequence>\d*)$"
+)
+LEASE_IDENTIFIER_PREFIX_RE = re.compile(
+    r"^(?P<type>[A-Za-z][A-Za-z0-9]?)(?P<digits>\d*)$"
+)
+
+
+def _district_lookup(code: str) -> str:
+    # Kode kecamatan disimpan tanpa nol di depan ("05" -> "5", "00" -> "0").
+    return "0" if set(code) <= {"0"} else code.lstrip("0")
+
+
+def build_lease_identifier_query(search_string: str) -> Q:
+    """Bangun filter tunnus sewa untuk tunnus lengkap maupun sebagian.
+
+    Panjang kode kab/kota tidak tetap, sehingga untuk tunnus sebagian semua
+    kemungkinan pembagian digit antara kab/kota dan kecamatan dicoba (OR).
+    """
+    full = LEASE_IDENTIFIER_FULL_RE.match(search_string)
+    if full:
+        query = Q(
+            type__identifier__iexact=full.group("type"),
+            municipality__identifier=full.group("municipality"),
+            district__identifier=_district_lookup(full.group("district")),
+        )
+        if full.group("sequence"):
+            query &= Q(identifier__sequence__startswith=full.group("sequence"))
+        return query
+
+    prefix = LEASE_IDENTIFIER_PREFIX_RE.match(search_string)
+    if not prefix:
+        return Q()
+    lease_type = prefix.group("type")
+    digits = prefix.group("digits")
+    if len(lease_type) == 1 or not digits:
+        return Q(type__identifier__istartswith=lease_type)
+
+    query = Q(
+        type__identifier__iexact=lease_type,
+        municipality__identifier__startswith=digits,
+    )
+    for split in range(1, len(digits)):
+        municipality, district = digits[:split], digits[split:]
+        if len(district) > 2:
+            continue
+        if len(district) == 2:
+            district_q = Q(district__identifier=_district_lookup(district))
+        else:
+            # Satu digit pertama kode kecamatan, mis. "7" -> kecamatan 70-79.
+            first = int(district)
+            district_q = Q(
+                district__identifier__in=[
+                    str(i) for i in range(first * 10, first * 10 + 10)
+                ]
+            )
+        query |= (
+            Q(
+                type__identifier__iexact=lease_type,
+                municipality__identifier=municipality,
+            )
+            & district_q
+        )
+    return query
+
 
 class DistrictViewSet(AtomicTransactionModelViewSet):
     queryset = District.objects.all()
@@ -215,51 +282,9 @@ class LeaseViewSet(FieldPermissionsViewsetMixin, AtomicTransactionModelViewSet):
             combined_q = Q()
             for search_string in search_strings:
                 looks_like_identifier = bool(
-                    re.match(r"[A-Z]+\d{3,4}-\d+$", search_string, re.IGNORECASE)
+                    LEASE_IDENTIFIER_FULL_RE.match(search_string)
                 )
-
-                # Search by identifier or parts of it
-                if len(search_string) < 3:
-                    identifier_q = Q(type__identifier__istartswith=search_string)
-                elif len(search_string) == 3:
-                    identifier_q = Q(
-                        type__identifier__iexact=search_string[:2],
-                        municipality__identifier=search_string[2:3],
-                    )
-                elif len(search_string) < 7:
-                    district_identifier = search_string[3:5]
-                    if district_identifier == "0":
-                        identifier_q = Q(
-                            type__identifier__iexact=search_string[:2],
-                            municipality__identifier=search_string[2:3],
-                            district__identifier__in=range(0, 10),
-                        )
-                    else:
-                        if district_identifier == "00":
-                            district_identifier = "0"
-                        else:
-                            district_identifier = district_identifier.lstrip("0")
-
-                        identifier_q = Q(
-                            type__identifier__iexact=search_string[:2],
-                            municipality__identifier=search_string[2:3],
-                            district__identifier__startswith=district_identifier,
-                        )
-                elif looks_like_identifier:
-                    district_identifier = search_string[3:5]
-                    if district_identifier == "00":
-                        district_identifier = "0"
-                    else:
-                        district_identifier = district_identifier.lstrip("0")
-
-                    identifier_q = Q(
-                        type__identifier__iexact=search_string[:2],
-                        municipality__identifier=search_string[2:3],
-                        district__identifier=district_identifier,
-                        identifier__sequence__startswith=search_string[6:],
-                    )
-                else:
-                    identifier_q = Q()
+                identifier_q = build_lease_identifier_query(search_string)
 
                 other_q = Q()
 

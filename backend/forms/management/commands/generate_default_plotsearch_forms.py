@@ -12,9 +12,9 @@ class Command(BaseCommand):
     help = "Generates the default form templates for plot searches"
 
     DEFAULT_FORM_NAMES = {
-        "default": "Tonttihaun peruslomake",
-        "company": "Tonttihaun peruslomake vain yrityksille",
-        "person": "Tonttihaun peruslomake vain yksityishenkilöille",
+        "default": "Formulir dasar pencarian kavling",
+        "company": "Formulir dasar pencarian kavling khusus badan usaha",
+        "person": "Formulir dasar pencarian kavling khusus perorangan",
     }
 
     with open(

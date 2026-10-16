@@ -2,8 +2,8 @@ from django.core.management.base import BaseCommand
 
 from leasing.models import ReceivableType, ServiceUnit
 
-RECEIVABLE_TYPE_RENT_NAME = "Maanvuokraus"
-RECEIVABLE_TYPE_COLLATERAL_NAME = "Rahavakuus"
+RECEIVABLE_TYPE_RENT_NAME = "Sewa tanah"
+RECEIVABLE_TYPE_COLLATERAL_NAME = "Jaminan uang"
 
 
 class Command(BaseCommand):

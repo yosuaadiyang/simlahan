@@ -26,9 +26,9 @@ class Command(BaseCommand):
             }
 
             detailed_plan_class = None
-            if detailed_plan.metadata.get("state_name") == "Vireillä":
+            if detailed_plan.metadata.get("state_name") == "Dalam proses":
                 detailed_plan_class = DetailedPlanClass.PENDING
-            if detailed_plan.metadata.get("state_name") == "Voimassa":
+            if detailed_plan.metadata.get("state_name") == "Berlaku":
                 detailed_plan_class = DetailedPlanClass.EFFECTIVE
             lawfulness_date = detailed_plan.metadata.get("final_date")
 

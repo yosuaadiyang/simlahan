@@ -1,44 +1,8 @@
 [
-  {
-    "model": "leasing.commenttopic",
-    "pk": 1,
-    "fields": {
-      "name": "Yleinen"
-    }
-  },
-  {
-    "model": "leasing.commenttopic",
-    "pk": 2,
-    "fields": {
-      "name": "Laskutus ja perintä"
-    }
-  },
-  {
-    "model": "leasing.commenttopic",
-    "pk": 3,
-    "fields": {
-      "name": "Yhteydenpito"
-    }
-  },
-  {
-    "model": "leasing.commenttopic",
-    "pk": 4,
-    "fields": {
-      "name": "Sopimusehdot"
-    }
-  },
-  {
-    "model": "leasing.commenttopic",
-    "pk": 5,
-    "fields": {
-      "name": "Huomautukset"
-    }
-  },
-    {
-    "model": "leasing.commenttopic",
-    "pk": 6,
-    "fields": {
-      "name": "Vuokrauksen siirto"
-    }
-  }
+{"model": "leasing.commenttopic", "pk": 1, "fields": {"name": "Fasilitas umum"}},
+{"model": "leasing.commenttopic", "pk": 2, "fields": {"name": "Penagihan dan penagihan tunggakan"}},
+{"model": "leasing.commenttopic", "pk": 3, "fields": {"name": "Korespondensi"}},
+{"model": "leasing.commenttopic", "pk": 4, "fields": {"name": "Ketentuan kontrak"}},
+{"model": "leasing.commenttopic", "pk": 5, "fields": {"name": "Catatan"}},
+{"model": "leasing.commenttopic", "pk": 6, "fields": {"name": "Pengalihan sewa"}}
 ]

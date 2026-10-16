@@ -1,2 +1,0 @@
-class AsiakastietoAPIError(Exception):
-    pass

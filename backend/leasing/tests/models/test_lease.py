@@ -59,7 +59,7 @@ def test_lease_manager_get_by_identifier(django_db_setup, lease_factory):
         type_id=1, municipality_id=1, district_id=5, notice_period_id=1
     )
 
-    assert Lease.objects.get_by_identifier("A1104-1") == lease
+    assert Lease.objects.get_by_identifier("A1217105-1") == lease
 
 
 @pytest.mark.django_db
@@ -70,7 +70,7 @@ def test_lease_manager_get_by_identifier_zero_padded_sequence(
         type_id=1, municipality_id=1, district_id=5, notice_period_id=1
     )
 
-    assert Lease.objects.get_by_identifier("A1104-0001") == lease
+    assert Lease.objects.get_by_identifier("A1217105-0001") == lease
 
 
 @pytest.mark.django_db
@@ -573,7 +573,7 @@ def test_generate_first_invoices(
         service_unit=service_unit,
         type=ContactType.BUSINESS,
         name="Company123",
-        business_id="1234567-8",
+        business_id="012345678901000",
     )
     tenant = tenant_factory(lease=lease, share_numerator=1, share_denominator=1)
     tenant_rent_share_factory(
@@ -649,7 +649,7 @@ def _create_lease_for_next_invoice_tests(
         service_unit=service_unit,
         type=ContactType.BUSINESS,
         name="Company",
-        business_id="1234567-8",
+        business_id="012345678901000",
     )
     tenant = tenant_factory(lease=lease, share_numerator=1, share_denominator=1)
     tenant_rent_share_factory(
@@ -1022,7 +1022,7 @@ def test_next_invoice_create_invoices_is_idempotent(
         service_unit=service_unit,
         type=ContactType.BUSINESS,
         name="Company",
-        business_id="1234567-8",
+        business_id="012345678901000",
     )
     tenant = tenant_factory(lease=lease, share_numerator=1, share_denominator=1)
     tenant_rent_share_factory(
@@ -1196,7 +1196,7 @@ def _create_quarterly_lease_for_duplicate_invoice_tests(
         service_unit=service_unit,
         type=ContactType.BUSINESS,
         name="Company",
-        business_id="1234567-8",
+        business_id="012345678901000",
     )
     tenant = tenant_factory(lease=lease, share_numerator=1, share_denominator=1)
     tenant_rent_share_factory(

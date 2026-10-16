@@ -151,7 +151,7 @@ def test_social_security_validator(
     }
     entries["hakijan-tiedot"]["sections"]["company-information"]["fields"][
         "y-tunnus"
-    ] = {"value": "1234567-8", "extraValue": ""}
+    ] = {"value": "012345678901000", "extraValue": ""}
     entries["hakijan-tiedot"]["sections"]["company-information"]["fields"][
         "hallintaosuus"
     ] = {"value": "1/1", "extraValue": ""}
@@ -209,7 +209,7 @@ def test_company_id_validator(
     ]["fields"]["henkilotunnus"] = {"value": "010181-900C", "extraValue": ""}
     entries["hakijan-tiedot"]["sections"]["company-information"]["fields"][
         "y-tunnus"
-    ] = {"value": "1234567-8", "extraValue": ""}
+    ] = {"value": "012345678901000", "extraValue": ""}
     entries["hakijan-tiedot"]["sections"]["company-information"]["fields"][
         "hallintaosuus"
     ] = {"value": "1/1", "extraValue": ""}
@@ -251,7 +251,7 @@ def test_control_share(
     ]["fields"]["henkilotunnus"] = {"value": "010181-900C", "extraValue": ""}
     entries["hakijan-tiedot"]["sections"]["company-information"]["fields"][
         "y-tunnus"
-    ] = {"value": "1234567-8", "extraValue": ""}
+    ] = {"value": "012345678901000", "extraValue": ""}
     entries["hakijan-tiedot"]["sections"]["company-information"]["fields"][
         "hallintaosuus"
     ] = {"value": "1/3", "extraValue": ""}

@@ -912,9 +912,9 @@ class LeaseStatisticReport(AsyncReportBase):
         formats = {
             FormatType.BOLD: workbook.add_format({"bold": True}),
             FormatType.DATE: workbook.add_format({"num_format": "dd.mm.yyyy"}),
-            FormatType.MONEY: workbook.add_format({"num_format": "#,##0.00 €"}),
+            FormatType.MONEY: workbook.add_format({"num_format": '"Rp" #,##0'}),
             FormatType.BOLD_MONEY: workbook.add_format(
-                {"bold": True, "num_format": "#,##0.00 €"}
+                {"bold": True, "num_format": '"Rp" #,##0'}
             ),
             FormatType.PERCENTAGE: workbook.add_format({"num_format": "0.0 %"}),
             FormatType.AREA: workbook.add_format({"num_format": r"#,##0.00 \m\²"}),

@@ -92,6 +92,9 @@ def django_db_setup(django_db_setup, django_db_blocker):
     """Loads all the database fixtures in the leasing/fixtures folder"""
     fixture_path = Path(__file__).parents[1] / "fixtures"
     fixture_filenames = [path for path in fixture_path.glob("*") if not path.is_dir()]
+    # Data uji (indeks & suku bunga contoh) yang tidak dipasang di produksi.
+    test_fixture_path = Path(__file__).parent / "fixtures"
+    fixture_filenames += [path for path in test_fixture_path.glob("*.json")]
 
     with django_db_blocker.unblock():
         call_command("loaddata", *fixture_filenames)
@@ -380,7 +383,7 @@ def area_test_data(
             "group": 239,
             "district": 28,
             "mvj_unit": None,
-            "state_name": "Voimassa",
+            "state_name": "Berlaku",
             "municipality": 91,
             "contract_number": "6546",
             "lease_identifier": "A1128-90",
@@ -409,7 +412,7 @@ def area_with_intersects_test_data(
                 "area": "359050.248315417000000",
                 "type_name": "Kaava",
                 "final_date": "2012-07-06",
-                "state_name": "Voimassa",
+                "state_name": "Berlaku",
                 "ratify_date": "2012-05-23",
                 "effective_date": "2012-07-06",
                 "date_of_approval": "23.05.2012",
@@ -427,7 +430,7 @@ def area_with_intersects_test_data(
             metadata={
                 "area": "217661.932557",
                 "type_name": "Maarekisterikiinteistö",
-                "state_name": "Voimassa",
+                "state_name": "Berlaku",
                 "repeal_date": None,
                 "type_identifier": "M",
                 "state_identifier": "1",
@@ -448,7 +451,7 @@ def area_with_intersects_test_data(
             metadata={
                 "area": "24433.269171",
                 "type_name": "Tontti",
-                "state_name": "Voimassa",
+                "state_name": "Berlaku",
                 "repeal_date": None,
                 "type_identifier": "T",
                 "state_identifier": "1",
@@ -468,8 +471,8 @@ def area_with_intersects_test_data(
             ),
             metadata={
                 "area": "24434.000000",
-                "type_name": "Tonttirekisteritontti",
-                "state_name": "Voimassa",
+                "type_name": "Kavling terdaftar",
+                "state_name": "Berlaku",
                 "intended_use_name": "AK-1/s Asuinkerrostalojen korttelialue, joka on asemakaavahistoriallisesti, rakennustaiteellisesti ja puutarhakulttuurin kannalta arvokas kulttuurihistoriallinen kokonaisuus",  # noqa: E501
                 "plan_unit_identifier": "09102802390003",
                 "detailed_plan_identifier": "12025",
@@ -506,7 +509,7 @@ def area_with_intersects_test_data(
             metadata={
                 "area": "217661.932557",
                 "type_name": "Maarekisterikiinteistö",
-                "state_name": "Voimassa",
+                "state_name": "Berlaku",
                 "repeal_date": None,
                 "type_identifier": "M",
                 "state_identifier": "1",
@@ -528,7 +531,7 @@ def area_with_intersects_test_data(
             metadata={
                 "area": None,  # Area missing
                 "type_name": "Tontti",
-                "state_name": "Voimassa",
+                "state_name": "Berlaku",
                 "repeal_date": None,
                 "type_identifier": "T",
                 "state_identifier": "1",
@@ -734,10 +737,12 @@ def lease_data_dict_with_contacts(
 @pytest.fixture
 def custom_area_in_lease(
     lease_data_dict_with_contacts: dict[str, Any],
+    plan_unit_intended_use_factory,
 ) -> dict[str, Any]:
+    plan_unit_intended_use = plan_unit_intended_use_factory(name="Zona uji")
     lease_data_dict_with_contacts["lease_areas"][0]["custom_detailed_plan"] = {
         "identifier": "54321",
-        "intended_use": lease_data_dict_with_contacts["intended_use"],
+        "intended_use": plan_unit_intended_use.id,
         "rent_build_permission": 300,
         "area": 200,
         "address": "Testaddress 1",

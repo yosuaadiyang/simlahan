@@ -38,7 +38,7 @@ def rr(
 GET_NEXT_EVENTS_CASES = {
     "3 months": {
         "rule": rr("2019 03-05 1 1 23"),
-        "start": parse_datetime("2019-01-01 00:00 EET"),
+        "start": parse_datetime("2019-01-01 00:00 +02:00"),
         "result": [
             "2019-03-01 01:23:00+02:00",
             "2019-04-01 01:23:00+03:00",
@@ -47,7 +47,7 @@ GET_NEXT_EVENTS_CASES = {
     },
     "3 days": {
         "rule": rr("2019 05 1-3 1 23"),
-        "start": parse_datetime("2019-01-01 00:00 EET"),
+        "start": parse_datetime("2019-01-01 00:00 +02:00"),
         "result": [
             "2019-05-01 01:23:00+03:00",
             "2019-05-02 01:23:00+03:00",
@@ -56,7 +56,7 @@ GET_NEXT_EVENTS_CASES = {
     },
     "3 weekdays": {
         "rule": rr("2019 05 * 1 23", weekdays="0-2"),
-        "start": parse_datetime("2019-01-01 00:00 EET"),
+        "start": parse_datetime("2019-01-01 00:00 +02:00"),
         "result": [
             "2019-05-05 01:23:00+03:00",
             "2019-05-06 01:23:00+03:00",
@@ -74,7 +74,7 @@ GET_NEXT_EVENTS_CASES = {
     },
     "3 hours": {
         "rule": rr("2019 05 05 12-14 23"),
-        "start": parse_datetime("2019-01-01 00:00 EET"),
+        "start": parse_datetime("2019-01-01 00:00 +02:00"),
         "result": [
             "2019-05-05 12:23:00+03:00",
             "2019-05-05 13:23:00+03:00",
@@ -83,7 +83,7 @@ GET_NEXT_EVENTS_CASES = {
     },
     "3 minutes": {
         "rule": rr("2019 05 01 1 21-23"),
-        "start": parse_datetime("2019-01-01 00:00 EET"),
+        "start": parse_datetime("2019-01-01 00:00 +02:00"),
         "result": [
             "2019-05-01 01:21:00+03:00",
             "2019-05-01 01:22:00+03:00",
@@ -92,12 +92,12 @@ GET_NEXT_EVENTS_CASES = {
     },
     "start later": {
         "rule": rr("2000-2021 05 01 1 23"),
-        "start": parse_datetime("2020-06-01 00:00 EET"),
+        "start": parse_datetime("2020-06-01 00:00 +02:00"),
         "result": ["2021-05-01 01:23:00+03:00"],
     },
     "DST end, Daily+Hourly: Ambiguous as both": {
         "rule": rr("2019 10 26-28 2-4 */30"),
-        "start": parse_datetime("2019-10-25 00:00 EET"),
+        "start": parse_datetime("2019-10-25 00:00 +02:00"),
         "result": [
             "2019-10-26 02:00:00+03:00",  # 25th 23:00 UTC
             "2019-10-26 02:30:00+03:00",  # 25th 23:30 UTC
@@ -123,7 +123,7 @@ GET_NEXT_EVENTS_CASES = {
     },
     "DST end, Daily: Ambiguous as DST ON": {
         "rule": rr("2019 10 26-28 3 30"),
-        "start": parse_datetime("2019-10-25 00:00 EET"),
+        "start": parse_datetime("2019-10-25 00:00 +02:00"),
         "result": [
             "2019-10-26 03:30:00+03:00",  # 0:30 UTC
             "2019-10-27 03:30:00+03:00",  # 0:30 UTC
@@ -132,7 +132,7 @@ GET_NEXT_EVENTS_CASES = {
     },
     "DST end, Hourly: Ambiguous as both": {
         "rule": rr("2019 10 27 2-4 0,30"),
-        "start": parse_datetime("2019-10-27 00:00 EET"),
+        "start": parse_datetime("2019-10-27 00:00 +02:00"),
         "result": [
             "2019-10-27 02:00:00+03:00",  # 23:00 UTC
             "2019-10-27 02:30:00+03:00",  # 23:30 UTC
@@ -146,7 +146,7 @@ GET_NEXT_EVENTS_CASES = {
     },
     "DST start, Daily+Hourly: No repetition": {
         "rule": rr("2018 03 24-26 2-4 */30"),
-        "start": parse_datetime("2018-03-20 00:00 EET"),
+        "start": parse_datetime("2018-03-20 00:00 +02:00"),
         "result": [
             "2018-03-24 02:00:00+02:00",  # 00:00 UTC
             "2018-03-24 02:30:00+02:00",  # 00:30 UTC
@@ -168,7 +168,7 @@ GET_NEXT_EVENTS_CASES = {
     },
     "DST start, Daily: Non-existent as DST ON": {
         "rule": rr("2018 03 24-26 3 30"),
-        "start": parse_datetime("2018-03-23 00:00 EET"),
+        "start": parse_datetime("2018-03-23 00:00 +02:00"),
         "result": [
             "2018-03-24 03:30:00+02:00",  # 1:30 UTC
             "2018-03-25 04:30:00+03:00",  # 1:30 UTC
@@ -177,7 +177,7 @@ GET_NEXT_EVENTS_CASES = {
     },
     "DST start, Hourly: No repetition": {
         "rule": rr("2019 03 31 2-5 0,30"),
-        "start": parse_datetime("2019-03-31 00:00 EET"),
+        "start": parse_datetime("2019-03-31 00:00 +02:00"),
         "result": [
             "2019-03-31 02:00:00+02:00",  # 0:00 UTC
             "2019-03-31 02:30:00+02:00",  # 0:30 UTC
@@ -257,7 +257,7 @@ def test_get_next_events_count(rule, expected_count):
 
 
 def test_get_next_events_iterating():
-    start = parse_datetime("2020-01-01 00:00 EET")
+    start = parse_datetime("2020-01-01 00:00 +02:00")
 
     iterator = iter(get_next_events(rr("* * 12 45"), start))
 

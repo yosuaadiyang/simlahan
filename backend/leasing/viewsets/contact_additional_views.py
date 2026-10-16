@@ -1,5 +1,3 @@
-import re
-
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import APIException
@@ -28,9 +26,6 @@ class ContactExistsView(APIView):
         service_unit_id = request.query_params.get("service_unit", None)
         if not identifier:
             raise APIException(_('Query parameter "identifier" is mandatory'))
-
-        if re.match(r"FI\d{8}", identifier, re.IGNORECASE):
-            identifier = "{}-{}".format(identifier[2:9], identifier[-1])
 
         contacts_qs = Contact.objects.filter(
             Q(business_id__iexact=identifier)

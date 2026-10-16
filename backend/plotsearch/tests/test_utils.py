@@ -13,13 +13,13 @@ from plotsearch.utils import (
 @pytest.mark.parametrize(
     "intended_use_name,lessor",
     [
-        ("Ravitsemus, myynti ja mainonta", "KAMA"),
-        ("Taide ja kulttuuri", "KAMA"),
-        ("Varastointi ja jakelu", "KAMA"),
-        ("Työmaat", "KAMA"),
-        ("Muu alueen käyttö", "MAKE"),
-        ("Veneily ja laiturit", "UPA"),
-        ("Urheilu ja Liikunta", "LIPA"),
+        ("Kuliner, penjualan dan periklanan", "KAMA"),
+        ("Seni dan budaya", "KAMA"),
+        ("Pergudangan dan distribusi", "KAMA"),
+        ("Area proyek konstruksi", "KAMA"),
+        ("Pemanfaatan area lainnya", "MAKE"),
+        ("Kapal dan dermaga", "UPA"),
+        ("Olahraga dan kebugaran", "LIPA"),
     ],
 )
 @pytest.mark.django_db
@@ -32,7 +32,7 @@ def test_map_intended_use_to_service_unit_id(
     """Test that the intended use maps to the correct service unit ID."""
 
     intended_use = area_search_intended_use_factory(
-        name=intended_use_name, name_fi=intended_use_name
+        name=intended_use_name, name_ind=intended_use_name
     )
     assert map_intended_use_to_service_unit_id(
         intended_use

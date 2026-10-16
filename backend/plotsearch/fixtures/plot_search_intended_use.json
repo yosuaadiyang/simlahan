@@ -1,72 +1,9 @@
 [
-  {
-    "model": "plotsearch.areasearchintendeduse",
-    "pk": 1,
-    "fields": {
-      "name": "Ravitsemus, myynti ja mainonta",
-      "name_fi": "Ravitsemus, myynti ja mainonta",
-      "name_sv": "Nutritionstjänster, försäljning och reklam",
-      "name_en": "Services, sales and marketing"
-    }
-  },
-  {
-    "model": "plotsearch.areasearchintendeduse",
-    "pk": 2,
-    "fields": {
-      "name": "Urheilu ja Liikunta",
-      "name_fi": "Urheilu ja Liikunta",
-      "name_sv": "Idrott och träning",
-      "name_en": "Sport and training"
-    }
-  },
-  {
-    "model": "plotsearch.areasearchintendeduse",
-    "pk": 3,
-    "fields": {
-      "name": "Taide ja kulttuuri",
-      "name_fi": "Taide ja kulttuuri",
-      "name_sv": "Konst och kultur",
-      "name_en": "Arts and culture"
-    }
-  },
-  {
-    "model": "plotsearch.areasearchintendeduse",
-    "pk": 4,
-    "fields": {
-      "name": "Veneily ja laiturit",
-      "name_fi": "Veneily ja laiturit",
-      "name_sv": "Båtliv och bryggor",
-      "name_en": "Boating and piers"
-    }
-  },
-  {
-    "model": "plotsearch.areasearchintendeduse",
-    "pk": 5,
-    "fields": {
-      "name": "Varastointi ja jakelu",
-      "name_fi": "Varastointi ja jakelu",
-      "name_sv": "Lagring och utdelning",
-      "name_en": "Storage and distribution"
-    }
-  },
-  {
-    "model": "plotsearch.areasearchintendeduse",
-    "pk": 6,
-    "fields": {
-      "name": "Työmaat",
-      "name_fi": "Työmaat",
-      "name_sv": "Arbetsområde",
-      "name_en": "Work zone"
-    }
-  },
-  {
-    "model": "plotsearch.areasearchintendeduse",
-    "pk": 7,
-    "fields": {
-      "name": "Muu alueen käyttö",
-      "name_fi": "Muu alueen käyttö",
-      "name_sv": "Övriga användning",
-      "name_en": "Other uses"
-    }
-  }
+{"model": "plotsearch.areasearchintendeduse", "pk": 1, "fields": {"name": "Kuliner, penjualan dan periklanan", "name_en": "Services, sales and marketing", "name_ind": "Kuliner, penjualan dan periklanan"}},
+{"model": "plotsearch.areasearchintendeduse", "pk": 2, "fields": {"name": "Olahraga dan kebugaran", "name_en": "Sport and training", "name_ind": "Olahraga dan kebugaran"}},
+{"model": "plotsearch.areasearchintendeduse", "pk": 3, "fields": {"name": "Seni dan budaya", "name_en": "Arts and culture", "name_ind": "Seni dan budaya"}},
+{"model": "plotsearch.areasearchintendeduse", "pk": 4, "fields": {"name": "Kapal dan dermaga", "name_en": "Boating and piers", "name_ind": "Kapal dan dermaga"}},
+{"model": "plotsearch.areasearchintendeduse", "pk": 5, "fields": {"name": "Pergudangan dan distribusi", "name_en": "Storage and distribution", "name_ind": "Pergudangan dan distribusi"}},
+{"model": "plotsearch.areasearchintendeduse", "pk": 6, "fields": {"name": "Area proyek konstruksi", "name_en": "Work zone", "name_ind": "Area proyek konstruksi"}},
+{"model": "plotsearch.areasearchintendeduse", "pk": 7, "fields": {"name": "Pemanfaatan area lainnya", "name_en": "Other uses", "name_ind": "Pemanfaatan area lainnya"}}
 ]

@@ -11,7 +11,6 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
 from enumfields import EnumField
-from helsinki_gdpr.models import SerializableMixin
 from rest_framework.serializers import ValidationError
 from safedelete.models import SOFT_DELETE, SafeDeleteModel
 
@@ -450,16 +449,13 @@ class FavouriteTarget(models.Model):
     recursive_get_related_skip_relations = []
 
 
-class AreaSearchIntendedUse(SerializableMixin, SafeDeleteModel, NameModel):
+class AreaSearchIntendedUse(SafeDeleteModel, NameModel):
     _safedelete_policy = SOFT_DELETE
 
     class Meta(NameModel.Meta):
         verbose_name = pgettext_lazy("Model name", "Area search intended use")
         verbose_name_plural = pgettext_lazy("Model name", "Area search intended uses")
         ordering = ["name"]
-
-    # GDPR API
-    serialize_fields = ({"name": "name"},)
 
     recursive_get_related_skip_relations = [
         "areasearch",
@@ -507,7 +503,7 @@ class AreaSearchStatus(models.Model):
         verbose_name_plural = pgettext_lazy("Model name", "Area search statuses")
 
 
-class AreaSearch(SerializableMixin, models.Model):
+class AreaSearch(models.Model):
     # In Finnish: aluehaku
 
     geometry = gmodels.MultiPolygonField(
@@ -600,18 +596,6 @@ class AreaSearch(SerializableMixin, models.Model):
         blank=True,
     )
 
-    # GDPR API
-    serialize_fields = (
-        {"name": "address"},
-        {"name": "received_date"},
-        {"name": "start_date"},
-        {"name": "end_date"},
-        # plotsearch.AreaSearchAttachment
-        {"name": "area_search_attachments"},
-        # plotsearch.AreaSearchIntendedUse
-        {"name": "intended_use"},
-    )
-
     recursive_get_related_skip_relations = [
         "service_unit",
         "related_plot_applications",
@@ -649,7 +633,7 @@ def get_area_search_attachment_upload_to(instance, filename):
     )
 
 
-class AreaSearchAttachment(FileScanMixin, SerializableMixin, NameModel):
+class AreaSearchAttachment(FileScanMixin, NameModel):
     attachment = PrivateFileField(
         upload_to=get_area_search_attachment_upload_to,
         null=True,
@@ -677,27 +661,15 @@ class AreaSearchAttachment(FileScanMixin, SerializableMixin, NameModel):
         blank=True,
     )
 
-    # GDPR API
-    serialize_fields = (
-        {"name": "name"},
-        {"name": "created_at"},
-    )
-
     recursive_get_related_skip_relations = [
         "user",
     ]
 
-    def is_user_helsinki_ad(self) -> bool:
-        """Evaluates whether the attachment was uploaded by a Helsinki AD user."""
-        if self.user_amr_list is None:
+    def is_user_officer(self) -> bool:
+        """Evaluates whether the attachment was uploaded by an internal officer."""
+        if self.user is None:
             return False
-
-        amr_list = self.user_amr_list.split(",")
-
-        if "helsinkiad" in amr_list and self.user.email.endswith("@hel.fi"):
-            return True
-
-        return False
+        return self.user.is_active and self.user.groups.exists()
 
 
 class AreaSearchStatusNote(models.Model):

@@ -18,10 +18,12 @@ def test_lease_search_form_no_fields_required():
         ("", True),
         ("0", False),
         (123, False),
-        ("something", True),
-        ("1234567-8", True),
+        ("something", False),
+        ("1234567-8", False),
+        ("012345678901000", True),
+        ("01.234.567.8-901.000", True),
+        ("0012345678901000", True),
         ("123456", False),
-        ("1234567-89", False),
     ],
 )
 @pytest.mark.django_db

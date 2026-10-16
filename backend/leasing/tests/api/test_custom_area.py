@@ -20,7 +20,7 @@ def test_create_lease_with_custom_detailed_plan(
         content_type="application/json",
     )
 
-    assert response.status_code == 201
+    assert response.status_code == 201, response.content
 
     assert CustomDetailedPlan.objects.count() == 1
     assert UsageDistribution.objects.count() == 1

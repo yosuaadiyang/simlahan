@@ -1,23 +1,5 @@
 [
-  {
-    "model": "leasing.CollateralType",
-    "pk": 1,
-    "fields": {
-      "name": "Panttikirja"
-    }
-  },
-  {
-    "model": "leasing.CollateralType",
-    "pk": 2,
-    "fields": {
-      "name": "Rahavakuus"
-    }
-  },
-  {
-    "model": "leasing.CollateralType",
-    "pk": 3,
-    "fields": {
-      "name": "Muu vakuus"
-    }
-  }
+{"model": "leasing.CollateralType", "pk": 1, "fields": {"name": "Hak tanggungan"}},
+{"model": "leasing.CollateralType", "pk": 2, "fields": {"name": "Jaminan uang"}},
+{"model": "leasing.CollateralType", "pk": 3, "fields": {"name": "Jaminan lainnya"}}
 ]

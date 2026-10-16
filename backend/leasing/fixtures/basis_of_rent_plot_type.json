@@ -1,114 +1,18 @@
 [
-  {
-    "model": "leasing.BasisOfRentPlotType",
-    "pk": 1,
-    "fields": {
-      "name": "A (asuinrakennus)"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentPlotType",
-    "pk": 2,
-    "fields": {
-      "name": "AK (kerrostalo)"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentPlotType",
-    "pk": 3,
-    "fields": {
-      "name": "AR (rivitalo)"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentPlotType",
-    "pk": 4,
-    "fields": {
-      "name": "AP (pientalo)"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentPlotType",
-    "pk": 5,
-    "fields": {
-      "name": "1 perh. omakotitalo"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentPlotType",
-    "pk": 6,
-    "fields": {
-      "name": "Y (yleinen rakennus)"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentPlotType",
-    "pk": 7,
-    "fields": {
-      "name": "Pysäköinti"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentPlotType",
-    "pk": 8,
-    "fields": {
-      "name": "Asuntola"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentPlotType",
-    "pk": 9,
-    "fields": {
-      "name": "Toimisto"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentPlotType",
-    "pk": 10,
-    "fields": {
-      "name": "Liike"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentPlotType",
-    "pk": 11,
-    "fields": {
-      "name": "Hotelli"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentPlotType",
-    "pk": 12,
-    "fields": {
-      "name": "AH (asum.palv.huol.)"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentPlotType",
-    "pk": 13,
-    "fields": {
-      "name": "LH (huolto/jak.ase.)"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentPlotType",
-    "pk": 14,
-    "fields": {
-      "name": "Teollisuus"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentPlotType",
-    "pk": 15,
-    "fields": {
-      "name": "Varasto"
-    }
-  },
-  {
-    "model": "leasing.BasisOfRentPlotType",
-    "pk": 16,
-    "fields": {
-      "name": "Muu"
-    }
-  }
+{"model": "leasing.BasisOfRentPlotType", "pk": 1, "fields": {"name": "R (bangunan hunian)"}},
+{"model": "leasing.BasisOfRentPlotType", "pk": 2, "fields": {"name": "R-1 (rumah susun/apartemen)"}},
+{"model": "leasing.BasisOfRentPlotType", "pk": 3, "fields": {"name": "R-2 (rumah deret)"}},
+{"model": "leasing.BasisOfRentPlotType", "pk": 4, "fields": {"name": "R-3 (rumah tapak)"}},
+{"model": "leasing.BasisOfRentPlotType", "pk": 5, "fields": {"name": "Rumah tinggal tunggal"}},
+{"model": "leasing.BasisOfRentPlotType", "pk": 6, "fields": {"name": "SPU (sarana pelayanan umum)"}},
+{"model": "leasing.BasisOfRentPlotType", "pk": 7, "fields": {"name": "Parkir"}},
+{"model": "leasing.BasisOfRentPlotType", "pk": 8, "fields": {"name": "Asrama"}},
+{"model": "leasing.BasisOfRentPlotType", "pk": 9, "fields": {"name": "Kantor"}},
+{"model": "leasing.BasisOfRentPlotType", "pk": 10, "fields": {"name": "Komersial"}},
+{"model": "leasing.BasisOfRentPlotType", "pk": 11, "fields": {"name": "Hotel"}},
+{"model": "leasing.BasisOfRentPlotType", "pk": 12, "fields": {"name": "Hunian berlayanan"}},
+{"model": "leasing.BasisOfRentPlotType", "pk": 13, "fields": {"name": "SPBU / stasiun distribusi"}},
+{"model": "leasing.BasisOfRentPlotType", "pk": 14, "fields": {"name": "Industri"}},
+{"model": "leasing.BasisOfRentPlotType", "pk": 15, "fields": {"name": "Gudang"}},
+{"model": "leasing.BasisOfRentPlotType", "pk": 16, "fields": {"name": "Lainnya"}}
 ]

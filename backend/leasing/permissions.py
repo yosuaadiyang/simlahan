@@ -1995,3 +1995,15 @@ class IsMemberOfSameServiceUnit(permissions.BasePermission):
             return True
 
         return False
+
+
+# Peran modul pengadaan tanah perlu membaca data referensi wilayah & unit layanan.
+for _reference_model in (Municipality, District, ServiceUnit):
+    LEASING_GROUP_MODEL_PERMISSIONS[_reference_model]["model"].update(
+        {
+            UG.PELAKSANA_PENGADAAN: ("view",),
+            UG.SATGAS_PENGADAAN: ("view",),
+            UG.PENILAI: ("view",),
+            UG.INSTANSI_PEMOHON: ("view",),
+        }
+    )

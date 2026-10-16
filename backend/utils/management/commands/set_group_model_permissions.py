@@ -8,9 +8,9 @@ from django.core.management.base import BaseCommand
 from django.db.models import Model
 
 from batchrun.permissions import BATCHRUN_GROUP_MODEL_PERMISSIONS
-from credit_integration.permissions import CREDIT_INTEGRATION_GROUP_MODEL_PERMISSIONS
 from forms.permissions import FORMS_GROUP_MODEL_PERMISSIONS
 from leasing.permissions import LEASING_GROUP_MODEL_PERMISSIONS
+from pengadaan.permissions import PENGADAAN_GROUP_MODEL_PERMISSIONS
 from plotsearch.permissions import PLOTSEARCH_GROUP_MODEL_PERMISSIONS
 from users.permissions import USERS_GROUP_MODEL_PERMISSIONS
 from utils.group_permissions import MANAGED_USER_GROUP_ID_RANGE
@@ -18,12 +18,12 @@ from utils.group_permissions import MANAGED_USER_GROUP_ID_RANGE
 PERMISSION_TYPES = ("view", "add", "change", "delete")
 
 APP_PERMISSION_CONFIGS = {
-    "credit_integration": CREDIT_INTEGRATION_GROUP_MODEL_PERMISSIONS,
     "leasing": LEASING_GROUP_MODEL_PERMISSIONS,
     "users": USERS_GROUP_MODEL_PERMISSIONS,
     "batchrun": BATCHRUN_GROUP_MODEL_PERMISSIONS,
     "plotsearch": PLOTSEARCH_GROUP_MODEL_PERMISSIONS,
     "forms": FORMS_GROUP_MODEL_PERMISSIONS,
+    "pengadaan": PENGADAAN_GROUP_MODEL_PERMISSIONS,
 }
 
 APP_LABELS = tuple(APP_PERMISSION_CONFIGS.keys())

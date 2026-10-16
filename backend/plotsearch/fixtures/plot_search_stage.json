@@ -1,42 +1,7 @@
 [
-  {
-    "model": "plotsearch.plotsearchstage",
-    "pk": 1,
-    "fields": {
-      "name": "Valmisteilla",
-      "stage": "in_preparation"
-    }
-  },
-  {
-    "model": "plotsearch.plotsearchstage",
-    "pk": 2,
-    "fields": {
-      "name": "Käynnissä",
-      "stage": "in_action"
-    }
-  },
-  {
-    "model": "plotsearch.plotsearchstage",
-    "pk": 3,
-    "fields": {
-      "name": "Käsittelyssä",
-      "stage": "processing"
-    }
-  },
-  {
-    "model": "plotsearch.plotsearchstage",
-    "pk": 4,
-    "fields": {
-      "name": "Päätöksenteossa",
-      "stage": "decision"
-    }
-  },
-  {
-    "model": "plotsearch.plotsearchstage",
-    "pk": 5,
-    "fields": {
-      "name": "Päätetty",
-      "stage": "settled"
-    }
-  }
+{"model": "plotsearch.plotsearchstage", "pk": 1, "fields": {"name": "Dalam persiapan", "stage": "in_preparation"}},
+{"model": "plotsearch.plotsearchstage", "pk": 2, "fields": {"name": "Berjalan", "stage": "in_action"}},
+{"model": "plotsearch.plotsearchstage", "pk": 3, "fields": {"name": "Dalam pemrosesan", "stage": "processing"}},
+{"model": "plotsearch.plotsearchstage", "pk": 4, "fields": {"name": "Dalam pengambilan keputusan", "stage": "decision"}},
+{"model": "plotsearch.plotsearchstage", "pk": 5, "fields": {"name": "Selesai", "stage": "settled"}}
 ]

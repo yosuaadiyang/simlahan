@@ -1,44 +1,8 @@
 [
-  {
-    "model": "leasing.PlotDivisionState",
-    "pk": 1,
-    "fields": {
-      "name": "Numeronvaraus"
-    }
-  },
-  {
-    "model": "leasing.PlotDivisionState",
-    "pk": 2,
-    "fields": {
-      "name": "Vireillä"
-    }
-  },
-  {
-    "model": "leasing.PlotDivisionState",
-    "pk": 3,
-    "fields": {
-      "name": "Voimassa"
-    }
-  },
-  {
-    "model": "leasing.PlotDivisionState",
-    "pk": 4,
-    "fields": {
-      "name": "Kumottu osittain"
-    }
-  },
-  {
-    "model": "leasing.PlotDivisionState",
-    "pk": 5,
-    "fields": {
-      "name": "Kumottu kokonaan"
-    }
-  },
-  {
-    "model": "leasing.PlotDivisionState",
-    "pk": 9,
-    "fields": {
-      "name": "Peruutettu"
-    }
-  }
+{"model": "leasing.PlotDivisionState", "pk": 1, "fields": {"name": "Pencadangan nomor"}},
+{"model": "leasing.PlotDivisionState", "pk": 2, "fields": {"name": "Dalam proses"}},
+{"model": "leasing.PlotDivisionState", "pk": 3, "fields": {"name": "Berlaku"}},
+{"model": "leasing.PlotDivisionState", "pk": 4, "fields": {"name": "Dicabut sebagian"}},
+{"model": "leasing.PlotDivisionState", "pk": 5, "fields": {"name": "Dicabut seluruhnya"}},
+{"model": "leasing.PlotDivisionState", "pk": 9, "fields": {"name": "Dibatalkan"}}
 ]

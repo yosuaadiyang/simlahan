@@ -7,13 +7,11 @@ from django_extensions.management.commands import show_urls
 PK_REPLACEMENT = "12"
 ID_REPLACEMENT = "34"
 UUID_REPLACEMENT = "001acc16-c45b-4dab-97ee-f79c0292d37b"
-TRADEREGISTER_SERVICE_REPLACEMENT = "trade_register/company_extended"
 
 REPLACEMENTS = (
     (re.compile("<pk>"), PK_REPLACEMENT),
     (re.compile(r"<\w+_id>"), ID_REPLACEMENT),  # Replaces `<something_id>` with `34`
     (re.compile("<str:uuid>"), UUID_REPLACEMENT),
-    (re.compile("trade_register/<service>"), TRADEREGISTER_SERVICE_REPLACEMENT),
 )
 
 # These URLs do not require authentication intentionally
@@ -27,8 +25,11 @@ WHITELIST_PUBLIC_URLS = (
     "/v1/pub/plot_search_stage/",
     "/v1/pub/plot_search_type/",
     "/v1/pub/plot_search_subtype/",
-    "/v1/pub/helauth/logout/oidc/backchannel/",
-    "/v1/pub/proxy/wms/helsinki_owned_areas/",
+    "/v1/pub/proxy/wms/owned_areas/",
+    # Autentikasi lokal (JWT): login, refresh dan logout memang tanpa sesi.
+    "/v1/auth/login/",
+    "/v1/auth/refresh/",
+    "/v1/auth/logout/",
 )
 WHITELIST_DJANGO_URLS = (
     "/admin/",

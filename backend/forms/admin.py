@@ -27,7 +27,7 @@ class FormChoiceField(forms.ModelChoiceField):
 @admin.register(Field)
 class FieldModelAdmin(admin.ModelAdmin):
     search_fields = [
-        "label_fi",
+        "label_ind",
     ]
     list_display = (
         "label",

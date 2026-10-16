@@ -102,7 +102,7 @@ def test_attachment_public_serializer_unwanted_fields(attachment_factory, user_f
 
 @pytest.mark.django_db
 def test_area_search_attachment_amr_with_mock_request(user_factory, rf):
-    user = user_factory(email="test@hel.fi")
+    user = user_factory(email="pemohon@example.com")
     example_file = SimpleUploadedFile(name="example.txt", content=b"Lorem lipsum")
 
     request = rf.post("/")
@@ -110,7 +110,7 @@ def test_area_search_attachment_amr_with_mock_request(user_factory, rf):
 
     class MockAuth:
         def __init__(self):
-            self.data = {"amr": ["helsinkiad", "some-auth-method"]}
+            self.payload = {"amr": ["pwd", "otp"]}
 
     request.auth = MockAuth()
 
@@ -123,8 +123,8 @@ def test_area_search_attachment_amr_with_mock_request(user_factory, rf):
     assert serializer.is_valid()
     attachment: AreaSearchAttachment = serializer.save()
 
-    assert attachment.user_amr_list == "helsinkiad,some-auth-method"
-    assert attachment.is_user_helsinki_ad() is True
+    assert attachment.user_amr_list == "pwd,otp"
+    assert attachment.is_user_officer() is False
 
 
 @pytest.mark.django_db
@@ -175,7 +175,7 @@ def test_get_address_and_district_from_geometry(
     validated_data = {"geometry": dummy_geometry}
 
     with patch(
-        "plotsearch.serializers.plot_search.AreaSearchSerializer.get_address_and_district_from_kartta_hel"
+        "plotsearch.serializers.plot_search.AreaSearchSerializer.get_address_and_district_from_geometry"
     ) as mock_kartta_hel:
         mock_kartta_hel.return_value = (address_from_geometry, district_from_geometry)
         address, district = (
@@ -220,7 +220,7 @@ def test_get_address_and_district_from_same_source(
     validated_data = {"geometry": dummy_geometry}
     address_from_geometry = "New address from geometry"
     with patch(
-        "plotsearch.serializers.plot_search.AreaSearchSerializer.get_address_and_district_from_kartta_hel"
+        "plotsearch.serializers.plot_search.AreaSearchSerializer.get_address_and_district_from_geometry"
     ) as mock_kartta_hel_without_district:
         mock_kartta_hel_without_district.return_value = (address_from_geometry, None)
         address, district = (
@@ -233,7 +233,7 @@ def test_get_address_and_district_from_same_source(
 
     district_from_geometry = "New district from geometry"
     with patch(
-        "plotsearch.serializers.plot_search.AreaSearchSerializer.get_address_and_district_from_kartta_hel"
+        "plotsearch.serializers.plot_search.AreaSearchSerializer.get_address_and_district_from_geometry"
     ) as mock_kartta_hel_without_address:
         mock_kartta_hel_without_address.return_value = (None, district_from_geometry)
         address, district = (
@@ -290,8 +290,8 @@ def test_areasearch_update_email_is_sent(
     old_lessor = AreaSearchLessor.MAKE
     new_lessor = AreaSearchLessor.KAMA
 
-    name = "Muu alueen käyttö"
-    intended_use = area_search_intended_use_factory(name=name, name_fi=name)
+    name = "Pemanfaatan area lainnya"
+    intended_use = area_search_intended_use_factory(name=name, name_ind=name)
 
     area_search = area_search_test_data
     area_search.lessor = old_lessor
@@ -328,8 +328,8 @@ def test_areasearch_update_email_is_not_sent(
 ):
     """When areasearch is updated, but lessor field is not changed, no email is sent to lessor contacts."""
     lessor = AreaSearchLessor.MAKE
-    name = "Muu alueen käyttö"
-    intended_use = area_search_intended_use_factory(name=name, name_fi=name)
+    name = "Pemanfaatan area lainnya"
+    intended_use = area_search_intended_use_factory(name=name, name_ind=name)
 
     area_search = area_search_test_data
     area_search.lessor = lessor

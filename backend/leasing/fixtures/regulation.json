@@ -1,30 +1,6 @@
 [
-  {
-    "model": "leasing.Regulation",
-    "pk": 1,
-    "fields": {
-      "name": "ARA"
-    }
-  },
-  {
-    "model": "leasing.Regulation",
-    "pk": 2,
-    "fields": {
-      "name": "ASO"
-    }
-  },
-  {
-    "model": "leasing.Regulation",
-    "pk": 3,
-    "fields": {
-      "name": "Hitas"
-    }
-  },
-  {
-    "model": "leasing.Regulation",
-    "pk": 4,
-    "fields": {
-      "name": "Hintakontrolloitu"
-    }
-  }
+{"model": "leasing.Regulation", "pk": 1, "fields": {"name": "Perumahan bersubsidi"}},
+{"model": "leasing.Regulation", "pk": 2, "fields": {"name": "Hak huni"}},
+{"model": "leasing.Regulation", "pk": 3, "fields": {"name": "Harga diatur"}},
+{"model": "leasing.Regulation", "pk": 4, "fields": {"name": "Harga dikendalikan"}}
 ]

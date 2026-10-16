@@ -6,13 +6,27 @@ from leasing.models.map_layers import HexColorValidator
 
 
 def test_business_id_validator():
-    validators.validate_business_id("1234567-8")
+    # NPWP 15 digit (format lama), dengan dan tanpa tanda baca
+    validators.validate_business_id("012345678901000")
+    validators.validate_business_id("01.234.567.8-901.000")
+    # NPWP 16 digit (format baru)
+    validators.validate_business_id("0012345678901000")
 
     with pytest.raises(ValidationError):
-        validators.validate_business_id("1234567-")
+        validators.validate_business_id("1234567-8")
 
     with pytest.raises(ValidationError):
-        validators.validate_business_id("1234567-89")
+        validators.validate_business_id("01234567890100")
+
+
+def test_national_identification_number_validator():
+    validators.validate_national_identification_number("2171011501900001")
+
+    with pytest.raises(ValidationError):
+        validators.validate_national_identification_number("010190-123A")
+
+    with pytest.raises(ValidationError):
+        validators.validate_national_identification_number("217101150190000")
 
 
 @pytest.fixture

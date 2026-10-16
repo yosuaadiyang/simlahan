@@ -187,10 +187,10 @@ class CollectionNoteCreateUpdateSerializer(
         if collection_note.collection_stage in stages_creating_decision:
             # Currently always selects fixed decision maker and type
             decision_maker = DecisionMaker.objects.filter(
-                name="Tontit-yksikön kirje"
+                name="Surat Unit Pengelola Aset Lahan"
             ).first()
             decision_type = DecisionType.objects.filter(
-                name="Maanvuokrien maksukehotus purku-uhalla"
+                name="Teguran bayar sewa tanah dengan ancaman pembatalan"
             ).first()
 
             Decision.objects.create(

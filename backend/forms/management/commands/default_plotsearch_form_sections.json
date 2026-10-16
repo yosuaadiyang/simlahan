@@ -2,16 +2,16 @@
   "sections": [
     {
       "identifier": "hakijan-tiedot",
-      "title": "Hakijan tiedot",
+      "title": "Data pemohon",
       "visible": true,
       "sort_order": 0,
       "add_new_allowed": true,
       "show_duplication_check": true,
-      "add_new_text": "Lisää hakija",
+      "add_new_text": "Tambah pemohon",
       "subsections": [
         {
           "identifier": "yrityksen-tiedot",
-          "title": "Yrityksen tiedot",
+          "title": "Data badan usaha",
           "visible": true,
           "sort_order": 0,
           "add_new_allowed": false,
@@ -20,7 +20,7 @@
           "subsections": [
             {
               "identifier": "yhteyshenkilo",
-              "title": "Yhteyshenkilö",
+              "title": "Narahubung",
               "visible": true,
               "sort_order": 0,
               "add_new_allowed": false,
@@ -31,7 +31,7 @@
                 {
                   "identifier": "etunimi",
                   "type": "textbox",
-                  "label": "Etunimi",
+                  "label": "Nama depan",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -43,7 +43,7 @@
                 {
                   "identifier": "sukunimi",
                   "type": "textbox",
-                  "label": "Sukunimi",
+                  "label": "Nama belakang",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -55,7 +55,7 @@
                 {
                   "identifier": "kieli",
                   "type": "textbox",
-                  "label": "Kieli",
+                  "label": "Bahasa",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -67,7 +67,7 @@
                 {
                   "identifier": "puhelinnumero",
                   "type": "textbox",
-                  "label": "Puhelinnumero",
+                  "label": "Nomor telepon",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -79,7 +79,7 @@
                 {
                   "identifier": "sahkoposti",
                   "type": "textbox",
-                  "label": "Sähköposti",
+                  "label": "Email",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -91,7 +91,7 @@
                 {
                   "identifier": "katuosoite",
                   "type": "textbox",
-                  "label": "Katuosoite",
+                  "label": "Alamat",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -103,7 +103,7 @@
                 {
                   "identifier": "postinumero",
                   "type": "textbox",
-                  "label": "Postinumero",
+                  "label": "Kode pos",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -115,7 +115,7 @@
                 {
                   "identifier": "postitoimipaikka",
                   "type": "textbox",
-                  "label": "Postitoimipaikka",
+                  "label": "Kota/Kabupaten",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -127,7 +127,7 @@
                 {
                   "identifier": "maa",
                   "type": "textbox",
-                  "label": "Maa",
+                  "label": "Negara",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -142,7 +142,7 @@
             },
             {
               "identifier": "laskutustiedot",
-              "title": "Laskutustiedot",
+              "title": "Data penagihan",
               "visible": true,
               "sort_order": 2,
               "add_new_allowed": false,
@@ -153,7 +153,7 @@
                 {
                   "identifier": "c-0",
                   "type": "textbox",
-                  "label": "c/o",
+                  "label": "u.p.",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -165,7 +165,7 @@
                 {
                   "identifier": "kieli",
                   "type": "textbox",
-                  "label": "Kieli",
+                  "label": "Bahasa",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -177,7 +177,7 @@
                 {
                   "identifier": "puhelinnumero",
                   "type": "textbox",
-                  "label": "Puhelinnumero",
+                  "label": "Nomor telepon",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -189,7 +189,7 @@
                 {
                   "identifier": "sahkoposti",
                   "type": "textbox",
-                  "label": "Sähköposti",
+                  "label": "Email",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -201,7 +201,7 @@
                 {
                   "identifier": "katuosoite",
                   "type": "textbox",
-                  "label": "Katuosoite",
+                  "label": "Alamat",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -213,7 +213,7 @@
                 {
                   "identifier": "postinumero",
                   "type": "textbox",
-                  "label": "Postinumero",
+                  "label": "Kode pos",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -225,7 +225,7 @@
                 {
                   "identifier": "postitoimipaikka",
                   "type": "textbox",
-                  "label": "Postitoimipaikka",
+                  "label": "Kota/Kabupaten",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -237,7 +237,7 @@
                 {
                   "identifier": "maa",
                   "type": "textbox",
-                  "label": "Maa",
+                  "label": "Negara",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -249,7 +249,7 @@
                 {
                   "identifier": "verkkolaskutusosoite",
                   "type": "textbox",
-                  "label": "Verkkolaskutusosoite",
+                  "label": "Alamat e-faktur",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -261,7 +261,7 @@
                 {
                   "identifier": "valittajatunnus",
                   "type": "textbox",
-                  "label": "Välittäjätunnus",
+                  "label": "ID perantara",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -273,7 +273,7 @@
                 {
                   "identifier": "hakijan-laskutusviite",
                   "type": "textbox",
-                  "label": "Hakijan laskutusviite",
+                  "label": "Referensi tagihan pemohon",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -291,7 +291,7 @@
             {
               "identifier": "yrityksen-nimi",
               "type": "textbox",
-              "label": "Yrityksen nimi",
+              "label": "Nama badan usaha",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -303,7 +303,7 @@
             {
               "identifier": "y-tunnus",
               "type": "textbox",
-              "label": "Y-tunnus",
+              "label": "NPWP badan",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -315,7 +315,7 @@
             {
               "identifier": "kieli",
               "type": "textbox",
-              "label": "Kieli",
+              "label": "Bahasa",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -327,7 +327,7 @@
             {
               "identifier": "puhelinnumero",
               "type": "textbox",
-              "label": "Puhelinnumero",
+              "label": "Nomor telepon",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -339,7 +339,7 @@
             {
               "identifier": "sahkoposti",
               "type": "textbox",
-              "label": "Sähköposti",
+              "label": "Email",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -351,7 +351,7 @@
             {
               "identifier": "katuosoite",
               "type": "textbox",
-              "label": "Katuosoite",
+              "label": "Alamat",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -363,7 +363,7 @@
             {
               "identifier": "postinumero",
               "type": "textbox",
-              "label": "Postinumero",
+              "label": "Kode pos",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -375,7 +375,7 @@
             {
               "identifier": "postitoimipaikka",
               "type": "textbox",
-              "label": "Postitoimipaikka",
+              "label": "Kota/Kabupaten",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -387,7 +387,7 @@
             {
               "identifier": "maa",
               "type": "textbox",
-              "label": "Maa",
+              "label": "Negara",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -399,7 +399,7 @@
             {
               "identifier": "hallintaosuus",
               "type": "fractional",
-              "label": "Hallintaosuus",
+              "label": "Porsi penguasaan",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -411,7 +411,7 @@
             {
               "identifier": "liikevaihto-edellinen-tilikausi",
               "type": "textbox",
-              "label": "Liikevaihto (edellinen tilikausi)",
+              "label": "Omzet (tahun buku sebelumnya)",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -423,7 +423,7 @@
             {
               "identifier": "hakijayrityksen-perustamisvuosi",
               "type": "textbox",
-              "label": "Hakijayrityksen perustamisvuosi",
+              "label": "Tahun pendirian badan usaha",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -435,7 +435,7 @@
             {
               "identifier": "hakijayrityksen-kotipaikka",
               "type": "textbox",
-              "label": "Hakijayrityksen kotipaikka",
+              "label": "Domisili badan usaha pemohon",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -447,7 +447,7 @@
             {
               "identifier": "kuvaus-hakijan-harjoittamasta-toiminnasta",
               "type": "textarea",
-              "label": "Kuvaus hakijan harjoittamasta toiminnasta",
+              "label": "Uraian kegiatan usaha pemohon",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -459,7 +459,7 @@
             {
               "identifier": "hakijayrityksen-hlomäärä-helsingissä",
               "type": "textbox",
-              "label": "Hakijayrityksen työntekijöiden määrä Helsingissä",
+              "label": "Jumlah karyawan di daerah ini",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -471,7 +471,7 @@
             {
               "identifier": "hakijayrityksen-hlomäärä-muualla",
               "type": "textbox",
-              "label": "Hakijayrityksen työntekijöiden määrä muualla",
+              "label": "Jumlah karyawan di daerah lain",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -486,7 +486,7 @@
         },
         {
           "identifier": "henkilon-tiedot",
-          "title": "Henkilön tiedot",
+          "title": "Data perorangan",
           "visible": true,
           "sort_order": 1,
           "add_new_allowed": false,
@@ -495,7 +495,7 @@
           "subsections": [
             {
               "identifier": "laskunsaaja",
-              "title": "Laskutustiedot",
+              "title": "Data penagihan",
               "visible": true,
               "sort_order": 1,
               "add_new_allowed": false,
@@ -506,7 +506,7 @@
                 {
                   "identifier": "c-o",
                   "type": "textbox",
-                  "label": "c/o",
+                  "label": "u.p.",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -518,7 +518,7 @@
                 {
                   "identifier": "kieli",
                   "type": "textbox",
-                  "label": "Kieli",
+                  "label": "Bahasa",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -530,7 +530,7 @@
                 {
                   "identifier": "puhelinnumero",
                   "type": "textbox",
-                  "label": "Puhelinnumero",
+                  "label": "Nomor telepon",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -542,7 +542,7 @@
                 {
                   "identifier": "sahkoposti",
                   "type": "textbox",
-                  "label": "Sähköposti",
+                  "label": "Email",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -554,7 +554,7 @@
                 {
                   "identifier": "katuosoite",
                   "type": "textbox",
-                  "label": "Katuosoite",
+                  "label": "Alamat",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -566,7 +566,7 @@
                 {
                   "identifier": "postinumero",
                   "type": "textbox",
-                  "label": "Postinumero",
+                  "label": "Kode pos",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -578,7 +578,7 @@
                 {
                   "identifier": "postitoimipaikka",
                   "type": "textbox",
-                  "label": "Postitoimipaikka",
+                  "label": "Kota/Kabupaten",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -590,7 +590,7 @@
                 {
                   "identifier": "maa",
                   "type": "textbox",
-                  "label": "Maa",
+                  "label": "Negara",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -602,7 +602,7 @@
                 {
                   "identifier": "hakijan-laskutusviite",
                   "type": "textbox",
-                  "label": "Hakijan laskutusviite",
+                  "label": "Referensi tagihan pemohon",
                   "hint_text": null,
                   "enabled": true,
                   "required": false,
@@ -620,7 +620,7 @@
             {
               "identifier": "etunimi",
               "type": "textbox",
-              "label": "Etunimi",
+              "label": "Nama depan",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -632,7 +632,7 @@
             {
               "identifier": "Sukunimi",
               "type": "textbox",
-              "label": "Sukunimi",
+              "label": "Nama belakang",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -644,7 +644,7 @@
             {
               "identifier": "henkilotunnus",
               "type": "textbox",
-              "label": "Henkilötunnus",
+              "label": "NIK",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -656,7 +656,7 @@
             {
               "identifier": "kieli",
               "type": "textbox",
-              "label": "Kieli",
+              "label": "Bahasa",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -668,7 +668,7 @@
             {
               "identifier": "puhelinnumero",
               "type": "textbox",
-              "label": "Puhelinnumero",
+              "label": "Nomor telepon",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -680,7 +680,7 @@
             {
               "identifier": "sahkoposti",
               "type": "textbox",
-              "label": "Sähköposti",
+              "label": "Email",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -692,7 +692,7 @@
             {
               "identifier": "katuosoite",
               "type": "textbox",
-              "label": "Katuosoite",
+              "label": "Alamat",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -704,7 +704,7 @@
             {
               "identifier": "postinumero",
               "type": "textbox",
-              "label": "Postinumero",
+              "label": "Kode pos",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -716,7 +716,7 @@
             {
               "identifier": "postitoimipaikka",
               "type": "textbox",
-              "label": "Postitoimipaikka",
+              "label": "Kota/Kabupaten",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -728,7 +728,7 @@
             {
               "identifier": "maa",
               "type": "textbox",
-              "label": "Maa",
+              "label": "Negara",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -740,7 +740,7 @@
             {
               "identifier": "hallintaosuus",
               "type": "fractional",
-              "label": "Hallintaosuus",
+              "label": "Porsi penguasaan",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -752,7 +752,7 @@
             {
               "identifier": "turvakielto",
               "type": "textbox",
-              "label": "Turvakielto",
+              "label": "Data dirahasiakan karena alasan keamanan",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -767,7 +767,7 @@
         },
         {
           "identifier": "lisatiedot",
-          "title": "Lisätiedot",
+          "title": "Informasi tambahan",
           "visible": true,
           "sort_order": 2,
           "add_new_allowed": false,
@@ -778,7 +778,7 @@
             {
               "identifier": "lisatietoa",
               "type": "textarea",
-              "label": "Lisätietoa",
+              "label": "Keterangan tambahan",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -796,7 +796,7 @@
         {
           "identifier": "hakija",
           "type": "radiobuttoninline",
-          "label": "Hakija",
+          "label": "Pemohon",
           "hint_text": null,
           "enabled": true,
           "required": false,
@@ -805,13 +805,13 @@
           "sort_order": 0,
           "choices": [
             {
-              "text": "Yritys",
+              "text": "Badan usaha",
               "value": "1",
               "action": null,
               "has_text_input": false
             },
             {
-              "text": "Henkilö",
+              "text": "Perorangan",
               "value": "2",
               "action": null,
               "has_text_input": false
@@ -824,7 +824,7 @@
     },
     {
       "identifier": "haettava-kohde",
-      "title": "Haettava kohde",
+      "title": "Objek yang dimohon",
       "visible": true,
       "sort_order": 1,
       "add_new_allowed": true,
@@ -833,7 +833,7 @@
       "subsections": [
         {
           "identifier": "hakijan-referenssit-kolme-parasta",
-          "title": "Hakijan referenssit (kolme parasta)",
+          "title": "Referensi pemohon (tiga terbaik)",
           "visible": true,
           "sort_order": 1,
           "add_new_allowed": false,
@@ -844,7 +844,7 @@
             {
               "identifier": "lyhyt-kuvaus-referensseista",
               "type": "textarea",
-              "label": "Lyhyt kuvaus referensseistä",
+              "label": "Uraian singkat referensi",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -856,7 +856,7 @@
             {
               "identifier": "referenssiliitteet",
               "type": "uploadfiles",
-              "label": "Referenssiliitteet",
+              "label": "Lampiran referensi",
               "hint_text": null,
               "enabled": true,
               "required": false,
@@ -874,7 +874,7 @@
         {
           "identifier": "onko-aiemmin-saanut-tonttia",
           "type": "checkbox",
-          "label": "Onko aiemmin saanut tonttia kaupungin haussa?",
+          "label": "Pernah memperoleh alokasi lahan sebelumnya?",
           "hint_text": null,
           "enabled": true,
           "required": false,
@@ -886,7 +886,7 @@
         {
           "identifier": "tontti-jota-hakemus-koskee",
           "type": "dropdown",
-          "label": "Tontti, jota hakemus koskee",
+          "label": "Kavling yang dimohon",
           "hint_text": null,
           "enabled": true,
           "required": false,
@@ -898,8 +898,8 @@
         {
           "identifier": "hinta",
           "type": "textbox",
-          "label": "Hinta",
-          "hint_text": "€/k-m²",
+          "label": "Harga",
+          "hint_text": "Rp/m² lantai",
           "enabled": true,
           "required": false,
           "validation": null,
@@ -910,7 +910,7 @@
         {
           "identifier": "hankkeen-paasuunnittelija",
           "type": "textbox",
-          "label": "Hankkeen pääsuunnittelija",
+          "label": "Perencana utama proyek",
           "hint_text": null,
           "enabled": true,
           "required": false,
@@ -922,7 +922,7 @@
         {
           "identifier": "hankkeen-arvioitu-aikataulu",
           "type": "textbox",
-          "label": "Hankkeen arvioitu aikataulu",
+          "label": "Perkiraan jadwal proyek",
           "hint_text": null,
           "enabled": true,
           "required": false,
@@ -934,8 +934,8 @@
         {
           "identifier": "hankkeen-toivottu-laajuus",
           "type": "textarea",
-          "label": "Hankkeen toivottu laajuus",
-          "hint_text": "Esimerkiksi rakennusoikeuden määrä k-m², käyttötarkoitus (k-m²-jakauma, jos useita käyttötarkoituksia), asuntohankkeissa lisäksi asuntojen lukumäärä (kpl) ja keskipinta-ala (m²).",
+          "label": "Skala proyek yang diinginkan",
+          "hint_text": "Misalnya luas lantai bangunan (m²), peruntukan (pembagian m² jika lebih dari satu peruntukan), dan untuk proyek hunian juga jumlah unit serta luas rata-rata (m²).",
           "enabled": true,
           "required": false,
           "validation": null,
@@ -946,7 +946,7 @@
         {
           "identifier": "rahoitus-ja-hallintamuoto",
           "type": "checkbox",
-          "label": "Rahoitus- ja hallintamuoto",
+          "label": "Skema pembiayaan dan penguasaan",
           "hint_text": null,
           "enabled": false,
           "required": false,
@@ -955,55 +955,55 @@
           "sort_order": 6,
           "choices": [
             {
-              "text": "Sääntelemätön omistus",
+              "text": "Kepemilikan komersial",
               "value": "1",
               "action": null,
               "has_text_input": false
             },
             {
-              "text": "Hitas omistus",
+              "text": "Kepemilikan bersubsidi",
               "value": "2",
               "action": null,
               "has_text_input": false
             },
             {
-              "text": "Hintakontrolloitu omistus",
+              "text": "Kepemilikan harga terkendali",
               "value": "3",
               "action": null,
               "has_text_input": false
             },
             {
-              "text": "Asumisoikeus",
+              "text": "Hak menghuni",
               "value": "4",
               "action": null,
               "has_text_input": false
             },
             {
-              "text": "Sääntelemätön vuokra",
+              "text": "Sewa komersial",
               "value": "5",
               "action": null,
               "has_text_input": false
             },
             {
-              "text": "Valtion tukema vuokra 10v",
+              "text": "Sewa bersubsidi pemerintah 10 tahun",
               "value": "6",
               "action": null,
               "has_text_input": false
             },
             {
-              "text": "Valtion tukema vuokra pitkä",
+              "text": "Sewa bersubsidi pemerintah jangka panjang",
               "value": "7",
               "action": null,
               "has_text_input": false
             },
             {
-              "text": "Valtion tukema takauslaina",
+              "text": "Pinjaman berjaminan pemerintah",
               "value": "8",
               "action": null,
               "has_text_input": false
             },
             {
-              "text": "Muu",
+              "text": "Lainnya",
               "value": "9",
               "action": null,
               "has_text_input": false
@@ -1013,7 +1013,7 @@
         {
           "identifier": "erityisryhmat",
           "type": "checkbox",
-          "label": "Erityisryhmät",
+          "label": "Kelompok khusus",
           "hint_text": null,
           "enabled": true,
           "required": false,
@@ -1022,25 +1022,25 @@
           "sort_order": 7,
           "choices": [
             {
-              "text": "Opiskelijat",
+              "text": "Mahasiswa",
               "value": "1",
               "action": null,
               "has_text_input": false
             },
             {
-              "text": "Nuoret/nuoret aikuiset",
+              "text": "Remaja/dewasa muda",
               "value": "2",
               "action": null,
               "has_text_input": false
             },
             {
-              "text": "Seniorit",
+              "text": "Lansia",
               "value": "3",
               "action": null,
               "has_text_input": false
             },
             {
-              "text": "Muut erityisryhmät, mitä:",
+              "text": "Kelompok khusus lain, sebutkan:",
               "value": "4",
               "action": null,
               "has_text_input": true
@@ -1050,7 +1050,7 @@
         {
           "identifier": "muut-hankkeen-mahdolliset-kehitysteemat",
           "type": "checkbox",
-          "label": "Muut hankkeen mahdolliset kehitysteemat",
+          "label": "Tema pengembangan lainnya",
           "hint_text": null,
           "enabled": true,
           "required": false,
@@ -1059,37 +1059,37 @@
           "sort_order": 8,
           "choices": [
             {
-              "text": "Kohtuuhintaisuus",
+              "text": "Keterjangkauan harga",
               "value": "1",
               "action": null,
               "has_text_input": false
             },
             {
-              "text": "Asumisen ratkaisut",
+              "text": "Solusi hunian",
               "value": "2",
               "action": null,
               "has_text_input": false
             },
             {
-              "text": "Elinkaariratkaisut",
+              "text": "Solusi siklus hidup bangunan",
               "value": "3",
               "action": null,
               "has_text_input": false
             },
             {
-              "text": "Tekniset ratkaisut",
+              "text": "Solusi teknis",
               "value": "4",
               "action": null,
               "has_text_input": false
             },
             {
-              "text": "Hiilineutraali Helsinki",
+              "text": "Rendah karbon",
               "value": "5",
               "action": null,
               "has_text_input": false
             },
             {
-              "text": "Muu:",
+              "text": "Lainnya:",
               "value": "6",
               "action": null,
               "has_text_input": true
@@ -1099,8 +1099,8 @@
         {
           "identifier": "hankkeen-yleiskuvaus",
           "type": "textarea",
-          "label": "Hankkeen yleiskuvaus",
-          "hint_text": "Asuntohankkeet: Kuvaus hankkeen suunnittelusta, toteutustavasta ja organisaatiosta sekä hakijan käytettävissä olevista taloudellisista ja muista resursseista. \nMuut hankkeet: Taloudellinen liiketoimintasuunnitelma, kuvaus suunniteltavasta toiminnasta ja konseptista sekä hankeorganisaatiosta (hankkeen toteuttaja, operaattori, sijoittajataho jne.)",
+          "label": "Gambaran umum proyek",
+          "hint_text": "Proyek hunian: uraian perencanaan, cara pelaksanaan, organisasi proyek, serta sumber daya keuangan dan lainnya yang dimiliki pemohon. Proyek lain: rencana bisnis, uraian kegiatan dan konsep, serta organisasi proyek (pelaksana, operator, investor, dsb.)",
           "enabled": true,
           "required": false,
           "validation": null,
@@ -1111,7 +1111,7 @@
         {
           "identifier": "hankkeen-mahdolliset-erityispiirteet",
           "type": "textarea",
-          "label": "Hankkeen mahdolliset erityispiirteet",
+          "label": "Kekhususan proyek",
           "hint_text": null,
           "enabled": true,
           "required": false,
@@ -1123,7 +1123,7 @@
         {
           "identifier": "lyhyt-kuvaus-hankkeen-suunnittelusta",
           "type": "textarea",
-          "label": "Lyhyt kuvaus hankkeen suunnittelusta ja toteutustavasta ja -organisaatiosta sekä hakijan käytössä olevista taloudellisista ja muista resursseista",
+          "label": "Uraian singkat perencanaan, cara pelaksanaan, dan organisasi proyek serta sumber daya keuangan dan lainnya yang dimiliki pemohon",
           "hint_text": null,
           "enabled": true,
           "required": false,
@@ -1138,7 +1138,7 @@
     },
     {
       "identifier": "vahvistukset",
-      "title": "Vahvistukset",
+      "title": "Pernyataan",
       "visible": true,
       "sort_order": 2,
       "add_new_allowed": false,
@@ -1149,7 +1149,7 @@
         {
           "identifier": "lahettamalla-hakemuksen-vakuutan",
           "type": "checkbox",
-          "label": "Lähettämällä hakemuksen vakuutan antamani tiedot oikeiksi ja ilmoitan tutustuneeni yleisen asuntotonttien varauskierroksen verkkosivustolla asiaa koskevaan materiaaliin.",
+          "label": "Dengan mengirim permohonan, saya menyatakan data yang saya berikan benar dan saya telah membaca ketentuan pencarian kavling yang dipublikasikan.",
           "hint_text": null,
           "enabled": true,
           "required": false,
@@ -1158,7 +1158,7 @@
           "sort_order": 0,
           "choices": [
             {
-              "text": "Kyllä",
+              "text": "Ya",
               "value": "1",
               "action": null,
               "has_text_input": false
@@ -1168,7 +1168,7 @@
         {
           "identifier": "suostun-siihen-etta-helsingin-kaupunki",
           "type": "checkbox",
-          "label": "Suostun, että Helsingin kaupunki voi antaa päätöksen tai muun asiakirjan tiedoksi ilmoittamaani sähköpostiosoitteeseen sähköisenä viestinä.",
+          "label": "Saya setuju keputusan atau dokumen lain disampaikan secara elektronik ke alamat email yang saya cantumkan.",
           "hint_text": null,
           "enabled": true,
           "required": false,
@@ -1177,7 +1177,7 @@
           "sort_order": 1,
           "choices": [
             {
-              "text": "Kyllä",
+              "text": "Ya",
               "value": "1",
               "action": null,
               "has_text_input": false
@@ -1187,7 +1187,7 @@
         {
           "identifier": "hyvaksyn-tietojeni-tallentamisen",
           "type": "checkbox",
-          "label": "Hyväksyn tietojeni tallentamisen ja käsittelyn Helsingin kaupunkiympäristön asiakasrekisterin selosteen mukaisesti. Lisätiedot: hel.fi/rekisteriseloste",
+          "label": "Saya menyetujui penyimpanan dan pemrosesan data saya sesuai pemberitahuan pelindungan data pribadi instansi pengelola lahan.",
           "hint_text": null,
           "enabled": true,
           "required": true,
@@ -1196,7 +1196,7 @@
           "sort_order": 3,
           "choices": [
             {
-              "text": "Hyväksyn tietojeni tallentamisen ja käsittelyn Helsingin kaupunkiympäristön asiakasrekisterin selosteen mukaisesti. Lisätiedot: hel.fi/rekisteriseloste",
+              "text": "Saya menyetujui penyimpanan dan pemrosesan data saya sesuai pemberitahuan pelindungan data pribadi instansi pengelola lahan.",
               "value": "1",
               "action": null,
               "has_text_input": false

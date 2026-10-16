@@ -2,7 +2,6 @@ from django.db import models
 from django.db.models.fields.json import JSONField
 from django.utils.translation import gettext_lazy as _
 from enumfields import EnumField
-from helsinki_gdpr.models import SerializableMixin
 
 from file_operations.private_files import PrivateFileField
 from file_operations.viewsets.mixins import FileScanMixin
@@ -95,15 +94,15 @@ class Section(models.Model):
 
 class Field(models.Model):
     FIELD_TYPES = (
-        ("textbox", _("Tekstikenttä")),
-        ("textarea", _("Tekstialue")),
-        ("dropdown", _("Alasvetovalikko")),
-        ("checkbox", _("Valintaruutu")),
-        ("radiobutton", _("Radiopainike")),
-        ("radiobuttoninline", _("Radiopainike linjassa")),
-        ("uploadfiles", _("Lataa tiedosto")),
-        ("fractional", _("Murtoluku")),
-        ("hidden", _("Piilotettu")),
+        ("textbox", _("Text field")),
+        ("textarea", _("Text area")),
+        ("dropdown", _("Dropdown")),
+        ("checkbox", _("Checkbox")),
+        ("radiobutton", _("Radio button")),
+        ("radiobuttoninline", _("Radio button inline")),
+        ("uploadfiles", _("Upload file")),
+        ("fractional", _("Fraction")),
+        ("hidden", _("Hidden")),
     )
     label = models.CharField(max_length=255)
     hint_text = models.CharField(max_length=1024, null=True, blank=True)
@@ -210,7 +209,7 @@ def get_attachment_file_upload_to(instance, filename):
     )
 
 
-class Attachment(FileScanMixin, SerializableMixin, models.Model):
+class Attachment(FileScanMixin, models.Model):
     name = models.CharField(max_length=255)
     attachment = PrivateFileField(upload_to=get_attachment_file_upload_to)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Time created"))
@@ -219,13 +218,6 @@ class Attachment(FileScanMixin, SerializableMixin, models.Model):
     answer = models.ForeignKey(Answer, on_delete=models.CASCADE, null=True, blank=True)
     field = models.ForeignKey(Field, on_delete=models.CASCADE)
     user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
-
-    # GDPR API
-    serialize_fields = (
-        {"name": "name"},
-        {"name": "attachment"},
-        {"name": "created_at"},
-    )
 
     recursive_get_related_skip_relations = [
         "user",

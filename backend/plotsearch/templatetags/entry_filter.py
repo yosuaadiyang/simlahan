@@ -1,6 +1,13 @@
 from django import template
+from django.conf import settings
 
 register = template.Library()
+
+
+@register.simple_tag
+def organization_name():
+    """Nama instansi pengelola lahan (settings.ORGANIZATION_NAME)."""
+    return settings.ORGANIZATION_NAME
 
 
 @register.filter

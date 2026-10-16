@@ -45,7 +45,7 @@ def test_generate_and_send_applicant_and_lessor_emails(
     input_data: AnswerInputData = {
         "answer_id": answer.get("id"),
         "answer_type": AnswerType.AREA_SEARCH,
-        "user_language": "fi",
+        "user_language": "id",
     }
     with patch("forms.utils.send_email") as mock_send_answer_email, patch(
         "forms.utils._generate_applicant_plotsearch_email"
@@ -65,12 +65,12 @@ def test_generate_and_queue_answer_emails(
 ):
     answer = answer_with_email.get("answer")
 
-    # Case 1: Test that async_task is called, content language is Finnish
+    # Case 1: Test that async_task is called, content language is Indonesian
     with patch("forms.utils.send_email") as mock_send_answer_email:
         input_data: AnswerInputData = {
             "answer_id": answer.get("id"),
             "answer_type": AnswerType.AREA_SEARCH,
-            "user_language": "fi",
+            "user_language": "id",
         }
         generate_and_queue_answer_emails(input_data=input_data)
 
@@ -79,9 +79,9 @@ def test_generate_and_queue_answer_emails(
         applicant_email: EmailMessageInput = applicant_input
         assert applicant_email.get("from_email") == settings.DEFAULT_FROM_EMAIL
         assert (
-            "Tämä on kopio Helsingin kaupungille lähetetystä aluehaun hakemuksesta."
-            in applicant_email.get("body")
-        ), "Should contain Finnish text from the email template"
+            "Ini adalah salinan permohonan pencarian area Anda yang dikirim ke "
+            f"{settings.ORGANIZATION_NAME}." in applicant_email.get("body")
+        ), "Should contain Indonesian text from the email template"
 
     # Case 1: Test that async_task is called, content language is English
     with patch("forms.utils.send_email") as mock_send_answer_email:
@@ -97,8 +97,8 @@ def test_generate_and_queue_answer_emails(
         applicant_email: EmailMessageInput = applicant_input
         assert applicant_email.get("from_email") == settings.DEFAULT_FROM_EMAIL
         assert (
-            "This is a copy of your area search application sent to the City of Helsinki."
-            in applicant_email.get("body")
+            "This is a copy of your area search application sent to "
+            f"{settings.ORGANIZATION_NAME}." in applicant_email.get("body")
         ), "Should contain English text from the email template"
 
 
@@ -107,11 +107,11 @@ def test_generate_email_user_language(
     answer_with_email, setup_lessor_contacts_and_service_units
 ):
     answer_id = answer_with_email.get("answer", {}).get("id")
-    default_user_language = "fi"
+    default_user_language = "id"
 
-    # Case 1: User language is set to Finnish
+    # Case 1: User language is set to Indonesian
     with patch("forms.utils.override") as mock_override:
-        user_language = "fi"
+        user_language = "id"
         input_data: AnswerInputData = {
             "answer_id": answer_id,
             "answer_type": AnswerType.AREA_SEARCH,
@@ -122,7 +122,7 @@ def test_generate_email_user_language(
         language_code = mock_override.call_args_list[0].args[0]
         assert language_code == user_language
 
-    # Case 2: User language is set to Georgian, should default to Finnish
+    # Case 2: User language is set to Georgian, should default to Indonesian
     with patch("forms.utils.override") as mock_override:
         user_language = "ka"  # Georgian
         input_data: AnswerInputData = {
@@ -139,13 +139,13 @@ def test_generate_email_user_language(
         # Check the active language when patched function is called
         assert get_language() == user_language
 
-    # Case 3: User language is set to Swedish
-    # Expecting the current language context to be Swedish
+    # Case 3: User language is set to English
+    # Expecting the current language context to be English
     with patch(
         "forms.utils._generate_applicant_plotsearch_email",
         side_effect=get_language_side_effect,
     ) as mock_generate_plotsearch_email:
-        user_language = "sv"
+        user_language = "en"
         input_data: AnswerInputData = {
             "answer_id": answer_id,
             "answer_type": AnswerType.AREA_SEARCH,
@@ -170,7 +170,7 @@ def test_generate_email_user_language(
 #         input_data: AnswerInputData = {
 #             "answer_id": answer_id,
 #             "answer_type": AnswerType.AREA_SEARCH,
-#             "user_language": "fi",
+#             "user_language": "id",
 #         }
 #         generate_and_queue_answer_emails(input_data=input_data)
 #         email: EmailMessageInput = mock_send_answer_email.call_args_list[0].args[0]

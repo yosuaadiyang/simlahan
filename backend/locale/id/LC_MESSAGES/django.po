@@ -1,0 +1,5367 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: SimLahan\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-16 09:02+0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Indonesian\n"
+"Language: id\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "View auditlog"
+msgstr "Lihat log audit"
+
+msgid "View auditlog of a lease or a contact"
+msgstr "Lihat log audit sewa atau kontak"
+
+msgid "executable or script"
+msgstr "berkas eksekusi atau skrip"
+
+msgid "Django management command"
+msgstr "perintah manajemen Django"
+
+msgid "Invalid integer set specifier"
+msgstr "Penentu himpunan bilangan bulat tidak valid"
+
+msgid "creation time"
+msgstr "waktu dibuat"
+
+msgid "modification time"
+msgstr "waktu diubah"
+
+msgid "name"
+msgstr "nama"
+
+msgid ""
+"Name of the command to run e.g. name of a program in PATH or a full path to "
+"an executable, or name of a management command."
+msgstr ""
+"Nama perintah yang dijalankan, mis. nama program di PATH, path lengkap ke "
+"berkas eksekusi, atau nama perintah manajemen."
+
+msgid "parameters"
+msgstr "parameter"
+
+msgid "parameter format string"
+msgstr "format string parameter"
+
+#, python-brace-format
+msgid ""
+"String that defines how the parameters are formatted when calling the "
+"command. E.g. if this is \"--rent-id {rent_id}\" and value 123 is passed as "
+"an argument to the rent_id parameter, then the command will be called as "
+"\"COMMAND --rent-id 123\"."
+msgstr ""
+"String yang menentukan format parameter saat perintah dipanggil. Mis. jika "
+"nilainya \"--rent-id {rent_id}\" dan nilai 123 diberikan sebagai argumen "
+"parameter rent_id, perintah dipanggil sebagai \"COMMAND --rent-id 123\"."
+
+msgid "command"
+msgstr "perintah"
+
+msgid "commands"
+msgstr "perintah"
+
+msgid "identifier"
+msgstr "pengenal"
+
+msgid "log compacting delay"
+msgstr "tunda pemadatan log"
+
+msgid ""
+"Days to wait before compacting log entries. Calculated from the start time "
+"of the job. Compacting log entries means that the individual log entries are"
+" concatenated to a single string and the original entries are deleted. This "
+"allows PostgreSQL to compress the log contents (check \"TOAST\" from "
+"PostgreSQL documentation). The metadata information about the log entry "
+"kinds (stdout/stderr) and timestamps are stored separately so that the "
+"original contents of the log entries are still recoverable."
+msgstr ""
+"Jumlah hari sebelum entri log dipadatkan, dihitung dari waktu mulai tugas. "
+"Pemadatan menggabungkan entri log menjadi satu string dan menghapus entri "
+"asli sehingga PostgreSQL dapat mengompresi isi log (lihat \"TOAST\" di "
+"dokumentasi PostgreSQL). Metadata jenis entri (stdout/stderr) dan stempel "
+"waktu disimpan terpisah sehingga isi asli tetap dapat dipulihkan."
+
+msgid "log deleting delay"
+msgstr "tunda penghapusan log"
+
+msgid ""
+"Days to wait before deleting logs. Calculated from the start time of the "
+"job."
+msgstr "Jumlah hari sebelum log dihapus, dihitung dari waktu mulai tugas."
+
+msgid "run inforomation deleting delay"
+msgstr "tunda penghapusan informasi eksekusi"
+
+msgid ""
+"Days to wait before deleting all inforomation about the run. Calculated from"
+" the start time of the job."
+msgstr ""
+"Jumlah hari sebelum seluruh informasi eksekusi dihapus, dihitung dari waktu "
+"mulai tugas."
+
+msgid "job history retention policy"
+msgstr "kebijakan retensi riwayat tugas"
+
+msgid "job history retention policies"
+msgstr "kebijakan retensi riwayat tugas"
+
+msgid "Descriptive name for the job"
+msgstr "Nama deskriptif tugas"
+
+msgid "comment"
+msgstr "komentar"
+
+msgid "arguments"
+msgstr "argumen"
+
+msgid ""
+"Argument for the command as a JSON object. These will be formatted with the "
+"parameter format string of the command. E.g. to pass value 123 as an "
+"argument to the rent_id parameter, set this to {\"rent_id\": 123}."
+msgstr ""
+"Argumen perintah sebagai objek JSON yang diformat dengan format string "
+"parameter perintah. Mis. untuk memberikan nilai 123 ke parameter rent_id, "
+"isi dengan {\"rent_id\": 123}."
+
+msgid "history retention policy"
+msgstr "kebijakan retensi riwayat"
+
+msgid ""
+"Defines how long logs and information about completed runs is preserved."
+msgstr ""
+"Menentukan berapa lama log dan informasi eksekusi yang selesai disimpan."
+
+msgid "job"
+msgstr "tugas"
+
+msgid "jobs"
+msgstr "tugas"
+
+msgid ""
+"Name of the timezone, e.g. \"Asia/Jakarta\" or \"UTC\". See "
+"https://en.wikipedia.org/wiki/List_of_tz_database_time_zones for a list of "
+"possible values."
+msgstr ""
+"Nama zona waktu, mis. \"Asia/Jakarta\" atau \"UTC\". Lihat "
+"https://en.wikipedia.org/wiki/List_of_tz_database_time_zones untuk daftar "
+"nilai yang tersedia."
+
+msgid "timezone"
+msgstr "zona waktu"
+
+msgid "timezones"
+msgstr "zona waktu"
+
+msgid "Timezone name can't be empty"
+msgstr "Nama zona waktu tidak boleh kosong"
+
+msgid "Invalid timezone name"
+msgstr "Nama zona waktu tidak valid"
+
+msgid "enabled"
+msgstr "aktif"
+
+msgid "years"
+msgstr "tahun"
+
+msgid "months"
+msgstr "bulan"
+
+msgid "days of month"
+msgstr "tanggal dalam bulan"
+
+msgid "weekdays"
+msgstr "hari dalam minggu"
+
+msgid ""
+"Limit execution to specified weekdays. Use integer values to represent the "
+"weekdays with the following mapping: 0=Sunday, 1=Monday, 2=Tuesday, ..., "
+"6=Saturday."
+msgstr ""
+"Batasi eksekusi pada hari tertentu. Gunakan bilangan bulat: 0=Minggu, "
+"1=Senin, 2=Selasa, ..., 6=Sabtu."
+
+msgid "hours"
+msgstr "jam"
+
+msgid "minutes"
+msgstr "menit"
+
+msgid "scheduled job"
+msgstr "tugas terjadwal"
+
+msgid "scheduled jobs"
+msgstr "tugas terjadwal"
+
+#, python-brace-format
+msgid "Scheduled job \"{job}\" @ {schedule}"
+msgstr "Tugas terjadwal \"{job}\" @ {schedule}"
+
+msgid "PID"
+msgstr "PID"
+
+msgid "Records the process id of the process, which is/was executing this job"
+msgstr "Mencatat ID proses yang sedang/telah menjalankan tugas ini"
+
+msgid "start time"
+msgstr "waktu mulai"
+
+msgid "stop time"
+msgstr "waktu selesai"
+
+msgid "exit code"
+msgstr "kode keluar"
+
+msgid "job run"
+msgstr "eksekusi tugas"
+
+msgid "job runs"
+msgstr "eksekusi tugas"
+
+msgid "run"
+msgstr "eksekusi"
+
+msgid "kind"
+msgstr "jenis"
+
+msgid "line number"
+msgstr "nomor baris"
+
+msgid "number"
+msgstr "nomor"
+
+msgid "time"
+msgstr "waktu"
+
+msgid "text"
+msgstr "teks"
+
+msgid "log entry"
+msgstr "entri log"
+
+msgid "log entries"
+msgstr "entri log"
+
+#, python-brace-format
+msgid "{run_name}: {kind} entry {linenum}({number})"
+msgstr "{run_name}: entri {kind} {linenum}({number})"
+
+msgid "content"
+msgstr "isi"
+
+msgid "log entry metadata"
+msgstr "metadata entri log"
+
+msgid "timestamp of the first entry"
+msgstr "stempel waktu entri pertama"
+
+msgid "timestamp of the last entry"
+msgstr "stempel waktu entri terakhir"
+
+msgid "total count of entries"
+msgstr "jumlah total entri"
+
+msgid "count of error entries"
+msgstr "jumlah entri galat"
+
+msgid "log"
+msgstr "log"
+
+msgid "logs"
+msgstr "log"
+
+msgid "scheduled run time"
+msgstr "waktu eksekusi terjadwal"
+
+msgid "assignment time"
+msgstr "waktu penugasan"
+
+msgid "assignee process id (PID)"
+msgstr "ID proses penerima tugas (PID)"
+
+msgid "filepath"
+msgstr "path berkas"
+
+msgid "scan time"
+msgstr "waktu pemindaian"
+
+msgid "deletion time"
+msgstr "waktu penghapusan"
+
+msgid "error message"
+msgstr "pesan galat"
+
+msgid "File Scan Status"
+msgstr "Status Pemindaian Berkas"
+
+msgid "File Scan Statuses"
+msgstr "Status Pemindaian Berkas"
+
+msgid ""
+"File has not yet been scanned for viruses, and is unsafe to download at this"
+" time."
+msgstr "Berkas belum dipindai virus dan belum aman diunduh saat ini."
+
+msgid ""
+"File was found to contain virus or malware, and the file has been deleted."
+msgstr "Berkas terdeteksi mengandung virus atau malware dan telah dihapus."
+
+msgid ""
+"File scan failed. File is unsafe to download before it has been successfully"
+" scanned for viruses and malware."
+msgstr ""
+"Pemindaian berkas gagal. Berkas tidak aman diunduh sebelum berhasil dipindai"
+" dari virus dan malware."
+
+msgid "Unknown error related to virus scanning: '{}'"
+msgstr "Galat tidak dikenal terkait pemindaian virus: '{}'"
+
+msgid "File '{}' does not have an extension."
+msgstr "Berkas '{}' tidak memiliki ekstensi."
+
+msgid "File extension '.{}' is not allowed."
+msgstr "Ekstensi berkas '.{}' tidak diizinkan."
+
+#, python-brace-format
+msgid "File '{filename}' exceeds maximum file size of {max_size} MB."
+msgstr "Berkas '{filename}' melebihi ukuran maksimum {max_size} MB."
+
+msgctxt "Form state"
+msgid "Work in progress"
+msgstr "Dalam pengerjaan"
+
+msgctxt "Form state"
+msgid "Ready"
+msgstr "Siap"
+
+msgctxt "Form state"
+msgid "Deleted"
+msgstr "Dihapus"
+
+msgctxt "Section type"
+msgid "Show always"
+msgstr "Selalu tampil"
+
+msgctxt "Section type"
+msgid "Show if"
+msgstr "Tampil jika"
+
+msgctxt "Applicant type"
+msgid "Person"
+msgstr "Perorangan"
+
+msgctxt "Applicant type"
+msgid "Company"
+msgstr "Badan usaha"
+
+msgctxt "Applicant type"
+msgid "Both"
+msgstr "Keduanya"
+
+msgid "Time created"
+msgstr "Waktu dibuat"
+
+msgid "Time modified"
+msgstr "Waktu diubah"
+
+msgid "Text field"
+msgstr "Kolom teks"
+
+msgid "Text area"
+msgstr "Area teks"
+
+msgid "Dropdown"
+msgstr "Daftar pilihan"
+
+msgid "Checkbox"
+msgstr "Kotak centang"
+
+msgid "Radio button"
+msgstr "Tombol radio"
+
+msgid "Radio button inline"
+msgstr "Tombol radio sebaris"
+
+msgid "Upload file"
+msgstr "Unggah berkas"
+
+msgid "Fraction"
+msgstr "Pecahan"
+
+msgid "Hidden"
+msgstr "Tersembunyi"
+
+msgid "Invalid personal identity code"
+msgstr "NIK tidak valid"
+
+msgid "Invalid business ID"
+msgstr "NPWP tidak valid"
+
+msgid "Lessor"
+msgstr "Pemberi sewa"
+
+msgid "Description area"
+msgstr "Uraian area"
+
+msgid "Address"
+msgstr "Alamat"
+
+msgid "District"
+msgstr "Kecamatan"
+
+msgid "Intended use"
+msgstr "Peruntukan"
+
+msgid "Description intended use"
+msgstr "Uraian peruntukan"
+
+msgid "Start date"
+msgstr "Tanggal mulai"
+
+msgid "End date"
+msgstr "Tanggal berakhir"
+
+msgid "Received date"
+msgstr "Tanggal diterima"
+
+msgid "Identifier"
+msgstr "Pengenal"
+
+msgid "State"
+msgstr "Status"
+
+msgid "Preparer"
+msgstr "Penyiap"
+
+msgid "Decline reason"
+msgstr "Alasan penolakan"
+
+msgid "Preparer note"
+msgstr "Catatan penyiap"
+
+msgid "Status notes"
+msgstr "Catatan status"
+
+msgid "Copy of plot application(s) {}"
+msgstr "Salinan permohonan kavling {}"
+
+msgid "Copy of area rental application {}"
+msgstr "Salinan permohonan sewa area {}"
+
+msgid "<identifier missing>"
+msgstr "<pengenal tidak ada>"
+
+msgid "<district missing>"
+msgstr "<kecamatan tidak ada>"
+
+msgid "<address missing>"
+msgstr "<alamat tidak ada>"
+
+msgid "<applicant missing>"
+msgstr "<pemohon tidak ada>"
+
+msgid "<start date missing>"
+msgstr "<tanggal mulai tidak ada>"
+
+#, python-brace-format
+msgid ""
+"Area search {identifier} {district} {address} {applicant} lease period "
+"{start_date} - {end_date}"
+msgstr ""
+"Pencarian area {identifier} {district} {address} {applicant} masa sewa "
+"{start_date} - {end_date}"
+
+msgid "This field is required"
+msgstr "Kolom ini wajib diisi"
+
+msgid "Control share is not even"
+msgstr "Porsi penguasaan tidak genap"
+
+msgid "Lease"
+msgstr "Sewa"
+
+msgid "Tenant names"
+msgstr "Nama penyewa"
+
+msgid "Search by identifier"
+msgstr "Cari berdasarkan pengenal"
+
+msgid "Lease Area Identifier"
+msgstr "Pengenal Area Sewa"
+
+msgid "Color"
+msgstr "Warna"
+
+#, python-brace-format
+msgid "Ratio {ratio}… ({current_index}/{rent_index})"
+msgstr "Rasio {ratio}… ({current_index}/{rent_index})"
+
+#, python-brace-format
+msgid "Ratio {ratio}"
+msgstr "Rasio {ratio}"
+
+msgid "New base rent"
+msgstr "Sewa dasar baru"
+
+msgid "New base rent {}"
+msgstr "Sewa dasar baru {}"
+
+msgid "Total payable"
+msgstr "Total terutang"
+
+msgctxt "Classification"
+msgid "Public"
+msgstr "Publik"
+
+msgctxt "Classification"
+msgid "Confidential"
+msgstr "Rahasia"
+
+msgctxt "Classification"
+msgid "Official"
+msgstr "Resmi"
+
+msgctxt "Lease state"
+msgid "Lease"
+msgstr "Sewa"
+
+msgctxt "Lease state"
+msgid "Short term lease"
+msgstr "Sewa jangka pendek"
+
+msgctxt "Lease state"
+msgid "Long term lease"
+msgstr "Sewa jangka panjang"
+
+msgctxt "Lease state"
+msgid "Reservation"
+msgstr "Pencadangan"
+
+msgctxt "Lease state"
+msgid "Reserve"
+msgstr "Cadangan"
+
+msgctxt "Lease state"
+msgid "Permission"
+msgstr "Izin"
+
+msgctxt "Lease state"
+msgid "Tenure"
+msgstr "Hak penguasaan"
+
+msgctxt "Lease state"
+msgid "Buildings and public areas"
+msgstr "Bangunan dan area publik"
+
+msgctxt "Lease state"
+msgid "Power of attorney"
+msgstr "Surat kuasa"
+
+msgctxt "Lease state"
+msgid "Preliminary"
+msgstr "Pendahuluan"
+
+msgctxt "Lease relation"
+msgid "Transfer"
+msgstr "Pengalihan"
+
+msgctxt "Lease relation"
+msgid "Other"
+msgstr "Lainnya"
+
+msgctxt "Notice period"
+msgid "No period"
+msgstr "Tanpa jangka waktu"
+
+msgctxt "Notice period"
+msgid "Time period"
+msgstr "Jangka waktu"
+
+msgctxt "Notice period"
+msgid "Other"
+msgstr "Lainnya"
+
+msgctxt "Tenant contact type"
+msgid "Tenant"
+msgstr "Penyewa"
+
+msgctxt "Tenant contact type"
+msgid "Billing contact"
+msgstr "Kontak penagihan"
+
+msgctxt "Tenant contact type"
+msgid "Contact"
+msgstr "Kontak"
+
+msgctxt "Location type"
+msgid "Surface"
+msgstr "Permukaan"
+
+msgctxt "Location type"
+msgid "Underground"
+msgstr "Bawah tanah"
+
+msgctxt "Lease area type"
+msgid "Plan unit"
+msgstr "Unit rencana"
+
+msgctxt "Lease area type"
+msgid "Real property"
+msgstr "Bidang tanah"
+
+msgctxt "Lease area type"
+msgid "Unseparated parcel"
+msgstr "Bidang belum dipecah"
+
+msgctxt "Lease area type"
+msgid "Other"
+msgstr "Lainnya"
+
+msgctxt "Lease area attachment type"
+msgid "MATTI report"
+msgstr "Laporan MATTI"
+
+msgctxt "Lease area attachment type"
+msgid "Geotechnical"
+msgstr "Geoteknik"
+
+msgctxt "Plot type"
+msgid "Real property"
+msgstr "Bidang tanah"
+
+msgctxt "Plot type"
+msgid "Unseparated parcel"
+msgstr "Bidang belum dipecah"
+
+msgctxt "Plot type"
+msgid "Searchable"
+msgstr "Dapat dicari"
+
+msgctxt "Plot type"
+msgid "Procedural reservation"
+msgstr "Pencadangan melalui prosedur"
+
+msgctxt "Plot type"
+msgid "Direct reservation"
+msgstr "Pencadangan langsung"
+
+msgctxt "Period type"
+msgid "/ month"
+msgstr "/ bulan"
+
+msgctxt "Period type"
+msgid "/ year"
+msgstr "/ tahun"
+
+msgctxt "Area unit"
+msgid "m^2"
+msgstr "m^2"
+
+msgctxt "Area unit"
+msgid "Floor area m^2"
+msgstr "Luas lantai m^2"
+
+msgctxt "Area unit"
+msgid "Apartment area m^2"
+msgstr "Luas unit hunian m^2"
+
+msgctxt "Constructability state"
+msgid "Unverified"
+msgstr "Belum diverifikasi"
+
+msgctxt "Constructability state"
+msgid "Requires measures"
+msgstr "Perlu tindakan"
+
+msgctxt "Constructability state"
+msgid "Enquiry sent"
+msgstr "Permintaan terkirim"
+
+msgctxt "Constructability state"
+msgid "Complete"
+msgstr "Selesai"
+
+msgctxt "Constructability type"
+msgid "Preconstruction"
+msgstr "Pra-konstruksi"
+
+msgctxt "Constructability type"
+msgid "Demolition"
+msgstr "Pembongkaran"
+
+msgctxt "Constructability type"
+msgid "Polluted land"
+msgstr "Tanah tercemar"
+
+msgctxt "Constructability type"
+msgid "Report"
+msgstr "Laporan"
+
+msgctxt "Constructability type"
+msgid "Other"
+msgstr "Lainnya"
+
+msgctxt "Polluted Land rent condition state"
+msgid "Asked"
+msgstr "Ditanyakan"
+
+msgctxt "Polluted Land rent condition state"
+msgid "Ready"
+msgstr "Siap"
+
+msgctxt "Constructability Report investigation state"
+msgid "No need"
+msgstr "Tidak perlu"
+
+msgctxt "Constructability Report investigation state"
+msgid "Ongoing"
+msgstr "Berlangsung"
+
+msgctxt "Constructability Report investigation state"
+msgid "Ready"
+msgstr "Siap"
+
+msgctxt "Rent type"
+msgid "Index"
+msgstr "Indeks"
+
+msgctxt "Rent type"
+msgid "Index (old)"
+msgstr "Indeks (lama)"
+
+msgctxt "Rent type"
+msgid "One time"
+msgstr "Sekali bayar"
+
+msgctxt "Rent type"
+msgid "Fixed"
+msgstr "Tetap"
+
+msgctxt "Rent type"
+msgid "Free"
+msgstr "Gratis"
+
+msgctxt "Rent type"
+msgid "Manual"
+msgstr "Manual"
+
+msgctxt "Rent cycle"
+msgid "January to december"
+msgstr "Januari s.d. Desember"
+
+msgctxt "Rent cycle"
+msgid "April to march"
+msgstr "April s.d. Maret"
+
+msgctxt "Index type"
+msgid "ind 50620 / 10/20%:n vaihtelut"
+msgstr "ind 50620 / variasi 10/20%"
+
+msgctxt "Index type"
+msgid "ind 4661 / 10/20%:n vaihtelut"
+msgstr "ind 4661 / variasi 10/20%"
+
+msgctxt "Index type"
+msgid "ind 418 / 10%:n vaihtelu"
+msgstr "ind 418 / variasi 10%"
+
+msgctxt "Index type"
+msgid "ind 418 / 20%:n vaihtelu"
+msgstr "ind 418 / variasi 20%"
+
+msgctxt "Index type"
+msgid "ind 392"
+msgstr "ind 392"
+
+msgctxt "Index type"
+msgid "ind 100 (pyöristys)"
+msgstr "ind 100 (pembulatan)"
+
+msgctxt "Index type"
+msgid "ind 100"
+msgstr "ind 100"
+
+msgctxt "Due dates type"
+msgid "Custom"
+msgstr "Kustom"
+
+msgctxt "Due dates type"
+msgid "Fixed"
+msgstr "Tetap"
+
+msgctxt "Due dates position"
+msgid "Start of month"
+msgstr "Awal bulan"
+
+msgctxt "Due dates position"
+msgid "Middle of month"
+msgstr "Pertengahan bulan"
+
+msgctxt "Rent adjustment type"
+msgid "Discount"
+msgstr "Potongan"
+
+msgctxt "Rent adjustment type"
+msgid "Increase"
+msgstr "Kenaikan"
+
+msgctxt "Rent Adjustment amount type"
+msgid "% per year"
+msgstr "% per tahun"
+
+msgctxt "Rent Adjustment amount type"
+msgid "€ per year"
+msgstr "Rp per tahun"
+
+msgctxt "Rent Adjustment amount type"
+msgid "€ total"
+msgstr "Rp total"
+
+msgctxt "Subvention type"
+msgid "Form of management"
+msgstr "Bentuk pengelolaan"
+
+msgctxt "Subvention type"
+msgid "Re-lease"
+msgstr "Sewa ulang"
+
+msgctxt "Invoice delivery method"
+msgid "Mail"
+msgstr "Pos"
+
+msgctxt "Invoice delivery method"
+msgid "Electronic"
+msgstr "Elektronik"
+
+msgctxt "Invoice state"
+msgid "Open"
+msgstr "Terbuka"
+
+msgctxt "Invoice state"
+msgid "Paid"
+msgstr "Lunas"
+
+msgctxt "Invoice state"
+msgid "Refunded"
+msgstr "Dikembalikan"
+
+msgctxt "Invoice type"
+msgid "Charge"
+msgstr "Tagihan"
+
+msgctxt "Invoice type"
+msgid "Credit note"
+msgstr "Nota kredit"
+
+msgctxt "Contact type"
+msgid "Person"
+msgstr "Perorangan"
+
+msgctxt "Contact type"
+msgid "Business"
+msgstr "Badan usaha"
+
+msgctxt "Contact type"
+msgid "Unit"
+msgstr "Unit"
+
+msgctxt "Contact type"
+msgid "Association"
+msgstr "Perkumpulan"
+
+msgctxt "Contact type"
+msgid "Other"
+msgstr "Lainnya"
+
+msgctxt "Infill development compensation"
+msgid "Ongoing"
+msgstr "Berlangsung"
+
+msgctxt "Infill development compensation"
+msgid "Negotiating"
+msgstr "Negosiasi"
+
+msgctxt "Infill development compensation"
+msgid "Decision"
+msgstr "Keputusan"
+
+msgctxt "Area type"
+msgid "Lease area"
+msgstr "Area sewa"
+
+msgctxt "Area type"
+msgid "Plan unit"
+msgstr "Unit rencana"
+
+msgctxt "Area type"
+msgid "Real property"
+msgstr "Bidang tanah"
+
+msgctxt "Area type"
+msgid "Unseparated parcel"
+msgstr "Bidang belum dipecah"
+
+msgctxt "Area type"
+msgid "Plot division"
+msgstr "Pemecahan bidang"
+
+msgctxt "Area type"
+msgid "Basis of rent"
+msgstr "Dasar sewa"
+
+msgctxt "Area type"
+msgid "Infill development compensation"
+msgstr "Kompensasi pembangunan sisipan"
+
+msgctxt "Area type"
+msgid "Detailed plan"
+msgstr "Rencana detail"
+
+msgctxt "Area type"
+msgid "Other"
+msgstr "Lainnya"
+
+msgctxt "Email log type"
+msgid "Constructability"
+msgstr "Kelayakan bangun"
+
+msgctxt "Leasehold transfer party type"
+msgid "Lessor"
+msgstr "Pemberi sewa"
+
+msgctxt "Leasehold transfer party type"
+msgid "Conveyor"
+msgstr "Pihak yang mengalihkan"
+
+msgctxt "Leasehold transfer party type"
+msgid "Acquirer"
+msgstr "Penerima pengalihan"
+
+msgctxt "Decision type kind"
+msgid "Lease cancellation"
+msgstr "Pembatalan sewa"
+
+msgctxt "Decision type kind"
+msgid "Basis of Rent"
+msgstr "Dasar Sewa"
+
+msgctxt "Decision type kind"
+msgid "Lease service unit transfer"
+msgstr "Pengalihan unit layanan sewa"
+
+msgctxt "Detailed plan class"
+msgid "Pending"
+msgstr "Tertunda"
+
+msgctxt "Detailed plan class"
+msgid "Effective"
+msgstr "Berlaku"
+
+msgctxt "Basis of rent type"
+msgid "Lease"
+msgstr "Sewa"
+
+msgctxt "Basis of rent type"
+msgid "Lease (old)"
+msgstr "Sewa (lama)"
+
+msgctxt "Basis of rent type"
+msgid "Temporary"
+msgstr "Sementara"
+
+msgctxt "Basis of rent type"
+msgid "Additional yard"
+msgstr "Pekarangan tambahan"
+
+msgctxt "Basis of rent type"
+msgid "Field"
+msgstr "Lapangan"
+
+msgctxt "Basis of rent type"
+msgid "Mast"
+msgstr "Menara"
+
+msgctxt "Basis of rent zone"
+msgid "Zone 1"
+msgstr "Zona 1"
+
+msgctxt "Basis of rent zone"
+msgid "Zone 2"
+msgstr "Zona 2"
+
+msgctxt "Basis of rent zone"
+msgid "Zone 3"
+msgstr "Zona 3"
+
+msgctxt "Plan Unit Status"
+msgid "Present"
+msgstr "Berlaku"
+
+msgctxt "Plan Unit Status"
+msgid "Pending"
+msgstr "Tertunda"
+
+msgctxt "Periodic Rent Adjustment Type"
+msgid "Periodic Rent Adjustment 20y/20y"
+msgstr "Penyesuaian Sewa Berkala 20t/20t"
+
+msgctxt "Periodic Rent Adjustment Type"
+msgid "Periodic Rent Adjustment 20y/10y"
+msgstr "Penyesuaian Sewa Berkala 20t/10t"
+
+msgctxt "Collection stage"
+msgid "Risk of demolition"
+msgstr "Risiko pembongkaran"
+
+msgctxt "Collection stage"
+msgid "Risk of demolition and litigation"
+msgstr "Risiko pembongkaran dan gugatan"
+
+msgctxt "Collection stage"
+msgid "Risk of litigation"
+msgstr "Risiko gugatan"
+
+msgctxt "Collection stage"
+msgid "Risk of termination and litigation"
+msgstr "Risiko pemutusan dan gugatan"
+
+msgctxt "Collection stage"
+msgid "Simple payment reminder"
+msgstr "Pengingat pembayaran sederhana"
+
+msgctxt "Collection stage"
+msgid "Payment demand"
+msgstr "Tuntutan pembayaran"
+
+msgctxt "Collection stage"
+msgid "Payment deferral"
+msgstr "Penundaan pembayaran"
+
+msgctxt "Collection stage"
+msgid "Contract change"
+msgstr "Perubahan kontrak"
+
+msgctxt "Collection stage"
+msgid "Bankruptcy or reorganization"
+msgstr "Kepailitan atau restrukturisasi"
+
+msgctxt "Collection stage"
+msgid "Distraint"
+msgstr "Sita"
+
+msgctxt "Collection stage"
+msgid "Distraint notice"
+msgstr "Pemberitahuan sita"
+
+msgctxt "Collection stage"
+msgid "Notice"
+msgstr "Pemberitahuan"
+
+msgctxt "Collection stage"
+msgid "Complaint or other obstruction"
+msgstr "Pengaduan atau hambatan lain"
+
+msgctxt "Preparation state"
+msgid "Missing lease property"
+msgstr "Objek sewa belum ada"
+
+msgctxt "Preparation state"
+msgid "Missing lease area geometry"
+msgstr "Geometri area sewa belum ada"
+
+msgctxt "Preparation state"
+msgid "Missing tenant"
+msgstr "Penyewa belum ada"
+
+msgctxt "Preparation state"
+msgid "Missing rent"
+msgstr "Sewa belum ada"
+
+msgctxt "Preparation state"
+msgid "Missing decision"
+msgstr "Keputusan belum ada"
+
+msgctxt "Preparation state"
+msgid "Missing constructability"
+msgstr "Kelayakan bangun belum ada"
+
+msgctxt "Preparation state"
+msgid "Contract not signed"
+msgstr "Kontrak belum ditandatangani"
+
+msgctxt "Preparation state"
+msgid "Rent not marked ready"
+msgstr "Sewa belum ditandai siap"
+
+msgctxt "Preparation state"
+msgid "Invoicing not started"
+msgstr "Penagihan belum dimulai"
+
+msgid "Going to SAP"
+msgstr "Akan dikirim ke SAP"
+
+msgctxt "Model name"
+msgid "Area source"
+msgstr "Sumber area"
+
+msgid "Area type"
+msgstr "Jenis area"
+
+msgid "External ID"
+msgstr "ID eksternal"
+
+msgid "Geometry"
+msgstr "Geometri"
+
+msgid "Metadata"
+msgstr "Metadata"
+
+msgid "Source"
+msgstr "Sumber"
+
+msgctxt "Model name"
+msgid "Area"
+msgstr "Area"
+
+msgid "Note"
+msgstr "Catatan"
+
+msgid "User"
+msgstr "Pengguna"
+
+msgctxt "Model name"
+msgid "Area note"
+msgstr "Catatan area"
+
+msgctxt "Model name"
+msgid "Area notes"
+msgstr "Catatan area"
+
+msgctxt "Model name"
+msgid "Basis of rent plot type"
+msgstr "Jenis kavling dasar sewa"
+
+msgctxt "Model name"
+msgid "Basis of rent plot types"
+msgstr "Jenis kavling dasar sewa"
+
+msgctxt "Model name"
+msgid "Basis of rent build permission type"
+msgstr "Jenis izin bangunan dasar sewa"
+
+msgctxt "Model name"
+msgid "Basis of rent build permission types"
+msgstr "Jenis izin bangunan dasar sewa"
+
+msgid "Plot type"
+msgstr "Jenis kavling"
+
+msgid "Detailed plan identifier"
+msgstr "Pengenal rencana detail"
+
+msgid "Form of management"
+msgstr "Bentuk pengelolaan"
+
+msgid "Form of financing"
+msgstr "Bentuk pembiayaan"
+
+msgid "Lease rights end date"
+msgstr "Tanggal berakhir hak sewa"
+
+msgid "Index"
+msgstr "Indeks"
+
+msgctxt "Model name"
+msgid "Basis of rent"
+msgstr "Dasar sewa"
+
+msgctxt "Model name"
+msgid "Basis of rents"
+msgstr "Dasar sewa"
+
+msgid "Basis of rent"
+msgstr "Dasar sewa"
+
+msgid "Build permission type"
+msgstr "Jenis izin bangunan"
+
+msgid "Amount"
+msgstr "Jumlah"
+
+msgid "Area unit"
+msgstr "Satuan luas"
+
+msgctxt "Model name"
+msgid "Basis of rent rate"
+msgstr "Tarif dasar sewa"
+
+msgctxt "Model name"
+msgid "Basis of rent rates"
+msgstr "Tarif dasar sewa"
+
+msgctxt "Model name"
+msgid "Basis of rent property identifier"
+msgstr "Pengenal bidang dasar sewa"
+
+msgctxt "Model name"
+msgid "Basis of rent property identifiers"
+msgstr "Pengenal bidang dasar sewa"
+
+msgid "Reference number"
+msgstr "Nomor referensi"
+
+msgid "Decision maker"
+msgstr "Pengambil keputusan"
+
+msgid "Decision date"
+msgstr "Tanggal keputusan"
+
+msgid "Section"
+msgstr "Pasal"
+
+msgctxt "Model name"
+msgid "Basis of rent decision"
+msgstr "Keputusan dasar sewa"
+
+msgctxt "Model name"
+msgid "Basis of rent decisions"
+msgstr "Keputusan dasar sewa"
+
+msgctxt "Model name"
+msgid "Comment topic"
+msgstr "Topik komentar"
+
+msgctxt "Model name"
+msgid "Comment topics"
+msgstr "Topik komentar"
+
+msgid "Topic"
+msgstr "Topik"
+
+msgid "Text"
+msgstr "Teks"
+
+msgctxt "Model name"
+msgid "Comment"
+msgstr "Komentar"
+
+msgctxt "Model name"
+msgid "Comments"
+msgstr "Komentar"
+
+msgid "Type"
+msgstr "Jenis"
+
+msgid "First name"
+msgstr "Nama depan"
+
+msgid "Last name"
+msgstr "Nama belakang"
+
+msgid "Name"
+msgstr "Nama"
+
+msgid "c/o"
+msgstr "u.p."
+
+msgid "Business ID"
+msgstr "NPWP"
+
+msgid "Postal code"
+msgstr "Kode pos"
+
+msgid "City"
+msgstr "Kota/Kabupaten"
+
+msgid "Country"
+msgstr "Negara"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Phone"
+msgstr "Telepon"
+
+msgid "Language"
+msgstr "Bahasa"
+
+msgid "National identification number"
+msgstr "NIK"
+
+msgid "Address protection"
+msgstr "Perlindungan alamat"
+
+msgid "SAP customer number"
+msgstr "Nomor pelanggan SAP"
+
+msgid "Electronic billing address"
+msgstr "Alamat e-faktur"
+
+msgid "Partner code"
+msgstr "Kode mitra"
+
+msgid "Is a lessor"
+msgstr "Pemberi sewa"
+
+msgid "SAP sales office"
+msgstr "Kantor penjualan SAP"
+
+msgid "Service unit"
+msgstr "Unit layanan"
+
+msgctxt "Model name"
+msgid "Contact"
+msgstr "Kontak"
+
+msgctxt "Model name"
+msgid "Contacts"
+msgstr "Kontak"
+
+#. Translators: Replaces the name of a person with a generic term.
+msgctxt "Replaces persons name"
+msgid "PRIVATE"
+msgstr "RAHASIA"
+
+#, python-brace-format
+msgid "{name} (National Identification Number {id})"
+msgstr "{name} (NIK {id})"
+
+#, python-brace-format
+msgid "{name} (Business ID {id})"
+msgstr "{name} (NPWP {id})"
+
+msgctxt "Model name"
+msgid "Contract type"
+msgstr "Jenis kontrak"
+
+msgctxt "Model name"
+msgid "Contract types"
+msgstr "Jenis kontrak"
+
+msgid "Contract type"
+msgstr "Jenis kontrak"
+
+msgid "Contract number"
+msgstr "Nomor kontrak"
+
+msgid "Signing date"
+msgstr "Tanggal penandatanganan"
+
+msgid "Sign by date"
+msgstr "Batas tanggal penandatanganan"
+
+msgid "Signing note"
+msgstr "Catatan penandatanganan"
+
+msgid "First call sent"
+msgstr "Panggilan pertama terkirim"
+
+msgid "Second call sent"
+msgstr "Panggilan kedua terkirim"
+
+msgid "Third call sent"
+msgstr "Panggilan ketiga terkirim"
+
+msgid "Is readjustment decision"
+msgstr "Keputusan penyesuaian ulang"
+
+msgid "Decision"
+msgstr "Keputusan"
+
+msgid "KTJ link"
+msgstr "Tautan data pertanahan"
+
+msgid "Institution identifier"
+msgstr "Pengenal lembaga"
+
+msgid "Executor"
+msgstr "Pelaksana"
+
+msgctxt "Model name"
+msgid "Contract"
+msgstr "Kontrak"
+
+msgctxt "Model name"
+msgid "Contracts"
+msgstr "Kontrak"
+
+msgctxt "Model name"
+msgid "Collateral type"
+msgstr "Jenis jaminan"
+
+msgctxt "Model name"
+msgid "Collateral types"
+msgstr "Jenis jaminan"
+
+msgid "Contract"
+msgstr "Kontrak"
+
+msgid "Collateral type"
+msgstr "Jenis jaminan"
+
+msgid "Other type"
+msgstr "Jenis lain"
+
+msgid "Number"
+msgstr "Nomor"
+
+msgid "Deed date"
+msgstr "Tanggal akta"
+
+msgid "Total amount"
+msgstr "Jumlah total"
+
+msgid "Paid date"
+msgstr "Tanggal dibayar"
+
+msgid "Returned date"
+msgstr "Tanggal dikembalikan"
+
+msgctxt "Model name"
+msgid "Collateral"
+msgstr "Jaminan"
+
+msgctxt "Model name"
+msgid "Collaterals"
+msgstr "Jaminan"
+
+msgid "Description"
+msgstr "Uraian"
+
+msgctxt "Model name"
+msgid "Contract change"
+msgstr "Perubahan kontrak"
+
+msgctxt "Model name"
+msgid "Contract changes"
+msgstr "Perubahan kontrak"
+
+msgid "File"
+msgstr "Berkas"
+
+msgid "Uploader"
+msgstr "Pengunggah"
+
+msgid "Time uploaded"
+msgstr "Waktu unggah"
+
+msgctxt "Model name"
+msgid "Collection letter"
+msgstr "Surat penagihan"
+
+msgctxt "Model name"
+msgid "Collection letters"
+msgstr "Surat penagihan"
+
+msgctxt "Model name"
+msgid "Collection letter template"
+msgstr "Templat surat penagihan"
+
+msgctxt "Model name"
+msgid "Collection letter templates"
+msgstr "Templat surat penagihan"
+
+msgid "Collection stage"
+msgstr "Tahap penagihan"
+
+msgid "Invoices"
+msgstr "Tagihan"
+
+msgid "Sent date"
+msgstr "Tanggal kirim"
+
+msgid "Inspection date"
+msgstr "Tanggal pemeriksaan"
+
+msgid "Postpone date"
+msgstr "Tanggal penundaan"
+
+msgid "Entire lease"
+msgstr "Seluruh sewa"
+
+msgctxt "Model name"
+msgid "Collection letter note"
+msgstr "Catatan surat penagihan"
+
+msgctxt "Model name"
+msgid "Collection letter notes"
+msgstr "Catatan surat penagihan"
+
+msgctxt "Model name"
+msgid "Collection court decision"
+msgstr "Putusan pengadilan penagihan"
+
+msgctxt "Model name"
+msgid "Collection court decisions"
+msgstr "Putusan pengadilan penagihan"
+
+msgid "Reference rate"
+msgstr "Suku bunga acuan"
+
+msgid "Penalty rate"
+msgstr "Suku bunga denda"
+
+msgctxt "Model name"
+msgid "Interest rate"
+msgstr "Suku bunga"
+
+msgctxt "Model name"
+msgid "Interest rates"
+msgstr "Suku bunga"
+
+msgctxt "Model name"
+msgid "Decision maker"
+msgstr "Pengambil keputusan"
+
+msgctxt "Model name"
+msgid "Decision makers"
+msgstr "Pengambil keputusan"
+
+msgid "Decision type kind"
+msgstr "Kategori jenis keputusan"
+
+msgctxt "Model name"
+msgid "Decision type"
+msgstr "Jenis keputusan"
+
+msgctxt "Model name"
+msgid "Decision types"
+msgstr "Jenis keputusan"
+
+msgctxt "Model name"
+msgid "Decision"
+msgstr "Keputusan"
+
+msgctxt "Model name"
+msgid "Decisions"
+msgstr "Keputusan"
+
+msgctxt "Model name"
+msgid "Condition type"
+msgstr "Jenis persyaratan"
+
+msgctxt "Model name"
+msgid "Condition types"
+msgstr "Jenis persyaratan"
+
+msgid "Supervision date"
+msgstr "Tanggal pengawasan"
+
+msgid "Supervised date"
+msgstr "Tanggal diawasi"
+
+msgctxt "Model name"
+msgid "Condition"
+msgstr "Persyaratan"
+
+msgctxt "Model name"
+msgid "Conditions"
+msgstr "Persyaratan"
+
+msgid "Accepter"
+msgstr "Penyetuju"
+
+msgid "Class"
+msgstr "Kelas"
+
+msgid "Diary number"
+msgstr "Nomor agenda"
+
+msgid "Plan stage"
+msgstr "Tahap rencana"
+
+msgid "Lawfulness date"
+msgstr "Tanggal berkekuatan hukum"
+
+msgctxt "Model name"
+msgid "Detailed plan"
+msgstr "Rencana detail"
+
+msgctxt "Model name"
+msgid "Detailed plans"
+msgstr "Rencana detail"
+
+msgid "Email log type"
+msgstr "Jenis log email"
+
+msgctxt "Model name"
+msgid "Email log"
+msgstr "Log email"
+
+msgctxt "Model name"
+msgid "Email logs"
+msgstr "Log email"
+
+msgid "Lease contract change date"
+msgstr "Tanggal perubahan kontrak sewa"
+
+msgctxt "Model name"
+msgid "Infill development compensation"
+msgstr "Kompensasi pembangunan sisipan"
+
+msgctxt "Model name"
+msgid "Infill development compensations"
+msgstr "Kompensasi pembangunan sisipan"
+
+msgid "Infill development compensation"
+msgstr "Kompensasi pembangunan sisipan"
+
+msgid "Monetary compensation amount"
+msgstr "Jumlah kompensasi uang"
+
+msgid "Compensation investment amount"
+msgstr "Jumlah investasi kompensasi"
+
+msgid "Increase in value"
+msgstr "Kenaikan nilai"
+
+msgid "Part of the increase in value"
+msgstr "Porsi kenaikan nilai"
+
+msgid "Discount in rent"
+msgstr "Potongan sewa"
+
+msgid "Year"
+msgstr "Tahun"
+
+msgid "Sent to SAP date"
+msgstr "Tanggal dikirim ke SAP"
+
+msgctxt "Model name"
+msgid "Infill development compensation lease"
+msgstr "Sewa kompensasi pembangunan sisipan"
+
+msgctxt "Model name"
+msgid "Infill development compensation leases"
+msgstr "Sewa kompensasi pembangunan sisipan"
+
+msgid "Infill development compensation lease"
+msgstr "Sewa kompensasi pembangunan sisipan"
+
+msgctxt "Model name"
+msgid "Infill development compensation decision"
+msgstr "Keputusan kompensasi pembangunan sisipan"
+
+msgctxt "Model name"
+msgid "Infill development compensation decisions"
+msgstr "Keputusan kompensasi pembangunan sisipan"
+
+msgid "Floor m2"
+msgstr "Luas lantai m2"
+
+msgid "Amount per floor m^2"
+msgstr "Jumlah per m^2 lantai"
+
+msgctxt "Model name"
+msgid "Infill development compensation intended use"
+msgstr "Peruntukan kompensasi pembangunan sisipan"
+
+msgctxt "Model name"
+msgid "Infill development compensation intended uses"
+msgstr "Peruntukan kompensasi pembangunan sisipan"
+
+msgctxt "Model name"
+msgid "Infill development compensation attachment"
+msgstr "Lampiran kompensasi pembangunan sisipan"
+
+msgctxt "Model name"
+msgid "Infill development compensation attachments"
+msgstr "Lampiran kompensasi pembangunan sisipan"
+
+msgid "Inspector"
+msgstr "Pemeriksa"
+
+msgctxt "Model name"
+msgid "Inspection"
+msgstr "Pemeriksaan"
+
+msgctxt "Model name"
+msgid "Inspections"
+msgstr "Pemeriksaan"
+
+msgctxt "Model name"
+msgid "Inspection attachment"
+msgstr "Lampiran pemeriksaan"
+
+msgctxt "Model name"
+msgid "Inspection attachments"
+msgstr "Lampiran pemeriksaan"
+
+msgid "Billing period start date"
+msgstr "Tanggal mulai periode tagihan"
+
+msgid "Billing period end date"
+msgstr "Tanggal akhir periode tagihan"
+
+msgctxt "Model name"
+msgid "Invoice set"
+msgstr "Kumpulan tagihan"
+
+msgid "Invoice set"
+msgstr "Kumpulan tagihan"
+
+msgid "Recipient"
+msgstr "Penerima"
+
+msgid "Sent to SAP at"
+msgstr "Dikirim ke SAP pada"
+
+msgid "SAP ID"
+msgstr "ID SAP"
+
+msgid "Due date"
+msgstr "Jatuh tempo"
+
+msgid "Adjusted due date"
+msgstr "Jatuh tempo disesuaikan"
+
+msgid "Invoicing date"
+msgstr "Tanggal penagihan"
+
+msgid "Billed amount"
+msgstr "Jumlah ditagih"
+
+msgid "Outstanding amount"
+msgstr "Jumlah terutang"
+
+msgid "Payment notification date"
+msgstr "Tanggal pemberitahuan pembayaran"
+
+msgid "Collection charge"
+msgstr "Biaya penagihan"
+
+msgid "Payment notification catalog date"
+msgstr "Tanggal katalog pemberitahuan pembayaran"
+
+msgid "Delivery method"
+msgstr "Metode pengiriman"
+
+msgid "Notes"
+msgstr "Catatan"
+
+msgid "Is automatically generated?"
+msgstr "Dibuat otomatis?"
+
+msgid "Credited invoice"
+msgstr "Tagihan yang dikreditkan"
+
+msgid "Interest invoice for"
+msgstr "Tagihan bunga untuk"
+
+msgctxt "Model name"
+msgid "Invoice"
+msgstr "Tagihan"
+
+msgctxt "Model name"
+msgid "Invoices"
+msgstr "Tagihan"
+
+msgid "Cannot credit an invoice that has been refunded."
+msgstr "Tidak dapat mengkreditkan tagihan yang sudah dikembalikan."
+
+msgctxt "Model name"
+msgid "Invoice note"
+msgstr "Catatan tagihan"
+
+msgctxt "Model name"
+msgid "Invoice notes"
+msgstr "Catatan tagihan"
+
+msgid "Invoice"
+msgstr "Tagihan"
+
+msgid "Tenant"
+msgstr "Penyewa"
+
+msgid "Receivable type"
+msgstr "Jenis piutang"
+
+msgctxt "Model name"
+msgid "Invoice row"
+msgstr "Baris tagihan"
+
+msgctxt "Model name"
+msgid "Invoice rows"
+msgstr "Baris tagihan"
+
+msgid "Paid amount"
+msgstr "Jumlah dibayar"
+
+msgctxt "Model name"
+msgid "Invoice payment"
+msgstr "Pembayaran tagihan"
+
+msgctxt "Model name"
+msgid "Invoice payments"
+msgstr "Pembayaran tagihan"
+
+msgid "Is master?"
+msgstr "Data induk?"
+
+msgid "Master timestamp"
+msgstr "Stempel waktu data induk"
+
+msgid ""
+"The master land item has already created. There can be only one master land "
+"item per lease area and identifier."
+msgstr ""
+"Data induk lahan sudah dibuat. Hanya boleh ada satu data induk lahan per "
+"area sewa dan pengenal."
+
+msgid "Area in square meters"
+msgstr "Luas dalam meter persegi"
+
+msgid "Section area"
+msgstr "Luas bagian"
+
+msgid "Location"
+msgstr "Lokasi"
+
+msgid "Preconstruction state"
+msgstr "Status pra-konstruksi"
+
+msgid "Preconstruction estimated construction readiness"
+msgstr "Perkiraan kesiapan konstruksi pra-konstruksi"
+
+msgid "Preconstruction inspection"
+msgstr "Pemeriksaan pra-konstruksi"
+
+msgid "Demolition state"
+msgstr "Status pembongkaran"
+
+msgid "Polluted land state"
+msgstr "Status tanah tercemar"
+
+msgid "Polluted land rent condition state"
+msgstr "Status syarat sewa tanah tercemar"
+
+msgid "Polluted land rent condition date"
+msgstr "Tanggal syarat sewa tanah tercemar"
+
+msgid "ProjectWise number"
+msgstr "Nomor ProjectWise"
+
+msgid "Constructability report state"
+msgstr "Status laporan kelayakan bangun"
+
+msgid "Constructability report investigation state"
+msgstr "Status penyelidikan laporan kelayakan bangun"
+
+msgid "Constructability report signing date"
+msgstr "Tanggal penandatanganan laporan kelayakan bangun"
+
+msgid "Constructability report signer"
+msgstr "Penandatangan laporan kelayakan bangun"
+
+msgid "Other state"
+msgstr "Status lain"
+
+msgid "Archived decision"
+msgstr "Keputusan terarsip"
+
+msgctxt "Model name"
+msgid "Lease area"
+msgstr "Area sewa"
+
+msgctxt "Model name"
+msgid "Lease areas"
+msgstr "Area sewa"
+
+msgid "Is primary?"
+msgstr "Utama?"
+
+msgctxt "Model name"
+msgid "Lease area address"
+msgstr "Alamat area sewa"
+
+msgctxt "Model name"
+msgid "Lease area addresses"
+msgstr "Alamat area sewa"
+
+msgctxt "Model name"
+msgid "Lease area attachment"
+msgstr "Lampiran area sewa"
+
+msgctxt "Model name"
+msgid "Lease area attachments"
+msgstr "Lampiran area sewa"
+
+msgid "AHJO reference number"
+msgstr "Nomor referensi keputusan"
+
+msgid "Is static?"
+msgstr "Statis?"
+
+msgctxt "Model name"
+msgid "Constructability description"
+msgstr "Uraian kelayakan bangun"
+
+msgctxt "Model name"
+msgid "Constructability descriptions"
+msgstr "Uraian kelayakan bangun"
+
+msgid "Registration date"
+msgstr "Tanggal pendaftaran"
+
+msgid "Repeal date"
+msgstr "Tanggal pencabutan"
+
+msgid "At time of contract"
+msgstr "Pada saat kontrak"
+
+msgctxt "Model name"
+msgid "Plot"
+msgstr "Kavling"
+
+msgctxt "Model name"
+msgid "Plots"
+msgstr "Kavling"
+
+msgctxt "Model name"
+msgid "Plan unit type"
+msgstr "Jenis unit rencana"
+
+msgctxt "Model name"
+msgid "Plan unit types"
+msgstr "Jenis unit rencana"
+
+msgctxt "Model name"
+msgid "Plot divisions state"
+msgstr "Status pemecahan bidang"
+
+msgctxt "Model name"
+msgid "Plot division states"
+msgstr "Status pemecahan bidang"
+
+msgctxt "Model name"
+msgid "Plan unit state"
+msgstr "Status unit rencana"
+
+msgctxt "Model name"
+msgid "Plan unit states"
+msgstr "Status unit rencana"
+
+msgctxt "Model name"
+msgid "Plan unit intended use"
+msgstr "Peruntukan unit rencana"
+
+msgctxt "Model name"
+msgid "Plan unit intended uses"
+msgstr "Peruntukan unit rencana"
+
+msgid "Plot division identifier"
+msgstr "Pengenal pemecahan bidang"
+
+msgid "Plot division date of approval"
+msgstr "Tanggal persetujuan pemecahan bidang"
+
+msgid "Plot division effective date"
+msgstr "Tanggal berlaku pemecahan bidang"
+
+msgid "Plot division state"
+msgstr "Status pemecahan bidang"
+
+msgid "Detailed plan latest processing date"
+msgstr "Tanggal pemrosesan terakhir rencana detail"
+
+msgid "Note for latest processing date"
+msgstr "Catatan tanggal pemrosesan terakhir"
+
+msgid "Plan unit type"
+msgstr "Jenis unit rencana"
+
+msgid "Plan unit state"
+msgstr "Status unit rencana"
+
+msgid "Plan unit intended use"
+msgstr "Peruntukan unit rencana"
+
+msgid "Plan unit status"
+msgstr "Status unit rencana"
+
+msgctxt "Model name"
+msgid "Plan unit"
+msgstr "Unit rencana"
+
+msgctxt "Model name"
+msgid "Plan units"
+msgstr "Unit rencana"
+
+msgid "SAP material code"
+msgstr "Kode material SAP"
+
+msgid "SAP order item number"
+msgstr "Nomor item pesanan SAP"
+
+msgid "If 'SAP project number' is set, it will be used instead of this value."
+msgstr ""
+"Jika 'Nomor proyek SAP' diisi, nilai tersebut dipakai sebagai pengganti "
+"nilai ini."
+
+msgid "SAP project number"
+msgstr "Nomor proyek SAP"
+
+msgid ""
+"This field takes priority over 'SAP order item number' if both are set."
+msgstr ""
+"Kolom ini diutamakan dibanding 'Nomor item pesanan SAP' jika keduanya diisi."
+
+msgid "Due dates position"
+msgstr "Posisi jatuh tempo"
+
+msgid "Is the Lease Type active?"
+msgstr "Jenis sewa aktif?"
+
+msgid "Is active?"
+msgstr "Aktif?"
+
+msgctxt "Model name"
+msgid "Lease type"
+msgstr "Jenis sewa"
+
+msgctxt "Model name"
+msgid "Lease types"
+msgstr "Jenis sewa"
+
+msgctxt "Model name"
+msgid "Municipality"
+msgstr "Kabupaten/Kota"
+
+msgctxt "Model name"
+msgid "Municipalities"
+msgstr "Kabupaten/Kota"
+
+msgid "Municipality"
+msgstr "Kabupaten/Kota"
+
+msgctxt "Model name"
+msgid "District"
+msgstr "Kecamatan"
+
+msgctxt "Model name"
+msgid "Districts"
+msgstr "Kecamatan"
+
+msgid "Is the intended use active?"
+msgstr "Peruntukan aktif?"
+
+msgctxt "Model name"
+msgid "Intended use"
+msgstr "Peruntukan"
+
+msgctxt "Model name"
+msgid "Intended uses"
+msgstr "Peruntukan"
+
+msgctxt "Model name"
+msgid "Statistical use"
+msgstr "Penggunaan statistik"
+
+msgctxt "Model name"
+msgid "Statistical uses"
+msgstr "Penggunaan statistik"
+
+msgctxt "Model name"
+msgid "Supportive housing"
+msgstr "Hunian pendukung"
+
+msgctxt "Model name"
+msgid "Supportive housings"
+msgstr "Hunian pendukung"
+
+msgctxt "Model name"
+msgid "Form of financing"
+msgstr "Bentuk pembiayaan"
+
+msgctxt "Model name"
+msgid "Forms of financing"
+msgstr "Bentuk pembiayaan"
+
+msgctxt "Model name"
+msgid "Form of management"
+msgstr "Bentuk pengelolaan"
+
+msgctxt "Model name"
+msgid "Forms of management"
+msgstr "Bentuk pengelolaan"
+
+msgctxt "Model name"
+msgid "Form of regulation"
+msgstr "Bentuk pengaturan"
+
+msgctxt "Model name"
+msgid "Forms of regulation"
+msgstr "Bentuk pengaturan"
+
+msgctxt "Model name"
+msgid "Hitas"
+msgstr "Skema harga terkendali"
+
+msgid "Period type"
+msgstr "Jenis periode"
+
+msgid "Duration"
+msgstr "Durasi"
+
+msgid "In ISO 8601 Duration format"
+msgstr "Dalam format durasi ISO 8601"
+
+msgctxt "Model name"
+msgid "Notice period"
+msgstr "Masa pemberitahuan"
+
+msgctxt "Model name"
+msgid "Notice periods"
+msgstr "Masa pemberitahuan"
+
+msgctxt "Model name"
+msgid "Special project"
+msgstr "Proyek khusus"
+
+msgctxt "Model name"
+msgid "Special projects"
+msgstr "Proyek khusus"
+
+msgctxt "Model name"
+msgid "Reservation procedure"
+msgstr "Prosedur pencadangan"
+
+msgctxt "Model name"
+msgid "Reservation Procedures"
+msgstr "Prosedur pencadangan"
+
+msgid "Lease type"
+msgstr "Jenis sewa"
+
+msgid "Sequence number"
+msgstr "Nomor urut"
+
+msgctxt "Model name"
+msgid "Lease identifier"
+msgstr "Pengenal sewa"
+
+msgctxt "Model name"
+msgid "Lease identifiers"
+msgstr "Pengenal sewa"
+
+msgid "Lease identifier"
+msgstr "Pengenal sewa"
+
+msgid "Classification"
+msgstr "Klasifikasi"
+
+msgid "Intended use note"
+msgstr "Catatan peruntukan"
+
+msgid "Transferable"
+msgstr "Dapat dialihkan"
+
+msgid "Regulated"
+msgstr "Diatur"
+
+msgid "Notice note"
+msgstr "Catatan pemberitahuan"
+
+msgid "Supportive housing"
+msgstr "Hunian pendukung"
+
+msgid "Statistical use"
+msgstr "Penggunaan statistik"
+
+msgid "Form of regulation"
+msgstr "Bentuk pengaturan"
+
+msgid "Hitas"
+msgstr "Skema harga terkendali"
+
+msgid "Notice period"
+msgstr "Masa pemberitahuan"
+
+msgid "Rent info completed at?"
+msgstr "Data sewa lengkap pada?"
+
+msgid "Invoicing enabled at?"
+msgstr "Penagihan diaktifkan pada?"
+
+msgid "Is subject to VAT?"
+msgstr "Dikenai PPN?"
+
+msgid "Real estate developer"
+msgstr "Pengembang properti"
+
+msgid "Conveyance number"
+msgstr "Nomor pengalihan"
+
+msgid "Building selling price"
+msgstr "Harga jual bangunan"
+
+msgid "Special project"
+msgstr "Proyek khusus"
+
+msgid "Reservation procedure"
+msgstr "Prosedur pencadangan"
+
+msgid "Internal order"
+msgstr "Pesanan internal"
+
+msgctxt "Model name"
+msgid "Lease"
+msgstr "Sewa"
+
+msgctxt "Model name"
+msgid "Leases"
+msgstr "Sewa"
+
+msgid "The intended use's service unit must match the lease's service_unit."
+msgstr "Unit layanan peruntukan harus sama dengan unit layanan sewa."
+
+#, python-brace-format
+msgid "{area_identifier}, {area_addresses}, {area_m2}m2"
+msgstr "{area_identifier}, {area_addresses}, {area_m2}m2"
+
+#, python-brace-format
+msgid "Contract #{contract_number}"
+msgstr "Kontrak #{contract_number}"
+
+msgid "Lease must have a start date to generate invoices."
+msgstr "Sewa harus memiliki tanggal mulai untuk membuat tagihan."
+
+msgid "Lease must have a start date to enable invoicing."
+msgstr "Sewa harus memiliki tanggal mulai untuk mengaktifkan penagihan."
+
+msgctxt "Model name"
+msgid "Lease state log"
+msgstr "Log status sewa"
+
+msgctxt "Model name"
+msgid "Lease state logs"
+msgstr "Log status sewa"
+
+msgid "Application received at"
+msgstr "Permohonan diterima pada"
+
+msgid "The date the application was received."
+msgstr "Tanggal permohonan diterima."
+
+msgid "From lease"
+msgstr "Dari sewa"
+
+msgid "To lease"
+msgstr "Ke sewa"
+
+msgid "Lease relation type"
+msgstr "Jenis relasi sewa"
+
+msgctxt "Model name"
+msgid "Related lease"
+msgstr "Sewa terkait"
+
+msgctxt "Model name"
+msgid "Related leases"
+msgstr "Sewa terkait"
+
+msgid "File name"
+msgstr "Nama berkas"
+
+msgctxt "Model name"
+msgid "Leasehold transfer import log"
+msgstr "Log impor pengalihan hak sewa"
+
+msgctxt "Model name"
+msgid "Leasehold transfer import logs"
+msgstr "Log impor pengalihan hak sewa"
+
+msgctxt "Model name"
+msgid "Leasehold transfer"
+msgstr "Pengalihan hak sewa"
+
+msgctxt "Model name"
+msgid "Leasehold transfers"
+msgstr "Pengalihan hak sewa"
+
+msgid "Leasehold transfer"
+msgstr "Pengalihan hak sewa"
+
+msgctxt "Model name"
+msgid "Leasehold transfer property"
+msgstr "Bidang pengalihan hak sewa"
+
+msgctxt "Model name"
+msgid "Leasehold transfer properties"
+msgstr "Bidang pengalihan hak sewa"
+
+msgid "Numerator"
+msgstr "Pembilang"
+
+msgid "Denominator"
+msgstr "Penyebut"
+
+msgctxt "Model name"
+msgid "Leasehold transfer party"
+msgstr "Pihak pengalihan hak sewa"
+
+msgctxt "Model name"
+msgid "Leasehold transfer parties"
+msgstr "Pihak pengalihan hak sewa"
+
+msgid "Time archived"
+msgstr "Waktu diarsipkan"
+
+msgid "Archived note"
+msgstr "Catatan arsip"
+
+msgctxt "Model name"
+msgid "Receivable type"
+msgstr "Jenis piutang"
+
+msgctxt "Model name"
+msgid "Receivable types"
+msgstr "Jenis piutang"
+
+msgctxt "Model name"
+msgid "Rent intended use"
+msgstr "Peruntukan sewa"
+
+msgctxt "Model name"
+msgid "Rent intended uses"
+msgstr "Peruntukan sewa"
+
+msgid "Index code"
+msgstr "Kode indeks"
+
+msgid "Index name"
+msgstr "Nama indeks"
+
+msgid "Region"
+msgstr "Wilayah"
+
+msgid "Data source"
+msgstr "Sumber data"
+
+msgid "Source table updated"
+msgstr "Tabel sumber diperbarui"
+
+msgid "Source table label"
+msgstr "Label tabel sumber"
+
+msgid "API endpoint URL"
+msgstr "URL endpoint API"
+
+msgctxt "model name"
+msgid "price index of old dwellings in housing companies"
+msgstr "indeks harga hunian lama"
+
+msgctxt "model name"
+msgid "price indexes of old dwellings in housing companies"
+msgstr "indeks harga hunian lama"
+
+msgid "Cycle"
+msgstr "Siklus"
+
+msgid "Index type"
+msgstr "Jenis indeks"
+
+msgid "Due dates type"
+msgstr "Jenis jatuh tempo"
+
+msgid "Due dates per year"
+msgstr "Jatuh tempo per tahun"
+
+msgid "Elementary index"
+msgstr "Indeks dasar"
+
+msgid "Index rounding"
+msgstr "Pembulatan indeks"
+
+msgid "X value"
+msgstr "Nilai X"
+
+msgid "Y value"
+msgstr "Nilai Y"
+
+msgid "Y value start date"
+msgstr "Tanggal mulai nilai Y"
+
+msgid "Equalization start date"
+msgstr "Tanggal mulai penyetaraan"
+
+msgid "Equalization end date"
+msgstr "Tanggal akhir penyetaraan"
+
+msgid "Manual ratio"
+msgstr "Rasio manual"
+
+msgid "Manual ratio (previous)"
+msgstr "Rasio manual (sebelumnya)"
+
+msgid "Payable rent amount"
+msgstr "Jumlah sewa terutang"
+
+msgid "Payable rent start date"
+msgstr "Tanggal mulai sewa terutang"
+
+msgid "Payable rent end date"
+msgstr "Tanggal akhir sewa terutang"
+
+msgid "Override receivable type"
+msgstr "Jenis piutang pengganti"
+
+msgid "Old dwellings in housing companies price index"
+msgstr "Indeks harga hunian lama"
+
+msgid "Periodic Rent Adjustment Type"
+msgstr "Jenis Penyesuaian Sewa Berkala"
+
+msgid "Start price index point figure value"
+msgstr "Nilai angka indeks harga awal"
+
+msgid "Start price index point figure year"
+msgstr "Tahun angka indeks harga awal"
+
+msgctxt "Model name"
+msgid "Rent"
+msgstr "Sewa"
+
+msgctxt "Model name"
+msgid "Rents"
+msgstr "Sewa"
+
+msgid "Cannot calculate payable rent. The rent cycle '{}' is not defined."
+msgstr ""
+"Tidak dapat menghitung sewa terutang. Siklus sewa '{}' tidak terdefinisi."
+
+#, python-brace-format
+msgid "Manual ratio {ratio}"
+msgstr "Rasio manual {ratio}"
+
+msgid "Manual ratio not found!"
+msgstr "Rasio manual tidak ditemukan!"
+
+msgid "Average index for the year {} is not available!"
+msgstr "Indeks rata-rata tahun {} tidak tersedia!"
+
+msgid "Rent"
+msgstr "Sewa"
+
+msgid "Day"
+msgstr "Hari"
+
+msgid "Month"
+msgstr "Bulan"
+
+msgctxt "Model name"
+msgid "Rent due date"
+msgstr "Jatuh tempo sewa"
+
+msgctxt "Model name"
+msgid "Rent due dates"
+msgstr "Jatuh tempo sewa"
+
+msgctxt "Model name"
+msgid "Fixed initial year rent"
+msgstr "Sewa tahun awal tetap"
+
+msgctxt "Model name"
+msgid "Fixed initial year rents"
+msgstr "Sewa tahun awal tetap"
+
+msgid "Period"
+msgstr "Periode"
+
+msgid "Base amount"
+msgstr "Jumlah dasar"
+
+msgid "Base amount period"
+msgstr "Periode jumlah dasar"
+
+msgid "Base year rent"
+msgstr "Sewa tahun dasar"
+
+msgctxt "Model name"
+msgid "Contract rent"
+msgstr "Sewa kontrak"
+
+msgctxt "Model name"
+msgid "Contract rents"
+msgstr "Sewa kontrak"
+
+msgid "Factor"
+msgstr "Faktor"
+
+msgctxt "Model name"
+msgid "Index adjusted rent"
+msgstr "Sewa disesuaikan indeks"
+
+msgctxt "Model name"
+msgid "Index adjusted rents"
+msgstr "Sewa disesuaikan indeks"
+
+msgid "Full amount"
+msgstr "Jumlah penuh"
+
+msgid "Amount type"
+msgstr "Jenis jumlah"
+
+msgid "Amount left"
+msgstr "Sisa jumlah"
+
+msgid "Subvention type"
+msgstr "Jenis subsidi"
+
+msgid "Subvention base percent"
+msgstr "Persentase dasar subsidi"
+
+msgid "Graduated subvention percent"
+msgstr "Persentase subsidi bertingkat"
+
+msgctxt "Model name"
+msgid "Rent adjustment"
+msgstr "Penyesuaian sewa"
+
+msgctxt "Model name"
+msgid "Rent adjustments"
+msgstr "Penyesuaian sewa"
+
+msgctxt "Model name"
+msgid "Form of management (Subvention)"
+msgstr "Bentuk pengelolaan (Subsidi)"
+
+msgid "Rent adjustment"
+msgstr "Penyesuaian sewa"
+
+msgid "Subvention amount"
+msgstr "Jumlah subsidi"
+
+msgctxt "Model name"
+msgid "Management subvention (Rent adjustment)"
+msgstr "Subsidi pengelolaan (Penyesuaian sewa)"
+
+msgctxt "Model name"
+msgid "Management subventions (Rent adjustment)"
+msgstr "Subsidi pengelolaan (Penyesuaian sewa)"
+
+msgid "Subvention percent"
+msgstr "Persentase subsidi"
+
+msgctxt "Model name"
+msgid "Temporary subvention (Rent adjustment)"
+msgstr "Subsidi sementara (Penyesuaian sewa)"
+
+msgctxt "Model name"
+msgid "Temporary subventions (Rent adjustment)"
+msgstr "Subsidi sementara (Penyesuaian sewa)"
+
+msgid "Difference percent"
+msgstr "Persentase selisih"
+
+msgid "Calendar year rent"
+msgstr "Sewa tahun kalender"
+
+msgctxt "Model name"
+msgid "Payable rent"
+msgstr "Sewa terutang"
+
+msgctxt "Model name"
+msgid "Payable rents"
+msgstr "Sewa terutang"
+
+msgid "Payable amount"
+msgstr "Jumlah terutang"
+
+msgid "Equalized payable amount"
+msgstr "Jumlah terutang disetarakan"
+
+msgid "Equalization factor"
+msgstr "Faktor penyetaraan"
+
+msgctxt "Model name"
+msgid "Equalized rent"
+msgstr "Sewa disetarakan"
+
+msgctxt "Model name"
+msgid "Equalized rents"
+msgstr "Sewa disetarakan"
+
+msgctxt "Model name"
+msgid "Index"
+msgstr "Indeks"
+
+msgctxt "Model name"
+msgid "Indexes"
+msgstr "Indeks"
+
+msgid "Index {}{} = {}"
+msgstr "Indeks {}{} = {}"
+
+msgid "Index 1914:1-6=100"
+msgstr "Indeks 1914:1-6=100"
+
+msgid "Index 1938:8-1939:7=100"
+msgstr "Indeks 1938:8-1939:7=100"
+
+msgid "Value"
+msgstr "Nilai"
+
+msgid "Comment"
+msgstr "Komentar"
+
+msgctxt "Model name"
+msgid "Index point figure, yearly"
+msgstr "Angka indeks, tahunan"
+
+msgctxt "Model name"
+msgid "Index point figures, yearly"
+msgstr "Angka indeks, tahunan"
+
+msgid "Lease basis of rent"
+msgstr "Dasar sewa"
+
+msgid "Area amount"
+msgstr "Jumlah luas"
+
+msgid "Zone"
+msgstr "Zona"
+
+msgid "Amount per area (index 100)"
+msgstr "Jumlah per luas (indeks 100)"
+
+msgid "Profit margin percentage"
+msgstr "Persentase margin keuntungan"
+
+msgid "Discount percentage"
+msgstr "Persentase potongan"
+
+msgid "Plans inspected at"
+msgstr "Rencana diperiksa pada"
+
+msgid "Plans inspected by"
+msgstr "Rencana diperiksa oleh"
+
+msgid "Locked at"
+msgstr "Dikunci pada"
+
+msgid "Locked by"
+msgstr "Dikunci oleh"
+
+msgid "Subvention graduated percent"
+msgstr "Persentase subsidi bertingkat"
+
+msgctxt "Model name"
+msgid "Lease basis of rent"
+msgstr "Dasar sewa"
+
+msgctxt "Model name"
+msgid "Lease basis of rents"
+msgstr "Dasar sewa"
+
+msgctxt "Model name"
+msgid "Management subvention (Basis of rent)"
+msgstr "Subsidi pengelolaan (Dasar sewa)"
+
+msgctxt "Model name"
+msgid "Management subventions (Basis of rent)"
+msgstr "Subsidi pengelolaan (Dasar sewa)"
+
+msgctxt "Model name"
+msgid "Temporary subvention (Basis of rent)"
+msgstr "Subsidi sementara (Dasar sewa)"
+
+msgctxt "Model name"
+msgid "Temporary subventions (Basis of rent)"
+msgstr "Subsidi sementara (Dasar sewa)"
+
+msgid "Invoice number sequence name"
+msgstr "Nama urutan nomor tagihan"
+
+msgid "First invoice number"
+msgstr "Nomor tagihan pertama"
+
+msgid "Contract number sequence name"
+msgstr "Nama urutan nomor kontrak"
+
+msgid "First contract number"
+msgstr "Nomor kontrak pertama"
+
+msgid "Default receivable type (rent)"
+msgstr "Jenis piutang bawaan (sewa)"
+
+msgid "Receivable type used when creating rent invoices"
+msgstr "Jenis piutang yang dipakai saat membuat tagihan sewa"
+
+msgid "Default receivable type (collateral)"
+msgstr "Jenis piutang bawaan (jaminan)"
+
+msgid ""
+"Receivable type which should be used when creating collateral invoices."
+msgstr "Jenis piutang yang dipakai saat membuat tagihan jaminan."
+
+msgid "Use the override receivable type from rent in automatic invoices?"
+msgstr "Gunakan jenis piutang pengganti dari sewa pada tagihan otomatis?"
+
+msgid ""
+"Use the override receivable type from rent in automatic invoices, if it is "
+"present. When creating a rent, some service units (such as KAMA and KuVa) "
+"want to select a receivable type to be used in future automatic invoices. "
+"This helps avoid some technical difficulties in invoice XML generation. "
+"Generation logic would otherwise be unaware of the desired receivable type, "
+"if it is different from the service unit's default receivable type, or the "
+"leasetype's receivable type."
+msgstr ""
+"Gunakan jenis piutang pengganti dari sewa pada tagihan otomatis jika ada. "
+"Saat membuat sewa, sebagian unit layanan ingin memilih jenis piutang untuk "
+"tagihan otomatis berikutnya, yang mungkin berbeda dari jenis piutang bawaan "
+"unit layanan atau jenis sewa."
+
+msgid "Require 'Application received at' field on lease summary page?"
+msgstr "Wajibkan kolom 'Permohonan diterima pada' di halaman ringkasan sewa?"
+
+msgid ""
+"Make 'Application received at' / 'Hakemuksen saapumispäivä' a required field"
+" on lease summary page."
+msgstr ""
+"Jadikan 'Permohonan diterima pada' sebagai kolom wajib di halaman ringkasan "
+"sewa."
+
+msgctxt "Model name"
+msgid "Service unit"
+msgstr "Unit layanan"
+
+msgctxt "Model name"
+msgid "Service units"
+msgstr "Unit layanan"
+
+msgctxt "Model name"
+msgid "Service unit group mapping"
+msgstr "Pemetaan grup unit layanan"
+
+msgctxt "Model name"
+msgid "Service unit group mappings"
+msgstr "Pemetaan grup unit layanan"
+
+msgid "Reference"
+msgstr "Referensi"
+
+msgctxt "Model name"
+msgid "Tenant"
+msgstr "Penyewa"
+
+msgctxt "Model name"
+msgid "Tenants"
+msgstr "Penyewa"
+
+msgid "Contact"
+msgstr "Kontak"
+
+msgctxt "Model name"
+msgid "Tenant contact"
+msgstr "Kontak penyewa"
+
+msgctxt "Model name"
+msgid "Tenant contacts"
+msgstr "Kontak penyewa"
+
+msgid "Rent share numerator"
+msgstr "Pembilang porsi sewa"
+
+msgid "Rent share denominator"
+msgstr "Penyebut porsi sewa"
+
+msgctxt "Model name"
+msgid "Tenant rent share"
+msgstr "Porsi sewa penyewa"
+
+msgctxt "Model name"
+msgid "Tenant rent shares"
+msgstr "Porsi sewa penyewa"
+
+msgid "Key"
+msgstr "Kunci"
+
+msgctxt "Model name"
+msgid "UI Datum"
+msgstr "Data UI"
+
+msgctxt "Model name"
+msgid "UI Data"
+msgstr "Data UI"
+
+msgid "Percent"
+msgstr "Persen"
+
+msgctxt "Model name"
+msgid "VAT"
+msgstr "PPN"
+
+msgctxt "Model name"
+msgid "VATs"
+msgstr "PPN"
+
+msgid "VAT {}% {} - {}"
+msgstr "PPN {}% {} - {}"
+
+msgid "Only one VAT can be active at a time"
+msgstr "Hanya satu PPN yang boleh aktif pada satu waktu"
+
+msgid "Collaterals"
+msgstr "Jaminan"
+
+msgid "Show all collaterals"
+msgstr "Tampilkan semua jaminan"
+
+msgid "Paid"
+msgstr "Dibayar"
+
+msgid "Returned"
+msgstr "Dikembalikan"
+
+msgid "Lease id"
+msgstr "ID sewa"
+
+msgid "Lease start date"
+msgstr "Tanggal mulai sewa"
+
+msgid "Lease end date"
+msgstr "Tanggal berakhir sewa"
+
+msgid "Invoice payments"
+msgstr "Pembayaran tagihan"
+
+msgid ""
+"Show all the payments that have been paid between the start and the end date"
+msgstr "Tampilkan semua pembayaran antara tanggal mulai dan tanggal akhir"
+
+msgid "Invoice number"
+msgstr "Nomor tagihan"
+
+msgid "Filing code"
+msgstr "Kode arsip"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Invoces in period"
+msgstr "Tagihan dalam periode"
+
+msgid "Show all the invoices that have due date between start and end date"
+msgstr ""
+"Tampilkan semua tagihan yang jatuh temponya antara tanggal mulai dan tanggal"
+" akhir"
+
+msgid "Invoice state"
+msgstr "Status tagihan"
+
+msgid "Recipient name"
+msgstr "Nama penerima"
+
+msgid "Recipient address"
+msgstr "Alamat penerima"
+
+msgctxt "Invoicing review"
+msgid "Invoicing not enabled"
+msgstr "Penagihan belum diaktifkan"
+
+msgctxt "Invoicing review"
+msgid "Rent info not complete"
+msgstr "Data sewa belum lengkap"
+
+msgctxt "Invoicing review"
+msgid "No rents"
+msgstr "Tidak ada sewa"
+
+msgctxt "Invoicing review"
+msgid "No due date"
+msgstr "Tidak ada jatuh tempo"
+
+msgctxt "Invoicing review"
+msgid "One time rents with no invoice from max 5 year old leases"
+msgstr "Sewa sekali bayar tanpa tagihan dari sewa berumur maksimal 5 tahun"
+
+msgctxt "Invoicing review"
+msgid "Incorrect management shares"
+msgstr "Porsi penguasaan tidak tepat"
+
+msgctxt "Invoicing review"
+msgid "Incorrect rent shares"
+msgstr "Porsi sewa tidak tepat"
+
+msgctxt "Invoicing review"
+msgid "No tenant contact"
+msgstr "Tidak ada kontak penyewa"
+
+msgctxt "Invoicing review"
+msgid "No lease area"
+msgstr "Tidak ada area sewa"
+
+msgctxt "Invoicing review"
+msgid "Index type missing"
+msgstr "Jenis indeks belum ada"
+
+msgctxt "Invoicing review"
+msgid "Ongoing rent without rent shares"
+msgstr "Sewa berjalan tanpa porsi sewa"
+
+msgctxt "Invoicing review"
+msgid "Gaps in billing periods for last 5 years"
+msgstr "Celah periode tagihan dalam 5 tahun terakhir"
+
+msgid "Invoicing review"
+msgstr "Tinjauan penagihan"
+
+msgid "Show leases that might have errors in their invoicing"
+msgstr "Tampilkan sewa yang mungkin memiliki kesalahan penagihan"
+
+msgctxt "Invoicing review"
+msgid "Section"
+msgstr "Bagian"
+
+msgid "Open invoices"
+msgstr "Tagihan terbuka"
+
+msgid "Show all the invoices that have their state as \"open\""
+msgstr "Tampilkan semua tagihan berstatus \"terbuka\""
+
+msgid "Lease database id"
+msgstr "ID basis data sewa"
+
+msgid "Grand total"
+msgstr "Total keseluruhan"
+
+msgid "Invoices paid by a contact"
+msgstr "Tagihan yang dibayar kontak"
+
+msgid "Show invoices paid by a contact"
+msgstr "Tampilkan tagihan yang dibayar oleh kontak"
+
+msgid "Contact identifier"
+msgstr "Pengenal kontak"
+
+msgid "Number of rows"
+msgstr "Jumlah baris"
+
+msgid "Contact rents"
+msgstr "Sewa kontak"
+
+msgid "Show all rent amounts from all of the leases the contact is a part of"
+msgstr "Tampilkan semua jumlah sewa dari seluruh sewa yang melibatkan kontak"
+
+msgid "Lease area identifier"
+msgstr "Pengenal area sewa"
+
+msgid "Tenants"
+msgstr "Penyewa"
+
+msgid "Rent amount"
+msgstr "Jumlah sewa"
+
+msgid "Rent amount for contact"
+msgstr "Jumlah sewa untuk kontak"
+
+msgid "Contact not found"
+msgstr "Kontak tidak ditemukan"
+
+msgid "Decision conditions"
+msgstr "Persyaratan keputusan"
+
+msgid ""
+"Show decision conditions that have their supervision date between the given "
+"dates. Excluding conditions that have a supervised date."
+msgstr ""
+"Tampilkan persyaratan keputusan yang tanggal pengawasannya di antara tanggal"
+" yang diberikan, kecuali yang sudah memiliki tanggal diawasi."
+
+msgid "Yes"
+msgstr "Ya"
+
+msgid "No"
+msgstr "Tidak"
+
+msgid "Supervision date exists"
+msgstr "Tanggal pengawasan ada"
+
+msgid "Lease area"
+msgstr "Area sewa"
+
+msgid "Index type leases"
+msgstr "Sewa per jenis indeks"
+
+msgid "Show leases with a certain index type"
+msgstr "Tampilkan sewa dengan jenis indeks tertentu"
+
+msgid "Only active leases"
+msgstr "Hanya sewa aktif"
+
+msgid "Tenant name"
+msgstr "Nama penyewa"
+
+msgid "Leases where invoicing is disabled"
+msgstr "Sewa dengan penagihan nonaktif"
+
+msgid "Shows active leases where invoicing is not enabled"
+msgstr "Menampilkan sewa aktif yang penagihannya belum diaktifkan"
+
+msgid "Lease bases of rent"
+msgstr "Dasar sewa"
+
+msgid "Shows lease bases of rent"
+msgstr "Menampilkan dasar sewa"
+
+msgid "Lease intended use"
+msgstr "Peruntukan sewa"
+
+msgid "Active lease"
+msgstr "Sewa aktif"
+
+msgid "Unit price (index)"
+msgstr "Harga satuan (indeks)"
+
+msgid "Initial year rent"
+msgstr "Sewa tahun awal"
+
+msgid "Discounted rent"
+msgstr "Sewa setelah potongan"
+
+msgid "Subvented initial year rent"
+msgstr "Sewa tahun awal bersubsidi"
+
+msgid "Subvention euros per year"
+msgstr "Subsidi Rp per tahun"
+
+msgid "Subvention amount per area"
+msgstr "Jumlah subsidi per luas"
+
+msgid "Temporary subvention percentage"
+msgstr "Persentase subsidi sementara"
+
+msgid "Temporary discount amount euros per year"
+msgstr "Potongan sementara Rp per tahun"
+
+msgid "Lease count"
+msgstr "Jumlah sewa"
+
+msgid "Show the count of leases by type"
+msgstr "Tampilkan jumlah sewa per jenis"
+
+msgid "Count"
+msgstr "Jumlah"
+
+msgid "Temporary subvention percentage (short)"
+msgstr "Persentase subsidi sementara (singkat)"
+
+msgid "Lease statistics report"
+msgstr "Laporan statistik sewa"
+
+msgid ""
+"Shows information about all leases or if start date is provided the leases "
+"that have started on or after it"
+msgstr ""
+"Menampilkan informasi seluruh sewa, atau jika tanggal mulai diisi, sewa yang"
+" dimulai pada atau setelah tanggal tersebut"
+
+msgid "Contract signing date"
+msgstr "Tanggal penandatanganan kontrak"
+
+msgid "Lease state"
+msgstr "Status sewa"
+
+msgid "Latest decision maker"
+msgstr "Pengambil keputusan terakhir"
+
+msgid "Latest decision date"
+msgstr "Tanggal keputusan terakhir"
+
+msgid "Latest decision type"
+msgstr "Jenis keputusan terakhir"
+
+msgid "Total area"
+msgstr "Luas total"
+
+#, python-brace-format
+msgid "Permitted building volume {unit} (Residential)"
+msgstr "Volume bangunan diizinkan {unit} (Hunian)"
+
+msgid "Rent amount (Residential)"
+msgstr "Jumlah sewa (Hunian)"
+
+#, python-brace-format
+msgid "Permitted building volume {unit} (Business)"
+msgstr "Volume bangunan diizinkan {unit} (Usaha)"
+
+msgid "Rent amount (Business)"
+msgstr "Jumlah sewa (Usaha)"
+
+#, python-brace-format
+msgid "Permitted building volume total {unit}"
+msgstr "Total volume bangunan diizinkan {unit}"
+
+msgid "Total rent amount for year"
+msgstr "Total jumlah sewa per tahun"
+
+#, python-brace-format
+msgid "Average amount per area {unit} (Residential)"
+msgstr "Rata-rata jumlah per luas {unit} (Hunian)"
+
+#, python-brace-format
+msgid "Average amount per area {unit} (Business)"
+msgstr "Rata-rata jumlah per luas {unit} (Usaha)"
+
+#, python-brace-format
+msgid "Unit price {unit} (index)"
+msgstr "Harga satuan {unit} (indeks)"
+
+msgid "Subsidy percent"
+msgstr "Persentase subsidi"
+
+msgid "Form of management (Subvention)"
+msgstr "Bentuk pengelolaan (Subsidi)"
+
+msgid "Re-lease"
+msgstr "Sewa ulang"
+
+msgid "Option to purchase"
+msgstr "Opsi pembelian"
+
+msgid "Matti report"
+msgstr "Laporan MATTI"
+
+msgid "Results will be sent by email to {}"
+msgstr "Hasil akan dikirim melalui email ke {}"
+
+msgid "Basis of rents"
+msgstr "Dasar sewa"
+
+msgid "Rent adjustments"
+msgstr "Penyesuaian sewa"
+
+msgid "Shows all of the rent adjustments"
+msgstr "Menampilkan semua penyesuaian sewa"
+
+msgid "Management subventions"
+msgstr "Subsidi pengelolaan"
+
+msgid "Temporary subventions"
+msgstr "Subsidi sementara"
+
+msgid "Rent compare"
+msgstr "Perbandingan sewa"
+
+msgid "Show difference in rent between two years"
+msgstr "Tampilkan selisih sewa antara dua tahun"
+
+msgid "First year"
+msgstr "Tahun pertama"
+
+msgid "Second year"
+msgstr "Tahun kedua"
+
+msgid "Rent type"
+msgstr "Jenis sewa"
+
+msgid "First year rent"
+msgstr "Sewa tahun pertama"
+
+msgid "Second year rent"
+msgstr "Sewa tahun kedua"
+
+msgid "Rent forecast"
+msgstr "Proyeksi sewa"
+
+msgid "Calculate total yearly rent by lease type"
+msgstr "Hitung total sewa tahunan per jenis sewa"
+
+msgid "Start year"
+msgstr "Tahun mulai"
+
+msgid "End year"
+msgstr "Tahun akhir"
+
+msgid "Internal"
+msgstr "Internal"
+
+msgid "External"
+msgstr "Eksternal"
+
+#, python-brace-format
+msgid "Total {year} {internal_external_text}"
+msgstr "Total {year} {internal_external_text}"
+
+msgid "Rent type leases"
+msgstr "Sewa per jenis sewa"
+
+msgid "Show leases with a certain rent type"
+msgstr "Tampilkan sewa dengan jenis sewa tertentu"
+
+msgid "Reservations"
+msgstr "Pencadangan"
+
+msgid "Show reservations"
+msgstr "Tampilkan pencadangan"
+
+msgid "Start date start"
+msgstr "Tanggal mulai dari"
+
+msgid "Start date end"
+msgstr "Tanggal mulai sampai"
+
+msgid "End date start"
+msgstr "Tanggal berakhir dari"
+
+msgid "End date end"
+msgstr "Tanggal berakhir sampai"
+
+msgid "Exclude ones that are related to a lease"
+msgstr "Kecualikan yang terkait dengan sewa"
+
+msgid "Exclude sold"
+msgstr "Kecualikan yang terjual"
+
+msgid "Reservation id"
+msgstr "ID pencadangan"
+
+msgid "Reservee name"
+msgstr "Nama penerima pencadangan"
+
+msgid "Plan number"
+msgstr "Nomor rencana"
+
+msgid "Main permitted build area (floor-m²)"
+msgstr "Luas bangunan utama diizinkan (m² lantai)"
+
+msgid "Other permitted build area (floor-m²)"
+msgstr "Luas bangunan lain diizinkan (m² lantai)"
+
+msgid "Financing method"
+msgstr "Metode pembiayaan"
+
+msgid "Management method"
+msgstr "Metode pengelolaan"
+
+msgid "Message"
+msgstr "Pesan"
+
+msgid "Report \"{}\" successfully generated"
+msgstr "Laporan \"{}\" berhasil dibuat"
+
+msgid "Generated report attached"
+msgstr "Laporan yang dibuat terlampir"
+
+msgid "Failed to generate report \"{}\""
+msgstr "Gagal membuat laporan \"{}\""
+
+msgid "Please try again"
+msgstr "Silakan coba lagi"
+
+msgid "Report type not found"
+msgstr "Jenis laporan tidak ditemukan"
+
+msgid "No permission to generate report"
+msgstr "Tidak berwenang membuat laporan"
+
+msgid "Can only add contacts to service units the user is a member of"
+msgstr ""
+"Kontak hanya dapat ditambahkan ke unit layanan tempat pengguna menjadi "
+"anggota"
+
+msgid "Cannot change service unit"
+msgstr "Unit layanan tidak dapat diubah"
+
+msgid ""
+"Can not add a court decision for an invoice belonging to another service "
+"unit"
+msgstr ""
+"Tidak dapat menambahkan putusan pengadilan untuk tagihan milik unit layanan "
+"lain"
+
+msgid ""
+"Can not add a collection letter for an invoice belonging to another service "
+"unit"
+msgstr ""
+"Tidak dapat menambahkan surat penagihan untuk tagihan milik unit layanan "
+"lain"
+
+msgid ""
+"Can not create a collection note for an invoice belonging to another service"
+" unit"
+msgstr ""
+"Tidak dapat membuat catatan penagihan untuk tagihan milik unit layanan lain"
+
+msgid "Invoices must be provided for this type of collection note"
+msgstr "Tagihan wajib dicantumkan untuk jenis catatan penagihan ini"
+
+msgid "Payment deferrals must be targeted to a single invoice"
+msgstr "Penundaan pembayaran harus ditujukan ke satu tagihan"
+
+msgid "Missing postpone date for payment deferral"
+msgstr "Tanggal penundaan untuk penundaan pembayaran belum diisi"
+
+msgid "Postpone date can only be set for payment deferrals"
+msgstr "Tanggal penundaan hanya dapat diisi untuk penundaan pembayaran"
+
+msgid "'Entire lease' can only be set for contract changes"
+msgstr "'Seluruh sewa' hanya dapat diisi untuk perubahan kontrak"
+
+msgid "Inspection date can only be set for contract changes"
+msgstr "Tanggal pemeriksaan hanya dapat diisi untuk perubahan kontrak"
+
+msgid "Cannot use an inactive receivable type"
+msgstr "Jenis piutang nonaktif tidak dapat digunakan"
+
+msgid ""
+"Can only use receivable types from service units the user is a member of"
+msgstr ""
+"Hanya jenis piutang dari unit layanan tempat pengguna menjadi anggota yang "
+"dapat digunakan"
+
+msgid "Can only add invoices to service units the user is a member of"
+msgstr ""
+"Tagihan hanya dapat ditambahkan ke unit layanan tempat pengguna menjadi "
+"anggota"
+
+msgid "Either recipient or tenant is required."
+msgstr "Penerima atau penyewa wajib diisi."
+
+msgid "Tenant not found in lease"
+msgstr "Penyewa tidak ditemukan dalam sewa"
+
+msgid "Billing contact not found for tenant"
+msgstr "Kontak penagihan untuk penyewa tidak ditemukan"
+
+msgid "Tenant share"
+msgstr "Porsi penyewa"
+
+msgid "Rent share"
+msgstr "Porsi sewa"
+
+msgid ""
+"Both Billing period start and end are required if one of them is provided"
+msgstr "Awal dan akhir periode tagihan wajib diisi jika salah satunya diisi"
+
+msgid "Billing period end must be the same or after the start"
+msgstr "Akhir periode tagihan harus sama dengan atau setelah awal periode"
+
+msgid "No active tenants found for the lease during the billing period"
+msgstr "Tidak ada penyewa aktif dalam sewa selama periode tagihan"
+
+msgid "No rent share found for invoice recipient"
+msgstr "Porsi sewa untuk penerima tagihan tidak ditemukan"
+
+msgid "from_lease and to_lease cannot be the same Lease"
+msgstr "from_lease dan to_lease tidak boleh sewa yang sama"
+
+msgid "Must be from the same service unit as the parent"
+msgstr "Harus berasal dari unit layanan yang sama dengan induknya"
+
+msgid "'Application received at' is a mandatory field for this service unit"
+msgstr "'Permohonan diterima pada' wajib diisi untuk unit layanan ini"
+
+msgid "Can only add leases to service units the user is a member of"
+msgstr ""
+"Sewa hanya dapat ditambahkan ke unit layanan tempat pengguna menjadi anggota"
+
+msgid "Fixed initial rent end date must match rent cycle end date"
+msgstr ""
+"Tanggal akhir sewa awal tetap harus sama dengan tanggal akhir siklus sewa"
+
+msgid "Index is mandatory if the rent type is Index"
+msgstr "Indeks wajib diisi jika jenis sewa adalah Indeks"
+
+msgid "Amount total adjustment type cannot have an end date"
+msgstr "Jenis penyesuaian jumlah total tidak boleh memiliki tanggal akhir"
+
+msgid ""
+"This number of custom due dates per year is not allowed: {}. Must be one of "
+"{}"
+msgstr ""
+"Jumlah jatuh tempo kustom per tahun ini tidak diizinkan: {}. Harus salah "
+"satu dari {}"
+
+msgid "Adjustment type is required when periodic rent adjustment is added"
+msgstr ""
+"Jenis penyesuaian wajib diisi jika penyesuaian sewa berkala ditambahkan"
+
+#, python-brace-format
+msgid ""
+"Override receivable type '{type_name}' was unexpected. Service unit "
+"'{unit_name}' does not use this feature. Please contact MVJ developers about"
+" this error."
+msgstr ""
+"Jenis piutang pengganti '{type_name}' tidak terduga. Unit layanan "
+"'{unit_name}' tidak menggunakan fitur ini. Hubungi pengembang SimLahan "
+"terkait galat ini."
+
+msgid ""
+"Override receivable type '{}' was unexpected. This rent type does not "
+"generate automatic invoices. Please contact MVJ developers about this error."
+msgstr ""
+"Jenis piutang pengganti '{}' tidak terduga. Jenis sewa ini tidak membuat "
+"tagihan otomatis. Hubungi pengembang SimLahan terkait galat ini."
+
+msgid ""
+"Override receivable type is required for this rent type in service unit {}"
+msgstr ""
+"Jenis piutang pengganti wajib diisi untuk jenis sewa ini di unit layanan {}"
+
+msgid "Basis of rent item id {} not found"
+msgstr "Item dasar sewa dengan id {} tidak ditemukan"
+
+msgid "Can't edit locked basis of rent item"
+msgstr "Item dasar sewa yang terkunci tidak dapat diubah"
+
+msgid "Enter a valid business id."
+msgstr "Masukkan NPWP yang valid."
+
+msgid "Enter a valid national identification number (16 digits)."
+msgstr "Masukkan NIK yang valid (16 digit)."
+
+msgid "Check if contact already exist"
+msgstr "Periksa apakah kontak sudah ada"
+
+msgid ""
+"Check if contact already exist by business id or national identification "
+"number"
+msgstr "Periksa apakah kontak sudah ada berdasarkan NPWP atau NIK"
+
+msgid "Query parameter \"identifier\" is mandatory"
+msgstr "Parameter kueri \"identifier\" wajib diisi"
+
+msgid "Copy decision to leases"
+msgstr "Salin keputusan ke sewa"
+
+msgid "Duplicates chosen decision to chosen leases"
+msgstr "Menggandakan keputusan terpilih ke sewa terpilih"
+
+msgid "Send email"
+msgstr "Kirim email"
+
+msgid "MVJ lease {} {}"
+msgstr "Sewa SimLahan {} {}"
+
+msgid "Reminder: {}"
+msgstr "Pengingat: {}"
+
+msgid "Can't create invoices if invoicing is not enabled."
+msgstr "Tagihan tidak dapat dibuat jika penagihan belum diaktifkan."
+
+msgid "Can't edit invoices that have been sent to SAP"
+msgstr "Tagihan yang sudah dikirim ke SAP tidak dapat diubah"
+
+msgid "Can't edit fully refunded invoices"
+msgstr "Tagihan yang sudah dikembalikan penuh tidak dapat diubah"
+
+msgid "Can't delete numbered invoices"
+msgstr "Tagihan bernomor tidak dapat dihapus"
+
+msgid "Can't delete invoices that have been sent to SAP"
+msgstr "Tagihan yang sudah dikirim ke SAP tidak dapat dihapus"
+
+msgid "Invalid amount"
+msgstr "Jumlah tidak valid"
+
+msgid "Amount must be bigger than zero"
+msgstr "Jumlah harus lebih besar dari nol"
+
+msgid "Calculate penalty interest"
+msgstr "Hitung bunga denda"
+
+msgid "Calculate penalty interest for the outstanding amount until today"
+msgstr "Hitung bunga denda atas jumlah terutang sampai hari ini"
+
+msgid "Credit invoice"
+msgstr "Kreditkan tagihan"
+
+msgid "Credit invoice or part of it"
+msgstr "Kreditkan tagihan seluruhnya atau sebagian"
+
+msgid "Cannot credit invoices belonging to a different service unit"
+msgstr "Tidak dapat mengkreditkan tagihan milik unit layanan lain"
+
+msgid "Cannot credit invoices that have not been sent to SAP"
+msgstr "Tidak dapat mengkreditkan tagihan yang belum dikirim ke SAP"
+
+msgid "Credit invoice row"
+msgstr "Kreditkan baris tagihan"
+
+msgid "Credit invoice row or part of it"
+msgstr "Kreditkan baris tagihan seluruhnya atau sebagian"
+
+msgid "No permission. Can only delete own empty leases."
+msgstr "Tidak berwenang. Hanya sewa kosong milik sendiri yang dapat dihapus."
+
+msgid "Create charge"
+msgstr "Buat tagihan"
+
+msgid "Create charge shared to tenants by their shares"
+msgstr "Buat tagihan yang dibagi ke penyewa sesuai porsinya"
+
+#, python-brace-format
+msgid "the penalty interest rate is {interest_percent} %"
+msgstr "suku bunga denda adalah {interest_percent} %"
+
+#, python-brace-format
+msgid ""
+"The penalty interest rate starting on {start_date} is {interest_percent} %"
+msgstr "Suku bunga denda mulai {start_date} adalah {interest_percent} %"
+
+#, python-brace-format
+msgid ""
+"The penalty interest rate between {start_date} and {end_date} is "
+"{interest_percent} %"
+msgstr ""
+"Suku bunga denda antara {start_date} dan {end_date} adalah "
+"{interest_percent} %"
+
+msgid "Create collection letter document"
+msgstr "Buat dokumen surat penagihan"
+
+msgid "No billing info or billing info does not have a contact address"
+msgstr ""
+"Tidak ada data penagihan atau data penagihan tidak memiliki alamat kontak"
+
+#, python-brace-format
+msgid ""
+"Penalty interest for the invoice with the due date of {due_date} is "
+"{interest_amount} euroa"
+msgstr ""
+"Bunga denda untuk tagihan dengan jatuh tempo {due_date} adalah Rp "
+"{interest_amount}"
+
+#, python-brace-format
+msgid "{due_date}, {debt_amount} euro (between {start_date} and {end_date})"
+msgstr "{due_date}, Rp {debt_amount} (antara {start_date} dan {end_date})"
+
+msgid "Error creating the document from the template"
+msgstr "Galat saat membuat dokumen dari templat"
+
+msgid "Rent for period"
+msgstr "Sewa per periode"
+
+msgid "View rent amounts for a given period"
+msgstr "Lihat jumlah sewa untuk periode tertentu"
+
+msgid "Start date or end date is invalid"
+msgstr "Tanggal mulai atau tanggal akhir tidak valid"
+
+msgid "Start date cannot be after end date"
+msgstr "Tanggal mulai tidak boleh setelah tanggal akhir"
+
+msgid "List billing periods for year"
+msgstr "Daftar periode tagihan per tahun"
+
+msgid "Year parameter is not valid"
+msgstr "Parameter tahun tidak valid"
+
+msgid "Preview invoices for year"
+msgstr "Pratinjau tagihan per tahun"
+
+msgid "Set invoicing state"
+msgstr "Atur status penagihan"
+
+msgid "Sets invoicing state for lease to true or false"
+msgstr "Mengatur status penagihan sewa menjadi aktif atau nonaktif"
+
+msgid "Cannot change invoicing state belonging to a different service unit"
+msgstr "Tidak dapat mengubah status penagihan milik unit layanan lain"
+
+msgid "Cannot enable invoicing if rent info is not completed"
+msgstr "Penagihan tidak dapat diaktifkan jika data sewa belum lengkap"
+
+msgid "Failed to set invoicing state: {}"
+msgstr "Gagal mengatur status penagihan: {}"
+
+msgid "Set rent info completion state"
+msgstr "Atur status kelengkapan data sewa"
+
+msgid "Cannot complete rent info: {}"
+msgstr "Data sewa tidak dapat dilengkapi: {}"
+
+msgid "This query parameter is required."
+msgstr "Parameter kueri ini wajib diisi."
+
+msgid "Must be an integer."
+msgstr "Harus berupa bilangan bulat."
+
+msgid "Can't create global ui data"
+msgstr "Data UI global tidak dapat dibuat"
+
+msgid "Can't create other users ui data"
+msgstr "Data UI pengguna lain tidak dapat dibuat"
+
+msgid "Data integrity error"
+msgstr "Galat integritas data"
+
+msgid "Indonesian"
+msgstr "Bahasa Indonesia"
+
+msgid "English"
+msgstr "Bahasa Inggris"
+
+msgid "Land acquisition"
+msgstr "Pengadaan tanah"
+
+msgid "Location determination (Penlok) expires"
+msgstr "Penetapan Lokasi (Penlok) berakhir"
+
+msgid "Objection period for inventory results ends"
+msgstr "Masa keberatan hasil inventarisasi berakhir"
+
+msgid "Deliberation must be held"
+msgstr "Musyawarah harus dilaksanakan"
+
+msgid "Last day to file an objection to the district court"
+msgstr "Hari terakhir mengajukan keberatan ke Pengadilan Negeri"
+
+msgid "Court/handling body must decide"
+msgstr "Pengadilan/lembaga penanganan harus memutus"
+
+msgid "Last day to file cassation"
+msgstr "Hari terakhir mengajukan kasasi"
+
+msgid "District court must accept the consignment"
+msgstr "Pengadilan Negeri harus menerima penitipan"
+
+msgid "Results must be handed over to the requiring agency"
+msgstr "Hasil harus diserahkan kepada instansi yang memerlukan tanah"
+
+msgid "Apply for land rights registration"
+msgstr "Ajukan pendaftaran hak atas tanah"
+
+msgid "Public interest (Law 2/2012)"
+msgstr "Kepentingan umum (UU 2/2012)"
+
+msgid "Small scale public interest (max. 5 ha)"
+msgstr "Kepentingan umum skala kecil (maks. 5 ha)"
+
+msgid "Private / business-to-business acquisition"
+msgstr "Pengadaan swasta / antar-badan usaha"
+
+msgid "National defense and security"
+msgstr "Pertahanan dan keamanan nasional"
+
+msgid "Public roads, toll roads, tunnels, railways, stations"
+msgstr "Jalan umum, jalan tol, terowongan, jalur kereta api, stasiun"
+
+msgid "Dams, irrigation, drinking water, drainage, sanitation"
+msgstr "Waduk, bendungan, irigasi, air minum, drainase, sanitasi"
+
+msgid "Ports, airports and terminals"
+msgstr "Pelabuhan, bandar udara, dan terminal"
+
+msgid "Oil, gas and geothermal infrastructure"
+msgstr "Infrastruktur minyak, gas, dan panas bumi"
+
+msgid "Power generation, transmission and distribution"
+msgstr "Pembangkit, transmisi, dan distribusi tenaga listrik"
+
+msgid "Government telecommunications and informatics"
+msgstr "Jaringan telekomunikasi dan informatika pemerintah"
+
+msgid "Waste disposal and processing sites"
+msgstr "Tempat pembuangan dan pengolahan sampah"
+
+msgid "Government hospitals and public health centers"
+msgstr "Rumah sakit pemerintah dan pusat kesehatan masyarakat"
+
+msgid "Public safety facilities"
+msgstr "Fasilitas keselamatan umum"
+
+msgid "Public cemeteries"
+msgstr "Tempat pemakaman umum"
+
+msgid "Social facilities, public facilities and green open space"
+msgstr "Fasilitas sosial, fasilitas umum, dan ruang terbuka hijau publik"
+
+msgid "Nature reserves and cultural heritage"
+msgstr "Cagar alam dan cagar budaya"
+
+msgid "Government offices"
+msgstr "Kantor pemerintah"
+
+msgid "Slum rearrangement, land consolidation, public housing"
+msgstr ""
+"Penataan permukiman kumuh, konsolidasi tanah, perumahan masyarakat "
+"berpenghasilan rendah"
+
+msgid "Government education and school infrastructure"
+msgstr "Prasarana pendidikan atau sekolah pemerintah"
+
+msgid "Government sports infrastructure"
+msgstr "Prasarana olahraga pemerintah"
+
+msgid "Public markets and public parking"
+msgstr "Pasar umum dan lapangan parkir umum"
+
+msgid "Upstream/downstream oil & gas industrial estates"
+msgstr "Kawasan industri hulu dan hilir minyak dan gas"
+
+msgid "Special economic zones"
+msgstr "Kawasan ekonomi khusus"
+
+msgid "Industrial estates"
+msgstr "Kawasan industri"
+
+msgid "Tourism areas"
+msgstr "Kawasan pariwisata"
+
+msgid "Food security areas"
+msgstr "Kawasan ketahanan pangan"
+
+msgid "Technology development areas"
+msgstr "Kawasan pengembangan teknologi"
+
+msgid "Other"
+msgstr "Lainnya"
+
+msgid "State budget (APBN)"
+msgstr "APBN"
+
+msgid "Regional budget (APBD)"
+msgstr "APBD"
+
+msgid "State Asset Management Agency (LMAN)"
+msgstr "Lembaga Manajemen Aset Negara (LMAN)"
+
+msgid "State-owned enterprise"
+msgstr "BUMN/BUMD"
+
+msgid "Private / business entity"
+msgstr "Swasta / badan usaha"
+
+msgid "Planning"
+msgstr "Perencanaan"
+
+msgid "Preparation"
+msgstr "Persiapan"
+
+msgid "Implementation"
+msgstr "Pelaksanaan"
+
+msgid "Handover of results"
+msgstr "Penyerahan hasil"
+
+msgid "Completed"
+msgstr "Selesai"
+
+msgid "Draft"
+msgstr "Draf"
+
+msgid "Active"
+msgstr "Aktif"
+
+msgid "On hold"
+msgstr "Ditunda"
+
+msgid "Cancelled"
+msgstr "Dibatalkan"
+
+msgid "Low"
+msgstr "Rendah"
+
+msgid "Medium"
+msgstr "Sedang"
+
+msgid "High"
+msgstr "Tinggi"
+
+msgid "National strategic project (PSN)"
+msgstr "Proyek strategis nasional (PSN)"
+
+msgid "Pending"
+msgstr "Belum mulai"
+
+msgid "In progress"
+msgstr "Sedang berjalan"
+
+msgid "Done"
+msgstr "Selesai"
+
+msgid "Not applicable"
+msgstr "Tidak berlaku"
+
+msgid "Freehold title (SHM)"
+msgstr "Hak Milik (SHM)"
+
+msgid "Right to build (HGB)"
+msgstr "Hak Guna Bangunan (HGB)"
+
+msgid "Right to cultivate (HGU)"
+msgstr "Hak Guna Usaha (HGU)"
+
+msgid "Right of use (Hak Pakai)"
+msgstr "Hak Pakai"
+
+msgid "Right of management (HPL)"
+msgstr "Hak Pengelolaan (HPL)"
+
+msgid "Strata title (SHMSRS)"
+msgstr "Hak Milik atas Satuan Rumah Susun (SHMSRS)"
+
+msgid "Waqf land"
+msgstr "Tanah wakaf"
+
+msgid "Customary (ulayat) land"
+msgstr "Tanah ulayat"
+
+msgid "Unregistered evidence (girik, letter C, petok D)"
+msgstr "Alas hak belum terdaftar (girik, letter C, petok D)"
+
+msgid "State land controlled by a party"
+msgstr "Tanah negara yang dikuasai pihak"
+
+msgid "State/regional asset (BMN/BMD)"
+msgstr "Barang milik negara/daerah (BMN/BMD)"
+
+msgid "Rice field"
+msgstr "Sawah"
+
+msgid "Dry field / garden"
+msgstr "Tegalan / kebun"
+
+msgid "Plantation"
+msgstr "Perkebunan"
+
+msgid "Residential yard"
+msgstr "Pekarangan"
+
+msgid "Commercial"
+msgstr "Komersial"
+
+msgid "Industrial"
+msgstr "Industri"
+
+msgid "Forest"
+msgstr "Hutan"
+
+msgid "Fishpond"
+msgstr "Tambak"
+
+msgid "Public facility"
+msgstr "Fasilitas umum"
+
+msgid "Vacant land"
+msgstr "Tanah kosong"
+
+msgid "Identified"
+msgstr "Teridentifikasi"
+
+msgid "Inventoried"
+msgstr "Terinventarisasi"
+
+msgid "Inventory results announced"
+msgstr "Hasil inventarisasi diumumkan"
+
+msgid "Valued"
+msgstr "Dinilai"
+
+msgid "In deliberation"
+msgstr "Dalam musyawarah"
+
+msgid "Agreed"
+msgstr "Sepakat"
+
+msgid "Objection in court"
+msgstr "Keberatan di pengadilan"
+
+msgid "Compensation consigned to court"
+msgstr "Ganti kerugian dititipkan di pengadilan"
+
+msgid "Compensation paid"
+msgstr "Ganti kerugian dibayar"
+
+msgid "Rights released"
+msgstr "Hak dilepaskan"
+
+msgid "Handed over"
+msgstr "Diserahkan"
+
+msgid "Excluded from acquisition"
+msgstr "Dikeluarkan dari pengadaan"
+
+msgid "Individual"
+msgstr "Perorangan"
+
+msgid "Legal entity"
+msgstr "Badan hukum"
+
+msgid "Government agency"
+msgstr "Instansi pemerintah"
+
+msgid "Customary law community"
+msgstr "Masyarakat hukum adat"
+
+msgid "Waqf manager (nazhir)"
+msgstr "Pengelola wakaf (nazhir)"
+
+msgid "Right holder / owner"
+msgstr "Pemegang hak / pemilik"
+
+msgid "Heir"
+msgstr "Ahli waris"
+
+msgid "Holder of management right"
+msgstr "Pemegang hak pengelolaan"
+
+msgid "Party controlling state land in good faith"
+msgstr "Pihak yang menguasai tanah negara dengan iktikad baik"
+
+msgid "Tenant / user"
+msgstr "Penyewa / pemakai"
+
+msgid "Proxy / attorney"
+msgstr "Kuasa"
+
+msgid "Physical inventory (task force A)"
+msgstr "Inventarisasi fisik (Satgas A)"
+
+msgid "Juridical identification (task force B)"
+msgstr "Identifikasi yuridis (Satgas B)"
+
+msgid "Scheduled"
+msgstr "Terjadwal"
+
+msgid "Needs verification"
+msgstr "Perlu verifikasi"
+
+msgid "Notification of development plan"
+msgstr "Pemberitahuan rencana pembangunan"
+
+msgid "Location determination (Penlok) announcement"
+msgstr "Pengumuman Penetapan Lokasi (Penlok)"
+
+msgid "Inventory results (parcel map and nominative list)"
+msgstr "Hasil inventarisasi (peta bidang dan daftar nominatif)"
+
+msgid "Valuation results"
+msgstr "Hasil penilaian"
+
+msgid "Final"
+msgstr "Final"
+
+msgid "Revised"
+msgstr "Direvisi"
+
+msgid "Rejected"
+msgstr "Ditolak"
+
+msgid "Absent"
+msgstr "Tidak hadir"
+
+msgid "Postponed"
+msgstr "Ditunda"
+
+msgid "Money"
+msgstr "Uang"
+
+msgid "Replacement land"
+msgstr "Tanah pengganti"
+
+msgid "Resettlement"
+msgstr "Permukiman kembali"
+
+msgid "Share ownership"
+msgstr "Kepemilikan saham"
+
+msgid "Other agreed form"
+msgstr "Bentuk lain yang disepakati"
+
+msgid "Objection to development location plan"
+msgstr "Keberatan atas rencana lokasi pembangunan"
+
+msgid "Lawsuit against location determination (State Administrative Court)"
+msgstr "Gugatan atas penetapan lokasi (PTUN)"
+
+msgid "Objection to inventory results"
+msgstr "Keberatan atas hasil inventarisasi"
+
+msgid "Objection to compensation (District Court)"
+msgstr "Keberatan atas ganti kerugian (Pengadilan Negeri)"
+
+msgid "Cassation to the Supreme Court"
+msgstr "Kasasi ke Mahkamah Agung"
+
+msgid "Ownership dispute"
+msgstr "Sengketa kepemilikan"
+
+msgid "Other litigation"
+msgstr "Perkara lain"
+
+msgid "Filed"
+msgstr "Diajukan"
+
+msgid "In process"
+msgstr "Dalam proses"
+
+msgid "Granted"
+msgstr "Dikabulkan"
+
+msgid "Final and binding"
+msgstr "Berkekuatan hukum tetap"
+
+msgid "Withdrawn"
+msgstr "Dicabut"
+
+msgid "Entitled party refuses the agreed/decided compensation"
+msgstr "Pihak yang berhak menolak ganti kerugian yang disepakati/diputuskan"
+
+msgid "Whereabouts of the entitled party unknown"
+msgstr "Pihak yang berhak tidak diketahui keberadaannya"
+
+msgid "Object is in an ownership dispute"
+msgstr "Objek sedang menjadi sengketa kepemilikan"
+
+msgid "Object is in a court case"
+msgstr "Objek sedang menjadi perkara di pengadilan"
+
+msgid "Object is seized by an authorized official"
+msgstr "Objek diletakkan sita oleh pejabat berwenang"
+
+msgid "Object is used as collateral at a bank"
+msgstr "Objek menjadi jaminan di bank"
+
+msgid "Requested to court"
+msgstr "Dimohonkan ke pengadilan"
+
+msgid "Deposited"
+msgstr "Dititipkan"
+
+msgid "Collected by entitled party"
+msgstr "Diambil pihak yang berhak"
+
+msgid "Determined"
+msgstr "Ditetapkan"
+
+msgid "Validated by executing chair"
+msgstr "Divalidasi Ketua Pelaksana"
+
+msgid "Consigned"
+msgstr "Dititipkan"
+
+msgid "Bank transfer"
+msgstr "Transfer bank"
+
+msgid "Cheque / giro"
+msgstr "Cek / giro"
+
+msgid "In kind (land, housing, shares)"
+msgstr "Natura (tanah, permukiman, saham)"
+
+msgid "Not displaced"
+msgstr "Tidak terdampak relokasi"
+
+msgid "Partially displaced"
+msgstr "Terdampak relokasi sebagian"
+
+msgid "Fully displaced"
+msgstr "Terdampak relokasi penuh"
+
+msgid "Identification"
+msgstr "Identifikasi"
+
+msgid "Verification"
+msgstr "Verifikasi"
+
+msgid "Assistance being provided"
+msgstr "Pendampingan berjalan"
+
+msgid "Resettled"
+msgstr "Sudah dipindahkan"
+
+msgid "Land acquisition planning document (DPPT)"
+msgstr "Dokumen Perencanaan Pengadaan Tanah (DPPT)"
+
+msgid "Feasibility study / environmental document"
+msgstr "Studi kelayakan / dokumen lingkungan"
+
+msgid "Public consultation minutes"
+msgstr "Berita acara konsultasi publik"
+
+msgid "Location determination decree (Penlok)"
+msgstr "Keputusan Penetapan Lokasi (Penlok)"
+
+msgid "Parcel map"
+msgstr "Peta bidang"
+
+msgid "Nominative list"
+msgstr "Daftar nominatif"
+
+msgid "Announcement"
+msgstr "Pengumuman"
+
+msgid "Valuation report"
+msgstr "Laporan penilaian"
+
+msgid "Deliberation minutes"
+msgstr "Berita acara musyawarah"
+
+msgid "Court decision"
+msgstr "Putusan pengadilan"
+
+msgid "Consignment decree"
+msgstr "Penetapan penitipan (konsinyasi)"
+
+msgid "Proof of payment / receipt"
+msgstr "Bukti pembayaran / kuitansi"
+
+msgid "Minutes of rights release"
+msgstr "Berita acara pelepasan hak"
+
+msgid "Land certificate / evidence of rights"
+msgstr "Sertipikat / alas hak"
+
+msgid "Identity document"
+msgstr "Dokumen identitas"
+
+msgid "Handover minutes (BAST)"
+msgstr "Berita acara serah terima (BAST)"
+
+msgid "Photo"
+msgstr "Foto"
+
+msgid "NOMINATIVE LIST OF LAND ACQUISITION"
+msgstr "DAFTAR NOMINATIF PENGADAAN TANAH"
+
+#, python-format
+msgid "Agency requiring the land: %(agency)s"
+msgstr "Instansi yang memerlukan tanah: %(agency)s"
+
+#, python-format
+msgid "Printed on %(date)s"
+msgstr "Dicetak pada %(date)s"
+
+msgid "No."
+msgstr "No."
+
+msgid "Parcel number"
+msgstr "Nomor bidang"
+
+msgid "NIB"
+msgstr "NIB"
+
+msgid "Village"
+msgstr "Desa/Kelurahan"
+
+msgid "Type of right"
+msgstr "Jenis hak"
+
+msgid "Certificate / evidence number"
+msgstr "Nomor sertipikat / alas hak"
+
+msgid "Entitled parties"
+msgstr "Pihak yang berhak"
+
+msgid "Measured area (m²)"
+msgstr "Luas ukur (m²)"
+
+msgid "Affected area (m²)"
+msgstr "Luas terkena (m²)"
+
+msgid "Land use"
+msgstr "Penggunaan tanah"
+
+msgid "Buildings"
+msgstr "Bangunan"
+
+msgid "Plants"
+msgstr "Tanaman"
+
+msgid "Valuation (IDR)"
+msgstr "Nilai penilaian (Rp)"
+
+msgid "Compensation (IDR)"
+msgstr "Ganti kerugian (Rp)"
+
+msgid "Paid (IDR)"
+msgstr "Dibayar (Rp)"
+
+msgid "Status"
+msgstr "Status"
+
+#, python-format
+msgid "Invalid GeoJSON file: %(error)s"
+msgstr "Berkas GeoJSON tidak valid: %(error)s"
+
+msgid "Archive is too large."
+msgstr "Arsip terlalu besar."
+
+msgid "No .shp file found in the archive."
+msgstr "Tidak ada berkas .shp di dalam arsip."
+
+msgid "The .prj file (coordinate system) is required for shapefiles."
+msgstr "Berkas .prj (sistem koordinat) wajib ada untuk shapefile."
+
+msgid ""
+"Supported formats: GeoJSON (.geojson/.json) or zipped shapefile (.zip)."
+msgstr ""
+"Format yang didukung: GeoJSON (.geojson/.json) atau shapefile terkompresi "
+"(.zip)."
+
+msgid "Feature limit exceeded; remaining rows skipped."
+msgstr "Batas jumlah fitur terlampaui; baris sisanya dilewati."
+
+#, python-format
+msgid "Row %(row)s: attribute '%(field)s' is empty."
+msgstr "Baris %(row)s: atribut '%(field)s' kosong."
+
+#, python-format
+msgid "Row %(row)s: invalid geometry (%(error)s)."
+msgstr "Baris %(row)s: geometri tidak valid (%(error)s)."
+
+msgid "No overdue or upcoming deadlines."
+msgstr "Tidak ada tenggat yang terlewat atau akan datang."
+
+msgid "OVERDUE"
+msgstr "TERLEWAT"
+
+msgid "due soon"
+msgstr "segera jatuh tempo"
+
+msgid "No recipients with an email address."
+msgstr "Tidak ada penerima yang memiliki alamat email."
+
+#, python-format
+msgid "Land acquisition deadlines %(date)s"
+msgstr "Tenggat pengadaan tanah %(date)s"
+
+#, python-format
+msgid "Email sent to %(count)s recipients."
+msgstr "Email terkirim ke %(count)s penerima."
+
+msgid "Prepare the land acquisition planning document (DPPT)"
+msgstr "Menyusun Dokumen Perencanaan Pengadaan Tanah (DPPT)"
+
+msgid "Submit DPPT to the governor"
+msgstr "Menyampaikan DPPT kepada gubernur"
+
+msgid "Form the preparation team"
+msgstr "Membentuk Tim Persiapan"
+
+msgid "Notify the development plan"
+msgstr "Pemberitahuan rencana pembangunan"
+
+msgid "Initial data collection of the location"
+msgstr "Pendataan awal lokasi rencana pembangunan"
+
+msgid "Public consultation"
+msgstr "Konsultasi publik"
+
+msgid "Handle objections to the location plan"
+msgstr "Penanganan keberatan atas rencana lokasi"
+
+msgid "Location determination (Penlok)"
+msgstr "Penetapan Lokasi (Penlok)"
+
+msgid "Announce the location determination"
+msgstr "Pengumuman Penetapan Lokasi"
+
+msgid "Prepare implementation and form task forces"
+msgstr "Penyiapan pelaksanaan dan pembentukan Satgas"
+
+msgid "Inventory and identification of parcels and parties"
+msgstr "Inventarisasi dan identifikasi bidang serta pihak yang berhak"
+
+msgid "Announce parcel map and nominative list"
+msgstr "Pengumuman peta bidang dan daftar nominatif"
+
+msgid "Verify and correct inventory results"
+msgstr "Verifikasi dan perbaikan hasil inventarisasi"
+
+msgid "Appoint the public appraiser (KJPP)"
+msgstr "Penetapan Penilai Publik (KJPP)"
+
+msgid "Valuation of compensation"
+msgstr "Penilaian ganti kerugian"
+
+msgid "Deliberation on the form and amount of compensation"
+msgstr "Musyawarah bentuk dan besarnya ganti kerugian"
+
+msgid "Settle objections in the district court"
+msgstr "Penyelesaian keberatan di Pengadilan Negeri"
+
+msgid "Validate compensation recipients"
+msgstr "Validasi penerima ganti kerugian"
+
+msgid "Provide compensation"
+msgstr "Pemberian ganti kerugian"
+
+msgid "Consign compensation to the district court (if needed)"
+msgstr "Penitipan ganti kerugian di Pengadilan Negeri (jika diperlukan)"
+
+msgid "Release of rights"
+msgstr "Pelepasan hak"
+
+msgid "Hand over results to the agency requiring the land"
+msgstr "Penyerahan hasil kepada instansi yang memerlukan tanah"
+
+msgid "Apply for land rights registration/certification"
+msgstr "Pengajuan pendaftaran/sertipikasi hak atas tanah"
+
+msgid "Monitoring and evaluation"
+msgstr "Pemantauan dan evaluasi"
+
+msgid "Prepare the acquisition plan and location"
+msgstr "Menyusun rencana pengadaan dan lokasi"
+
+msgid "Confirm conformity with spatial plan"
+msgstr "Memastikan kesesuaian dengan rencana tata ruang"
+
+msgid "Inventory and identification"
+msgstr "Inventarisasi dan identifikasi"
+
+msgid "Valuation by appraiser"
+msgstr "Penilaian oleh penilai"
+
+msgid "Deliberation / direct agreement"
+msgstr "Musyawarah / kesepakatan langsung"
+
+msgid "Payment and release of rights"
+msgstr "Pembayaran dan pelepasan hak"
+
+msgid "Register land rights in the name of the agency"
+msgstr "Pendaftaran hak atas tanah atas nama instansi"
+
+msgid "Define land requirement and budget"
+msgstr "Menetapkan kebutuhan lahan dan anggaran"
+
+msgid "Check spatial suitability (KKPR) and permits"
+msgstr "Memeriksa kesesuaian ruang (KKPR) dan perizinan"
+
+msgid "Socialize the plan to landowners"
+msgstr "Sosialisasi rencana kepada pemilik tanah"
+
+msgid "Inventory parcels and verify rights"
+msgstr "Inventarisasi bidang dan verifikasi hak"
+
+msgid "Price appraisal"
+msgstr "Penilaian harga"
+
+msgid "Price negotiation"
+msgstr "Negosiasi harga"
+
+msgid "Sale and purchase / release deed before PPAT/notary"
+msgstr "Akta jual beli / pelepasan hak di hadapan PPAT/notaris"
+
+msgid "Settle BPHTB and income tax"
+msgstr "Penyelesaian BPHTB dan PPh"
+
+msgid "Transfer of title at the land office"
+msgstr "Peralihan hak di kantor pertanahan"
+
+msgid "Date"
+msgstr "Tanggal"
+
+msgid "Collective leave"
+msgstr "Cuti bersama"
+
+msgctxt "Model name"
+msgid "Holiday"
+msgstr "Hari libur"
+
+msgctxt "Model name"
+msgid "Holidays"
+msgstr "Hari libur"
+
+msgid "working days"
+msgstr "hari kerja"
+
+msgid "days"
+msgstr "hari"
+
+msgid "Code"
+msgstr "Kode"
+
+msgid "Unit"
+msgstr "Satuan"
+
+msgid "Legal basis"
+msgstr "Dasar hukum"
+
+msgctxt "Model name"
+msgid "Deadline rule"
+msgstr "Aturan tenggat"
+
+msgctxt "Model name"
+msgid "Deadline rules"
+msgstr "Aturan tenggat"
+
+msgid "Acquisition type"
+msgstr "Jenis pengadaan"
+
+msgid "Purpose category"
+msgstr "Kategori peruntukan"
+
+msgid "Priority"
+msgstr "Prioritas"
+
+msgid "Funding source"
+msgstr "Sumber dana"
+
+msgid "Agency requiring the land"
+msgstr "Instansi yang memerlukan tanah"
+
+msgid "Contact of the requiring agency"
+msgstr "Narahubung instansi yang memerlukan tanah"
+
+msgid "Executing land office"
+msgstr "Kantor pertanahan pelaksana"
+
+msgid "Executing chair"
+msgstr "Ketua Pelaksana"
+
+msgid "Regency / city"
+msgstr "Kabupaten/Kota"
+
+msgid "Location description"
+msgstr "Uraian lokasi"
+
+msgid "Estimated land requirement (m²)"
+msgstr "Perkiraan kebutuhan lahan (m²)"
+
+msgid "Estimated budget (IDR)"
+msgstr "Perkiraan anggaran (Rp)"
+
+msgid "Stage"
+msgstr "Tahap"
+
+msgid "Planning document (DPPT) number"
+msgstr "Nomor Dokumen Perencanaan (DPPT)"
+
+msgid "Planning document (DPPT) date"
+msgstr "Tanggal Dokumen Perencanaan (DPPT)"
+
+msgid "Notification of development plan date"
+msgstr "Tanggal pemberitahuan rencana pembangunan"
+
+msgid "Public consultation date"
+msgstr "Tanggal konsultasi publik"
+
+msgid "Location determination (Penlok) decree number"
+msgstr "Nomor keputusan Penetapan Lokasi (Penlok)"
+
+msgid "Location determination (Penlok) date"
+msgstr "Tanggal Penetapan Lokasi (Penlok)"
+
+msgid "Location determination extended"
+msgstr "Penetapan lokasi diperpanjang"
+
+msgid "Location determination announcement date"
+msgstr "Tanggal pengumuman Penetapan Lokasi"
+
+msgid "Target completion date"
+msgstr "Target tanggal selesai"
+
+msgid "Created by"
+msgstr "Dibuat oleh"
+
+msgctxt "Model name"
+msgid "Land acquisition project"
+msgstr "Proyek pengadaan tanah"
+
+msgctxt "Model name"
+msgid "Land acquisition projects"
+msgstr "Proyek pengadaan tanah"
+
+msgid "Project"
+msgstr "Proyek"
+
+msgid "Order"
+msgstr "Urutan"
+
+msgid "Title"
+msgstr "Judul"
+
+msgid "Planned date"
+msgstr "Tanggal rencana"
+
+msgid "Actual date"
+msgstr "Tanggal realisasi"
+
+msgid "Responsible person"
+msgstr "Penanggung jawab"
+
+msgctxt "Model name"
+msgid "Milestone"
+msgstr "Tonggak"
+
+msgctxt "Model name"
+msgid "Milestones"
+msgstr "Tonggak"
+
+msgid "Parcel identification number (NIB)"
+msgstr "Nomor Identifikasi Bidang (NIB)"
+
+msgid "Sub-district (kecamatan)"
+msgstr "Kecamatan"
+
+msgid "Village (desa/kelurahan)"
+msgstr "Desa/Kelurahan"
+
+msgid "Building area (m²)"
+msgstr "Luas bangunan (m²)"
+
+msgid "Other objects related to the land"
+msgstr "Benda lain yang berkaitan dengan tanah"
+
+msgid "Disputed"
+msgstr "Bersengketa"
+
+msgctxt "Model name"
+msgid "Parcel"
+msgstr "Bidang tanah"
+
+msgctxt "Model name"
+msgid "Parcels"
+msgstr "Bidang tanah"
+
+msgid "Parcel"
+msgstr "Bidang tanah"
+
+msgid "Party type"
+msgstr "Jenis pihak"
+
+msgid "Role"
+msgstr "Peran"
+
+msgid "National identification number (NIK)"
+msgstr "Nomor Induk Kependudukan (NIK)"
+
+msgid "Taxpayer identification number (NPWP)"
+msgstr "Nomor Pokok Wajib Pajak (NPWP)"
+
+msgid "Share (%)"
+msgstr "Porsi (%)"
+
+msgid "Bank name"
+msgstr "Nama bank"
+
+msgid "Bank account number"
+msgstr "Nomor rekening bank"
+
+msgid "Bank account holder"
+msgstr "Nama pemilik rekening"
+
+msgctxt "Model name"
+msgid "Entitled party"
+msgstr "Pihak yang berhak"
+
+msgctxt "Model name"
+msgid "Entitled parties"
+msgstr "Pihak yang berhak"
+
+msgid "Can view sensitive personal data (NIK, bank account)"
+msgstr "Dapat melihat data pribadi sensitif (NIK, rekening bank)"
+
+msgid "Survey type"
+msgstr "Jenis survei"
+
+msgid "Survey date"
+msgstr "Tanggal survei"
+
+msgid "Task force"
+msgstr "Satgas"
+
+msgid "Surveyor"
+msgstr "Petugas survei"
+
+msgid "Latitude"
+msgstr "Lintang"
+
+msgid "Longitude"
+msgstr "Bujur"
+
+msgid "Findings"
+msgstr "Temuan"
+
+msgctxt "Model name"
+msgid "Parcel survey"
+msgstr "Survei bidang"
+
+msgctxt "Model name"
+msgid "Parcel surveys"
+msgstr "Survei bidang"
+
+msgid "Announcement type"
+msgstr "Jenis pengumuman"
+
+msgid "Announced on"
+msgstr "Diumumkan pada"
+
+msgid "Place of announcement"
+msgstr "Tempat pengumuman"
+
+msgid "Document number"
+msgstr "Nomor dokumen"
+
+msgctxt "Model name"
+msgid "Announcement"
+msgstr "Pengumuman"
+
+msgctxt "Model name"
+msgid "Announcements"
+msgstr "Pengumuman"
+
+msgid "Public appraiser firm (KJPP)"
+msgstr "Kantor Jasa Penilai Publik (KJPP)"
+
+msgid "Appraiser name"
+msgstr "Nama penilai"
+
+msgid "Appraiser license number"
+msgstr "Nomor izin penilai"
+
+msgid "Report number"
+msgstr "Nomor laporan"
+
+msgid "Valuation date"
+msgstr "Tanggal penilaian"
+
+msgid "Results submitted to the land agency on"
+msgstr "Hasil disampaikan ke Lembaga Pertanahan pada"
+
+msgid "Land value"
+msgstr "Nilai tanah"
+
+msgid "Above- and below-ground space value"
+msgstr "Nilai ruang atas dan bawah tanah"
+
+msgid "Building value"
+msgstr "Nilai bangunan"
+
+msgid "Plants value"
+msgstr "Nilai tanaman"
+
+msgid "Other objects value"
+msgstr "Nilai benda lain"
+
+msgid "Non-physical losses value"
+msgstr "Nilai kerugian nonfisik"
+
+msgid ""
+"E.g. transaction costs, waiting period compensation, relocation costs, loss "
+"of business, profession change costs, remaining land value."
+msgstr ""
+"Mis. biaya transaksi, kompensasi masa tunggu, biaya pindah, kehilangan "
+"usaha, biaya alih profesi, nilai sisa tanah."
+
+msgid "Total value"
+msgstr "Nilai total"
+
+msgctxt "Model name"
+msgid "Valuation"
+msgstr "Penilaian"
+
+msgctxt "Model name"
+msgid "Valuations"
+msgstr "Penilaian"
+
+msgid "Held on"
+msgstr "Dilaksanakan pada"
+
+msgid "Minutes number"
+msgstr "Nomor berita acara"
+
+msgid "Chaired by"
+msgstr "Dipimpin oleh"
+
+msgctxt "Model name"
+msgid "Deliberation"
+msgstr "Musyawarah"
+
+msgctxt "Model name"
+msgid "Deliberations"
+msgstr "Musyawarah"
+
+msgid "Deliberation"
+msgstr "Musyawarah"
+
+msgid "Entitled party"
+msgstr "Pihak yang berhak"
+
+msgid "Outcome"
+msgstr "Hasil"
+
+msgid "Form of compensation"
+msgstr "Bentuk ganti kerugian"
+
+msgid "Agreed amount (IDR)"
+msgstr "Nilai disepakati (Rp)"
+
+msgid "Minutes signed on"
+msgstr "Berita acara ditandatangani pada"
+
+msgctxt "Model name"
+msgid "Deliberation result"
+msgstr "Hasil musyawarah"
+
+msgctxt "Model name"
+msgid "Deliberation results"
+msgstr "Hasil musyawarah"
+
+msgid "Previous instance"
+msgstr "Instansi sebelumnya"
+
+msgid "Filed by"
+msgstr "Diajukan oleh"
+
+msgid "Court / handling body"
+msgstr "Pengadilan / lembaga penanganan"
+
+msgid "Case number"
+msgstr "Nomor perkara"
+
+msgid "Filed on"
+msgstr "Diajukan pada"
+
+msgid "Received by court on"
+msgstr "Diterima pengadilan pada"
+
+msgid "Decided on"
+msgstr "Diputus pada"
+
+msgid "Decision summary"
+msgstr "Ringkasan putusan"
+
+msgid "Compensation amount decided (IDR)"
+msgstr "Nilai ganti kerugian yang diputus (Rp)"
+
+msgctxt "Model name"
+msgid "Objection / case"
+msgstr "Keberatan / perkara"
+
+msgctxt "Model name"
+msgid "Objections / cases"
+msgstr "Keberatan / perkara"
+
+msgid "Reason"
+msgstr "Alasan"
+
+msgid "District court"
+msgstr "Pengadilan Negeri"
+
+msgid "Application date"
+msgstr "Tanggal permohonan"
+
+msgid "Court decree number"
+msgstr "Nomor penetapan pengadilan"
+
+msgid "Decree date"
+msgstr "Tanggal penetapan"
+
+msgid "Deposited on"
+msgstr "Dititipkan pada"
+
+msgid "Amount (IDR)"
+msgstr "Jumlah (Rp)"
+
+msgid "Collected by entitled party on"
+msgstr "Diambil pihak yang berhak pada"
+
+msgctxt "Model name"
+msgid "Consignment"
+msgstr "Penitipan (konsinyasi)"
+
+msgctxt "Model name"
+msgid "Consignments"
+msgstr "Penitipan (konsinyasi)"
+
+msgid "Description of non-monetary compensation"
+msgstr "Uraian ganti kerugian nonuang"
+
+msgid "Valuation"
+msgstr "Penilaian"
+
+msgid "Deliberation result"
+msgstr "Hasil musyawarah"
+
+msgid "Validated on"
+msgstr "Divalidasi pada"
+
+msgid "Validated by"
+msgstr "Divalidasi oleh"
+
+msgctxt "Model name"
+msgid "Compensation"
+msgstr "Ganti kerugian"
+
+msgctxt "Model name"
+msgid "Compensations"
+msgstr "Ganti kerugian"
+
+msgid "Compensation"
+msgstr "Ganti kerugian"
+
+msgid "Paid on"
+msgstr "Dibayar pada"
+
+msgid "Payment method"
+msgstr "Metode pembayaran"
+
+msgid "Bank reference"
+msgstr "Referensi bank"
+
+msgctxt "Model name"
+msgid "Compensation payment"
+msgstr "Pembayaran ganti kerugian"
+
+msgctxt "Model name"
+msgid "Compensation payments"
+msgstr "Pembayaran ganti kerugian"
+
+msgid "Released on"
+msgstr "Dilepaskan pada"
+
+msgid "Original certificate/evidence surrendered"
+msgstr "Asli sertipikat/alas hak diserahkan"
+
+msgctxt "Model name"
+msgid "Rights release"
+msgstr "Pelepasan hak"
+
+msgctxt "Model name"
+msgid "Rights releases"
+msgstr "Pelepasan hak"
+
+msgid "Handover minutes (BAST) number"
+msgstr "Nomor berita acara serah terima (BAST)"
+
+msgid "Handed over on"
+msgstr "Diserahkan pada"
+
+msgid "Parcels"
+msgstr "Bidang tanah"
+
+msgid "Land registration applied on"
+msgstr "Pendaftaran tanah diajukan pada"
+
+msgid "Registration / certificate number"
+msgstr "Nomor pendaftaran / sertipikat"
+
+msgctxt "Model name"
+msgid "Handover"
+msgstr "Penyerahan hasil"
+
+msgctxt "Model name"
+msgid "Handovers"
+msgstr "Penyerahan hasil"
+
+msgid "Head of household"
+msgstr "Kepala keluarga"
+
+msgid "Family card number (KK)"
+msgstr "Nomor Kartu Keluarga (KK)"
+
+msgid "Number of members"
+msgstr "Jumlah anggota"
+
+msgid "Displacement"
+msgstr "Dampak relokasi"
+
+msgid "Assistance provided"
+msgstr "Bantuan yang diberikan"
+
+msgid "Monetary assistance (IDR)"
+msgstr "Bantuan uang (Rp)"
+
+msgid "Progress (%)"
+msgstr "Kemajuan (%)"
+
+msgctxt "Model name"
+msgid "Affected household"
+msgstr "Rumah tangga terdampak"
+
+msgctxt "Model name"
+msgid "Affected households"
+msgstr "Rumah tangga terdampak"
+
+msgid "Document type"
+msgstr "Jenis dokumen"
+
+msgid "Document date"
+msgstr "Tanggal dokumen"
+
+msgid "Uploaded by"
+msgstr "Diunggah oleh"
+
+msgctxt "Model name"
+msgid "Acquisition document"
+msgstr "Dokumen pengadaan"
+
+msgctxt "Model name"
+msgid "Acquisition documents"
+msgstr "Dokumen pengadaan"
+
+msgid "Target completion date cannot be before the start date."
+msgstr "Target tanggal selesai tidak boleh sebelum tanggal mulai."
+
+msgid "Small scale acquisition is limited to 5 hectares (50,000 m²)."
+msgstr "Pengadaan skala kecil dibatasi 5 hektare (50.000 m²)."
+
+msgid "Affected area cannot exceed the measured area."
+msgstr "Luas terkena tidak boleh melebihi luas ukur."
+
+msgid "Sub-district must be in the project's regency/city."
+msgstr "Kecamatan harus berada di kabupaten/kota proyek."
+
+msgid "Bank account number must be numeric."
+msgstr "Nomor rekening bank harus berupa angka."
+
+msgid "Total shares of the parcel's parties exceed 100%."
+msgstr "Total porsi pihak pada bidang ini melebihi 100%."
+
+msgid "Value cannot be negative."
+msgstr "Nilai tidak boleh negatif."
+
+msgid "Parcel does not belong to the deliberation's project."
+msgstr "Bidang tidak termasuk dalam proyek musyawarah ini."
+
+msgid "Party does not belong to the selected parcel."
+msgstr "Pihak tidak terkait dengan bidang yang dipilih."
+
+msgid "Parcel does not belong to the selected project."
+msgstr "Bidang tidak termasuk dalam proyek yang dipilih."
+
+msgid "Decision date cannot be before the filing date."
+msgstr "Tanggal putusan tidak boleh sebelum tanggal pengajuan."
+
+msgid "Amount must be greater than zero."
+msgstr "Jumlah harus lebih besar dari nol."
+
+msgid "Compensation must be validated before it can be paid."
+msgstr "Ganti kerugian harus divalidasi sebelum dibayar."
+
+msgid "Payments exceed the compensation amount."
+msgstr "Pembayaran melebihi nilai ganti kerugian."
+
+msgid "Monetary compensation must be greater than zero."
+msgstr "Ganti kerugian uang harus lebih besar dari nol."
+
+msgid ""
+"Rights can only be released after compensation has been paid or consigned to"
+" the court."
+msgstr ""
+"Hak hanya dapat dilepaskan setelah ganti kerugian dibayar atau dititipkan di"
+" pengadilan."
+
+msgid "All parcels must belong to the selected project."
+msgstr "Semua bidang harus termasuk dalam proyek yang dipilih."
+
+#, python-format
+msgid "Parcel %(parcel)s has no rights release yet."
+msgstr "Bidang %(parcel)s belum memiliki pelepasan hak."
+
+msgid "Family card number must be 16 digits."
+msgstr "Nomor Kartu Keluarga harus 16 digit."
+
+msgid "File type is not allowed."
+msgstr "Jenis berkas tidak diizinkan."
+
+msgid "File is too large."
+msgstr "Berkas terlalu besar."
+
+msgid "A file is required."
+msgstr "Berkas wajib diunggah."
+
+msgid "Only determined compensation can be validated."
+msgstr "Hanya ganti kerugian berstatus ditetapkan yang dapat divalidasi."
+
+msgid "The entitled party has no bank account number."
+msgstr "Pihak yang berhak tidak memiliki nomor rekening bank."
+
+msgid "Land acquisition deadlines"
+msgstr "Tenggat pengadaan tanah"
+
+msgid "Land acquisition dashboard"
+msgstr "Dasbor pengadaan tanah"
+
+msgid "Land acquisition choices"
+msgstr "Pilihan pengadaan tanah"
+
+msgid "Working day calculator"
+msgstr "Kalkulator hari kerja"
+
+msgid "Use format YYYY-MM-DD."
+msgstr "Gunakan format YYYY-MM-DD."
+
+msgid "Must be between 0 and 3650."
+msgstr "Harus antara 0 dan 3650."
+
+msgctxt "Area search lessor"
+msgid "Area use and control"
+msgstr "Pemanfaatan dan penguasaan area"
+
+msgctxt "Area search lessor"
+msgid "Development of land assets"
+msgstr "Pengembangan aset lahan"
+
+msgctxt "Area search lessor"
+msgid "Sports venue services"
+msgstr "Layanan fasilitas olahraga"
+
+msgctxt "Area search lessor"
+msgid "Outdoor services"
+msgstr "Layanan ruang terbuka"
+
+msgctxt "Area search lessor"
+msgid "Youth services"
+msgstr "Layanan kepemudaan"
+
+msgctxt "Search class"
+msgid "Plot search"
+msgstr "Pencarian kavling"
+
+msgctxt "Search class"
+msgid "Other"
+msgstr "Lainnya"
+
+msgctxt "Search stage"
+msgid "In preparation"
+msgstr "Dalam persiapan"
+
+msgctxt "Search stage"
+msgid "In action"
+msgstr "Berlangsung"
+
+msgctxt "Search stage"
+msgid "Processing"
+msgstr "Diproses"
+
+msgctxt "Search stage"
+msgid "Decision making"
+msgstr "Pengambilan keputusan"
+
+msgctxt "Search stage"
+msgid "Settled"
+msgstr "Selesai"
+
+msgctxt "Information state"
+msgid "Checked"
+msgstr "Sudah diperiksa"
+
+msgctxt "Information state"
+msgid "Not checked"
+msgstr "Belum diperiksa"
+
+msgctxt "Information state"
+msgid "Not needed"
+msgstr "Tidak diperlukan"
+
+msgctxt "Information state"
+msgid "Requires further action"
+msgstr "Perlu tindak lanjut"
+
+msgctxt "Information check name"
+msgid "Trade register extract"
+msgstr "Nomor Induk Berusaha (NIB/OSS)"
+
+msgctxt "Information check name"
+msgid "Creditworthiness certificate"
+msgstr "Keterangan kelayakan kredit"
+
+msgctxt "Information check name"
+msgid "Statement of payment of earning-related pension contributions"
+msgstr "Bukti pembayaran iuran BPJS Ketenagakerjaan"
+
+msgctxt "Information check name"
+msgid "Certificate of entry in the VAT register"
+msgstr "Surat Pengukuhan Pengusaha Kena Pajak (PKP)"
+
+msgctxt "Information check name"
+msgid "Certificate of entry in the advance payment register"
+msgstr "Bukti pembayaran angsuran PPh Pasal 25"
+
+msgctxt "Information check name"
+msgid "Tax debt certificate"
+msgstr "Surat Keterangan Fiskal (SKF)"
+
+msgctxt "Information check name"
+msgid "Certificate of entry in the register of employers"
+msgstr "Bukti Wajib Lapor Ketenagakerjaan (WLKP)"
+
+msgctxt "Decline reason"
+msgid "Application expired"
+msgstr "Permohonan kedaluwarsa"
+
+msgctxt "Decline reason"
+msgid "Application missed deadline"
+msgstr "Permohonan melewati batas waktu"
+
+msgctxt "Decline reason"
+msgid "Application missing details"
+msgstr "Data permohonan tidak lengkap"
+
+msgctxt "Decline reason"
+msgid "Applicant not qualified"
+msgstr "Pemohon tidak memenuhi syarat"
+
+msgctxt "Decline reason"
+msgid "Applicant withdrew application"
+msgstr "Pemohon menarik permohonan"
+
+msgctxt "Decline reason"
+msgid "Area not controlled by city"
+msgstr "Area tidak dikuasai instansi"
+
+msgctxt "Decline reason"
+msgid "Area not available for lease"
+msgstr "Area tidak tersedia untuk disewakan"
+
+msgctxt "Decline reason"
+msgid "Other reason"
+msgstr "Alasan lain"
+
+msgctxt "Area search state"
+msgid "Received"
+msgstr "Diterima"
+
+msgctxt "Area search state"
+msgid "Pending additional information"
+msgstr "Menunggu informasi tambahan"
+
+msgctxt "Area search state"
+msgid "In action"
+msgstr "Diproses"
+
+msgctxt "Area search state"
+msgid "Settled"
+msgstr "Selesai"
+
+msgctxt "Area search state"
+msgid "Revoked"
+msgstr "Dicabut"
+
+msgctxt "Area search state"
+msgid "Declined"
+msgstr "Ditolak"
+
+msgctxt "Model name"
+msgid "Plot search type"
+msgstr "Jenis pencarian kavling"
+
+msgctxt "Model name"
+msgid "Plot search types"
+msgstr "Jenis pencarian kavling"
+
+msgctxt "Model name"
+msgid "Plot search subtype"
+msgstr "Subjenis pencarian kavling"
+
+msgctxt "Model name"
+msgid "Plot search subtypes"
+msgstr "Subjenis pencarian kavling"
+
+msgctxt "Model name"
+msgid "Plot search stage"
+msgstr "Tahap pencarian kavling"
+
+msgctxt "Model name"
+msgid "Plot search stages"
+msgstr "Tahap pencarian kavling"
+
+msgid "Subtype"
+msgstr "Subjenis"
+
+msgid "Begin at"
+msgstr "Mulai pada"
+
+msgid "End at"
+msgstr "Berakhir pada"
+
+msgctxt "Model name"
+msgid "Plot search"
+msgstr "Pencarian kavling"
+
+msgctxt "Model name"
+msgid "Plot searches"
+msgstr "Pencarian kavling"
+
+msgid "Target type"
+msgstr "Jenis objek"
+
+msgctxt "Model name"
+msgid "Area search intended use"
+msgstr "Peruntukan pencarian area"
+
+msgctxt "Model name"
+msgid "Area search intended uses"
+msgstr "Peruntukan pencarian area"
+
+msgctxt "Model name"
+msgid "Area search status"
+msgstr "Status pencarian area"
+
+msgctxt "Model name"
+msgid "Area search statuses"
+msgstr "Status pencarian area"
+
+msgid "Time received"
+msgstr "Waktu diterima"
+
+msgid "Time settled"
+msgstr "Waktu selesai"
+
+msgid "Area search state"
+msgstr "Status pencarian area"
+
+msgctxt "Model name"
+msgid "Area search"
+msgstr "Pencarian area"
+
+msgctxt "Model name"
+msgid "Area searches"
+msgstr "Pencarian area"
+
+msgid "User amr"
+msgstr "AMR pengguna"
+
+msgid "Authentication method reference"
+msgstr "Referensi metode autentikasi"
+
+msgid "The target has been removed from the system!"
+msgstr "Objek telah dihapus dari sistem!"
+
+msgid "The target information has changed!"
+msgstr "Informasi objek telah berubah!"
+
+msgid "Area search application"
+msgstr "Permohonan pencarian area"
+
+msgid "Area search information"
+msgstr "Informasi pencarian area"
+
+msgid "Information check"
+msgstr "Pemeriksaan informasi"
+
+msgid "Time stamp"
+msgstr "Stempel waktu"
+
+#, python-format
+msgid "This is a copy of your area search application sent to %(org)s."
+msgstr ""
+"Ini adalah salinan permohonan pencarian area Anda yang dikirim ke %(org)s."
+
+msgid ""
+"You can find a detailed copy of your application as an attachment in this "
+"email."
+msgstr "Salinan lengkap permohonan Anda terlampir dalam email ini."
+
+msgid "Plot search information"
+msgstr "Informasi pencarian kavling"
+
+#, python-format
+msgid ""
+"This is a confirmation that the following plot applications sent to %(org)s "
+"were received."
+msgstr ""
+"Ini adalah konfirmasi bahwa permohonan kavling berikut yang dikirim ke "
+"%(org)s telah diterima."
+
+msgctxt "list of identifiers in email"
+msgid "Application identifiers"
+msgstr "Pengenal permohonan"
+
+msgid "yes"
+msgstr "ya"
+
+msgid "no"
+msgstr "tidak"
+
+msgid "You have received a link for a direct reservation plot search"
+msgstr "Anda menerima tautan pencarian kavling pencadangan langsung"
+
+#, python-brace-format
+msgid ""
+"Hi {receiver}! Here is the link for the direct reservation plot search: {url} \n"
+"\n"
+"{covering_note}"
+msgstr ""
+"Halo {receiver}! Berikut tautan pencarian kavling pencadangan langsung: {url} \n"
+"\n"
+"{covering_note}"
+
+#, python-brace-format
+msgid ""
+"Change: area search {identifier} {district} {address} {applicant} lease "
+"period {start_date} - {end_date}"
+msgstr ""
+"Perubahan: pencarian area {identifier} {district} {address} {applicant} masa"
+" sewa {start_date} - {end_date}"
+
+msgid "(name missing)"
+msgstr "(nama tidak ada)"
+
+#, python-brace-format
+msgid ""
+"The new lessor of area search {link} is {new_lessor}, previously "
+"{old_lessor}."
+msgstr ""
+"Pemberi sewa baru untuk pencarian area {link} adalah {new_lessor}, "
+"sebelumnya {old_lessor}."
+
+msgid "Error in upstream service"
+msgstr "Galat pada layanan hulu"
+
+msgid "The deadline for applications"
+msgstr "Batas waktu permohonan"
+
+msgid "Plot"
+msgstr "Kavling"
+
+msgid "Detailed plan state"
+msgstr "Status rencana detail"
+
+msgid "Permitted build floor area (floor-m²)"
+msgstr "Luas lantai bangunan diizinkan (m² lantai)"
+
+msgid "Permitted build residential floor area (floor-m²)"
+msgstr "Luas lantai hunian diizinkan (m² lantai)"
+
+msgid "Permitted build commercial floor area (floor-m²)"
+msgstr "Luas lantai komersial diizinkan (m² lantai)"
+
+msgid "Area (m²)"
+msgstr "Luas (m²)"
+
+msgid "First suitable construction year"
+msgstr "Tahun pertama layak bangun"
+
+msgid "HITAS"
+msgstr "SKEMA HARGA TERKENDALI"
+
+msgid "Login"
+msgstr "Masuk"
+
+msgid "Username or password is incorrect."
+msgstr "Nama pengguna atau kata sandi salah."
+
+msgid "Logout"
+msgstr "Keluar"
+
+msgid "Current user"
+msgstr "Pengguna saat ini"
+
+msgid "Old password is incorrect."
+msgstr "Kata sandi lama salah."
+
+msgid "Change password"
+msgstr "Ubah kata sandi"
+
+msgid "Department"
+msgstr "Departemen"
+
+msgid "Latest API token usage date"
+msgstr "Tanggal terakhir penggunaan token API"
+
+msgid "Token exists"
+msgstr "Token ada"
+
+msgid "Users permissions"
+msgstr "Izin pengguna"

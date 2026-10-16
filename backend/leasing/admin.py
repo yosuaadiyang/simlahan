@@ -1,12 +1,9 @@
-from itertools import groupby
-
 from django.contrib.gis import admin
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from enumfields.admin import EnumFieldListFilter
 
 from field_permissions.admin import FieldPermissionsAdminMixin
-from laske_export.exporter import LaskeExporter
 from leasing.models import (
     Area,
     AreaNote,
@@ -96,15 +93,15 @@ from leasing.models.map_layers import VipunenMapLayer
 from leasing.models.service_unit import ServiceUnitGroupMapping
 
 
-class CenterOnHelsinkiGISAdmin(admin.GISModelAdmin):
-    # Position 24.945, 60.192 (SRID 4326) transformed to SRID 900913
-    default_lon = 2776864.697838209
-    default_lat = 8442609.191245062
-    default_zoom = 11
+class CenterOnIndonesiaGISAdmin(admin.GISModelAdmin):
+    # Titik tengah Indonesia (SRID 4326)
+    gis_widget_kwargs = {
+        "attrs": {"default_lon": 118.0, "default_lat": -2.5, "default_zoom": 5}
+    }
 
 
 @admin.register(AreaNote)
-class AreaNoteAdmin(FieldPermissionsAdminMixin, CenterOnHelsinkiGISAdmin):
+class AreaNoteAdmin(FieldPermissionsAdminMixin, CenterOnIndonesiaGISAdmin):
     list_display = ("created_at", "user")
     search_fields = ["note", "user__first_name", "user__last_name", "user__username"]
 
@@ -141,7 +138,7 @@ class NameAdmin(FieldPermissionsModelAdmin):
 
 
 @admin.register(Area)
-class AreaAdmin(CenterOnHelsinkiGISAdmin):
+class AreaAdmin(CenterOnIndonesiaGISAdmin):
     list_display = ("identifier", "type", "source")
     list_filter = (("type", EnumFieldListFilter), "source")
     search_fields = ["identifier"]
@@ -577,19 +574,6 @@ class InvoiceRowInline(FieldPermissionsAdminMixin, admin.TabularInline):
 
 @admin.register(Invoice)
 class InvoiceAdmin(FieldPermissionsModelAdmin):
-    actions = ["resend_invoice"]
-
-    def resend_invoice(self, request, queryset):
-        invoice_count = 0
-        for service_unit, group in groupby(queryset, lambda i: i.service_unit):
-            invoices = list(group)
-            invoice_count += len(invoices)
-
-            exporter = LaskeExporter(service_unit=service_unit)
-            exporter.export_invoices(invoices)
-
-        self.message_user(request, f"Invoice resent for {invoice_count} invoices.")
-
     list_display = (
         "number",
         "lease",
@@ -597,7 +581,6 @@ class InvoiceAdmin(FieldPermissionsModelAdmin):
         "billing_period_start_date",
         "billing_period_end_date",
         "total_amount",
-        "sent_to_sap_at",
     )
     search_fields = ("number", "lease__identifier__identifier")
     inlines = [InvoiceRowInline, InvoicePaymentInline]
@@ -872,11 +855,11 @@ class VipunenMapLayerAdmin(FieldPermissionsModelAdmin):
         "hierarchical_name",
         "color_display",
         "parent",
-        "name_fi",
+        "name_ind",
         "keywords",
     )
     list_filter = ("parent",)
-    search_fields = ["name_fi", "name_sv", "name_en", "keywords"]
+    search_fields = ["name_ind", "name_en", "keywords"]
     autocomplete_fields = ["filter_by_lease_type", "filter_by_intended_use"]
 
     @admin.display(description="Hierarchical name")

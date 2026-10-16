@@ -47,7 +47,7 @@ class InvoicesInPeriodReport(ReportBase):
         "start_date": forms.DateField(label=_("Start date"), required=True),
         "end_date": forms.DateField(label=_("End date"), required=True),
         "lease_type": forms.ModelChoiceField(
-            label=_("Laskutuslaji"),
+            label=_("Lease type"),
             queryset=LeaseType.objects.all(),
             empty_label=None,
             required=False,

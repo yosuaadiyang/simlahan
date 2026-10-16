@@ -14,7 +14,7 @@ RE_LEASE_DECISION_TYPE_ID = 29  # Vuokraus (sopimuksen uusiminen/jatkam.)
 
 OPTION_TO_PURCHASE_CONDITION_TYPE_ID = 24  # 24 = Osto-optioehto
 
-LEASING_CONTRACT_TYPE_NAME = "Vuokrasopimus"
+LEASING_CONTRACT_TYPE_NAME = "Perjanjian sewa"
 
 
 class ReportURL(TypedDict):

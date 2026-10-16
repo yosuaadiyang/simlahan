@@ -1,37 +1,7 @@
 [
-  {
-    "model": "leasing.ManagementSubventionFormOfManagement",
-    "pk": 1,
-    "fields": {
-      "name": "ARAn pitkä vuokratuki"
-    }
-  },
-  {
-    "model": "leasing.ManagementSubventionFormOfManagement",
-    "pk": 2,
-    "fields": {
-      "name": "ARAn muut tuet"
-    }
-  },
-  {
-    "model": "leasing.ManagementSubventionFormOfManagement",
-    "pk": 3,
-    "fields": {
-      "name": "Hitas"
-    }
-  },
-  {
-    "model": "leasing.ManagementSubventionFormOfManagement",
-    "pk": 4,
-    "fields": {
-      "name": "Muu välimuoto"
-    }
-  },
-  {
-    "model": "leasing.ManagementSubventionFormOfManagement",
-    "pk": 5,
-    "fields": {
-      "name": "ASO"
-    }
-  }
+{"model": "leasing.ManagementSubventionFormOfManagement", "pk": 1, "fields": {"name": "Subsidi sewa jangka panjang"}},
+{"model": "leasing.ManagementSubventionFormOfManagement", "pk": 2, "fields": {"name": "Subsidi pemerintah lainnya"}},
+{"model": "leasing.ManagementSubventionFormOfManagement", "pk": 3, "fields": {"name": "Harga diatur"}},
+{"model": "leasing.ManagementSubventionFormOfManagement", "pk": 4, "fields": {"name": "Bentuk antara lainnya"}},
+{"model": "leasing.ManagementSubventionFormOfManagement", "pk": 5, "fields": {"name": "Hak huni"}}
 ]

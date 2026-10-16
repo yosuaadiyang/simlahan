@@ -54,14 +54,14 @@ def test_duplicates_are_removed(
         service_unit,
         type=ContactType.BUSINESS,
         name="Acme Corp",
-        business_id="1234567-8",
+        business_id="012345678901000",
     )
     _create_contact(
         contact_factory,
         service_unit,
         type=ContactType.BUSINESS,
         name="Acme Corp",
-        business_id="1234567-8",
+        business_id="012345678901000",
     )
 
     _call(service_unit, tmp_path, replace_references=True, delete_duplicates=True)
@@ -82,14 +82,14 @@ def test_oldest_contact_is_kept(
         service_unit,
         type=ContactType.BUSINESS,
         name="Acme Corp",
-        business_id="1234567-8",
+        business_id="012345678901000",
     )
     _create_contact(
         contact_factory,
         service_unit,
         type=ContactType.BUSINESS,
         name="Acme Corp",
-        business_id="1234567-8",
+        business_id="012345678901000",
     )
 
     _call(service_unit, tmp_path, replace_references=True, delete_duplicates=True)
@@ -111,14 +111,14 @@ def test_contacts_with_different_name_are_not_deduplicated(
         service_unit,
         type=ContactType.BUSINESS,
         name="Acme Corp",
-        business_id="1234567-8",
+        business_id="012345678901000",
     )
     _create_contact(
         contact_factory,
         service_unit,
         type=ContactType.BUSINESS,
         name="Acme Corp (old)",
-        business_id="1234567-8",
+        business_id="012345678901000",
     )
 
     _call(service_unit, tmp_path, replace_references=True, delete_duplicates=True)
@@ -139,7 +139,7 @@ def test_contacts_with_different_business_id_are_not_deduplicated(
         service_unit,
         type=ContactType.BUSINESS,
         name="Acme Corp",
-        business_id="1234567-8",
+        business_id="012345678901000",
     )
     _create_contact(
         contact_factory,
@@ -167,14 +167,14 @@ def test_dry_run_does_not_remove_contacts(
         service_unit,
         type=ContactType.BUSINESS,
         name="Acme Corp",
-        business_id="1234567-8",
+        business_id="012345678901000",
     )
     _create_contact(
         contact_factory,
         service_unit,
         type=ContactType.BUSINESS,
         name="Acme Corp",
-        business_id="1234567-8",
+        business_id="012345678901000",
     )
 
     _call(service_unit, tmp_path)
@@ -194,13 +194,13 @@ def test_contacts_outside_target_date_are_not_affected(
     contact_factory(
         type=ContactType.BUSINESS,
         name="Acme Corp",
-        business_id="1234567-8",
+        business_id="012345678901000",
         service_unit=service_unit,
     )
     contact_factory(
         type=ContactType.BUSINESS,
         name="Acme Corp",
-        business_id="1234567-8",
+        business_id="012345678901000",
         service_unit=service_unit,
     )
 
@@ -225,7 +225,7 @@ def test_contacts_outside_service_unit_are_not_affected(
             other_unit,
             type=ContactType.BUSINESS,
             name="Acme Corp",
-            business_id="1234567-8",
+            business_id="012345678901000",
         )
 
     _call(target_unit, tmp_path, replace_references=True, delete_duplicates=True)

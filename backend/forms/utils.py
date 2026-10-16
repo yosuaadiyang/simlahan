@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Iterable, List, Tuple, TypedDict
 from django.conf import settings
 from django.db.models import Q
 from django.template.loader import render_to_string
+from django.utils.html import escape
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
 from django.utils.translation import override
@@ -552,7 +553,7 @@ def handle_email_sending(response: Response, user_language: str) -> None:
 class AnswerInputData(TypedDict):
     answer_id: int
     answer_type: AnswerType
-    user_language: str  # ISO 639-1 language code, e.g. "fi", "en", "sv"
+    user_language: str  # ISO 639-1 language code, e.g. "id", "en"
 
 
 def _get_applicant_email_to_addresses(answer: "Answer") -> List[str]:
@@ -672,11 +673,11 @@ def generate_and_queue_answer_emails(input_data: AnswerInputData) -> None:
 
     answer_id = input_data.get("answer_id")
     answer_type = input_data.get("answer_type")
-    user_preferred_language = input_data.get("user_language", "fi")
+    user_preferred_language = input_data.get("user_language", settings.LANGUAGE_CODE)
     user_language = (
         user_preferred_language
         if user_preferred_language in get_supported_language_codes()
-        else "fi"
+        else settings.LANGUAGE_CODE
     )
 
     try:
@@ -698,7 +699,7 @@ def generate_and_queue_answer_emails(input_data: AnswerInputData) -> None:
 
     # Use default language for officer emails, because applicant's chosen
     # language should not influence that.
-    with override("fi"):
+    with override(settings.LANGUAGE_CODE):
         if answer_type == AnswerType.AREA_SEARCH:
             # Send email to officers responsible for processing area searches.
             officer_email_input = _generate_lessor_new_areasearch_email(answer)
@@ -774,48 +775,61 @@ def _get_lessor_new_areasearch_email_subject(
             "Answer or area search is None. Cannot generate email subject."
         )
 
-    identifier = area_search.identifier or "<tunnus puuttuu>"
-    district = area_search.district or "<kaupunginosa puuttuu>"
-    address = (
-        area_search.address or "<osoite puuttuu>"
+    identifier = area_search.identifier or _("<identifier missing>")
+    district = area_search.district or _("<district missing>")
+    address = area_search.address or _(
+        "<address missing>"
     )  # Ideally "if many addresses, the one from the first property code",
     # but areasearch address field is calculated elsewhere from geometry.
 
     applicants = []
     get_applicant(answer, applicants)
-    applicant = applicants[0] if applicants else "<hakija puuttuu>"
+    applicant = applicants[0] if applicants else _("<applicant missing>")
 
     date_format = "%d.%m.%Y"
     start_date = (
         area_search.start_date.strftime(date_format)
         if area_search.start_date
-        else "<aloitusaika puuttuu>"
+        else _("<start date missing>")
     )
     end_date = (
         area_search.end_date.strftime(date_format) if area_search.end_date else ""
     )
 
-    return f"Aluehakemus {identifier} {district} {address} {applicant} vuokra-aika {start_date} - {end_date}"
+    return _(
+        "Area search {identifier} {district} {address} {applicant} "
+        "lease period {start_date} - {end_date}"
+    ).format(
+        identifier=identifier,
+        district=district,
+        address=address,
+        applicant=applicant,
+        start_date=start_date,
+        end_date=end_date,
+    )
 
 
 def _get_lessor_new_areasearch_email_body(area_search: "AreaSearch") -> str:
     if area_search is None:
         raise ValueError("Area search is None. Cannot generate email body.")
 
+    from plotsearch.utils import AREA_SEARCH_UI_PATH
+
     identifier = area_search.identifier
     ui_base_url = settings.OFFICER_UI_URL
     if not ui_base_url:
         link_to_areasearch = identifier
     else:
-        link_to_areasearch = (
-            f"<a href='{ui_base_url}/aluehaut/{area_search.pk}'>{identifier}</a>"
-        )
+        link_to_areasearch = f"<a href='{ui_base_url}/{AREA_SEARCH_UI_PATH}/{area_search.pk}'>{identifier}</a>"
 
     intended_use = area_search.intended_use or "-"
     intended_use_description = area_search.description_intended_use or "-"
 
-    return f"""<html><body>
-<p>Aluehakemus: {link_to_areasearch}</p>
-<p>Käyttötarkoitus: {intended_use}</p>
-<p>Tarkempi kuvaus käyttötarkoituksesta: {intended_use_description}</p>
-</body></html>"""
+    return (
+        "<html><body>"
+        f"<p>{_('Area search')}: {link_to_areasearch}</p>"
+        f"<p>{_('Intended use')}: {escape(intended_use)}</p>"
+        f"<p>{_('Detailed description of the intended use')}: "
+        f"{escape(intended_use_description)}</p>"
+        "</body></html>"
+    )

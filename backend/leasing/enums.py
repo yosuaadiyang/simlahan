@@ -651,11 +651,11 @@ class ServiceUnitId(IntEnum):
 
     @member
     class Labels:
-        MAKE = "Maaomaisuuden kehittäminen ja tontit"
-        KAMA = "Palu/Kaupunkitilan käyttö ja maanvuokraus"
-        KUVA_LIPA = "KuVa / Liikuntapaikkapalvelut"
-        KUVA_UPA = "KuVa / Ulkoilupalvelut"
-        KUVA_NUP = "KuVa / Nuorisopalvelut"
+        MAKE = "Pengelolaan Aset Lahan dan Kavling"
+        KAMA = "Pemanfaatan Ruang dan Sewa Lahan"
+        KUVA_LIPA = "Fasilitas Olahraga"
+        KUVA_UPA = "Ruang Terbuka dan Rekreasi"
+        KUVA_NUP = "Fasilitas Kepemudaan"
 
 
 class SapSalesOfficeNumber(Enum):

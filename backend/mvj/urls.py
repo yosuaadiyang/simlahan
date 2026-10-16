@@ -8,7 +8,6 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions, routers
 
 from audittrail.viewsets import AuditTrailView
-from credit_integration import urls as credit_integration_urlpatterns
 from forms.viewsets.form import (
     AnswerOpeningRecordViewset,
     AnswerPublicViewSet,
@@ -19,17 +18,8 @@ from forms.viewsets.form import (
     MeetingMemoViewset,
     TargetStatusViewset,
 )
-from gdpr.views import MvjGDPRAPIView
 from leasing.api_functions import CalculateIncreaseWith360DayCalendar
-from leasing.export_api.viewsets import (
-    ExportExpiredLeaseViewSet,
-    ExportLeaseAreaViewSet,
-    ExportLeaseProcessingTimeReportViewSet,
-    ExportLeaseStatisticReportViewSet,
-    ExportVipunenMapLayerViewSet,
-)
 from leasing.report.viewset import ReportViewSet
-from leasing.views import CloudiaProxy, RyytiApiProxy, VirreProxy, ktj_proxy
 from leasing.viewsets.area_note import AreaNoteViewSet
 from leasing.viewsets.basis_of_rent import BasisOfRentViewSet
 from leasing.viewsets.batchrun import (
@@ -64,7 +54,6 @@ from leasing.viewsets.invoice import (
 from leasing.viewsets.invoice_additional_views import (
     InvoiceCalculatePenaltyInterestView,
     InvoiceCreditView,
-    InvoiceExportToLaskeView,
     InvoiceSetCreditView,
 )
 from leasing.viewsets.land_area import (
@@ -111,7 +100,8 @@ from leasing.viewsets.service_unit import ServiceUnitViewSet
 from leasing.viewsets.ui_data import UiDataViewSet
 from leasing.viewsets.vat import VatViewSet
 from mvj.views import healthz, readiness
-from plotsearch.views.map_service_proxy import helsinki_owned_areas_wms_proxy
+from pengadaan.urls import urlpatterns as pengadaan_urls
+from plotsearch.views.map_service_proxy import owned_areas_wms_proxy
 from plotsearch.views.plot_search import (
     AreaSearchAttachmentPublicViewset,
     AreaSearchAttachmentViewset,
@@ -138,6 +128,13 @@ from plotsearch.views.plot_search import (
     PlotSearchViewSet,
     RelatedPlotApplicationViewSet,
     TargetStatusGeneratePDF,
+)
+from users.auth_views import (
+    LoginView,
+    LogoutView,
+    MeView,
+    PasswordChangeView,
+    TokenRefreshView,
 )
 from users.views import UsersPermissions
 from users.viewsets import OfficerViewSet, UserViewSet
@@ -250,35 +247,6 @@ router.register(r"user", UserViewSet)
 router.register(r"officer", OfficerViewSet, basename="officer")
 router.register(r"vat", VatViewSet)
 
-# Export API
-export_router = routers.DefaultRouter()
-export_router.register(
-    r"lease_area",
-    ExportLeaseAreaViewSet,
-    basename="export_lease_area",
-)
-export_router.register(
-    r"vipunen_map_layer",
-    ExportVipunenMapLayerViewSet,
-    basename="export_vipunen_map_layer",
-)
-export_router.register(
-    r"expired_lease",
-    ExportExpiredLeaseViewSet,
-    basename="export_expired_lease",
-)
-# Export API reports
-export_router.register(
-    r"report/lease_statistic",
-    ExportLeaseStatisticReportViewSet,
-    basename="export_lease_statistic_report",
-)
-export_router.register(
-    r"report/lease_processing_time",
-    ExportLeaseProcessingTimeReportViewSet,
-    basename="export_lease_processing_time",
-)
-
 # Public router
 pub_router = routers.DefaultRouter()
 
@@ -347,11 +315,6 @@ additional_api_paths = [
     ),
     path("invoice_credit/", InvoiceCreditView.as_view(), name="invoice-credit"),
     path(
-        "invoice_export_to_laske/",
-        InvoiceExportToLaskeView.as_view(),
-        name="invoice-export-to-laske",
-    ),
-    path(
         "invoice_set_credit/", InvoiceSetCreditView.as_view(), name="invoice-set-credit"
     ),
     path(
@@ -386,36 +349,12 @@ additional_api_paths = [
         CalculateIncreaseWith360DayCalendar.as_view(),
     ),
 ]
-gdpr_urls = [
-    path(
-        getattr(
-            settings,
-            "GDPR_API_URL_PATTERN",
-            "v1/profiles/<uuid:uuid>",
-        ),
-        MvjGDPRAPIView.as_view(),
-        name="gdpr_v1",
-    )
-]
 additional_pub_api_paths = [
     path("plot_search_ui/", PlotSearchUIDataView.as_view(), name="pub_plot_search_ui"),
     path(
-        "proxy/wms/helsinki_owned_areas/",
-        helsinki_owned_areas_wms_proxy,
-        name="pub_helsinki_owned_areas_wms_proxy",
-    ),
-    # Enables oidc backchannel logout, requires setting `HELUSERS_BACK_CHANNEL_LOGOUT_ENABLED = True`
-    # to be useful
-    path("helauth/", include("helusers.urls")),
-    # GDPR API
-    path(
-        "gdpr-api/",
-        include(
-            (
-                gdpr_urls,
-                "gdpr",  # Namespace
-            ),
-        ),
+        "proxy/wms/owned_areas/",
+        owned_areas_wms_proxy,
+        name="pub_owned_areas_wms_proxy",
     ),
 ]
 if getattr(settings, "FLAG_PLOTSEARCH", False) is True:
@@ -436,11 +375,15 @@ pub_api_urls = [
         include(pub_router.urls + additional_pub_api_paths),
     )
 ]
-credit_integration_urls = [
-    path("", include((credit_integration_urlpatterns, "credit_integration")))
+auth_api_urls = [
+    path("auth/login/", LoginView.as_view(), name="auth-login"),
+    path("auth/refresh/", TokenRefreshView.as_view(), name="auth-refresh"),
+    path("auth/logout/", LogoutView.as_view(), name="auth-logout"),
+    path("auth/me/", MeView.as_view(), name="auth-me"),
+    path("auth/password/", PasswordChangeView.as_view(), name="auth-password"),
 ]
 
-v1_urls = api_urls + credit_integration_urls + pub_api_urls
+v1_urls = api_urls + auth_api_urls + pub_api_urls + pengadaan_urls
 
 urlpatterns = [
     path(
@@ -450,15 +393,6 @@ urlpatterns = [
             namespace="v1",
         ),
     ),
-    path(
-        "export/v1/",
-        include((export_router.urls, "export_v1"), namespace="export_v1"),
-    ),
-    re_path(r"(?P<base_type>ktjki[ir])/tuloste/(?P<print_type>[\w/]+)/pdf", ktj_proxy),
-    path("contract_file/<contract_id>/", CloudiaProxy.as_view()),
-    path("contract_file/<contract_id>/<file_id>/", CloudiaProxy.as_view()),
-    path("trade_register/<service>/<business_id>/", VirreProxy.as_view()),
-    path("ryyti/<api>/<business_id>/", RyytiApiProxy.as_view(), name="ryyti-api-proxy"),
     path("admin/", admin.site.urls),
     path("auth/", include(rest_framework.urls)),
 ]
@@ -466,9 +400,9 @@ urlpatterns = [
 # Generate a schema
 schema_view = get_schema_view(
     openapi.Info(
-        title="MVJ API",
+        title="SimLahan API",
         default_version="v1",
-        description="City of Helsinki land lease system API",
+        description="API Sistem Informasi Manajemen Lahan dan Pengadaan Tanah",
         terms_of_service="",
         contact=openapi.Contact(email=""),
         license=openapi.License(name="MIT License"),

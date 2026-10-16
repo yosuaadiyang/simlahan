@@ -1,23 +1,5 @@
 [
-  {
-    "model": "leasing.StatisticalUse",
-    "pk": 1,
-    "fields": {
-      "name": "Asuntotontit"
-    }
-  },
-  {
-    "model": "leasing.StatisticalUse",
-    "pk": 2,
-    "fields": {
-      "name": "Yritystontit"
-    }
-  },
-  {
-    "model": "leasing.StatisticalUse",
-    "pk": 3,
-    "fields": {
-      "name": "Muut"
-    }
-  }
+{"model": "leasing.StatisticalUse", "pk": 1, "fields": {"name": "Kavling hunian"}},
+{"model": "leasing.StatisticalUse", "pk": 2, "fields": {"name": "Kavling usaha"}},
+{"model": "leasing.StatisticalUse", "pk": 3, "fields": {"name": "Lainnya"}}
 ]

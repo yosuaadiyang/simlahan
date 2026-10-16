@@ -76,7 +76,7 @@ def answer_with_email(
 ):
     user = user_factory(username=fake.name())
     intended_use = area_search_intended_use_factory(
-        name="Urheilu ja liikunta", name_fi="Urheilu ja liikunta"
+        name="Olahraga dan kebugaran", name_ind="Olahraga dan kebugaran"
     )
 
     area_search_payload = {

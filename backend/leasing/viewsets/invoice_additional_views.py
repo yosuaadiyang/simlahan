@@ -4,11 +4,10 @@ from dateutil import parser
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from rest_framework.exceptions import APIException, PermissionDenied, ValidationError
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from laske_export.exporter import LaskeExporter
 from leasing.models import Invoice, ReceivableType
 from leasing.models.invoice import InvoiceRow, InvoiceSet
 from leasing.permissions import PerMethodPermission
@@ -187,32 +186,3 @@ class InvoiceSetCreditView(APIView):
             result["invoices"].append(InvoiceSerializer(credit_invoice).data)
 
         return Response(result)
-
-
-class InvoiceExportToLaskeView(APIView):
-    permission_classes = (PerMethodPermission,)
-    perms_map = {"POST": ["leasing.add_invoice"]}
-
-    def get_view_name(self):
-        return _("Export invoice to Laske")
-
-    def get_view_description(self, html=False):
-        return _("Export chosen invoice to Laske SAP system")
-
-    def post(self, request, format=None):
-        invoice = get_object_from_query_params("invoice", request.query_params)
-        if invoice.sent_to_sap_at:
-            raise ValidationError(_("This invoice has already been sent to SAP"))
-
-        if invoice.number:
-            raise ValidationError(
-                _("Can't send invoices that already have a number to SAP")
-            )
-
-        try:
-            exporter = LaskeExporter(service_unit=invoice.service_unit)
-            exporter.export_invoices([invoice])
-        except Exception as e:
-            raise APIException(str(e))
-
-        return Response({"success": True})

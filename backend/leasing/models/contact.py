@@ -13,7 +13,10 @@ from enumfields import EnumField
 from field_permissions.registry import field_permissions
 from leasing.enums import ContactType
 from leasing.models.types import ContactsActiveLeases
-from leasing.validators import validate_business_id
+from leasing.validators import (
+    validate_business_id,
+    validate_national_identification_number,
+)
 
 from .mixins import TimeStampedSafeDeleteModel
 
@@ -100,6 +103,7 @@ class Contact(TimeStampedSafeDeleteModel):
         null=True,
         blank=True,
         max_length=255,
+        validators=[validate_national_identification_number],
     )
 
     # In Finnish: Turvakielto

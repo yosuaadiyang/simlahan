@@ -12,6 +12,11 @@ class UserGroup(IntEnum):
     PERINTALAKIMIES = 5
     LASKUTTAJA = 6
     PAAKAYTTAJA = 7
+    # Peran modul pengadaan tanah
+    PELAKSANA_PENGADAAN = 8
+    SATGAS_PENGADAAN = 9
+    PENILAI = 10
+    INSTANSI_PEMOHON = 11
 
 
 UG = UserGroup

@@ -23,14 +23,6 @@ DEFAULT_REPORT_PERMS = {
         UG.LASKUTTAJA,
         UG.PAAKAYTTAJA,
     ],
-    "extra_city_rent": [
-        UG.VALMISTELIJA,
-        UG.SOPIMUSVALMISTELIJA,
-        UG.SYOTTAJA,
-        UG.PERINTALAKIMIES,
-        UG.LASKUTTAJA,
-        UG.PAAKAYTTAJA,
-    ],
     "index_types": [
         UG.VALMISTELIJA,
         UG.SOPIMUSVALMISTELIJA,
@@ -52,12 +44,6 @@ DEFAULT_REPORT_PERMS = {
         UG.PAAKAYTTAJA,
     ],
     "invoicing_review": [
-        UG.VALMISTELIJA,
-        UG.PERINTALAKIMIES,
-        UG.LASKUTTAJA,
-        UG.PAAKAYTTAJA,
-    ],
-    "laske_invoice_count": [
         UG.VALMISTELIJA,
         UG.PERINTALAKIMIES,
         UG.LASKUTTAJA,

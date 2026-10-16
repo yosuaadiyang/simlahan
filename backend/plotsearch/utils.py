@@ -2,6 +2,7 @@ import logging
 from typing import TYPE_CHECKING
 
 from django.conf import settings
+from django.utils.html import escape
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import override
 
@@ -9,6 +10,9 @@ from forms.enums import ApplicantType
 from leasing.enums import ServiceUnitId
 from plotsearch.enums import AreaSearchLessor
 from utils.email import EmailMessageInput, send_email
+
+# Path halaman detail pencarian area di UI petugas (frontend).
+AREA_SEARCH_UI_PATH = "pencarian-area"
 
 if TYPE_CHECKING:
     from plotsearch.models import AreaSearch, AreaSearchIntendedUse
@@ -21,16 +25,17 @@ def map_intended_use_to_lessor(
 ) -> AreaSearchLessor | None:
     """Maps AreaSearchIntendedUse to AreaSearchLessor."""
     intended_uses_with_lessors = {
-        "ravitsemus, myynti ja mainonta": AreaSearchLessor.KAMA,
-        "taide ja kulttuuri": AreaSearchLessor.KAMA,
-        "varastointi ja jakelu": AreaSearchLessor.KAMA,
-        "työmaat": AreaSearchLessor.KAMA,
-        "muu alueen käyttö": AreaSearchLessor.MAKE,
-        "veneily ja laiturit": AreaSearchLessor.UPA,
-        "urheilu ja liikunta": AreaSearchLessor.LIPA,
+        "kuliner, penjualan dan periklanan": AreaSearchLessor.KAMA,
+        "seni dan budaya": AreaSearchLessor.KAMA,
+        "pergudangan dan distribusi": AreaSearchLessor.KAMA,
+        "area proyek konstruksi": AreaSearchLessor.KAMA,
+        "pemanfaatan area lainnya": AreaSearchLessor.MAKE,
+        "kapal dan dermaga": AreaSearchLessor.UPA,
+        "olahraga dan kebugaran": AreaSearchLessor.LIPA,
     }
     try:
-        lessor = intended_uses_with_lessors.get(intended_use.name_fi.lower(), None)
+        name = intended_use.name_ind or intended_use.name or ""
+        lessor = intended_uses_with_lessors.get(name.lower(), None)
     except AttributeError:
         return None
 
@@ -53,7 +58,7 @@ def map_intended_use_to_service_unit_id(intended_use: "AreaSearchIntendedUse") -
     """Maps AreaSearchIntendedUse to service unit ID."""
     lessor = map_intended_use_to_lessor(intended_use)
     if not lessor:
-        raise ValueError(f"Invalid intended use name_fi with ID {intended_use.pk}")
+        raise ValueError(f"Invalid intended use name with ID {intended_use.pk}")
     return map_lessor_enum_to_service_unit_id(lessor)
 
 
@@ -169,12 +174,12 @@ def send_areasearch_lessor_changed_email(
     area_search: "AreaSearch",
     new_lessor: AreaSearchLessor,
     old_lessor: AreaSearchLessor,
-    language: str = "fi",
+    language: str | None = None,
 ) -> None:
     """
     Sends an email to lessors when area search lessor changes.
     """
-    with override(language):
+    with override(language or settings.LANGUAGE_CODE):
         from_email = settings.FROM_EMAIL_AREA_SEARCH or settings.MVJ_EMAIL_FROM
         to_addresses = [
             _get_lessor_email_to_address(new_lessor),
@@ -236,28 +241,38 @@ def _get_areasearch_lessor_changed_email_subject(
     if answer is None:
         raise ValueError("Answer is None. Cannot generate email subject.")
 
-    identifier = area_search.identifier or "<tunnus puuttuu>"
-    district = area_search.district or "<kaupunginosa puuttuu>"
-    address = (
-        area_search.address or "<osoite puuttuu>"
+    identifier = area_search.identifier or _("<identifier missing>")
+    district = area_search.district or _("<district missing>")
+    address = area_search.address or _(
+        "<address missing>"
     )  # Ideally "if many addresses, the one from the first property code",
     # but areasearch address field is calculated elsewhere from geometry.
 
     applicants = []
     get_applicant(answer, applicants)
-    applicant = applicants[0] if applicants else "<hakija puuttuu>"
+    applicant = applicants[0] if applicants else _("<applicant missing>")
 
     date_format = "%d.%m.%Y"
     start_date = (
         area_search.start_date.strftime(date_format)
         if area_search.start_date
-        else "<aloitusaika puuttuu>"
+        else _("<start date missing>")
     )
     end_date = (
         area_search.end_date.strftime(date_format) if area_search.end_date else ""
     )
 
-    return f"Muutos Aluehakemus {identifier} {district} {address} {applicant} vuokra-aika {start_date} - {end_date}"
+    return _(
+        "Change: area search {identifier} {district} {address} {applicant} "
+        "lease period {start_date} - {end_date}"
+    ).format(
+        identifier=identifier,
+        district=district,
+        address=address,
+        applicant=applicant,
+        start_date=start_date,
+        end_date=end_date,
+    )
 
 
 def _get_areasearch_lessor_changed_email_body(
@@ -274,12 +289,10 @@ def _get_areasearch_lessor_changed_email_body(
     if not ui_base_url:
         link_to_areasearch = identifier
     else:
-        link_to_areasearch = (
-            f"<a href='{ui_base_url}/aluehaut/{area_search.pk}'>{identifier}</a>"
-        )
+        link_to_areasearch = f"<a href='{ui_base_url}/{AREA_SEARCH_UI_PATH}/{area_search.pk}'>{identifier}</a>"
 
-    new_lessor_name = _get_lessor_contact_name(new_lessor) or "(nimi puuttuu)"
-    old_lessor_name = _get_lessor_contact_name(old_lessor) or "(nimi puuttuu)"
+    new_lessor_name = _get_lessor_contact_name(new_lessor) or _("(name missing)")
+    old_lessor_name = _get_lessor_contact_name(old_lessor) or _("(name missing)")
 
     intended_use = area_search.intended_use or "-"
     intended_use_description = area_search.description_intended_use or "-"
@@ -300,13 +313,23 @@ def _get_areasearch_lessor_changed_email_body(
         processing_note = "-"
         preparer_note = "-"
 
-    return f"""<html><body>
-<p>Aluehakemuksen {link_to_areasearch} uusi vuokranantaja on {new_lessor_name}, oli {old_lessor_name}.</p>
-<p>Käyttötarkoitus: {intended_use}</p>
-<p>Tarkempi kuvaus käyttötarkoituksesta: {intended_use_description}</p>
-<p>Käsittelytietojen huomautus: {processing_note}</p>
-<p>Käsittelijän muistiinpanot: {preparer_note}</p>
-</body></html>"""
+    lessor_changed = _(
+        "The new lessor of area search {link} is {new_lessor}, previously {old_lessor}."
+    ).format(
+        link=link_to_areasearch,
+        new_lessor=escape(new_lessor_name),
+        old_lessor=escape(old_lessor_name),
+    )
+    return (
+        "<html><body>"
+        f"<p>{lessor_changed}</p>"
+        f"<p>{_('Intended use')}: {escape(intended_use)}</p>"
+        f"<p>{_('Detailed description of the intended use')}: "
+        f"{escape(intended_use_description)}</p>"
+        f"<p>{_('Processing note')}: {escape(processing_note)}</p>"
+        f"<p>{_('Preparer notes')}: {escape(preparer_note)}</p>"
+        "</body></html>"
+    )
 
 
 def _get_lessor_contact_name(lessor: AreaSearchLessor) -> str | None:

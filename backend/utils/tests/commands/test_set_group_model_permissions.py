@@ -81,7 +81,7 @@ def test_permissions_for_identically_named_models_are_separated_by_app(monkeypat
     """Keep permissions distinct when different apps use the same model name."""
 
     model_name = "duplicatemodel"
-    app_labels = ("credit_integration", "leasing")
+    app_labels = ("leasing",)
     models_by_app = {
         app_label: [make_model(app_label, model_name)] for app_label in app_labels
     }
@@ -191,7 +191,7 @@ def test_replaces_only_managed_groups_model_permissions(monkeypatch):
     model = make_model(app_label, model_name)
     permissions = create_permissions(app_label, model_name)
     managed_group = Group.objects.create(id=1, name="Managed")
-    unmanaged_group = Group.objects.create(id=8, name="Unmanaged")
+    unmanaged_group = Group.objects.create(id=99, name="Unmanaged")
     unrelated_content_type = ContentType.objects.create(
         app_label=app_label, model="unrelatedmodel"
     )

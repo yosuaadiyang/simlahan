@@ -23,23 +23,6 @@ class ServiceUnit(TimeStampedSafeDeleteModel):
     first_invoice_number = models.IntegerField(
         verbose_name=_("First invoice number"), null=True, blank=True
     )
-    laske_sender_id = models.CharField(
-        verbose_name=_("Sender ID in Laske"), max_length=255
-    )
-    laske_import_id = models.CharField(
-        verbose_name=_("Import ID in Laske"), max_length=255
-    )
-    laske_sales_org = models.CharField(
-        verbose_name=_("Sales Organisation in Laske"), max_length=255
-    )
-    laske_fill_priority_and_info = models.BooleanField(
-        verbose_name=_("Fill priority and info?"),
-        help_text=_(
-            "Fill Info and Priority data from a contact into OrderParty and"
-            " BillingParty in SalesOrder when creating LASKE XML"
-        ),
-        default=True,
-    )
     contract_number_sequence_name = models.CharField(
         verbose_name=_("Contract number sequence name"),
         max_length=255,
@@ -62,9 +45,7 @@ class ServiceUnit(TimeStampedSafeDeleteModel):
         "leasing.ReceivableType",
         verbose_name=_("Default receivable type (collateral)"),
         help_text=_(
-            "Receivable type which should be used when creating collateral invoices. "
-            "On SAP export, the profit center is filled from this receivable type's "
-            "sap_project_number or sap_order_item_number."
+            "Receivable type which should be used when creating collateral invoices."
         ),
         related_name="+",
         null=True,

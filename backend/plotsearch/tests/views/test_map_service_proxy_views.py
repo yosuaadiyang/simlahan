@@ -15,7 +15,7 @@ from rest_framework.status import (
 )
 
 from plotsearch.serializers.map_service_proxy import WmsRequestSerializer
-from plotsearch.views.map_service_proxy import helsinki_owned_areas_wms_proxy
+from plotsearch.views.map_service_proxy import owned_areas_wms_proxy
 
 
 @pytest.fixture
@@ -34,23 +34,23 @@ def mock_settings():
     settings.MAP_SERVICE_WMS_URL = "http://example.com/wms"
     settings.MAP_SERVICE_WMS_USERNAME = "test_user"
     settings.MAP_SERVICE_WMS_PASSWORD = "test_password"
-    settings.MAP_SERVICE_WMS_HELSINKI_OWNED_AREAS_LAYER = "test_layer"
+    settings.MAP_SERVICE_WMS_OWNED_AREAS_LAYER = "test_layer"
 
 
 def test_missing_configuration(rf):
     with patch("plotsearch.views.map_service_proxy.settings") as mock_settings:
         mock_settings.MAP_SERVICE_WMS_URL = None
-        url = reverse("v1:pub_helsinki_owned_areas_wms_proxy")
+        url = reverse("v1:pub_owned_areas_wms_proxy")
         request = rf.get(url)
-        response = helsinki_owned_areas_wms_proxy(request)
+        response = owned_areas_wms_proxy(request)
         assert response.status_code == HTTP_500_INTERNAL_SERVER_ERROR
         assert response.data == "Service misconfigured."
 
 
 def test_invalid_serializer(rf, mock_settings):
-    url = reverse("v1:pub_helsinki_owned_areas_wms_proxy")
+    url = reverse("v1:pub_owned_areas_wms_proxy")
     request = rf.get(url, {"format": "image/png"})
-    response = helsinki_owned_areas_wms_proxy(request)
+    response = owned_areas_wms_proxy(request)
     assert response.status_code == HTTP_400_BAD_REQUEST
     assert "bbox" in response.data.keys(), "bbox is required in request"
 
@@ -64,9 +64,9 @@ def test_request_timeout(
     mock_serializer.return_value.validated_data = valid_request_data
     mock_requests.side_effect = requests.exceptions.Timeout
 
-    url = reverse("v1:pub_helsinki_owned_areas_wms_proxy")
+    url = reverse("v1:pub_owned_areas_wms_proxy")
     request = rf.get(url, valid_request_data)
-    response = helsinki_owned_areas_wms_proxy(request)
+    response = owned_areas_wms_proxy(request)
     assert response.status_code == HTTP_504_GATEWAY_TIMEOUT
     assert response.data == "Error connecting to map service, timeout"
 
@@ -83,9 +83,9 @@ def test_upstream_service_error(
     mock_response.content = b"Upstream error"
     mock_requests.return_value = mock_response
 
-    url = reverse("v1:pub_helsinki_owned_areas_wms_proxy")
+    url = reverse("v1:pub_owned_areas_wms_proxy")
     request = rf.get(url, valid_request_data)
-    response = helsinki_owned_areas_wms_proxy(request)
+    response = owned_areas_wms_proxy(request)
     assert response.status_code == 500
     with translation.override("en"):
         assert response.data == "Error in upstream service"
@@ -115,9 +115,9 @@ def test_successful_proxy(
     mock_response.raw = BytesIO(b"image data")
     mock_requests.return_value = mock_response
 
-    url = reverse("v1:pub_helsinki_owned_areas_wms_proxy")
+    url = reverse("v1:pub_owned_areas_wms_proxy")
     request = rf.get(url, valid_request_data)
-    response = helsinki_owned_areas_wms_proxy(request)
+    response = owned_areas_wms_proxy(request)
     assert response.status_code == 200
     assert response["Content-Type"] == "image/png"
     content = b"".join(list(response.streaming_content))
@@ -145,18 +145,18 @@ def test_invalid_content_type_from_upstream(
     mock_response.raw = BytesIO(b"<html><body>Not an image</body></html>")
     mock_requests.return_value = mock_response
 
-    url = reverse("v1:pub_helsinki_owned_areas_wms_proxy")
+    url = reverse("v1:pub_owned_areas_wms_proxy")
     request = rf.get(url, valid_request_data)
 
     with translation.override("en"):
-        response = helsinki_owned_areas_wms_proxy(request)
+        response = owned_areas_wms_proxy(request)
 
         assert response.status_code == HTTP_502_BAD_GATEWAY
         assert response.data == "Invalid response from upstream service"
 
         mock_logger = MagicMock()
         with patch("plotsearch.views.map_service_proxy.logger", mock_logger):
-            helsinki_owned_areas_wms_proxy(request)
+            owned_areas_wms_proxy(request)
             mock_logger.warning.assert_called_once_with(
                 "Unexpected content type from upstream: text/html"
             )

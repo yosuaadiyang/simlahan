@@ -1,156 +1,24 @@
 [
-  {
-    "model": "leasing.ConditionType",
-    "pk": 1,
-    "fields": {
-      "name": "Käyttötarkoitusehto"
-    }
-  },
-  {
-    "model": "leasing.ConditionType",
-    "pk": 2,
-    "fields": {
-      "name": "Erityissiirtoehto"
-    }
-  },
-  {
-    "model": "leasing.ConditionType",
-    "pk": 3,
-    "fields": {
-      "name": "Valvottava ehto"
-    }
-  },
-  {
-    "model": "leasing.ConditionType",
-    "pk": 4,
-    "fields": {
-      "name": "Korvaussehto (ent. sopimusehto)"
-    }
-  },
-  {
-    "model": "leasing.ConditionType",
-    "pk": 5,
-    "fields": {
-      "name": "Sopimussakko"
-    }
-  },
-  {
-    "model": "leasing.ConditionType",
-    "pk": 6,
-    "fields": {
-      "name": "Alennusehto"
-    }
-  },
-  {
-    "model": "leasing.ConditionType",
-    "pk": 7,
-    "fields": {
-      "name": "Korotusehto"
-    }
-  },
-  {
-    "model": "leasing.ConditionType",
-    "pk": 8,
-    "fields": {
-      "name": "Vuokran tarkistusehto"
-    }
-  },
-  {
-    "model": "leasing.ConditionType",
-    "pk": 9,
-    "fields": {
-      "name": "Vuokra-ajan päättymisehto"
-    }
-  },
-  {
-    "model": "leasing.ConditionType",
-    "pk": 10,
-    "fields": {
-      "name": "Vuokra-ajan pidentämisehto (Varaus)"
-    }
-  },
-  {
-    "model": "leasing.ConditionType",
-    "pk": 11,
-    "fields": {
-      "name": "Lunastussiirtoehto"
-    }
-  },
-  {
-    "model": "leasing.ConditionType",
-    "pk": 12,
-    "fields": {
-      "name": "Rakentamisvelvollisuusehto"
-    }
-  },
-  {
-    "model": "leasing.ConditionType",
-    "pk": 13,
-    "fields": {
-      "name": "Muu ehto"
-    }
-  },
-  {
-    "model": "leasing.ConditionType",
-    "pk": 14,
-    "fields": {
-      "name": "Takuuvuokra/Takaus tms."
-    }
-  },
-  {
-    "model": "leasing.ConditionType",
-    "pk": 15,
-    "fields": {
-      "name": "Siirto perustettavan yhtiön lukuun"
-    }
-  },
-  {
-    "model": "leasing.ConditionType",
-    "pk": 16,
-    "fields": {
-      "name": "Rasite- ja/tai rasitteenluont.ehto"
-    }
-  },
-  {
-    "model": "leasing.ConditionType",
-    "pk": 20,
-    "fields": {
-      "name": "Tiedote laskuun (seuraavaan)"
-    }
-  },
-  {
-    "model": "leasing.ConditionType",
-    "pk": 21,
-    "fields": {
-      "name": "Maankäyttösopimus"
-    }
-  },
-  {
-    "model": "leasing.ConditionType",
-    "pk": 22,
-    "fields": {
-      "name": "Maksamaton kauppahinta"
-    }
-  },
-  {
-    "model": "leasing.ConditionType",
-    "pk": 23,
-    "fields": {
-      "name": "Korkotukiehto"
-    }
-  },
-  {
-    "model": "leasing.ConditionType",
-    "pk": 24,
-    "fields": {
-      "name": "Osto-optioehto"
-    }
-  },
-  {
-    "model": "leasing.ConditionType",
-    "pk": 25,
-    "fields": {
-      "name": "ALV:n perintäehto"
-    }
-  }
+{"model": "leasing.ConditionType", "pk": 1, "fields": {"name": "Syarat peruntukan"}},
+{"model": "leasing.ConditionType", "pk": 2, "fields": {"name": "Syarat pengalihan khusus"}},
+{"model": "leasing.ConditionType", "pk": 3, "fields": {"name": "Syarat yang diawasi"}},
+{"model": "leasing.ConditionType", "pk": 4, "fields": {"name": "Syarat ganti rugi (dahulu syarat kontrak)"}},
+{"model": "leasing.ConditionType", "pk": 5, "fields": {"name": "Denda kontrak"}},
+{"model": "leasing.ConditionType", "pk": 6, "fields": {"name": "Syarat potongan"}},
+{"model": "leasing.ConditionType", "pk": 7, "fields": {"name": "Syarat kenaikan"}},
+{"model": "leasing.ConditionType", "pk": 8, "fields": {"name": "Syarat peninjauan sewa"}},
+{"model": "leasing.ConditionType", "pk": 9, "fields": {"name": "Syarat berakhirnya masa sewa"}},
+{"model": "leasing.ConditionType", "pk": 10, "fields": {"name": "Syarat perpanjangan masa sewa (pencadangan)"}},
+{"model": "leasing.ConditionType", "pk": 11, "fields": {"name": "Syarat pengalihan dengan pembelian"}},
+{"model": "leasing.ConditionType", "pk": 12, "fields": {"name": "Syarat kewajiban membangun"}},
+{"model": "leasing.ConditionType", "pk": 13, "fields": {"name": "Syarat lainnya"}},
+{"model": "leasing.ConditionType", "pk": 14, "fields": {"name": "Uang jaminan sewa/garansi"}},
+{"model": "leasing.ConditionType", "pk": 15, "fields": {"name": "Pengalihan atas nama badan usaha yang akan didirikan"}},
+{"model": "leasing.ConditionType", "pk": 16, "fields": {"name": "Syarat hak servitut/pembebanan"}},
+{"model": "leasing.ConditionType", "pk": 20, "fields": {"name": "Catatan pada tagihan (berikutnya)"}},
+{"model": "leasing.ConditionType", "pk": 21, "fields": {"name": "Perjanjian pemanfaatan lahan"}},
+{"model": "leasing.ConditionType", "pk": 22, "fields": {"name": "Harga jual belum dibayar"}},
+{"model": "leasing.ConditionType", "pk": 23, "fields": {"name": "Syarat subsidi bunga"}},
+{"model": "leasing.ConditionType", "pk": 24, "fields": {"name": "Syarat opsi beli"}},
+{"model": "leasing.ConditionType", "pk": 25, "fields": {"name": "Syarat pemungutan PPN"}}
 ]

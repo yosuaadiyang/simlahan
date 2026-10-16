@@ -652,7 +652,7 @@ def test_add_target_info_link(
     target_info_link_data = {
         "url": fake.uri(),
         "description": fake.sentence(),
-        "language": "fi",
+        "language": "id",
     }
 
     url = reverse(
@@ -693,7 +693,7 @@ def test_getting_and_editing_and_deleting_existing_info_link(
             plot_search_target=plot_search_target,
             url=fake.uri(),
             description=fake.sentence(),
-            language=["fi", "en", "sv"][i],
+            language=["id", "en", "id"][i],
         )
 
     # Fetch info links via api
@@ -761,7 +761,7 @@ def test_getting_and_editing_and_deleting_existing_info_link(
                     {
                         "url": "https://google.com",
                         "description": "foo",
-                        "language": "fi",
+                        "language": "id",
                     }
                 ],
             }
@@ -1020,44 +1020,38 @@ def test_opening_record_create(
 
 
 @pytest.mark.django_db
-def test_is_user_helsinki_ad_true(user_factory):
-    user = user_factory(email="test@hel.fi")
+def test_is_user_officer_true(user_factory, group_factory):
+    user = user_factory(email="petugas@example.go.id")
+    user.groups.add(group_factory(name="Petugas uji"))
     attachment = AreaSearchAttachment.objects.create(
         user=user,
-        user_amr_list="helsinkiad,something_else",
         name="Test Attachment",
     )
-    assert attachment.is_user_helsinki_ad() is True
+    assert attachment.is_user_officer() is True
 
 
 @pytest.mark.django_db
-def test_is_user_helsinki_ad_false_no_amr(user_factory):
-    user = user_factory(email="test@hel.fi")
+def test_is_user_officer_false_without_groups(user_factory):
+    user = user_factory(email="pemohon@example.com")
     attachment = AreaSearchAttachment.objects.create(
         user=user,
-        user_amr_list=None,
         name="Test Attachment",
     )
-    assert attachment.is_user_helsinki_ad() is False
+    assert attachment.is_user_officer() is False
 
 
 @pytest.mark.django_db
-def test_is_user_helsinki_ad_false_no_helsinkiad_amr(user_factory):
-    user = user_factory(email="test@hel.fi")
+def test_is_user_officer_false_inactive(user_factory, group_factory):
+    user = user_factory(email="nonaktif@example.go.id", is_active=False)
+    user.groups.add(group_factory(name="Petugas uji"))
     attachment = AreaSearchAttachment.objects.create(
         user=user,
-        user_amr_list="something_else",
         name="Test Attachment",
     )
-    assert attachment.is_user_helsinki_ad() is False
+    assert attachment.is_user_officer() is False
 
 
 @pytest.mark.django_db
-def test_is_user_helsinki_ad_false_wrong_email_domain(user_factory):
-    user = user_factory(email="test@example.com")
-    attachment = AreaSearchAttachment.objects.create(
-        user=user,
-        user_amr_list="helsinkiad,something_else",
-        name="Test Attachment",
-    )
-    assert attachment.is_user_helsinki_ad() is False
+def test_is_user_officer_false_without_user():
+    attachment = AreaSearchAttachment.objects.create(name="Test Attachment")
+    assert attachment.is_user_officer() is False

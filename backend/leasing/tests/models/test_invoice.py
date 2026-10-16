@@ -9,6 +9,7 @@ from django.db import IntegrityError
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.timezone import make_aware
+from django.utils.translation import gettext
 
 from leasing.enums import ContactType, InvoiceState, InvoiceType
 from leasing.models import Invoice, ReceivableType, ServiceUnit, Vat
@@ -273,7 +274,9 @@ def test_create_credit_invoice_refunded_state_blocks_credit(
     with pytest.raises(ValidationError) as e:
         invoice.create_credit_invoice()
 
-    assert str(e.value.message) == "Cannot credit an invoice that has been refunded."
+    assert str(e.value.message) == gettext(
+        "Cannot credit an invoice that has been refunded."
+    )
 
 
 @pytest.mark.django_db
