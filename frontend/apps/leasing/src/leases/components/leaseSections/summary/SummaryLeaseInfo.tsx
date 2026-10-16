@@ -103,13 +103,13 @@ const Tenants = ({ largeScreen, tenants, tenantWarnings }: TenantsProps) => {
           <Fragment>
             <Row>
               <Column large={4}>
-                <FormTextTitle title="Vuokralainen" />
+                <FormTextTitle title="Penyewa" />
               </Column>
               <Column large={4}>
-                <FormTextTitle title="Hallintaosuus" />
+                <FormTextTitle title="Porsi penguasaan" />
               </Column>
               <Column large={4}>
-                <FormTextTitle title="Ajalla" />
+                <FormTextTitle title="Pada periode" />
               </Column>
             </Row>
             <ListItems>
@@ -170,7 +170,7 @@ const Tenants = ({ largeScreen, tenants, tenantWarnings }: TenantsProps) => {
             >
               <Row key={index}>
                 <Column small={6}>
-                  <FormTextTitle title="Vuokralainen" />
+                  <FormTextTitle title="Penyewa" />
                   <FormText>
                     <ExternalLink
                       className="no-margin"
@@ -183,13 +183,13 @@ const Tenants = ({ largeScreen, tenants, tenantWarnings }: TenantsProps) => {
                   </FormText>
                 </Column>
                 <Column small={6}>
-                  <FormTextTitle title="Hallintaosuus" />
+                  <FormTextTitle title="Porsi penguasaan" />
                   <FormText>
                     {contact.share_numerator} / {contact.share_denominator}
                   </FormText>
                 </Column>
                 <Column small={6}>
-                  <FormTextTitle title="Ajalla" />
+                  <FormTextTitle title="Pada periode" />
                   <FormText>
                     {formatDateRange(
                       contact.tenant.start_date,
@@ -245,8 +245,8 @@ const SummaryLeaseInfo = ({
   const overdueInvoices = getContentOverdueInvoices(invoices);
   return (
     <Fragment>
-      <SubTitle>Vuokralaiset</SubTitle>
-      {!tenants.length && <FormText>Ei vuokralaisia</FormText>}
+      <SubTitle>Penyewa</SubTitle>
+      {!tenants.length && <FormText>Tidak ada penyewa</FormText>}
       <Tenants
         largeScreen={largeScreen}
         tenants={tenants}
@@ -260,8 +260,8 @@ const SummaryLeaseInfo = ({
         )}
       >
         <>
-          <SubTitle>Vuokrakohteet</SubTitle>
-          {!leaseAreas.length && <FormText>Ei vuokrakohteita</FormText>}
+          <SubTitle>Objek sewa</SubTitle>
+          {!leaseAreas.length && <FormText>Tidak ada objek sewa</FormText>}
           {!!leaseAreas.length && (
             <Fragment>
               <Row>
@@ -272,7 +272,7 @@ const SummaryLeaseInfo = ({
                   )}
                 >
                   <Column small={6} large={4}>
-                    <FormTextTitle title="Kohteen tunnus" />
+                    <FormTextTitle title="Pengenal objek" />
                   </Column>
                 </Authorization>
                 <Authorization
@@ -282,7 +282,7 @@ const SummaryLeaseInfo = ({
                   )}
                 >
                   <Column small={6} large={8}>
-                    <FormTextTitle title="Kohteen osoite" />
+                    <FormTextTitle title="Alamat objek" />
                   </Column>
                 </Authorization>
               </Row>
@@ -337,9 +337,9 @@ const SummaryLeaseInfo = ({
         )}
       >
         <>
-          <SubTitle>Rakentamiskelpoisuus</SubTitle>
+          <SubTitle>Kelayakan bangun</SubTitle>
           {!constructabilityAreas.length && (
-            <FormText>Ei vuokrakohteita</FormText>
+            <FormText>Tidak ada objek sewa</FormText>
           )}
           {!!constructabilityAreas.length &&
             constructabilityAreas.map((area, index) => {
@@ -383,7 +383,7 @@ const SummaryLeaseInfo = ({
                     <Row>
                       <Column small={6} large={4}>
                         <ListItem>
-                          Esirakentaminen, johtosiirrot, kunnallistekniikka
+                          Pematangan lahan, relokasi jaringan, prasarana kota
                         </ListItem>
                       </Column>
                       <Column small={6} large={4}>
@@ -410,7 +410,7 @@ const SummaryLeaseInfo = ({
                   >
                     <Row>
                       <Column small={6} large={4}>
-                        <ListItem>Purku</ListItem>
+                        <ListItem>Pembongkaran</ListItem>
                       </Column>
                       <Column small={6} large={4}>
                         <StatusIndicator
@@ -436,7 +436,7 @@ const SummaryLeaseInfo = ({
                   >
                     <Row>
                       <Column small={6} large={4}>
-                        <ListItem>Pima ja jäte</ListItem>
+                        <ListItem>Tanah tercemar dan limbah</ListItem>
                       </Column>
                       <Column small={6} large={4}>
                         <StatusIndicator
@@ -462,7 +462,7 @@ const SummaryLeaseInfo = ({
                   >
                     <Row>
                       <Column small={6} large={4}>
-                        <ListItem>Rakennettavuusselvitys</ListItem>
+                        <ListItem>Kajian kelayakan bangun</ListItem>
                       </Column>
                       <Column small={6} large={4}>
                         <StatusIndicator
@@ -488,7 +488,7 @@ const SummaryLeaseInfo = ({
                   >
                     <Row>
                       <Column small={6} large={4}>
-                        <ListItem>Muut</ListItem>
+                        <ListItem>Lainnya</ListItem>
                       </Column>
                       <Column small={6} large={4}>
                         <StatusIndicator
@@ -575,7 +575,7 @@ const SummaryLeaseInfo = ({
       <Authorization allow={isMethodAllowed(invoiceMethods, Methods.GET)}>
         {!!overdueInvoices.length && (
           <Fragment>
-            <SubTitle>Erääntyneet laskut</SubTitle>
+            <SubTitle>Tagihan jatuh tempo</SubTitle>
             {largeScreen && (
               <Fragment>
                 <Row>

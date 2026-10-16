@@ -14,14 +14,14 @@ const SearchInput = ({
   onChange,
   onKeyUp,
   onSubmit,
-  placeholder = "Hae hakusanalla",
+  placeholder = "Cari dengan kata kunci",
   type = "text",
   value = "",
 }: Props) => {
   return (
     <div className="search-input__component">
       <label className="search-input__label" htmlFor="top-navigation__search">
-        Hae hakusanalla
+        Cari dengan kata kunci
       </label>
       <input
         className="search-input"

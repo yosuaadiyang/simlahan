@@ -137,7 +137,7 @@ const OldDwellingsInHousingCompaniesPriceIndexEdit: React.FC<Props> = ({
   ) : (
     <AddButton
       className={"no-top-margin"}
-      label="Lisää tasotarkistus"
+      label="Tambah penyesuaian sewa berkala"
       onClick={addOldDwellingsInHousingCompaniesPriceIndex}
     />
   );

@@ -237,7 +237,7 @@ function* createPlotSearchSaga({
         yield put(receiveIsSaveClicked(false));
         displayUIMessage({
           title: "",
-          body: "Tonttihaku luotu",
+          body: "Pencarian kavling dibuat",
         });
         break;
 
@@ -317,7 +317,7 @@ function* editPlotSearchSaga({
               () =>
                 displayUIMessage({
                   title: "",
-                  body: "Tonttihaku tallennettu",
+                  body: "Pencarian kavling disimpan",
                 }),
               nullPlanUnits(),
             ],
@@ -330,7 +330,7 @@ function* editPlotSearchSaga({
         yield put(
           receiveError(
             new SubmissionError({
-              _error: "Server error 400",
+              _error: "Galat server 400",
               ...bodyAsJson,
             }),
           ),
@@ -425,7 +425,7 @@ function* deletePlotSearchSaga({
         );
         displayUIMessage({
           title: "",
-          body: "Tonttihaku poistettu",
+          body: "Pencarian kavling dihapus",
         });
         break;
       }
@@ -663,7 +663,7 @@ function* editFormSaga({ payload: form, type: any }): Generator<any, any, any> {
         yield put(
           receiveError(
             new SubmissionError({
-              _error: "Server error 400",
+              _error: "Galat server 400",
               ...bodyAsJson,
             }),
           ),
@@ -777,7 +777,7 @@ function* batchCreateReservationIdentifiersSaga({
     displayUIMessage(
       {
         title: "",
-        body: "Vuokratunnusten luonti keskeytyi virheeseen!",
+        body: "Pembuatan pengenal sewa terhenti karena galat!",
       },
       {
         type: "error",
@@ -787,7 +787,7 @@ function* batchCreateReservationIdentifiersSaga({
     yield put(reservationIdentifiersCreated());
     displayUIMessage({
       title: "",
-      body: "Varaustunnukset luotu",
+      body: "Pengenal pencadangan dibuat",
     });
 
     if (payload.callback) {
@@ -838,8 +838,8 @@ function* createDirectReservationLinkSaga({
       case 201:
         yield put(directReservationLinkCreated());
         displayUIMessage({
-          title: "Suoravarauslinkki lähetetty",
-          body: `Suoravarauslinkki: ${bodyAsJson.url}`,
+          title: "Tautan pencadangan langsung terkirim",
+          body: `Tautan pencadangan langsung: ${bodyAsJson.url}`,
         });
         callBack();
         break;
@@ -849,7 +849,7 @@ function* createDirectReservationLinkSaga({
         displayUIMessage(
           {
             title: "",
-            body: "Suoravarauslinkin lähetys epäonnistui",
+            body: "Pengiriman tautan pencadangan langsung gagal",
           },
           {
             type: "error",
@@ -862,7 +862,7 @@ function* createDirectReservationLinkSaga({
     displayUIMessage(
       {
         title: "",
-        body: "Suoravarauslinkin lähetys epäonnistui",
+        body: "Pengiriman tautan pencadangan langsung gagal",
       },
       {
         type: "error",

@@ -45,7 +45,7 @@ const CreateInvoiceNoteModal: React.FC<Props> = ({
   );
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Luo laskujen tiedote">
+    <Modal isOpen={isOpen} onClose={onClose} title="Buat catatan tagihan">
       {isOpen && (
         <Form
           onSubmit={handleSubmitData}
@@ -116,14 +116,14 @@ const CreateInvoiceNoteModal: React.FC<Props> = ({
                 <Button
                   className={ButtonColors.ALERT}
                   onClick={onClose}
-                  text="Peruuta"
+                  text="Batal"
                 />
                 <Button
                   className={ButtonColors.SUCCESS}
                   disabled={!valid}
                   onClick={handleSubmit}
                   type="submit"
-                  text="Tallenna"
+                  text="Simpan"
                 />
               </ModalButtonWrapper>
             </form>

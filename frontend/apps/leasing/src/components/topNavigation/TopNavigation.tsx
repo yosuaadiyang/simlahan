@@ -189,7 +189,7 @@ class TopNavigation extends Component<Props & WithRouterProps, State> {
                     onClick={toggleSideMenu}
                     tabIndex={0}
                   >
-                    <span>Maanvuokrausjärjestelmä</span>
+                    <span>SimLahan</span>
                     <MainMenuIcon />
                   </button>
                 </div>
@@ -221,7 +221,7 @@ class TopNavigation extends Component<Props & WithRouterProps, State> {
                     ) : (
                       <div className="user-service-unit-text">
                         <div className="service-unit-label">
-                          Oma palvelukokonaisuus
+                          Unit layanan sendiri
                         </div>
                         <div className="service-unit-name">
                           {userActiveServiceUnit.name}
@@ -242,7 +242,7 @@ class TopNavigation extends Component<Props & WithRouterProps, State> {
                     </button>{" "}
                   </p>
                   <button className="logout-link" onClick={handleLogout}>
-                    Kirjaudu ulos
+                    Keluar
                   </button>
                 </div>
               </div>

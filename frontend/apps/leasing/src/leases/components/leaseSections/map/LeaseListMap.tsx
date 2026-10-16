@@ -116,7 +116,7 @@ class LeaseListMap extends PureComponent<Props & WithRouterProps, State> {
               areaNotes={areaNotes}
             />
           ),
-          name: "Muistettavat ehdot",
+          name: "Catatan area",
         });
     }
     layers.push({
@@ -129,7 +129,7 @@ class LeaseListMap extends PureComponent<Props & WithRouterProps, State> {
           stateOptions={stateOptions}
         />
       ),
-      name: "Vuokraukset",
+      name: "Sewa",
     });
     return layers;
   };
@@ -169,7 +169,7 @@ class LeaseListMap extends PureComponent<Props & WithRouterProps, State> {
           overlayLayers={overlayLayers}
           showZoomLevelWarning={zoom < MAX_ZOOM_LEVEL_TO_FETCH_LEASES}
           zoom={zoom}
-          zoomLevelWarningText="Tarkenna lähemmäksi kartalla hakeaksesi vuokraukset"
+          zoomLevelWarningText="Perbesar peta untuk menampilkan sewa"
         />
       </Fragment>
     );

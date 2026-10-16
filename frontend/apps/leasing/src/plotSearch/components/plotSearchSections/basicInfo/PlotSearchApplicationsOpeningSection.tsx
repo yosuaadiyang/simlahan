@@ -37,7 +37,7 @@ class PlotSearchApplicationsOpeningSection extends Component<InnerProps> {
     }
 
     return (
-      <Collapse defaultOpen={true} headerTitle="Kilpailun hakemusten avaaminen">
+      <Collapse defaultOpen={true} headerTitle="Pembukaan permohonan kompetisi">
         <Row>
           <Authorization
             allow={isFieldAllowedToRead(

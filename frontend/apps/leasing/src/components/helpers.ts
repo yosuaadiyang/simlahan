@@ -68,16 +68,16 @@ export const getRentExplanationDescription = (
   switch (subjectType) {
     case RentExplanationSubjectType.CONTRACT_RENT:
       if (baseAmount !== null) {
-        return `Sopimusvuokra - ${intendedUseName} (${formatNumber(baseAmount)} € ${getLabelOfOption(baseAmountPeriodOptions, baseAmountPeriod) || ""})`;
+        return `Sewa kontrak - ${intendedUseName} (Rp ${formatNumber(baseAmount)} ${getLabelOfOption(baseAmountPeriodOptions, baseAmountPeriod) || ""})`;
       }
 
-      return `Sopimusvuokra - ${intendedUseName} (${formatNumber(amount)} € ${getLabelOfOption(periodOptions, period) || ""})`;
+      return `Sewa kontrak - ${intendedUseName} (Rp ${formatNumber(amount)} ${getLabelOfOption(periodOptions, period) || ""})`;
 
     case RentExplanationSubjectType.FIXED_INITIAL_YEAR_RENT:
-      return `Kiinteä alkuvuosivuokra - ${intendedUseName} (${formatNumber(amount)} € / vuosi)`;
+      return `Sewa tahun awal tetap - ${intendedUseName} (Rp ${formatNumber(amount)} / tahun)`;
 
     case RentExplanationSubjectType.RENT:
-      return `Perittävä vuokra (${getLabelOfOption(typeOptions, type) || ""})`;
+      return `Sewa yang ditagih (${getLabelOfOption(typeOptions, type) || ""})`;
 
     default:
       return description;
@@ -104,7 +104,7 @@ export const getRentSubItemDescription = (
 
   switch (subjectType) {
     case RentSubItemSubjectType.INDEX:
-      return `Indeksitarkistus (vertailuluku ${subjectNumber})`;
+      return `Penyesuaian indeks (angka pembanding ${subjectNumber})`;
 
     case RentSubItemSubjectType.RENT_ADJUSTMENT:
       switch (type) {

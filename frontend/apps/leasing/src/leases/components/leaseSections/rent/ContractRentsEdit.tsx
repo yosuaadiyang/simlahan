@@ -33,7 +33,7 @@ const ContractRentsEdit = ({ fields, rentField, rentType }: Props) => {
     !hasPermissions(usersPermissions, UsersPermissions.ADD_CONTRACTRENT) &&
     (!fields || !fields.length)
   ) {
-    return <FormText>Ei sopimusvuokria</FormText>;
+    return <FormText>Tidak ada sewa kontrak</FormText>;
   }
 
   return (
@@ -84,7 +84,7 @@ const ContractRentsEdit = ({ fields, rentField, rentType }: Props) => {
                 <Column>
                   <AddButtonSecondary
                     className={!fields || !fields.length ? "no-top-margin" : ""}
-                    label="Lisää sopimusvuokra"
+                    label="Tambah sewa kontrak"
                     onClick={handleAdd}
                   />
                 </Column>

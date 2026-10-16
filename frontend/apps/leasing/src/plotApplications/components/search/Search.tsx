@@ -211,7 +211,7 @@ class Search extends Component<Props & WithRouterProps, State> {
             <FormFieldLegacy
               disableDirty
               fieldAttributes={{
-                label: "Hae hakusanalla",
+                label: "Cari dengan kata kunci",
                 type: FieldTypes.SEARCH,
                 read_only: false,
               }}
@@ -227,7 +227,7 @@ class Search extends Component<Props & WithRouterProps, State> {
               <Column small={12} large={6}>
                 <SearchRow>
                   <SearchLabelColumn>
-                    <SearchLabel>Tonttihaku</SearchLabel>
+                    <SearchLabel>Pencarian kavling</SearchLabel>
                   </SearchLabelColumn>
                   <SearchInputColumn>
                     <FormFieldLegacy
@@ -249,7 +249,7 @@ class Search extends Component<Props & WithRouterProps, State> {
 
                 <SearchRow>
                   <SearchLabelColumn>
-                    <SearchLabel>Hakutyyppi</SearchLabel>
+                    <SearchLabel>Jenis pencarian</SearchLabel>
                   </SearchLabelColumn>
                   <SearchInputColumn>
                     <FormFieldLegacy
@@ -270,7 +270,7 @@ class Search extends Component<Props & WithRouterProps, State> {
 
                 <SearchRow>
                   <SearchLabelColumn>
-                    <SearchLabel>Alkupvm</SearchLabel>
+                    <SearchLabel>Tgl mulai</SearchLabel>
                   </SearchLabelColumn>
                   <SearchInputColumn>
                     <Row>
@@ -308,7 +308,7 @@ class Search extends Component<Props & WithRouterProps, State> {
                       autoBlur
                       disableDirty
                       fieldAttributes={{
-                        label: "Voimassa",
+                        label: "Berlaku",
                         type: FieldTypes.CHECKBOX,
                         read_only: false,
                       }}
@@ -317,7 +317,7 @@ class Search extends Component<Props & WithRouterProps, State> {
                         options: [
                           {
                             value: true,
-                            label: "Voimassa",
+                            label: "Berlaku",
                           },
                         ],
                       }}
@@ -329,7 +329,7 @@ class Search extends Component<Props & WithRouterProps, State> {
                       autoBlur
                       disableDirty
                       fieldAttributes={{
-                        label: "Päättyneet",
+                        label: "Telah berakhir",
                         type: FieldTypes.CHECKBOX,
                         read_only: false,
                       }}
@@ -338,7 +338,7 @@ class Search extends Component<Props & WithRouterProps, State> {
                         options: [
                           {
                             value: true,
-                            label: "Päättyneet",
+                            label: "Telah berakhir",
                           },
                         ],
                       }}
@@ -352,7 +352,7 @@ class Search extends Component<Props & WithRouterProps, State> {
               <Column small={12} large={6}>
                 <SearchRow>
                   <SearchLabelColumn>
-                    <SearchLabel>Kohteen tunnus</SearchLabel>
+                    <SearchLabel>Pengenal objek</SearchLabel>
                   </SearchLabelColumn>
                   <SearchInputColumn>
                     <FormFieldLegacy
@@ -370,7 +370,7 @@ class Search extends Component<Props & WithRouterProps, State> {
 
                 <SearchRow>
                   <SearchLabelColumn>
-                    <SearchLabel>Haun alatyyppi</SearchLabel>
+                    <SearchLabel>Subjenis pencarian</SearchLabel>
                   </SearchLabelColumn>
                   <SearchInputColumn>
                     <FormFieldLegacy
@@ -392,7 +392,7 @@ class Search extends Component<Props & WithRouterProps, State> {
 
                 <SearchRow>
                   <SearchLabelColumn>
-                    <SearchLabel>Loppupvm</SearchLabel>
+                    <SearchLabel>Tgl akhir</SearchLabel>
                   </SearchLabelColumn>
                   <SearchInputColumn>
                     <Row>
@@ -429,7 +429,7 @@ class Search extends Component<Props & WithRouterProps, State> {
                       autoBlur
                       disableDirty
                       fieldAttributes={{
-                        label: "Vain varatut kohteet",
+                        label: "Hanya objek yang dicadangkan",
                         type: FieldTypes.CHECKBOX,
                         read_only: false,
                       }}
@@ -438,7 +438,7 @@ class Search extends Component<Props & WithRouterProps, State> {
                         options: [
                           {
                             value: true,
-                            label: "Vain varatut kohteet",
+                            label: "Hanya objek yang dicadangkan",
                           },
                         ],
                       }}
@@ -453,12 +453,12 @@ class Search extends Component<Props & WithRouterProps, State> {
         <Row>
           <Column small={6}>
             <SearchChangeTypeLink onClick={this.toggleSearchType}>
-              {isBasicSearch ? "Tarkennettu haku" : "Yksinkertainen haku"}
+              {isBasicSearch ? "Pencarian lanjutan" : "Pencarian sederhana"}
             </SearchChangeTypeLink>
           </Column>
           <Column small={6}>
             <SearchClearLink onClick={this.handleClear}>
-              Tyhjennä haku
+              Kosongkan pencarian
             </SearchClearLink>
           </Column>
         </Row>

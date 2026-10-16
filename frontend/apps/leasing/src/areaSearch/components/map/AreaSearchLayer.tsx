@@ -77,16 +77,16 @@ const AreaSearchLayer: React.FC<Props> = ({
                 {formatDate(search.end_date) || ""}
               </p>
               <p>
-                <strong>Käyttötarkoitus: </strong>
+                <strong>Peruntukan: </strong>
                 {getLabelOfOption(intendedUseOptions, search.intended_use) ||
                   "-"}
               </p>
               <p>
-                <strong>Vuokranantaja: </strong>
+                <strong>Pemberi sewa: </strong>
                 {getLabelOfOption(lessorOptions, search.lessor) || "-"}
               </p>
               <p>
-                <strong>Tila: </strong>
+                <strong>Status: </strong>
                 {getLabelOfOption(stateOptions, search.state) || "-"}
               </p>
             </Popup>

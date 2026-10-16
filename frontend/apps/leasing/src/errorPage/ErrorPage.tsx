@@ -6,7 +6,7 @@ const ErrorPage = () => (
     <Row>
       <Column>
         <h1>404</h1>
-        <p>Etsimääsi sivua ei ole olemassa</p>
+        <p>Halaman yang Anda cari tidak ada</p>
       </Column>
     </Row>
   </div>

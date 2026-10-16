@@ -115,7 +115,7 @@ class SelectPanel extends Component<Props, State> {
     const { focusIndex } = this.state;
     const { ItemRenderer, selectAllLabel, disabled, hasSelectAll } = this.props;
     const selectAllOption = {
-      label: selectAllLabel || "Valitse kaikki",
+      label: selectAllLabel || "Pilih semua",
       value: "",
     };
     return (

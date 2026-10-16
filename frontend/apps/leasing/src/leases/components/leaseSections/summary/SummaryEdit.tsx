@@ -295,7 +295,7 @@ const SummaryEdit: React.FC<Props> = ({ formApi }: Props) => {
                         )}
                         name="classification"
                         overrideValues={{
-                          label: "Julkisuusluokka",
+                          label: "Kelas publikasi",
                         }}
                         enableUiDataEdit
                         uiDataKey={getUiDataLeaseKey(
@@ -736,7 +736,7 @@ const SummaryEdit: React.FC<Props> = ({ formApi }: Props) => {
                             {LeaseFieldTitles.ARRANGEMENT_DECISION}
                           </FormTextTitle>
                           <FormText>
-                            {summary.arrangement_decision ? "Kyllä" : "Ei"}
+                            {summary.arrangement_decision ? "Ya" : "Tidak"}
                           </FormText>
                         </>
                       </Authorization>

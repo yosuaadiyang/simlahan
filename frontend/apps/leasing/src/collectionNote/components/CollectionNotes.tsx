@@ -72,7 +72,7 @@ const CollectionNotes: React.FC<CollectionNotesProps> = ({
           </LoaderWrapper>
         ) : (
           <>
-            {!collectionNotes?.length && <FormText>Ei huomautuksia</FormText>}
+            {!collectionNotes?.length && <FormText>Tidak ada catatan</FormText>}
 
             {!!collectionNotes?.length && (
               <BoxItemContainer>

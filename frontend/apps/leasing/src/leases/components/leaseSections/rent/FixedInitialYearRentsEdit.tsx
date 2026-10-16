@@ -54,7 +54,7 @@ const FixedInitialYearRentsEdit = ({ fields }: Props) => {
     ) &&
     (!fields || !fields.length)
   ) {
-    return <FormText>Ei sopimusvuokria</FormText>;
+    return <FormText>Tidak ada sewa kontrak</FormText>;
   }
 
   return (
@@ -214,7 +214,7 @@ const FixedInitialYearRentsEdit = ({ fields }: Props) => {
                               )}
                               invisibleLabel
                               name={`${rent}.amount`}
-                              unit="€"
+                              unit="Rp"
                               overrideValues={{
                                 label:
                                   LeaseRentFixedInitialYearRentsFieldTitles.AMOUNT,
@@ -276,7 +276,7 @@ const FixedInitialYearRentsEdit = ({ fields }: Props) => {
                             <RemoveButton
                               className="third-level"
                               onClick={handleRemove}
-                              title="Poista alennus/korotus"
+                              title="Hapus potongan/kenaikan"
                             />
                           </Authorization>
                         </Column>
@@ -295,7 +295,7 @@ const FixedInitialYearRentsEdit = ({ fields }: Props) => {
                             >
                               <RemoveButton
                                 onClick={handleRemove}
-                                title="Poista kiinteä alkuvuosivuokra"
+                                title="Hapus sewa tahun awal tetap"
                               />
                             </Authorization>
                           </ActionButtonWrapper>
@@ -339,7 +339,7 @@ const FixedInitialYearRentsEdit = ({ fields }: Props) => {
                                     LeaseRentFixedInitialYearRentsFieldPaths.AMOUNT,
                                   )}
                                   name={`${rent}.amount`}
-                                  unit="€"
+                                  unit="Rp"
                                   overrideValues={{
                                     label:
                                       LeaseRentFixedInitialYearRentsFieldTitles.AMOUNT,
@@ -420,7 +420,7 @@ const FixedInitialYearRentsEdit = ({ fields }: Props) => {
                 <Column>
                   <AddButtonSecondary
                     className={!fields || !fields.length ? "no-top-margin" : ""}
-                    label="Lisää kiinteä alkuvuosivuokra"
+                    label="Tambah sewa tahun awal tetap"
                     onClick={handleAdd}
                   />
                 </Column>

@@ -96,7 +96,7 @@ const InvoiceRowsEdit = ({
                           >
                             <RemoveButton
                               onClick={handleRemove}
-                              title="Poista rivi"
+                              title="Hapus baris"
                             />
                           </Authorization>
                         </ActionButtonWrapper>
@@ -171,7 +171,7 @@ const InvoiceRowsEdit = ({
                                   InvoiceRowsFieldPaths.AMOUNT,
                                 )}
                                 name={`${row}.amount`}
-                                unit="€"
+                                unit="Rp"
                                 overrideValues={{
                                   label: InvoiceRowsFieldTitles.AMOUNT,
                                 }}
@@ -256,7 +256,7 @@ const InvoiceRowsEdit = ({
             >
               <Row>
                 <Column>
-                  <AddButtonThird label="Lisää rivi" onClick={handleAdd} />
+                  <AddButtonThird label="Tambah baris" onClick={handleAdd} />
                 </Column>
               </Row>
             </Authorization>

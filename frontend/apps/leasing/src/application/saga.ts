@@ -201,7 +201,7 @@ function* fetchApplicationRelatedAttachmentsSaga({
         displayUIMessage(
           {
             title: "",
-            body: "Hakemuksen liitteitä ei löytynyt!",
+            body: "Lampiran permohonan tidak ditemukan!",
           },
           {
             type: "error",
@@ -213,7 +213,7 @@ function* fetchApplicationRelatedAttachmentsSaga({
     displayUIMessage(
       {
         title: "",
-        body: "Hakemuksen liitteitä ei löytynyt!",
+        body: "Lampiran permohonan tidak ditemukan!",
       },
       {
         type: "error",

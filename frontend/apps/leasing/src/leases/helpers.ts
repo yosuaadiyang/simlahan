@@ -128,8 +128,12 @@ export const isLeaseCreatedByUser = (
   user: Record<string, any>,
 ): boolean => {
   const preparerUsername = get(lease, "preparer.username");
+  const username = get(user, "username");
   const userEmail = get(user, "profile.email");
-  return !!preparerUsername && !!userEmail && preparerUsername === userEmail;
+  return (
+    !!preparerUsername &&
+    (preparerUsername === username || preparerUsername === userEmail)
+  );
 };
 
 /**
@@ -822,24 +826,28 @@ export const getContentConstructabilityEmail = (
   user: Record<string, any>,
   text: string | null | undefined,
 ): string => {
-  let emailContent = `Vuokraustunnus: ${getContentLeaseIdentifier(lease) || "-"}\n`;
+  let emailContent = `Pengenal sewa: ${getContentLeaseIdentifier(lease) || "-"}\n`;
   const leaseAreas = get(lease, "lease_areas", []);
   leaseAreas.forEach((area) => {
     const addresses = getContentLeaseAreaAddresses(area)
       .filter((address) => address.address)
       .map((address) => getFullAddress(address));
-    emailContent += `\nVuokra-alue: ${area.identifier}`;
+    emailContent += `
+Area sewa: ${area.identifier}`;
 
     if (addresses.length) {
-      emailContent += `\nOsoite: ${addresses.join(" - ")}\n`;
+      emailContent += `
+Alamat: ${addresses.join(" - ")}\n`;
     }
   });
 
   if (text) {
-    emailContent += `\nViesti: ${text}\n`;
+    emailContent += `
+Pesan: ${text}\n`;
   }
 
-  emailContent += `\nLähettäjä: ${get(user, "profile.name")}`;
+  emailContent += `
+Pengirim: ${get(user, "profile.name")}`;
   return emailContent;
 };
 
@@ -1099,11 +1107,11 @@ export const getTenantShareWarnings = (
 
     if (roundToFixed(totalShare, 8) > 1) {
       warnings.push(
-        `Hallintaosuus välillä ${formatDateRange(dateRange.start_date, dateRange.end_date)} on yli 100%`,
+        `Porsi penguasaan antara ${formatDateRange(dateRange.start_date, dateRange.end_date)} di atas 100%`,
       );
     } else if (roundToFixed(totalShare, 8) < 1) {
       warnings.push(
-        `Hallintaosuus välillä ${formatDateRange(dateRange.start_date, dateRange.end_date)} on alle 100%`,
+        `Porsi penguasaan antara ${formatDateRange(dateRange.start_date, dateRange.end_date)} di bawah 100%`,
       );
     }
   });
@@ -1172,11 +1180,11 @@ export const getTenantRentShareWarnings = (
 
       if (totalShare > 1) {
         warnings.push(
-          `Laskutusosuus (${getLabelOfOption(intendedUseOptions, key.toString()) || "-"}) välillä ${formatDateRange(dateRange.start_date, dateRange.end_date)} on yli 100%`,
+          `Porsi tagihan (${getLabelOfOption(intendedUseOptions, key.toString()) || "-"}) antara ${formatDateRange(dateRange.start_date, dateRange.end_date)} di atas 100%`,
         );
       } else if (totalShare < 1) {
         warnings.push(
-          `Laskutusosuus (${getLabelOfOption(intendedUseOptions, key.toString()) || "-"}) välillä ${formatDateRange(dateRange.start_date, dateRange.end_date)} on alle 100%`,
+          `Porsi tagihan (${getLabelOfOption(intendedUseOptions, key.toString()) || "-"}) antara ${formatDateRange(dateRange.start_date, dateRange.end_date)} di bawah 100%`,
         );
       }
     });
@@ -2317,7 +2325,7 @@ export const getRentWarnings = (
 
     if (showWarning) {
       warnings.push(
-        `Vuokralla ${formatDateRange(rent.start_date, rent.end_date)} on eri määrä kiinteitä alkuvuosivuokria ja sopimusvuokria`,
+        `Disewa ${formatDateRange(rent.start_date, rent.end_date)} jumlah sewa tahun awal tetap dan sewa kontrak berbeda`,
       );
     }
   });
@@ -2394,7 +2402,7 @@ export const getInvoiceRecipientOptions = (
   if (addAll) {
     recipients.push({
       value: RecipientOptions.ALL,
-      label: "Kaikki",
+      label: "Semua",
     });
   }
 
@@ -3957,7 +3965,7 @@ export const getPointFigureFormText = (
   if (yearFromLease && valueFromLease)
     return `${yearFromLease} * ${valueFromLease}`;
 
-  return "Indeksipisteluku puuttuu";
+  return "Angka indeks tidak ada";
 };
 
 /**

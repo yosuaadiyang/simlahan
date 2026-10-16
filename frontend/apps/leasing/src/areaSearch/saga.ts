@@ -260,14 +260,14 @@ function* batchEditAreaSearchInfoChecksSaga({
     yield put(hideEditMode());
     displayUIMessage({
       title: "",
-      body: "Käsittelytiedot päivitetty",
+      body: "Data pemrosesan diperbarui",
     });
   } else {
     yield put(receiveAreaSearchInfoChecksBatchEditFailure(errors));
     displayUIMessage(
       {
         title: "",
-        body: `${errorCount} käsittelytiedon päivitys epäonnistui!`,
+        body: `${errorCount} pembaruan data pemrosesan gagal!`,
       },
       {
         type: "error",
@@ -288,7 +288,7 @@ function* editAreaSearchSaga({ payload, type: any }): Generator<any, any, any> {
         yield put(receiveAreaSearchEdited());
         displayUIMessage({
           title: "",
-          body: "Käsittelijä ja vuokranantaja päivitetty",
+          body: "Petugas dan pemberi sewa diperbarui",
         });
         break;
 
@@ -298,7 +298,7 @@ function* editAreaSearchSaga({ payload, type: any }): Generator<any, any, any> {
         displayUIMessage(
           {
             title: "",
-            body: "Tietojen päivitys epäonnistui!",
+            body: "Pembaruan data gagal!",
           },
           {
             type: "error",
@@ -311,7 +311,7 @@ function* editAreaSearchSaga({ payload, type: any }): Generator<any, any, any> {
     displayUIMessage(
       {
         title: "",
-        body: "Tietojen päivitys epäonnistui!",
+        body: "Pembaruan data gagal!",
       },
       {
         type: "error",
@@ -342,7 +342,7 @@ function* createAreaSearchSpecsSaga({
         displayUIMessage(
           {
             title: "",
-            body: "Aluehaun tallennus epäonnistui!",
+            body: "Pencarian area gagal disimpan!",
           },
           {
             type: "error",
@@ -355,7 +355,7 @@ function* createAreaSearchSpecsSaga({
     displayUIMessage(
       {
         title: "",
-        body: "Aluehaun tallennus epäonnistui!",
+        body: "Pencarian area gagal disimpan!",
       },
       {
         type: "error",
@@ -398,7 +398,7 @@ function* createAreaSearchApplicationSaga({
         yield put(hideEditMode());
         displayUIMessage({
           title: "",
-          body: "Hakemus luotu",
+          body: "Permohonan dibuat",
         });
         break;
 
@@ -414,7 +414,7 @@ function* createAreaSearchApplicationSaga({
     displayUIMessage(
       {
         title: "",
-        body: "Hakemuksen tallennus epäonnistui",
+        body: "Permohonan gagal disimpan",
       },
       {
         type: "error",

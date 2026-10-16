@@ -83,7 +83,9 @@ const DecisionConditionsEdit: React.FC<Props> = ({
               usersPermissions,
               UsersPermissions.ADD_CONDITION,
             ) &&
-              (!fields || !fields.length) && <FormText>Ei ehtoja</FormText>}
+              (!fields || !fields.length) && (
+                <FormText>Tidak ada persyaratan</FormText>
+              )}
 
             {fields && !!fields.length && (
               <BoxItemContainer>
@@ -298,7 +300,7 @@ const DecisionConditionsEdit: React.FC<Props> = ({
                                 <RemoveButton
                                   className="third-level"
                                   onClick={handleRemove}
-                                  title="Poista ehto"
+                                  title="Hapus persyaratan"
                                 />
                               </Authorization>
                             }
@@ -319,7 +321,7 @@ const DecisionConditionsEdit: React.FC<Props> = ({
                             >
                               <RemoveButton
                                 onClick={handleRemove}
-                                title="Poista ehto"
+                                title="Hapus persyaratan"
                               />
                             </Authorization>
                           </ActionButtonWrapper>
@@ -442,7 +444,10 @@ const DecisionConditionsEdit: React.FC<Props> = ({
             >
               <Row>
                 <Column>
-                  <AddButtonSecondary label="Lisää ehto" onClick={handleAdd} />
+                  <AddButtonSecondary
+                    label="Tambah persyaratan"
+                    onClick={handleAdd}
+                  />
                 </Column>
               </Row>
             </Authorization>

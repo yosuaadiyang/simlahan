@@ -1,95 +1,26 @@
-[![Build](https://github.com/City-of-Helsinki/mvj-ui/workflows/Node.js%20CI/badge.svg)](https://github.com/City-of-Helsinki/mvj-ui/actions)
+# SimLahan – Frontend
 
+Antarmuka petugas SimLahan (React 18 + TypeScript + Vite), turunan
+[City-of-Helsinki/mvj-ui](https://github.com/City-of-Helsinki/mvj-ui) (MIT).
+Panduan lengkap instalasi ada di [README utama](../README.md).
 
-
-# MVJ UI
-City of Helsinki Land lease UI
-
-
-## What's in the box?
-
-- [Typescript](https://www.typescriptlang.org/) Type checker
-- [Yarn](https://yarnpkg.com/) Dependency manager
-- [Vite](https://vitejs.dev/) Front-end tooling
-- [Vitest](https://vitest.dev/) Testing framework
-- [React](https://facebook.github.io/react/) User interface components
-- [Redux](http://redux.js.org/) Predictable state container
-
-
-## Usage with devcontainer
-
-Open your editor, and then `Reopen in Container` (vscode).
-
-Run vite dev server and expose port:
+## Pengembangan
 
 ```bash
-yarn --immutable
-yarn dev:leasing --host
-yarn dev:landuse --host
+corepack enable
+yarn install
+cp apps/leasing/.env.example apps/leasing/.env   # sesuaikan VITE_API_URL
+yarn start          # http://localhost:3000
+yarn test           # vitest
+yarn lint
+yarn build          # hasil di dist/
 ```
 
-## Usage w/o Docker
+Struktur penting:
 
-
-#### 1. Yarn
-Make sure you have [Yarn](https://yarnpkg.com/en/docs/install) installed globally.
-
-#### 2. Install dependencies
-
-```bash
-yarn --immutable
-```
-
-#### 3. Add .env file
-
-```bash
-cp .env.example .env
-```
-
-#### 4. Start the development server
-
-```bash
-yarn dev:leasing
-yarn dev:landuse
-```
-
-#### 5. Compile the distribution build
-
-```bash
-yarn run build
-```
-## Test
-
-#### Run the test suite
-
-```bash
-yarn test
-```
-
-#### Run the test suit in watch mode
-
-```bash
-yarn run test:watch
-```
-
-#### Generate the test coverage report
-
-```bash
-yarn run test:coverage
-```
-
-## Automatic Code formatting
-
-Install Prettier extension for VSCode. The editor will format TypeScript and SCSS files automatically on save.
-
-
-## Environment variables
-
-There are multiple .env files. Fill them in based on .env.example files:
-- apps/leasing/.env
-- apps/landuse/.env
-
-The files contain e.g.
-- API URL
-- authentication provider parameters
-- feature flags
+- `apps/leasing/src/acquisition/` – modul **Pengadaan Tanah** (dasbor, proyek,
+  bidang & peta, pihak, penilaian, musyawarah, keberatan, ganti kerugian,
+  pelepasan & penyerahan, relokasi, dokumen, kalender hari kerja).
+- `apps/leasing/src/auth/` – login lokal JWT (access token di memori, refresh
+  token di localStorage, diperbarui otomatis).
+- `apps/leasing/src/root/routes.tsx` – rute berbahasa Indonesia.

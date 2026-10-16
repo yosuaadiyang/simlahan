@@ -27,7 +27,7 @@ export const DEFAULT_SORT_ORDER = TableSortOrder.ASCENDING;
 export const plotSearchStateFilterOptions = [
   {
     value: "filter_one",
-    label: "Suodatusehto 1",
+    label: "Kondisi saring 1",
   },
 ];
 export const AUTOMATIC_PLOT_SEARCH_STAGES = [
@@ -54,15 +54,15 @@ export const FieldTypeFeatures = {
   UNCHANGEABLE_VALUE: "unchangeable-value",
 };
 export const FieldTypeLabels = {
-  textbox: "Tekstikenttä",
-  textarea: "Tekstialue",
-  dropdown: "Pudotusvalikko",
-  checkbox: "Valintaruutu",
-  radiobutton: "Radiopainike",
-  radiobuttoninline: "Radiopainike linjassa",
-  uploadfiles: "Tiedoston lataus",
-  fractional: "Murtoluku",
-  hidden: "Piilotettu",
+  textbox: "Kolom teks",
+  textarea: "Area teks",
+  dropdown: "Daftar pilihan",
+  checkbox: "Kotak centang",
+  radiobutton: "Tombol radio",
+  radiobuttoninline: "Tombol radio sebaris",
+  uploadfiles: "Unduh berkas",
+  fractional: "Pecahan",
+  hidden: "Tersembunyi",
 };
 export const FIELD_TYPE_FEATURES_BY_FIELD_TYPE_NAME: Record<
   string,
@@ -101,7 +101,7 @@ export const PROTECTED_FORM_PATHS: ProtectedFormPathsSections = {
     subsections: {
       "henkilon-tiedot": {
         subsections: {},
-        fields: ["etunimi", "Sukunimi", "henkilotunnus", "sahkoposti"],
+        fields: ["etunimi", "Nama belakang", "henkilotunnus", "sahkoposti"],
       },
       "yrityksen-tiedot": {
         subsections: {},

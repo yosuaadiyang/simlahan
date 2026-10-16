@@ -47,39 +47,40 @@ class PlotApplicationsListOpeningModal extends Component<InnerProps> {
       <Modal
         isOpen={isOpen}
         onClose={onClose}
-        title={canBeOpened ? "Avaa hakemus" : "Kilpailu käynnissä"}
+        title={canBeOpened ? "Buka permohonan" : "Kompetisi berlangsung"}
       >
         {data && canBeOpened && !allowedToOpen && (
           <>
             <p>
-              {data.plot_search_subtype?.name} {data.plot_search?.name} on
-              päättynyt {endDate}.
+              {data.plot_search_subtype?.name} {data.plot_search?.name} telah
+              berakhir {endDate}.
             </p>
-            <p>Sinulla ei ole oikeutta avata tätä hakemusta.</p>
+            <p>Anda tidak berwenang membuka permohonan ini.</p>
           </>
         )}
         {data && canBeOpened && allowedToOpen && (
           <>
             <p>
-              {data.plot_search_subtype?.name} {data.plot_search?.name} on
-              päättynyt {endDate}.
+              {data.plot_search_subtype?.name} {data.plot_search?.name} telah
+              berakhir {endDate}.
             </p>
-            <p>Kilpailun järjestäjänä voit avata hakemukset.</p>
             <p>
-              Varmista, että hakemusten avaamistilaisuudessa on läsnä kolme
-              henkilöä. Avaamisesta syntyy aikaleima, jota ei voi peruuttaa.
+              Sebagai penyelenggara kompetisi Anda dapat membuka permohonan.
+            </p>
+            <p>
+              Pastikan tiga orang hadir dalam acara pembukaan permohonan.
+              Pembukaan menghasilkan stempel waktu yang tidak dapat dibatalkan.
             </p>
           </>
         )}
         {data && !canBeOpened && (
           <>
             <p>
-              {data.plot_search_subtype?.name} {data.plot_search?.name} päättyy{" "}
+              {data.plot_search_subtype?.name} {data.plot_search?.name} berakhir{" "}
               {endDate}.
             </p>
             <p>
-              Virkailijan ei ole mahdollista nähdä hakemuksia ennen
-              päättymisajankohtaa.
+              Petugas tidak dapat melihat permohonan sebelum waktu berakhir.
             </p>
           </>
         )}
@@ -87,10 +88,10 @@ class PlotApplicationsListOpeningModal extends Component<InnerProps> {
           <Button
             className={canBeOpened ? "secondary" : ""}
             onClick={onClose}
-            text="Sulje"
+            text="Tutup"
           />
           {canBeOpened && (
-            <Button onClick={this.openApplications} text="Avaa hakemus" />
+            <Button onClick={this.openApplications} text="Buka permohonan" />
           )}
         </ModalButtonWrapper>
       </Modal>

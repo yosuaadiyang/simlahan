@@ -11,7 +11,7 @@ const AttachIcon = ({ className }: Props) => (
     viewBox="0 0 18 21"
     version="1.1"
   >
-    <title>Liitä</title>
+    <title>Kaitkan</title>
     <g stroke="none" fill="none">
       <g id="Artboard" transform="translate(-323.000000, -175.000000)">
         <path

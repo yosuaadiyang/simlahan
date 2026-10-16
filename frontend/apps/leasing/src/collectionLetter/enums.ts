@@ -16,8 +16,8 @@ export const CollectionLetterFieldPaths = {
  * @enum {string}
  */
 export const CollectionLetterFieldTitles = {
-  COLLECTION_LETTERS: "Perintäkirjeet",
-  FILE: "Tiedosto",
-  UPLOADED_AT: "Lisätty",
-  UPLOADER: "Lisääjä",
+  COLLECTION_LETTERS: "Surat penagihan",
+  FILE: "Berkas",
+  UPLOADED_AT: "Ditambahkan",
+  UPLOADER: "Ditambahkan oleh",
 };

@@ -267,19 +267,19 @@ const CollectionNoteEdit: React.FC<Props> = ({
               <Button
                 className={ButtonColors.SECONDARY}
                 onClick={onCancel}
-                text="Peruuta"
+                text="Batal"
               />
               <Button
                 className={ButtonColors.ALERT}
                 onClick={onDelete}
-                text="Poista"
+                text="Hapus"
               />
               <Button
                 className={ButtonColors.SUCCESS}
                 disabled={!valid}
                 onClick={handleSubmit}
                 type="submit"
-                text="Tallenna"
+                text="Simpan"
               />
             </ButtonWrapper>
           </form>

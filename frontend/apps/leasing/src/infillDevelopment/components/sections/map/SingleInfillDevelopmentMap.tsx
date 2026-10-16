@@ -194,7 +194,7 @@ const SingleInfillDevelopmentMap: React.FC = () => {
               areaNotes={areaNotes}
             />
           ),
-          name: "Muistettavat ehdot",
+          name: "Catatan area",
         });
     }
 

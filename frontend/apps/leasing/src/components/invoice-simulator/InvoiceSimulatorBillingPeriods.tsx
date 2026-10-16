@@ -52,22 +52,22 @@ const InvoiceSimulatorBillingPeriod = ({
       <Row>
         <Column small={6} medium={4} large={2}>
           <FormTitleAndText
-            title="Laskutuskausi"
+            title="Periode tagihan"
             text={formatDateRange(startDate, endDate)}
           />
         </Column>
         <Column small={6} medium={4} large={2}>
-          <FormTitleAndText title="Eräpäivä" text={formatDate(dueDate)} />
+          <FormTitleAndText title="Jatuh tempo" text={formatDate(dueDate)} />
         </Column>
         <Column small={12} medium={4} large={8}>
           <FormTitleAndText
-            title="Summa yhteensä"
+            title="Jumlah total"
             text={<AmountWithVat amount={totalAmount} date={dueDate} />}
           />
         </Column>
       </Row>
 
-      <SubTitle>Laskelma</SubTitle>
+      <SubTitle>Perhitungan</SubTitle>
       <Row>
         <Column
           small={12}
@@ -93,7 +93,7 @@ const InvoiceSimulatorBillingPeriod = ({
         </Column>
       </Row>
 
-      <SubTitle>Laskut</SubTitle>
+      <SubTitle>Tagihan</SubTitle>
       {invoices.map((invoice, index) => {
         return (
           <InvoiceSimulatorInvoice

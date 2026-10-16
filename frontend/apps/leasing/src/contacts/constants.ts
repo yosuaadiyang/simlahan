@@ -11,7 +11,7 @@ export const DEFAULT_SORT_KEY: string = "names";
  */
 export const DEFAULT_SORT_ORDER: string = TableSortOrder.ASCENDING;
 export const TENANT_CONTACT_TYPE_LABELS: Record<string, string> = {
-  [TenantContactType.TENANT]: "Vuokralainen",
-  [TenantContactType.BILLING]: "Laskunsaaja",
-  [TenantContactType.CONTACT]: "Yhteyshenkilö",
+  [TenantContactType.TENANT]: "Penyewa",
+  [TenantContactType.BILLING]: "Penerima tagihan",
+  [TenantContactType.CONTACT]: "Narahubung",
 };

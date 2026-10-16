@@ -87,7 +87,7 @@ function* createUiDataSaga({ payload, type: any }): Generator<any, any, any> {
         );
         displayUIMessage({
           title: "",
-          body: "Ohjeteksti tallennettu",
+          body: "Teks bantuan disimpan",
         });
         break;
 
@@ -122,7 +122,7 @@ function* deleteUiDataSaga({
         );
         displayUIMessage({
           title: "",
-          body: "Ohjeteksti poistettu",
+          body: "Teks bantuan dihapus",
         });
         break;
 
@@ -154,7 +154,7 @@ function* editUiDataSaga({ payload, type: any }): Generator<any, any, any> {
         );
         displayUIMessage({
           title: "",
-          body: "Ohjeteksti tallennettu",
+          body: "Teks bantuan disimpan",
         });
         break;
 

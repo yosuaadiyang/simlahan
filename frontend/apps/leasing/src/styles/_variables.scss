@@ -1,6 +1,7 @@
 @use "hds-design-tokens/lib/all" as hds;
 
-$font-family-source: hds.$font-default;
+$font-family-source: "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial,
+  "Noto Sans", sans-serif;
 
 /// @type Font
 $body-font-family: $font-family-source;

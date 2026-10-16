@@ -236,7 +236,9 @@ class ReservationIdentifiersModal extends Component<Props, State> {
     }
 
     const currentModalTitle =
-      editorTarget !== null ? "Muokkaa varaustunnusta" : "Varaustunnukset";
+      editorTarget !== null
+        ? "Ubah pengenal pencadangan"
+        : "Pengenal pencadangan";
     return (
       <Modal
         isOpen={isOpen}
@@ -284,13 +286,13 @@ class ReservationIdentifiersModal extends Component<Props, State> {
                 },
                 {
                   key: "targetIdentifier",
-                  text: "Kohteen tunnus",
+                  text: "Pengenal objek",
                 },
                 {
                   key: "leaseIdentifier",
                   text: (
                     <>
-                      Vuokraustunnus
+                      Pengenal sewa
                       <br />
                       nykyisin
                     </>
@@ -300,7 +302,7 @@ class ReservationIdentifiersModal extends Component<Props, State> {
                   key: "suggestedLeaseIdentifier",
                   text: (
                     <>
-                      Ehdotettu
+                      Diusulkan
                       <br />
                       vuokraustunnus
                     </>
@@ -308,13 +310,13 @@ class ReservationIdentifiersModal extends Component<Props, State> {
                 },
                 {
                   key: "intendedUse",
-                  text: "Käyttötarkoitus",
+                  text: "Peruntukan",
                 },
                 {
                   key: "applicants",
                   text: (
                     <>
-                      Ehdotettu
+                      Diusulkan
                       <br />
                       varauksensaaja
                     </>
@@ -322,12 +324,12 @@ class ReservationIdentifiersModal extends Component<Props, State> {
                 },
                 {
                   key: "reservationIdentifier",
-                  text: "Varaustunnus",
-                  renderer: (identifier) => identifier || "Ei vielä luotu",
+                  text: "Pengenal pencadangan",
+                  renderer: (identifier) => identifier || "Belum dibuat",
                 },
                 {
                   key: "index",
-                  text: "Muokkaa",
+                  text: "Ubah",
                   sortable: false,
                   renderer: (id, row) => (
                     <>
@@ -335,7 +337,7 @@ class ReservationIdentifiersModal extends Component<Props, State> {
                         <EditButton
                           className="inline-button"
                           onClick={() => this.selectEditorTarget(id, row)}
-                          title="Muokkaa"
+                          title="Ubah"
                         />
                       )}
                     </>
@@ -350,7 +352,7 @@ class ReservationIdentifiersModal extends Component<Props, State> {
             {errors && (
               <ErrorBlock
                 error={
-                  "Varaustunnusten luonti keskeytyi virheeseen. Osa tunnuksista on saattanut jäädä luomatta ja osa luoduista tunnuksista on saattanut jäädä linkittymättä haettuihin kohteisiin. Tarkista ajankohtainen tilanne sivu päivittämällä ja yritä luontia uudelleen."
+                  "Pembuatan pengenal pencadangan terhenti karena galat. Sebagian pengenal mungkin belum dibuat dan sebagian mungkin belum terhubung ke objek yang dimohon. Periksa kondisi terkini dengan memuat ulang halaman lalu coba lagi."
                 }
               />
             )}
@@ -364,11 +366,11 @@ class ReservationIdentifiersModal extends Component<Props, State> {
               <Button
                 className={ButtonColors.SECONDARY}
                 onClick={onClose}
-                text="Peruuta"
+                text="Batal"
               />
               <Button
                 onClick={this.handleSubmit}
-                text="Luo varaustunnukset"
+                text="Buat pengenal pencadangan"
                 disabled={
                   selectedRowsCount === 0 ||
                   isBatchCreatingReservationIdentifiers
@@ -388,7 +390,7 @@ class ReservationIdentifiersModal extends Component<Props, State> {
                 this.selectEditorTarget(null);
               }}
               allowToChangeRelateTo={false}
-              confirmButtonLabel="Tallenna"
+              confirmButtonLabel="Simpan"
             />
           </>
         )}

@@ -180,7 +180,7 @@ class PlotSearchPage extends Component<Props & WithRouterProps, State> {
     this.setPageTitle();
     receiveTopNavigationSettings({
       linkUrl: getRouteById(Routes.PLOT_SEARCH),
-      pageTitle: "Tonttihaut",
+      pageTitle: "Pencarian kavling",
       showSearch: true,
     });
 
@@ -284,7 +284,7 @@ class PlotSearchPage extends Component<Props & WithRouterProps, State> {
     }
   };
   setPageTitle = (name?: string) => {
-    setPageTitle(`${name ? `${name} | ` : ""}Tonttihaku`);
+    setPageTitle(`${name ? `${name} | ` : ""}Pencarian kavling`);
   };
   isAnyFormDirty = () => {
     const { isBasicInformationFormDirty } = this.props;
@@ -674,23 +674,23 @@ class PlotSearchPage extends Component<Props & WithRouterProps, State> {
             isEditMode={isEditMode}
             tabs={[
               {
-                label: "Perustiedot",
+                label: "Data dasar",
                 allow: true,
                 isDirty: isBasicInformationFormDirty,
                 hasError: isSaveClicked && !isBasicInformationFormValid,
               },
               {
-                label: "Hakemuslomake",
+                label: "Formulir permohonan",
                 allow: true,
                 isDirty: isApplicationFormDirty,
                 hasError: isSaveClicked && !isApplicationFormValid,
               },
               {
-                label: "Kartta",
+                label: "Peta",
                 allow: true,
               },
               {
-                label: "Muutoshistoria",
+                label: "Riwayat perubahan",
                 allow: true,
               },
             ]}

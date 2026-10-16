@@ -18,8 +18,8 @@ import { hasAnyPageDirtyForms } from "@/util/forms";
 import { hasPermissions } from "@/util/helpers";
 import { getRouteById, Routes } from "@/root/routes";
 import { withUsersPermissions } from "@/components/attributes/UsersPermissions";
+import { FLAG_PLOTSEARCH } from "@/featureFlags";
 import type { UsersPermissions as UsersPermissionsType } from "@/usersPermissions/types";
-import { FLAG_LANDUSE } from "@/featureFlags";
 type OwnProps = {
   isOpen: boolean;
   onLinkClick: (...args: Array<any>) => any;
@@ -181,10 +181,47 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
                           onClick={handleClick}
                           to={getRouteById(Routes.LEASES)}
                         >
-                          Vuokraukset
+                          Sewa
                         </Link>
                       </span>
                     </li>
+                  </Authorization>
+
+                  <Authorization
+                    allow={hasPermissions(
+                      usersPermissions,
+                      UsersPermissions.VIEW_ACQUISITIONPROJECT,
+                    )}
+                  >
+                    <SubMenu
+                      header="Pengadaan Tanah"
+                      isOpen={subMenuKey === "acquisition"}
+                      items={[
+                        {
+                          allow: true,
+                          onClick: handleClick,
+                          text: "Dasbor & tenggat",
+                          to: getRouteById(Routes.ACQUISITION_DASHBOARD),
+                        },
+                        {
+                          allow: true,
+                          onClick: handleClick,
+                          text: "Proyek pengadaan",
+                          to: getRouteById(Routes.ACQUISITIONS),
+                        },
+                        {
+                          allow: hasPermissions(
+                            usersPermissions,
+                            UsersPermissions.VIEW_HOLIDAY,
+                          ),
+                          onClick: handleClick,
+                          text: "Kalender & aturan tenggat",
+                          to: getRouteById(Routes.ACQUISITION_SETTINGS),
+                        },
+                      ]}
+                      menuKey="acquisition"
+                      onHeaderClick={this.handleHeaderClick}
+                    />
                   </Authorization>
 
                   <Authorization
@@ -198,7 +235,7 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
                         onClick={handleClick}
                         to={getRouteById(Routes.CONTACTS)}
                       >
-                        Asiakkaat
+                        Kontak
                       </Link>
                     </li>
                   </Authorization>
@@ -214,7 +251,7 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
                         onClick={handleClick}
                         to={getRouteById(Routes.AREA_NOTES)}
                       >
-                        Muistettavat ehdot
+                        Catatan area
                       </Link>
                     </li>
                   </Authorization>
@@ -230,7 +267,7 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
                         onClick={handleClick}
                         to={getRouteById(Routes.RENT_BASIS)}
                       >
-                        Vuokrausperiaatteet
+                        Prinsip sewa
                       </Link>
                     </li>
                   </Authorization>
@@ -240,7 +277,7 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
                       onClick={handleClick}
                       to={getRouteById(Routes.LEASE_REPORTS)}
                     >
-                      Tilastot ja raportit
+                      Statistik dan laporan
                     </Link>
                   </li>
 
@@ -258,14 +295,14 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
                         onClick={handleClick}
                         to={getRouteById(Routes.INFILL_DEVELOPMENTS)}
                       >
-                        Täydennysrakentamiskorvaukset
+                        Kompensasi pembangunan sisipan
                       </Link>
                     </li>
                   </Authorization>
 
-                  {!import.meta.env.PROD && ( // TODO: Remove this when taking Tonttihaku in use
+                  {FLAG_PLOTSEARCH && (
                     <SubMenu
-                      header="Tonttihaut ja kilpailut"
+                      header="Pencarian kavling dan kompetisi"
                       isOpen={subMenuKey === "plot"}
                       items={[
                         {
@@ -274,7 +311,7 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
                             UsersPermissions.VIEW_PLOTSEARCH,
                           ),
                           onClick: handleClick,
-                          text: "Tonttihaut",
+                          text: "Pencarian kavling",
                           to: getRouteById(Routes.PLOT_SEARCH),
                         },
                         {
@@ -283,7 +320,7 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
                             UsersPermissions.VIEW_ANSWER,
                           ),
                           onClick: handleClick,
-                          text: "Tonttihakemukset",
+                          text: "Permohonan kavling",
                           to: getRouteById(Routes.PLOT_APPLICATIONS),
                         },
                       ]}
@@ -303,7 +340,7 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
                         onClick={handleClick}
                         to={getRouteById(Routes.AREA_SEARCH)}
                       >
-                        Aluehaut
+                        Pencarian area
                       </Link>
                     </li>
                   </Authorization>
@@ -333,15 +370,11 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
                       hasPermissions(
                         usersPermissions,
                         UsersPermissions.VIEW_INVOICENOTE,
-                      ) ||
-                      hasPermissions(
-                        usersPermissions,
-                        UsersPermissions.VIEW_LEASEHOLDTRANSFER,
                       )
                     }
                   >
                     <SubMenu
-                      header="Lisää"
+                      header="Tambah"
                       isOpen={subMenuKey === "tools"}
                       items={[
                         {
@@ -350,7 +383,7 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
                             UsersPermissions.VIEW_INDEX,
                           ),
                           onClick: handleClick,
-                          text: "Elinkustannusindeksit",
+                          text: "Indeks biaya hidup",
                           to: getRouteById(Routes.INDEX),
                         },
                         {
@@ -364,17 +397,8 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
                               UsersPermissions.VIEW_SCHEDULEDJOB,
                             ),
                           onClick: handleClick,
-                          text: "Eräajot",
+                          text: "Tugas terjadwal",
                           to: getRouteById(Routes.BATCH_RUN),
-                        },
-                        {
-                          allow: hasPermissions(
-                            usersPermissions,
-                            UsersPermissions.VIEW_INVOICE,
-                          ),
-                          onClick: handleClick,
-                          text: "Kaupparekisterihaku",
-                          to: getRouteById(Routes.TRADE_REGISTER),
                         },
                         {
                           allow: hasPermissions(
@@ -382,17 +406,8 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
                             UsersPermissions.VIEW_INVOICENOTE,
                           ),
                           onClick: handleClick,
-                          text: "Laskujen tiedotteet",
+                          text: "Catatan tagihan",
                           to: getRouteById(Routes.INVOICE_NOTES),
-                        },
-                        {
-                          allow: hasPermissions(
-                            usersPermissions,
-                            UsersPermissions.VIEW_INVOICE,
-                          ),
-                          onClick: handleClick,
-                          text: "SAP laskut",
-                          to: getRouteById(Routes.SAP_INVOICES),
                         },
                         {
                           allow: hasPermissions(
@@ -400,43 +415,14 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
                             UsersPermissions.ADD_LEASEBASISOFRENT,
                           ),
                           onClick: handleClick,
-                          text: "Vuokralaskuri",
+                          text: "Kalkulator sewa",
                           to: getRouteById(Routes.BASIS_OF_RENT_CALCULATOR),
-                        },
-                        {
-                          allow: hasPermissions(
-                            usersPermissions,
-                            UsersPermissions.VIEW_LEASEHOLDTRANSFER,
-                          ),
-                          onClick: handleClick,
-                          text: "Vuokraoikeuden siirrot",
-                          to: getRouteById(Routes.LEASEHOLD_TRANSFER),
-                        },
-                        {
-                          allow: hasPermissions(
-                            usersPermissions,
-                            UsersPermissions.VIEW_CREDITDECISION,
-                          ),
-                          onClick: handleClick,
-                          text: "Asiakastieto",
-                          to: getRouteById(Routes.CREDIT_DECISION),
                         },
                       ]}
                       menuKey="tools"
                       onHeaderClick={this.handleHeaderClick}
                     />
                   </Authorization>
-
-                  {FLAG_LANDUSE && (
-                    <>
-                      <hr />
-                      <li>
-                        <a href="/maankayttosopimukset/">
-                          Maankäyttösopimukset
-                        </a>
-                      </li>
-                    </>
-                  )}
                 </ul>
               )}
             </div>

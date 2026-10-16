@@ -1,13 +1,16 @@
 import store from "@/root/store";
 import { getApiToken } from "@/auth/selectors";
+import { refreshAccessToken } from "@/auth/session";
 import { UI_ACCEPT_LANGUAGE_VALUE } from "@/api/constants";
 import type { ApiSyncResponse } from "./types";
 import type { ApiResponse } from "types";
 
 const callApiAsync = async <T = ApiResponse>(
   request: Request,
+  isRetry: boolean = false,
 ): Promise<ApiSyncResponse<T>> => {
   const apiToken = getApiToken(store.getState());
+  const retryRequest = isRetry ? null : request.clone();
 
   if (apiToken) {
     request.headers.set("Authorization", `Bearer ${apiToken}`);
@@ -24,7 +27,11 @@ const callApiAsync = async <T = ApiResponse>(
   }
 
   const response = await fetch(request);
-  const bodyAsJson = await response.json();
+  if (response.status === 401 && apiToken && retryRequest) {
+    const newToken = await refreshAccessToken();
+    if (newToken) return callApiAsync<T>(retryRequest, true);
+  }
+  const bodyAsJson = response.status === 204 ? {} : await response.json();
   return {
     response,
     bodyAsJson,

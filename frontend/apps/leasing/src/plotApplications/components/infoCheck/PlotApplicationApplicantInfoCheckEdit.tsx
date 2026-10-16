@@ -34,10 +34,10 @@ class PlotApplicationApplicantInfoCheck extends PureComponent<Props> {
     return (
       <PlotApplicationInfoCheckCollapse
         className="PlotApplicationApplicantInfoCheckEdit"
-        headerTitle="Hakijan käsittelytiedot"
+        headerTitle="Data pemrosesan pemohon"
       >
         <>
-          <h4>Tarkistettavat dokumentit</h4>
+          <h4>Dokumen yang diperiksa</h4>
           <ApplicantInfoCheckEdit
             infoCheckIds={infoCheckIds}
             answer={answer}

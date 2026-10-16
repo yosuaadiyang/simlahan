@@ -79,7 +79,7 @@ const BasicInfoDecisionEdit = ({
               style={{
                 height: "unset",
               }}
-              title="Poista päätös"
+              title="Hapus keputusan"
             />
           )}
         </Authorization>

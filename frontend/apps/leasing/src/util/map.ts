@@ -8,53 +8,56 @@ import type { LatLngBounds } from "leaflet";
  */
 export const localizeMap = (): void => {
   L.drawLocal.draw.handlers.circle.tooltip.start =
-    "Klikkaa ja raahaa piirtääksesi ympyrän";
-  L.drawLocal.draw.handlers.circle.radius = "Säde";
+    "Klik dan seret untuk menggambar lingkaran";
+  L.drawLocal.draw.handlers.circle.radius = "Radius";
   L.drawLocal.draw.handlers.polygon.tooltip.start =
-    "Aloita alueen piirtäminen klikkaamalla.";
+    "Klik untuk mulai menggambar area.";
   L.drawLocal.draw.handlers.polygon.tooltip.cont =
-    "Jatka alueen piirtämistä klikkaamalla";
+    "Klik untuk melanjutkan menggambar area";
   L.drawLocal.draw.handlers.polygon.tooltip.end =
-    "Klikkaa ensimmäistä pistettä kuvion päättämiseksi";
+    "Klik titik pertama untuk menutup bentuk";
   L.drawLocal.draw.handlers.polyline.error =
-    "<strong>Virhe:</strong> kuvion reunat ei saa leikata toisiaan!";
+    "<strong>Galat:</strong> sisi bidang tidak boleh saling berpotongan!";
   L.drawLocal.draw.handlers.polyline.tooltip.start =
-    "Aloita viivan piirtäminen klikkaamalla.";
+    "Klik untuk mulai menggambar garis.";
   L.drawLocal.draw.handlers.polyline.tooltip.cont =
-    "Jatka viivan piirtämistä klikkaamalla";
+    "Klik untuk melanjutkan menggambar garis";
   L.drawLocal.draw.handlers.polyline.tooltip.end =
-    "Klikkaa viimeistä pistettä viivan päättämiseksi";
+    "Klik titik terakhir untuk mengakhiri garis";
   L.drawLocal.draw.handlers.rectangle.tooltip.start =
-    "Klikkaa ja raahaa piirtääksesi suorakulmion";
+    "Klik dan seret untuk menggambar persegi panjang";
   L.drawLocal.draw.handlers.simpleshape.tooltip.end =
-    "Vapauta hiiren painike päättääksesi piirtämisen.";
+    "Lepaskan tombol mouse untuk selesai menggambar.";
   L.drawLocal.edit.handlers.edit.tooltip.text =
-    "Muokkaa ominaisuuksia vetämällä kahvoja";
+    "Ubah bentuk dengan menyeret titik kendali";
   L.drawLocal.edit.handlers.edit.tooltip.subtext =
-    "Klikkaa peruuta-painiketta kumotaksesi muutokset";
+    "Klik tombol batal untuk membatalkan perubahan";
   L.drawLocal.edit.handlers.remove.tooltip.text =
-    "Klikkaa aluetta poistaaksesi sen";
-  L.drawLocal.draw.toolbar.actions.title = "Peruuta piirtäminen";
-  L.drawLocal.draw.toolbar.actions.text = "Peruuta";
-  L.drawLocal.draw.toolbar.finish.title = "Lopeta piirtäminen";
-  L.drawLocal.draw.toolbar.finish.text = "Lopeta";
-  L.drawLocal.draw.toolbar.undo.title = "Poista viimeisin piirretty piste";
-  L.drawLocal.draw.toolbar.undo.text = "Poista viimeisin piste";
-  L.drawLocal.edit.toolbar.actions.save.title = "Tallenna muutokset";
-  L.drawLocal.edit.toolbar.actions.save.text = "Tallenna";
-  L.drawLocal.edit.toolbar.actions.cancel.title = "Peruuta muutokset";
-  L.drawLocal.edit.toolbar.actions.cancel.text = "Peruuta";
-  L.drawLocal.edit.toolbar.actions.clearAll.title = "Poista kaikki";
-  L.drawLocal.edit.toolbar.actions.clearAll.text = "Poista kaikki";
-  L.drawLocal.draw.toolbar.buttons.polyline = "Piirrä viiva";
-  L.drawLocal.draw.toolbar.buttons.polygon = "Piirrä monikulmio";
-  L.drawLocal.draw.toolbar.buttons.rectangle = "Piirrä suorakaide";
-  L.drawLocal.draw.toolbar.buttons.circle = "Piirrä ympyrä";
-  L.drawLocal.edit.toolbar.buttons.editDisabled = "Ei muokattavia alueita";
-  L.drawLocal.edit.toolbar.buttons.edit = "Muokkaa alueita";
-  L.drawLocal.edit.toolbar.buttons.editDisabled = "Ei muokattavia alueita";
-  L.drawLocal.edit.toolbar.buttons.remove = "Poista alueita";
-  L.drawLocal.edit.toolbar.buttons.removeDisabled = "Ei poistettavia alueita";
+    "Klik area untuk menghapusnya";
+  L.drawLocal.draw.toolbar.actions.title = "Batalkan penggambaran";
+  L.drawLocal.draw.toolbar.actions.text = "Batal";
+  L.drawLocal.draw.toolbar.finish.title = "Selesai menggambar";
+  L.drawLocal.draw.toolbar.finish.text = "Selesai";
+  L.drawLocal.draw.toolbar.undo.title = "Hapus titik terakhir yang digambar";
+  L.drawLocal.draw.toolbar.undo.text = "Hapus titik terakhir";
+  L.drawLocal.edit.toolbar.actions.save.title = "Simpan perubahan";
+  L.drawLocal.edit.toolbar.actions.save.text = "Simpan";
+  L.drawLocal.edit.toolbar.actions.cancel.title = "Batalkan perubahan";
+  L.drawLocal.edit.toolbar.actions.cancel.text = "Batal";
+  L.drawLocal.edit.toolbar.actions.clearAll.title = "Hapus semua";
+  L.drawLocal.edit.toolbar.actions.clearAll.text = "Hapus semua";
+  L.drawLocal.draw.toolbar.buttons.polyline = "Gambar garis";
+  L.drawLocal.draw.toolbar.buttons.polygon = "Gambar poligon";
+  L.drawLocal.draw.toolbar.buttons.rectangle = "Gambar persegi panjang";
+  L.drawLocal.draw.toolbar.buttons.circle = "Gambar lingkaran";
+  L.drawLocal.edit.toolbar.buttons.editDisabled =
+    "Tidak ada area yang dapat diubah";
+  L.drawLocal.edit.toolbar.buttons.edit = "Ubah area";
+  L.drawLocal.edit.toolbar.buttons.editDisabled =
+    "Tidak ada area yang dapat diubah";
+  L.drawLocal.edit.toolbar.buttons.remove = "Hapus area";
+  L.drawLocal.edit.toolbar.buttons.removeDisabled =
+    "Tidak ada area yang dapat dihapus";
 };
 
 /**
@@ -92,24 +95,11 @@ export const getCoordinatesOfGeometry = (
  * @returns {Object}
  */
 export const formatCoordsToLatLng = (
-  geojson: Record<string, any> | null | undefined,
+  _geojson: Record<string, any> | null | undefined,
 ): (Record<string, any> | null | undefined) | null => {
-  let crs;
-
-  if (geojson) {
-    if (geojson.crs && geojson.crs.type === "name") {
-      crs = new L.Proj.CRS(geojson.crs.properties.name);
-    } else if (geojson.crs && geojson.crs.type) {
-      crs = new L.Proj.CRS(geojson.crs.type, geojson.crs.properties.code);
-    }
-
-    if (crs !== undefined) {
-      return (coords: Array<number>) => {
-        const point = L.point(coords[0], coords[1]);
-        return crs ? crs.projection.unproject(point) : null;
-      };
-    }
-  }
+  // Semua geometri dari API SimLahan berformat WGS84 (EPSG:4326) sehingga
+  // konversi bawaan Leaflet (lng/lat) sudah tepat.
+  return undefined;
 };
 
 /**

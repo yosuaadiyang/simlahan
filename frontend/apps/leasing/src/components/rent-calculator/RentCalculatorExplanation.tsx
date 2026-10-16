@@ -68,7 +68,7 @@ const RentCalculatorExplanation = ({ date, explanation }: Props) => {
             </FormText>
           ) : (
             <FormText className="rent-calculator__explanation_amount">
-              {`${formatNumber(amount)} €`}
+              {`Rp ${formatNumber(amount)}`}
             </FormText>
           )}
         </Column>

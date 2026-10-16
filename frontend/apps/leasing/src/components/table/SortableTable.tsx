@@ -204,7 +204,7 @@ class SortableTable extends Component<Props, State> {
   };
   static defaultProps: Partial<Props> = {
     fixedHeader: false,
-    noDataText: "Ei tuloksia",
+    noDataText: "Tidak ada hasil",
     sortable: false,
   };
   setContainerRef: (arg0: any) => void = (el) => {
@@ -553,8 +553,8 @@ class SortableTable extends Component<Props, State> {
                 sortedData.map((row, index) => {
                   const isRowSelected = Boolean(
                     selectedRow &&
-                      !selectedRow.tableGroupName &&
-                      selectedRow.id === row.id,
+                    !selectedRow.tableGroupName &&
+                    selectedRow.id === row.id,
                   );
                   return row.isTableGroup ? (
                     <SortableTableGroup

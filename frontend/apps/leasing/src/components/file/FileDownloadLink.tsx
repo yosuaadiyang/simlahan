@@ -99,7 +99,7 @@ class FileDownloadLink extends PureComponent<Props, State> {
             const errorMessage = errors?.error ? errors.error : "";
             displayUIMessage(
               {
-                title: "Tiedoston lataaminen epäonnistui",
+                title: "Pengunduhan berkas gagal",
                 body: errorMessage,
               },
               {
@@ -118,7 +118,7 @@ class FileDownloadLink extends PureComponent<Props, State> {
         displayUIMessage(
           {
             title: "",
-            body: "Tiedoston lataaminen epäonnistui",
+            body: "Pengunduhan berkas gagal",
           },
           {
             type: "error",

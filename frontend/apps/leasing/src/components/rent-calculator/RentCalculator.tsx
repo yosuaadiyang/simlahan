@@ -217,7 +217,7 @@ const RentCalculator: React.FC<Props> = ({ formApi }) => {
                 (saveClicked && Object.keys(calculatorErrors).length > 0)
               }
               onClick={handleCreateRentsForPeriod}
-              text="Laske"
+              text="Hitung"
             />
           </div>
         </Column>

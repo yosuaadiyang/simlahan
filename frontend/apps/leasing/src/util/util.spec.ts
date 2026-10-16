@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   isValidDate,
   getDayMonth,
@@ -607,10 +607,10 @@ describe("utils", () => {
   describe("helpers.js", () => {
     it("Should return correct title", () => {
       expect(composePageTitle("foo")).to.deep.equal(
-        "foo | Maanvuokrausjärjestelmä | Helsingin Kaupunki",
+        "foo | SimLahan | Sistem Informasi Manajemen Lahan",
       );
       expect(composePageTitle()).to.deep.equal(
-        "Maanvuokrausjärjestelmä | Helsingin Kaupunki",
+        "SimLahan | Sistem Informasi Manajemen Lahan",
       );
       expect(composePageTitle("foo", false)).to.deep.equal("foo");
     });
@@ -728,13 +728,20 @@ describe("utils", () => {
       expect(formatDateRange(null, null)).to.deep.equal("");
     });
     it("should get reference number link", () => {
-      expect(getReferenceNumberLink("123")).to.deep.equal(
-        "https://paatokset.hel.fi/asia/123",
+      vi.stubEnv(
+        "VITE_DECISION_URL_TEMPLATE",
+        "https://jdih.example.go.id/{id}",
       );
-      expect(getReferenceNumberLink("123 456")).to.deep.equal(
-        "https://paatokset.hel.fi/asia/123-456",
+      expect(getReferenceNumberLink("123")).to.deep.equal(
+        "https://jdih.example.go.id/123",
+      );
+      expect(getReferenceNumberLink("593/12/2025")).to.deep.equal(
+        "https://jdih.example.go.id/593%2F12%2F2025",
       );
       expect(getReferenceNumberLink(null)).to.deep.equal(null);
+      vi.stubEnv("VITE_DECISION_URL_TEMPLATE", "");
+      expect(getReferenceNumberLink("123")).to.deep.equal(null);
+      vi.unstubAllEnvs();
     });
     it("should find item from collection by id", () => {
       const items = [
@@ -1440,15 +1447,23 @@ describe("utils", () => {
         findFromOcdString("property1:test/property2:test2", "property3"),
       ).to.deep.equal(null);
     });
-    it("should return PTP plan report url", () => {
+    it("should return plan report url from template", () => {
+      vi.stubEnv("VITE_PLAN_REPORT_URL_TEMPLATE", "https://rdtr.example/{id}");
       expect(createPTPPlanReportUrl("123")).to.deep.equal(
-        "https://ptp.hel.fi/DataForms/planreport/?id=123",
+        "https://rdtr.example/123",
       );
+      vi.unstubAllEnvs();
+      expect(createPTPPlanReportUrl("123")).to.deep.equal(null);
     });
-    it("should return PTP plot division url", () => {
-      expect(createPTPPlotDivisionUrl("123")).to.deep.equal(
-        "https://ptp.hel.fi/DataHandlers/Tonttijaot/?q=123",
+    it("should return plot division url from template", () => {
+      vi.stubEnv(
+        "VITE_PLOT_DIVISION_URL_TEMPLATE",
+        "https://bidang.example?q={id}",
       );
+      expect(createPTPPlotDivisionUrl("123")).to.deep.equal(
+        "https://bidang.example?q=123",
+      );
+      vi.unstubAllEnvs();
     });
     it("should return api response count", () => {
       const apiResponse = {

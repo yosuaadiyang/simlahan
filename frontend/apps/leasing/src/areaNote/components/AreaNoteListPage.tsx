@@ -58,7 +58,7 @@ const getOverlayLayers = (
           defaultAreaNote={areaNoteId}
         />
       ),
-      name: "Muistettavat ehdot",
+      name: "Catatan area",
     });
   }
 
@@ -124,11 +124,11 @@ const AreaNoteListPage: React.FC = () => {
   }, [areaNoteId, areaNoteMethods, areaNotes]);
 
   useEffect(() => {
-    setPageTitle("Muistettavat ehdot");
+    setPageTitle("Catatan area");
     dispatch(
       receiveTopNavigationSettings({
         linkUrl: getRouteById(Routes.AREA_NOTES),
-        pageTitle: "Muistettavat ehdot",
+        pageTitle: "Catatan area",
         showSearch: false,
       }),
     );
@@ -194,7 +194,7 @@ const AreaNoteListPage: React.FC = () => {
             <AddButtonSecondary
               className="no-top-margin"
               disabled={isEditMode}
-              label="Luo muistettava ehto"
+              label="Buat catatan area"
               onClick={handleCreateButtonClick}
             />
           </Authorization>

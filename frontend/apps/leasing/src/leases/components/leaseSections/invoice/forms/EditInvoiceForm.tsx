@@ -74,7 +74,8 @@ const Payments = ({ fields, relativeTo }: PaymentsProps): ReactElement => {
       {({ modalDispatch }) => {
         return (
           <>
-            {!fields || (!fields.length && <FormText>Ei maksuja</FormText>)}
+            {!fields ||
+              (!fields.length && <FormText>Tidak ada pembayaran</FormText>)}
 
             {fields && !!fields.length && (
               <Row>
@@ -152,7 +153,7 @@ const Payments = ({ fields, relativeTo }: PaymentsProps): ReactElement => {
                           )}
                           invisibleLabel
                           name={`${payment}.paid_amount`}
-                          unit="€"
+                          unit="Rp"
                           overrideValues={{
                             label: InvoicePaymentsFieldTitles.PAID_AMOUNT,
                           }}
@@ -192,7 +193,7 @@ const Payments = ({ fields, relativeTo }: PaymentsProps): ReactElement => {
                             <RemoveButton
                               className="third-level"
                               onClick={handleRemove}
-                              title="Poista maksu"
+                              title="Hapus pembayaran"
                             />
                           </Authorization>
                         }
@@ -210,7 +211,10 @@ const Payments = ({ fields, relativeTo }: PaymentsProps): ReactElement => {
             >
               <Row>
                 <Column>
-                  <AddButtonThird label="Lisää maksu" onClick={handleAdd} />
+                  <AddButtonThird
+                    label="Tambah pembayaran"
+                    onClick={handleAdd}
+                  />
                 </Column>
               </Row>
             </Authorization>
@@ -418,8 +422,8 @@ const EditInvoiceForm: React.FC<Props> = ({
                 >
                   <SendupButton
                     onClick={handleExportToLaske}
-                    text="Lähetä SAP:iin"
-                    title="Lähetä SAP:iin"
+                    text="Kirim ke SAP"
+                    title="Kirim ke SAP"
                   />
                 </Authorization>
               )}
@@ -850,7 +854,7 @@ const EditInvoiceForm: React.FC<Props> = ({
                     </FormTextTitle>
                     <FormText>
                       {invoice && !isEmptyValue(invoice.collection_charge)
-                        ? `${formatNumber(invoice.collection_charge)} €`
+                        ? `Rp ${formatNumber(invoice.collection_charge)}`
                         : "-"}
                     </FormText>
                   </>
@@ -967,7 +971,7 @@ const EditInvoiceForm: React.FC<Props> = ({
                         >
                           {creditedInvoice && creditedInvoice.number
                             ? creditedInvoice.number
-                            : "Numeroimaton"}
+                            : "Tanpa nomor"}
                         </a>
                       }
                     </FormText>
@@ -1003,7 +1007,7 @@ const EditInvoiceForm: React.FC<Props> = ({
                         >
                           {interestInvoiceFor.number
                             ? interestInvoiceFor.number
-                            : "Numeroimaton"}
+                            : "Tanpa nomor"}
                         </a>
                       }
                     </FormText>
@@ -1129,7 +1133,7 @@ const EditInvoiceForm: React.FC<Props> = ({
                                 onClick={handleCreditInvoiceClick}
                                 tabIndex={0}
                               >
-                                {item.number ? item.number : "Numeroimaton"}
+                                {item.number ? item.number : "Tanpa nomor"}
                               </a>
                             </FormText>
                           </Column>
@@ -1230,7 +1234,7 @@ const EditInvoiceForm: React.FC<Props> = ({
                                 onClick={handleInterestInvoiceClick}
                                 tabIndex={0}
                               >
-                                {item.number ? item.number : "Numeroimaton"}
+                                {item.number ? item.number : "Tanpa nomor"}
                               </a>
                             </FormText>
                           </Column>

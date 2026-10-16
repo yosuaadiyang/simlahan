@@ -117,13 +117,13 @@ class PlotApplicationEdit extends PureComponent<Props> {
     );
     return (
       <div className="PlotApplication">
-        <Title>Hakemus</Title>
+        <Title>Permohonan</Title>
         <Divider />
         <Loader isLoading={isLoading} />
         {!isLoading && fieldTypes && (
           <>
             {currentPlotApplication.opening_record && (
-              <Collapse defaultOpen={true} headerTitle="Hakemuksen avaaminen">
+              <Collapse defaultOpen={true} headerTitle="Pembukaan permohonan">
                 <PlotApplicationOpeningRecordForm />
               </Collapse>
             )}

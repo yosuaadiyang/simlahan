@@ -128,13 +128,13 @@ class AreaSearchApplicantInfoCheckForm extends Component<AreaSearchApplicantInfo
           <Button
             className={ButtonColors.SECONDARY}
             onClick={onClose}
-            text="Peruuta"
+            text="Batal"
           />
           <Button
             className={ButtonColors.SUCCESS}
             disabled={!valid}
             onClick={this.handleSave}
-            text="Tallenna"
+            text="Simpan"
           />
         </ModalButtonWrapper>
       </form>

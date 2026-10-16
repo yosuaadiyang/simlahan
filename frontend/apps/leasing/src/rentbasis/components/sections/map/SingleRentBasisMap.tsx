@@ -103,7 +103,7 @@ const SingleRentBasisMap: React.FC = () => {
             plotTypeOptions={plotTypeOptions}
           />
         ),
-        name: "Vuokrausperiaatteet",
+        name: "Prinsip sewa",
       });
     }
 
@@ -119,7 +119,7 @@ const SingleRentBasisMap: React.FC = () => {
               areaNotes={areaNotes}
             />
           ),
-          name: "Muistettavat ehdot",
+          name: "Catatan area",
         });
     }
     return layers;

@@ -87,12 +87,12 @@ const VisualizationTypes = {
 const visualizationTypeOptions = [
   {
     value: VisualizationTypes.TABLE,
-    label: "Taulukko",
+    label: "Tabel",
     icon: <TableIcon className="icon-medium" />,
   },
   {
     value: VisualizationTypes.MAP,
-    label: "Kartta",
+    label: "Peta",
     icon: <MapIcon className="icon-medium" />,
   },
 ];
@@ -162,10 +162,10 @@ class AreaSearchApplicationListPage extends PureComponent<
       location: { search },
     } = this.props;
     const searchQuery = getUrlParams(search);
-    setPageTitle("Aluehaun hakemukset");
+    setPageTitle("Permohonan pencarian area");
     receiveTopNavigationSettings({
       linkUrl: getRouteById(Routes.AREA_SEARCH),
-      pageTitle: "Aluehaun hakemukset",
+      pageTitle: "Permohonan pencarian area",
       showSearch: false,
     });
 
@@ -232,7 +232,7 @@ class AreaSearchApplicationListPage extends PureComponent<
     const stateOptions = getFieldOptions(areaSearchListAttributes, "state");
     columns.push({
       key: "checkbox",
-      text: "Tulosta",
+      text: "Cetak",
       sortable: false,
       renderer: (_, item) => (
         <div
@@ -244,7 +244,7 @@ class AreaSearchApplicationListPage extends PureComponent<
             name={`selectedSearches.${item.id}`}
             fieldAttributes={{
               type: FieldTypes.CHECKBOX,
-              label: "Valitse hakemus " + item.identifier,
+              label: "Pilih permohonan " + item.identifier,
               read_only: false,
             }}
             autoBlur
@@ -270,68 +270,68 @@ class AreaSearchApplicationListPage extends PureComponent<
     });
     columns.push({
       key: "identifier",
-      text: "Hakemus",
+      text: "Permohonan",
     });
     columns.push({
       key: "applicants",
-      text: "Hakija",
+      text: "Pemohon",
       sortable: false,
     });
     columns.push({
       key: "received_date",
-      text: "Saapunut",
+      text: "Diterima",
       renderer: (val) => formatDate(val),
     });
     columns.push({
       key: "intended_use",
-      text: "Käyttötarkoitus",
+      text: "Peruntukan",
       renderer: (val) => getLabelOfOption(intendedUseOptions, val),
     });
     columns.push({
       key: "address",
-      text: "Osoite",
+      text: "Alamat",
     });
     columns.push({
       key: "district",
-      text: "Kaupunginosa",
+      text: "Kecamatan",
     });
     columns.push({
       key: "start_date",
-      text: "Alkupvm",
+      text: "Tgl mulai",
       renderer: (val) => formatDate(val),
     });
     columns.push({
       key: "end_date",
-      text: "Loppupvm",
+      text: "Tgl akhir",
       renderer: (val) => formatDate(val),
     });
     columns.push({
       key: "state",
-      text: "Tila",
+      text: "Status",
       renderer: (val) => getLabelOfOption(stateOptions, val),
     });
     columns.push({
       key: "lessor",
-      text: "Vuokranantaja",
+      text: "Pemberi sewa",
       renderer: (val, row) => (
         <span onMouseUp={(e) => e.stopPropagation()}>
           <Button
             className={ButtonColors.LINK}
             onClick={() => this.openAreaSearchEditModal(row.id)}
-            text={val || "Avoin"}
+            text={val || "Terbuka"}
           />
         </span>
       ),
     });
     columns.push({
       key: "preparer",
-      text: "Käsittelijä",
+      text: "Petugas",
       renderer: (val, row) => (
         <span onMouseUp={(e) => e.stopPropagation()}>
           <Button
             className={ButtonColors.LINK}
             onClick={() => this.openAreaSearchEditModal(row.id)}
-            text={getUserFullName(val) || "Avoin"}
+            text={getUserFullName(val) || "Terbuka"}
           />
         </span>
       ),
@@ -669,7 +669,7 @@ class AreaSearchApplicationListPage extends PureComponent<
   openCreateAreaSearch = () => {
     const { navigate } = this.props;
     navigate({
-      pathname: `${getRouteById(Routes.AREA_SEARCH)}/uusi`,
+      pathname: `${getRouteById(Routes.AREA_SEARCH)}/baru`,
     });
   };
   selectAllSearches = (
@@ -758,8 +758,8 @@ class AreaSearchApplicationListPage extends PureComponent<
         ) {
           amountText =
             isFetchingByBBox || areaSearchesByBBox?.count === undefined
-              ? "Ladataan..."
-              : `Löytyi ${areaSearchesByBBox.count} kpl`;
+              ? "Memuat..."
+              : `Ditemukan ${areaSearchesByBBox.count} kpl`;
         }
 
         break;
@@ -768,8 +768,8 @@ class AreaSearchApplicationListPage extends PureComponent<
       default:
         amountText =
           isFetching || areaSearches?.count === undefined
-            ? "Ladataan..."
-            : `Löytyi ${areaSearches.count} kpl`;
+            ? "Memuat..."
+            : `Ditemukan ${areaSearches.count} kpl`;
     }
 
     return (
@@ -781,7 +781,7 @@ class AreaSearchApplicationListPage extends PureComponent<
             >
               <AddButtonSecondary
                 className="no-top-margin"
-                label="Luo aluehakemus"
+                label="Buat permohonan area"
                 onClick={this.openCreateAreaSearch}
               />
             </Authorization>
@@ -810,7 +810,7 @@ class AreaSearchApplicationListPage extends PureComponent<
               <VisualisationTypeWrapper>
                 {
                   <IconRadioButtons
-                    legend={"Kartta/taulukko"}
+                    legend={"Peta/tabel"}
                     onChange={this.handleVisualizationTypeChange}
                     options={visualizationTypeOptions}
                     radioName="visualization-type-radio"
@@ -858,7 +858,7 @@ class AreaSearchApplicationListPage extends PureComponent<
                           options: [
                             {
                               value: true,
-                              label: "Valitse kaikki suodatuksen mukaan",
+                              label: "Pilih semua sesuai saringan",
                             },
                           ],
                         }}
@@ -887,7 +887,7 @@ class AreaSearchApplicationListPage extends PureComponent<
         </TableWrapper>
         <Button
           onClick={this.openExportModal}
-          text="Tulosta"
+          text="Cetak"
           disabled={selectedSearches.length === 0}
         />
         <EditAreaSearchPreparerModal

@@ -115,7 +115,7 @@ const CollateralFinancialGuarantee = ({
                 LeaseContractCollateralsFieldPaths.TOTAL_AMOUNT,
               )}
               name={`${field}.total_amount`}
-              unit="€"
+              unit="Rp"
               overrideValues={{
                 label: LeaseContractCollateralsFieldTitles.TOTAL_AMOUNT,
               }}
@@ -357,7 +357,7 @@ const CollateralMortgageDocument = ({
                 LeaseContractCollateralsFieldPaths.TOTAL_AMOUNT,
               )}
               name={`${field}.total_amount`}
-              unit="€"
+              unit="Rp"
               overrideValues={{
                 label: LeaseContractCollateralsFieldTitles.TOTAL_AMOUNT,
               }}
@@ -546,7 +546,7 @@ const CollateralOther = ({ attributes, field, isSaveClicked }: OtherProps) => {
                 LeaseContractCollateralsFieldPaths.TOTAL_AMOUNT,
               )}
               name={`${field}.total_amount`}
-              unit="€"
+              unit="Rp"
               overrideValues={{
                 label: LeaseContractCollateralsFieldTitles.TOTAL_AMOUNT,
               }}
@@ -640,7 +640,7 @@ const CollateralEdit: React.FC<Props> = ({
               UsersPermissions.DELETE_COLLATERAL,
             )}
           >
-            <RemoveButton onClick={onRemove} title="Poista vakuus" />
+            <RemoveButton onClick={onRemove} title="Hapus jaminan" />
           </Authorization>
         </ActionButtonWrapper>
 

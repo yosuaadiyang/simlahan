@@ -31,7 +31,7 @@ function* createReleatedLeaseSaga({
         yield put(
           fetchSingleLeaseAfterEdit({
             leaseId: payload.from_lease,
-            successMessage: "Vuokraustunnusten välinen liitos luotu",
+            successMessage: "Keterkaitan antarpengenal sewa dibuat",
           }),
         );
         break;
@@ -62,7 +62,7 @@ function* deleteReleatedLeaseSaga({
         yield put(
           fetchSingleLeaseAfterEdit({
             leaseId: payload.leaseId,
-            successMessage: "Vuokraustunnusten välinen liitos poistettu",
+            successMessage: "Keterkaitan antarpengenal sewa dihapus",
           }),
         );
         break;
@@ -93,7 +93,7 @@ function* createRelatedPlotApplicationSaga({
         yield put(
           fetchSingleLeaseAfterEdit({
             leaseId: payload.lease,
-            successMessage: "Liitos luotu",
+            successMessage: "Keterkaitan dibuat",
           }),
         );
         break;
@@ -127,7 +127,7 @@ function* deleteRelatedPlotApplicationSaga({
         yield put(
           fetchSingleLeaseAfterEdit({
             leaseId: payload.leaseId,
-            successMessage: "Liitos poistettu",
+            successMessage: "Keterkaitan dihapus",
           }),
         );
         break;

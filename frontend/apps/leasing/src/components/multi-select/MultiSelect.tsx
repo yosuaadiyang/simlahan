@@ -54,7 +54,7 @@ const MultiSelect = ({
     if (noneSelected) {
       return (
         <span className="multi-select__none-selected">
-          {customText || "Valitse..."}
+          {customText || "Pilih..."}
         </span>
       );
     }
@@ -67,7 +67,7 @@ const MultiSelect = ({
       return <span>{`${selected.length} valittu`}</span>;
     }
 
-    return <span>{allSelected ? "Kaikki valittu" : getSelectedText()}</span>;
+    return <span>{allSelected ? "Semua dipilih" : getSelectedText()}</span>;
   };
 
   const handleSelectedChanged = (selected: Array<any>) => {

@@ -72,7 +72,7 @@ class Comment extends PureComponent<Props, State> {
                 <TextAreaInput
                   onChange={this.handleTextFieldChange}
                   id={`comment_${comment.id}`}
-                  placeholder="Kommentti"
+                  placeholder="Komentar"
                   rows={3}
                   value={editedText}
                 />
@@ -84,13 +84,13 @@ class Comment extends PureComponent<Props, State> {
                   <Button
                     className={ButtonColors.SECONDARY}
                     onClick={this.handleCancelButtonClick}
-                    text="Peruuta"
+                    text="Batal"
                   />
                   <Button
                     className={ButtonColors.SUCCESS}
                     disabled={!editedText}
                     onClick={this.handleEdit}
-                    text="Tallenna"
+                    text="Simpan"
                   />
                 </div>
               </Column>
@@ -105,7 +105,7 @@ class Comment extends PureComponent<Props, State> {
             <EditButton
               className="position-topright"
               onClick={this.handleEditButtonClick}
-              title="Muokkaa kommenttia"
+              title="Ubah komentar"
             />
           )}
           <div className="comment-panel__comment_content-wrapper">

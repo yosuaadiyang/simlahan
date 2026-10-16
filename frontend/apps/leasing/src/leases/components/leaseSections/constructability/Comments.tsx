@@ -43,7 +43,7 @@ const Comments: React.FC<Props> = ({
     ) : (
       showNoDataText && (
         <FormText>
-          <em>Ei huomautuksia.</em>
+          <em>Tidak ada catatan.</em>
         </FormText>
       )
     )}

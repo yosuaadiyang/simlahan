@@ -109,12 +109,12 @@ const NewRentBasisPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    setPageTitle("Uusi vuokrausperiaate");
+    setPageTitle("Prinsip sewa baru");
     dispatch(receiveIsSaveClicked(false));
     dispatch(
       receiveTopNavigationSettings({
         linkUrl: getRouteById(Routes.RENT_BASIS),
-        pageTitle: "Vuokrausperiaatteet",
+        pageTitle: "Prinsip sewa",
         showSearch: false,
       }),
     );
@@ -213,7 +213,7 @@ const NewRentBasisPage: React.FC = () => {
               showCopyButton={true}
             />
           }
-          infoComponent={<h1>Uusi vuokrausperuste</h1>}
+          infoComponent={<h1>Prinsip sewa baru</h1>}
           onBack={handleBack}
         />
       </PageNavigationWrapper>

@@ -181,7 +181,7 @@ function* createPlotApplicationSaga({
         yield put(hideEditMode());
         displayUIMessage({
           title: "",
-          body: "Hakemus luotu",
+          body: "Permohonan dibuat",
         });
         break;
 
@@ -205,7 +205,7 @@ function* editPlotApplicationSaga({
     displayUIMessage(
       {
         title: "",
-        body: "Hakemuksen tallennus epäonnistui",
+        body: "Permohonan gagal disimpan",
       },
       {
         type: "error",
@@ -240,7 +240,7 @@ function* editPlotApplicationSaga({
         yield put(hideEditMode());
         displayUIMessage({
           title: "",
-          body: "Hakemus tallennettu",
+          body: "Permohonan disimpan",
         });
         break;
 
@@ -311,7 +311,7 @@ function* fetchApplicationRelatedFormSaga({
         displayUIMessage(
           {
             title: "",
-            body: "Hakemukseen liittyvää lomaketta ei löytynyt!",
+            body: "Formulir terkait permohonan tidak ditemukan!",
           },
           {
             type: "error",
@@ -323,7 +323,7 @@ function* fetchApplicationRelatedFormSaga({
     displayUIMessage(
       {
         title: "",
-        body: "Hakemukseen liittyvää lomaketta ei löytynyt!",
+        body: "Formulir terkait permohonan tidak ditemukan!",
       },
       {
         type: "error",
@@ -383,7 +383,7 @@ function* fetchTargetInfoChecksForPlotSearchSaga({
         displayUIMessage(
           {
             title: "",
-            body: "Hakuun liittyvien hakemusten tietojen lataaminen epäonnistui!",
+            body: "Data permohonan terkait pencarian gagal dimuat!",
           },
           {
             type: "error",
@@ -395,7 +395,7 @@ function* fetchTargetInfoChecksForPlotSearchSaga({
     displayUIMessage(
       {
         title: "",
-        body: "Hakuun liittyvien hakemusten tietojen lataaminen epäonnistui!",
+        body: "Data permohonan terkait pencarian gagal dimuat!",
       },
       {
         type: "error",
@@ -430,7 +430,7 @@ function* uploadMeetingMemoSaga({
 
         displayUIMessage({
           title: "",
-          body: "Kokousmuistio lisätty",
+          body: "Notulen rapat ditambahkan",
         });
         break;
 
@@ -439,7 +439,7 @@ function* uploadMeetingMemoSaga({
         displayUIMessage(
           {
             title: "",
-            body: "Kokousmuistion tallennus epäonnistui",
+            body: "Notulen rapat gagal disimpan",
           },
           {
             type: "error",
@@ -452,7 +452,7 @@ function* uploadMeetingMemoSaga({
     displayUIMessage(
       {
         title: "",
-        body: "Kokousmuistion tallennus epäonnistui",
+        body: "Notulen rapat gagal disimpan",
       },
       {
         type: "error",
@@ -483,7 +483,7 @@ function* deleteMeetingMemoSaga({
 
         displayUIMessage({
           title: "",
-          body: "Kokousmuistio poistettu",
+          body: "Notulen rapat dihapus",
         });
         break;
 
@@ -492,7 +492,7 @@ function* deleteMeetingMemoSaga({
         displayUIMessage(
           {
             title: "",
-            body: "Kokousmuistion poistaminen epäonnistui",
+            body: "Notulen rapat gagal dihapus",
           },
           {
             type: "error",
@@ -505,7 +505,7 @@ function* deleteMeetingMemoSaga({
     displayUIMessage(
       {
         title: "",
-        body: "Kokousmuistion poistaminen epäonnistui",
+        body: "Notulen rapat gagal dihapus",
       },
       {
         type: "error",
@@ -637,14 +637,14 @@ function* batchEditPlotApplicationModelsSaga({
     yield put(hideEditMode());
     displayUIMessage({
       title: "",
-      body: "Käsittelytiedot päivitetty",
+      body: "Data pemrosesan diperbarui",
     });
   } else {
     yield put(receiveBatchInfoCheckEditFailure(errors));
     displayUIMessage(
       {
         title: "",
-        body: `${errorCount} käsittelytiedon päivitys epäonnistui!`,
+        body: `${errorCount} pembaruan data pemrosesan gagal!`,
       },
       {
         type: "error",
@@ -672,7 +672,7 @@ function* createOpeningRecordSaga({
         yield put(showEditMode());
         displayUIMessage({
           title: "",
-          body: "Hakemus avattu",
+          body: "Permohonan dibuka",
         });
         break;
 
@@ -681,7 +681,7 @@ function* createOpeningRecordSaga({
         displayUIMessage(
           {
             title: "",
-            body: "Hakemuksen avaaminen epäonnistui",
+            body: "Pembukaan permohonan gagal",
           },
           {
             type: "error",
@@ -694,7 +694,7 @@ function* createOpeningRecordSaga({
     displayUIMessage(
       {
         title: "",
-        body: "Hakemuksen avaaminen epäonnistui",
+        body: "Pembukaan permohonan gagal",
       },
       {
         type: "error",

@@ -48,7 +48,7 @@ const UserServiceUnitSelectInput: React.FC<Props> = ({
     <form>
       <div className={"form-field"}>
         <FormFieldLabel htmlFor={"userServiceUnitSelect"}>
-          Oma palvelukokonaisuus
+          Unit layanan sendiri
         </FormFieldLabel>
         <div className={"form-field__component"}>
           <div className={"form-field__select"}>
@@ -64,9 +64,9 @@ const UserServiceUnitSelectInput: React.FC<Props> = ({
               id={"userServiceUnitSelect"}
               onBlur={handleChange}
               onChange={handleChange}
-              noOptionsMessage={() => "Ei tuloksia"}
+              noOptionsMessage={() => "Tidak ada hasil"}
               options={options}
-              placeholder={"Valitse..."}
+              placeholder={"Pilih..."}
               value={currentValue}
             />
           </div>

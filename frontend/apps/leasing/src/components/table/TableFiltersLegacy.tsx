@@ -34,12 +34,12 @@ const TableFiltersLegacy = ({
           })}
         >
           {!!filterOptions.length && (
-            <p className="table__filters_filter-wrapper_title">Suodatus</p>
+            <p className="table__filters_filter-wrapper_title">Penyaringan</p>
           )}
           {!!componentToRenderUnderTitle && componentToRenderUnderTitle}
           <CheckboxInput
             checkboxName="lease-type-checkbox"
-            legend="Suodata"
+            legend="Saring"
             onChange={handleFilterChange}
             options={filterOptions}
             selectAllButton={false}

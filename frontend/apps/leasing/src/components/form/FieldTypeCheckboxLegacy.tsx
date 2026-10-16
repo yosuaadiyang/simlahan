@@ -80,7 +80,7 @@ const FieldTypeCheckbox = ({
             onChange={(event) => handleChange(event, !value)}
             value={value}
           />
-          <span>Kyllä</span>
+          <span>Ya</span>
         </label>
       )}
     </fieldset>

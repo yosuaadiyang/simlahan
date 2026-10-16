@@ -93,7 +93,7 @@ const Tenant = ({
               }
             >
               <CollapseHeaderSubtitle>
-                <span>Välillä:</span>
+                <span>Antara:</span>
                 {formatDateRange(
                   get(tenant, "tenant.start_date"),
                   get(tenant, "tenant.end_date"),

@@ -12,15 +12,15 @@ import {
 export const CreditInvoiceOptions = [
   {
     value: CreditInvoiceOptionsEnum.FULL,
-    label: "Koko lasku",
+    label: "Seluruh tagihan",
   },
   {
     value: CreditInvoiceOptionsEnum.RECEIVABLE_TYPE,
-    label: "Koko saamislaji",
+    label: "Seluruh jenis piutang",
   },
   {
     value: CreditInvoiceOptionsEnum.RECEIVABLE_TYPE_AMOUNT,
-    label: "Summa saamislajista",
+    label: "Jumlah per jenis piutang",
   },
 ];
 
@@ -31,15 +31,15 @@ export const CreditInvoiceOptions = [
 export const CreditInvoiceSetOptions = [
   {
     value: CreditInvoiceOptionsEnum.FULL,
-    label: "Koko laskuryhmä",
+    label: "Seluruh kelompok tagihan",
   },
   {
     value: CreditInvoiceOptionsEnum.RECEIVABLE_TYPE,
-    label: "Koko saamislaji",
+    label: "Seluruh jenis piutang",
   },
   {
     value: CreditInvoiceOptionsEnum.RECEIVABLE_TYPE_AMOUNT,
-    label: "Summa saamislajista",
+    label: "Jumlah per jenis piutang",
   },
 ];
 
@@ -50,15 +50,15 @@ export const CreditInvoiceSetOptions = [
 export const SteppedDiscountAmountTypeOptions = [
   {
     value: SteppedDiscountAmountTypes.PERCENTAGE_PER_YEAR,
-    label: "% per vuosi",
+    label: "% per tahun",
   },
   {
     value: SteppedDiscountAmountTypes.PERCENTAGE_PER_6_MONTHS,
-    label: "% per 6 kk",
+    label: "% per 6 bln",
   },
   {
     value: SteppedDiscountAmountTypes.PERCENTAGE_PER_MONTH,
-    label: "% per kuukausi",
+    label: "% per bulan",
   },
 ];
 
@@ -73,7 +73,7 @@ export const oneTimeRentDueDateTypeOptions = [
   },
   {
     value: RentDueDateTypes.CUSTOM,
-    label: "Erikseen määritelty",
+    label: "Ditentukan terpisah",
   },
 ];
 
@@ -82,11 +82,11 @@ export const oneTimeRentDueDateTypeOptions = [
  */
 export const shareBasisOptions = [
   {
-    label: "Laskutusosuus",
+    label: "Porsi tagihan",
     value: "tenant_share",
   },
   {
-    label: "Hallintaosuus",
+    label: "Porsi penguasaan",
     value: "rent_share",
   },
 ];
@@ -98,39 +98,39 @@ export const shareBasisOptions = [
 export const preparationStateFilterOptions = [
   {
     value: "missing_lease_property",
-    label: "Vuokrakohde puuttuu",
+    label: "Objek sewa belum ada",
   },
   {
     value: "missing_lease_area_geometry",
-    label: "Vuokra-alueen geometria puuttuu",
+    label: "Geometri area sewa belum ada",
   },
   {
     value: "missing_tenant",
-    label: "Vuokralainen puuttuu",
+    label: "Penyewa belum ada",
   },
   {
     value: "missing_rent",
-    label: "Vuokra puuttuu",
+    label: "Sewa belum ada",
   },
   {
     value: "missing_decision",
-    label: "Päätös puuttuu",
+    label: "Keputusan belum ada",
   },
   {
     value: "missing_constructability",
-    label: "Rakentamiskelpoisuus puuttuu",
+    label: "Kelayakan bangun belum ada",
   },
   {
     value: "contract_not_signed",
-    label: "Sopimusta ei allekirjoitettu",
+    label: "Kontrak belum ditandatangani",
   },
   {
     value: "rent_not_marked_ready",
-    label: "Vuokraus ei merkitty valmiiksi",
+    label: "Sewa belum ditandai lengkap",
   },
   {
     value: "invoicing_not_started",
-    label: "Laskutus ei käynnistetty",
+    label: "Penagihan belum dimulai",
   },
 ];
 
@@ -189,7 +189,7 @@ export const DEFAULT_SORT_ORDER = TableSortOrder.ASCENDING;
  * Max zoom level to fetch leases for map
  * @const {number}
  */
-export const MAX_ZOOM_LEVEL_TO_FETCH_LEASES = 7;
+export const MAX_ZOOM_LEVEL_TO_FETCH_LEASES = 14;
 
 /**
  * Bounding box for search query

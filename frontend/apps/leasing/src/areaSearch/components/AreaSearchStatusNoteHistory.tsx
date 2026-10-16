@@ -18,14 +18,14 @@ class AreaSearchStatusNoteHistory extends Component<Props> {
       <Collapse
         defaultOpen
         className="AreaSearchStatusNoteHistory"
-        headerTitle="Historia"
+        headerTitle="Riwayat"
       >
         {statusNotes.map((note) => (
           <div
             className="AreaSearchStatusNoteHistory__item"
             key={note.time_stamp}
           >
-            <strong>Käsittelijä: </strong>
+            <strong>Petugas: </strong>
             {getUserFullName(note.preparer)}{" "}
             {formatDate(note.time_stamp, "dd.MM.yyyy H.mm")}
             <p>{note.note}</p>

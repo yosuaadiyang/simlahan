@@ -41,7 +41,9 @@ class ShowMore extends PureComponent<Props, State> {
     }
   };
   getLinkText = () => {
-    return this.state.open ? "Näytä vähemmän" : "Näytä lisää";
+    return this.state.open
+      ? "Tampilkan lebih sedikit"
+      : "Tampilkan lebih banyak";
   };
   handleReadMoreClick = () => {
     this.setState((prevState) => ({

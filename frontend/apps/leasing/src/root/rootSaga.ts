@@ -11,7 +11,6 @@ import commentSaga from "@/comments/saga";
 import contactSaga from "@/contacts/saga";
 import contractFileSaga from "@/contractFile/saga";
 import createCollectionLetterSaga from "@/createCollectionLetter/saga";
-import creditDecisionSaga from "@/creditDecision/saga";
 import districtSaga from "@/district/saga";
 import indexSaga from "@/index/saga";
 import infillDevelopmentSaga from "@/infillDevelopment/saga";
@@ -24,7 +23,6 @@ import leaseSaga from "@/leases/saga";
 import leaseAreaAttachmentSaga from "@/leaseAreaAttachment/saga";
 import leaseInspectionAttachmentSaga from "@/leaseInspectionAttachment/saga";
 import leaseCreateChargeSaga from "@/leaseCreateCharge/saga";
-import leaseholdTransferSaga from "@/leaseholdTransfer/saga";
 import leaseReportsSaga from "@/reports/saga";
 import leaseTypeSaga from "@/leaseType/saga";
 import lessorSaga from "@/lessor/saga";
@@ -34,9 +32,7 @@ import previewInvoicesSaga from "@/previewInvoices/saga";
 import relatedLeaseSaga from "@/relatedLease/saga";
 import rentBasisSaga from "@/rentbasis/saga";
 import rentForPeriodSaga from "@/rentForPeriod/saga";
-import sapInvoicesSaga from "@/sapInvoice/saga";
 import serviceUnitsSaga from "@/serviceUnits/saga";
-import tradeRegisterSaga from "@/tradeRegister/saga";
 import uiDataSaga from "@/uiData/saga";
 import userSaga from "@/users/saga";
 import usersPermissionsSaga from "@/usersPermissions/saga";
@@ -59,7 +55,6 @@ export default function* rootSaga() {
     fork(contactSaga),
     fork(contractFileSaga),
     fork(createCollectionLetterSaga),
-    fork(creditDecisionSaga),
     fork(districtSaga),
     fork(indexSaga),
     fork(infillDevelopmentSaga),
@@ -71,7 +66,6 @@ export default function* rootSaga() {
     fork(leaseSaga),
     fork(leaseAreaAttachmentSaga),
     fork(leaseCreateChargeSaga),
-    fork(leaseholdTransferSaga),
     fork(leaseInspectionAttachmentSaga),
     fork(leaseReportsSaga),
     fork(leaseTypeSaga),
@@ -82,9 +76,7 @@ export default function* rootSaga() {
     fork(relatedLeaseSaga),
     fork(rentBasisSaga),
     fork(rentForPeriodSaga),
-    fork(sapInvoicesSaga),
     fork(serviceUnitsSaga),
-    fork(tradeRegisterSaga),
     fork(uiDataSaga),
     fork(userSaga),
     fork(usersPermissionsSaga),

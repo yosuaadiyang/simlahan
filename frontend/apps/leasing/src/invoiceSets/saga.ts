@@ -69,7 +69,7 @@ function* creditInvoiceSetSaga({
         yield put(receiveInvoiceToCredit(null));
         displayUIMessage({
           title: "",
-          body: "Hyvityslaskut luotu",
+          body: "Nota kredit dibuat",
         });
         break;
 

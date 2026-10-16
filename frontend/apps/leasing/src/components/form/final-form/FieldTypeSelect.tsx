@@ -106,11 +106,11 @@ const FieldTypeSelect = (props: FieldComponentProps): JSX.Element => {
         isLoading={isLoading}
         onBlur={handleBlur}
         onChange={handleChange}
-        noOptionsMessage={() => "Ei tuloksia"}
+        noOptionsMessage={() => "Tidak ada hasil"}
         onInputChange={handleInputChange}
         onMenuOpen={handleMenuOpen}
         options={options}
-        placeholder={placeholder || "Valitse..."}
+        placeholder={placeholder || "Pilih..."}
         value={selectedOption}
       />
     </div>

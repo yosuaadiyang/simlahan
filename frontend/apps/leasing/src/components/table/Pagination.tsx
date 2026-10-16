@@ -143,7 +143,7 @@ const Pagination = ({ activePage, maxPage, onPageClick }: Props) => {
     pages.push(
       <PaginationPrevious
         key="previous"
-        ariaLabel="Edellinen sivu"
+        ariaLabel="Halaman sebelumnya"
         disabled={activePage === 1}
         onClick={onPageClick}
         page={activePage - 1}
@@ -153,7 +153,7 @@ const Pagination = ({ activePage, maxPage, onPageClick }: Props) => {
       <PaginationItem
         key={1}
         active={activePage === 1}
-        ariaLabel="Sivu 1"
+        ariaLabel="Halaman 1"
         disabled={activePage === 1}
         onClick={onPageClick}
         page={1}
@@ -177,7 +177,7 @@ const Pagination = ({ activePage, maxPage, onPageClick }: Props) => {
           <PaginationItem
             key={i}
             active={activePage === i}
-            ariaLabel={`Sivu ${i}`}
+            ariaLabel={`Halaman ${i}`}
             disabled={activePage === i}
             onClick={onPageClick}
             page={i}
@@ -190,7 +190,7 @@ const Pagination = ({ activePage, maxPage, onPageClick }: Props) => {
           <PaginationItem
             key={i}
             active={activePage === i}
-            ariaLabel={`Sivu ${i}`}
+            ariaLabel={`Halaman ${i}`}
             disabled={activePage === i}
             onClick={onPageClick}
             page={i}
@@ -203,7 +203,7 @@ const Pagination = ({ activePage, maxPage, onPageClick }: Props) => {
           <PaginationItem
             key={i}
             active={activePage === i}
-            ariaLabel={`Sivu ${i}`}
+            ariaLabel={`Halaman ${i}`}
             disabled={activePage === i}
             onClick={onPageClick}
             page={i}
@@ -225,7 +225,7 @@ const Pagination = ({ activePage, maxPage, onPageClick }: Props) => {
       <PaginationItem
         key={maxPage}
         active={activePage === maxPage}
-        ariaLabel={`Sivu ${maxPage}`}
+        ariaLabel={`Halaman ${maxPage}`}
         disabled={activePage === maxPage}
         onClick={onPageClick}
         page={maxPage}
@@ -234,7 +234,7 @@ const Pagination = ({ activePage, maxPage, onPageClick }: Props) => {
     pages.push(
       <PaginationNext
         key="next"
-        ariaLabel="Seuraava sivu"
+        ariaLabel="Halaman berikutnya"
         disabled={activePage === maxPage}
         onClick={onPageClick}
         page={activePage + 1}

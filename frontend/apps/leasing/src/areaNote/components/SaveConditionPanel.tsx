@@ -105,11 +105,7 @@ const SaveConditionPanel = forwardRef<SaveConditionPanelHandle, Props>(
               })}
             >
               <div className="area-note-map__save-condition-panel_container">
-                <h2>
-                  {isNew
-                    ? "Luo muistettava ehto"
-                    : "Muokkaa muistettavaa ehtoa"}
-                </h2>
+                <h2>{isNew ? "Buat catatan area" : "Ubah catatan area"}</h2>
 
                 <Row>
                   <Column>
@@ -117,13 +113,13 @@ const SaveConditionPanel = forwardRef<SaveConditionPanelHandle, Props>(
                       className="invisible"
                       htmlFor="area-note__comment"
                     >
-                      Kirjoita huomautus
+                      Tulis catatan
                     </FormFieldLabel>
                     <TextAreaInput
                       className="no-margin"
                       id="area-note__comment"
                       onChange={(e: any) => setNote(e.target.value)}
-                      placeholder="Kirjoita huomautus"
+                      placeholder="Tulis catatan"
                       rows={4}
                       setRefForField={(element: any) => {
                         firstFieldRef.current = element;
@@ -143,14 +139,14 @@ const SaveConditionPanel = forwardRef<SaveConditionPanelHandle, Props>(
                             className={ButtonColors.ALERT}
                             disabled={disableDelete}
                             onClick={handleDelete}
-                            text="Poista"
+                            text="Hapus"
                           />
                         )}
                       </Authorization>
                       <Button
                         className={ButtonColors.SECONDARY}
                         onClick={onCancel}
-                        text="Peruuta"
+                        text="Batal"
                       />
                       {isNew ? (
                         <Authorization
@@ -160,7 +156,7 @@ const SaveConditionPanel = forwardRef<SaveConditionPanelHandle, Props>(
                             className={ButtonColors.SUCCESS}
                             disabled={disableSave}
                             onClick={handleCreate}
-                            text="Luo muistettava ehto"
+                            text="Buat catatan area"
                           />
                         </Authorization>
                       ) : (
@@ -174,7 +170,7 @@ const SaveConditionPanel = forwardRef<SaveConditionPanelHandle, Props>(
                             className={ButtonColors.SUCCESS}
                             disabled={disableSave}
                             onClick={handleEdit}
-                            text="Tallenna"
+                            text="Simpan"
                           />
                         </Authorization>
                       )}

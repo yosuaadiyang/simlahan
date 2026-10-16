@@ -68,17 +68,17 @@ const RentBasisLayer = ({
           };
 
           const identifierText = getPropertyIdentifierString();
-          const popupContent = `<p class='title'><strong>Vuokrausperiaatteet</strong></p>
+          const popupContent = `<p class='title'><strong>Prinsip sewa</strong></p>
             <p><strong>Id:</strong> ${id}</p>
-            <p><strong>Tonttityyppi:</strong> ${getLabelOfOption(plotTypeOptions, plot_type) || "-"}</p>
-            <p><strong>Alkupvm:</strong> ${formatDate(start_date) || "-"}</p>
-            <p><strong>Loppupvm:</strong> ${formatDate(end_date) || "-"}</p>
-            <p><strong>Kiinteistötunnukset:</strong> ${identifierText}</p>
-            <p><strong>Asemakaava:</strong> ${detailed_plan_identifier || "-"}</p>
-            <p><strong>Hallintamuoto:</strong> ${getLabelOfOption(managementOptions, management) || "-"}</p>
-            <p><strong>Rahoitusmuoto:</strong> ${getLabelOfOption(financingOptions, financing) || "-"}</p>
-            <p><strong>Vuokraoikeuspäättyy:</strong> ${formatDate(lease_rights_end_date) || "-"}</p>
-            <p><strong>Indeksi:</strong> ${getLabelOfOption(indexOptions, index) || "-"}</p>`;
+            <p><strong>Jenis kavling:</strong> ${getLabelOfOption(plotTypeOptions, plot_type) || "-"}</p>
+            <p><strong>Tgl mulai:</strong> ${formatDate(start_date) || "-"}</p>
+            <p><strong>Tgl akhir:</strong> ${formatDate(end_date) || "-"}</p>
+            <p><strong>Pengenal bidang:</strong> ${identifierText}</p>
+            <p><strong>Rencana detail:</strong> ${detailed_plan_identifier || "-"}</p>
+            <p><strong>Bentuk pengelolaan:</strong> ${getLabelOfOption(managementOptions, management) || "-"}</p>
+            <p><strong>Bentuk pembiayaan:</strong> ${getLabelOfOption(financingOptions, financing) || "-"}</p>
+            <p><strong>Hak sewa berakhir:</strong> ${formatDate(lease_rights_end_date) || "-"}</p>
+            <p><strong>Indeks:</strong> ${getLabelOfOption(indexOptions, index) || "-"}</p>`;
           layer.bindPopup(popupContent);
         }
 

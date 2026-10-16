@@ -12,15 +12,6 @@
       "name": "Debug leasing",
       "url": "http://localhost:3000",
       "webRoot": "${workspaceFolder}/apps/leasing/src",
-    },
-        {
-      // Launches Chrome browser, where your actions can be detected in VSCode internal debugger.
-      // Before this, you need to run the frontend in terminal with `yarn start`.
-      "type": "chrome",
-      "request": "launch",
-      "name": "Debug landuse",
-      "url": "http://localhost:3000",
-      "webRoot": "${workspaceFolder}/apps/landuse/src",
     }
   ]
 }

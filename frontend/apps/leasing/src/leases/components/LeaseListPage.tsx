@@ -107,7 +107,7 @@ const VisualizationTypes = {
 };
 
 const PreparerOwnLeasesOption = {
-  label: "Omat vuokraukset",
+  label: "Sewa saya",
   value: "preparers_own_leases",
 };
 
@@ -220,11 +220,11 @@ const LeaseListPage: React.FC = () => {
   }, [queryParams]);
 
   useEffect(() => {
-    setPageTitle("Vuokraukset");
+    setPageTitle("Sewa");
     dispatch(
       receiveTopNavigationSettings({
         linkUrl: getRouteById(Routes.LEASES),
-        pageTitle: "Vuokraukset",
+        pageTitle: "Sewa",
         showSearch: false,
       }),
     );
@@ -616,7 +616,7 @@ const LeaseListPage: React.FC = () => {
       <Button
         className="lease-list-expand-button"
         aria-label={
-          isExpanded ? "Piilota rivin lisätiedot" : "Näytä rivin lisätiedot"
+          isExpanded ? "Sembunyikan detail baris" : "Tampilkan detail baris"
         }
         aria-expanded={isExpanded}
         variant={ButtonVariant.Supplementary}
@@ -949,7 +949,7 @@ const LeaseListPage: React.FC = () => {
                 >
                   <span>
                     <IconScrollContent />
-                    &nbsp;Taulukko
+                    &nbsp;Tabel
                   </span>
                 </Tabs.Tab>
                 <Tabs.Tab
@@ -959,7 +959,7 @@ const LeaseListPage: React.FC = () => {
                 >
                   <span>
                     <IconMap />
-                    &nbsp;Kartta
+                    &nbsp;Peta
                   </span>
                 </Tabs.Tab>
               </Tabs.TabList>
@@ -971,7 +971,7 @@ const LeaseListPage: React.FC = () => {
                     </LoaderWrapper>
                   )}
                   <span>
-                    {isFetching ? "Ladataan..." : `Löytyi ${count} kpl`}
+                    {isFetching ? "Memuat..." : `Ditemukan ${count} kpl`}
                   </span>
                   <Table
                     ariaLabelSortButtonUnset="Not sorted"
@@ -989,7 +989,7 @@ const LeaseListPage: React.FC = () => {
                     dense
                   />
                   <Pagination
-                    language="fi"
+                    language="en"
                     onChange={(event, index) => {
                       event.preventDefault();
                       handlePageClick(index + 1);
@@ -997,7 +997,7 @@ const LeaseListPage: React.FC = () => {
                     pageCount={maxPage || 1}
                     pageHref={() => "#"}
                     pageIndex={activePage - 1}
-                    paginationAriaLabel={`Sivuvalitsin, ${activePage} / ${maxPage}`}
+                    paginationAriaLabel={`Pemilih halaman, ${activePage} / ${maxPage}`}
                     siblingCount={5}
                   />
                 </>

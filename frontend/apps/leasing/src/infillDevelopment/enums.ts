@@ -21,15 +21,15 @@ export const InfillDevelopmentCompensationFieldPaths = {
  * @enum {string}
  */
 export const InfillDevelopmentCompensationFieldTitles = {
-  BASIC_INFO: "Perustiedot",
-  DETAILED_PLAN_IDENTIFIER: "Asemakaavan nro.",
-  LEASE_CONTRACT_CHANGE_DATE: "Vuokrasopimuksen muutospvm",
-  MAP: "Kartta",
-  NAME: "Hankkeen nimi",
-  NOTE: "Huomautus",
-  REFERENCE_NUMBER: "Diaarinumero",
-  STATE: "Neuvotteluvaihe",
-  USER: "Vastuuhenkilö",
+  BASIC_INFO: "Data dasar",
+  DETAILED_PLAN_IDENTIFIER: "No. rencana detail",
+  LEASE_CONTRACT_CHANGE_DATE: "Tgl perubahan kontrak sewa",
+  MAP: "Peta",
+  NAME: "Nama proyek",
+  NOTE: "Catatan",
+  REFERENCE_NUMBER: "Nomor agenda",
+  STATE: "Tahap negosiasi",
+  USER: "Penanggung jawab",
 };
 
 /**
@@ -66,18 +66,18 @@ export const InfillDevelopmentCompensationLeasesFieldPaths = {
  * @enum {string}
  */
 export const InfillDevelopmentCompensationLeasesFieldTitles = {
-  INFILL_DEVELOPMENT_COMPENSATION_LEASES: "Vuokraukset",
-  COMPENSATION_INVESTMENT_AMOUNT: "Korvausinvestoinnit",
-  DISCOUNT_IN_RENT: "Vuokranalennus",
-  INCREASE_IN_VALUE: "Arvonnousu (alv 0%)",
-  LEASE: "Vuokraustunnus",
-  MONETARY_COMPENSATION_AMOUNT: "Rahakorvaus",
-  NOTE: "Huomautus",
-  PAID_DATE: "Maksettu",
-  PART_OF_THE_INCREASE_IN_VALUE: "Osuus arvonnoususta",
-  SENT_TO_SAP_DATE: "Maksu lähetetty SAP",
-  TOTAL_COMPENSATION: "Korvaus yhteensä",
-  YEAR: "Arvioitu maksuvuosi",
+  INFILL_DEVELOPMENT_COMPENSATION_LEASES: "Sewa",
+  COMPENSATION_INVESTMENT_AMOUNT: "Investasi kompensasi",
+  DISCOUNT_IN_RENT: "Potongan sewa",
+  INCREASE_IN_VALUE: "Kenaikan nilai (PPN 0%)",
+  LEASE: "Pengenal sewa",
+  MONETARY_COMPENSATION_AMOUNT: "Kompensasi uang",
+  NOTE: "Catatan",
+  PAID_DATE: "Dibayar",
+  PART_OF_THE_INCREASE_IN_VALUE: "Porsi kenaikan nilai",
+  SENT_TO_SAP_DATE: "Pembayaran dikirim ke SAP",
+  TOTAL_COMPENSATION: "Total kompensasi",
+  YEAR: "Perkiraan tahun pembayaran",
 };
 
 /**
@@ -103,11 +103,11 @@ export const InfillDevelopmentCompensationLeaseDecisionsFieldPaths = {
  * @enum {string}
  */
 export const InfillDevelopmentCompensationLeaseDecisionsFieldTitles = {
-  DECISIONS: "Korvauksen päätös",
-  DECISION_DATE: "Pvm",
-  DECISION_MAKER: "Päättäjä",
-  REFERENCE_NUMBER: "Diaarinumero",
-  SECTION: "Pykälä",
+  DECISIONS: "Keputusan kompensasi",
+  DECISION_DATE: "Tgl",
+  DECISION_MAKER: "Pengambil keputusan",
+  REFERENCE_NUMBER: "Nomor agenda",
+  SECTION: "Pasal",
 };
 
 /**
@@ -132,8 +132,8 @@ export const InfillDevelopmentCompensationLeaseIntendedUsesFieldPaths = {
  * @enum {string}
  */
 export const InfillDevelopmentCompensationLeaseIntendedUsesFieldTitles = {
-  INTENDED_USES: "Käyttötarkoitus",
-  AMOUNT_PER_FLOOR_M2: "€ / k-m²",
+  INTENDED_USES: "Peruntukan",
+  AMOUNT_PER_FLOOR_M2: "Rp / m² lantai",
   FLOOR_M2: "k-m²",
-  INTENDED_USE: "Käyttötarkoitus",
+  INTENDED_USE: "Peruntukan",
 };

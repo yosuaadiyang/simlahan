@@ -103,7 +103,7 @@ class AreaSearchApplicationCreatePage extends Component<
       receiveSingleAreaSearch,
       showEditMode,
     } = this.props;
-    setPageTitle("Uusi aluehakemus");
+    setPageTitle("Permohonan area baru");
     receiveSingleAreaSearch(null);
     showEditMode();
     fetchAttributes();
@@ -266,11 +266,11 @@ class AreaSearchApplicationCreatePage extends Component<
                 showCommentButton={false}
                 showCopyButton={false}
                 saveButtonText={
-                  !currentAreaSearch ? "Jatka lomakkeen täyttöön" : "Tallenna"
+                  !currentAreaSearch ? "Lanjutkan mengisi formulir" : "Simpan"
                 }
               />
             }
-            infoComponent={<h1>Uusi aluehakemus</h1>}
+            infoComponent={<h1>Permohonan area baru</h1>}
             onBack={this.handleBack}
           />
           <Tabs
@@ -278,13 +278,13 @@ class AreaSearchApplicationCreatePage extends Component<
             isEditMode={true}
             tabs={[
               {
-                label: "Aluehaun määritys",
+                label: "Penetapan pencarian area",
                 allow: true,
                 isDirty: isSpecsFormDirty,
                 hasError: isSaveClicked && !isSpecsFormValid,
               },
               {
-                label: "Hakemus",
+                label: "Permohonan",
                 allow: !!currentAreaSearch,
                 isDirty: isApplicationFormDirty,
                 hasError:

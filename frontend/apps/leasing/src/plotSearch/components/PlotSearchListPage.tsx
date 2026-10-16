@@ -60,12 +60,12 @@ const VisualizationTypes = {
 const visualizationTypeOptions = [
   {
     value: VisualizationTypes.TABLE,
-    label: "Taulukko",
+    label: "Tabel",
     icon: <TableIcon className="icon-medium" />,
   },
   {
     value: VisualizationTypes.MAP,
-    label: "Kartta",
+    label: "Peta",
     icon: <MapIcon className="icon-medium" />,
   },
 ];
@@ -113,10 +113,10 @@ class PlotSearchListPage extends PureComponent<Props & WithRouterProps, State> {
 
   componentDidMount() {
     const { receiveTopNavigationSettings } = this.props;
-    setPageTitle("Tonttihaut");
+    setPageTitle("Pencarian kavling");
     receiveTopNavigationSettings({
       linkUrl: getRouteById(Routes.PLOT_SEARCH),
-      pageTitle: "Tonttihaut",
+      pageTitle: "Pencarian kavling",
       showSearch: false,
     });
     this.search();
@@ -142,42 +142,42 @@ class PlotSearchListPage extends PureComponent<Props & WithRouterProps, State> {
     const stageOptions = getFieldOptions(plotSearchAttributes, "stage");
     columns.push({
       key: "name",
-      text: "Haku",
+      text: "Pencarian",
       sortable: false,
     });
     columns.push({
       key: "type",
-      text: "Hakutyyppi",
+      text: "Jenis pencarian",
       sortable: false,
       renderer: (val) => getLabelOfOption(typeOptions, val),
     });
     columns.push({
       key: "subtype",
-      text: "Haun alatyyppi",
+      text: "Subjenis pencarian",
       sortable: false,
       renderer: (val) => getLabelOfOption(subtypeOptions, val),
     });
     columns.push({
       key: "stage",
-      text: "Haun vaihe",
+      text: "Tahap pencarian",
       sortable: false,
       renderer: (val) => getLabelOfOption(stageOptions, val),
     });
     columns.push({
       key: "begin_at",
-      text: "Alkupvm",
+      text: "Tgl mulai",
       sortable: false,
       renderer: (val) => formatDate(val),
     });
     columns.push({
       key: "end_at",
-      text: "Loppupvm",
+      text: "Tgl akhir",
       sortable: false,
       renderer: (val) => formatDate(val),
     });
     columns.push({
       key: "latest_decicion",
-      text: "Viimeisin päätös",
+      text: "Keputusan terakhir",
       sortable: false,
       renderer: (id) =>
         id ? (
@@ -186,7 +186,7 @@ class PlotSearchListPage extends PureComponent<Props & WithRouterProps, State> {
     });
     columns.push({
       key: "id",
-      text: "Kohteen tunnus",
+      text: "Pengenal objek",
       sortable: false,
       renderer: (id) =>
         id ? (
@@ -415,7 +415,7 @@ class PlotSearchListPage extends PureComponent<Props & WithRouterProps, State> {
             >
               <AddButtonSecondary
                 className="no-top-margin"
-                label="Luo tonttihaku"
+                label="Buat pencarian kavling"
                 onClick={this.openModalhandleCreatePlotSearch}
               />
             </Authorization>
@@ -433,7 +433,7 @@ class PlotSearchListPage extends PureComponent<Props & WithRouterProps, State> {
         <TableFilterWrapper
           filterComponent={
             <TableFiltersLegacy
-              amountText={isFetching ? "Ladataan..." : `Löytyi ${count} kpl`}
+              amountText={isFetching ? "Memuat..." : `Ditemukan ${count} kpl`}
               filterOptions={plotSearchStateFilterOptions}
               filterValue={plotSearchStates}
               onFilterChange={this.handlePlotSearchStatesChange}
@@ -442,7 +442,7 @@ class PlotSearchListPage extends PureComponent<Props & WithRouterProps, State> {
           visualizationComponent={
             <VisualisationTypeWrapper>
               <IconRadioButtons
-                legend={"Kartta/taulukko"}
+                legend={"Peta/tabel"}
                 onChange={this.handleVisualizationTypeChange}
                 options={visualizationTypeOptions}
                 radioName="visualization-type-radio"

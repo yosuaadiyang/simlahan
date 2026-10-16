@@ -82,11 +82,11 @@ const RentBasisListPage: React.FC = () => {
   );
 
   useEffect(() => {
-    setPageTitle("Vuokrausperiaatteet");
+    setPageTitle("Prinsip sewa");
     dispatch(
       receiveTopNavigationSettings({
         linkUrl: getRouteById(Routes.RENT_BASIS),
-        pageTitle: "Vuokrausperiaatteet",
+        pageTitle: "Prinsip sewa",
         showSearch: false,
       }),
     );
@@ -226,7 +226,7 @@ const RentBasisListPage: React.FC = () => {
       columns.push({
         key: "property_identifiers",
         sortable: false,
-        text: "Kohteen tunnus",
+        text: "Pengenal objek",
       });
     }
 
@@ -238,7 +238,7 @@ const RentBasisListPage: React.FC = () => {
     ) {
       columns.push({
         key: "build_permission_types",
-        text: "Pääkäyttötarkoitus",
+        text: "Peruntukan utama",
         renderer: (val) =>
           val ? getLabelOfOption(buildPermissionTypeOptions, val) : "-",
         sortable: false,
@@ -250,7 +250,7 @@ const RentBasisListPage: React.FC = () => {
     ) {
       columns.push({
         key: "start_date",
-        text: "Alkupvm",
+        text: "Tgl mulai",
         renderer: (val) => formatDate(val) || "-",
       });
     }
@@ -260,7 +260,7 @@ const RentBasisListPage: React.FC = () => {
     ) {
       columns.push({
         key: "end_date",
-        text: "Loppupvm",
+        text: "Tgl akhir",
         renderer: (val) => formatDate(val) || "-",
       });
     }
@@ -323,7 +323,7 @@ const RentBasisListPage: React.FC = () => {
               >
                 <AddButtonSecondary
                   className="no-top-margin"
-                  label="Luo vuokrausperuste"
+                  label="Buat prinsip sewa"
                   onClick={handleCreateButtonClick}
                 />
               </Authorization>
@@ -339,7 +339,7 @@ const RentBasisListPage: React.FC = () => {
           </Row>
 
           <TableFiltersLegacy
-            amountText={isFetching ? "Ladataan..." : `Löytyi ${count} kpl`}
+            amountText={isFetching ? "Memuat..." : `Ditemukan ${count} kpl`}
             filterOptions={[]}
             filterValue={[]}
           />

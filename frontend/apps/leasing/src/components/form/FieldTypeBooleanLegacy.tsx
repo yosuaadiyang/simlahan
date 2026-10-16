@@ -21,11 +21,11 @@ const FieldTypeBoolean = ({
   const options = [
     {
       value: false,
-      label: "Ei",
+      label: "Tidak",
     },
     {
       value: true,
-      label: "Kyllä",
+      label: "Ya",
     },
   ];
 

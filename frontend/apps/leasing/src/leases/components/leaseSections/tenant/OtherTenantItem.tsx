@@ -88,7 +88,7 @@ const OtherTenantItem = ({
               }
             >
               <CollapseHeaderSubtitle>
-                <span>Välillä:</span>
+                <span>Antara:</span>
                 {formatDateRange(tenant.start_date, tenant.end_date) || "-"}
               </CollapseHeaderSubtitle>
             </Authorization>
@@ -192,7 +192,7 @@ const OtherTenantItem = ({
         )}
       >
         <>
-          <SubTitle>Asiakkaan tiedot</SubTitle>
+          <SubTitle>Data kontak</SubTitle>
           <ContactTemplate contact={contact} />
         </>
       </Authorization>

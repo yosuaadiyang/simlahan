@@ -46,7 +46,7 @@ export const getInvoiceLabel = (
       invoice.billing_period_start_date,
       invoice.billing_period_end_date,
     ),
-    invoice.billed_amount != null ? `${invoice.billed_amount} €` : null,
+    invoice.billed_amount != null ? `Rp ${invoice.billed_amount}` : null,
     invoice.recipient.name,
   ].filter(Boolean);
   return parts.join(" · ");

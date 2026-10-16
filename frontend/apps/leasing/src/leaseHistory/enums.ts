@@ -2,9 +2,9 @@
  * Lease field titles enumerable.
  */
 export const LeaseHistoryItemTypes = {
-  PLOTSEARCH: "Haku",
-  PLOT_APPLICATION: "Hakemus",
-  AREA_SEARCH: "Aluehakemus",
+  PLOTSEARCH: "Pencarian",
+  PLOT_APPLICATION: "Permohonan",
+  AREA_SEARCH: "Permohonan area",
 };
 
 /**

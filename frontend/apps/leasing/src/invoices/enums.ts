@@ -71,33 +71,33 @@ export const InvoiceFieldPaths = {
  * @enum {string}
  */
 export const InvoiceFieldTitles = {
-  ADJUSTED_DUE_DATE: "Muutettu eräpäivä",
-  BILLED_AMOUNT: "Laskutettu määrä",
-  BILLING_PERIOD: "Laskutuskausi",
-  BILLING_PERIOD_END_DATE: "Laskutuskausi loppupvm",
-  BILLING_PERIOD_START_DATE: "Laskutuskausi alkupvm",
-  COLLECTION_CHARGE: "Perintäkulu",
-  CREDIT_INVOICES: "Hyvityslaskut",
-  CREDITED_INVOICE: "Hyvitetty lasku",
-  DELIVERY_METHOD: "E vai paperilasku",
-  DUE_DATE: "Eräpäivä",
-  INTEREST_INVOICE_FOR: "Korkolasku laskulle",
-  INVOICING_DATE: "Laskutuspvm",
-  INVOICESET: "Laskuryhmät",
-  LEASE: "Vuokraus",
-  NOTES: "Tiedote",
-  NUMBER: "Laskunumero",
-  OUTSTANDING_AMOUNT: "Maksamaton määrä",
-  PAYMENT_NOTIFICATION_DATE: "Maksukehotuspvm",
-  PAYMENT_NOTIFICATION_CATALOG_DATE: "Maksukehotus luettelo",
-  POSTPONE_DATE: "Lykkäyspvm",
-  RECIPIENT: "Laskunsaaja",
-  SAP_ID: "SAP numero",
-  SENT_TO_SAP_AT: "Lähetetty SAP:iin",
-  SHARE: "Laskun osuus",
-  STATE: "Laskun tila",
-  TYPE: "Laskun tyyppi",
-  TOTAL_AMOUNT: "Laskun pääoma",
+  ADJUSTED_DUE_DATE: "Jatuh tempo diubah",
+  BILLED_AMOUNT: "Jumlah ditagih",
+  BILLING_PERIOD: "Periode tagihan",
+  BILLING_PERIOD_END_DATE: "Periode tagihan tgl akhir",
+  BILLING_PERIOD_START_DATE: "Periode tagihan tgl mulai",
+  COLLECTION_CHARGE: "Biaya penagihan",
+  CREDIT_INVOICES: "Nota kredit",
+  CREDITED_INVOICE: "Tagihan yang dikreditkan",
+  DELIVERY_METHOD: "Tagihan elektronik atau kertas",
+  DUE_DATE: "Jatuh tempo",
+  INTEREST_INVOICE_FOR: "Tagihan bunga untuk tagihan",
+  INVOICING_DATE: "Tgl penagihan",
+  INVOICESET: "Kelompok tagihan",
+  LEASE: "Sewa",
+  NOTES: "Pengumuman",
+  NUMBER: "Nomor tagihan",
+  OUTSTANDING_AMOUNT: "Jumlah belum dibayar",
+  PAYMENT_NOTIFICATION_DATE: "Tgl pemberitahuan pembayaran",
+  PAYMENT_NOTIFICATION_CATALOG_DATE: "Daftar pemberitahuan pembayaran",
+  POSTPONE_DATE: "Tgl penundaan",
+  RECIPIENT: "Penerima tagihan",
+  SAP_ID: "Nomor SAP",
+  SENT_TO_SAP_AT: "Dikirim ke SAP",
+  SHARE: "Porsi tagihan",
+  STATE: "Status tagihan",
+  TYPE: "Jenis tagihan",
+  TOTAL_AMOUNT: "Pokok tagihan",
 };
 
 /**
@@ -118,10 +118,10 @@ export const InvoiceCreditInvoicesFieldPaths = {
  * @enum {string}
  */
 export const InvoiceCreditInvoicesFieldTitles = {
-  CREDIT_INVOICES: "Hyvityslaskut",
-  DUE_DATE: "Eräpäivä",
-  NUMBER: "Laskunumero",
-  TOTAL_AMOUNT: "Summa",
+  CREDIT_INVOICES: "Nota kredit",
+  DUE_DATE: "Jatuh tempo",
+  NUMBER: "Nomor tagihan",
+  TOTAL_AMOUNT: "Jumlah",
 };
 
 /**
@@ -142,10 +142,10 @@ export const InvoiceInterestInvoicesFieldPaths = {
  * @enum {string}
  */
 export const InvoiceInterestInvoicesFieldTitles = {
-  INTEREST_INVOICES: "Korkolaskut",
-  DUE_DATE: "Eräpäivä",
-  NUMBER: "Laskunumero",
-  TOTAL_AMOUNT: "Summa",
+  INTEREST_INVOICES: "Tagihan bunga",
+  DUE_DATE: "Jatuh tempo",
+  NUMBER: "Nomor tagihan",
+  TOTAL_AMOUNT: "Jumlah",
 };
 
 /**
@@ -165,9 +165,9 @@ export const InvoicePaymentsFieldPaths = {
  * @enum {string}
  */
 export const InvoicePaymentsFieldTitles = {
-  PAYMENTS: "Maksut",
-  PAID_AMOUNT: "Maksettu määrä (alviton)",
-  PAID_DATE: "Maksettu pvm",
+  PAYMENTS: "Pembayaran",
+  PAID_AMOUNT: "Jumlah dibayar (tanpa PPN)",
+  PAID_DATE: "Tgl dibayar",
 };
 
 /**
@@ -191,12 +191,12 @@ export const InvoiceRowsFieldPaths = {
  * @enum {string}
  */
 export const InvoiceRowsFieldTitles = {
-  ROWS: "Erittely",
-  AMOUNT: "Määrä (alviton)",
-  BILLING_PERIOD_END_DATE: "Laskutuskauden loppupvm",
-  BILLING_PERIOD_START_DATE: "Laskutuskauden alkupvm",
-  DESCRIPTION: "Selite",
-  SHARE_BASIS: "Laskuosuuden jakaja",
-  RECEIVABLE_TYPE: "Saamislaji",
-  TENANT: "Vuokralainen",
+  ROWS: "Rincian",
+  AMOUNT: "Jumlah (tanpa PPN)",
+  BILLING_PERIOD_END_DATE: "Tgl akhir periode tagihan",
+  BILLING_PERIOD_START_DATE: "Tgl mulai periode tagihan",
+  DESCRIPTION: "Keterangan",
+  SHARE_BASIS: "Penyebut porsi tagihan",
+  RECEIVABLE_TYPE: "Jenis piutang",
+  TENANT: "Penyewa",
 };

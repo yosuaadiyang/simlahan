@@ -128,7 +128,7 @@ class PlotApplicationsPage extends Component<Props & WithRouterProps, State> {
     receiveIsSaveClicked(false);
     receiveTopNavigationSettings({
       linkUrl: getRouteById(Routes.PLOT_APPLICATIONS),
-      pageTitle: "Tonttihakemukset",
+      pageTitle: "Permohonan kavling",
       showSearch: true,
     });
 
@@ -139,7 +139,7 @@ class PlotApplicationsPage extends Component<Props & WithRouterProps, State> {
     }
 
     fetchPlotSearchList();
-    setPageTitle("Uusi hakemus");
+    setPageTitle("Permohonan baru");
   }
 
   handleShowEditMode = () => {
@@ -387,13 +387,13 @@ class PlotApplicationsPage extends Component<Props & WithRouterProps, State> {
             isEditMode={true}
             tabs={[
               {
-                label: "Hakemus",
+                label: "Permohonan",
                 allow: true,
                 isDirty: isApplicationFormDirty,
                 hasError: isSaveClicked && !isApplicationFormValid,
               },
               {
-                label: "Muutoshistoria",
+                label: "Riwayat perubahan",
                 allow: true,
               },
             ]}
@@ -409,7 +409,7 @@ class PlotApplicationsPage extends Component<Props & WithRouterProps, State> {
             </TabPane>
 
             <TabPane>
-              <ContentContainer>{"Muutoshistoria"}</ContentContainer>
+              <ContentContainer>{"Riwayat perubahan"}</ContentContainer>
             </TabPane>
           </TabContent>
         </PageContainer>

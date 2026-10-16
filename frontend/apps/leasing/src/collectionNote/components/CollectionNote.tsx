@@ -187,7 +187,7 @@ const CollectionNoteItem: React.FC<Props> = ({
                   >
                     {CollectionNoteFieldTitles.ENTIRE_LEASE}
                   </FormTextTitle>
-                  <FormText>{note.entire_lease ? "Kyllä" : "Ei"}</FormText>
+                  <FormText>{note.entire_lease ? "Ya" : "Tidak"}</FormText>
                 </>
               </Authorization>
             </Column>
@@ -269,7 +269,7 @@ const CollectionNoteItem: React.FC<Props> = ({
             className="position-topright"
             disabled={!enableEdit}
             onClick={handleEdit}
-            title="Muokkaa"
+            title="Ubah"
           />
         </Authorization>
       </Row>
@@ -361,7 +361,7 @@ const CollectionNoteItem: React.FC<Props> = ({
                   <Column small={3} large={2}>
                     <FormText>
                       {invoice.billed_amount != null
-                        ? `${invoice.billed_amount} €`
+                        ? `Rp ${invoice.billed_amount}`
                         : "-"}
                     </FormText>
                   </Column>

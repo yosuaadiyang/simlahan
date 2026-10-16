@@ -1,113 +1,45 @@
-import { useEffect, useCallback, useMemo } from "react";
-import { useAppDispatch, useAppSelector } from "@/root/hooks";
-import {
-  useApiTokens,
-  useOidcClient,
-  useApiTokensClientTracking,
-  isApiTokensUpdatedSignal,
-  isApiTokensRemovedSignal,
-  isApiTokensRenewalStartedSignal,
-  useAuthenticatedUser,
-} from "hds-react";
-import { setRedirectUrlToSessionStorage } from "@/util/storage";
-import { Routes, getRouteById } from "@/root/routes";
-import {
-  clearApiToken,
-  clearUser,
-  userFound,
-  receiveApiToken,
-} from "./actions";
+import { useCallback, useEffect, useState } from "react";
+import { useAppSelector } from "@/root/hooks";
 import { getApiToken, getLoggedInUser } from "./selectors";
-import { apiTokenKeyName } from "@/auth/constants";
+import {
+  hasStoredSession,
+  login as loginRequest,
+  logout as logoutRequest,
+  restoreSession,
+} from "./session";
 
 const useAuth = () => {
-  const { login: oidcLogin, logout: oidcLogout } = useOidcClient();
-  const authenticatedUser = useAuthenticatedUser();
-  const dispatch = useAppDispatch();
-  const [apiTokensClientSignal, apiTokensClientSignalReset] =
-    useApiTokensClientTracking();
-  const { getStoredApiTokens } = useApiTokens();
-
-  const reduxUser = useAppSelector(getLoggedInUser);
-  const reduxApiToken = useAppSelector(getApiToken);
-
-  // Sync user updates
-  useEffect(() => {
-    if (authenticatedUser) {
-      const isUserEqual =
-        JSON.stringify(authenticatedUser) === JSON.stringify(reduxUser);
-      if (!reduxUser || !isUserEqual) dispatch(userFound(authenticatedUser));
-    } else {
-      if (reduxApiToken) dispatch(clearApiToken());
-      if (reduxUser) dispatch(clearUser());
-    }
-  }, [authenticatedUser, dispatch, reduxApiToken, reduxUser]);
-
-  // Initial sync for apiToken
-  useEffect(() => {
-    const [_error, apiToken] = getStoredApiTokens();
-    if (apiToken) {
-      dispatch(receiveApiToken(apiToken));
-    }
-  }, [dispatch, getStoredApiTokens]);
-
-  // Sync apiToken updates
-  useEffect(() => {
-    // Signal call order
-    // 1. Always called in the renew cycle, does not indicate itention to only remove
-    if (isApiTokensRemovedSignal(apiTokensClientSignal)) {
-      // Placeholder for future use
-    }
-    // 2.
-    if (isApiTokensRenewalStartedSignal(apiTokensClientSignal)) {
-      // Placeholder for future use
-    }
-    // 3.
-    if (isApiTokensUpdatedSignal(apiTokensClientSignal)) {
-      const [_error, apiToken] = getStoredApiTokens();
-      if (apiToken && apiToken?.[apiTokenKeyName] !== reduxApiToken) {
-        dispatch(receiveApiToken(apiToken));
-      }
-    }
-
-    return apiTokensClientSignalReset;
-  }, [
-    apiTokensClientSignal,
-    apiTokensClientSignalReset,
-    getStoredApiTokens,
-    dispatch,
-    reduxApiToken,
-  ]);
-
-  const loggedIn = Boolean(reduxUser) && Boolean(reduxApiToken);
-
-  const determineRedirectPath = (redirectPath: string): string => {
-    if (!redirectPath || redirectPath.startsWith("/callback")) {
-      return getRouteById(Routes.LEASES);
-    }
-    return redirectPath;
-  };
-
-  const login = useCallback(
-    (redirectPath: string) => {
-      // avoid setting redirectPath to `/callback`, which could happen if there was an error during login
-      // and user returns to the callback url with error, and then tries to log in again
-      const finalRedirectPath = determineRedirectPath(redirectPath);
-      setRedirectUrlToSessionStorage(finalRedirectPath);
-      oidcLogin();
-    },
-    [oidcLogin],
+  const user = useAppSelector(getLoggedInUser);
+  const apiToken = useAppSelector(getApiToken);
+  const [isRestoring, setIsRestoring] = useState<boolean>(
+    () => !user && hasStoredSession(),
   );
 
-  const logout = useCallback(() => {
-    dispatch(clearApiToken());
-    dispatch(clearUser());
-    oidcLogout();
-  }, [oidcLogout, dispatch]);
+  useEffect(() => {
+    let cancelled = false;
+    if (!user && hasStoredSession()) {
+      setIsRestoring(true);
+      restoreSession().finally(() => {
+        if (!cancelled) setIsRestoring(false);
+      });
+    }
+    return () => {
+      cancelled = true;
+    };
+    // Hanya saat aplikasi pertama kali dimuat.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const login = useCallback(
+    (username: string, password: string) => loginRequest(username, password),
+    [],
+  );
+  const logout = useCallback(() => logoutRequest(), []);
 
   return {
-    loggedIn,
-    authenticatedUser,
+    loggedIn: Boolean(user) && Boolean(apiToken),
+    isRestoring,
+    authenticatedUser: user,
     login,
     logout,
   };

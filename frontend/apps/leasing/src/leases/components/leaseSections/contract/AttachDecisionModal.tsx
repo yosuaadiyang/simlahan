@@ -135,11 +135,11 @@ const AttachDecisionModal: React.FC<Props> = ({
   return (
     <Modal
       className="modal-autoheight"
-      title="Liitä vuokrauksiin"
+      title="Kaitkan ke sewa"
       isOpen={isOpen}
       onClose={onClose}
     >
-      <FormText>Valitse vuokratunnukset</FormText>
+      <FormText>Pilih pengenal sewa</FormText>
       <DualListBox
         icons={{
           moveToAvailable: "<",
@@ -154,8 +154,8 @@ const AttachDecisionModal: React.FC<Props> = ({
           selected: filterSelected,
         }}
         lang={{
-          availableFilterPlaceholder: "Hae vuokratunnuksia...",
-          selectedFilterPlaceholder: "Hae valittuja vuokratunnuksia...",
+          availableFilterPlaceholder: "Cari pengenal sewa...",
+          selectedFilterPlaceholder: "Cari pengenal sewa terpilih...",
         }}
         onChange={handleLeaseListChange}
         onFilterChange={handleFilterChange}
@@ -171,7 +171,7 @@ const AttachDecisionModal: React.FC<Props> = ({
         options={[
           {
             value: true,
-            label: "Liitä myös ehdot",
+            label: "Kaitkan juga persyaratan",
           },
         ]}
       />
@@ -180,13 +180,13 @@ const AttachDecisionModal: React.FC<Props> = ({
         <Button
           className={ButtonColors.SECONDARY}
           onClick={onCancel}
-          text="Peruuta"
+          text="Batal"
         />
         <Button
           className={ButtonColors.SUCCESS}
           disabled={!selectedLeases.length}
           onClick={handleSubmit}
-          text="Liitä"
+          text="Kaitkan"
         />
       </ModalButtonWrapper>
     </Modal>

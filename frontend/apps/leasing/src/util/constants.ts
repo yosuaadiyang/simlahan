@@ -1,33 +1,50 @@
+const envNumber = (value: string | undefined, fallback: number): number => {
+  const parsed = Number(value);
+  return value !== undefined && value !== "" && Number.isFinite(parsed)
+    ? parsed
+    : fallback;
+};
+
 /**
- * Default coordinates for Map (helsinki centrum)
+ * Pusat peta awal (WGS84). Default: tengah Indonesia; atur lewat
+ * VITE_MAP_CENTER_LAT / VITE_MAP_CENTER_LNG.
  * @readonly
  * @const {{lat: number, lng: number}}
  */
 export const DEFAULT_CENTER = {
-  lat: 60.1699,
-  lng: 24.9384,
+  lat: envNumber(import.meta.env.VITE_MAP_CENTER_LAT, -2.5),
+  lng: envNumber(import.meta.env.VITE_MAP_CENTER_LNG, 118),
 };
 
 /**
- * Default zoom level
+ * Zoom awal peta (Web Mercator / EPSG:3857).
  * @readonly
  * @const {number}
  */
-export const DEFAULT_ZOOM = 5;
+export const DEFAULT_ZOOM = envNumber(import.meta.env.VITE_MAP_DEFAULT_ZOOM, 5);
 
 /**
- * Minimum zoom
+ * Zoom minimum
  * @readonly
  * @const {number}
  */
-export const MIN_ZOOM = 2;
+export const MIN_ZOOM = 4;
 
 /**
- * Maximum zoom
+ * Zoom maksimum
  * @readonly
  * @const {number}
  */
-export const MAX_ZOOM = 12;
+export const MAX_ZOOM = 19;
+
+/**
+ * Layer WMS tambahan opsional (mis. peta bidang atau RDTR instansi).
+ */
+export const MAP_WMS = {
+  url: import.meta.env.VITE_MAP_WMS_URL || "",
+  layers: import.meta.env.VITE_MAP_WMS_LAYERS || "",
+  name: import.meta.env.VITE_MAP_WMS_NAME || "Peta instansi",
+};
 
 /**
  * Map color palette
@@ -52,18 +69,11 @@ export const MAP_COLORS = [
 ];
 
 /**
- * Url of the ptp.hel.fi API
- * @readonly
- * @const {string}
- */
-export const PAIKKATIETOPALVELU_URL = "https://ptp.hel.fi";
-
-/**
  * Delete modal button text
  * @readonly
  * @const {string}
  */
-export const DELETE_MODAL_BUTTON_TEXT = "Poista";
+export const DELETE_MODAL_BUTTON_TEXT = "Hapus";
 
 /**
  * Maximum number of results per page on list tables
@@ -71,10 +81,3 @@ export const DELETE_MODAL_BUTTON_TEXT = "Poista";
  * @const {number}
  */
 export const LIST_TABLE_PAGE_SIZE = 25;
-
-/**
- * Base url for Service Map API
- * @readonly
- * @const {string}
- */
-export const SERVICE_MAP_URL = "https://api.hel.fi/servicemap/v2";

@@ -165,29 +165,29 @@ const ContactLeaseTable: React.FC<Props> = ({ contact }: Props) => {
       },
       {
         key: "is_active",
-        headerName: "Vuokraus voimassa",
+        headerName: "Sewa berlaku",
         isSortable: true,
         transform: ({ is_active }: { is_active: boolean }) =>
-          is_active ? "Kyllä" : "-",
+          is_active ? "Ya" : "-",
       },
       {
         key: "roles",
-        headerName: "Rooli",
+        headerName: "Peran",
         isSortable: true,
       },
       {
         key: "contact_role_active",
-        headerName: "Rooli voimassa",
+        headerName: "Peran berlaku",
         isSortable: true,
         transform: ({
           contact_role_active,
         }: {
           contact_role_active: boolean;
-        }) => (contact_role_active ? "Kyllä" : "-"),
+        }) => (contact_role_active ? "Ya" : "-"),
       },
       {
         key: "has_overdue_invoices",
-        headerName: "Vuokrarästejä",
+        headerName: "Tunggakan sewa",
         isSortable: true,
         transform: ({
           has_overdue_invoices,
@@ -195,7 +195,7 @@ const ContactLeaseTable: React.FC<Props> = ({ contact }: Props) => {
           has_overdue_invoices: boolean;
         }) =>
           has_overdue_invoices ? (
-            <strong style={{ color: "var(--color-error)" }}>Kyllä</strong>
+            <strong style={{ color: "var(--color-error)" }}>Ya</strong>
           ) : (
             "-"
           ),
@@ -241,12 +241,12 @@ const ContactLeaseTable: React.FC<Props> = ({ contact }: Props) => {
 
   return (
     <GreenBox className="with-top-margin">
-      <h3>Asiakkaan vuokraukset</h3>
-      <span>{isFetchingLeases ? "Ladataan..." : `Löytyi ${count} kpl`}</span>
+      <h3>Sewa kontak</h3>
+      <span>{isFetchingLeases ? "Memuat..." : `Ditemukan ${count} kpl`}</span>
       <Table
-        ariaLabelSortButtonUnset="Ei järjestetty"
-        ariaLabelSortButtonAscending="Järjestä nousevasti"
-        ariaLabelSortButtonDescending="Järjestä laskevasti"
+        ariaLabelSortButtonUnset="Belum diselenggarakan"
+        ariaLabelSortButtonAscending="Urutkan menaik"
+        ariaLabelSortButtonDescending="Urutkan menurun"
         id="contact-lease-list-table"
         indexKey="lease_id"
         renderIndexCol={false}
@@ -259,7 +259,7 @@ const ContactLeaseTable: React.FC<Props> = ({ contact }: Props) => {
         dense
       />
       <Pagination
-        language="fi"
+        language="en"
         onChange={(event, index) => {
           event.preventDefault();
           handlePageClick(index + 1);
@@ -267,7 +267,7 @@ const ContactLeaseTable: React.FC<Props> = ({ contact }: Props) => {
         pageCount={maxPage || 1}
         pageHref={() => "#"}
         pageIndex={activePage - 1}
-        paginationAriaLabel={`Sivuvalitsin, ${activePage} / ${maxPage}`}
+        paginationAriaLabel={`Pemilih halaman, ${activePage} / ${maxPage}`}
         siblingCount={5}
       />
     </GreenBox>

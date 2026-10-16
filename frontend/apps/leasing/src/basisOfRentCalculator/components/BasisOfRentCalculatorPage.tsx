@@ -52,11 +52,11 @@ const BasisOfRentCalculatorPage: React.FC = () => {
   );
 
   useEffect(() => {
-    setPageTitle("Vuokralaskuri");
+    setPageTitle("Kalkulator sewa");
     dispatch(
       receiveTopNavigationSettings({
         linkUrl: getRouteById(Routes.BASIS_OF_RENT_CALCULATOR),
-        pageTitle: "Vuokralaskuri",
+        pageTitle: "Kalkulator sewa",
         showSearch: false,
       }),
     );

@@ -93,7 +93,7 @@ const InvoiceRows = ({
                 LeaseCreateChargeRowsFieldPaths.ROWS,
               )}
             >
-              Erittely
+              Rincian
             </SubTitle>
             {!!fields && !!fields.length && (
               <>
@@ -286,7 +286,7 @@ const InvoiceRows = ({
                             }
                             invisibleLabel
                             name={`${row}.amount`}
-                            unit="€"
+                            unit="Rp"
                             overrideValues={{
                               label: InvoiceRowsFieldTitles.AMOUNT,
                             }}
@@ -338,7 +338,7 @@ const InvoiceRows = ({
                             <RemoveButton
                               className="third-level"
                               onClick={handleRemove}
-                              title="Poista rivi"
+                              title="Hapus baris"
                             />
                           )}
                         </Column>
@@ -364,7 +364,7 @@ const InvoiceRows = ({
             >
               <Row>
                 <Column>
-                  <AddButtonThird label="Lisää rivi" onClick={handleAdd} />
+                  <AddButtonThird label="Tambah baris" onClick={handleAdd} />
                 </Column>
               </Row>
             </Authorization>
@@ -443,7 +443,7 @@ const NewInvoiceForm = ({ onClose, onSave, setRefForFirstField }: Props) => {
           <form onSubmit={handleSubmit} className="invoice__new-invoice_form">
             <WhiteBox>
               <BoxContentWrapper>
-                <h3>Luo lasku</h3>
+                <h3>Buat tagihan</h3>
                 <CloseButton className="position-topright" onClick={onClose} />
 
                 <Row>
@@ -463,7 +463,7 @@ const NewInvoiceForm = ({ onClose, onSave, setRefForFirstField }: Props) => {
                         name="tenant"
                         setRefForField={setRefForFirstField}
                         overrideValues={{
-                          label: "Vuokralainen",
+                          label: "Penyewa",
                           options: recipientOptions,
                         }}
                         enableUiDataEdit
@@ -675,13 +675,13 @@ const NewInvoiceForm = ({ onClose, onSave, setRefForFirstField }: Props) => {
                       <Button
                         className={ButtonColors.SECONDARY}
                         onClick={onClose}
-                        text="Peruuta"
+                        text="Batal"
                       />
                       <Button
                         className={ButtonColors.SUCCESS}
                         disabled={isCreateClicked || !valid}
                         type="submit"
-                        text="Tallenna"
+                        text="Simpan"
                       />
                     </div>
                   </Column>

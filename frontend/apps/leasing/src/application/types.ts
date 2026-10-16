@@ -28,9 +28,8 @@ export type FormSection = {
   id: number;
   identifier: string;
   title: string;
-  title_fi: string;
+  title_ind: string;
   title_en: string | null;
-  title_sv: string | null;
   visible: boolean;
   sort_order: number;
   add_new_allowed: boolean;
@@ -47,13 +46,11 @@ export type FormField = {
   identifier: string;
   type: any;
   label: string;
-  label_fi: string;
+  label_ind: string;
   label_en: string | null;
-  label_sv: string | null;
   hint_text: string | null;
-  hint_text_fi: string | null;
+  hint_text_ind: string | null;
   hint_text_en: string | null;
-  hint_text_sv: string | null;
   enabled: boolean;
   required: boolean;
   validation?: string | null;
@@ -66,9 +63,8 @@ export type FormField = {
 export type FormFieldChoice = {
   id: number;
   text: string;
-  text_fi: string;
+  text_ind: string;
   text_en: string | null;
-  text_sv: string | null;
   value: string;
   action?: string | null;
   has_text_input: boolean;

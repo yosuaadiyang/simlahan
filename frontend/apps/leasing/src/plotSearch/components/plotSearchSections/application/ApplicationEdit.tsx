@@ -161,8 +161,8 @@ class ApplicationEdit extends PureComponent<Props, State> {
           read_only: false,
           label:
             currentPlotSearch.form !== null
-              ? "Korvaava lomakepohja"
-              : "Lomakepohja",
+              ? "Templat formulir pengganti"
+              : "Templat formulir",
         }}
         name={`template`}
         overrideValues={{
@@ -216,7 +216,7 @@ class ApplicationEdit extends PureComponent<Props, State> {
                                 fieldAttributes={{
                                   required: false,
                                   read_only: false,
-                                  label: "Lomakepohja",
+                                  label: "Templat formulir",
                                   type: "radio-with-field",
                                   choices: [],
                                 }}
@@ -225,11 +225,12 @@ class ApplicationEdit extends PureComponent<Props, State> {
                                   options: [
                                     {
                                       label:
-                                        "Käytä aiemmin tallennettua lomaketta",
+                                        "Gunakan formulir yang tersimpan sebelumnya",
                                       value: "1",
                                     },
                                     {
-                                      label: "Korvaa uudella lomakepohjalla",
+                                      label:
+                                        "Ganti dengan templat formulir baru",
                                       value: "0",
                                     },
                                   ],
@@ -248,14 +249,14 @@ class ApplicationEdit extends PureComponent<Props, State> {
                             showWarning={formIdChanged}
                             meta={{
                               warning:
-                                "Lomakkeen kenttiä voi muokata vasta, kun lomakepohjan vaihto on vahvistettu tonttihaku tallentamalla.",
+                                "Kolom formulir baru dapat diubah setelah penggantian templat formulir dikonfirmasi dengan menyimpan pencarian kavling.",
                             }}
                           />
                           <WarningField
                             showWarning={!hasMinimumRequiredFieldsFilled}
                             meta={{
                               warning:
-                                "Ole hyvä ja täytä ensin pakolliset perustiedot.",
+                                "Silakan isi terlebih dahulu data dasar yang wajib.",
                             }}
                           />
                         </>

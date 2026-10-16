@@ -11,7 +11,6 @@ import Collateral from "./Collateral";
 import DecisionLink from "@/components/links/DecisionLink";
 import FormText from "@/components/form/FormText";
 import FormTextTitle from "@/components/form/FormTextTitle";
-import KtjLink from "@/components/ktj/KtjLink";
 import { receiveCollapseStates } from "@/leases/slice";
 import { FormNames, ViewModes } from "@/enums";
 import {
@@ -343,7 +342,7 @@ const ContractItem: React.FC<Props> = ({
                 >
                   {LeaseContractsFieldTitles.IS_READJUSTMENT_DECISION}
                 </FormTextTitle>
-                <FormText>{"Kyllä"}</FormText>
+                <FormText>{"Ya"}</FormText>
               </>
             </Authorization>
           </Column>
@@ -391,56 +390,6 @@ const ContractItem: React.FC<Props> = ({
           <Authorization
             allow={isFieldAllowedToRead(
               attributes,
-              LeaseContractsFieldPaths.KTJ_LINK,
-            )}
-          >
-            <>
-              <FormTextTitle>
-                {LeaseContractsFieldTitles.KTJ_LINK}
-              </FormTextTitle>
-              {contract.institution_identifier ? (
-                <KtjLink
-                  fileKey="vuokraoikeustodistus"
-                  fileName="vuokraoikeustodistus"
-                  identifier={contract.institution_identifier}
-                  idKey="kohdetunnus"
-                  label="Vuokraoikeustodistus"
-                />
-              ) : (
-                <FormText>-</FormText>
-              )}
-            </>
-          </Authorization>
-        </Column>
-        <Column small={6} medium={4} large={2}>
-          <Authorization
-            allow={isFieldAllowedToRead(
-              attributes,
-              LeaseContractsFieldPaths.KTJ_LINK,
-            )}
-          >
-            <>
-              <FormTextTitle>
-                {LeaseContractsFieldTitles.ENCUMBRANCE}
-              </FormTextTitle>
-              {contract.institution_identifier ? (
-                <KtjLink
-                  fileKey="rasitustodistus"
-                  fileName="rasitustodistus"
-                  identifier={contract.institution_identifier}
-                  idKey="kohdetunnus"
-                  label="Rasitustodistus"
-                />
-              ) : (
-                <FormText>-</FormText>
-              )}
-            </>
-          </Authorization>
-        </Column>
-        <Column small={6} medium={4} large={2}>
-          <Authorization
-            allow={isFieldAllowedToRead(
-              attributes,
               LeaseContractsFieldPaths.EXECUTOR,
             )}
           >
@@ -473,7 +422,7 @@ const ContractItem: React.FC<Props> = ({
         >
           {!contract.contract_changes ||
             (!contract.contract_changes.length && (
-              <FormText>Ei sopimuksen muutoksia</FormText>
+              <FormText>Tidak ada perubahan kontrak</FormText>
             ))}
           {contract.contract_changes && !!contract.contract_changes.length && (
             <BoxItemContainer>
@@ -685,7 +634,9 @@ const ContractItem: React.FC<Props> = ({
           )}
         >
           {!contract.collaterals ||
-            (!contract.collaterals.length && <FormText>Ei vakuuksia</FormText>)}
+            (!contract.collaterals.length && (
+              <FormText>Tidak ada jaminan</FormText>
+            ))}
           {contract.collaterals && !!contract.collaterals.length && (
             <BoxItemContainer>
               {contract.collaterals.map((collateral) => {

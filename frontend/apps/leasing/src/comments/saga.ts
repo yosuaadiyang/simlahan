@@ -111,7 +111,7 @@ function* createCommentSaga({
         );
         displayUIMessage({
           title: "",
-          body: "Kommentti luotu",
+          body: "Komentar dibuat",
         });
         break;
 
@@ -148,7 +148,7 @@ function* editCommentSaga({
         yield put(hideEditModeById(comment.id));
         displayUIMessage({
           title: "",
-          body: "Kommentti tallennettu",
+          body: "Komentar disimpan",
         });
         break;
 

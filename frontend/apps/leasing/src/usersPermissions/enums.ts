@@ -4,6 +4,19 @@
  * @enum {string}
  */
 export const UsersPermissions = {
+  // Pengadaan tanah
+  VIEW_ACQUISITIONPROJECT: "view_acquisitionproject",
+  ADD_ACQUISITIONPROJECT: "add_acquisitionproject",
+  CHANGE_ACQUISITIONPROJECT: "change_acquisitionproject",
+  DELETE_ACQUISITIONPROJECT: "delete_acquisitionproject",
+  VIEW_ACQUISITIONPARCEL: "view_acquisitionparcel",
+  ADD_ACQUISITIONPARCEL: "add_acquisitionparcel",
+  CHANGE_ACQUISITIONPARCEL: "change_acquisitionparcel",
+  DELETE_ACQUISITIONPARCEL: "delete_acquisitionparcel",
+  VIEW_SENSITIVE_PERSONAL_DATA: "view_sensitive_personal_data",
+  VIEW_HOLIDAY: "view_holiday",
+  CHANGE_COMPENSATION: "change_compensation",
+  VALIDATE_COMPENSATION: "validate_compensation",
   ADD_ANSWEROPENINGRECORD: "add_answeropeningrecord",
   ADD_BASISOFRENTDECISION: "add_basisofrentdecision",
   ADD_BASISOFRENTPROPERTYIDENTIFIER: "add_basisofrentpropertyidentifier",
@@ -91,7 +104,6 @@ export const UsersPermissions = {
   DELETE_TENANTRENTSHARE: "delete_tenantrentshare",
   DELETE_USAGEDISTRIBUTION: "delete_usagedistribution",
   EDIT_GLOBAL_UI_DATA: "edit_global_ui_data",
-  SEND_CREDITDECISION_INQUIRY: "send_creditdecision_inquiry",
   SEND_SANCTIONS_INQUIRY: "send_sanctions_inquiry",
   VIEW_ANSWER: "view_answer",
   VIEW_AREANOTE: "view_areanote",
@@ -102,7 +114,6 @@ export const UsersPermissions = {
   VIEW_COLLECTIONNOTE: "view_collectionnote",
   VIEW_COMMENT: "view_comment",
   VIEW_CONTACT: "view_contact",
-  VIEW_CREDITDECISION: "view_creditdecision",
   VIEW_EMAILLOG: "view_emaillog",
   VIEW_INFILLDEVELOPMENTCOMPENSATION: "view_infilldevelopmentcompensation",
   VIEW_INDEX: "view_index",
@@ -113,7 +124,6 @@ export const UsersPermissions = {
   VIEW_JOBRUN: "view_jobrun",
   VIEW_LEASE_LEASE_AREAS: "view_lease_lease_areas",
   VIEW_LEASE: "view_lease",
-  VIEW_LEASEHOLDTRANSFER: "view_leaseholdtransfer",
   VIEW_LEASETYPE: "view_leasetype",
   VIEW_PLOTSEARCH: "view_plotsearch",
   VIEW_SCHEDULEDJOB: "view_scheduledjob",

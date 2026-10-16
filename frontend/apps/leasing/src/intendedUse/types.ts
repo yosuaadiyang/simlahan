@@ -8,8 +8,7 @@ export type IntendedUseState = {
 export type IntendedUse = {
   id: number;
   name: string;
-  name_fi?: string;
-  name_sv?: string;
+  name_ind?: string;
   name_en?: string;
   is_active: boolean;
   service_unit: string;

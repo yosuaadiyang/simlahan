@@ -11,7 +11,7 @@ const MoveDownIcon = ({
     className={classNames("icons", "icons__move-down", className)}
     viewBox="11 0 16 27"
   >
-    <title>Siirrä alas</title>
+    <title>Pindah ke bawah</title>
     <g id="icon_sort2" stroke="none" strokeWidth="1" fillRule="evenodd">
       <polygon
         id="Path-Copy-2"

@@ -15,14 +15,14 @@
     text-align: center;
     padding: 2rem 2rem 3rem;
 
-    .helsinki-logo {
+    .app-logo {
       background: url(/assets/images/logo.svg);
       background-size: contain;
       background-repeat: no-repeat;
       height: 48px;
       margin-bottom: rem-calc(40px);
       width: 100%;
-      background-position: right;
+      background-position: center;
     }
 
     h3 {
@@ -30,7 +30,14 @@
       font-weight: variables.$semibold;
     }
 
+    input {
+      display: block;
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+
     button {
+      margin-top: 0.5rem;
       background-color: transparent;
       color: variables.$black;
       border: 2px solid variables.$black;
@@ -39,11 +46,20 @@
     }
   }
 
-  .login-koro {
-    height: rem-calc(14px);
-    background: url(/assets/images/basic-wave-koro.svg);
-    background-size: 96px 14px;
-    @include mixins.rotate(180deg);
+  &__organization {
+    font-weight: variables.$semibold;
+  }
+
+  &__label {
+    display: block;
+    text-align: left;
+    font-weight: variables.$semibold;
+    margin-bottom: 0.25rem;
+  }
+
+  &__error {
+    color: variables.$red;
+    font-weight: variables.$semibold;
   }
 
   .login-footer {

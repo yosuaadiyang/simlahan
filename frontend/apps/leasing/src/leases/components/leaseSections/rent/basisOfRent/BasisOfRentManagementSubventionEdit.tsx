@@ -137,7 +137,7 @@ const BasisOfRentManagementSubventionEdit: React.FC<Props> = ({
               label:
                 BasisOfRentManagementSubventionsFieldTitles.SUBVENTION_AMOUNT,
             }}
-            unit="€"
+            unit="Rp"
             invisibleLabel
           />
         </Authorization>
@@ -154,7 +154,7 @@ const BasisOfRentManagementSubventionEdit: React.FC<Props> = ({
             onChange={onChangeCurrentSubventionAmount}
             fieldAttributes={{
               decimal_places: 2,
-              label: "Subventio prosentteina",
+              label: "Subsidi dalam persen",
               max_digits: 2,
               read_only: false,
               required: false,
@@ -177,7 +177,7 @@ const BasisOfRentManagementSubventionEdit: React.FC<Props> = ({
               )}
             >
               <FormText className="full-width">
-                {formatNumber(subventionTotal, 3)} €
+                Rp {formatNumber(subventionTotal, 3)}
               </FormText>
             </Authorization>
           }
@@ -195,7 +195,7 @@ const BasisOfRentManagementSubventionEdit: React.FC<Props> = ({
                   style={{
                     height: "unset",
                   }}
-                  title="Poista hallintamuoto"
+                  title="Hapus bentuk pengelolaan"
                 />
               )}
             </Authorization>

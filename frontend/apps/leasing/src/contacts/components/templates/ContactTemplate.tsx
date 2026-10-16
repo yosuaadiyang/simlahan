@@ -381,7 +381,7 @@ const ContactTemplate = ({ attributes, contact }: Props) => {
                 >
                   {ContactFieldTitles.IS_LESSOR}
                 </FormTextTitle>
-                <FormText>{contact.is_lessor ? "Kyllä" : "Ei"}</FormText>
+                <FormText>{contact.is_lessor ? "Ya" : "Tidak"}</FormText>
               </>
             </Authorization>
           </Column>
@@ -421,10 +421,10 @@ const ContactTemplate = ({ attributes, contact }: Props) => {
                 {contact.address_protection ? (
                   <span>
                     <i />
-                    <span>Turvakielto</span>
+                    <span>Perlindungan alamat</span>
                   </span>
                 ) : (
-                  "Ei turvakieltoa"
+                  "Tidak ada perlindungan alamat"
                 )}
               </FormText>
             </Column>

@@ -30,7 +30,7 @@ const InvoiceSimulatorForm: React.FC<Props> = ({ onSubmit, isFetching }) => {
                 name="invoice_simulator_year"
                 disableDirty
                 overrideValues={{
-                  label: "Vuosi",
+                  label: "Tahun",
                 }}
               />
             </Column>
@@ -39,7 +39,7 @@ const InvoiceSimulatorForm: React.FC<Props> = ({ onSubmit, isFetching }) => {
                 className={`${ButtonColors.SUCCESS} no-margin`}
                 disabled={isFetching || !valid}
                 type="submit"
-                text="Näytä laskut"
+                text="Tampilkan tagihan"
               />
             </Column>
           </Row>

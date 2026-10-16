@@ -33,4 +33,4 @@ export const BOUNDING_BOX_FOR_SEARCH_QUERY = [
  * Max zoom level to fetch leases for map
  * @const {number}
  */
-export const MAX_ZOOM_LEVEL_TO_FETCH_LEASES = 7;
+export const MAX_ZOOM_LEVEL_TO_FETCH_LEASES = 14;

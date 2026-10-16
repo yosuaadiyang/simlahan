@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useRef } from "react";
-import L from "leaflet";
 import {
   LayersControl,
   LayerGroup,
   Map,
+  TileLayer,
   WMSTileLayer,
   ZoomControl,
 } from "react-leaflet";
@@ -11,34 +11,14 @@ import {
 const { BaseLayer, Overlay } = LayersControl;
 
 import FullscreenControl from "react-leaflet-fullscreen";
-import proj4 from "proj4";
-import "proj4leaflet";
 import GeoSearch from "@/components/map/GeoSearch";
 import Loader from "@/components/loader/Loader";
 import LoaderWrapper from "@/components/loader/LoaderWrapper";
 import ZoomBox from "@/components/map/ZoomBox";
-import { MIN_ZOOM, MAX_ZOOM } from "@/util/constants";
+import { MAP_WMS, MIN_ZOOM, MAX_ZOOM } from "@/util/constants";
 
-const projectionBounds = L.bounds([25440000, 6630000], [25571072, 6761072]);
-const CRS = new L.Proj.CRS(
-  "EPSG:3879",
-  "+proj=tmerc +lat_0=0 +lon_0=25 +k=1 +x_0=25500000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs",
-  {
-    resolutions: [
-      256, 128, 64, 32, 16, 8, 4, 2, 1, 0.5, 0.25, 0.125, 0.0625, 0.03125,
-    ],
-    bounds: projectionBounds,
-  },
-);
-
-proj4.defs(
-  "EPSG:3879",
-  "+proj=tmerc +lat_0=0 +lon_0=25 +k=1 +x_0=25500000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs",
-);
-proj4.defs(
-  "WGS84",
-  "+title=WGS 84 (long/lat) +proj=longlat +ellps=WGS84 +datum=WGS84 +units=degrees",
-);
+// Peta memakai Web Mercator (EPSG:3857, bawaan Leaflet); data dari API dalam
+// WGS84 (EPSG:4326).
 
 type Props = {
   bounds?: Record<string, any>;
@@ -97,7 +77,6 @@ const MapContainer: React.FC<Props> = ({
   return (
     <Map
       ref={setMapRef}
-      attributionControl={false}
       center={center || undefined}
       bounds={bounds || undefined}
       maxBoundsViscosity={0}
@@ -105,7 +84,6 @@ const MapContainer: React.FC<Props> = ({
       maxZoom={MAX_ZOOM}
       zoom={zoom}
       zoomControl={false}
-      crs={CRS}
       boxZoom={false}
       onViewportChanged={handleViewportChanged}
     >
@@ -115,30 +93,30 @@ const MapContainer: React.FC<Props> = ({
         </LoaderWrapper>
       )}
       <LayersControl position="topright">
-        <BaseLayer checked name="Karttasarja">
-          <WMSTileLayer
-            url={"https://kartta.hel.fi/ws/geoserver/avoindata/wms?"}
-            layers={"avoindata:Karttasarja"}
-            format={"image/png"}
-            transparent={true}
+        <BaseLayer checked name="OpenStreetMap">
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            maxZoom={MAX_ZOOM}
           />
         </BaseLayer>
-        <BaseLayer name="Ortoilmakuva">
-          <WMSTileLayer
-            url={"https://kartta.hel.fi/ws/geoserver/avoindata/wms?"}
-            layers={"avoindata:Ortoilmakuva"}
-            format={"image/png"}
-            transparent={true}
+        <BaseLayer name="Citra satelit (Esri)">
+          <TileLayer
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+            attribution="Tiles &copy; Esri, Maxar, Earthstar Geographics"
+            maxZoom={MAX_ZOOM}
           />
         </BaseLayer>
-        <BaseLayer name="Asemakaava">
-          <WMSTileLayer
-            url={"https://kartta.hel.fi/ws/geoserver/avoindata/wms?"}
-            layers={"avoindata:Ajantasa_asemakaava"}
-            format={"image/png"}
-            transparent={true}
-          />
-        </BaseLayer>
+        {!!MAP_WMS.url && !!MAP_WMS.layers && (
+          <Overlay name={MAP_WMS.name}>
+            <WMSTileLayer
+              url={MAP_WMS.url}
+              layers={MAP_WMS.layers}
+              format={"image/png"}
+              transparent={true}
+            />
+          </Overlay>
+        )}
         {!!overlayLayers &&
           overlayLayers.length &&
           overlayLayers.map((layer, index) => (
@@ -149,16 +127,16 @@ const MapContainer: React.FC<Props> = ({
       </LayersControl>
 
       {enableSearch && <GeoSearch />}
-      <FullscreenControl position="topright" title="Koko näytön tila" />
+      <FullscreenControl position="topright" title="Layar penuh" />
       <ZoomControl
         position="topright"
-        zoomInTitle="Lähennä"
-        zoomOutTitle="Loitonna"
+        zoomInTitle="Perbesar"
+        zoomOutTitle="Perkecil"
       />
       <ZoomBox
         position="topright"
         modal={true}
-        title="Tarkenna valittuun alueeseen"
+        title="Perbesar ke area terpilih"
       />
       {children}
     </Map>

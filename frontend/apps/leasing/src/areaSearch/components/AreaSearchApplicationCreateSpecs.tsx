@@ -100,7 +100,7 @@ class AreaSearchApplicationCreateSpecs extends Component<Props> {
     const today = startOfToday();
     return (
       <div className="AreaSearchApplicationCreate">
-        <Title>Aluehaku</Title>
+        <Title>Pencarian area</Title>
 
         <Row>
           <Authorization allow={true}>
@@ -110,7 +110,7 @@ class AreaSearchApplicationCreateSpecs extends Component<Props> {
                 fieldAttributes={get(attributes, "intended_use")}
                 name="intended_use"
                 overrideValues={{
-                  label: "Käyttötarkoitus",
+                  label: "Peruntukan",
                 }}
               />
             </Column>
@@ -125,7 +125,7 @@ class AreaSearchApplicationCreateSpecs extends Component<Props> {
                 overrideValues={{
                   required: true,
                   fieldType: FieldTypes.DATE,
-                  label: "Vuokra-ajan alkupvm",
+                  label: "Tgl mulai masa sewa",
                   read_only: false,
                 }}
                 minDate={today}
@@ -141,7 +141,7 @@ class AreaSearchApplicationCreateSpecs extends Component<Props> {
                 name="end_date"
                 overrideValues={{
                   fieldType: FieldTypes.DATE,
-                  label: "Vuokra-ajan loppupvm",
+                  label: "Tgl akhir masa sewa",
                   read_only: false,
                 }}
                 minDate={today}
@@ -158,7 +158,7 @@ class AreaSearchApplicationCreateSpecs extends Component<Props> {
                 name="description_intended_use"
                 overrideValues={{
                   fieldType: FieldTypes.TEXTAREA,
-                  label: "Käyttötarkoituksen kuvaus",
+                  label: "Uraian peruntukan",
                 }}
               />
             </Column>
@@ -166,7 +166,7 @@ class AreaSearchApplicationCreateSpecs extends Component<Props> {
         </Row>
         <Row>
           <Column small={12}>
-            <FormFieldLabel required>Haettava alue</FormFieldLabel>
+            <FormFieldLabel required>Area yang dimohon</FormFieldLabel>
             <AreaSearchMap
               change={(features) => {
                 change("geometry", features);
@@ -195,7 +195,7 @@ class AreaSearchApplicationCreateSpecs extends Component<Props> {
                 name="description_area"
                 overrideValues={{
                   fieldType: FieldTypes.TEXTAREA,
-                  label: "Vuokra-alueen kuvaus",
+                  label: "Uraian area sewa",
                 }}
               />
             </Column>
@@ -205,9 +205,9 @@ class AreaSearchApplicationCreateSpecs extends Component<Props> {
           <Authorization allow={true}>
             <Column small={12} medium={4}>
               <FormFieldLabel htmlFor="areaSearchApplicationAttachments">
-                Liitteet
+                Lampiran
               </FormFieldLabel>
-              {attachments.length === 0 && <div>Ei lisättyjä liitteitä.</div>}
+              {attachments.length === 0 && <div>Belum ada lampiran.</div>}
               {attachments.map((attachment) => (
                 <Row key={attachment.id}>
                   <Column small={8} medium={10}>
@@ -221,7 +221,7 @@ class AreaSearchApplicationCreateSpecs extends Component<Props> {
                 </Row>
               ))}
               <AddFileButton
-                label="Lisää tiedosto"
+                label="Tambah berkas"
                 onChange={this.handleFileAdded}
                 name="AreaSearchApplicationCreateSpecsAttachment"
                 disabled={
@@ -268,8 +268,8 @@ export default flowRight(
         values.end_date &&
         values.start_date > values.end_date
       ) {
-        errors.start_date = "Alkupäivämäärän on oltava ennen loppupäivämäärää";
-        errors.end_date = "Loppupäivämäärän on oltava ennen alkupäivämäärää";
+        errors.start_date = "Tanggal mulai harus sebelum tanggal akhir";
+        errors.end_date = "Tanggal akhir harus setelah tanggal mulai";
       }
 
       return errors;

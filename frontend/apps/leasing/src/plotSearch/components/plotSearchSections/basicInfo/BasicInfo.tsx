@@ -135,24 +135,24 @@ class BasicInfo extends PureComponent<Props, State> {
             ) && (
               <Button
                 onClick={() => showEditMode(true)}
-                text="Avaa hakemukset"
+                text="Buka permohonan"
               />
             )}
           {plotSearch.stageType === PlotSearchStageTypes.IN_ACTION && (
             <Button
               onClick={openDirectReservationLinkModal}
-              text="Lähetä hakemuslinkki"
+              text="Kirim tautan permohonan"
             />
           )}
           {isInProcessing && (
             <Button
               onClick={openReservationIdentifiersModal}
-              text="Luo varaustunnukset"
+              text="Buat pengenal pencadangan"
             />
           )}
           <DocumentsButton
             onClick={openExportModal}
-            label="Tulosta kaikki hakemukset"
+            label="Cetak semua permohonan"
           />
         </div>
         <Title>{PlotSearchFieldTitles.BASIC_INFO}</Title>
@@ -347,7 +347,7 @@ class BasicInfo extends PureComponent<Props, State> {
                 </Column>*/}
               </Row>
               {(!plotSearch.decisions || plotSearch.decisions.length === 0) && (
-                <FormText>Ei valittuja päätöksiä.</FormText>
+                <FormText>Tidak ada keputusan terpilih.</FormText>
               )}
               {!!plotSearch.decisions &&
                 plotSearch.decisions.map((decision, index) => (

@@ -176,7 +176,7 @@ class PlotSearchSitePlanUnit extends PureComponent<Props, State> {
                 {/* style={{position: 'absolute', right: '15px', top: '-5px'}}> */}
                 <WarningField
                   meta={{
-                    warning: label + " Päivitä tiedot",
+                    warning: label + " Perbarui data",
                   }}
                   showWarning={isDeleted || isNewer}
                 />
@@ -193,7 +193,7 @@ class PlotSearchSitePlanUnit extends PureComponent<Props, State> {
                 {/* style={{position: 'absolute', right: '15px', top: '-5px'}}> */}
                 <WarningField
                   meta={{
-                    warning: label + " Poista kohde hausta",
+                    warning: label + " Hapus objek dari pencarian",
                   }}
                   showWarning={isDeleted || isNewer}
                 />
@@ -522,7 +522,7 @@ class PlotSearchSitePlanUnit extends PureComponent<Props, State> {
                     <Column small={4} medium={4} large={12}>
                       <FormText>
                         {/* TODO: add a link here if a by-target filter is implemented for the application list view */}
-                        Hakemukset ({applicationCount})
+                        Permohonan ({applicationCount})
                       </FormText>
                     </Column>
                     <Column small={4} medium={4} large={12}>

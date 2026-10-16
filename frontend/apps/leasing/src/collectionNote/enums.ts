@@ -24,17 +24,17 @@ export const CollectionNoteFieldPaths = {
  * @enum {string}
  */
 export const CollectionNoteFieldTitles = {
-  COLLECTION_NOTES: "Huomautukset",
-  MODIFIED_AT: "Muokattu",
-  CREATED_AT: "Lisätty",
-  NOTE: "Huomautus",
-  USER: "Lisääjä",
-  COLLECTION_STAGE: "Perintävaihe",
-  INVOICES: "Laskut",
-  SENT_DATE: "Lähetyspäivämäärä",
-  INSPECTION_DATE: "Valvontapäivämäärä",
-  POSTPONE_DATE: "Maksun lykkäyspäivämäärä",
-  ENTIRE_LEASE: "Koko vuokraus",
+  COLLECTION_NOTES: "Catatan",
+  MODIFIED_AT: "Diubah",
+  CREATED_AT: "Ditambahkan",
+  NOTE: "Catatan",
+  USER: "Ditambahkan oleh",
+  COLLECTION_STAGE: "Tahap penagihan",
+  INVOICES: "Tagihan",
+  SENT_DATE: "Tanggal kirim",
+  INSPECTION_DATE: "Tanggal pengawasan",
+  POSTPONE_DATE: "Tanggal penundaan pembayaran",
+  ENTIRE_LEASE: "Seluruh sewa",
 };
 
 /**

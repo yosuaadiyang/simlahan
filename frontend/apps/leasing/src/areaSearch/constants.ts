@@ -7,7 +7,7 @@ export const DEFAULT_SORT_ORDER = TableSortOrder.ASCENDING;
  * Max zoom level to fetch leases for map
  * @const {number}
  */
-export const MAX_ZOOM_LEVEL_TO_FETCH_AREA_SEARCHES = 7;
+export const MAX_ZOOM_LEVEL_TO_FETCH_AREA_SEARCHES = 12;
 
 /**
  * Bounding box for search query

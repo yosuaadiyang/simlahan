@@ -159,7 +159,7 @@ const OtherTenantItemEdit = ({
                 }
               >
                 <CollapseHeaderSubtitle>
-                  <span>Välillä:</span>
+                  <span>Antara:</span>
                   {formatDateRange(
                     savedTenant.start_date,
                     savedTenant.end_date,
@@ -179,8 +179,8 @@ const OtherTenantItemEdit = ({
         >
           <span>
             {contactType === TenantContactType.BILLING
-              ? "Laskunsaaja"
-              : "Yhteyshenkilö"}
+              ? "Penerima tagihan"
+              : "Narahubung"}
           </span>
         </Authorization>
       }
@@ -229,7 +229,7 @@ const OtherTenantItemEdit = ({
                     >
                       <div className="contact-buttons-wrapper">
                         <AddButtonThird
-                          label="Luo asiakas"
+                          label="Buat kontak"
                           onClick={handleAddClick}
                         />
                       </div>
@@ -303,14 +303,14 @@ const OtherTenantItemEdit = ({
           <>
             {!!contact && (
               <SubTitle>
-                Asiakkaan tiedot
+                Data kontak
                 <Authorization
                   allow={isMethodAllowed(contactMethods, Methods.PATCH)}
                 >
                   <EditButton
                     className="inline-button"
                     onClick={handleEditClick}
-                    title="Muokkaa asiakasta"
+                    title="Ubah kontak"
                   />
                 </Authorization>
               </SubTitle>

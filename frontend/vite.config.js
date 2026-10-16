@@ -63,7 +63,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         leasing: path.resolve(__dirname, 'apps/leasing/index.html'),
-        landuse: path.resolve(__dirname, 'apps/landuse/index.html'),
       },
       output: {
         format: 'es',

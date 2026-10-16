@@ -20,10 +20,10 @@ export const ApplicantInfoCheckFieldPaths = {
   COMMENT: "comment",
 };
 export const ApplicantInfoCheckFieldTitles = {
-  PREPARER: "Tarkastaja",
-  STATE: "Tila",
-  MARK_ALL: "Merkitse kaikkiin hakijan hakemuksiin",
-  COMMENT: "Kommentti",
+  PREPARER: "Pemeriksa",
+  STATE: "Status",
+  MARK_ALL: "Tandai pada semua permohonan pemohon",
+  COMMENT: "Komentar",
 };
 export const ApplicantInfoCheckExternalTypes = {
   CREDIT_INQUIRY: "credit_inquiry",
@@ -36,7 +36,7 @@ export const ApplicantTypes = {
   UNKNOWN: null,
   // UI only states
   UNSELECTED: "unselected",
-  NOT_APPLICABLE: "not applicable",
+  NOT_APPLICABLE: "No.",
 };
 export const TargetIdentifierTypes = {
   PLAN_UNIT: "plan_unit",

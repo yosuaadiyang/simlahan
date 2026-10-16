@@ -72,7 +72,7 @@ const renderTargets = ({
 
         return (
           <Column lg={4} sm={4} key={target.id}>
-            <FormFieldLabel>Kohteen tunnus</FormFieldLabel>
+            <FormFieldLabel>Pengenal objek</FormFieldLabel>
             <label className="option-label">
               <input
                 type="checkbox"
@@ -137,11 +137,12 @@ class DirectReservationLinkModal extends Component<Props> {
       <Modal
         isOpen={isOpen}
         onClose={onClose}
-        title="Lähetä henkilökohtainen hakemuslinkki"
+        title="Kirim tautan permohonan pribadi"
         className="DirectReservationLinkModal"
       >
         <p>
-          Tällä lomakkeella voit luoda uniikin hakemuslinkin vastaanottajalle
+          Dengan formulir ini Anda dapat membuat tautan permohonan unik untuk
+          penerima
         </p>
         <Row>
           <FieldArray
@@ -161,19 +162,15 @@ class DirectReservationLinkModal extends Component<Props> {
               fieldAttributes={{
                 type: FieldTypes.CHOICE,
                 read_only: false,
-                label: "Kieli",
+                label: "Bahasa",
                 choices: [
                   {
-                    value: "FI",
-                    display_name: "Suomi",
-                  },
-                  {
-                    value: "SE",
-                    display_name: "Ruotsi",
+                    value: "ID",
+                    display_name: "Bahasa Indonesia",
                   },
                   {
                     value: "EN",
-                    display_name: "Englanti",
+                    display_name: "Bahasa Inggris",
                   },
                 ],
               }}
@@ -188,7 +185,7 @@ class DirectReservationLinkModal extends Component<Props> {
               fieldAttributes={{
                 type: FieldTypes.STRING,
                 read_only: false,
-                label: "Vastaanottajan etunimi",
+                label: "Nama depan penerima",
               }}
               name="first_name"
             />
@@ -199,7 +196,7 @@ class DirectReservationLinkModal extends Component<Props> {
               fieldAttributes={{
                 type: FieldTypes.STRING,
                 read_only: false,
-                label: "Vastaanottajan sukunimi",
+                label: "Nama belakang penerima",
               }}
               name="last_name"
             />
@@ -211,7 +208,7 @@ class DirectReservationLinkModal extends Component<Props> {
                 type: FieldTypes.STRING,
                 read_only: false,
                 required: true,
-                label: "Vastaanottajan sähköpostiosoite",
+                label: "Alamat email penerima",
               }}
               name="email"
             />
@@ -222,7 +219,7 @@ class DirectReservationLinkModal extends Component<Props> {
               fieldAttributes={{
                 type: FieldTypes.STRING,
                 read_only: false,
-                label: "Yrityksen nimi",
+                label: "Nama badan usaha",
               }}
               name="company"
             />
@@ -235,7 +232,7 @@ class DirectReservationLinkModal extends Component<Props> {
               fieldAttributes={{
                 type: FieldTypes.TEXTAREA,
                 read_only: false,
-                label: "Saateteksti",
+                label: "Teks pengantar",
               }}
               name="covering_note"
             />
@@ -248,13 +245,13 @@ class DirectReservationLinkModal extends Component<Props> {
               fieldAttributes={{
                 type: FieldTypes.CHECKBOX,
                 read_only: false,
-                label: "Lähetä kopio viestistä omaan sähköpostiin",
+                label: "Kirim salinan pesan ke email sendiri",
               }}
               overrideValues={{
                 options: [
                   {
                     value: true,
-                    label: "Kyllä",
+                    label: "Ya",
                   },
                 ],
               }}
@@ -272,11 +269,11 @@ class DirectReservationLinkModal extends Component<Props> {
           <Button
             className={ButtonColors.SECONDARY}
             onClick={onClose}
-            text="Peruuta"
+            text="Batal"
           />
           <Button
             disabled={isCreatingDirectReservationLink}
-            text="Lähetä"
+            text="Kirim"
             onClick={this.handleSubmit}
           />
         </ModalButtonWrapper>

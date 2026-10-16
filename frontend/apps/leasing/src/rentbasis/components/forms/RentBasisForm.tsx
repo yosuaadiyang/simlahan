@@ -86,7 +86,7 @@ const PropertyIdentifiers = ({
               UsersPermissions.ADD_BASISOFRENTPROPERTYIDENTIFIER,
             ) &&
               (!fields || !fields.length) && (
-                <FormText>Ei kiinteistötunnuksia</FormText>
+                <FormText>Tidak ada pengenal bidang</FormText>
               )}
 
             {fields &&
@@ -148,7 +148,7 @@ const PropertyIdentifiers = ({
                             <RemoveButton
                               className="third-level"
                               onClick={handleRemove}
-                              title="Poista kiinteistötunnus"
+                              title="Hapus pengenal bidang"
                             />
                           </Authorization>
                         }
@@ -167,7 +167,7 @@ const PropertyIdentifiers = ({
               <Row>
                 <Column>
                   <AddButtonThird
-                    label="Lisää kiinteistötunnus"
+                    label="Tambah pengenal bidang"
                     onClick={handleAdd}
                   />
                 </Column>
@@ -214,7 +214,9 @@ const Decisions = ({
               usersPermissions,
               UsersPermissions.ADD_BASISOFRENTDECISION,
             ) &&
-              (!fields || !fields.length) && <FormText>Ei sopimuksia</FormText>}
+              (!fields || !fields.length) && (
+                <FormText>Tidak ada kontrak</FormText>
+              )}
             {fields && !!fields.length && (
               <Row>
                 <Column small={3} large={2}>
@@ -431,7 +433,7 @@ const Decisions = ({
                             <RemoveButton
                               className="third-level"
                               onClick={handleRemove}
-                              title="Poista päätös"
+                              title="Hapus keputusan"
                             />
                           </Authorization>
                         }
@@ -449,7 +451,10 @@ const Decisions = ({
             >
               <Row>
                 <Column>
-                  <AddButtonThird label="Lisää päätös" onClick={handleAdd} />
+                  <AddButtonThird
+                    label="Tambah keputusan"
+                    onClick={handleAdd}
+                  />
                 </Column>
               </Row>
             </Authorization>
@@ -497,7 +502,9 @@ const RentRates = ({
               usersPermissions,
               UsersPermissions.ADD_BASISOFRENTRATE,
             ) &&
-              (!fields || !fields.length) && <FormText>Ei hintoja</FormText>}
+              (!fields || !fields.length) && (
+                <FormText>Tidak ada harga</FormText>
+              )}
             {fields && !!fields.length && (
               <>
                 <Row>
@@ -628,7 +635,7 @@ const RentRates = ({
                             )}
                             invisibleLabel
                             name={`${field}.amount`}
-                            unit="€"
+                            unit="Rp"
                             overrideValues={{
                               label: RentBasisRentRatesFieldTitles.AMOUNT,
                             }}
@@ -670,7 +677,7 @@ const RentRates = ({
                               <RemoveButton
                                 className="third-level"
                                 onClick={handleRemove}
-                                title="Poista hinta"
+                                title="Hapus harga"
                               />
                             </Authorization>
                           }
@@ -690,7 +697,7 @@ const RentRates = ({
             >
               <Row>
                 <Column>
-                  <AddButtonThird label="Lisää hinta" onClick={handleAdd} />
+                  <AddButtonThird label="Tambah harga" onClick={handleAdd} />
                 </Column>
               </Row>
             </Authorization>

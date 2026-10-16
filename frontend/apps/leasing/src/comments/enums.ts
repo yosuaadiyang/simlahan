@@ -14,6 +14,6 @@ export const CommentFieldPaths = {
  * @enum {string}
  */
 export const CommentFieldTitles = {
-  TEXT: "Kommentti",
-  TOPIC: "Aihealue",
+  TEXT: "Komentar",
+  TOPIC: "Topik",
 };

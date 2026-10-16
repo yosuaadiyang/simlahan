@@ -17,8 +17,8 @@ export const ButtonColors = {
  * @enum {string}
  */
 export const ButtonLabels = {
-  CREATE_LEASE_IDENTIFIER: "Luo vuokraustunnus",
-  CREATE_LEASE: "Luo vuokraus",
+  CREATE_LEASE_IDENTIFIER: "Buat pengenal sewa",
+  CREATE_LEASE: "Buat sewa",
 };
 
 /**
@@ -47,8 +47,8 @@ export const RentCalculatorFieldPaths = {
  * @enum {string}
  */
 export const RentCalculatorFieldTitles = {
-  RENT_CALCULATOR: "Vuokralaskelma",
-  TYPE: "Vuokra ajalle",
+  RENT_CALCULATOR: "Perhitungan sewa",
+  TYPE: "Sewa untuk periode",
 };
 
 /**
@@ -95,13 +95,4 @@ export const RentSubItemSubjectType = {
 export const RentSubItemType = {
   DISCOUNT: "discount",
   INCREASE: "increase",
-};
-
-/**
- * Municipalities enum for address search input
- * @readonly
- * @enum {string}
- */
-export const AddressFieldMunicipalities = {
-  HELSINKI: "helsinki",
 };

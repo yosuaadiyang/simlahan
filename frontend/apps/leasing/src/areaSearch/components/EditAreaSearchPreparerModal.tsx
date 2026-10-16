@@ -40,7 +40,7 @@ class EditAreaSearchPreparerModal extends Component<Props> {
       >
         {areaSearchData && (
           <FormText>
-            Saapunut {formatDate(areaSearchData.received_date)} -{" "}
+            Diterima {formatDate(areaSearchData.received_date)} -{" "}
             {areaSearchData.applicants.join(", ")}
           </FormText>
         )}

@@ -88,11 +88,11 @@ const ContactListPage: React.FC = () => {
   );
 
   useEffect(() => {
-    setPageTitle("Asiakkaat");
+    setPageTitle("Kontak");
     dispatch(
       receiveTopNavigationSettings({
         linkUrl: getRouteById(Routes.CONTACTS),
-        pageTitle: "Asiakkaat",
+        pageTitle: "Kontak",
         showSearch: false,
       }),
     );
@@ -216,7 +216,7 @@ const ContactListPage: React.FC = () => {
       <Button
         className="contact-list-expand-button"
         aria-label={
-          isExpanded ? "Piilota rivin lisätiedot" : "Näytä rivin lisätiedot"
+          isExpanded ? "Sembunyikan detail baris" : "Tampilkan detail baris"
         }
         aria-expanded={isExpanded}
         variant={ButtonVariant.Supplementary}
@@ -276,7 +276,7 @@ const ContactListPage: React.FC = () => {
     ) {
       cols.push({
         key: "names",
-        headerName: "Nimi",
+        headerName: "Nama",
         isSortable: true,
         transform: (row: Contact) =>
           renderClickableCell(getContactFullName(row) || "-", row.id),
@@ -379,7 +379,7 @@ const ContactListPage: React.FC = () => {
             <Loader isLoading={true} />
           </LoaderWrapper>
         )}
-        <span>{isFetching ? "Ladataan..." : `Löytyi ${count} kpl`}</span>
+        <span>{isFetching ? "Memuat..." : `Ditemukan ${count} kpl`}</span>
         <Table
           ariaLabelSortButtonUnset="Not sorted"
           ariaLabelSortButtonAscending="Sorted in ascending order"
@@ -396,7 +396,7 @@ const ContactListPage: React.FC = () => {
           dense
         />
         <Pagination
-          language="fi"
+          language="en"
           onChange={(event, index) => {
             event.preventDefault();
             handlePageClick(index + 1);
@@ -404,7 +404,7 @@ const ContactListPage: React.FC = () => {
           pageCount={maxPage || 1}
           pageHref={() => "#"}
           pageIndex={activePage - 1}
-          paginationAriaLabel={`Sivuvalitsin, ${activePage} / ${maxPage}`}
+          paginationAriaLabel={`Pemilih halaman, ${activePage} / ${maxPage}`}
           siblingCount={5}
         />
       </ContentContainerHds>

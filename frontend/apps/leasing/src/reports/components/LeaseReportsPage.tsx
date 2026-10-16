@@ -42,11 +42,11 @@ const LeaseReportsPage: React.FC = () => {
   const reports: Reports = useAppSelector(getReports);
 
   useEffect(() => {
-    setPageTitle("Tilastot ja raportit");
+    setPageTitle("Statistik dan laporan");
     dispatch(
       receiveTopNavigationSettings({
         linkUrl: getRouteById(Routes.LEASE_REPORTS),
-        pageTitle: "Tilastot ja raportit",
+        pageTitle: "Statistik dan laporan",
         showSearch: false,
       }),
     );

@@ -432,7 +432,7 @@ const RentBasisReadonly = ({ rentBasis }: Props) => {
                 ))}
               </ListItems>
             ) : (
-              <FormText>Ei päätöksiä</FormText>
+              <FormText>Tidak ada keputusan</FormText>
             )}
           </Column>
         </Row>
@@ -528,7 +528,7 @@ const RentBasisReadonly = ({ rentBasis }: Props) => {
                         >
                           <ListItem>
                             {!isEmptyValue(price.amount)
-                              ? `${formatNumber(price.amount)} €`
+                              ? `Rp ${formatNumber(price.amount)}`
                               : "-"}
                           </ListItem>
                         </Authorization>

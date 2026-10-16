@@ -18,8 +18,8 @@ export const JobRunFieldPaths = {
 export const JobRunFieldTitles = {
   ID: "",
   EXIT_CODE: "",
-  STARTED_AT: "Aloitusaika",
-  STOPPED_AT: "Päättymisaika",
+  STARTED_AT: "Waktu mulai",
+  STOPPED_AT: "Waktu berakhir",
 };
 
 /**
@@ -38,8 +38,8 @@ export const JobRunJobFieldPaths = {
  * @enum {string}
  */
 export const JobRunJobFieldTitles = {
-  COMMENT: "Työn kommentti",
-  NAME: "Työ",
+  COMMENT: "Komentar tugas",
+  NAME: "Tugas",
 };
 
 /**
@@ -58,8 +58,8 @@ export const JobRunLogEntryFieldPaths = {
  * @enum {string}
  */
 export const JobRunLogEntryFieldTitles = {
-  TEXT: "Tulos",
-  TIME: "Aika",
+  TEXT: "Hasil",
+  TIME: "Waktu",
 };
 
 /**
@@ -86,14 +86,14 @@ export const ScheduledJobFieldPaths = {
  */
 export const ScheduledJobFieldTitles = {
   ID: "",
-  ENABLED: "Käytössä",
-  YEARS: "Vuodet",
-  MONTHS: "Kuukaudet",
-  DAYS_OF_MONTH: "Päivät",
-  WEEKDAYS: "Viikonpäivä",
+  ENABLED: "Digunakan",
+  YEARS: "Tahun",
+  MONTHS: "Bulan",
+  DAYS_OF_MONTH: "Hari",
+  WEEKDAYS: "Hari",
   HOURS: "tunnit",
-  MINUTES: "Minuutit",
-  COMMENT: "Kommentti",
+  MINUTES: "Menit",
+  COMMENT: "Komentar",
 };
 
 /**
@@ -112,6 +112,6 @@ export const ScheduledJobJobFieldPaths = {
  * @enum {string}
  */
 export const ScheduledJobJobFieldTitles = {
-  COMMENT: "Työn kommentti",
-  NAME: "Työ",
+  COMMENT: "Komentar tugas",
+  NAME: "Tugas",
 };

@@ -85,7 +85,7 @@ const ContractRents = ({ contractRents, rentType }: Props) => {
     <>
       <BoxItemContainer>
         {(!contractRents || !contractRents.length) && (
-          <FormText>Ei sopimusvuokria</FormText>
+          <FormText>Tidak ada sewa kontrak</FormText>
         )}
 
         {contractRents &&
@@ -93,12 +93,12 @@ const ContractRents = ({ contractRents, rentType }: Props) => {
           contractRents.map((contractRent, index) => {
             const getAmountText = () => {
               if (isEmptyValue(contractRent.amount)) return null;
-              return `${formatNumber(contractRent.amount)} € ${getLabelOfOption(amountPeriodOptions, contractRent.period) || ""}`;
+              return `Rp ${formatNumber(contractRent.amount)} ${getLabelOfOption(amountPeriodOptions, contractRent.period) || ""}`;
             };
 
             const getBaseAmount = () => {
               if (isEmptyValue(contractRent.base_amount)) return null;
-              return `${formatNumber(contractRent.base_amount)} € ${getLabelOfOption(baseAmountPeriodOptions, contractRent.base_amount_period) || ""}`;
+              return `Rp ${formatNumber(contractRent.base_amount)} ${getLabelOfOption(baseAmountPeriodOptions, contractRent.base_amount_period) || ""}`;
             };
 
             const renderFields = () => (
@@ -204,7 +204,7 @@ const ContractRents = ({ contractRents, rentType }: Props) => {
                           </FormTextTitle>
                           <FormText>
                             {!isEmptyValue(contractRent.base_year_rent)
-                              ? `${formatNumber(contractRent.base_year_rent)} €`
+                              ? `Rp ${formatNumber(contractRent.base_year_rent)}`
                               : "-"}
                           </FormText>
                         </>

@@ -62,7 +62,7 @@ class AreaSearchExportModal extends Component<Props> {
 
     switch (selectedMode) {
       case ExportModes.APPLICATIONS_PDF: {
-        guideText = "Tulostus sisältää valitut hakemukset .pdf-muodossa.";
+        guideText = "Hasil cetak berisi permohonan terpilih dalam format .pdf.";
         const params: Record<string, string> = {
           ids: selectedSearchIds.join(","),
         };
@@ -79,7 +79,7 @@ class AreaSearchExportModal extends Component<Props> {
         break;
       }
       case ExportModes.APPLICATIONS_XLS:
-        guideText = "Tulostus sisältää valitut hakemukset .xls-muodossa.";
+        guideText = "Hasil cetak berisi permohonan terpilih dalam format .xls.";
         downloadUrl = createUrl("area_search/get_answers_xlsx/", {
           ids: selectedSearchIds.join(","),
         });
@@ -90,7 +90,7 @@ class AreaSearchExportModal extends Component<Props> {
       <Modal
         isOpen={isOpen}
         onClose={onClose}
-        title="Tulosta tiedostoon"
+        title="Cetak ke berkas"
         className="AreaSearchExportModal"
       >
         <FormFieldLegacy
@@ -99,15 +99,15 @@ class AreaSearchExportModal extends Component<Props> {
             type: FieldTypes.CHOICE,
             required: false,
             read_only: false,
-            label: "Tulostusalue",
+            label: "Cakupan cetak",
             choices: [
               {
                 value: ExportModes.APPLICATIONS_PDF,
-                display_name: "Tulosta valitut hakemukset (PDF)",
+                display_name: "Cetak permohonan terpilih (PDF)",
               },
               {
                 value: ExportModes.APPLICATIONS_XLS,
-                display_name: "Tulosta valitut hakemukset (XLS)",
+                display_name: "Cetak permohonan terpilih (XLS)",
               },
             ],
           }}
@@ -122,13 +122,13 @@ class AreaSearchExportModal extends Component<Props> {
                 type: FieldTypes.CHECKBOX,
                 required: false,
                 read_only: false,
-                label: "Sisällytä tulostukseen käsittelytiedot",
+                label: "Sertakan data pemrosesan saat mencetak",
               }}
               overrideValues={{
                 options: [
                   {
                     value: true,
-                    label: "Sisällytä tulostukseen käsittelytiedot",
+                    label: "Sertakan data pemrosesan saat mencetak",
                   },
                 ],
               }}
@@ -141,13 +141,13 @@ class AreaSearchExportModal extends Component<Props> {
                 type: FieldTypes.CHECKBOX,
                 required: false,
                 read_only: false,
-                label: "Sisällytä tulostukseen liitteet",
+                label: "Sertakan lampiran saat mencetak",
               }}
               overrideValues={{
                 options: [
                   {
                     value: true,
-                    label: "Sisällytä tulostukseen liitteet",
+                    label: "Sertakan lampiran saat mencetak",
                   },
                 ],
               }}
@@ -160,12 +160,12 @@ class AreaSearchExportModal extends Component<Props> {
           <Button
             className={ButtonColors.SECONDARY}
             onClick={onClose}
-            text="Peruuta"
+            text="Batal"
           />
           <FileDownloadButton
             disabled={!downloadUrl || !selectedMode}
             url={downloadUrl}
-            label="Tulosta"
+            label="Cetak"
             onSuccess={() => onClose()}
           />
         </ModalButtonWrapper>

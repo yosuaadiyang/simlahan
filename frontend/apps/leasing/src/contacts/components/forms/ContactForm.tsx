@@ -397,7 +397,7 @@ const ContactForm: React.FC<Props> = ({
                   >
                     <WarningField
                       meta={{
-                        warning: "Y-tunnuksen pituuden on oltava 9 merkkiä",
+                        warning: "NPWP harus 15 atau 16 digit",
                       }}
                       showWarning={true}
                     />
@@ -428,7 +428,7 @@ const ContactForm: React.FC<Props> = ({
                       validate={(value) => {
                         const error = getContactBusinessIdFieldError(value);
                         return error
-                          ? "Y-tunnuksen pituuden on oltava 9 merkkiä"
+                          ? "NPWP harus 15 atau 16 digit"
                           : undefined;
                       }}
                     />
@@ -568,7 +568,7 @@ const ContactForm: React.FC<Props> = ({
                       {ContactFieldTitles.IS_LESSOR}
                     </FormTextTitle>
                     <FormText>
-                      {initialValues.is_lessor ? "Kyllä" : "Ei"}
+                      {initialValues.is_lessor ? "Ya" : "Tidak"}
                     </FormText>
                   </>
                 </Authorization>

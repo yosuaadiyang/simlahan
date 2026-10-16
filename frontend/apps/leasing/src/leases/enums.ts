@@ -206,9 +206,9 @@ export const ConstructabilityType = {
  * @type {{PREPARATION: string, IN_EFFECT: string, FINISHED: string}}
  */
 export const LeaseStatus = {
-  PREPARATION: "Valmisteilla",
-  IN_EFFECT: "Voimassa",
-  FINISHED: "Päättynyt",
+  PREPARATION: "Dalam persiapan",
+  IN_EFFECT: "Berlaku",
+  FINISHED: "Berakhir",
 };
 
 /**
@@ -423,56 +423,56 @@ export const LeaseFieldPaths = {
  * @type {{}}
  */
 export const LeaseFieldTitles = {
-  ADDRESS: "Osoite",
-  APPLICATION_RECEIVED_AT: "Hakemuksen saapumispäivä",
-  AREA_IDENTIFIER: "Kohteen tunnus",
-  ARRANGEMENT_DECISION: "Järjestelypäätös",
-  AUDIT_LOG: "Muutoshistoria",
-  BUILDING_SELLING_PRICE: "Rakennuksen kauppahinta",
-  CLASSIFICATION: "Julkisuusluokka",
-  CONTRACT_NUMBERS: "Sopimusnumero",
-  CONVEYANCE_NUMBER: "Luovutusnumero",
-  DISTRICT: "Kaupunginosa",
-  END_DATE: "Loppupvm",
-  FINANCING: "Rahoitusmuoto",
-  HISTORY: "Historiapuu",
-  HITAS: "Hitas",
-  IDENTIFIER: "Vuokraustunnus",
-  IDENTIFIER_SHORT: "Tunnus",
-  INFILL_DEVELOPMENT_COMPENSATIONS: "Täydennysrakentamiskorvaus",
-  INTENDED_USE: "Vuokrauksen käyttötarkoitus",
-  INTENDED_USE_NOTE: "Käyttötarkoituksen huomautus",
-  INTERNAL_ORDER: "Sisäinen tilaus",
-  IS_SUBJECT_TO_VAT: "Arvonlisävelvollinen",
-  LESSOR: "Vuokranantaja",
-  MANAGEMENT: "Hallintamuoto",
-  MAP: "Kartta",
-  MATCHING_BASIS_OF_RENTS: "Vuokrausperiaatteet",
-  MUNICIPALITY: "Kunta",
-  NOTE: "Huomautus",
-  NOTICE_NOTE: "Irtisanomisajan huomautus",
-  NOTICE_PERIOD: "Irtisanomisaika",
-  PREPARER: "Valmistelija",
-  REAL_ESTATE_DEVELOPER: "Rakennuttaja",
-  REFERENCE_NUMBER: "Diaarinumero",
-  REGULATED: "Sääntely",
-  REGULATION: "Sääntelymuoto",
-  RELATED_LEASES: "Liittyvät vuokraukset",
-  RELATE_TO: "Liittyy vuokraukseen",
-  RESERVATION_PROCEDURE: "Varauksen menettely",
-  SERVICE_UNIT: "Palvelukokonaisuus",
-  SPECIAL_PROJECT: "Erityishanke",
-  START_DATE: "Alkupvm",
-  STATE: "Tyyppi",
-  STATISTICAL_USE: "Tilastollinen pääkäyttötarkoitus",
-  STATUS: "Olotila",
-  SUMMARY: "Yhteenveto",
-  SUMMARY_BASIC_INFO: "Perustiedot",
-  SUMMARY_STATISTICAL_INFO: "Tilastotiedot",
-  SUPPORTIVE_HOUSING: "Erityisasunnot",
-  TRANSFERABLE: "Siirto-oikeus",
-  TENANT: "Vuokralainen",
-  TYPE: "Vuokrauksen laji",
+  ADDRESS: "Alamat",
+  APPLICATION_RECEIVED_AT: "Tanggal permohonan diterima",
+  AREA_IDENTIFIER: "Pengenal objek",
+  ARRANGEMENT_DECISION: "Keputusan penataan",
+  AUDIT_LOG: "Riwayat perubahan",
+  BUILDING_SELLING_PRICE: "Harga jual bangunan",
+  CLASSIFICATION: "Kelas publikasi",
+  CONTRACT_NUMBERS: "Nomor kontrak",
+  CONVEYANCE_NUMBER: "Nomor pengalihan",
+  DISTRICT: "Kecamatan",
+  END_DATE: "Tgl akhir",
+  FINANCING: "Bentuk pembiayaan",
+  HISTORY: "Pohon riwayat",
+  HITAS: "Skema harga terkendali",
+  IDENTIFIER: "Pengenal sewa",
+  IDENTIFIER_SHORT: "Pengenal",
+  INFILL_DEVELOPMENT_COMPENSATIONS: "Kompensasi pembangunan sisipan",
+  INTENDED_USE: "Peruntukan sewa",
+  INTENDED_USE_NOTE: "Catatan peruntukan",
+  INTERNAL_ORDER: "Pesanan internal",
+  IS_SUBJECT_TO_VAT: "Wajib PPN",
+  LESSOR: "Pemberi sewa",
+  MANAGEMENT: "Bentuk pengelolaan",
+  MAP: "Peta",
+  MATCHING_BASIS_OF_RENTS: "Prinsip sewa",
+  MUNICIPALITY: "Kabupaten/Kota",
+  NOTE: "Catatan",
+  NOTICE_NOTE: "Catatan masa pemberitahuan",
+  NOTICE_PERIOD: "Masa pemberitahuan",
+  PREPARER: "Penyiap",
+  REAL_ESTATE_DEVELOPER: "Pengembang",
+  REFERENCE_NUMBER: "Nomor agenda",
+  REGULATED: "Pengaturan",
+  REGULATION: "Bentuk pengaturan",
+  RELATED_LEASES: "Sewa terkait",
+  RELATE_TO: "Terkait dengan sewa",
+  RESERVATION_PROCEDURE: "Prosedur pencadangan",
+  SERVICE_UNIT: "Unit layanan",
+  SPECIAL_PROJECT: "Proyek khusus",
+  START_DATE: "Tgl mulai",
+  STATE: "Jenis",
+  STATISTICAL_USE: "Peruntukan utama statistik",
+  STATUS: "Kondisi",
+  SUMMARY: "Ringkasan",
+  SUMMARY_BASIC_INFO: "Data dasar",
+  SUMMARY_STATISTICAL_INFO: "Data statistik",
+  SUPPORTIVE_HOUSING: "Hunian khusus",
+  TRANSFERABLE: "Hak pengalihan",
+  TENANT: "Penyewa",
+  TYPE: "Jenis sewa",
 };
 
 /**
@@ -531,40 +531,39 @@ export const LeaseAreasFieldPaths = {
  * @type {{}}
  */
 export const LeaseAreasFieldTitles = {
-  LEASE_AREAS: "Vuokrakohde",
-  LEASE_AREAS_SHORT: "Kohde",
-  ARCHIVED_AT: "Arkistoitu",
-  ARCHIVED_DECISION: "Päätös",
-  ARCHIVED_NOTE: "Huomautus",
-  AREA: "Pinta-ala",
-  CONSTRUCTABILITY: "Rakentamiskelpoisuus",
-  CONSTRUCTABILITY_REPORT: "Rakennettavuusselvitys",
-  CONSTRUCTABILITY_REPORT_GEOTECHNICAL_ATTACHMENTS:
-    "Geoteknisen palvelun tiedosto",
-  CONSTRUCTABILITY_REPORT_INVESTIGATION_STATE: "Selvitys",
-  CONSTRUCTABILITY_REPORT_SIGNING_DATE: "Allekirjoituspvm",
-  CONSTRUCTABILITY_REPORT_SIGNER: "Allekirjoittaja",
-  CONSTRUCTABILITY_REPORT_STATE: "Selvitysaste",
-  DEMOLITION: "Purku",
-  DEMOLITION_STATE: "Selvitysaste",
-  GEOMETRY: "Karttalinkki",
-  IDENTIFIER: "Kohteen tunnus",
-  LOCATION: "Sijainti",
-  OTHER: "Muut",
-  OTHER_STATE: "Selvitysaste",
-  POLLUTED_LAND: "Pima ja jäte",
-  POLLUTED_LAND_MATTI_REPORTS: "Matti raportti",
-  POLLUTED_LAND_PLANNER: "PIMA valmistelija",
-  POLLUTED_LAND_PROJECTWISE_NUMBER: "ProjectWise numero",
-  POLLUTED_LAND_RENT_CONDITION_DATE: "Vuokraehdot pvm",
-  POLLUTED_LAND_RENT_CONDITION_STATE: "Vuokraehdot",
-  POLLUTED_LAND_STATE: "Selvitysaste",
-  PRECONSTRUCTION: "Esirakentaminen, johtosiirrot ja kunnallistekniikka",
+  LEASE_AREAS: "Objek sewa",
+  LEASE_AREAS_SHORT: "Objek",
+  ARCHIVED_AT: "Diarsipkan",
+  ARCHIVED_DECISION: "Keputusan",
+  ARCHIVED_NOTE: "Catatan",
+  AREA: "Luas",
+  CONSTRUCTABILITY: "Kelayakan bangun",
+  CONSTRUCTABILITY_REPORT: "Kajian kelayakan bangun",
+  CONSTRUCTABILITY_REPORT_GEOTECHNICAL_ATTACHMENTS: "Berkas layanan geoteknik",
+  CONSTRUCTABILITY_REPORT_INVESTIGATION_STATE: "Kajian",
+  CONSTRUCTABILITY_REPORT_SIGNING_DATE: "Tgl penandatanganan",
+  CONSTRUCTABILITY_REPORT_SIGNER: "Penandatangan",
+  CONSTRUCTABILITY_REPORT_STATE: "Tingkat kajian",
+  DEMOLITION: "Pembongkaran",
+  DEMOLITION_STATE: "Tingkat kajian",
+  GEOMETRY: "Tautan peta",
+  IDENTIFIER: "Pengenal objek",
+  LOCATION: "Lokasi",
+  OTHER: "Lainnya",
+  OTHER_STATE: "Tingkat kajian",
+  POLLUTED_LAND: "Tanah tercemar dan limbah",
+  POLLUTED_LAND_MATTI_REPORTS: "Laporan MATTI",
+  POLLUTED_LAND_PLANNER: "Penyiap tanah tercemar",
+  POLLUTED_LAND_PROJECTWISE_NUMBER: "Nomor ProjectWise",
+  POLLUTED_LAND_RENT_CONDITION_DATE: "Tgl syarat sewa",
+  POLLUTED_LAND_RENT_CONDITION_STATE: "Syarat sewa",
+  POLLUTED_LAND_STATE: "Tingkat kajian",
+  PRECONSTRUCTION: "Pematangan lahan, relokasi jaringan, dan prasarana kota",
   PRECONSTRUCTION_ESTIMATED_CONSTRUCTION_READINESS_MOMENT:
-    "Arvioitu rakentamisvalmius (kk/v)",
-  PRECONSTRUCTION_INSPECTION_MOMENT: "Tarkistuspäivä (kk/v)",
-  PRECONSTRUCTION_STATE: "Selvitysaste",
-  TYPE: "Määritelmä",
+    "Perkiraan kesiapan konstruksi (bln/thn)",
+  PRECONSTRUCTION_INSPECTION_MOMENT: "Tanggal penyesuaian (bln/thn)",
+  PRECONSTRUCTION_STATE: "Tingkat kajian",
+  TYPE: "Definisi",
 };
 
 /**
@@ -586,10 +585,10 @@ export const LeaseAreaAttachmentsFieldPaths = {
  * @type {{}}
  */
 export const LeaseAreaAttachmentsFieldTitles = {
-  ATTACHMENTS: "Tiedostot",
-  FILE: "Nimi",
-  UPLOADED_AT: "Pvm",
-  UPLOADER: "Lataaja",
+  ATTACHMENTS: "Berkas",
+  FILE: "Nama",
+  UPLOADED_AT: "Tgl",
+  UPLOADER: "Pengunggah",
 };
 
 /**
@@ -612,11 +611,11 @@ export const LeaseAreaAddressesFieldPaths = {
  * @type {{}}
  */
 export const LeaseAreaAddressesFieldTitles = {
-  ADDRESSES: "Osoitteet",
-  ADDRESS: "Osoite",
-  CITY: "Kaupunki",
-  IS_PRIMARY: "Ensisijainen osoite",
-  POSTAL_CODE: "Postinumero",
+  ADDRESSES: "Alamat",
+  ADDRESS: "Alamat",
+  CITY: "Kota",
+  IS_PRIMARY: "Alamat utama",
+  POSTAL_CODE: "Kode pos",
 };
 
 /**
@@ -669,9 +668,9 @@ export const LeaseAreaUsageDistributionFieldPaths = {
  * @type {{}}
  */
 export const LeaseAreaUsageDistributionFieldTitles = {
-  DISTRIBUTION: "Käyttöjakauma",
-  BUILD_PERMISSION: "Rakennusoikeus",
-  NOTE: "Huomautus",
+  DISTRIBUTION: "Distribusi penggunaan",
+  BUILD_PERMISSION: "Hak membangun",
+  NOTE: "Catatan",
 };
 
 /**
@@ -693,9 +692,9 @@ export const LeaseAreaCustomDetailedPlanInfoLinksFieldPaths = {
  * @type {{}}
  */
 export const LeaseAreaCustomDetailedPlanInfoLinksFieldTitles = {
-  URL: "Lisätietolinkki",
-  DESCRIPTION: "Lisätietolinkin kuvaus",
-  LANGUAGE: "Kieli",
+  URL: "Tautan informasi",
+  DESCRIPTION: "Uraian tautan informasi",
+  LANGUAGE: "Bahasa",
 };
 
 /**
@@ -704,20 +703,22 @@ export const LeaseAreaCustomDetailedPlanInfoLinksFieldTitles = {
  * @type {{}}
  */
 export const LeaseAreaCustomDetailedPlanFieldTitles = {
-  IDENTIFIER: "Kohteen tunnus",
-  INTENDED_USE: "Kaavayksikön käyttötarkoitus",
-  ADDRESS: "Osoite",
-  AREA: "Kokonaisalue",
-  STATE: "Kaavayksikön olotila",
-  TYPE: "Kaavayksikön laji",
-  DETAILED_PLAN: "Asemakaava",
-  DETAILED_PLAN_LATEST_PROCESSING_DATE: "Asemakaavan viim. käsittelypvm",
-  DETAILED_PLAN_LATEST_PROCESSING_DATE_NOTE: "Asemak. käsittelypvm huomautus",
-  RENT_BUILD_PERMISSION: "Kokonaisrakennusoikeus",
+  IDENTIFIER: "Pengenal objek",
+  INTENDED_USE: "Peruntukan unit rencana",
+  ADDRESS: "Alamat",
+  AREA: "Area total",
+  STATE: "Status unit rencana",
+  TYPE: "Jenis unit rencana",
+  DETAILED_PLAN: "Rencana detail",
+  DETAILED_PLAN_LATEST_PROCESSING_DATE:
+    "Tgl pemrosesan terakhir rencana detail",
+  DETAILED_PLAN_LATEST_PROCESSING_DATE_NOTE:
+    "Catatan tgl pemrosesan rencana detail",
+  RENT_BUILD_PERMISSION: "Total hak membangun",
   PRECONSTRUCTION_ESTIMATED_CONSTRUCTION_READINESS_MOMENT:
-    "Arvioitu rakentamisen valmius",
-  INFO_LINKS: "Lisätietolinkit",
-  USAGE_DISTRIBUTIONS: "Käyttöjakaumat",
+    "Perkiraan kesiapan konstruksi",
+  INFO_LINKS: "Tautan informasi",
+  USAGE_DISTRIBUTIONS: "Distribusi penggunaan",
 };
 
 /**
@@ -760,23 +761,24 @@ export const LeasePlanUnitsFieldPaths = {
  * @type {{}}
  */
 export const LeasePlanUnitsFieldTitles = {
-  PLAN_UNITS: "Kaavayksiköt",
-  AREA: "Kokonaisala",
-  DETAILED_PLAN_IDENTIFIER: "Asemakaava",
-  DETAILED_PLAN_LATEST_PROCESSING_DATE: "Asemakaavan viimeisin käsittelypvm",
+  PLAN_UNITS: "Unit rencana",
+  AREA: "Luas total",
+  DETAILED_PLAN_IDENTIFIER: "Rencana detail",
+  DETAILED_PLAN_LATEST_PROCESSING_DATE:
+    "Tgl pemrosesan terakhir rencana detail",
   DETAILED_PLAN_LATEST_PROCESSING_DATE_NOTE:
-    "Asemakaavan viimeisin käsittelypvm huomautus",
-  GEOMETRY: "Karttalinkki",
-  IDENTIFIER: "Kohteen tunnus",
-  PLAN_UNIT_INTENDED_USE: "Kaavayksikön käyttötarkoitus",
-  PLAN_UNIT_STATE: "Kaavayksikön olotila",
-  PLAN_UNIT_TYPE: "Kaavayksikön laji",
-  PLOT_DIVISION_EFFECTIVE_DATE: "Tonttijaon voimaantulopvm",
-  PLOT_DIVISION_IDENTIFIER: "Tonttijaon tunnus",
-  PLOT_DIVISION_STATE: "Tonttijaon olotila",
-  SECTION_AREA: "Leikkausala",
-  IS_MASTER: "Onko alkuperäinen?",
-  USAGE_DISTRIBUTIONS: "Käyttöjakaumat",
+    "Catatan tgl pemrosesan terakhir rencana detail",
+  GEOMETRY: "Tautan peta",
+  IDENTIFIER: "Pengenal objek",
+  PLAN_UNIT_INTENDED_USE: "Peruntukan unit rencana",
+  PLAN_UNIT_STATE: "Status unit rencana",
+  PLAN_UNIT_TYPE: "Jenis unit rencana",
+  PLOT_DIVISION_EFFECTIVE_DATE: "Tgl berlaku pemecahan bidang",
+  PLOT_DIVISION_IDENTIFIER: "Pengenal pemecahan bidang",
+  PLOT_DIVISION_STATE: "Status pemecahan bidang",
+  SECTION_AREA: "Luas bagian",
+  IS_MASTER: "Asli?",
+  USAGE_DISTRIBUTIONS: "Distribusi penggunaan",
 };
 
 /**
@@ -805,15 +807,15 @@ export const LeasePlotsFieldPaths = {
  * @type {{}}
  */
 export const LeasePlotsFieldTitles = {
-  PLOTS: "Kiinteistöt / määräalat",
-  AREA: "Kokonaisala",
-  GEOMETRY: "Karttalinkki",
-  IDENTIFIER: "Kohteen tunnus",
-  KTJ_LINK: "Ktj-dokumentit",
-  REGISTRATION_DATE: "Rekisteröintipvm",
-  REPEAL_DATE: "Kumoamispvm",
-  SECTION_AREA: "Leikkausala",
-  TYPE: "Määritelmä",
+  PLOTS: "Bidang tanah",
+  AREA: "Luas total",
+  GEOMETRY: "Tautan peta",
+  IDENTIFIER: "Pengenal objek",
+  KTJ_LINK: "Dokumen pertanahan",
+  REGISTRATION_DATE: "Tgl pendaftaran",
+  REPEAL_DATE: "Tgl pencabutan",
+  SECTION_AREA: "Luas bagian",
+  TYPE: "Definisi",
 };
 
 /**
@@ -838,11 +840,11 @@ export const LeaseConstructabilityDescriptionsFieldPaths = {
  * @type {{}}
  */
 export const LeaseConstructabilityDescriptionsFieldTitles = {
-  CONSTRUCTABILITY_DESCRIPTIONS: "Huomautukset",
-  AHJO_REFERENCE_NUMBER: "AHJO diaarinumero",
-  IS_STATIC: "Pysyvä huomautus",
-  TEXT: "Huomautus",
-  TYPE: "Tyyppi",
+  CONSTRUCTABILITY_DESCRIPTIONS: "Catatan",
+  AHJO_REFERENCE_NUMBER: "Nomor referensi keputusan",
+  IS_STATIC: "Catatan tetap",
+  TEXT: "Catatan",
+  TYPE: "Jenis",
 };
 
 /**
@@ -865,12 +867,12 @@ export const LeaseTenantsFieldPaths = {
  * @type {{}}
  */
 export const LeaseTenantsFieldTitles = {
-  TENANTS: "Vuokralaiset",
-  REFERENCE: "Viite",
-  SHARE_DENOMINATOR: "Jakaja",
-  SHARE_FRACTION: "Hallintaosuus",
-  SHARE_NUMERATOR: "Jaettava",
-  SHARE_PERCENTAGE: "Laskun hallintaosuus",
+  TENANTS: "Penyewa",
+  REFERENCE: "Referensi",
+  SHARE_DENOMINATOR: "Penyebut",
+  SHARE_FRACTION: "Porsi penguasaan",
+  SHARE_NUMERATOR: "Pembilang",
+  SHARE_PERCENTAGE: "Porsi penguasaan tagihan",
 };
 
 /**
@@ -896,11 +898,11 @@ export const LeaseTenantRentSharesFieldPaths = {
  * @type {{}}
  */
 export const LeaseTenantRentSharesFieldTitles = {
-  RENT_SHARES: "Laskutusosuudet",
-  INTENDED_USE: "Käyttötarkoitus",
-  SHARE_DENOMINATOR: "Jakaja",
-  SHARE_FRACTION: "Laskutusosuus",
-  SHARE_NUMERATOR: "Jaettava",
+  RENT_SHARES: "Porsi tagihan",
+  INTENDED_USE: "Peruntukan",
+  SHARE_DENOMINATOR: "Penyebut",
+  SHARE_FRACTION: "Porsi tagihan",
+  SHARE_NUMERATOR: "Pembilang",
 };
 
 /**
@@ -923,10 +925,10 @@ export const LeaseTenantContactSetFieldPaths = {
  * @type {{}}
  */
 export const LeaseTenantContactSetFieldTitles = {
-  CONTACT: "Asiakas",
-  END_DATE: "Loppupvm",
-  START_DATE: "Alkupvm",
-  TYPE: "Tyyppi",
+  CONTACT: "Kontak",
+  END_DATE: "Tgl akhir",
+  START_DATE: "Tgl mulai",
+  TYPE: "Jenis",
 };
 
 /**
@@ -969,28 +971,28 @@ export const LeaseRentsFieldPaths = {
  * @type {{}}
  */
 export const LeaseRentsFieldTitles = {
-  RENTS: "Vuokrat",
-  AMOUNT: "Kertakaikkinen vuokra",
-  CYCLE: "Vuokrakausi",
-  DUE_DATES_PER_YEAR: "Laskut kpl/v",
-  DUE_DATES_TYPE: "Laskutusjako",
-  ELEMENTARY_INDEX: "Perusindeksi",
-  END_DATE: "Loppupvm",
-  EQUALIZATION_END_DATE: "Tasaus loppupvm",
-  EQUALIZATION_START_DATE: "Tasaus alkupvm",
-  INDEX_ROUNDING: "Pyöristys",
-  INDEX_TYPE: "Indeksin tunnusnumero",
-  RENT_INFO_COMPLETED_AT: "Vuokratiedot kunnossa?",
-  MANUAL_RATIO: "Käsinlaskentakerroin",
-  MANUAL_RATIO_PREVIOUS: "Käsinlaskentakerroin (edellinen)",
-  NOTE: "Huomautus",
-  START_DATE: "Alkupvm",
-  TYPE: "Vuokralaji",
+  RENTS: "Sewa",
+  AMOUNT: "Sewa sekali bayar",
+  CYCLE: "Periode sewa",
+  DUE_DATES_PER_YEAR: "Tagihan per tahun",
+  DUE_DATES_TYPE: "Pembagian tagihan",
+  ELEMENTARY_INDEX: "Indeks dasar",
+  END_DATE: "Tgl akhir",
+  EQUALIZATION_END_DATE: "Tgl akhir penyetaraan",
+  EQUALIZATION_START_DATE: "Tgl mulai penyetaraan",
+  INDEX_ROUNDING: "Pembulatan",
+  INDEX_TYPE: "Nomor pengenal indeks",
+  RENT_INFO_COMPLETED_AT: "Data sewa lengkap?",
+  MANUAL_RATIO: "Faktor hitung manual",
+  MANUAL_RATIO_PREVIOUS: "Faktor hitung manual (sebelumnya)",
+  NOTE: "Catatan",
+  START_DATE: "Tgl mulai",
+  TYPE: "Jenis sewa",
   X_VALUE: "X-luku",
   Y_VALUE: "Y-luku",
-  Y_VALUE_START: "Y-luku alkaen",
-  YEARLY_DUE_DATES: "Eräpäivät (pv.kk)",
-  OVERRIDE_RECEIVABLE_TYPE: "Automaattinen saamislaji",
+  Y_VALUE_START: "Nilai Y mulai",
+  YEARLY_DUE_DATES: "Jatuh tempo (tgl.bln)",
+  OVERRIDE_RECEIVABLE_TYPE: "Jenis piutang otomatis",
 };
 
 /**
@@ -1010,9 +1012,9 @@ export const LeaseRentDueDatesFieldPaths = {
  * @type {{}}
  */
 export const LeaseRentDueDatesFieldTitles = {
-  DUE_DATES: "Eräpäivät",
-  DAY: "Päivä",
-  MONTH: "Kuukausi",
+  DUE_DATES: "Jatuh tempo",
+  DAY: "Hari",
+  MONTH: "Bulan",
 };
 
 /**
@@ -1036,10 +1038,10 @@ export const LeaseRentOldDwellingsInHousingCompaniesPriceIndexFieldPaths = {
  * @type {{}}
  */
 export const LeaseRentOldDwellingsInHousingCompaniesPriceIndexFieldTitles = {
-  OLD_DWELLINGS_IN_HOUSING_COMPANIES_PRICE_INDEX: "Tasotarkistus",
-  TYPE: "Tyyppi",
-  POINT_FIGURES: "Indeksipisteluku",
-  REVIEW_DAYS: "Tarkistuspäivät",
+  OLD_DWELLINGS_IN_HOUSING_COMPANIES_PRICE_INDEX: "Penyesuaian sewa berkala",
+  TYPE: "Jenis",
+  POINT_FIGURES: "Angka indeks",
+  REVIEW_DAYS: "Tanggal penyesuaian",
 };
 
 /**
@@ -1064,11 +1066,11 @@ export const LeaseRentFixedInitialYearRentsFieldPaths = {
  * @type {{}}
  */
 export const LeaseRentFixedInitialYearRentsFieldTitles = {
-  FIXED_INITIAL_YEAR_RENTS: "Kiinteä alkuvuosivuokra",
-  AMOUNT: "Kiinteä alkuvuosivuokra",
-  END_DATE: "Loppupvm",
-  INTENDED_USE: "Käyttötarkoitus",
-  START_DATE: "Alkupvm",
+  FIXED_INITIAL_YEAR_RENTS: "Sewa tahun awal tetap",
+  AMOUNT: "Sewa tahun awal tetap",
+  END_DATE: "Tgl akhir",
+  INTENDED_USE: "Peruntukan",
+  START_DATE: "Tgl mulai",
 };
 
 /**
@@ -1100,18 +1102,18 @@ export const LeaseRentContractRentsFieldPaths = {
  * @type {{}}
  */
 export const LeaseRentContractRentsFieldTitles = {
-  CONTRACT_RENTS: "Sopimusvuokra",
-  AMOUNT: "Perusvuosivuokra",
-  AMOUNT_FIXED_RENT: "Sopimusvuokra",
-  AMOUNT_INITIAL_YEAR_RENT: "Alkuvuosivuokra",
-  PERIOD: "Yksikkö",
-  BASE_AMOUNT: "Vuokranlaskennan perusteena oleva vuokra",
-  BASE_AMOUNT_PERIOD: "Yksikkö",
-  BASE_YEAR_RENT: "Uusi perusvuosivuokra",
-  END_DATE: "Loppupvm",
-  INDEX: "Indeksi",
-  INTENDED_USE: "Käyttötarkoitus",
-  START_DATE: "Alkupvm",
+  CONTRACT_RENTS: "Sewa kontrak",
+  AMOUNT: "Sewa tahunan dasar",
+  AMOUNT_FIXED_RENT: "Sewa kontrak",
+  AMOUNT_INITIAL_YEAR_RENT: "Sewa tahun awal",
+  PERIOD: "Satuan",
+  BASE_AMOUNT: "Sewa yang menjadi dasar perhitungan sewa",
+  BASE_AMOUNT_PERIOD: "Satuan",
+  BASE_YEAR_RENT: "Sewa tahunan dasar baru",
+  END_DATE: "Tgl akhir",
+  INDEX: "Indeks",
+  INTENDED_USE: "Peruntukan",
+  START_DATE: "Tgl mulai",
 };
 
 /**
@@ -1136,12 +1138,12 @@ export const LeaseIndexAdjustedRentsFieldPaths = {
  * @type {{}}
  */
 export const LeaseIndexAdjustedRentsFieldTitles = {
-  INDEX_ADJUSTED_RENTS: "Indeksitarkistettu vuokra",
-  AMOUNT: "Indeksitarkistettu vuokra",
-  END_DATE: "Loppupvm",
-  FACTOR: "Laskentakerroin",
-  INTENDED_USE: "Käyttötarkoitus",
-  START_DATE: "Alkupvm",
+  INDEX_ADJUSTED_RENTS: "Sewa disesuaikan indeks",
+  AMOUNT: "Sewa disesuaikan indeks",
+  END_DATE: "Tgl akhir",
+  FACTOR: "Faktor perhitungan",
+  INTENDED_USE: "Peruntukan",
+  START_DATE: "Tgl mulai",
 };
 
 /**
@@ -1180,23 +1182,23 @@ export const LeaseRentAdjustmentsFieldPaths = {
  * @type {{}}
  */
 export const LeaseRentAdjustmentsFieldTitles = {
-  RENT_ADJUSTMENTS: "Alennukset ja korotukset",
-  AMOUNT_LEFT: "Jäljellä",
-  AMOUNT_TYPE: "Määrän tyyppi",
-  DECISION: "Päätös",
-  END_DATE: "Loppupvm",
-  FULL_AMOUNT: "Määrä",
-  INTENDED_USE: "Käyttötarkoitus",
-  NOTE: "Huomautus",
-  START_DATE: "Alkupvm",
-  SUBVENTION_BASE_PERCENT: "Perusalennus markkinavuokrasta",
-  SUBVENTION_GRADUATED_PERCENT: "Porrastettu alennus",
-  SUBVENTION_RE_LEASE_DISCOUNT_PRECENT: "Alennus markkinavuokrasta",
-  SUBVENTION_TYPE: "Subvention tyyppi",
-  TYPE: "Tyyppi",
-  PERCANTAGE_BEGINNING: "Ensimmäisen vuoden alennus",
-  NUMBER_OF_YEARS: "Vuosien lukumäärä",
-  PERCANTAGE_FINAL: "Viimeisen vuoden alennus",
+  RENT_ADJUSTMENTS: "Potongan dan kenaikan",
+  AMOUNT_LEFT: "Sisa",
+  AMOUNT_TYPE: "Jenis jumlah",
+  DECISION: "Keputusan",
+  END_DATE: "Tgl akhir",
+  FULL_AMOUNT: "Jumlah",
+  INTENDED_USE: "Peruntukan",
+  NOTE: "Catatan",
+  START_DATE: "Tgl mulai",
+  SUBVENTION_BASE_PERCENT: "Potongan dasar dari sewa pasar",
+  SUBVENTION_GRADUATED_PERCENT: "Potongan bertingkat",
+  SUBVENTION_RE_LEASE_DISCOUNT_PRECENT: "Potongan dari sewa pasar",
+  SUBVENTION_TYPE: "Jenis subsidi",
+  TYPE: "Jenis",
+  PERCANTAGE_BEGINNING: "Potongan tahun pertama",
+  NUMBER_OF_YEARS: "Jumlah tahun",
+  PERCANTAGE_FINAL: "Potongan tahun terakhir",
 };
 
 /**
@@ -1219,10 +1221,10 @@ export const RentAdjustmentManagementSubventionsFieldPaths = {
  * @type {{}}
  */
 export const RentAdjustmentManagementSubventionsFieldTitles = {
-  MANAGEMENT_SUBVENTIONS: "Hallintamuodot",
-  MANAGEMENT: "Hallintamuodon tyyppi",
-  SUBVENTION_AMOUNT: "Subventoitu yksikköhinta",
-  SUBVENTION_PERCENT: "Subventio prosentti",
+  MANAGEMENT_SUBVENTIONS: "Bentuk pengelolaan",
+  MANAGEMENT: "Jenis bentuk pengelolaan",
+  SUBVENTION_AMOUNT: "Harga satuan bersubsidi",
+  SUBVENTION_PERCENT: "Persentase subsidi",
 };
 
 /**
@@ -1245,9 +1247,9 @@ export const RentAdjustmentTemporarySubventionsFieldPaths = {
  * @type {{}}
  */
 export const RentAdjustmentTemporarySubventionsFieldTitles = {
-  TEMPORARY_SUBVENTIONS: "Tilapäisalennukset",
-  DESCRIPTION: "Tilapäisalennuksen tyyppi",
-  SUBVENTION_PERCENT: "Tilapäisalennus %",
+  TEMPORARY_SUBVENTIONS: "Potongan sementara",
+  DESCRIPTION: "Jenis potongan sementara",
+  SUBVENTION_PERCENT: "Potongan sementara %",
 };
 
 /**
@@ -1272,12 +1274,12 @@ export const LeasePayableRentsFieldPaths = {
  * @type {{}}
  */
 export const LeasePayableRentsFieldTitles = {
-  PAYABLE_RENTS: "Perittävä vuokra",
-  AMOUNT: "Perittävä vuokra",
-  CALENDAR_YEAR_RENT: "Kalenterivuosivuokra",
-  DIFFERENCE_PERCENT: "Nousu",
-  END_DATE: "Loppupvm",
-  START_DATE: "Alkupvm",
+  PAYABLE_RENTS: "Sewa yang ditagih",
+  AMOUNT: "Sewa yang ditagih",
+  CALENDAR_YEAR_RENT: "Sewa tahun kalender",
+  DIFFERENCE_PERCENT: "Kenaikan",
+  END_DATE: "Tgl akhir",
+  START_DATE: "Tgl mulai",
 };
 
 /**
@@ -1303,12 +1305,12 @@ export const LeaseEqualizedRentsFieldPaths = {
  * @type {{}}
  */
 export const LeaseEqualizedRentsFieldTitles = {
-  EQUALIZED_RENTS: "Tasatut vuokrat",
-  END_DATE: "Loppupäivämäärä",
-  EQUALIZATION_FACTOR: "Tasauskerroin",
-  EQUALIZED_PAYABLE_AMOUNT: "Tasattu perittävä vuokra",
-  PAYABLE_AMOUNT: "Perittävä vuokra",
-  START_DATE: "Alkupäivämäärä",
+  EQUALIZED_RENTS: "Sewa yang disetarakan",
+  END_DATE: "Tanggal akhir",
+  EQUALIZATION_FACTOR: "Faktor penyetaraan",
+  EQUALIZED_PAYABLE_AMOUNT: "Sewa tertagih yang disetarakan",
+  PAYABLE_AMOUNT: "Sewa yang ditagih",
+  START_DATE: "Tanggal mulai",
 };
 
 /**
@@ -1362,44 +1364,44 @@ export const LeaseBasisOfRentsFieldPaths = {
  * @type {{}}
  */
 export const LeaseBasisOfRentsFieldTitles = {
-  BASIS_OF_RENTS: "Vuokralaskuri",
+  BASIS_OF_RENTS: "Kalkulator sewa",
   AREA_HEIGHT: "ala/korkeus",
-  AMOUNT_PER_AREA: "Yksikköhinta (ind 100)",
-  ARCHIVED_AT: "Arkistoitu",
-  ARCHIVED_NOTE: "Arkitoinnin huomautus",
-  AREA: "Pinta-ala",
-  AREA_UNIT: "Pinta-alan yksikkö",
-  BASE_YEAR_RENT: "Perusvuosivuokra (ind 100)",
-  DISCOUNT_PERCENTAGE: "Lopullinen alennusprosentti",
-  DISCOUNTED_INITIAL: "Subventoitu alkuvuosivuokra (ind)",
-  SUBVENTION_DISCOUNT_PERCENTAGE: "Subventioprosentti",
-  TEMPORARY_DISCOUNT_PERCENTAGE: "Tilapäisalennuksen prosentti",
+  AMOUNT_PER_AREA: "Harga satuan (ind 100)",
+  ARCHIVED_AT: "Diarsipkan",
+  ARCHIVED_NOTE: "Catatan pengarsipan",
+  AREA: "Luas",
+  AREA_UNIT: "Satuan luas",
+  BASE_YEAR_RENT: "Sewa tahunan dasar (ind 100)",
+  DISCOUNT_PERCENTAGE: "Persentase potongan akhir",
+  DISCOUNTED_INITIAL: "Sewa tahun awal bersubsidi (ind)",
+  SUBVENTION_DISCOUNT_PERCENTAGE: "Persentase subsidi",
+  TEMPORARY_DISCOUNT_PERCENTAGE: "Persentase potongan sementara",
   DISCOUNTED_INITIAL_YEAR_RENT:
-    "Subventoitu ja alennettu alkuvuosivuokra (ind)",
-  DISCOUNTED_INITIAL_YEAR_RENT_PER_MONTH: "1 kk vuokra",
-  DISCOUNTED_INITIAL_YEAR_RENT_PER_MONTH_TOTAL: "1 kk vuokra yhteensä",
-  DISCOUNTED_INITIAL_YEAR_RENT_PER_2_MONTHS: "2 kk vuokra",
-  DISCOUNTED_INITIAL_YEAR_RENT_PER_2_MONTHS_TOTAL: "2 kk vuokra yhteensä",
-  INDEX: "Indeksi",
-  INITIAL_YEAR_RENT: "Alkuvuosivuokra (ind)",
-  INTENDED_USE: "Käyttötarkoitus",
-  LOCKED_AT: "Laskuri lukittu",
-  PLANS_INSPECTED_AT: "Piirustukset tarkastettu",
-  PRICE: "Hinta",
-  PROFIT_MARGIN_PERCENTAGE: "Tuottoprosentti",
-  RENT: "Vuokra",
-  RENT_PER_YEAR: "Vuokra/vuosi",
-  RENT_PER_MONTH: "Vuokra/kk",
-  SUBVENTION_BASE_PERCENT: "Markkinavuokran subventio",
-  SUBVENTION_GRADUATED_PERCENT: "Siirtymäajan subventio",
-  SUBVENTION_RE_LEASE_DISCOUNT_AMOUNT: "Subventio euroa/vuosi",
-  SUBVENTION_RE_LEASE_DISCOUNT_PRECENT: "Subventio prosentteina",
-  SUBVENTION_TYPE: "Subvention tyyppi",
-  UNIT_PRICE: "Yksikköhinta (ind)",
-  ZONE: "Vyöhyke",
-  UNLOCKED: "Avoin",
-  LOCKED: "Lukittu",
-  TOTAL: "Yhteensä",
+    "Sewa tahun awal bersubsidi dan berpotongan (ind)",
+  DISCOUNTED_INITIAL_YEAR_RENT_PER_MONTH: "Sewa 1 bln",
+  DISCOUNTED_INITIAL_YEAR_RENT_PER_MONTH_TOTAL: "Total sewa 1 bln",
+  DISCOUNTED_INITIAL_YEAR_RENT_PER_2_MONTHS: "Sewa 2 bln",
+  DISCOUNTED_INITIAL_YEAR_RENT_PER_2_MONTHS_TOTAL: "Total sewa 2 bln",
+  INDEX: "Indeks",
+  INITIAL_YEAR_RENT: "Sewa tahun awal (ind)",
+  INTENDED_USE: "Peruntukan",
+  LOCKED_AT: "Kalkulator dikunci",
+  PLANS_INSPECTED_AT: "Gambar telah diperiksa",
+  PRICE: "Harga",
+  PROFIT_MARGIN_PERCENTAGE: "Persentase imbal hasil",
+  RENT: "Sewa",
+  RENT_PER_YEAR: "Sewa/tahun",
+  RENT_PER_MONTH: "Sewa/bln",
+  SUBVENTION_BASE_PERCENT: "Subsidi sewa pasar",
+  SUBVENTION_GRADUATED_PERCENT: "Subsidi masa transisi",
+  SUBVENTION_RE_LEASE_DISCOUNT_AMOUNT: "Subsidi rupiah/tahun",
+  SUBVENTION_RE_LEASE_DISCOUNT_PRECENT: "Subsidi dalam persen",
+  SUBVENTION_TYPE: "Jenis subsidi",
+  UNIT_PRICE: "Harga satuan (ind)",
+  ZONE: "Zona",
+  UNLOCKED: "Terbuka",
+  LOCKED: "Dikunci",
+  TOTAL: "Total",
 };
 
 /**
@@ -1422,11 +1424,11 @@ export const BasisOfRentManagementSubventionsFieldPaths = {
  * @type {{}}
  */
 export const BasisOfRentManagementSubventionsFieldTitles = {
-  MANAGEMENT_SUBVENTIONS: "Hallintamuodot",
-  MANAGEMENT: "Hallintamuodon tyyppi",
-  SUBVENTION_AMOUNT: "Subventoitu yksikköhinta",
-  SUBVENTION_PERCENT: "Subventio prosentteina",
-  SUBVENTION_AMOUNT_YEAR: "Subventio euroina/vuosi",
+  MANAGEMENT_SUBVENTIONS: "Bentuk pengelolaan",
+  MANAGEMENT: "Jenis bentuk pengelolaan",
+  SUBVENTION_AMOUNT: "Harga satuan bersubsidi",
+  SUBVENTION_PERCENT: "Subsidi dalam persen",
+  SUBVENTION_AMOUNT_YEAR: "Subsidi dalam rupiah/tahun",
 };
 
 /**
@@ -1450,10 +1452,10 @@ export const BasisOfRentTemporarySubventionsFieldPaths = {
  * @type {{}}
  */
 export const BasisOfRentTemporarySubventionsFieldTitles = {
-  TEMPORARY_SUBVENTIONS: "Tilapäisalennukset",
-  DESCRIPTION: "Tilapäisalennuksen tyyppi",
-  SUBVENTION_AMOUNT: "Alennus euroa/vuosi",
-  SUBVENTION_PERCENT: "Alennus subventoidusta alkuvuosivuokrasta",
+  TEMPORARY_SUBVENTIONS: "Potongan sementara",
+  DESCRIPTION: "Jenis potongan sementara",
+  SUBVENTION_AMOUNT: "Potongan rupiah/tahun",
+  SUBVENTION_PERCENT: "Potongan dari sewa tahun awal bersubsidi",
 };
 
 /**
@@ -1478,14 +1480,14 @@ export const LeaseDecisionsFieldPaths = {
  * @type {{}}
  */
 export const LeaseDecisionsFieldTitles = {
-  DEBT_COLLECTION_DECISIONS: "Vuokrauksen purkamispäätös",
-  DECISIONS: "Päätökset",
-  DECISION_DATE: "Päätöspvm",
-  DECISION_MAKER: "Päättäjä",
-  DESCRIPTION: "Huomautus",
-  REFERENCE_NUMBER: "Diaarinumero",
-  SECTION: "Pykälä",
-  TYPE: "Päätöksen tyyppi",
+  DEBT_COLLECTION_DECISIONS: "Keputusan pembatalan sewa",
+  DECISIONS: "Keputusan",
+  DECISION_DATE: "Tgl keputusan",
+  DECISION_MAKER: "Pengambil keputusan",
+  DESCRIPTION: "Catatan",
+  REFERENCE_NUMBER: "Nomor agenda",
+  SECTION: "Pasal",
+  TYPE: "Jenis keputusan",
 };
 
 /**
@@ -1509,11 +1511,11 @@ export const LeaseDecisionConditionsFieldPaths = {
  * @type {{}}
  */
 export const LeaseDecisionConditionsFieldTitles = {
-  CONDITIONS: "Ehdot",
-  DESCRIPTION: "Huomautus",
-  SUPERVISED_DATE: "Valvottu pvm",
-  SUPERVISION_DATE: "Valvontapvm",
-  TYPE: "Ehtotyyppi",
+  CONDITIONS: "Persyaratan",
+  DESCRIPTION: "Catatan",
+  SUPERVISED_DATE: "Tgl diawasi",
+  SUPERVISION_DATE: "Tgl pengawasan",
+  TYPE: "Jenis persyaratan",
 };
 
 /**
@@ -1544,21 +1546,21 @@ export const LeaseContractsFieldPaths = {
  * @type {{}}
  */
 export const LeaseContractsFieldTitles = {
-  CONTRACTS: "Sopimukset",
-  CONTRACT_NUMBER: "Sopimusnumero",
-  DECISION: "Päätös",
-  FIRST_CALL_SENT: "1. kutsu lähetetty",
-  INSTITUTION_IDENTIFIER: "Laitostunnus",
-  IS_READJUSTMENT_DECISION: "Järjestelypäätös",
-  KTJ_LINK: "Ktj dokumentti",
-  ENCUMBRANCE: "Rasitustodistus",
-  SECOND_CALL_SENT: "2. kutsu lähetetty",
-  SIGN_BY_DATE: "Allekirjoitettava mennessä",
-  SIGNING_DATE: "Allekirjoituspvm",
-  SIGNING_NOTE: "Huomautus",
-  THIRD_CALL_SENT: "3. kutsu lähetetty",
-  TYPE: "Sopimuksen tyyppi",
-  EXECUTOR: "Toimeenpanija",
+  CONTRACTS: "Kontrak",
+  CONTRACT_NUMBER: "Nomor kontrak",
+  DECISION: "Keputusan",
+  FIRST_CALL_SENT: "Panggilan ke-1 terkirim",
+  INSTITUTION_IDENTIFIER: "Pengenal lembaga",
+  IS_READJUSTMENT_DECISION: "Keputusan penataan",
+  KTJ_LINK: "Dokumen pertanahan",
+  ENCUMBRANCE: "Surat keterangan beban",
+  SECOND_CALL_SENT: "Panggilan ke-2 terkirim",
+  SIGN_BY_DATE: "Ditandatangani paling lambat",
+  SIGNING_DATE: "Tgl penandatanganan",
+  SIGNING_NOTE: "Catatan",
+  THIRD_CALL_SENT: "Panggilan ke-3 terkirim",
+  TYPE: "Jenis kontrak",
+  EXECUTOR: "Pelaksana",
 };
 
 /**
@@ -1590,18 +1592,18 @@ export const LeaseContractCollateralsFieldPaths = {
  * @type {{}}
  */
 export const LeaseContractCollateralsFieldTitles = {
-  COLLATRALS: "Vakuudet",
-  DEED_DATE: "Panttikirjan pvm",
-  END_DATE: "Vakuuden loppupvm",
-  NOTE: "Huomautus",
-  NUMBER: "Vuokravakuusnro",
-  NUMBER_MORTGAGE_DOCUMENT: "Panttikirjan numero",
-  OTHER_TYPE: "Vakuuden laji",
-  PAID_DATE: "Maksettu pvm",
-  RETURNED_DATE: "Palautettu pvm",
-  START_DATE: "Vakuuden alkupvm",
-  TOTAL_AMOUNT: "Vakuuden määrä",
-  TYPE: "Vakuuden tyyppi",
+  COLLATRALS: "Jaminan",
+  DEED_DATE: "Tgl akta jaminan",
+  END_DATE: "Tgl akhir jaminan",
+  NOTE: "Catatan",
+  NUMBER: "No. jaminan sewa",
+  NUMBER_MORTGAGE_DOCUMENT: "Nomor akta jaminan",
+  OTHER_TYPE: "Jenis jaminan",
+  PAID_DATE: "Tgl dibayar",
+  RETURNED_DATE: "Tgl dikembalikan",
+  START_DATE: "Tgl mulai jaminan",
+  TOTAL_AMOUNT: "Jumlah jaminan",
+  TYPE: "Tipe jaminan",
 };
 
 /**
@@ -1633,15 +1635,15 @@ export const LeaseContractChangesFieldPaths = {
  * @type {{}}
  */
 export const LeaseContractChangesFieldTitles = {
-  CONTRACT_CHANGES: "Sopimuksen muutokset",
-  DESCRIPTION: "Huomautus",
-  DECISION: "Päätös",
-  FIRST_CALL_SENT: "1. kutsu lähetetty",
-  SECOND_CALL_SENT: "2. kutsu lähetetty",
-  SIGN_BY_DATE: "Allekirjoitettava mennessä",
-  SIGNING_DATE: "Allekirjoituspvm",
-  THIRD_CALL_SENT: "3. kutsu lähetetty",
-  EXECUTOR: "Toimeenpanija",
+  CONTRACT_CHANGES: "Perubahan kontrak",
+  DESCRIPTION: "Catatan",
+  DECISION: "Keputusan",
+  FIRST_CALL_SENT: "Panggilan ke-1 terkirim",
+  SECOND_CALL_SENT: "Panggilan ke-2 terkirim",
+  SIGN_BY_DATE: "Ditandatangani paling lambat",
+  SIGNING_DATE: "Tgl penandatanganan",
+  THIRD_CALL_SENT: "Panggilan ke-3 terkirim",
+  EXECUTOR: "Pelaksana",
 };
 
 /**
@@ -1663,11 +1665,11 @@ export const LeaseInspectionsFieldPaths = {
  * @type {{}}
  */
 export const LeaseInspectionsFieldTitles = {
-  INSPECTIONS: "Tarkastukset ja huomautukset",
-  DESCRIPTION: "Huomautus",
-  INSPECTOR: "Tarkastaja",
-  SUPERVISED_DATE: "Valvottu pvm",
-  SUPERVISION_DATE: "Valvontapvm",
+  INSPECTIONS: "Pemeriksaan dan catatan",
+  DESCRIPTION: "Catatan",
+  INSPECTOR: "Pemeriksa",
+  SUPERVISED_DATE: "Tgl diawasi",
+  SUPERVISION_DATE: "Tgl pengawasan",
 };
 
 /**
@@ -1689,10 +1691,10 @@ export const LeaseInspectionAttachmentsFieldPaths = {
  * @type {{}}
  */
 export const LeaseInspectionAttachmentsFieldTitles = {
-  ATTACHMENTS: "Tiedostot",
-  FILE: "Nimi",
-  UPLOADED_AT: "Pvm",
-  UPLOADER: "Lataaja",
+  ATTACHMENTS: "Berkas",
+  FILE: "Nama",
+  UPLOADED_AT: "Tgl",
+  UPLOADER: "Pengunggah",
 };
 
 /**
@@ -1714,13 +1716,13 @@ export const LeaseInvoicingFieldPaths = {
  * @type {{}}
  */
 export const LeaseInvoicingFieldTitles = {
-  DEBT_COLLECTION: "Perintä",
-  INVOICES: "Laskut",
-  INVOICING: "Laskutus",
-  INVOICING_DISABLED: "Laskutus ei käynnissä",
-  INVOICING_ENABLED: "Laskutus käynnissä",
-  INVOICING_INCOMPLETE_INFO: "Tiedot keskeneräiset",
-  PREVIEW_INVOICES: "Laskujen esikatselu",
+  DEBT_COLLECTION: "Penagihan",
+  INVOICES: "Tagihan",
+  INVOICING: "Penagihan",
+  INVOICING_DISABLED: "Penagihan tidak berjalan",
+  INVOICING_ENABLED: "Penagihan berjalan",
+  INVOICING_INCOMPLETE_INFO: "Data belum lengkap",
+  PREVIEW_INVOICES: "Pratinjau tagihan",
 };
 
 /**
@@ -1738,7 +1740,7 @@ export const LeaseInvoiceNotesFieldPaths = {
  * @type {{}}
  */
 export const LeaseInvoiceNotesFieldTitles = {
-  INVOICE_NOTES: "Laskujen tiedotteet",
+  INVOICE_NOTES: "Catatan tagihan",
 };
 
 /**
@@ -1749,37 +1751,37 @@ export const LeaseInvoiceNotesFieldTitles = {
 export const calculatorTypeOptions = [
   {
     value: "lease2022",
-    label: "Vuokra",
+    label: "Sewa",
   },
   {
     value: "lease",
-    label: "Vuokra (Vanha)",
+    label: "Sewa (lama)",
   },
   {
     value: "temporary",
-    label: "Tilapäiset",
+    label: "Sementara",
   },
   {
     value: "additional_yard",
-    label: "Lisäpihat",
+    label: "Pekarangan tambahan",
   },
   {
     value: "field",
-    label: "Pelto",
+    label: "Lapangan",
   },
   {
     value: "mast",
-    label: "Mastot",
+    label: "Menara",
   },
   {
     value: "device cabinet",
-    label: "Laitekaappi",
+    label: "Lemari perangkat",
   },
 ];
 
 export const periodicRentAdjustmentTypes = {
-  TASOTARKISTUS_20_20: "Tasotarkistus 20v/20v",
-  TASOTARKISTUS_20_10: "Tasotarkistus 20v/10v",
+  TASOTARKISTUS_20_20: "Penyesuaian sewa berkala 20t/20t",
+  TASOTARKISTUS_20_10: "Penyesuaian sewa berkala 20t/10t",
 };
 
 export const oldDwellingsInHousingCompaniesPriceIndexTypeOptions = {

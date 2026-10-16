@@ -67,16 +67,16 @@ export const renderAttachments = (
   areaSearchAttachments: Array<UploadedAreaSearchAttachmentMeta>,
 ) => {
   const getUploaderType = (file: UploadedAreaSearchAttachmentMeta) => {
-    if (file.is_user_helsinki_ad === true) return "Käsittelijä";
-    if (file.is_user_helsinki_ad === false) return "Hakija";
-    return "Ei tiedossa";
+    if (file.is_user_officer === true) return "Petugas";
+    if (file.is_user_officer === false) return "Pemohon";
+    return "Tidak diketahui";
   };
 
   const cols = [
     { key: "id", headerName: undefined },
-    { key: "attachmentId", headerName: "Liite nro" },
-    { key: "fileName", headerName: "Tiedostonnimi" },
-    { key: "uploaderType", headerName: "Tiedoston lähettäjä" },
+    { key: "attachmentId", headerName: "No. lampiran" },
+    { key: "fileName", headerName: "Nama berkas" },
+    { key: "uploaderType", headerName: "Pengirim berkas" },
   ];
   const rows = areaSearchAttachments.map((file, index) => {
     return {
@@ -93,7 +93,7 @@ export const renderAttachments = (
     };
   });
   if (areaSearchAttachments.length === 0) {
-    return <p>Hakemuksella ei ole liitteitä.</p>;
+    return <p>Permohonan tidak memiliki lampiran.</p>;
   }
 
   return (
@@ -132,7 +132,7 @@ class AreaSearchApplication extends Component<Props, State> {
     let form: Form | null | undefined;
     let answer: Record<string, any> | null | undefined;
     let area: number | null | undefined;
-    let selectedAreaTitle = "Alue";
+    let selectedAreaTitle = "Area";
 
     if (areaSearch) {
       form = areaSearch.form;
@@ -170,7 +170,7 @@ class AreaSearchApplication extends Component<Props, State> {
     );
     return (
       <div className="AreaSearchApplication">
-        <Title>Hakemus</Title>
+        <Title>Permohonan</Title>
         <Divider />
         {!(
           form &&
@@ -185,7 +185,7 @@ class AreaSearchApplication extends Component<Props, State> {
           fieldTypes &&
           !isFetchingFormAttributes && (
             <>
-              <Collapse headerTitle="Hakemuksen käsittelytiedot" defaultOpen>
+              <Collapse headerTitle="Data pemrosesan permohonan" defaultOpen>
                 <Row>
                   <Column small={4} medium={4} large={3}>
                     <FormTextTitle>
@@ -339,12 +339,12 @@ class AreaSearchApplication extends Component<Props, State> {
                     sectionTitleTransformers={[transformApplicantSectionTitle]}
                   />
                 ))}
-              <Collapse headerTitle="Liitteet" defaultOpen>
+              <Collapse headerTitle="Lampiran" defaultOpen>
                 {renderAttachments(areaSearch.area_search_attachments || [])}
               </Collapse>
 
-              <Collapse headerTitle="Hakemuksen käsittely" defaultOpen>
-                <TitleH3>Tarkistettavat dokumentit</TitleH3>
+              <Collapse headerTitle="Pemrosesan permohonan" defaultOpen>
+                <TitleH3>Dokumen yang diperiksa</TitleH3>
                 {answer.sections[APPLICANT_SECTION_IDENTIFIER].map(
                   (applicant, index) => (
                     <Fragment key={index}>
@@ -362,7 +362,7 @@ class AreaSearchApplication extends Component<Props, State> {
                     </Fragment>
                   ),
                 )}
-                <TitleH3>Käsittelytiedot</TitleH3>
+                <TitleH3>Data pemrosesan</TitleH3>
                 <Row>
                   <Column small={6} medium={4} large={3}>
                     <FormTextTitle>{AreaSearchFieldTitles.STATE}</FormTextTitle>

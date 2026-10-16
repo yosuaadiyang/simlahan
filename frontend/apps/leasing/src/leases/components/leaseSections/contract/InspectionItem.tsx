@@ -144,7 +144,9 @@ const InspectionItem: React.FC<Props> = ({ inspection, leaseAttributes }) => {
             {LeaseInspectionAttachmentsFieldTitles.ATTACHMENTS}
           </SubTitle>
 
-          {!inspectionAttachments.length && <FormText>Ei tiedostoja</FormText>}
+          {!inspectionAttachments.length && (
+            <FormText>Tidak ada berkas</FormText>
+          )}
 
           {!!inspectionAttachments.length && (
             <>

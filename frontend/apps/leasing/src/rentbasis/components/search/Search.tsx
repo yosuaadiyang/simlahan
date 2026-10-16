@@ -94,7 +94,7 @@ const SearchFields = ({
           <FormField
             disableDirty
             fieldAttributes={{
-              label: "Hae hakusanalla",
+              label: "Cari dengan kata kunci",
               type: FieldTypes.SEARCH,
               read_only: false,
             }}
@@ -109,7 +109,7 @@ const SearchFields = ({
           <Column small={12} large={6}>
             <SearchRow>
               <SearchLabelColumn>
-                <SearchLabel>Päätös</SearchLabel>
+                <SearchLabel>Keputusan</SearchLabel>
               </SearchLabelColumn>
               <SearchInputColumn>
                 <Row>
@@ -118,7 +118,7 @@ const SearchFields = ({
                       autoBlur
                       disableDirty
                       fieldAttributes={{
-                        label: "Päätöksen tekijä",
+                        label: "Pembuat keputusan",
                         type: FieldTypes.CHOICE,
                         read_only: false,
                       }}
@@ -133,7 +133,7 @@ const SearchFields = ({
                     <FormField
                       disableDirty
                       fieldAttributes={{
-                        label: "Päätöspvm",
+                        label: "Tgl keputusan",
                         type: FieldTypes.DATE,
                         read_only: false,
                       }}
@@ -145,7 +145,7 @@ const SearchFields = ({
                     <FormField
                       disableDirty
                       fieldAttributes={{
-                        label: "Pykälä",
+                        label: "Pasal",
                         type: FieldTypes.STRING,
                         read_only: false,
                       }}
@@ -161,14 +161,14 @@ const SearchFields = ({
           <Column small={12} large={6}>
             <SearchRow>
               <SearchLabelColumn>
-                <SearchLabel>Diaarinro</SearchLabel>
+                <SearchLabel>No. agenda</SearchLabel>
               </SearchLabelColumn>
               <SearchInputColumn>
                 <FormField
                   autoBlur
                   disableDirty
                   fieldAttributes={{
-                    label: "Diaarinro",
+                    label: "No. agenda",
                     type: FieldTypes.STRING,
                     read_only: false,
                   }}
@@ -184,11 +184,13 @@ const SearchFields = ({
       <Row>
         <Column small={6}>
           <SearchChangeTypeLink onClick={toggleSearchType}>
-            {isBasicSearch ? "Tarkennettu haku" : "Yksinkertainen haku"}
+            {isBasicSearch ? "Pencarian lanjutan" : "Pencarian sederhana"}
           </SearchChangeTypeLink>
         </Column>
         <Column small={6}>
-          <SearchClearLink onClick={handleClear}>Tyhjennä haku</SearchClearLink>
+          <SearchClearLink onClick={handleClear}>
+            Kosongkan pencarian
+          </SearchClearLink>
         </Column>
       </Row>
     </>

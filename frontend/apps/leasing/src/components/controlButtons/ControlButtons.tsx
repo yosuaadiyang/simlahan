@@ -54,7 +54,7 @@ const ControlButtons = ({
   onSave,
   showCommentButton = true,
   showCopyButton = false,
-  saveButtonText = "Tallenna",
+  saveButtonText = "Simpan",
 }: Props): JSX.Element => {
   const handleComment = () => {
     onComment?.();
@@ -136,7 +136,7 @@ const ControlButtons = ({
                   className={ButtonColors.SECONDARY}
                   disabled={isCancelDisabled}
                   onClick={handleCancel}
-                  text="Hylkää muutokset"
+                  text="Batalkan perubahan"
                 />
                 {showCopyButton && (
                   <Authorization allow={allowCopy}>
@@ -144,7 +144,7 @@ const ControlButtons = ({
                       className={ButtonColors.NEUTRAL}
                       disabled={isCopyDisabled}
                       onClick={handleCopy}
-                      text="Kopioi"
+                      text="Salin"
                     />
                   </Authorization>
                 )}
@@ -153,7 +153,7 @@ const ControlButtons = ({
                     <Button
                       className={ButtonColors.ALERT}
                       onClick={handleDelete}
-                      text="Poista"
+                      text="Hapus"
                     />
                   </Authorization>
                 )}
@@ -172,7 +172,7 @@ const ControlButtons = ({
                     className={ButtonColors.SUCCESS}
                     disabled={isEditDisabled}
                     onClick={onEdit}
-                    text="Muokkaa"
+                    text="Ubah"
                   />
                 </Authorization>
               </div>

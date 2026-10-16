@@ -122,7 +122,7 @@ const EqualizedRents = ({ equalizedRents }: Props) => {
       defaultSortKey="start_date"
       defaultSortOrder={TableSortOrder.DESCENDING}
       fixedHeader={true}
-      noDataText="Ei tasattuja laskuja"
+      noDataText="Tidak ada tagihan yang disetarakan"
       sortable={true}
     />
   );

@@ -28,12 +28,12 @@ export const required = (
   value: any,
   errorText?: string,
 ): string | undefined => {
-  const defaultError = formatError(errorText, "Pakollinen kenttä");
+  const defaultError = formatError(errorText, "Kolom wajib");
 
   if (value instanceof Date) {
     return !isNaN(value.valueOf())
       ? undefined
-      : formatError(errorText, "Virheellinen arvo");
+      : formatError(errorText, "Nilai tidak valid");
   }
 
   if (isArray(value)) {
@@ -51,7 +51,7 @@ export const integer = (
 ): string | null | undefined =>
   isEmptyValue(value) || Number.isInteger(Number(value))
     ? undefined
-    : formatError(errorText, "Arvon tulee olla kokonaisluku");
+    : formatError(errorText, "Nilai harus bilangan bulat");
 
 export const isDate = (
   value: any,
@@ -59,7 +59,7 @@ export const isDate = (
 ): string | null | undefined =>
   isEmptyValue(value) || isValidDate(new Date(value))
     ? undefined
-    : formatError(errorText, "Arvon tulee olla päivämäärä");
+    : formatError(errorText, "Nilai harus berupa tanggal");
 
 export const decimalNumber = (
   value: any,
@@ -68,7 +68,7 @@ export const decimalNumber = (
   isEmptyValue(value) ||
   !isNaN(value.toString().replace(",", ".").replace(/\s+/g, ""))
     ? undefined
-    : formatError(errorText, "Arvon tulee olla numero");
+    : formatError(errorText, "Nilai harus berupa angka");
 
 export const min = (
   value: any,
@@ -77,7 +77,7 @@ export const min = (
 ): string | null | undefined =>
   isEmptyValue(value) || Number(value) >= min
     ? undefined
-    : formatError(errorText, `Minimiarvo on ${min}`);
+    : formatError(errorText, `Nilai minimum adalah ${min}`);
 
 export const max = (
   value: any,
@@ -86,7 +86,7 @@ export const max = (
 ): string | null | undefined =>
   isEmptyValue(value) || Number(value) <= max
     ? undefined
-    : formatError(errorText, `Maksimiarvo on ${max}`);
+    : formatError(errorText, `Nilai maksimum adalah ${max}`);
 
 export const maxLength = (
   value: any,
@@ -95,7 +95,7 @@ export const maxLength = (
 ): string | undefined =>
   isEmptyValue(value) || value.length <= max
     ? undefined
-    : formatError(errorText, `Maksimipituus on ${max}`);
+    : formatError(errorText, `Panjang maksimum adalah ${max}`);
 
 export const digitsMaxLength = (
   value: any,
@@ -104,7 +104,10 @@ export const digitsMaxLength = (
 ): string | null | undefined =>
   isEmptyValue(value) || parseInt(value).toString().length <= max
     ? undefined
-    : formatError(errorText, `Kokonaislukuosan maksimipituus on ${max}`);
+    : formatError(
+        errorText,
+        `Panjang maksimum bagian bilangan bulat adalah ${max}`,
+      );
 
 export const decimalsMaxLength = (
   value: any,
@@ -114,7 +117,7 @@ export const decimalsMaxLength = (
   isEmptyValue(value) ||
   decimalPlaces(value.toString().replace(",", ".")) <= max
     ? undefined
-    : formatError(errorText, `Desimaaliosan maksimipituus on ${max}`);
+    : formatError(errorText, `Panjang maksimum bagian desimal adalah ${max}`);
 
 export const dateGreaterOrEqual = (
   date: string | null | undefined,
@@ -127,7 +130,7 @@ export const dateGreaterOrEqual = (
 
   return date && otherDate && !isBefore(new Date(date), new Date(otherDate))
     ? undefined
-    : formatError(errorText, "Loppupvm ei voi olla ennen alkupvm:ää");
+    : formatError(errorText, "Tgl akhir tidak boleh sebelum tgl mulai");
 };
 
 export const internalOrder = (
@@ -142,7 +145,7 @@ export const internalOrder = (
     ? undefined
     : formatError(
         errorText,
-        "Sisäisen tilauksen numero on korkeintaan 12-merkkinen numerosarja.",
+        "Nomor pesanan internal berupa deret angka maksimal 12 digit.",
       );
 };
 
@@ -153,12 +156,12 @@ export const referenceNumber = (
   if (isEmptyValue(value)) {
     return undefined;
   }
-  const regex = RegExp("^[Hh][Ee][Ll] [0-9]{4}-[0-9]{6}$");
-
-  const isValid = regex.test(value);
+  // Nomor surat/keputusan bebas format, cukup dibatasi panjang & karakter cetak.
+  const text = String(value).trim();
+  const isValid = text.length > 0 && text.length <= 128 && !/[\r\n]/.test(text);
   return isValid
     ? undefined
-    : formatError(errorText, "Arvon tulee olla muotoa HEL 0000-000000");
+    : formatError(errorText, "Format nilai tidak valid");
 };
 
 export const year = (
@@ -173,7 +176,7 @@ export const year = (
   const year = value.toString();
 
   if (!numbers.test(year) || year.length !== 4) {
-    return errorText ? errorText : "Vuoden tulee olla 4 numeron mittainen";
+    return errorText ? errorText : "Tahun harus terdiri dari 4 angka";
   }
 
   return undefined;

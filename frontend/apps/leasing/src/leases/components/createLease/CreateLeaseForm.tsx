@@ -321,13 +321,13 @@ const FormContent: React.FC<{
         <Button
           className={ButtonColors.SECONDARY}
           onClick={onClose}
-          text="Peruuta"
+          text="Batal"
         />
         <Button
           className={ButtonColors.SUCCESS}
           disabled={!valid || isFetchingDistricts || isCreateClicked}
           onClick={handleSubmit}
-          text={confirmButtonLabel || "Luo tunnus"}
+          text={confirmButtonLabel || "Buat pengenal"}
         />
       </ModalButtonWrapper>
     </div>

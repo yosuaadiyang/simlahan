@@ -208,7 +208,7 @@ const BasicInfoIndexOrManual = ({ rent }: Props) => {
                 <FormText>
                   {rent.due_dates && !!rent.due_dates.length
                     ? formatDueDates(sortDueDates(rent.due_dates))
-                    : "Ei eräpäiviä"}
+                    : "Tidak ada jatuh tempo"}
                 </FormText>
               </>
             </Authorization>
@@ -254,7 +254,7 @@ const BasicInfoIndexOrManual = ({ rent }: Props) => {
                 <FormText>
                   {rent.yearly_due_dates && !!rent.yearly_due_dates.length
                     ? formatDueDates(rent.yearly_due_dates)
-                    : "Ei eräpäiviä"}
+                    : "Tidak ada jatuh tempo"}
                 </FormText>
               </>
             </Authorization>
@@ -386,7 +386,7 @@ const BasicInfoIndexOrManual = ({ rent }: Props) => {
                     LeaseRentsFieldPaths.INDEX_ROUNDING,
                   )}
                 >
-                  Perusindeksi/pyöristys
+                  Indeks dasar/pembulatan
                 </FormTextTitle>
                 <FormText>
                   {rent.elementary_index || "-"} / {rent.index_rounding || "-"}
@@ -582,7 +582,7 @@ const BasicInfoOneTime = ({ rent }: Props) => {
               </FormTextTitle>
               <FormText>
                 {!isEmptyValue(rent.amount)
-                  ? `${formatNumber(rent.amount)} €`
+                  ? `Rp ${formatNumber(rent.amount)}`
                   : "-"}
               </FormText>
             </>
@@ -721,7 +721,7 @@ const BasicInfoFixed = ({ rent }: Props) => {
                 <FormText>
                   {rent.due_dates && !!rent.due_dates.length
                     ? formatDueDates(sortDueDates(rent.due_dates))
-                    : "Ei eräpäiviä"}
+                    : "Tidak ada jatuh tempo"}
                 </FormText>
               </>
             </Authorization>
@@ -767,7 +767,7 @@ const BasicInfoFixed = ({ rent }: Props) => {
                 <FormText>
                   {rent.yearly_due_dates && !!rent.yearly_due_dates.length
                     ? formatDueDates(rent.yearly_due_dates)
-                    : "Ei eräpäiviä"}
+                    : "Tidak ada jatuh tempo"}
                 </FormText>
               </>
             </Authorization>
@@ -910,7 +910,7 @@ const BasicInfoFree = ({ rent }: Props) => {
 const BasicInfo = ({ rent, rentType }: Props) => {
   return (
     <>
-      {!rentType && <FormText>Vuokralajia ei ole valittu</FormText>}
+      {!rentType && <FormText>Jenis sewa belum dipilih</FormText>}
       {(rentType === RentTypes.INDEX ||
         rentType === RentTypes.INDEX2022 ||
         rentType === RentTypes.MANUAL) && (

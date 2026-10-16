@@ -95,7 +95,7 @@ const ContractRentEdit = ({ field, onRemove, rentType, showRemove }: Props) => {
       leaseAttributes,
       LeaseRentContractRentsFieldPaths.PERIOD,
     );
-    return `${formatNumber(contractRent.amount)} € ${getLabelOfOption(amountPeriodOptions, contractRent.period) || ""}`;
+    return `Rp ${formatNumber(contractRent.amount)} ${getLabelOfOption(amountPeriodOptions, contractRent.period) || ""}`;
   };
 
   const getBaseAmountText = () => {
@@ -104,7 +104,7 @@ const ContractRentEdit = ({ field, onRemove, rentType, showRemove }: Props) => {
       leaseAttributes,
       LeaseRentContractRentsFieldPaths.BASE_AMOUNT_PERIOD,
     );
-    return `${formatNumber(contractRent.base_amount)} € ${getLabelOfOption(baseAmountPeriodOptions, contractRent.base_amount_period) || ""}`;
+    return `Rp ${formatNumber(contractRent.base_amount)} ${getLabelOfOption(baseAmountPeriodOptions, contractRent.base_amount_period) || ""}`;
   };
 
   const getContractRentPeriodOptions = () => {
@@ -191,7 +191,7 @@ const ContractRentEdit = ({ field, onRemove, rentType, showRemove }: Props) => {
                   )}
                   invisibleLabel
                   name={`${field}.amount`}
-                  unit="€"
+                  unit="Rp"
                   overrideValues={{
                     label:
                       rentType !== RentTypes.FIXED
@@ -311,7 +311,7 @@ const ContractRentEdit = ({ field, onRemove, rentType, showRemove }: Props) => {
                   )}
                   invisibleLabel
                   name={`${field}.base_amount`}
-                  unit="€"
+                  unit="Rp"
                   overrideValues={{
                     label: LeaseRentContractRentsFieldTitles.BASE_AMOUNT,
                   }}
@@ -360,7 +360,7 @@ const ContractRentEdit = ({ field, onRemove, rentType, showRemove }: Props) => {
           LeaseRentContractRentsFieldPaths.BASE_YEAR_RENT,
         )}
         name={`${field}.base_year_rent`}
-        unit="€"
+        unit="Rp"
         overrideValues={{
           label: LeaseRentContractRentsFieldTitles.BASE_YEAR_RENT,
         }}
@@ -496,7 +496,7 @@ const ContractRentEdit = ({ field, onRemove, rentType, showRemove }: Props) => {
               <RemoveButton
                 className="third-level"
                 onClick={onRemove}
-                title="Poista sopimusvuokra"
+                title="Hapus sewa kontrak"
               />
             </Authorization>
           </Column>
@@ -516,7 +516,7 @@ const ContractRentEdit = ({ field, onRemove, rentType, showRemove }: Props) => {
                 UsersPermissions.DELETE_CONTRACTRENT,
               )}
             >
-              <RemoveButton onClick={onRemove} title="Poista sopimusvuokra" />
+              <RemoveButton onClick={onRemove} title="Hapus sewa kontrak" />
             </Authorization>
           </ActionButtonWrapper>
         )}

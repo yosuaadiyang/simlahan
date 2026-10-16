@@ -209,7 +209,7 @@ class ApplicationPreviewSection extends PureComponent<Props> {
           <>
             <FormTextTitle>{get(field, "label")}</FormTextTitle>
             <AddButtonThird
-              label={"Liitä tiedosto"}
+              label={"Lampirkan berkas"}
               onClick={() => {}}
               disabled
             />
@@ -309,7 +309,7 @@ class ApplicationPreviewSection extends PureComponent<Props> {
                   onClick={() => {
                     openEditPlotApplicationSectionModal();
                   }}
-                  text="Muokkaa"
+                  text="Ubah"
                   disabled={disabled}
                 />
               )
@@ -325,7 +325,7 @@ class ApplicationPreviewSection extends PureComponent<Props> {
                   marginBottom: 15,
                 }}
               >
-                <em>Osio on piilotettu kokonaisuudessaan.</em>
+                <em>Bagian disembunyikan seluruhnya.</em>
               </div>
             )}
           </Collapse>

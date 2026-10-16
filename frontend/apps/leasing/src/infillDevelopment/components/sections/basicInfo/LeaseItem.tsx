@@ -225,7 +225,7 @@ const LeaseItem = ({ id, leaseData, leaseId }: Props) => {
             {InfillDevelopmentCompensationLeaseDecisionsFieldTitles.DECISIONS}
           </SubTitle>
 
-          {!decisions.length && <FormText>Ei päätöksiä</FormText>}
+          {!decisions.length && <FormText>Tidak ada keputusan</FormText>}
           {!!decisions.length && (
             <ListItems>
               <Row>
@@ -389,7 +389,7 @@ const LeaseItem = ({ id, leaseData, leaseId }: Props) => {
             }
           </SubTitle>
 
-          {!intendedUses.length && <FormText>Ei käyttötarkoituksia</FormText>}
+          {!intendedUses.length && <FormText>Tidak ada peruntukan</FormText>}
           {!!intendedUses.length && (
             <ListItems>
               <Row>
@@ -488,7 +488,7 @@ const LeaseItem = ({ id, leaseData, leaseId }: Props) => {
                     >
                       <ListItem>
                         {intendedUse.amount_per_floor_m2
-                          ? `${formatNumber(intendedUse.amount_per_floor_m2)} €/k-m²`
+                          ? `Rp ${formatNumber(intendedUse.amount_per_floor_m2)}/m² lantai`
                           : "-"}
                       </ListItem>
                     </Authorization>
@@ -520,7 +520,7 @@ const LeaseItem = ({ id, leaseData, leaseId }: Props) => {
               </FormTextTitle>
               <FormText>
                 {!isEmptyValue(leaseData.monetary_compensation_amount)
-                  ? `${formatNumber(leaseData.monetary_compensation_amount)} €`
+                  ? `Rp ${formatNumber(leaseData.monetary_compensation_amount)}`
                   : "-"}
               </FormText>
             </>
@@ -545,7 +545,7 @@ const LeaseItem = ({ id, leaseData, leaseId }: Props) => {
               </FormTextTitle>
               <FormText>
                 {!isEmptyValue(leaseData.compensation_investment_amount)
-                  ? `${formatNumber(leaseData.compensation_investment_amount)} €`
+                  ? `Rp ${formatNumber(leaseData.compensation_investment_amount)}`
                   : "-"}
               </FormText>
             </>
@@ -574,7 +574,7 @@ const LeaseItem = ({ id, leaseData, leaseId }: Props) => {
                   InfillDevelopmentCompensationLeasesFieldTitles.TOTAL_COMPENSATION
                 }
               </FormTextTitle>
-              <FormText>{`${formatNumber(totalCompensation)} €`}</FormText>
+              <FormText>{`Rp ${formatNumber(totalCompensation)}`}</FormText>
             </>
           </Authorization>
         </Column>
@@ -597,7 +597,7 @@ const LeaseItem = ({ id, leaseData, leaseId }: Props) => {
               </FormTextTitle>
               <FormText>
                 {!isEmptyValue(leaseData.increase_in_value)
-                  ? `${formatNumber(leaseData.increase_in_value)} €`
+                  ? `Rp ${formatNumber(leaseData.increase_in_value)}`
                   : "-"}
               </FormText>
             </>
@@ -622,7 +622,7 @@ const LeaseItem = ({ id, leaseData, leaseId }: Props) => {
               </FormTextTitle>
               <FormText>
                 {!isEmptyValue(leaseData.part_of_the_increase_in_value)
-                  ? `${formatNumber(leaseData.part_of_the_increase_in_value)} €`
+                  ? `Rp ${formatNumber(leaseData.part_of_the_increase_in_value)}`
                   : "-"}
               </FormText>
             </>
@@ -647,7 +647,7 @@ const LeaseItem = ({ id, leaseData, leaseId }: Props) => {
               </FormTextTitle>
               <FormText>
                 {!isEmptyValue(leaseData.discount_in_rent)
-                  ? `${formatNumber(leaseData.discount_in_rent)} €`
+                  ? `Rp ${formatNumber(leaseData.discount_in_rent)}`
                   : "-"}
               </FormText>
             </>
@@ -728,7 +728,7 @@ const LeaseItem = ({ id, leaseData, leaseId }: Props) => {
             {InfillDevelopmentCompensationAttachmentFieldTitles.ATTACHMENTS}
           </SubTitle>
 
-          {!attachments.length && <FormText>Ei liitetiedostoja</FormText>}
+          {!attachments.length && <FormText>Tidak ada lampiran</FormText>}
           {!!attachments.length && (
             <>
               <Row>

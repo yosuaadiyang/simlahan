@@ -66,7 +66,7 @@ const AreaSearchApplicationAnswersField = ({
               const choice = field.choices.find(
                 (choice) => choice.value === id || Number(choice.value) === id,
               );
-              let name = choice?.text || "(tuntematon vaihtoehto)";
+              let name = choice?.text || "(pilihan tidak dikenal)";
 
               if (choice?.has_text_input) {
                 name += ` (${fieldAnswer.extra_value})`;
@@ -92,7 +92,7 @@ const AreaSearchApplicationAnswersField = ({
                     if (field.choices.length > 0) {
                       displayValue = getChoiceName(displayValue);
                     } else {
-                      displayValue = displayValue === true ? "Kyllä" : "Ei";
+                      displayValue = displayValue === true ? "Ya" : "Tidak";
                     }
                   }
 

@@ -48,7 +48,7 @@ const TargetListLayer: React.FC<Props> = ({ color, targetsGeoJson }) => {
                 {target.identifier}
               </Link>
               <br />
-              <strong>Osoite:</strong> {target.address.address}
+              <strong>Alamat:</strong> {target.address.address}
             </Popup>
           </FeatureGroup>
         );

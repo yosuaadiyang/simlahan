@@ -14,7 +14,6 @@ import commentsReducer from "@/comments/reducer";
 import contactsReducer from "@/contacts/reducer";
 import contractFileReducer from "@/contractFile/reducer";
 import createCollectionLetterReducer from "@/createCollectionLetter/reducer";
-import creditDecisionReducer from "@/creditDecision/reducer";
 import leaseReportsReducer from "@/reports/reducer";
 import districtsReducer from "@/district/reducer";
 import indexReducer from "@/index/reducer";
@@ -30,17 +29,14 @@ import plotSearchReducer from "@/plotSearch/reducer";
 import plotApplicationsReducer from "@/plotApplications/reducer";
 import applicationReducer from "@/application/slice";
 import leaseCreateChargeReducer from "@/leaseCreateCharge/reducer";
-import leaseholdTransferReducer from "@/leaseholdTransfer/reducer";
 import leaseTypeReducer from "@/leaseType/reducer";
 import lessorReducer from "@/lessor/reducer";
 import penaltyInterestReducer from "@/penaltyInterest/reducer";
 import previewInvoicesReducer from "@/previewInvoices/reducer";
 import rentBasisReducer from "@/rentbasis/slice";
 import rentForPeriodReducer from "@/rentForPeriod/reducer";
-import sapInvoiceReducer from "@/sapInvoice/reducer";
 import serviceUnitsReducer from "@/serviceUnits/reducer";
 import topNavigationReducer from "@/components/topNavigation/reducer";
-import tradeRegisterReducer from "@/tradeRegister/reducer";
 import uiDataReducer from "@/uiData/reducer";
 import usersReducer from "@/users/reducer";
 import usersPermissionsReducer from "@/usersPermissions/slice";
@@ -60,7 +56,6 @@ export default combineReducers({
   contact: contactsReducer,
   contractFile: contractFileReducer,
   createCollectionLetter: createCollectionLetterReducer,
-  creditDecision: creditDecisionReducer,
   district: districtsReducer,
   form: formReducer,
   index: indexReducer,
@@ -75,7 +70,6 @@ export default combineReducers({
   plotApplications: plotApplicationsReducer,
   application: applicationReducer,
   leaseCreateCharge: leaseCreateChargeReducer,
-  leaseholdTransfer: leaseholdTransferReducer,
   leaseReports: leaseReportsReducer,
   leaseType: leaseTypeReducer,
   lessor: lessorReducer,
@@ -86,9 +80,7 @@ export default combineReducers({
   rentBasis: rentBasisReducer,
   rentForPeriod: rentForPeriodReducer,
   serviceUnits: serviceUnitsReducer,
-  sapInvoice: sapInvoiceReducer,
   topNavigation: topNavigationReducer,
-  tradeRegister: tradeRegisterReducer,
   uiData: uiDataReducer,
   user: usersReducer,
   usersPermissions: usersPermissionsReducer,

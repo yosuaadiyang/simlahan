@@ -121,7 +121,7 @@ const JobRunLogEntryPanel = (props: Props) => {
     if (copyElementContentsToClipboard(el)) {
       displayUIMessage({
         title: "",
-        body: "Ajon tiedot on kopioitu leikepöydälle.",
+        body: "Data eksekusi telah disalin ke papan klip.",
       });
     }
   }, [getTableContentForClipboard]);

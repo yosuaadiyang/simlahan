@@ -92,7 +92,7 @@ const InnerLeaseAreasBase: React.FC<AreaItemProps> = ({
                 marginBottom: 5,
               }}
             >
-              Arkisto
+              Arsip
             </h3>
           )}
 
@@ -140,7 +140,7 @@ const InnerLeaseAreasBase: React.FC<AreaItemProps> = ({
             >
               <Row>
                 <Column>
-                  <AddButton label="Lisää kohde" onClick={handleAdd} />
+                  <AddButton label="Tambah objek" onClick={handleAdd} />
                 </Column>
               </Row>
             </Authorization>
@@ -445,7 +445,7 @@ const LeaseAreasEdit: React.FC<Props> = ({ formApi }) => {
                     LeaseAreasFieldPaths.LEASE_AREAS,
                   )}
                 >
-                  Vuokra-alue
+                  Area sewa
                 </Title>
                 <WarningContainer
                   alignCenter
@@ -460,7 +460,7 @@ const LeaseAreasEdit: React.FC<Props> = ({ formApi }) => {
                       <Button
                         className={ButtonColors.NEUTRAL}
                         onClick={handleCopyAreasToContract}
-                        text="Kopioi sopimukseen"
+                        text="Salin ke kontrak"
                       />
                     </Authorization>
                   }
@@ -472,7 +472,7 @@ const LeaseAreasEdit: React.FC<Props> = ({ formApi }) => {
                     )}
                   >
                     <>
-                      Kokonaispinta-ala {formatNumber(areasSum) || "-"} m
+                      Luas permukaan total {formatNumber(areasSum) || "-"} m
                       <sup>2</sup>
                     </>
                   </Authorization>

@@ -119,7 +119,7 @@ export const transformApplicantInfoCheckTitle = (
         sectionsWithIdentifier instanceof Array
           ? sectionsWithIdentifier[0]
           : sectionsWithIdentifier;
-      const typeText = identifiers?.LABEL || "Hakija";
+      const typeText = identifiers?.LABEL || "Pemohon";
       const nameText =
         identifiers?.NAME_FIELDS?.map((field) => {
           return sectionWithIdentifier.fields[field]?.value || "";
@@ -128,7 +128,7 @@ export const transformApplicantInfoCheckTitle = (
     }
   }
 
-  return "Hakija";
+  return "Pemohon";
 };
 export const prepareAreaSearchForSubmission = (
   data: Record<string, any>,
@@ -213,14 +213,9 @@ const getAddressProtection = (
   if (!addressProtection) {
     return false;
   }
-  switch (addressProtection.toLowerCase()) {
-    case "kyllä":
-      return true;
-    case "ei":
-      return false;
-    default:
-      return false;
-  }
+  return ["ya", "kyllä", "true", "1"].includes(
+    addressProtection.trim().toLowerCase(),
+  );
 };
 
 const getContactType = (
@@ -270,7 +265,12 @@ export const getContactFromAnswerFields = (
         break;
       }
       case country: {
-        contact.country = value?.toLowerCase() === "suomi" ? "FI" : null;
+        contact.country =
+          String(value || "")
+            .trim()
+            .toLowerCase() === "indonesia"
+            ? "ID"
+            : null;
         break;
       }
       case c_o: {
@@ -278,7 +278,9 @@ export const getContactFromAnswerFields = (
         break;
       }
       case language: {
-        contact.language = value ? MapLanguageNameToCodeEnum[value] : null;
+        contact.language = value
+          ? MapLanguageNameToCodeEnum[String(value).toLowerCase()] || null
+          : null;
         break;
       }
       case name: {

@@ -17,7 +17,6 @@ import DecisionLink from "@/components/links/DecisionLink";
 import FormField from "@/components/form/final-form/FormField";
 import FormText from "@/components/form/FormText";
 import FormTextTitle from "@/components/form/FormTextTitle";
-import KtjLink from "@/components/ktj/KtjLink";
 import RemoveButton from "@/components/form/RemoveButton";
 import {
   receiveCollapseStates,
@@ -128,7 +127,7 @@ const ContractChanges: React.FC<ContractChangesProps> = ({
               UsersPermissions.ADD_CONTRACTCHANGE,
             ) &&
               (!fields || !fields.length) && (
-                <FormText>Ei sopimuksen muutoksia</FormText>
+                <FormText>Tidak ada perubahan kontrak</FormText>
               )}
             {!!fields && !!fields.length && (
               <BoxItemContainer>
@@ -163,7 +162,7 @@ const ContractChanges: React.FC<ContractChangesProps> = ({
                             >
                               <RemoveButton
                                 onClick={handleRemove}
-                                title="Poista sopimuksen muutos"
+                                title="Hapus perubahan kontrak"
                               />
                             </Authorization>
                           </ActionButtonWrapper>
@@ -393,7 +392,7 @@ const ContractChanges: React.FC<ContractChangesProps> = ({
               <Row>
                 <Column>
                   <AddButtonSecondary
-                    label="Lisää sopimuksen muutos"
+                    label="Tambah perubahan kontrak"
                     onClick={handleAdd}
                     style={{
                       marginTop: !fields.length ? 0 : undefined,
@@ -456,7 +455,9 @@ const Collaterals: React.FC<CollateralsProps> = ({
               usersPermissions,
               UsersPermissions.ADD_COLLATERAL,
             ) &&
-              (!fields || !fields.length) && <FormText>Ei vakuuksia</FormText>}
+              (!fields || !fields.length) && (
+                <FormText>Tidak ada jaminan</FormText>
+              )}
 
             {!!fields.length && (
               <BoxItemContainer>
@@ -500,7 +501,7 @@ const Collaterals: React.FC<CollateralsProps> = ({
               <Row>
                 <Column>
                   <AddButtonSecondary
-                    label="Lisää vakuus"
+                    label="Tambah jaminan"
                     onClick={handleAdd}
                     style={{
                       marginTop: !fields.length ? 0 : undefined,
@@ -755,7 +756,7 @@ const ContractItemEdit: React.FC<Props> = ({
                     <WarningContainer>
                       <WarningField
                         meta={{
-                          warning: "Sopimusnumero käytössä!",
+                          warning: "Nomor kontrak sudah digunakan!",
                         }}
                         showWarning={true}
                       />
@@ -765,7 +766,7 @@ const ContractItemEdit: React.FC<Props> = ({
                   <WarningContainer>
                     <WarningField
                       meta={{
-                        warning: "Sopimusnumero käytössä!",
+                        warning: "Nomor kontrak sudah digunakan!",
                       }}
                       showWarning={true}
                     />
@@ -989,61 +990,6 @@ const ContractItemEdit: React.FC<Props> = ({
                 enableUiDataEdit
                 uiDataKey={getUiDataLeaseKey(LeaseContractsFieldPaths.DECISION)}
               />
-            </Authorization>
-          </Column>
-          <Column small={6} medium={4} large={2}>
-            <Authorization
-              allow={isFieldAllowedToRead(
-                attributes,
-                LeaseContractsFieldPaths.INSTITUTION_IDENTIFIER,
-              )}
-            >
-              <>
-                <FormTextTitle
-                  enableUiDataEdit
-                  uiDataKey={getUiDataLeaseKey(
-                    LeaseContractsFieldPaths.KTJ_LINK,
-                  )}
-                >
-                  {LeaseContractsFieldTitles.KTJ_LINK}
-                </FormTextTitle>
-                {savedContract && savedContract.institution_identifier ? (
-                  <KtjLink
-                    fileKey="vuokraoikeustodistus"
-                    fileName="vuokraoikeustodistus"
-                    identifier={savedContract.institution_identifier}
-                    idKey="kohdetunnus"
-                    label="Vuokraoikeustodistus"
-                  />
-                ) : (
-                  <FormText>-</FormText>
-                )}
-              </>
-            </Authorization>
-          </Column>
-          <Column small={6} medium={4} large={2}>
-            <Authorization
-              allow={isFieldAllowedToRead(
-                attributes,
-                LeaseContractsFieldPaths.KTJ_LINK,
-              )}
-            >
-              <>
-                <FormTextTitle>
-                  {LeaseContractsFieldTitles.ENCUMBRANCE}
-                </FormTextTitle>
-                {savedContract && savedContract.institution_identifier ? (
-                  <KtjLink
-                    fileKey="rasitustodistus"
-                    fileName="rasitustodistus"
-                    identifier={savedContract.institution_identifier}
-                    idKey="kohdetunnus"
-                    label="Rasitustodistus"
-                  />
-                ) : (
-                  <FormText>-</FormText>
-                )}
-              </>
             </Authorization>
           </Column>
           <Column small={6} medium={4} large={2}>

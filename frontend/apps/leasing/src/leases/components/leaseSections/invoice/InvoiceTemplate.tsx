@@ -495,7 +495,7 @@ const InvoiceTemplate = ({
                 </FormTextTitle>
                 <FormText>
                   {invoice && !isEmptyValue(invoice.collection_charge)
-                    ? `${formatNumber(invoice.collection_charge)} €`
+                    ? `Rp ${formatNumber(invoice.collection_charge)}`
                     : "-"}
                 </FormText>
               </>
@@ -610,7 +610,7 @@ const InvoiceTemplate = ({
                     >
                       {creditedInvoice.number
                         ? creditedInvoice.number
-                        : "Numeroimaton"}
+                        : "Tanpa nomor"}
                     </a>
                   }
                 </FormText>
@@ -645,7 +645,7 @@ const InvoiceTemplate = ({
                     >
                       {interestInvoiceFor.number
                         ? interestInvoiceFor.number
-                        : "Numeroimaton"}
+                        : "Tanpa nomor"}
                     </a>
                   }
                 </FormText>
@@ -753,7 +753,7 @@ const InvoiceTemplate = ({
                             onClick={handleCreditInvoiceClick}
                             tabIndex={0}
                           >
-                            {item.number ? item.number : "Numeroimaton"}
+                            {item.number ? item.number : "Tanpa nomor"}
                           </a>
                         </FormText>
                       </Column>
@@ -850,7 +850,7 @@ const InvoiceTemplate = ({
                             onClick={handleInterestInvoiceClick}
                             tabIndex={0}
                           >
-                            {item.number ? item.number : "Numeroimaton"}
+                            {item.number ? item.number : "Tanpa nomor"}
                           </a>
                         </FormText>
                       </Column>
@@ -908,7 +908,7 @@ export const PaymentsReadOnly = ({
 }: PaymentsReadOnlyProps) => {
   return (
     <>
-      {!payments.length && <FormText>Ei maksuja</FormText>}
+      {!payments.length && <FormText>Tidak ada pembayaran</FormText>}
       {!!payments.length && (
         <ListItems>
           <Row>

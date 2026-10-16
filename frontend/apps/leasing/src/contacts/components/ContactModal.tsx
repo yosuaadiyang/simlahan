@@ -54,7 +54,7 @@ const ContactModal = ({
         className="modal-large"
         isOpen={isOpen}
         onClose={onClose}
-        title={title || "Uusi asiakas"}
+        title={title || "Kontak baru"}
       >
         {isOpen && (
           <Form
@@ -79,7 +79,7 @@ const ContactModal = ({
                   <Button
                     className={ButtonColors.SECONDARY}
                     onClick={onCancel}
-                    text="Peruuta"
+                    text="Batal"
                   />
                   {showSave && (
                     <Button
@@ -89,7 +89,7 @@ const ContactModal = ({
                         (submitting && !valid)
                       }
                       onClick={handleSubmit}
-                      text="Tallenna"
+                      text="Simpan"
                     />
                   )}
                   {showSaveAndAdd && (
@@ -100,7 +100,7 @@ const ContactModal = ({
                         (submitting && !valid)
                       }
                       onClick={handleSubmit}
-                      text="Tallenna ja Lisää"
+                      text="Simpan dan tambah"
                     />
                   )}
                 </div>

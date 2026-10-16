@@ -54,7 +54,7 @@ class PlotSearchSiteEditCustomDetailedPlan extends Component<Props, State> {
     } = this.props;
     const currentCustomDetailedPlan = currentTarget;
     const title = get(currentCustomDetailedPlan, "identifier")
-      ? `${get(currentCustomDetailedPlan, "identifier")} ${get(currentCustomDetailedPlan, "state.name")} - OMA MUU ALUE`
+      ? `${get(currentCustomDetailedPlan, "identifier")} ${get(currentCustomDetailedPlan, "state.name")} - AREA LAIN MILIK SENDIRI`
       : "-";
     const customDetailedPlanIntendedUseOptions = getFieldOptions(
       customDetailedPlanAttributes,

@@ -172,8 +172,8 @@ class AreaSearchApplicationEdit extends Component<Props, State> {
     if (fileExists) {
       displayUIMessage(
         {
-          title: "Virhe",
-          body: `Tiedosto nimellä ${file.name} on jo listassa.`,
+          title: "Galat",
+          body: `Berkas dengan nama ${file.name} sudah ada dalam daftar.`,
         },
         {
           type: "error",
@@ -247,7 +247,7 @@ class AreaSearchApplicationEdit extends Component<Props, State> {
     let form: Form | null | undefined;
     let answer: Record<string, any> | null | undefined;
     let area: number | null | undefined;
-    let selectedAreaTitle = "Alue";
+    let selectedAreaTitle = "Area";
 
     if (areaSearch) {
       form = areaSearch.form;
@@ -364,13 +364,13 @@ class AreaSearchApplicationEdit extends Component<Props, State> {
                 showSave={false}
                 showSaveAndAdd={!!contactModalSettings}
                 serviceUnit={userActiveServiceUnit}
-                title="Uusi asiakas"
+                title="Kontak baru"
               />
             );
           }}
         </ModalConsumer>
         <div className="AreaSearchApplication__header">
-          <Title>Hakemus</Title>
+          <Title>Permohonan</Title>
           <AddButtonSecondary
             label={ButtonLabels.CREATE_LEASE}
             onClick={this.showCreateLeaseModal}
@@ -390,7 +390,7 @@ class AreaSearchApplicationEdit extends Component<Props, State> {
           fieldTypes &&
           !isFetchingFormAttributes && (
             <>
-              <Collapse headerTitle="Hakemuksen käsittelytiedot" defaultOpen>
+              <Collapse headerTitle="Data pemrosesan permohonan" defaultOpen>
                 <Row>
                   <Column small={4} medium={4} large={3}>
                     <FormTextTitle>
@@ -552,18 +552,18 @@ class AreaSearchApplicationEdit extends Component<Props, State> {
                     handleShowContactModal={handleShowContactModal}
                   />
                 ))}
-              <Collapse headerTitle="Liitteet" defaultOpen>
+              <Collapse headerTitle="Lampiran" defaultOpen>
                 {renderAttachments(areaSearch.area_search_attachments || [])}
                 <AddFileButton
-                  label="Lisää tiedosto"
+                  label="Tambah berkas"
                   onChange={this.handleFileAdded}
                   name="AreaSearchApplicationEditAttachment"
                   disabled={isPerformingFileOperation}
                 />
               </Collapse>
 
-              <Collapse headerTitle="Hakemuksen käsittely" defaultOpen>
-                <TitleH3>Tarkistettavat dokumentit</TitleH3>
+              <Collapse headerTitle="Pemrosesan permohonan" defaultOpen>
+                <TitleH3>Dokumen yang diperiksa</TitleH3>
                 {answer.sections[APPLICANT_SECTION_IDENTIFIER].map(
                   (applicant, index) => (
                     <Fragment key={applicant.metadata.identifier}>
@@ -578,7 +578,7 @@ class AreaSearchApplicationEdit extends Component<Props, State> {
                     </Fragment>
                   ),
                 )}
-                <TitleH3>Käsittelytiedot</TitleH3>
+                <TitleH3>Data pemrosesan</TitleH3>
                 <Row>
                   <Column small={6} medium={4} large={3}>
                     <FormFieldLegacy

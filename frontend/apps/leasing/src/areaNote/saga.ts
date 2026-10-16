@@ -106,7 +106,7 @@ function* createAreaNoteSaga({
         yield put(hideEditMode());
         displayUIMessage({
           title: "",
-          body: "Muistettava ehto luotu",
+          body: "Catatan area dibuat",
         });
         break;
 
@@ -115,7 +115,7 @@ function* createAreaNoteSaga({
         yield put(
           receiveError(
             new SubmissionError({
-              _error: "Server error 400",
+              _error: "Galat server 400",
               ...bodyAsJson,
             }),
           ),
@@ -149,7 +149,7 @@ function* deleteAreaNoteSaga({
         yield put(hideEditMode());
         displayUIMessage({
           title: "",
-          body: "Muistettava ehto poistettu",
+          body: "Catatan area dihapus",
         });
         break;
 
@@ -158,7 +158,7 @@ function* deleteAreaNoteSaga({
         yield put(
           receiveError(
             new SubmissionError({
-              _error: "Server error 400",
+              _error: "Galat server 400",
               ...bodyAsJson,
             }),
           ),
@@ -192,7 +192,7 @@ function* editAreaNoteSaga({
         yield put(hideEditMode());
         displayUIMessage({
           title: "",
-          body: "Muistettava ehto tallennettu",
+          body: "Catatan area disimpan",
         });
         break;
 
@@ -201,7 +201,7 @@ function* editAreaNoteSaga({
         yield put(
           receiveError(
             new SubmissionError({
-              _error: "Server error 400",
+              _error: "Galat server 400",
               ...bodyAsJson,
             }),
           ),

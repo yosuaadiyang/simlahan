@@ -4,8 +4,8 @@
  * @enum {string}
  */
 export const AreaNoteFieldTitles = {
-  AREA_NOTES: "Muistettavat ehdot",
-  MODIFIED_AT: "Muokattu pvm",
-  NOTE: "Huomautus",
-  USER: "Käyttäjä",
+  AREA_NOTES: "Catatan area",
+  MODIFIED_AT: "Tgl diubah",
+  NOTE: "Catatan",
+  USER: "Pengguna",
 };

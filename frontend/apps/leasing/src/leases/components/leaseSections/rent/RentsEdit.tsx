@@ -101,7 +101,7 @@ const Rents: React.FC<RentsProps> = ({ archived, fields, rents }) => {
             {!hasPermissions(usersPermissions, UsersPermissions.ADD_RENT) &&
               !archived &&
               (!fields || !fields.length) && (
-                <FormText className="no-margin">Ei vuokria</FormText>
+                <FormText className="no-margin">Tidak ada sewa</FormText>
               )}
 
             {archived && !!fields && !!fields.length && (
@@ -111,7 +111,7 @@ const Rents: React.FC<RentsProps> = ({ archived, fields, rents }) => {
                   marginBottom: 5,
                 }}
               >
-                Arkisto
+                Arsip
               </h3>
             )}
 
@@ -153,7 +153,7 @@ const Rents: React.FC<RentsProps> = ({ archived, fields, rents }) => {
               >
                 <Row>
                   <Column>
-                    <AddButton label="Lisää vuokra" onClick={handleAdd} />
+                    <AddButton label="Tambah sewa" onClick={handleAdd} />
                   </Column>
                 </Row>
               </Authorization>
@@ -230,13 +230,13 @@ const RentsEdit: React.FC<Props> = ({
                           <Button
                             className={ButtonColors.NEUTRAL}
                             onClick={handleSetRentInfoUncomplete}
-                            text="Merkitse keskeneräisiksi"
+                            text="Tandai belum lengkap"
                           />
                         ) : (
                           <Button
                             className={ButtonColors.NEUTRAL}
                             onClick={handleSetRentInfoComplete}
-                            text="Merkitse valmiiksi"
+                            text="Tandai lengkap"
                           />
                         )}
                       </Authorization>
@@ -246,14 +246,14 @@ const RentsEdit: React.FC<Props> = ({
                     {isRentInfoComplete ? (
                       <SuccessField
                         meta={{
-                          warning: "Tiedot kunnossa",
+                          warning: "Data lengkap",
                         }}
                         showWarning={true}
                       />
                     ) : (
                       <WarningField
                         meta={{
-                          warning: "Tiedot keskeneräiset",
+                          warning: "Data belum lengkap",
                         }}
                         showWarning={true}
                       />

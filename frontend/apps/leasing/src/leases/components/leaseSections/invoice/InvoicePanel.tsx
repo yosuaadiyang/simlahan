@@ -139,20 +139,20 @@ const InvoicePanel = forwardRef<any, Props>(
                 <Button
                   className={ButtonColors.SECONDARY}
                   onClick={onClose}
-                  text="Peruuta"
+                  text="Batal"
                 />
                 <Button
                   className={ButtonColors.SUCCESS}
                   disabled={isEditClicked || !isFormValid}
                   onClick={handleSave}
-                  text="Tallenna"
+                  text="Simpan"
                 />
               </>
             </Authorization>
           )
         }
         onClose={onClose}
-        title="Laskun tiedot"
+        title="Data tagihan"
       >
         {isMethodAllowed(invoiceMethods, Methods.PATCH) &&
         !invoice?.sap_id &&

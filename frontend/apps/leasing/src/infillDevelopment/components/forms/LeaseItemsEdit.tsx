@@ -48,7 +48,7 @@ const LeaseItemsEdit = ({
               UsersPermissions.ADD_INFILLDEVELOPMENTCOMPENSATIONLEASE,
             ) &&
               (!fields || !fields.length) && (
-                <FormText>Ei vuokrauksia</FormText>
+                <FormText>Tidak ada sewa</FormText>
               )}
             {!!fields &&
               !!fields.length &&
@@ -107,10 +107,7 @@ const LeaseItemsEdit = ({
             >
               <Row>
                 <Column>
-                  <AddButtonSecondary
-                    label="Lisää vuokraus"
-                    onClick={handleAdd}
-                  />
+                  <AddButtonSecondary label="Tambah sewa" onClick={handleAdd} />
                 </Column>
               </Row>
             </Authorization>

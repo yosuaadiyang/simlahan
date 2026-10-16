@@ -30,7 +30,7 @@ const ApplicationAnswersSection = ({
     return null;
   }
 
-  const title = section.title || "(tuntematon osio)";
+  const title = section.title || "(bagian tidak dikenal)";
   const Wrapper = topLevel
     ? ({ children }) => (
         <Collapse defaultOpen={true} headerTitle={title}>

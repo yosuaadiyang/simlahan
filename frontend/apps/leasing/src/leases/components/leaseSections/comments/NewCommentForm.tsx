@@ -87,7 +87,7 @@ const NewCommentForm = ({
         className={`${ButtonColors.SUCCESS} no-margin`}
         disabled={isSaveClicked && !valid}
         onClick={handleAddComment}
-        text="Kommentoi"
+        text="Beri komentar"
       />
     </form>
   );

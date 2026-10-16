@@ -31,18 +31,18 @@ const ApiErrorModal = ({
     isOpen={isOpen}
     aria-labelledby="api-error-modal-title"
     close={handleDismiss}
-    closeButtonLabelText="Sulje"
+    closeButtonLabelText="Tutup"
   >
     <Dialog.Header
       id="api-error-modal-title"
-      title={`Server error ${data?.exception || ""}`}
+      title={`Galat server ${data?.exception || ""}`}
     />
     <Dialog.Content>
       {data ? <ApiErrorContent data={data} /> : null}
     </Dialog.Content>
     <Dialog.ActionButtons>
       <Button onClick={handleDismiss} variant={ButtonVariant.Secondary}>
-        Dismiss
+        Tutup
       </Button>
     </Dialog.ActionButtons>
   </Dialog>
@@ -74,7 +74,7 @@ const ApiErrorList = ({ errors }: ApiErrorData) => {
 
   return (
     <div className="api-error-modal__error-list">
-      <h5 className="api-error-modal__error-list-heading">Error list</h5>
+      <h5 className="api-error-modal__error-list-heading">Daftar galat</h5>
       {listObjectErrors(errors)}
     </div>
   );
@@ -82,7 +82,7 @@ const ApiErrorList = ({ errors }: ApiErrorData) => {
 
 const ApiErrorStackTrace = ({ trace }: ApiErrorData) => (
   <div className="api-error-modal__trace">
-    <h5 className="api-error-modal__trace-heading">Trace</h5>
+    <h5 className="api-error-modal__trace-heading">Jejak galat</h5>
     <ol className="api-error-modal__trace-nav">
       {trace
         .filter((item) => item.file)

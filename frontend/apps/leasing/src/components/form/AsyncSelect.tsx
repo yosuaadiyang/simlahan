@@ -153,14 +153,14 @@ class AsyncSelect extends Component<Props, State> {
           isDisabled={disabled}
           isLoading={isLoading}
           isMulti={multiSelect === undefined ? false : multiSelect}
-          loadingMessage={() => "Ladataan..."}
+          loadingMessage={() => "Memuat..."}
           loadOptions={this.loadOptions}
-          noOptionsMessage={() => "Ei tuloksia"}
+          noOptionsMessage={() => "Tidak ada hasil"}
           onBlur={this.handleBlur}
           onChange={this.handleChange}
           onInputChange={this.handleInputChange}
           onMenuOpen={this.handleMenuOpen}
-          placeholder={placeholder || "Valitse..."}
+          placeholder={placeholder || "Pilih..."}
           value={value}
         />
       </div>

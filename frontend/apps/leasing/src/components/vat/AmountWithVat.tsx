@@ -38,8 +38,8 @@ class AmountWithVat extends PureComponent<Props> {
     return (
       <span>
         {isSubjectToVat
-          ? `${formatNumber(amount)} € / ${formatNumber(amountWithVat)} € (alv ${vatPercent}%)`
-          : `${formatNumber(amount)} €`}
+          ? `Rp ${formatNumber(amount)} / Rp ${formatNumber(amountWithVat)} (PPN ${vatPercent}%)`
+          : `Rp ${formatNumber(amount)}`}
       </span>
     );
   }

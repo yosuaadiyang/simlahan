@@ -123,11 +123,11 @@ const SendEmailModal: React.FC<Props> = ({
   return (
     <Modal
       className="modal-autoheight"
-      title="Lähetä sähköposti"
+      title="Kirim email"
       isOpen={isOpen}
       onClose={onClose}
     >
-      <FormText>Valitse sähköpostin vastaanottajat</FormText>
+      <FormText>Pilih penerima email</FormText>
       <DualListBox
         icons={{
           moveToAvailable: "<",
@@ -139,8 +139,8 @@ const SendEmailModal: React.FC<Props> = ({
         canFilter
         filter={{ available: filterAvailable, selected: filterSelected }}
         lang={{
-          availableFilterPlaceholder: "Hae vastaanottajia...",
-          selectedFilterPlaceholder: "Hae valittuja vastaanottajia...",
+          availableFilterPlaceholder: "Cari penerima...",
+          selectedFilterPlaceholder: "Cari penerima terpilih...",
         }}
         onChange={handleUserListChange}
         onFilterChange={handleFilterChange}
@@ -150,10 +150,7 @@ const SendEmailModal: React.FC<Props> = ({
       />
 
       <FormText>
-        <label htmlFor="send-email_text">
-          {" "}
-          Sähköpostiin liittyvä kommentti
-        </label>
+        <label htmlFor="send-email_text"> Komentar terkait email</label>
       </FormText>
       <TextAreaInput
         className="no-margin"
@@ -168,13 +165,13 @@ const SendEmailModal: React.FC<Props> = ({
         <Button
           className={ButtonColors.SECONDARY}
           onClick={onCancel}
-          text="Peruuta"
+          text="Batal"
         />
         <Button
           className={ButtonColors.SUCCESS}
           disabled={!selectedUsers.length}
           onClick={handleSend}
-          text="Lähetä"
+          text="Kirim"
         />
       </ModalButtonWrapper>
     </Modal>

@@ -131,7 +131,9 @@ const renderDecisions = ({
               usersPermissions,
               UsersPermissions.ADD_INFILLDEVELOPMENTCOMPENSATIONDECISION,
             ) &&
-              (!fields || !fields.length) && <FormText>Ei päätöksiä</FormText>}
+              (!fields || !fields.length) && (
+                <FormText>Tidak ada keputusan</FormText>
+              )}
             {!!fields && !!fields.length && (
               <>
                 <Row>
@@ -351,7 +353,7 @@ const renderDecisions = ({
                           <RemoveButton
                             className="third-level"
                             onClick={handleRemove}
-                            title="Poista päätös"
+                            title="Hapus keputusan"
                           />
                         </Authorization>
                       </Column>
@@ -369,7 +371,10 @@ const renderDecisions = ({
             >
               <Row>
                 <Column>
-                  <AddButtonThird label="Lisää päätös" onClick={handleAdd} />
+                  <AddButtonThird
+                    label="Tambah keputusan"
+                    onClick={handleAdd}
+                  />
                 </Column>
               </Row>
             </Authorization>
@@ -416,7 +421,7 @@ const renderIntendedUses = ({
               UsersPermissions.ADD_INFILLDEVELOPMENTCOMPENSATIONINTENDEDUSE,
             ) &&
               (!fields || !fields.length) && (
-                <FormText>Ei käyttötarkoituksia</FormText>
+                <FormText>Tidak ada peruntukan</FormText>
               )}
             {!!fields && !!fields.length && (
               <>
@@ -576,7 +581,7 @@ const renderIntendedUses = ({
                             )}
                             invisibleLabel
                             name={`${field}.amount_per_floor_m2`}
-                            unit="€/k-m²"
+                            unit="Rp/m² lantai"
                             overrideValues={{
                               label:
                                 InfillDevelopmentCompensationLeaseIntendedUsesFieldTitles.AMOUNT_PER_FLOOR_M2,
@@ -594,7 +599,7 @@ const renderIntendedUses = ({
                           <RemoveButton
                             className="third-level"
                             onClick={handleRemove}
-                            title="Poista käyttötarkoitus"
+                            title="Hapus peruntukan"
                           />
                         </Authorization>
                       </Column>
@@ -613,7 +618,7 @@ const renderIntendedUses = ({
               <Row>
                 <Column>
                   <AddButtonThird
-                    label="Lisää käyttötarkoitus"
+                    label="Tambah peruntukan"
                     onClick={handleAdd}
                   />
                 </Column>
@@ -787,7 +792,7 @@ const LeaseItemEdit = (props: Props) => {
     <Collapse
       className="collapse__secondary"
       defaultOpen={collapseState !== undefined ? collapseState : true}
-      headerTitle={isFetching ? "Ladataan..." : identifier || "-"}
+      headerTitle={isFetching ? "Memuat..." : identifier || "-"}
       onRemove={
         hasPermissions(
           usersPermissions,
@@ -840,10 +845,10 @@ const LeaseItemEdit = (props: Props) => {
                     LeaseTenantsFieldPaths.TENANTS,
                   )}
                 >
-                  Vuokralainen
+                  Penyewa
                 </FormTextTitle>
 
-                {isFetching && <FormText>Ladataan...</FormText>}
+                {isFetching && <FormText>Memuat...</FormText>}
                 {!isFetching && !tenants.length && <FormText>-</FormText>}
                 {!isFetching && !!tenants.length && (
                   <ListItems>
@@ -877,10 +882,10 @@ const LeaseItemEdit = (props: Props) => {
                     LeasePlotsFieldPaths.PLOTS,
                   )}
                 >
-                  Kiinteistö
+                  Bidang tanah
                 </FormTextTitle>
 
-                {isFetching && <FormText>Ladataan...</FormText>}
+                {isFetching && <FormText>Memuat...</FormText>}
                 {!isFetching && !plots.length && <FormText>-</FormText>}
                 {!isFetching && !!plots.length && (
                   <ListItems>
@@ -906,10 +911,10 @@ const LeaseItemEdit = (props: Props) => {
                     LeasePlanUnitsFieldPaths.PLAN_UNITS,
                   )}
                 >
-                  Kaavayksikkö
+                  Unit rencana
                 </FormTextTitle>
 
-                {isFetching && <FormText>Ladataan...</FormText>}
+                {isFetching && <FormText>Memuat...</FormText>}
                 {!isFetching && !planUnits.length && <FormText>-</FormText>}
                 {!isFetching && !!planUnits.length && (
                   <ListItems>
@@ -931,12 +936,12 @@ const LeaseItemEdit = (props: Props) => {
               )}
             >
               <>
-                {isFetching && <FormText>Ladataan...</FormText>}
+                {isFetching && <FormText>Memuat...</FormText>}
                 {!isFetching && !leaseId && <FormText>-</FormText>}
                 {!isFetching && leaseId && (
                   <ExternalLink
                     href={`${getRouteById(Routes.LEASES)}/${leaseId}?tab=7`}
-                    text="Karttalinkki"
+                    text="Tautan peta"
                   />
                 )}
               </>
@@ -989,7 +994,7 @@ const LeaseItemEdit = (props: Props) => {
                   InfillDevelopmentCompensationLeasesFieldPaths.MONETARY_COMPENSATION_AMOUNT,
                 )}
                 name={`${field}.monetary_compensation_amount`}
-                unit="€"
+                unit="Rp"
                 overrideValues={{
                   label:
                     InfillDevelopmentCompensationLeasesFieldTitles.MONETARY_COMPENSATION_AMOUNT,
@@ -1018,7 +1023,7 @@ const LeaseItemEdit = (props: Props) => {
                   InfillDevelopmentCompensationLeasesFieldPaths.COMPENSATION_INVESTMENT_AMOUNT,
                 )}
                 name={`${field}.compensation_investment_amount`}
-                unit="€"
+                unit="Rp"
                 overrideValues={{
                   label:
                     InfillDevelopmentCompensationLeasesFieldTitles.COMPENSATION_INVESTMENT_AMOUNT,
@@ -1057,7 +1062,7 @@ const LeaseItemEdit = (props: Props) => {
                     InfillDevelopmentCompensationLeasesFieldTitles.TOTAL_COMPENSATION
                   }
                 </FormTextTitle>
-                <FormText>{`${formatNumber(totalCompensation)} €`}</FormText>
+                <FormText>{`Rp ${formatNumber(totalCompensation)}`}</FormText>
               </>
             </Authorization>
           </Column>
@@ -1075,7 +1080,7 @@ const LeaseItemEdit = (props: Props) => {
                   InfillDevelopmentCompensationLeasesFieldPaths.INCREASE_IN_VALUE,
                 )}
                 name={`${field}.increase_in_value`}
-                unit="€"
+                unit="Rp"
                 overrideValues={{
                   label:
                     InfillDevelopmentCompensationLeasesFieldTitles.INCREASE_IN_VALUE,
@@ -1104,7 +1109,7 @@ const LeaseItemEdit = (props: Props) => {
                   InfillDevelopmentCompensationLeasesFieldPaths.PART_OF_THE_INCREASE_IN_VALUE,
                 )}
                 name={`${field}.part_of_the_increase_in_value`}
-                unit="€"
+                unit="Rp"
                 overrideValues={{
                   label:
                     InfillDevelopmentCompensationLeasesFieldTitles.PART_OF_THE_INCREASE_IN_VALUE,
@@ -1133,7 +1138,7 @@ const LeaseItemEdit = (props: Props) => {
                   InfillDevelopmentCompensationLeasesFieldPaths.DISCOUNT_IN_RENT,
                 )}
                 name={`${field}.discount_in_rent`}
-                unit="€"
+                unit="Rp"
                 overrideValues={{
                   label:
                     InfillDevelopmentCompensationLeasesFieldTitles.DISCOUNT_IN_RENT,
@@ -1365,7 +1370,7 @@ const LeaseItemEdit = (props: Props) => {
                                     style={{
                                       right: 12,
                                     }}
-                                    title="Poista liitetiedosto"
+                                    title="Hapus lampiran"
                                   />
                                 </Authorization>
                               </Column>
@@ -1382,7 +1387,7 @@ const LeaseItemEdit = (props: Props) => {
                       )}
                     >
                       <AddFileButton
-                        label="Lisää tiedosto"
+                        label="Tambah berkas"
                         name={`${infillDevelopmentCompensationLeaseId}`}
                         onChange={handleFileChange}
                       />

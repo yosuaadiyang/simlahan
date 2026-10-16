@@ -14,7 +14,10 @@ const ExternalLink = ({
   openInNewTab = true,
   text,
 }: Props) => {
-  const isRelativePath = href && href.substring(0, 4) !== "www." ? true : false;
+  if (!href) {
+    return <span className={classNames("links__text", className)}>{text}</span>;
+  }
+  const isRelativePath = href.substring(0, 4) !== "www.";
   return (
     <a
       onMouseDown={
@@ -24,7 +27,7 @@ const ExternalLink = ({
       className={classNames("links__external-link", className)}
       target={openInNewTab ? "_blank" : "_self"}
       rel={"noreferrer"}
-      href={isRelativePath ? href : `http://${href || ""}`}
+      href={isRelativePath ? href : `https://${href}`}
     >
       <span>{text}</span>
       <ExternalLinkIcon />

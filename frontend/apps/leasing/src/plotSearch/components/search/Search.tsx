@@ -166,7 +166,7 @@ class Search extends Component<Props & WithRouterProps, State> {
             <FormFieldLegacy
               disableDirty
               fieldAttributes={{
-                label: "Hae hakusanalla",
+                label: "Cari dengan kata kunci",
                 type: FieldTypes.SEARCH,
                 read_only: false,
               }}
@@ -182,7 +182,7 @@ class Search extends Component<Props & WithRouterProps, State> {
               <Column small={12} large={6}>
                 <SearchRow>
                   <SearchLabelColumn>
-                    <SearchLabel>Hakutyyppi</SearchLabel>
+                    <SearchLabel>Jenis pencarian</SearchLabel>
                   </SearchLabelColumn>
                   <SearchInputColumn>
                     <FormFieldLegacy
@@ -205,7 +205,7 @@ class Search extends Component<Props & WithRouterProps, State> {
               <Column small={12} large={6}>
                 <SearchRow>
                   <SearchLabelColumn>
-                    <SearchLabel>Haun alatyyppi</SearchLabel>
+                    <SearchLabel>Subjenis pencarian</SearchLabel>
                   </SearchLabelColumn>
                   <SearchInputColumn>
                     <FormFieldLegacy
@@ -230,7 +230,7 @@ class Search extends Component<Props & WithRouterProps, State> {
               <Column small={12} large={6}>
                 <SearchRow>
                   <SearchLabelColumn>
-                    <SearchLabel>Alkupvm</SearchLabel>
+                    <SearchLabel>Tgl mulai</SearchLabel>
                   </SearchLabelColumn>
                   <SearchInputColumn>
                     <Row>
@@ -265,7 +265,7 @@ class Search extends Component<Props & WithRouterProps, State> {
               <Column small={12} large={6}>
                 <SearchRow>
                   <SearchLabelColumn>
-                    <SearchLabel>Loppupvm</SearchLabel>
+                    <SearchLabel>Tgl akhir</SearchLabel>
                   </SearchLabelColumn>
                   <SearchInputColumn>
                     <Row>
@@ -302,12 +302,12 @@ class Search extends Component<Props & WithRouterProps, State> {
         <Row>
           <Column small={6}>
             <SearchChangeTypeLink onClick={this.toggleSearchType}>
-              {isBasicSearch ? "Tarkennettu haku" : "Yksinkertainen haku"}
+              {isBasicSearch ? "Pencarian lanjutan" : "Pencarian sederhana"}
             </SearchChangeTypeLink>
           </Column>
           <Column small={6}>
             <SearchClearLink onClick={this.handleClear}>
-              Tyhjennä haku
+              Kosongkan pencarian
             </SearchClearLink>
           </Column>
         </Row>

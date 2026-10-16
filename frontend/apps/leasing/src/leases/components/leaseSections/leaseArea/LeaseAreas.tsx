@@ -36,19 +36,19 @@ const LeaseAreas: React.FC<Props> = () => {
   return (
     <div>
       <Title uiDataKey={getUiDataLeaseKey(LeaseAreasFieldPaths.LEASE_AREAS)}>
-        Vuokra-alue
+        Area sewa
       </Title>
       <Authorization
         allow={isFieldAllowedToRead(attributes, LeaseAreasFieldPaths.AREA)}
       >
         <WarningContainer alignCenter hideIcon>
-          Kokonaispinta-ala {formatNumber(areasSum) || "-"} m<sup>2</sup>
+          Luas permukaan total {formatNumber(areasSum) || "-"} m<sup>2</sup>
         </WarningContainer>
       </Authorization>
       <Divider />
 
       {noAreaData && (
-        <FormText className="no-margin">Ei vuokra-alueita</FormText>
+        <FormText className="no-margin">Tidak ada area sewa</FormText>
       )}
       {hasActiveAreas &&
         activeAreas.map((area, index) => (
@@ -66,7 +66,7 @@ const LeaseAreas: React.FC<Props> = () => {
             marginBottom: 5,
           }}
         >
-          Arkisto
+          Arsip
         </h3>
       )}
       {archivedAreas &&

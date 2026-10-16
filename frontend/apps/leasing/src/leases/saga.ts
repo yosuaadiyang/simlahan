@@ -263,7 +263,7 @@ function* createLeaseSaga({ payload }): Generator<any, any, any> {
             area_search_status: {
               status_notes: [
                 {
-                  note: "Päätetty",
+                  note: "Diputuskan",
                 },
               ],
             },
@@ -278,7 +278,7 @@ function* createLeaseSaga({ payload }): Generator<any, any, any> {
         yield put(hideCreateModal());
         displayUIMessage({
           title: "",
-          body: "Vuokraus luotu",
+          body: "Sewa dibuat",
         });
         break;
 
@@ -322,7 +322,7 @@ function* deleteLeaseSaga({ payload: leaseId }): Generator<any, any, any> {
         );
         displayUIMessage({
           title: "",
-          body: "Vuokraus poistettu",
+          body: "Sewa dihapus",
         });
         break;
       }
@@ -359,7 +359,7 @@ function* patchLeaseSaga({ payload: lease }): Generator<any, any, any> {
         yield put(
           fetchSingleLeaseAfterEdit({
             leaseId: lease.id,
-            successMessage: "Vuokraus tallennettu",
+            successMessage: "Sewa disimpan",
           }),
         );
         break;
@@ -369,7 +369,7 @@ function* patchLeaseSaga({ payload: lease }): Generator<any, any, any> {
         yield put(
           receiveError(
             new SubmissionError({
-              _error: "Server error 400",
+              _error: "Galat server 400",
               ...bodyAsJson,
             }),
           ),
@@ -404,7 +404,7 @@ function* patchLeaseInvoiceNotesSaga({
         yield put(
           fetchSingleLeaseAfterEdit({
             leaseId: lease.id,
-            successMessage: "Laskujen tiedotteet tallennettu",
+            successMessage: "Catatan tagihan disimpan",
           }),
         );
         break;
@@ -425,7 +425,7 @@ function* patchLeaseInvoiceNotesSaga({
         yield put(
           receiveError(
             new SubmissionError({
-              _error: "Server error 400",
+              _error: "Galat server 400",
               ...bodyAsJson,
             }),
           ),
@@ -460,7 +460,7 @@ function* sendEmailSaga({
         yield put(
           fetchSingleLeaseAfterEdit({
             leaseId: payload.lease,
-            successMessage: "Sähköposti lähetetty",
+            successMessage: "Email terkirim",
           }),
         );
         break;
@@ -470,7 +470,7 @@ function* sendEmailSaga({
         yield put(
           receiveError(
             new SubmissionError({
-              _error: "Server error 400",
+              _error: "Galat server 400",
               ...bodyAsJson,
             }),
           ),
@@ -510,7 +510,7 @@ function* startInvoicingSaga({ payload: leaseId }): Generator<any, any, any> {
         yield put(fetchInvoiceSetsByLease(leaseId));
         displayUIMessage({
           title: "",
-          body: "Laskutus käynnistetty",
+          body: "Penagihan dimulai",
         });
         break;
       }
@@ -545,7 +545,7 @@ function* stopInvoicingSaga({ payload: leaseId }): Generator<any, any, any> {
         );
         displayUIMessage({
           title: "",
-          body: "Laskutus keskeytetty",
+          body: "Penagihan dihentikan",
         });
         break;
       }
@@ -582,7 +582,7 @@ function* setRentInfoCompleteSaga({
         );
         displayUIMessage({
           title: "",
-          body: "Vuokratiedot on merkattu olevan kunnossa",
+          body: "Data sewa ditandai lengkap",
         });
         break;
       }
@@ -619,7 +619,7 @@ function* setRentInfoUncompleteSaga({
         );
         displayUIMessage({
           title: "",
-          body: "Vuokratiedot on merkattu keskeneräisiksi",
+          body: "Data sewa ditandai belum lengkap",
         });
         break;
       }
@@ -651,7 +651,7 @@ function* createChargeSaga({ payload }): Generator<any, any, any> {
         yield put(receiveIsCreateInvoicePanelOpen(false));
         displayUIMessage({
           title: "",
-          body: "Laskut luotu",
+          body: "Tagihan dibuat",
         });
         break;
 
@@ -680,7 +680,7 @@ function* copyDecisionToLeasesSaga({ payload }): Generator<any, any, any> {
         yield put(notFound());
         displayUIMessage({
           title: "",
-          body: "Päätös kopioitu vuokrauksiin",
+          body: "Keputusan disalin ke sewa",
         });
         break;
 
@@ -688,7 +688,7 @@ function* copyDecisionToLeasesSaga({ payload }): Generator<any, any, any> {
         displayUIMessage(
           {
             title: "",
-            body: "Päätöksen kopioiminen vuokrauksiin epäonnistui",
+            body: "Penyalinan keputusan ke sewa gagal",
           },
           {
             type: "error",

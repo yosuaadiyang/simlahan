@@ -182,7 +182,7 @@ const RenderComments: React.FC<CommentProps> = ({
             ) &&
               (!fields || !fields.length) && (
                 <FormText>
-                  <em>Ei huomautuksia</em>
+                  <em>Tidak ada catatan</em>
                 </FormText>
               )}
 
@@ -357,7 +357,7 @@ const RenderComments: React.FC<CommentProps> = ({
                               <RemoveButton
                                 className="third-level"
                                 onClick={handleRemove}
-                                title="Poista huomautus"
+                                title="Hapus catatan"
                               />
                             </Authorization>
                           }
@@ -377,7 +377,7 @@ const RenderComments: React.FC<CommentProps> = ({
             >
               <Row>
                 <Column>
-                  <AddButtonThird label="Lisää huomautus" onClick={handleAdd} />
+                  <AddButtonThird label="Tambah catatan" onClick={handleAdd} />
                 </Column>
               </Row>
             </Authorization>
@@ -975,7 +975,7 @@ const ConstructabilityItemEdit: React.FC<Props> = ({
                     UsersPermissionsEnum.ADD_LEASEAREAATTACHMENT,
                   ) &&
                     !pollutedLandMattiAttachments.length && (
-                      <FormText>Ei Matti raportteja</FormText>
+                      <FormText>Tidak ada laporan MATTI</FormText>
                     )}
                   {!!pollutedLandMattiAttachments.length && (
                     <>
@@ -1088,7 +1088,7 @@ const ConstructabilityItemEdit: React.FC<Props> = ({
                                   style={{
                                     right: 12,
                                   }}
-                                  title="Poista liitetiedosto"
+                                  title="Hapus lampiran"
                                 />
                               </Authorization>
                             </Column>
@@ -1105,7 +1105,7 @@ const ConstructabilityItemEdit: React.FC<Props> = ({
                     )}
                   >
                     <AddFileButton
-                      label="Lisää tiedosto"
+                      label="Tambah berkas"
                       name={`add_polluted_land_matti_report_button_${savedArea.id}`}
                       onChange={handleAddMattiReport}
                     />
@@ -1291,7 +1291,7 @@ const ConstructabilityItemEdit: React.FC<Props> = ({
                     UsersPermissionsEnum.ADD_LEASEAREAATTACHMENT,
                   ) &&
                     !constructabilityReportGeotechnicalAttachments.length && (
-                      <FormText>Ei geoteknisen palvelun tiedostoja</FormText>
+                      <FormText>Tidak ada berkas layanan geoteknik</FormText>
                     )}
                   {!!constructabilityReportGeotechnicalAttachments.length && (
                     <>
@@ -1405,7 +1405,7 @@ const ConstructabilityItemEdit: React.FC<Props> = ({
                                     style={{
                                       right: 12,
                                     }}
-                                    title="Poista liitetiedosto"
+                                    title="Hapus lampiran"
                                   />
                                 </Authorization>
                               </Column>
@@ -1423,7 +1423,7 @@ const ConstructabilityItemEdit: React.FC<Props> = ({
                     )}
                   >
                     <AddFileButton
-                      label="Lisää tiedosto"
+                      label="Tambah berkas"
                       name={`add_constructability_report_geotechnical_attachment_button_${savedArea.id}`}
                       onChange={handleAddGeotechnicalAttachment}
                     />

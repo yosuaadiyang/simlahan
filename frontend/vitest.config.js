@@ -4,7 +4,6 @@ export default defineConfig({
   test: {
     projects: [
       'apps/leasing/vite.config.js',
-      'apps/landuse/vite.config.js',
     ],
     coverage: {
       provider: 'v8',

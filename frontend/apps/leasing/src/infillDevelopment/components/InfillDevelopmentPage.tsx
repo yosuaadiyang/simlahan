@@ -180,7 +180,7 @@ const InfillDevelopmentPage = () => {
   const updatePageTitle = useCallback(() => {
     const name =
       (currentInfillDevelopment && currentInfillDevelopment.name) || "";
-    setPageTitle(`${name ? `${name} | ` : ""}Täydennysrakentamiskorvaus`);
+    setPageTitle(`${name ? `${name} | ` : ""}Kompensasi pembangunan sisipan`);
   }, [currentInfillDevelopment]);
 
   const stopAutoSaveTimer = useCallback(() => {
@@ -276,7 +276,7 @@ const InfillDevelopmentPage = () => {
     dispatch(
       receiveTopNavigationSettings({
         linkUrl: getRouteById(Routes.INFILL_DEVELOPMENTS),
-        pageTitle: "Täydennysrakentamiskorvaukset",
+        pageTitle: "Kompensasi pembangunan sisipan",
         showSearch: false,
       }),
     );

@@ -49,7 +49,7 @@ const RentCalculatorTotalRow = ({ rents }: Props) => {
       <Row>
         <Column small={4}>
           <FormText>
-            <strong>Yhteensä</strong>
+            <strong>Total</strong>
           </FormText>
         </Column>
         <Column small={8}>

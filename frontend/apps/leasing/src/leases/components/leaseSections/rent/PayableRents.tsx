@@ -114,7 +114,7 @@ const PayableRents = ({ payableRents }: Props) => {
       defaultSortKey="start_date"
       defaultSortOrder={TableSortOrder.DESCENDING}
       fixedHeader={true}
-      noDataText="Ei perittäviä vuokria"
+      noDataText="Tidak ada sewa yang ditagih"
       sortable={true}
     />
   );

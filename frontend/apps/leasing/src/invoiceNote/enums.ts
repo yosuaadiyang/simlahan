@@ -20,10 +20,10 @@ export const InvoiceNoteFieldPaths = {
  */
 export const InvoiceNoteFieldTitles = {
   ID: "Id",
-  CREATED_AT: "Luotu",
-  MODIFIED_AT: "Muokattu",
-  BILLING_PERIOD_START_DATE: "Laskutuksen alkupvm",
-  BILLING_PERIOD_END_DATE: "Laskutuksen loppupvm",
-  NOTES: "Tiedote",
-  LEASE: "Vuokraustunnus",
+  CREATED_AT: "Dibuat",
+  MODIFIED_AT: "Diubah",
+  BILLING_PERIOD_START_DATE: "Tgl mulai penagihan",
+  BILLING_PERIOD_END_DATE: "Tgl akhir penagihan",
+  NOTES: "Pengumuman",
+  LEASE: "Pengenal sewa",
 };

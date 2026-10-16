@@ -81,8 +81,8 @@ const SearchFormFields: React.FC<{
 
   const searchTexts: SearchProps["texts"] = useMemo(
     () => ({
-      searchPlaceholder: "Hae hakusanalla",
-      historyLabel: "Hakuhistoria",
+      searchPlaceholder: "Cari dengan kata kunci",
+      historyLabel: "Riwayat pencarian",
     }),
     [],
   );
@@ -97,7 +97,7 @@ const SearchFormFields: React.FC<{
               iconStart={<IconPlusCircleFill />}
               onClick={onCreateContact}
             >
-              Luo asiakas
+              Buat kontak
             </Button>
           </Authorization>
         </Column>
@@ -135,8 +135,8 @@ const SearchFormFields: React.FC<{
                   id="contact_service_unit"
                   texts={{
                     label: ContactFieldTitles.SERVICE_UNIT,
-                    placeholder: "Valitse palvelukokonaisuus",
-                    language: "fi",
+                    placeholder: "Pilih unit layanan",
+                    language: "en",
                   }}
                   value={filterSelectedOptions(value, serviceUnitOptions)}
                   options={serviceUnitOptions}
@@ -156,7 +156,7 @@ const SearchFormFields: React.FC<{
               {({ input: { value, onChange, onBlur, onFocus } }) => (
                 <TextInput
                   id="contact_lease"
-                  label="Vuokraustunnus"
+                  label="Pengenal sewa"
                   value={value || ""}
                   onChange={onChange}
                   onBlur={onBlur}
@@ -175,7 +175,7 @@ const SearchFormFields: React.FC<{
               {({ input: { value, onChange } }) => (
                 <Checkbox
                   id="contact_is_tenant"
-                  label="Vain vuokralaiset"
+                  label="Hanya penyewa"
                   checked={value === true || value === "true"}
                   onChange={(event) =>
                     onChange(event.target.checked ? true : undefined)
@@ -193,7 +193,7 @@ const SearchFormFields: React.FC<{
               {({ input: { value, onChange } }) => (
                 <Checkbox
                   id="contact_is_active"
-                  label="Vain aktiiviset asiakkaat"
+                  label="Hanya kontak aktif"
                   checked={value === true || value === "true"}
                   onChange={(event) =>
                     onChange(event.target.checked ? true : undefined)

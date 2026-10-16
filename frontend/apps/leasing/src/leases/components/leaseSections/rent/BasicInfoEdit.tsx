@@ -169,7 +169,7 @@ const DueDates = ({ dueDates, fields }: DueDatesProps): ReactElement => {
                               <RemoveButton
                                 className="third-level"
                                 onClick={handleRemove}
-                                title="Poista eräpäivä"
+                                title="Hapus jatuh tempo"
                               />
                             </Authorization>
                           }
@@ -190,7 +190,7 @@ const DueDates = ({ dueDates, fields }: DueDatesProps): ReactElement => {
         >
           <Row>
             <Column>
-              <AddButtonThird label="Lisää eräpäivä" onClick={handleAdd} />
+              <AddButtonThird label="Tambah jatuh tempo" onClick={handleAdd} />
             </Column>
           </Row>
         </Authorization>
@@ -658,7 +658,7 @@ const BasicInfoOneTime = ({ field }: BasicInfoOneTimeProps) => {
                 LeaseRentsFieldPaths.AMOUNT,
               )}
               name={`${field}.amount`}
-              unit="€"
+              unit="Rp"
               overrideValues={{
                 label: LeaseRentsFieldTitles.AMOUNT,
               }}

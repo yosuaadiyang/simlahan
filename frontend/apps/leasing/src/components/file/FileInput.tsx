@@ -10,7 +10,7 @@ const FileInput = ({ name, onChange, value }: Props) => {
     <div className="file__file-input">
       <input type="file" id={name} name={name} onChange={onChange} />
       <label htmlFor={name}>
-        <span>{value && value.name ? value.name : "Valitse tiedosto…"}</span>
+        <span>{value && value.name ? value.name : "Pilih berkas…"}</span>
       </label>
     </div>
   );

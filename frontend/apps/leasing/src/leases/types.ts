@@ -214,8 +214,7 @@ export type IntendedUse = {
   is_active: boolean;
   name: string;
   name_en: string | null;
-  name_fi: string | null;
-  name_sv: string | null;
+  name_ind: string | null;
   service_unit: ServiceUnit["id"];
 };
 export type BasisOfRent = {

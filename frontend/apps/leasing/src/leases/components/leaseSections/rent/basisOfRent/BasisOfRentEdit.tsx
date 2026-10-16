@@ -114,7 +114,7 @@ const ManagementSubventions = ({
               BasisOfRentManagementSubventionsFieldPaths.MANAGEMENT_SUBVENTIONS,
             ) &&
               (!fields || !fields.length) && (
-                <FormText>Ei hallintamuotoja</FormText>
+                <FormText>Tidak ada bentuk pengelolaan</FormText>
               )}
 
             {fields && !!fields.length && (
@@ -246,7 +246,7 @@ const ManagementSubventions = ({
                 <Row>
                   <Column>
                     <AddButtonThird
-                      label="Lisää hallintamuoto"
+                      label="Tambah bentuk pengelolaan"
                       onClick={handleAdd}
                     />
                   </Column>
@@ -292,7 +292,7 @@ const TemporarySubventions = ({
               BasisOfRentTemporarySubventionsFieldPaths.TEMPORARY_SUBVENTIONS,
             ) &&
               (!fields || !fields.length) && (
-                <FormText>Ei tilapäisalennuksia</FormText>
+                <FormText>Tidak ada potongan sementara</FormText>
               )}
 
             {fields && !!fields.length && (
@@ -410,7 +410,7 @@ const TemporarySubventions = ({
                   <Column>
                     <AddButtonThird
                       className="no-bottom-margin"
-                      label="Lisää tilapäisalennus"
+                      label="Tambah potongan sementara"
                       onClick={handleAdd}
                     />
                   </Column>
@@ -780,14 +780,14 @@ const BasisOfRentEdit: React.FC<Props> = ({
 
   const getAreaText = (amount: number | null | undefined) => {
     if (isEmptyValue(amount)) return "-";
-    if (isEmptyValue(areaUnit)) return `${formatNumber(amount)} €`;
+    if (isEmptyValue(areaUnit)) return `Rp ${formatNumber(amount)}`;
     return `${formatNumber(amount)} ${getLabelOfOption(areaUnitOptions, areaUnit) || ""}`;
   };
 
   const getAmountPerAreaText = (amount: number | null | undefined) => {
     if (isEmptyValue(amount)) return "-";
-    if (isEmptyValue(areaUnit)) return `${formatNumber(amount)} €`;
-    return `${formatNumber(amount)} € / ${getLabelOfOption(areaUnitOptions, areaUnit) || ""}`;
+    if (isEmptyValue(areaUnit)) return `Rp ${formatNumber(amount)}`;
+    return `Rp ${formatNumber(amount)} / ${getLabelOfOption(areaUnitOptions, areaUnit) || ""}`;
   };
 
   const getPlansInspectedText = () => {
@@ -829,7 +829,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
     if (copyElementContentsToClipboard(el)) {
       displayUIMessage({
         title: "",
-        body: "Vuokralaskuri on kopioitu leikepöydälle.",
+        body: "Kalkulator sewa telah disalin ke papan klip.",
       });
     }
   };
@@ -907,13 +907,13 @@ const BasisOfRentEdit: React.FC<Props> = ({
           ${isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.INDEX) ? `<td>${getLabelOfOption(indexOptions, index) || "-"}</td>` : ""}
           ${isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AMOUNT_PER_AREA) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.INDEX) ? `<td>${currentAmountPerAreaText}</td>` : ""}
           ${isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.PROFIT_MARGIN_PERCENTAGE) ? `<td>${!isEmptyValue(profitMarginPercentage) ? `${formatNumber(profitMarginPercentage)} %` : "-"}</td>` : ""}
-          ${isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AREA) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AMOUNT_PER_AREA) ? `<td>${!isEmptyValue(basicAnnualRent) ? `${formatNumber(basicAnnualRent)} €/v` : "-"}</td>` : ""}
-          ${isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AREA) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AMOUNT_PER_AREA) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.INDEX) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.PROFIT_MARGIN_PERCENTAGE) ? `<td>${!isEmptyValue(initialYearRent) ? `${formatNumber(initialYearRent)} €/v` : "-"}</td>` : ""}
+          ${isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AREA) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AMOUNT_PER_AREA) ? `<td>${!isEmptyValue(basicAnnualRent) ? `Rp ${formatNumber(basicAnnualRent)}/thn` : "-"}</td>` : ""}
+          ${isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AREA) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AMOUNT_PER_AREA) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.INDEX) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.PROFIT_MARGIN_PERCENTAGE) ? `<td>${!isEmptyValue(initialYearRent) ? `Rp ${formatNumber(initialYearRent)}/thn` : "-"}</td>` : ""}
           ${isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.DISCOUNT_PERCENTAGE) ? `<td>${!isEmptyValue(subvention_discount_percentage) ? `${formatNumber(subvention_discount_percentage)} %` : "-"}</td>` : ""}
           ${isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.DISCOUNT_PERCENTAGE) ? `<td>${!isEmptyValue(temporarySubventionDiscountPercentage) ? `${formatNumber(temporarySubventionDiscountPercentage)} %` : "-"}</td>` : ""}
-          ${isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AREA) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AMOUNT_PER_AREA) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.INDEX) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.PROFIT_MARGIN_PERCENTAGE) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.DISCOUNT_PERCENTAGE) ? `<td>${!isEmptyValue(discountedInitialYearRent) ? `${formatNumber(discountedInitialYearRent)} €/v` : "-"}</td>` : ""}
-          ${isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AREA) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AMOUNT_PER_AREA) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.INDEX) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.PROFIT_MARGIN_PERCENTAGE) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.DISCOUNT_PERCENTAGE) ? `<td>${!isEmptyValue(rentPerMonth) ? `${formatNumber(rentPerMonth)} €/kk` : "-"}</td>` : ""}
-          ${isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AREA) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AMOUNT_PER_AREA) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.INDEX) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.PROFIT_MARGIN_PERCENTAGE) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.DISCOUNT_PERCENTAGE) ? `<td>${!isEmptyValue(rentPer2Months) ? `${formatNumber(rentPer2Months)} €/2kk` : "-"}</td>` : ""}
+          ${isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AREA) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AMOUNT_PER_AREA) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.INDEX) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.PROFIT_MARGIN_PERCENTAGE) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.DISCOUNT_PERCENTAGE) ? `<td>${!isEmptyValue(discountedInitialYearRent) ? `Rp ${formatNumber(discountedInitialYearRent)}/thn` : "-"}</td>` : ""}
+          ${isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AREA) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AMOUNT_PER_AREA) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.INDEX) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.PROFIT_MARGIN_PERCENTAGE) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.DISCOUNT_PERCENTAGE) ? `<td>${!isEmptyValue(rentPerMonth) ? `Rp ${formatNumber(rentPerMonth)}/bln` : "-"}</td>` : ""}
+          ${isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AREA) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AMOUNT_PER_AREA) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.INDEX) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.PROFIT_MARGIN_PERCENTAGE) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.DISCOUNT_PERCENTAGE) ? `<td>${!isEmptyValue(rentPer2Months) ? `Rp ${formatNumber(rentPer2Months)}/2 bln` : "-"}</td>` : ""}
         </tr>
       </tbody>`;
   };
@@ -1102,7 +1102,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
           onChange={onChangeCurrentAmountPerArea}
           fieldAttributes={{
             decimal_places: 2,
-            label: "Yksikköhinta",
+            label: "Harga satuan",
             max_digits: 10,
             read_only: false,
             required: false,
@@ -1110,7 +1110,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
           }}
           disabled={isLocked}
           name={`${field}.current_amount_per_area`}
-          unit="€"
+          unit="Rp"
           invisibleLabel
           overrideValues={{
             label: LeaseBasisOfRentsFieldTitles.AMOUNT_PER_AREA,
@@ -1196,7 +1196,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
         </FormTextTitle>
         <FormText>
           {!isEmptyValue(initialYearRent)
-            ? `${formatNumber(initialYearRent)} €/v`
+            ? `Rp ${formatNumber(initialYearRent)}/thn`
             : "-"}
         </FormText>
       </>
@@ -1260,7 +1260,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
         </FormTextTitle>
         <FormText>
           {!isEmptyValue(basicAnnualRent)
-            ? `${formatNumber(basicAnnualRent)} €/v`
+            ? `Rp ${formatNumber(basicAnnualRent)}/thn`
             : "-"}
         </FormText>
       </>
@@ -1309,7 +1309,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
                 UsersPermissions.DELETE_LEASEBASISOFRENT,
               )}
             >
-              <RemoveButton onClick={onRemove} title="Poista vuokralaskuri" />
+              <RemoveButton onClick={onRemove} title="Hapus kalkulator sewa" />
             </Authorization>
           )}
         </ActionButtonWrapper>
@@ -1332,7 +1332,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
                 name={`${field}.type`}
                 disabled={isLocked || isExistingBasisOfRent}
                 overrideValues={{
-                  label: "Laskurin tyyppi",
+                  label: "Jenis kalkulator",
                 }}
                 enableUiDataEdit
                 uiDataKey={getUiDataLeaseKey(LeaseBasisOfRentsFieldPaths.TYPE)}
@@ -1601,7 +1601,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
                               name={`${field}.amount_per_area`}
                               disabled={isLocked}
                               invisibleLabel
-                              unit="€"
+                              unit="Rp"
                               overrideValues={{
                                 label: LeaseBasisOfRentsFieldTitles.PRICE,
                               }}
@@ -1611,7 +1611,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
                       )}
                       {calculatorType === CalculatorTypes.ADDITIONAL_YARD && (
                         <Column small={4} medium={2} large={1}>
-                          <FormTextTitle>{"Kerroin"}</FormTextTitle>
+                          <FormTextTitle>{"Faktor"}</FormTextTitle>
                           <FormText>{"* 1,5"}</FormText>
                         </Column>
                       )}
@@ -1630,10 +1630,10 @@ const BasisOfRentEdit: React.FC<Props> = ({
                             }
                           >
                             <>
-                              <FormTextTitle>{"Hinta"}</FormTextTitle>
+                              <FormTextTitle>{"Harga"}</FormTextTitle>
                               <FormText>
                                 {!isEmptyValue(zonePrice)
-                                  ? `${formatNumber(zonePrice)} €`
+                                  ? `Rp ${formatNumber(zonePrice)}`
                                   : "-"}
                               </FormText>
                             </>
@@ -1657,8 +1657,8 @@ const BasisOfRentEdit: React.FC<Props> = ({
                                 }
                               >
                                 <>
-                                  <FormTextTitle>{"Laskuri"}</FormTextTitle>
-                                  <FormText>{`Alue`}</FormText>
+                                  <FormTextTitle>{"Kalkulator"}</FormTextTitle>
+                                  <FormText>{`Area`}</FormText>
                                 </>
                               </Authorization>
                             </Column>
@@ -1678,9 +1678,9 @@ const BasisOfRentEdit: React.FC<Props> = ({
                                     )}
                                     name={`${field}.amount_per_area`}
                                     disabled={isLocked}
-                                    unit="€"
+                                    unit="Rp"
                                     overrideValues={{
-                                      label: "Hinta",
+                                      label: "Harga",
                                     }}
                                   />
                                 }
@@ -1700,7 +1700,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
                                 }
                               >
                                 <>
-                                  <FormTextTitle>{"Kerroin"}</FormTextTitle>
+                                  <FormTextTitle>{"Faktor"}</FormTextTitle>
                                   <FormText>{`*1,5`}</FormText>
                                 </>
                               </Authorization>
@@ -1721,7 +1721,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
                                   name={`${field}.area`}
                                   disabled={isLocked}
                                   overrideValues={{
-                                    label: "Ala/korkeus",
+                                    label: "Luas/tinggi",
                                   }}
                                 />
                               </Authorization>
@@ -1740,7 +1740,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
                                 }
                               >
                                 <>
-                                  <FormTextTitle>{"Yksikkö"}</FormTextTitle>
+                                  <FormTextTitle>{"Satuan"}</FormTextTitle>
                                   <FormText>{`m${String.fromCharCode(178)}`}</FormText>
                                 </>
                               </Authorization>
@@ -1764,7 +1764,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
                                   </FormTextTitle>
                                   <FormText>
                                     {!isEmptyValue(mastAreaRent)
-                                      ? `${formatNumber(mastAreaRent)} €`
+                                      ? `Rp ${formatNumber(mastAreaRent)}`
                                       : "-"}
                                   </FormText>
                                 </>
@@ -1903,7 +1903,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
                               {calculatorType === CalculatorTypes.TEMPORARY && (
                                 <FormText>
                                   {!isEmptyValue(temporaryRent)
-                                    ? `${formatNumber(temporaryRent)} €`
+                                    ? `Rp ${formatNumber(temporaryRent)}`
                                     : "-"}
                                 </FormText>
                               )}
@@ -1911,14 +1911,14 @@ const BasisOfRentEdit: React.FC<Props> = ({
                                 CalculatorTypes.ADDITIONAL_YARD && (
                                 <FormText>
                                   {!isEmptyValue(rentExtra)
-                                    ? `${formatNumber(rentExtra)} €`
+                                    ? `Rp ${formatNumber(rentExtra)}`
                                     : "-"}
                                 </FormText>
                               )}
                               {calculatorType === CalculatorTypes.FIELD && (
                                 <FormText>
                                   {!isEmptyValue(fieldsRent)
-                                    ? `${formatNumber(fieldsRent)} €`
+                                    ? `Rp ${formatNumber(fieldsRent)}`
                                     : "-"}
                                 </FormText>
                               )}
@@ -1953,7 +1953,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
                               )}
                               <FormText>
                                 {!isEmptyValue(temporaryRent)
-                                  ? `${formatNumber(temporaryRent * 12)} €`
+                                  ? `Rp ${formatNumber(temporaryRent * 12)}`
                                   : "-"}
                               </FormText>
                             </>
@@ -2024,7 +2024,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
                               {calculatorType === CalculatorTypes.TEMPORARY && (
                                 <FormText>
                                   {!isEmptyValue(temporaryRentIndexed)
-                                    ? `${formatNumber(temporaryRentIndexed)} €/v`
+                                    ? `Rp ${formatNumber(temporaryRentIndexed)}/thn`
                                     : "-"}
                                 </FormText>
                               )}
@@ -2032,14 +2032,14 @@ const BasisOfRentEdit: React.FC<Props> = ({
                                 CalculatorTypes.ADDITIONAL_YARD && (
                                 <FormText>
                                   {!isEmptyValue(rentExtraIndexed)
-                                    ? `${formatNumber(rentExtraIndexed)} €/v`
+                                    ? `Rp ${formatNumber(rentExtraIndexed)}/thn`
                                     : "-"}
                                 </FormText>
                               )}
                               {calculatorType === CalculatorTypes.FIELD && (
                                 <FormText>
                                   {!isEmptyValue(basicAnnualFieldRentIndexed)
-                                    ? `${formatNumber(basicAnnualFieldRentIndexed)} €/v`
+                                    ? `Rp ${formatNumber(basicAnnualFieldRentIndexed)}/thn`
                                     : "-"}
                                 </FormText>
                               )}
@@ -2130,7 +2130,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
                           }
                           disabled={isLocked}
                           name={`${field}.amount_per_area`}
-                          unit="€"
+                          unit="Rp"
                           invisibleLabel
                           overrideValues={{
                             label: LeaseBasisOfRentsFieldTitles.AMOUNT_PER_AREA,
@@ -2305,7 +2305,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
                     name={`${field}.subvention_discount_percentage`}
                     unit="%"
                     overrideValues={{
-                      label: "Subventioprosentti",
+                      label: "Persentase subsidi",
                     }}
                     enableUiDataEdit
                     tooltipStyle={{
@@ -2327,7 +2327,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
                     </FormTextTitle>
                     <FormText>
                       {!isEmptyValue(subventionDiscountedInitial)
-                        ? `${formatNumber(subventionDiscountedInitial)} €/v`
+                        ? `Rp ${formatNumber(subventionDiscountedInitial)}/thn`
                         : "-"}
                     </FormText>
                   </>
@@ -2371,7 +2371,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
                     name={`${field}.temporary_subvention_discount_percentage`}
                     unit="%"
                     overrideValues={{
-                      label: "Tilapäisalennuksen prosentti",
+                      label: "Persentase potongan sementara",
                     }}
                     enableUiDataEdit
                     tooltipStyle={{
@@ -2397,7 +2397,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
                 <FormField
                   disableTouched={isSaveClicked}
                   fieldAttributes={{
-                    label: "Lopullinen alennusprosentti",
+                    label: "Persentase potongan akhir",
                     read_only: true,
                     required: false,
                     type: "string",
@@ -2456,7 +2456,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
                   </FormTextTitle>
                   <FormText>
                     {!isEmptyValue(discountedInitialYearRent)
-                      ? `${formatNumber(discountedInitialYearRent)} €/v`
+                      ? `Rp ${formatNumber(discountedInitialYearRent)}/thn`
                       : "-"}
                   </FormText>
                 </>
@@ -2500,7 +2500,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
                   </FormTextTitle>
                   <FormText>
                     {!isEmptyValue(rentPerMonth)
-                      ? `${formatNumber(rentPerMonth)} €`
+                      ? `Rp ${formatNumber(rentPerMonth)}`
                       : "-"}
                   </FormText>
                 </>
@@ -2544,7 +2544,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
                   </FormTextTitle>
                   <FormText>
                     {!isEmptyValue(rentPer2Months)
-                      ? `${formatNumber(rentPer2Months)} €`
+                      ? `Rp ${formatNumber(rentPer2Months)}`
                       : "-"}
                   </FormText>
                 </>
@@ -2590,7 +2590,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
                       </FormTextTitle>
                       <FormText>
                         {!isEmptyValue(rentPerMonthTotal)
-                          ? `${formatNumber(rentPerMonthTotal)} €`
+                          ? `Rp ${formatNumber(rentPerMonthTotal)}`
                           : "-"}
                       </FormText>
                     </>
@@ -2634,7 +2634,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
                       </FormTextTitle>
                       <FormText>
                         {!isEmptyValue(rentPer2MonthsTotal)
-                          ? `${formatNumber(rentPer2MonthsTotal)} €`
+                          ? `Rp ${formatNumber(rentPer2MonthsTotal)}`
                           : "-"}
                       </FormText>
                     </>
@@ -2694,14 +2694,14 @@ const BasisOfRentEdit: React.FC<Props> = ({
                     <Column small={6}>
                       <Row>
                         <Column small={6} medium={4} large={2}>
-                          <FormText className="semibold">{"Yhteensä"}</FormText>
+                          <FormText className="semibold">{"Total"}</FormText>
                         </Column>
                         <Column small={6}></Column>
                         <Column small={6} medium={4} large={2}>
                           <FormText>{"*5%"}</FormText>
                         </Column>
                         <Column small={6} medium={4} large={2}>
-                          <FormText className="semibold">{`${formatNumber(mastTotal)} €`}</FormText>
+                          <FormText className="semibold">{`Rp ${formatNumber(mastTotal)}`}</FormText>
                         </Column>
                       </Row>
                     </Column>
@@ -2779,7 +2779,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
                           </FormTextTitle>
                           <FormText>
                             {!isEmptyValue(mastTotalIndexed)
-                              ? `${formatNumber(mastTotalIndexed)} €/v`
+                              ? `Rp ${formatNumber(mastTotalIndexed)}/thn`
                               : "-"}
                           </FormText>
                         </>
@@ -2907,7 +2907,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
               <Row>
                 <Column>
                   <AddButtonSecondary
-                    label="Lisää subventio"
+                    label="Tambah subsidi"
                     onClick={handleAddSubventions}
                   />
                 </Column>
@@ -2941,7 +2941,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
                       <ActionButtonWrapper>
                         <RemoveButton
                           onClick={handleRemoveSubventions}
-                          title="Poista subventiot"
+                          title="Hapus subsidi"
                         />
                       </ActionButtonWrapper>
                     )}
@@ -3113,7 +3113,7 @@ const BasisOfRentEdit: React.FC<Props> = ({
                                   }
                                 </FormTextTitle>
                                 <FormText>
-                                  {formatNumber(releaseDiscountAmount)} €
+                                  Rp {formatNumber(releaseDiscountAmount)}
                                 </FormText>
                               </>
                             </Authorization>
@@ -3176,11 +3176,11 @@ const BasisOfRentEdit: React.FC<Props> = ({
                         </Row>
                         <Row>
                           <Column small={4} large={6}>
-                            <FormText className="semibold">Yhteensä</FormText>
+                            <FormText className="semibold">Total</FormText>
                           </Column>
                           <Column small={4} large={2}>
                             <FormText className="semibold">
-                              {formatNumber(totalSubventionAmount)} €
+                              Rp {formatNumber(totalSubventionAmount)}
                             </FormText>
                           </Column>
                         </Row>

@@ -161,7 +161,7 @@ const FormFieldInputLegacy = ({
     switch (type) {
       case FieldTypeOptions.BOOLEAN:
       case FieldTypeOptions.CHECKBOX:
-        return !isEmptyValue(value) ? (value ? "Kyllä" : "Ei") : "-";
+        return !isEmptyValue(value) ? (value ? "Ya" : "Tidak") : "-";
 
       case FieldTypeOptions.CHOICE:
       case FieldTypeOptions.FIELD:

@@ -81,14 +81,14 @@ const RentCalculatorForm: React.FC<Props> = ({
     return [
       {
         value: RentCalculatorTypes.YEAR,
-        label: "Vuosi",
+        label: "Tahun",
         labelStyles: {
           minWidth: "115px",
         },
         field: (
           <FormField
             fieldAttributes={{
-              label: "Vuosi",
+              label: "Tahun",
               type: "string",
               read_only: false,
             }}
@@ -113,14 +113,14 @@ const RentCalculatorForm: React.FC<Props> = ({
       },
       {
         value: RentCalculatorTypes.BILLING_PERIOD,
-        label: "Laskutuskausi",
+        label: "Periode tagihan",
         labelStyles: {
           minWidth: "115px",
         },
         field: (
           <FormField
             fieldAttributes={{
-              label: "Laskutuskausi",
+              label: "Periode tagihan",
               type: "choice",
               read_only: false,
             }}
@@ -163,7 +163,7 @@ const RentCalculatorForm: React.FC<Props> = ({
             <FormField
               className="no-margin"
               fieldAttributes={{
-                label: "Laskelman tyyppi",
+                label: "Jenis perhitungan",
                 type: FieldTypes.RADIO_WITH_FIELD,
                 required: true,
                 read_only: false,

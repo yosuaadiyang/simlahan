@@ -38,10 +38,10 @@ const RentForPeriod = ({ onRemove, rentForPeriod }: Props) => {
           <RemoveButton
             className="position-topright"
             onClick={handleRemove}
-            title="Poista"
+            title="Hapus"
           />
         )}
-        {(!rents || !rents.length) && <FormText>Ei vuokria</FormText>}
+        {(!rents || !rents.length) && <FormText>Tidak ada sewa</FormText>}
         {!!rents && !!rents.length && (
           <Row>
             <Column small={12} large={8}>

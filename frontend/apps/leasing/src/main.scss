@@ -54,7 +54,6 @@
 @use "areaNote/components/area-note-map";
 @use "auth/components/login-page";
 @use "contacts/components/search/search";
-@use "creditDecision/components/credit-decision";
 @use "errorPage/error-page";
 @use "leases/components/createLease/create-lease";
 @use "leases/components/lease-list-page";
@@ -86,6 +85,7 @@
 @use "areaSearch/components/map/area-search-map";
 @use "areaSearch/components/map/single-area-search-map";
 @use "application/components/applicant-info-check";
+@use "acquisition/acquisition";
 
 html {
   -webkit-font-smoothing: antialiased;

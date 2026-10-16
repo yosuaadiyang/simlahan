@@ -1,8 +1,7 @@
 import { useEffect } from "react";
 import { useLeaflet } from "react-leaflet";
-import { GeoSearchControl } from "leaflet-geosearch";
 import type { Map } from "leaflet";
-import HelsinkiProvider from "./HelsinkiProvider";
+import { GeoSearchControl, OpenStreetMapProvider } from "leaflet-geosearch";
 
 const GeoSearch = (): null => {
   const leaflet = useLeaflet();
@@ -15,14 +14,19 @@ const GeoSearch = (): null => {
       position: "topright",
       style: "bar",
       showMarker: false,
-      provider: new HelsinkiProvider(),
+      provider: new OpenStreetMapProvider({
+        params: {
+          countrycodes: "id",
+          "accept-language": "id",
+        },
+      }),
       showPopup: false,
       autoClose: true,
       retainZoomLevel: false,
       animateZoom: true,
       keepResult: false,
-      searchLabel: "Hae osoitteella",
-      zoomLevel: 9,
+      searchLabel: "Cari alamat atau tempat",
+      zoomLevel: 17,
     });
 
     map.addControl(geoSearchControl);

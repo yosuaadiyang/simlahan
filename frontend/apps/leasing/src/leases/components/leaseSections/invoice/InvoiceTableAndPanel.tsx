@@ -205,7 +205,11 @@ const InvoiceTableAndPanel: React.FC<Props> = ({
               }
               disabled={disabled}
               invisibleLabel
-              label={isTableGroup ? `Laskuryhmä ${row.id}` : `Lasku ${row.id}`}
+              label={
+                isTableGroup
+                  ? `Kelompok tagihan ${row.id}`
+                  : `Tagihan ${row.id}`
+              }
               name={
                 isTableGroup ? `invoice_group_${row.id}` : `invoice_${row.id}`
               }
@@ -266,7 +270,7 @@ const InvoiceTableAndPanel: React.FC<Props> = ({
         ascSortFunction: sortNumberByKeyAsc,
         descSortFunction: sortNumberByKeyDesc,
         dataClassName: "no-wrap",
-        text: "Laskunro",
+        text: "No. tagihan",
       });
     }
 
@@ -325,7 +329,7 @@ const InvoiceTableAndPanel: React.FC<Props> = ({
         ascSortFunction: sortByTypeAsc,
         descSortFunction: sortByTypeDesc,
         renderer: (val) => getLabelOfOption(typeOptions, val) || "-",
-        text: "Tyyppi",
+        text: "Jenis",
       });
     }
 
@@ -358,7 +362,7 @@ const InvoiceTableAndPanel: React.FC<Props> = ({
         renderer: (val, row) => (
           <AmountWithVat amount={row.billed_amount || 0} date={row.due_date} />
         ),
-        text: "Laskutettu",
+        text: "Ditagih",
       });
     }
 
@@ -379,7 +383,7 @@ const InvoiceTableAndPanel: React.FC<Props> = ({
             date={row.due_date}
           />
         ),
-        text: "Maksamatta",
+        text: "Belum dibayar",
       });
     }
 

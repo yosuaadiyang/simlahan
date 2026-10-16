@@ -45,11 +45,11 @@ const PlotsLayer = ({
           } = feature.properties;
           const popupContent = `<p class='title'><strong>${getLabelOfOption(typeOptions, type) || "-"}</strong></p>
             <p><strong>Id:</strong> ${id}</p>
-            <p><strong>Tunnus:</strong> ${identifier}</p>
-            <p><strong>Kokonaisala:</strong> ${area || area === 0 ? `${formatNumber(area)} m²` : ""}</p>
-            <p><strong>Leikkausala:</strong> ${section_area || section_area === 0 ? `${formatNumber(section_area)} m²` : ""}</p>
-            <p><strong>Rekisteröintipvm:</strong> ${formatDate(registration_date) || "-"}</p>
-            <p><strong>Kumoamispvm:</strong> ${formatDate(repeal_date) || "-"}</p>`;
+            <p><strong>Pengenal:</strong> ${identifier}</p>
+            <p><strong>Luas total:</strong> ${area || area === 0 ? `${formatNumber(area)} m²` : ""}</p>
+            <p><strong>Luas bagian:</strong> ${section_area || section_area === 0 ? `${formatNumber(section_area)} m²` : ""}</p>
+            <p><strong>Tgl pendaftaran:</strong> ${formatDate(registration_date) || "-"}</p>
+            <p><strong>Tgl pencabutan:</strong> ${formatDate(repeal_date) || "-"}</p>`;
           layer.bindPopup(popupContent);
 
           if (id === defaultPlot) {

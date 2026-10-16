@@ -99,7 +99,7 @@ function* createCollectionNoteSaga({
         yield put(
           fetchSingleLeaseAfterEdit({
             leaseId: payload.lease,
-            successMessage: "Huomautus tallennettu",
+            successMessage: "Catatan disimpan",
           }),
         );
         break;
@@ -140,7 +140,7 @@ function* deleteCollectionNoteSaga({
         );
         displayUIMessage({
           title: "",
-          body: "Huomautus poistettu",
+          body: "Catatan dihapus",
         });
         break;
       }
@@ -170,7 +170,7 @@ function* editCollectionNoteSaga({
         yield put(fetchCollectionNotesByLeaseAction(payload.lease));
         displayUIMessage({
           title: "",
-          body: "Huomautus tallennettu",
+          body: "Catatan disimpan",
         });
         break;
 

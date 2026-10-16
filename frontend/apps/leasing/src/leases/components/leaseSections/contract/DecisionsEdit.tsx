@@ -47,7 +47,7 @@ const Decisions = ({
           <>
             {!hasPermissions(usersPermissions, UsersPermissions.ADD_DECISION) &&
               (!fields || !fields.length) && (
-                <FormText className="no-margin">Ei päätöksiä</FormText>
+                <FormText className="no-margin">Tidak ada keputusan</FormText>
               )}
             {fields &&
               !!fields.length &&
@@ -86,7 +86,7 @@ const Decisions = ({
             >
               <Row>
                 <Column>
-                  <AddButton label="Lisää päätös" onClick={handleAdd} />
+                  <AddButton label="Tambah keputusan" onClick={handleAdd} />
                 </Column>
               </Row>
             </Authorization>

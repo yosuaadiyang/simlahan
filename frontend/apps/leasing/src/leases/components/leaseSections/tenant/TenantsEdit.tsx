@@ -132,13 +132,13 @@ const renderTenants = ({
             marginBottom: 5,
           }}
         >
-          Arkisto
+          Arsip
         </h3>
       )}
       {!isFieldAllowedToEdit(leaseAttributes, LeaseTenantsFieldPaths.TENANTS) &&
         !archived &&
         (!fields || !fields.length) && (
-          <FormText className="no-margin">Ei vuokralaisia</FormText>
+          <FormText className="no-margin">Tidak ada penyewa</FormText>
         )}
       {fields &&
         !!fields.length &&
@@ -183,7 +183,7 @@ const renderTenants = ({
             <Column>
               <AddButton
                 className="no-margin"
-                label="Lisää vuokralainen"
+                label="Tambah penyewa"
                 onClick={handleAdd}
               />
             </Column>
@@ -336,8 +336,8 @@ const TenantsEdit: React.FC<Props> = ({ formApi }) => {
                 }
                 title={
                   contactModalSettings && contactModalSettings.isNew
-                    ? "Uusi asiakas"
-                    : "Muokkaa asiakasta"
+                    ? "Kontak baru"
+                    : "Ubah kontak"
                 }
                 serviceUnit={userActiveServiceUnit}
               />

@@ -107,7 +107,7 @@ class PlotApplicationTargetInfoCheckManagements extends PureComponent<TargetSubF
             );
           })
         ) : (
-          <FormText>Ei lisättyjä hallinta- ja rahoitusmuotoja.</FormText>
+          <FormText>Belum ada bentuk pengelolaan dan pembiayaan.</FormText>
         )}
       </div>
     );
@@ -139,7 +139,7 @@ class PlotApplicationTargetInfoCheckConditions extends PureComponent<TargetSubFi
             );
           })
         ) : (
-          <FormText>Ei lisättyjä ehtoja.</FormText>
+          <FormText>Belum ada persyaratan.</FormText>
         )}
       </div>
     );
@@ -156,7 +156,7 @@ const PlotApplicationTargetInfoCheckMeetingMemos = ({
     <div role="table">
       <Row>
         <Column small={12} medium={12} large={12} role="columnheader">
-          <FormTextTitle>Kokous-/neuvottelumuistiot</FormTextTitle>
+          <FormTextTitle>Notulen rapat/negosiasi</FormTextTitle>
         </Column>
         <Column large={1} />
       </Row>
@@ -233,7 +233,7 @@ const PlotApplicationTargetInfoCheckMeetingMemos = ({
           })}
         </Fragment>
       ) : (
-        <FormText>Ei lisättyjä muistioita.</FormText>
+        <FormText>Belum ada notulen.</FormText>
       )}
     </div>
   );
@@ -262,7 +262,7 @@ class PlotApplicationTargetInfoCheck extends PureComponent<Props> {
     return (
       <PlotApplicationInfoCheckCollapse
         className="PlotApplicationTargetInfoCheck"
-        headerTitle="Kohteen käsittelytiedot"
+        headerTitle="Data pemrosesan objek"
       >
         <form>
           <Row>
@@ -276,7 +276,7 @@ class PlotApplicationTargetInfoCheck extends PureComponent<Props> {
                 <FormTextTitle>
                   {PlotApplicationTargetInfoCheckFieldTitles.RESERVED}
                 </FormTextTitle>
-                <FormText>{values.reserved ? "Kyllä" : "Ei"}</FormText>
+                <FormText>{values.reserved ? "Ya" : "Tidak"}</FormText>
               </Column>
             </Authorization>
             <Authorization
@@ -339,7 +339,7 @@ class PlotApplicationTargetInfoCheck extends PureComponent<Props> {
                   }
                 </FormTextTitle>
                 <FormText>
-                  {values.added_target_to_applicant ? "Kyllä" : "Ei"}
+                  {values.added_target_to_applicant ? "Ya" : "Tidak"}
                 </FormText>
               </Column>
             </Authorization>

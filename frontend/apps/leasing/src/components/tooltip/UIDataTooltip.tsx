@@ -258,7 +258,7 @@ class UIDataTooltip extends PureComponent<Props, State> {
               >
                 {showEditContainer ? (
                   <>
-                    <FormFieldLabel htmlFor={name}>Ohjeteksti</FormFieldLabel>
+                    <FormFieldLabel htmlFor={name}>Teks bantuan</FormFieldLabel>
                     <TextAreaInput
                       id={name}
                       name={name}
@@ -273,19 +273,19 @@ class UIDataTooltip extends PureComponent<Props, State> {
                         <Button
                           className={ButtonColors.ALERT}
                           onClick={handleDelete}
-                          text="Poista"
+                          text="Hapus"
                         />
                       )}
                       <Button
                         className={ButtonColors.SECONDARY}
                         onClick={this.closeTooltip}
-                        text="Peruuta"
+                        text="Batal"
                       />
                       <Button
                         className={ButtonColors.SUCCESS}
                         disabled={isSaveClicked && !!error}
                         onClick={this.handleSave}
-                        text="Tallenna"
+                        text="Simpan"
                       />
                     </ModalButtonWrapper>
                   </>

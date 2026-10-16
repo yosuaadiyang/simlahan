@@ -30,12 +30,7 @@ class EditPlotApplicationSectionModal extends Component<Props> {
     }
 
     return (
-      <Modal
-        isOpen={isOpen}
-        onClose={onClose}
-        title="Muokkaa osiota"
-        scrollable
-      >
+      <Modal isOpen={isOpen} onClose={onClose} title="Ubah bagian" scrollable>
         <EditPlotApplicationSectionForm
           ref={this.setRefForForm}
           onClose={onClose}

@@ -94,7 +94,7 @@ class AreaSearchListMap extends PureComponent<Props & WithRouterProps, State> {
           stateOptions={stateOptions}
         />
       ),
-      name: "Kohteet",
+      name: "Objek",
     });
     return layers;
   };
@@ -137,7 +137,7 @@ class AreaSearchListMap extends PureComponent<Props & WithRouterProps, State> {
           overlayLayers={overlayLayers}
           showZoomLevelWarning={zoom < MAX_ZOOM_LEVEL_TO_FETCH_AREA_SEARCHES}
           zoom={zoom}
-          zoomLevelWarningText="Tarkenna lähemmäksi kartalla hakeaksesi hakemusten kohteet"
+          zoomLevelWarningText="Perbesar peta untuk menampilkan objek permohonan"
         />
       </Fragment>
     );

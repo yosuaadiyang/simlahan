@@ -30,7 +30,7 @@ class ConfirmationModal extends Component<Props> {
   render(): JSX.Element {
     const {
       confirmButtonClassName,
-      confirmButtonLabel = "Tallenna",
+      confirmButtonLabel = "Simpan",
       isOpen,
       label,
       onCancel,
@@ -52,7 +52,7 @@ class ConfirmationModal extends Component<Props> {
               className={ButtonColors.SECONDARY}
               innerRef={this.setCancelButtonRef}
               onClick={onCancel}
-              text="Peruuta"
+              text="Batal"
             />
             <Button
               className={confirmButtonClassName || ButtonColors.SUCCESS}

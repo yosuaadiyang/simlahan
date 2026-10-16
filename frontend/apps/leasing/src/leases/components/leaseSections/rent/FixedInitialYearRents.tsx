@@ -48,7 +48,7 @@ const FixedInitialYearRentsEdit: React.FC<Props> = ({
     <>
       <BoxItemContainer>
         {(!fixedInitialYearRents || !fixedInitialYearRents.length) && (
-          <FormText>Ei kiinteitä alkuvuosivuokria</FormText>
+          <FormText>Tidak ada sewa tahun awal tetap</FormText>
         )}
 
         {fixedInitialYearRents &&
@@ -151,7 +151,7 @@ const FixedInitialYearRentsEdit: React.FC<Props> = ({
                     >
                       <FormText>
                         {!isEmptyValue(rent.amount)
-                          ? `${formatNumber(rent.amount)} €`
+                          ? `Rp ${formatNumber(rent.amount)}`
                           : "-"}
                       </FormText>
                     </Authorization>
@@ -229,7 +229,7 @@ const FixedInitialYearRentsEdit: React.FC<Props> = ({
                             </FormTextTitle>
                             <FormText>
                               {!isEmptyValue(rent.amount)
-                                ? `${formatNumber(rent.amount)} €`
+                                ? `Rp ${formatNumber(rent.amount)}`
                                 : "-"}
                             </FormText>
                           </>

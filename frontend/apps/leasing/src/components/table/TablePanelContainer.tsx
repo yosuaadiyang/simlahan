@@ -24,7 +24,7 @@ const TablePanelContainer = ({
           <CloseButton
             className="position-topright"
             onClick={onClose}
-            title="Sulje"
+            title="Tutup"
           />
         </div>
         <div

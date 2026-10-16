@@ -41,13 +41,13 @@ import type { Attributes } from "types";
 export const getAuditLogActionTypeInFinnish = (action: string) => {
   switch (action) {
     case "create":
-      return "Luominen";
+      return "Pembuatan";
 
     case "delete":
-      return "Poistaminen";
+      return "Penghapusan";
 
     case "update":
-      return "Muokkaaminen";
+      return "Pengubahan";
 
     default:
       return action;
@@ -62,61 +62,61 @@ export const getAuditLogActionTypeInFinnish = (action: string) => {
 const getGeneralAuditLogContentLabel = (key: string) => {
   switch (key) {
     case "areasearch":
-      return "Aluehaku";
+      return "Pencarian area";
 
     case "contract":
-      return "Sopimus";
+      return "Kontrak";
 
     case "created_at":
-      return "Luotu";
+      return "Dibuat";
 
     case "decision":
-      return "Päätös";
+      return "Keputusan";
 
     case "deleted":
-      return "Poistettu";
+      return "Dihapus";
 
     case "id":
       return "Id";
 
     case "infill_development_compensation_lease":
-      return "Vuokraus";
+      return "Sewa";
 
     case "invoice":
-      return "Lasku";
+      return "Tagihan";
 
     case "file":
-      return "Tiedosto";
+      return "Berkas";
 
     case "lease":
-      return "Vuokraus";
+      return "Sewa";
 
     case "lease_area":
-      return "Vuokra-alue";
+      return "Area sewa";
 
     case "locked_by":
-      return "Lukinnut";
+      return "Dikunci oleh";
 
     case "modified_at":
-      return "Muokattu";
+      return "Diubah";
 
     case "note":
-      return "Huomautus";
+      return "Catatan";
 
     case "plotsearch":
-      return "Tonttihaku";
+      return "Pencarian kavling";
 
     case "rent":
-      return "Vuokra";
+      return "Sewa";
 
     case "uploaded_at":
-      return "Ladattu";
+      return "Diunggah";
 
     case "uploader":
-      return "Lataaja";
+      return "Pengunggah";
 
     case "user":
-      return "Käyttäjä";
+      return "Pengguna";
   }
 
   return key;

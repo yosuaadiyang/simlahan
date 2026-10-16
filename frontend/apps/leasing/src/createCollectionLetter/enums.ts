@@ -18,10 +18,10 @@ export const CreateCollectionLetterFieldPaths = {
  * @enum {string}
  */
 export const CreateCollectionLetterFieldTitles = {
-  COLLECTION_CHARGE: "Perimispalkkio",
-  CREATE_COLLECTION_LETTER: "Perintäkirjeen luominen",
-  INVOICES: "Perintälaskelma",
-  LEASE: "Vuokraus",
-  TEMPLATE: "Maksuvaatimustyyppi",
-  TENANTS: "Vuokralaiset",
+  COLLECTION_CHARGE: "Biaya penagihan",
+  CREATE_COLLECTION_LETTER: "Pembuatan surat penagihan",
+  INVOICES: "Perhitungan penagihan",
+  LEASE: "Sewa",
+  TEMPLATE: "Jenis tuntutan pembayaran",
+  TENANTS: "Penyewa",
 };

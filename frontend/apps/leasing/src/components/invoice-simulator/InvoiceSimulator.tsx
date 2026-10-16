@@ -76,7 +76,7 @@ const InvoiceSimulator: React.FC = () => {
         isFetching={isFetching}
       />
       {billingPeriods && !billingPeriods.length && !isFetching && (
-        <FormText>Ei laskuja valittuna vuonna</FormText>
+        <FormText>Tidak ada tagihan pada tahun terpilih</FormText>
       )}
       {((billingPeriods && !!billingPeriods.length) || isFetching) && (
         <div

@@ -8,10 +8,10 @@ import { RentCalculatorTypes } from "./enums";
 export const RentCalculatorTypeOptions = [
   {
     value: RentCalculatorTypes.YEAR,
-    label: "Vuosi",
+    label: "Tahun",
   },
   {
     value: RentCalculatorTypes.BILLING_PERIOD,
-    label: "Laskutuskausi",
+    label: "Periode tagihan",
   },
 ];

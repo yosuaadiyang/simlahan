@@ -48,7 +48,7 @@ const SuggestedEdit = ({
           )}
           name={`${field}.name`}
           overrideValues={{
-            label: "Ehdotettu varauksensaaja",
+            label: "Penerima pencadangan yang diusulkan",
             options: suggestedOptions,
           }}
           invisibleLabel
@@ -86,7 +86,7 @@ const SuggestedEdit = ({
               style={{
                 height: "unset",
               }}
-              title="Poista päätös"
+              title="Hapus keputusan"
             />
           )}
         </Authorization>

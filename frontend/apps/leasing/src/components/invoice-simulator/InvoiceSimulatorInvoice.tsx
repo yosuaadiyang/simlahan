@@ -56,29 +56,29 @@ const InvoiceSimulatorInvoice = ({
       <Row>
         <Column small={6} medium={4} large={2}>
           <FormTitleAndText
-            title="Laskutuskausi"
+            title="Periode tagihan"
             text={formatDateRange(startDate, endDate)}
           />
         </Column>
         <Column small={6} medium={4} large={2}>
-          <FormTitleAndText title="Eräpäivä" text={formatDate(dueDate)} />
+          <FormTitleAndText title="Jatuh tempo" text={formatDate(dueDate)} />
         </Column>
         <Column small={6} medium={4} large={2}>
           <FormTitleAndText
-            title="Summa"
+            title="Jumlah"
             text={<AmountWithVat amount={billedAmount} date={dueDate} />}
           />
         </Column>
         <Column small={6} medium={4} large={2}>
           <FormTitleAndText
-            title="Tyyppi"
+            title="Jenis"
             text={getLabelOfOption(typeOptions, type)}
           />
         </Column>
       </Row>
 
-      <SubTitle>Erittely</SubTitle>
-      {!rows.length && <FormText>Ei rivejä</FormText>}
+      <SubTitle>Rincian</SubTitle>
+      {!rows.length && <FormText>Tidak ada baris</FormText>}
       {!!rows.length && (
         <InvoiceSimulatorInvoiceRows
           dueDate={dueDate}

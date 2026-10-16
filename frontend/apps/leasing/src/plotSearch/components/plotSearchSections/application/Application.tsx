@@ -70,9 +70,7 @@ class Application extends PureComponent<Props, State> {
                 defaultOpen={applicationCollapseState}
               />
             ))}
-        {!form && (
-          <FormText>Hakemuslomaketta ei ole vielä määritetty.</FormText>
-        )}
+        {!form && <FormText>Formulir permohonan belum ditetapkan.</FormText>}
       </Fragment>
     );
   }

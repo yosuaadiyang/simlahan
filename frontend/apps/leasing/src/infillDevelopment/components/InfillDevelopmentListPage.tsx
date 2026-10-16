@@ -124,11 +124,11 @@ const InfillDevelopmentListPage: React.FC = () => {
   );
 
   useEffect(() => {
-    setPageTitle("Täydennysrakentamiskorvaukset");
+    setPageTitle("Kompensasi pembangunan sisipan");
     dispatch(
       receiveTopNavigationSettings({
         linkUrl: getRouteById(Routes.INFILL_DEVELOPMENTS),
-        pageTitle: "Täydennysrakentamiskorvaukset",
+        pageTitle: "Kompensasi pembangunan sisipan",
         showSearch: false,
       }),
     );
@@ -253,7 +253,7 @@ const InfillDevelopmentListPage: React.FC = () => {
     ) {
       nextColumns.push({
         key: "name",
-        text: "Hankkeen nimi",
+        text: "Nama proyek",
       });
     }
 
@@ -265,7 +265,7 @@ const InfillDevelopmentListPage: React.FC = () => {
     ) {
       nextColumns.push({
         key: "detailed_plan_identifier",
-        text: "Asemakaavan nro",
+        text: "No. rencana detail",
       });
     }
 
@@ -277,7 +277,7 @@ const InfillDevelopmentListPage: React.FC = () => {
     ) {
       nextColumns.push({
         key: "leaseIdentifiers",
-        text: "Vuokraustunnus",
+        text: "Pengenal sewa",
         sortable: false,
       });
     }
@@ -290,7 +290,7 @@ const InfillDevelopmentListPage: React.FC = () => {
     ) {
       nextColumns.push({
         key: "state",
-        text: "Neuvotteluvaihe",
+        text: "Tahap negosiasi",
         renderer: (val) => getLabelOfOption(stateOptions, val) || "-",
       });
     }
@@ -321,7 +321,7 @@ const InfillDevelopmentListPage: React.FC = () => {
           >
             <AddButtonSecondary
               className="no-top-margin"
-              label="Luo täydennysrakentamiskorvaus"
+              label="Buat kompensasi pembangunan sisipan"
               onClick={handleCreateButtonClick}
             />
           </Authorization>
@@ -339,7 +339,7 @@ const InfillDevelopmentListPage: React.FC = () => {
 
       <TableFiltersLegacy
         alignFiltersRight
-        amountText={isFetching ? "Ladataan..." : `Löytyi ${count} kpl`}
+        amountText={isFetching ? "Memuat..." : `Ditemukan ${count} kpl`}
         filterOptions={stateOptions}
         filterValue={selectedStates}
         onFilterChange={handleSelectedStatesChange}

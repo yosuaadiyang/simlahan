@@ -96,7 +96,7 @@ const CollectionLetterInvoiceRow: React.FC<Props> = ({
           fieldAttributes={{
             type: "choice",
             required: true,
-            label: "Perittävä lasku",
+            label: "Tagihan yang ditagihkan",
             read_only: false,
           }}
           invisibleLabel
@@ -113,7 +113,7 @@ const CollectionLetterInvoiceRow: React.FC<Props> = ({
         {!isFetching && (
           <FormText>
             {!isEmpty(penaltyInterest)
-              ? `${formatNumber(get(penaltyInterest, "outstanding_amount"))} €`
+              ? `Rp ${formatNumber(get(penaltyInterest, "outstanding_amount"))}`
               : "-"}
           </FormText>
         )}
@@ -121,7 +121,7 @@ const CollectionLetterInvoiceRow: React.FC<Props> = ({
       <Column small={2}>
         <FormText>
           {!isEmpty(penaltyInterest)
-            ? `${formatNumber(get(penaltyInterest, "total_interest_amount"))} €`
+            ? `Rp ${formatNumber(get(penaltyInterest, "total_interest_amount"))}`
             : "-"}
         </FormText>
       </Column>
@@ -132,7 +132,7 @@ const CollectionLetterInvoiceRow: React.FC<Props> = ({
             type: "decimal",
             required: true,
             read_only: false,
-            label: "Perimispalkkio",
+            label: "Biaya penagihan",
             decimal_places: 2,
             max_digits: 12,
           }}
@@ -148,7 +148,7 @@ const CollectionLetterInvoiceRow: React.FC<Props> = ({
           field={
             <FormText className="full-width">
               {!isEmpty(penaltyInterest)
-                ? `${formatNumber(getTotalAmount())} €`
+                ? `Rp ${formatNumber(getTotalAmount())}`
                 : "-"}
             </FormText>
           }
@@ -160,7 +160,7 @@ const CollectionLetterInvoiceRow: React.FC<Props> = ({
                 style={{
                   height: "unset",
                 }}
-                title="Poista rivi"
+                title="Hapus baris"
               />
             )
           }

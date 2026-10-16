@@ -38,7 +38,7 @@ class AreaSearchApplicationPropertyIdentifiers extends Component<Props, State> {
                 expanded: false,
               }))
             }
-            text="Näytä vähemmän"
+            text="Tampilkan lebih sedikit"
           />
         )}
         {visibleList.length < ids.length && (
@@ -49,7 +49,7 @@ class AreaSearchApplicationPropertyIdentifiers extends Component<Props, State> {
                 expanded: true,
               }))
             }
-            text={`Näytä kaikki (${ids.length})`}
+            text={`Tampilkan semua (${ids.length})`}
           />
         )}
       </>

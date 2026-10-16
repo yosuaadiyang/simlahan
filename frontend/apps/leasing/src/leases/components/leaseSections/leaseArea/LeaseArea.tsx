@@ -250,7 +250,7 @@ const LeaseArea: React.FC<Props> = ({ area }: Props) => {
             {LeaseAreaAddressesFieldTitles.ADDRESSES}
           </SubTitle>
           {!addresses ||
-            (!addresses.length && <FormText>Ei osoitteita</FormText>)}
+            (!addresses.length && <FormText>Tidak ada alamat</FormText>)}
           {!!addresses.length && (
             <>
               <Row>
@@ -361,7 +361,7 @@ const LeaseArea: React.FC<Props> = ({ area }: Props) => {
                           )}
                         >
                           <ListItem>
-                            {address.is_primary ? "Kyllä" : "Ei"}
+                            {address.is_primary ? "Ya" : "Tidak"}
                           </ListItem>
                         </Authorization>
                       </Column>
@@ -386,14 +386,14 @@ const LeaseArea: React.FC<Props> = ({ area }: Props) => {
                   ? plotsContractCollapseState
                   : !archived
               }
-              headerTitle="Kiinteistöt / määräalat sopimuksessa"
+              headerTitle="Bidang tanah dalam kontrak"
               onToggle={handlePlotsContractCollapseToggle}
               uiDataKey={getUiDataLeaseKey(LeasePlotsFieldPaths.PLOTS_CONTRACT)}
             >
               <BoxItemContainer>
                 {!area.plots_contract ||
                   (!area.plots_contract.length && (
-                    <FormText>Ei kiinteistöjä/määräaloja sopimuksessa</FormText>
+                    <FormText>Tidak ada bidang tanah dalam kontrak</FormText>
                   ))}
                 {area.plots_contract &&
                   !!area.plots_contract.length &&
@@ -411,14 +411,14 @@ const LeaseArea: React.FC<Props> = ({ area }: Props) => {
                   ? plotsCurrentCollapseState
                   : !archived
               }
-              headerTitle="Kiinteistöt / määräalat nykyhetkellä"
+              headerTitle="Bidang tanah saat ini"
               onToggle={handlePlotsCurrentCollapseToggle}
               uiDataKey={getUiDataLeaseKey(LeasePlotsFieldPaths.PLOTS)}
             >
               <BoxItemContainer>
                 {!area.plots_current ||
                   (!area.plots_current.length && (
-                    <FormText>Ei kiinteistöjä/määräaloja nykyhetkellä</FormText>
+                    <FormText>Tidak ada bidang tanah saat ini</FormText>
                   ))}
 
                 {area.plots_current &&
@@ -446,7 +446,7 @@ const LeaseArea: React.FC<Props> = ({ area }: Props) => {
                   ? planUnitsContractCollapseState
                   : !archived
               }
-              headerTitle="Kaavayksiköt sopimuksessa"
+              headerTitle="Unit rencana dalam kontrak"
               onToggle={handlePlanUnitContractCollapseToggle}
               uiDataKey={getUiDataLeaseKey(
                 LeasePlanUnitsFieldPaths.PLAN_UNITS_CONTRACT,
@@ -455,7 +455,7 @@ const LeaseArea: React.FC<Props> = ({ area }: Props) => {
               <BoxItemContainer>
                 {!area.plan_units_contract ||
                   (!area.plan_units_contract.length && (
-                    <FormText>Ei kaavayksiköitä sopimuksessa</FormText>
+                    <FormText>Tidak ada unit rencana dalam kontrak</FormText>
                   ))}
                 {area.plan_units_contract &&
                   !!area.plan_units_contract.length &&
@@ -477,14 +477,14 @@ const LeaseArea: React.FC<Props> = ({ area }: Props) => {
                   ? planUnitsCurrentCollapseState
                   : !archived
               }
-              headerTitle="Kaavayksiköt nykyhetkellä"
+              headerTitle="Unit rencana saat ini"
               onToggle={handlePlanUnitCurrentCollapseToggle}
               uiDataKey={getUiDataLeaseKey(LeasePlanUnitsFieldPaths.PLAN_UNITS)}
             >
               <BoxItemContainer>
                 {!area.plan_units_current ||
                   (!area.plan_units_current.length && (
-                    <FormText>Ei kaavayksiköitä nykyhetkellä</FormText>
+                    <FormText>Tidak ada unit rencana saat ini</FormText>
                   ))}
                 {area.plan_units_current &&
                   !!area.plan_units_current.length &&
@@ -507,14 +507,14 @@ const LeaseArea: React.FC<Props> = ({ area }: Props) => {
                   ? planUnitsCurrentCollapseState
                   : !archived
               }
-              headerTitle="Vireillä olevat kaavayksiköt"
+              headerTitle="Unit rencana yang tertunda"
               onToggle={handlePlanUnitCurrentCollapseToggle}
               uiDataKey={getUiDataLeaseKey(LeasePlanUnitsFieldPaths.PLAN_UNITS)}
             >
               <BoxItemContainer>
                 {!area.plan_units_pending ||
                   (!area.plan_units_pending.length && (
-                    <FormText>Ei vireillä olevia kaavayksiköitä</FormText>
+                    <FormText>Tidak ada unit rencana yang tertunda</FormText>
                   ))}
                 {area.plan_units_pending &&
                   !!area.plan_units_pending.length &&
@@ -547,7 +547,7 @@ const LeaseArea: React.FC<Props> = ({ area }: Props) => {
                   ? customDetailedPlanCollapseState
                   : !archived
               }
-              headerTitle="Oma muu alue"
+              headerTitle="Area lain milik sendiri"
               onToggle={handleCustomDetailedPlanCollapseToggle}
               uiDataKey={getUiDataLeaseKey(
                 LeaseAreaCustomDetailedPlanFieldPaths.CUSTOM_DETAILED_PLAN,
@@ -555,7 +555,7 @@ const LeaseArea: React.FC<Props> = ({ area }: Props) => {
             >
               <BoxItemContainer>
                 {!area.custom_detailed_plan ? (
-                  <FormText>Ei omaa muuta aluetta</FormText>
+                  <FormText>Tidak ada area lain milik sendiri</FormText>
                 ) : (
                   <CustomDetailedPlan
                     customDetailedPlan={area.custom_detailed_plan}

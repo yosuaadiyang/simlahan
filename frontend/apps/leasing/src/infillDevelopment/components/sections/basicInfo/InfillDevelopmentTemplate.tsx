@@ -229,7 +229,7 @@ const InfillDevelopmentTemplate = ({ infillDevelopment }: Props) => {
               }
             </SubTitle>
 
-            {!leases.length && <FormText>Ei vuokrauksia</FormText>}
+            {!leases.length && <FormText>Tidak ada sewa</FormText>}
             {!!leases.length && (
               <div
                 style={{

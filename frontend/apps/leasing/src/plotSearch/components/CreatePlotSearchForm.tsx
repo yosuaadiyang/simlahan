@@ -60,13 +60,13 @@ class CreatePlotSearchForm extends Component<Props> {
           <Button
             className={ButtonColors.SECONDARY}
             onClick={onClose}
-            text="Peruuta"
+            text="Batal"
           />
           <Button
             className={ButtonColors.SUCCESS}
             disabled={!valid}
             onClick={this.handleCreate}
-            text="Luo tonttihaku"
+            text="Buat pencarian kavling"
           />
         </ModalButtonWrapper>
       </form>

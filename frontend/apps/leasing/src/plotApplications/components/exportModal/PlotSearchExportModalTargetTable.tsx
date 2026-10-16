@@ -24,7 +24,7 @@ const PlotSearchExportModalTargetTableCheckbox = ({
       name={`items.${item.application_identifier}`}
       fieldAttributes={{
         type: FieldTypes.CHECKBOX,
-        label: "Valitse hakemus " + item.application_identifier,
+        label: "Pilih permohonan " + item.application_identifier,
         read_only: false,
       }}
       autoBlur

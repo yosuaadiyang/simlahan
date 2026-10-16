@@ -24,7 +24,7 @@ const PlotSearchReservationRecipients = ({
       </Column>
       {reservationRecipients.length === 0 && (
         <Column small={12}>
-          <FormText>Ei ehdotettuja varauksensaajia.</FormText>
+          <FormText>Tidak ada penerima pencadangan yang diusulkan.</FormText>
         </Column>
       )}
       {reservationRecipients.map((applicant) => (

@@ -53,7 +53,7 @@ const Tenants: React.FC = () => {
       )}
       <Divider />
       {!tenants.length && (
-        <FormText className="no-margin">Ei vuokralaisia</FormText>
+        <FormText className="no-margin">Tidak ada penyewa</FormText>
       )}
       {!!tenants.length &&
         tenants.map((tenant) => <Tenant key={tenant.id} tenant={tenant} />)}
@@ -65,7 +65,7 @@ const Tenants: React.FC = () => {
             marginBottom: 5,
           }}
         >
-          Arkisto
+          Arsip
         </h3>
       )}
       {!!tenantsArchived.length &&

@@ -88,7 +88,7 @@ function* createInvoiceNoteAndFetchListSaga({
         yield put(hideCreateInvoiceNoteModal());
         displayUIMessage({
           title: "",
-          body: "Laskujen tiedote tallennettu",
+          body: "Catatan tagihan disimpan",
         });
         yield put(fetchInvoiceNoteList(query));
         break;

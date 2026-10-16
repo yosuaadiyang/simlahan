@@ -124,14 +124,16 @@ const BasisOfRent = ({
 
   const getAreaText = (amount: string | null | undefined) => {
     if (isEmptyValue(amount)) return "-";
-    if (isEmptyValue(basisOfRent.area_unit)) return `${formatNumber(amount)} €`;
+    if (isEmptyValue(basisOfRent.area_unit))
+      return `Rp ${formatNumber(amount)}`;
     return `${formatNumber(amount)} ${basisOfRent.type === CalculatorTypes.FIELD ? "ha" : getLabelOfOption(areaUnitOptions, basisOfRent.area_unit) || ""}`;
   };
 
   const getAmountPerAreaText = (amount: number | string | null | undefined) => {
     if (isEmptyValue(amount)) return "-";
-    if (isEmptyValue(basisOfRent.area_unit)) return `${formatNumber(amount)} €`;
-    return `${formatNumber(amount)} € / ${getLabelOfOption(areaUnitOptions, basisOfRent.area_unit) || ""}`;
+    if (isEmptyValue(basisOfRent.area_unit))
+      return `Rp ${formatNumber(amount)}`;
+    return `Rp ${formatNumber(amount)} / ${getLabelOfOption(areaUnitOptions, basisOfRent.area_unit) || ""}`;
   };
 
   const getPlansInspectedText = () => {
@@ -389,7 +391,7 @@ const BasisOfRent = ({
         </FormTextTitle>
         <FormText>
           {!isEmptyValue(basicAnnualRent)
-            ? `${formatNumber(basicAnnualRent)} €/v`
+            ? `Rp ${formatNumber(basicAnnualRent)}/thn`
             : "-"}
         </FormText>
       </>
@@ -428,7 +430,7 @@ const BasisOfRent = ({
         </FormTextTitle>
         <FormText>
           {!isEmptyValue(initialYearRent)
-            ? `${formatNumber(initialYearRent)} €/v`
+            ? `Rp ${formatNumber(initialYearRent)}/thn`
             : "-"}
         </FormText>
       </>
@@ -456,7 +458,7 @@ const BasisOfRent = ({
                 LeaseBasisOfRentsFieldPaths.BASIS_OF_RENTS,
               )}
             >
-              <RemoveButton onClick={onRemove} title="Poista vuokralaskuri" />
+              <RemoveButton onClick={onRemove} title="Hapus kalkulator sewa" />
             </Authorization>
           )}
         </ActionButtonWrapper>
@@ -476,7 +478,7 @@ const BasisOfRent = ({
                     LeaseBasisOfRentsFieldPaths.TYPE,
                   )}
                 >
-                  Laskurin tyyppi
+                  Jenis kalkulator
                 </FormTextTitle>
                 <FormText>
                   {getLabelOfOption(calculatorTypeOptions, calculatorType) ||
@@ -502,8 +504,8 @@ const BasisOfRent = ({
                     }
                   >
                     <>
-                      <FormTextTitle>{"Laskuri"}</FormTextTitle>
-                      <FormText>{`Alue`}</FormText>
+                      <FormTextTitle>{"Kalkulator"}</FormTextTitle>
+                      <FormText>{`Area`}</FormText>
                     </>
                   </Authorization>
                 </Column>
@@ -515,10 +517,10 @@ const BasisOfRent = ({
                     )}
                   >
                     <>
-                      <FormTextTitle>{"Hinta"}</FormTextTitle>
+                      <FormTextTitle>{"Harga"}</FormTextTitle>
                       <FormText>
                         {!isEmptyValue(basisOfRent.amount_per_area)
-                          ? `${formatNumber(basisOfRent.amount_per_area)} €`
+                          ? `Rp ${formatNumber(basisOfRent.amount_per_area)}`
                           : "-"}
                       </FormText>
                     </>
@@ -538,7 +540,7 @@ const BasisOfRent = ({
                     }
                   >
                     <>
-                      <FormTextTitle>{"Kerroin"}</FormTextTitle>
+                      <FormTextTitle>{"Faktor"}</FormTextTitle>
                       <FormText>{`*1,5`}</FormText>
                     </>
                   </Authorization>
@@ -551,7 +553,7 @@ const BasisOfRent = ({
                     )}
                   >
                     <>
-                      <FormTextTitle>{"Ala/korkeus"}</FormTextTitle>
+                      <FormTextTitle>{"Luas/tinggi"}</FormTextTitle>
                       <FormText>
                         {!isEmptyValue(basisOfRent.area)
                           ? `${formatNumber(basisOfRent.area)}`
@@ -574,7 +576,7 @@ const BasisOfRent = ({
                     }
                   >
                     <>
-                      <FormTextTitle>{"Yksikkö"}</FormTextTitle>
+                      <FormTextTitle>{"Satuan"}</FormTextTitle>
                       <FormText>{`m${String.fromCharCode(178)}`}</FormText>
                     </>
                   </Authorization>
@@ -593,10 +595,10 @@ const BasisOfRent = ({
                     }
                   >
                     <>
-                      <FormTextTitle>{"Vuokra"}</FormTextTitle>
+                      <FormTextTitle>{"Sewa"}</FormTextTitle>
                       <FormText>
                         {!isEmptyValue(mastAreaRent)
-                          ? `${formatNumber(mastAreaRent)} €`
+                          ? `Rp ${formatNumber(mastAreaRent)}`
                           : "-"}
                       </FormText>
                     </>
@@ -621,8 +623,10 @@ const BasisOfRent = ({
                         }
                       >
                         <>
-                          {index === 0 && <FormText>{`Laitekaappi`}</FormText>}
-                          {index === 1 && <FormText>{`Masto`}</FormText>}
+                          {index === 0 && (
+                            <FormText>{`Lemari perangkat`}</FormText>
+                          )}
+                          {index === 1 && <FormText>{`Menara`}</FormText>}
                         </>
                       </Authorization>
                     </Column>
@@ -634,8 +638,8 @@ const BasisOfRent = ({
                         )}
                       >
                         <>
-                          {index === 0 && <FormText>{`1000,00 €`}</FormText>}
-                          {index === 1 && <FormText>{`600,00 €`}</FormText>}
+                          {index === 0 && <FormText>{`Rp 1000,00`}</FormText>}
+                          {index === 1 && <FormText>{`Rp 600,00`}</FormText>}
                         </>
                       </Authorization>
                     </Column>
@@ -703,7 +707,7 @@ const BasisOfRent = ({
                       >
                         <FormText>
                           {!isEmptyValue(rent)
-                            ? `${formatNumber(rent)} €`
+                            ? `Rp ${formatNumber(rent)}`
                             : "-"}
                         </FormText>
                       </Authorization>
@@ -777,7 +781,7 @@ const BasisOfRent = ({
                   </FormTextTitle>
                   <FormText>
                     {!isEmptyValue(zonePrice)
-                      ? `${formatNumber(zonePrice)} €`
+                      ? `Rp ${formatNumber(zonePrice)}`
                       : "-"}
                   </FormText>
                 </>
@@ -794,10 +798,10 @@ const BasisOfRent = ({
                 )}
               >
                 <>
-                  <FormTextTitle>{"Hinta"}</FormTextTitle>
+                  <FormTextTitle>{"Harga"}</FormTextTitle>
                   <FormText>
                     {!isEmptyValue(basisOfRent.amount_per_area)
-                      ? `${formatNumber(basisOfRent.amount_per_area)} €`
+                      ? `Rp ${formatNumber(basisOfRent.amount_per_area)}`
                       : "-"}
                   </FormText>
                 </>
@@ -813,7 +817,7 @@ const BasisOfRent = ({
                 )}
               >
                 <>
-                  <FormTextTitle>{"Kerroin"}</FormTextTitle>
+                  <FormTextTitle>{"Faktor"}</FormTextTitle>
                   <FormText>{"* 1,5"}</FormText>
                 </>
               </Authorization>
@@ -907,7 +911,7 @@ const BasisOfRent = ({
                           LeaseBasisOfRentsFieldPaths.BASE_YEAR_RENT,
                         )}
                       >
-                        {"Vuokra/kk"}
+                        {"Sewa/bln"}
                       </FormTextTitle>
                     )}
                     {calculatorType !== CalculatorTypes.TEMPORARY && (
@@ -917,25 +921,25 @@ const BasisOfRent = ({
                           LeaseBasisOfRentsFieldPaths.BASE_YEAR_RENT,
                         )}
                       >
-                        {"Vuokra/vuosi"}
+                        {"Sewa/tahun"}
                       </FormTextTitle>
                     )}
                     {calculatorType === CalculatorTypes.TEMPORARY && (
                       <FormText>
-                        {!isEmptyValue(rent) ? `${formatNumber(rent)} €` : "-"}
+                        {!isEmptyValue(rent) ? `Rp ${formatNumber(rent)}` : "-"}
                       </FormText>
                     )}
                     {calculatorType === CalculatorTypes.ADDITIONAL_YARD && (
                       <FormText>
                         {!isEmptyValue(rentExtra)
-                          ? `${formatNumber(rentExtra)} €`
+                          ? `Rp ${formatNumber(rentExtra)}`
                           : "-"}
                       </FormText>
                     )}
                     {calculatorType === CalculatorTypes.FIELD && (
                       <FormText>
                         {!isEmptyValue(fieldsRent)
-                          ? `${formatNumber(fieldsRent)} €`
+                          ? `Rp ${formatNumber(fieldsRent)}`
                           : "-"}
                       </FormText>
                     )}
@@ -967,13 +971,13 @@ const BasisOfRent = ({
                           LeaseBasisOfRentsFieldPaths.BASE_YEAR_RENT,
                         )}
                       >
-                        {"Vuokra/vuosi"}
+                        {"Sewa/tahun"}
                       </FormTextTitle>
                     )}
                     {calculatorType === CalculatorTypes.TEMPORARY && (
                       <FormText>
                         {!isEmptyValue(rent)
-                          ? `${formatNumber(rent * 12)} €`
+                          ? `Rp ${formatNumber(rent * 12)}`
                           : "-"}
                       </FormText>
                     )}
@@ -1034,21 +1038,21 @@ const BasisOfRent = ({
                     {calculatorType === CalculatorTypes.TEMPORARY && (
                       <FormText>
                         {!isEmptyValue(temporaryRentIndexed)
-                          ? `${formatNumber(temporaryRentIndexed)} €/v`
+                          ? `Rp ${formatNumber(temporaryRentIndexed)}/thn`
                           : "-"}
                       </FormText>
                     )}
                     {calculatorType === CalculatorTypes.ADDITIONAL_YARD && (
                       <FormText>
                         {!isEmptyValue(rentExtraIndexed)
-                          ? `${formatNumber(rentExtraIndexed)} €/v`
+                          ? `Rp ${formatNumber(rentExtraIndexed)}/thn`
                           : "-"}
                       </FormText>
                     )}
                     {calculatorType === CalculatorTypes.FIELD && (
                       <FormText>
                         {!isEmptyValue(basicAnnualFieldRentIndexed)
-                          ? `${formatNumber(basicAnnualFieldRentIndexed)} €/v`
+                          ? `Rp ${formatNumber(basicAnnualFieldRentIndexed)}/thn`
                           : "-"}
                       </FormText>
                     )}
@@ -1090,14 +1094,14 @@ const BasisOfRent = ({
                     <Column large={6} medium={9} small={12}>
                       <Row>
                         <Column small={6} medium={4} large={2}>
-                          <FormText className="semibold">{"Yhteensä"}</FormText>
+                          <FormText className="semibold">{"Total"}</FormText>
                         </Column>
                         <Column small={6}></Column>
                         <Column small={6} medium={4} large={2}>
                           <FormText>{"*5%"}</FormText>
                         </Column>
                         <Column small={6} medium={4} large={2}>
-                          <FormText className="semibold">{`${formatNumber(mastTotal)} €`}</FormText>
+                          <FormText className="semibold">{`Rp ${formatNumber(mastTotal)}`}</FormText>
                         </Column>
                       </Row>
                     </Column>
@@ -1163,7 +1167,7 @@ const BasisOfRent = ({
                           </FormTextTitle>
                           <FormText>
                             {!isEmptyValue(mastTotalIndexed)
-                              ? `${formatNumber(mastTotalIndexed)} €/v`
+                              ? `Rp ${formatNumber(mastTotalIndexed)}/thn`
                               : "-"}
                           </FormText>
                         </>
@@ -1276,7 +1280,7 @@ const BasisOfRent = ({
                       </FormTextTitle>
                       <FormText>
                         {!isEmptyValue(subventionDiscountedInitial)
-                          ? `${formatNumber(subventionDiscountedInitial)} €/v`
+                          ? `Rp ${formatNumber(subventionDiscountedInitial)}/thn`
                           : "-"}
                       </FormText>
                     </>
@@ -1374,7 +1378,7 @@ const BasisOfRent = ({
                   </FormTextTitle>
                   <FormText>
                     {!isEmptyValue(discountedInitialYearRent)
-                      ? `${formatNumber(discountedInitialYearRent)} €/v`
+                      ? `Rp ${formatNumber(discountedInitialYearRent)}/thn`
                       : "-"}
                   </FormText>
                 </>
@@ -1418,7 +1422,7 @@ const BasisOfRent = ({
                   </FormTextTitle>
                   <FormText>
                     {!isEmptyValue(rentPerMonth)
-                      ? `${formatNumber(rentPerMonth)} €`
+                      ? `Rp ${formatNumber(rentPerMonth)}`
                       : "-"}
                   </FormText>
                 </>
@@ -1462,7 +1466,7 @@ const BasisOfRent = ({
                   </FormTextTitle>
                   <FormText>
                     {!isEmptyValue(rentPer2Months)
-                      ? `${formatNumber(rentPer2Months)} €`
+                      ? `Rp ${formatNumber(rentPer2Months)}`
                       : "-"}
                   </FormText>
                 </>
@@ -1509,7 +1513,7 @@ const BasisOfRent = ({
                       </FormTextTitle>
                       <FormText>
                         {!isEmptyValue(rentPerMonthTotal)
-                          ? `${formatNumber(rentPerMonthTotal)} €`
+                          ? `Rp ${formatNumber(rentPerMonthTotal)}`
                           : "-"}
                       </FormText>
                     </>
@@ -1553,7 +1557,7 @@ const BasisOfRent = ({
                       </FormTextTitle>
                       <FormText>
                         {!isEmptyValue(rentPer2MonthsTotal)
-                          ? `${formatNumber(rentPer2MonthsTotal)} €`
+                          ? `Rp ${formatNumber(rentPer2MonthsTotal)}`
                           : "-"}
                       </FormText>
                     </>
@@ -1662,7 +1666,7 @@ const BasisOfRent = ({
                     </SubTitle>
                     {!managementSubventions ||
                       (!managementSubventions.length && (
-                        <FormText>Ei hallintamuotoja</FormText>
+                        <FormText>Tidak ada bentuk pengelolaan</FormText>
                       ))}
                     {managementSubventions &&
                       !!managementSubventions.length && (
@@ -1784,7 +1788,7 @@ const BasisOfRent = ({
                                       {!isEmptyValue(
                                         subvention.subvention_amount,
                                       )
-                                        ? `${formatNumber(subvention.subvention_amount)} €`
+                                        ? `Rp ${formatNumber(subvention.subvention_amount)}`
                                         : "-"}
                                     </FormText>
                                   </Authorization>
@@ -1812,7 +1816,7 @@ const BasisOfRent = ({
                                   >
                                     <FormText>
                                       {!isEmptyValue(subventionTotal)
-                                        ? `${formatNumber(subventionTotal, 3)} €`
+                                        ? `Rp ${formatNumber(subventionTotal, 3)}`
                                         : "-"}
                                     </FormText>
                                   </Authorization>
@@ -1922,7 +1926,7 @@ const BasisOfRent = ({
                           }
                         </FormTextTitle>
                         <FormText>
-                          {formatNumber(reLeaseDiscountAmount)} €
+                          Rp {formatNumber(reLeaseDiscountAmount)}
                         </FormText>
                       </>
                     </Authorization>
@@ -1949,7 +1953,7 @@ const BasisOfRent = ({
                   </SubTitle>
                   {!temporarySubventions ||
                     (!temporarySubventions.length && (
-                      <FormText>Ei tilapäisalennuksia</FormText>
+                      <FormText>Tidak ada potongan sementara</FormText>
                     ))}
                   {!!temporarySubventions && !!temporarySubventions.length && (
                     <>
@@ -2055,7 +2059,7 @@ const BasisOfRent = ({
                                 )}
                               >
                                 <FormText>
-                                  {formatNumber(subventionAmount, 3)} €
+                                  Rp {formatNumber(subventionAmount, 3)}
                                 </FormText>
                               </Authorization>
                             </Column>
@@ -2090,11 +2094,11 @@ const BasisOfRent = ({
                   </Row>
                   <Row>
                     <Column small={4} large={6}>
-                      <FormText className="semibold">Yhteensä</FormText>
+                      <FormText className="semibold">Total</FormText>
                     </Column>
                     <Column small={4} large={2}>
                       <FormText className="semibold">
-                        {formatNumber(totalSubventionAmount)} €
+                        Rp {formatNumber(totalSubventionAmount)}
                       </FormText>
                     </Column>
                   </Row>

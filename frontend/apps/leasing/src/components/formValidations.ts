@@ -6,13 +6,13 @@ export const validateRentCalculatorForm = (values: Record<string, any>) => {
 
   switch (values.type) {
     case RentCalculatorTypes.YEAR:
-      if (isEmptyValue(values.year)) errors.yearErrors = "Vuosi on pakollinen";
+      if (isEmptyValue(values.year)) errors.yearErrors = "Tahun wajib diisi";
       else if (year(values.year)) errors.yearErrors = year(values.year);
       break;
 
     case RentCalculatorTypes.BILLING_PERIOD:
       if (isEmptyValue(values.billing_period))
-        errors.billingPeriodErrors = "Laskutuskausi on pakollinen";
+        errors.billingPeriodErrors = "Periode tagihan wajib diisi";
       break;
   }
 

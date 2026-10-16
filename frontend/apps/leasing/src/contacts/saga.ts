@@ -128,7 +128,7 @@ function* createContactSaga({
         );
         displayUIMessage({
           title: "",
-          body: "Asiakas luotu",
+          body: "Kontak dibuat",
         });
         break;
 
@@ -165,7 +165,7 @@ function* editContactSaga({
         yield put(hideEditMode());
         displayUIMessage({
           title: "",
-          body: "Asiakas tallennettu",
+          body: "Kontak disimpan",
         });
         break;
 
@@ -209,7 +209,7 @@ function* createContactOnModalSaga({
         yield put(hideContactModal());
         displayUIMessage({
           title: "",
-          body: "Asiakas luotu",
+          body: "Kontak dibuat",
         });
         break;
 
@@ -253,7 +253,7 @@ function* editContactOnModalSaga({
         yield put(hideContactModal());
         displayUIMessage({
           title: "",
-          body: "Asiakas tallennettu",
+          body: "Kontak disimpan",
         });
         break;
 

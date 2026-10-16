@@ -75,12 +75,12 @@ const NewContactPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    setPageTitle("Uusi asiakas");
+    setPageTitle("Kontak baru");
     dispatch(receiveIsSaveClicked(false));
     dispatch(
       receiveTopNavigationSettings({
         linkUrl: getRouteById(Routes.CONTACTS),
-        pageTitle: "Asiakkaat",
+        pageTitle: "Kontak",
         showSearch: false,
       }),
     );
@@ -196,7 +196,7 @@ const NewContactPage: React.FC = () => {
                   showCopyButton={true}
                 />
               }
-              infoComponent={<h1>Uusi asiakas</h1>}
+              infoComponent={<h1>Kontak baru</h1>}
               onBack={handleBack}
             />
           </PageNavigationWrapper>

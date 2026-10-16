@@ -435,7 +435,7 @@ const Address = ({ formApi, field, onRemove }: AddressProps) => {
               <RemoveButton
                 className="third-level"
                 onClick={onRemove}
-                title="Poista osoite"
+                title="Hapus alamat"
               />
             </Authorization>
           }
@@ -597,7 +597,7 @@ const AddressItems = ({ formApi, fields }: AddressesProps): ReactElement => {
             >
               <Row>
                 <Column>
-                  <AddButtonThird label="Lisää osoite" onClick={handleAdd} />
+                  <AddButtonThird label="Tambah alamat" onClick={handleAdd} />
                 </Column>
               </Row>
             </Authorization>
@@ -847,13 +847,13 @@ const LeaseAreaEdit: React.FC<Props> = ({
               {(fieldArrayProps) =>
                 Plots({
                   ...fieldArrayProps,
-                  buttonTitle: "Lisää kiinteistö/määräala",
+                  buttonTitle: "Tambah bidang tanah",
                   collapseState: plotsContractCollapseState,
                   errors: { errors },
-                  noDataText: "Ei kiinteistöjä/määräaloja sopimuksessa",
+                  noDataText: "Tidak ada bidang tanah dalam kontrak",
                   onCollapseToggle: handlePlotsContractCollapseToggle,
                   plotsData: savedArea ? savedArea["plots_contract"] : [],
-                  title: "Kiinteistöt / määräalat sopimuksessa",
+                  title: "Bidang tanah dalam kontrak",
                   isMasterData: false, // These plan units' data is editable in MVJ
                   isActive,
                   areas: savedArea?.plots_contract ?? [],
@@ -869,13 +869,13 @@ const LeaseAreaEdit: React.FC<Props> = ({
               {(fieldArrayProps) =>
                 Plots({
                   ...fieldArrayProps,
-                  buttonTitle: "Lisää kiinteistö/määräala",
+                  buttonTitle: "Tambah bidang tanah",
                   collapseState: plotsCurrentCollapseState,
                   errors: { errors },
-                  noDataText: "Ei kiinteistöjä/määräaloja nykyhetkellä",
+                  noDataText: "Tidak ada bidang tanah saat ini",
                   onCollapseToggle: handlePlotsCurrentCollapseToggle,
                   plotsData: savedArea ? savedArea["plots_current"] : [],
-                  title: "Kiinteistöt / määräalat nykyhetkellä",
+                  title: "Bidang tanah saat ini",
                   isMasterData: true, // These plan units' data is received from master source (i.e. Facta) and is not editable in MVJ
                   isActive,
                   areas: savedArea?.plots_current ?? [],
@@ -899,12 +899,12 @@ const LeaseAreaEdit: React.FC<Props> = ({
               {(fieldArrayProps) =>
                 PlanUnits({
                   ...fieldArrayProps,
-                  buttonTitle: "Lisää kaavayksikkö",
+                  buttonTitle: "Tambah unit rencana",
                   collapseState: planUnitsContractCollapseState,
                   errors: { errors },
-                  noDataText: "Ei kaavayksiköitä sopimuksessa",
+                  noDataText: "Tidak ada unit rencana dalam kontrak",
                   onCollapseToggle: handlePlanUnitContractCollapseToggle,
-                  title: "Kaavayksiköt sopimuksessa",
+                  title: "Unit rencana dalam kontrak",
                   uiDataKey: getUiDataLeaseKey(
                     LeasePlanUnitsFieldPaths.PLAN_UNITS_CONTRACT,
                   ),
@@ -920,12 +920,12 @@ const LeaseAreaEdit: React.FC<Props> = ({
               {(fieldArrayProps) =>
                 PlanUnits({
                   ...fieldArrayProps,
-                  buttonTitle: "Lisää kaavayksikkö",
+                  buttonTitle: "Tambah unit rencana",
                   collapseState: planUnitsCurrentCollapseState,
                   errors: { errors },
-                  noDataText: "Ei kaavayksiköitä nykyhetkellä",
+                  noDataText: "Tidak ada unit rencana saat ini",
                   onCollapseToggle: handlePlanUnitCurrentCollapseToggle,
-                  title: "Kaavayksiköt nykyhetkellä",
+                  title: "Unit rencana saat ini",
                   uiDataKey: getUiDataLeaseKey(
                     LeasePlanUnitsFieldPaths.PLAN_UNITS,
                   ),
@@ -942,12 +942,12 @@ const LeaseAreaEdit: React.FC<Props> = ({
               {(fieldArrayProps) =>
                 PlanUnits({
                   ...fieldArrayProps,
-                  buttonTitle: "Vireillä olevat kaavayksiköt",
+                  buttonTitle: "Unit rencana yang tertunda",
                   collapseState: planUnitsCurrentCollapseState,
                   errors: { errors },
-                  noDataText: "Ei vireillä olevia kaavayksiköitä",
+                  noDataText: "Tidak ada unit rencana yang tertunda",
                   onCollapseToggle: handlePlanUnitCurrentCollapseToggle,
-                  title: "Vireillä olevat kaavayksiköt",
+                  title: "Unit rencana yang tertunda",
                   uiDataKey: null, // No uiDataKey
                   isMasterData: true, // These plan units' data is received from master source (i.e. Facta) and is not editable in MVJ
                   areas: savedArea?.plan_units_pending ?? [],
@@ -975,7 +975,7 @@ const LeaseAreaEdit: React.FC<Props> = ({
                   : true
               }
               hasErrors={isSaveClicked && !!errors?.custom_detailed_plan}
-              headerTitle={"Oma muu alue"}
+              headerTitle={"Area lain milik sendiri"}
               onToggle={(val) => handleCustomDetailedPlanCollapseToggle(val)}
               enableUiDataEdit
               uiDataKey={getUiDataLeaseKey(
@@ -1004,7 +1004,7 @@ const LeaseAreaEdit: React.FC<Props> = ({
                   <Column>
                     <AddButtonSecondary
                       className={"no-top-margin"}
-                      label={"Lisää oma muu alue"}
+                      label={"Tambah area lain milik sendiri"}
                       onClick={() =>
                         formApi.change(`${field}.custom_detailed_plan`, {})
                       }

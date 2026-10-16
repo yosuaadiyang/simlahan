@@ -46,7 +46,7 @@ const Contracts = ({
           <>
             {!hasPermissions(usersPermissions, UsersPermissions.ADD_CONTRACT) &&
               (!fields || !fields.length) && (
-                <FormText className="no-margin">Ei sopimuksia</FormText>
+                <FormText className="no-margin">Tidak ada kontrak</FormText>
               )}
 
             {fields &&
@@ -89,7 +89,7 @@ const Contracts = ({
             >
               <Row>
                 <Column>
-                  <AddButton label="Lisää sopimus" onClick={handleAdd} />
+                  <AddButton label="Tambah kontrak" onClick={handleAdd} />
                 </Column>
               </Row>
             </Authorization>

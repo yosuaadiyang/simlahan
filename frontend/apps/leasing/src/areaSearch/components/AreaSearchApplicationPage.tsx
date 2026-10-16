@@ -163,7 +163,7 @@ class AreaSearchApplicationPage extends Component<Props, State> {
     receiveIsSaveClicked(false);
     receiveTopNavigationSettings({
       linkUrl: getRouteById(Routes.AREA_SEARCH),
-      pageTitle: "Aluehaun hakemukset",
+      pageTitle: "Permohonan pencarian area",
       showSearch: true,
     });
 
@@ -176,7 +176,7 @@ class AreaSearchApplicationPage extends Component<Props, State> {
     fetchSingleAreaSearch(areaSearchId);
     fetchFormAttributes();
     fetchApplicantInfoCheckAttributes();
-    setPageTitle("Hakemus");
+    setPageTitle("Permohonan");
   }
 
   componentWillUnmount() {
@@ -300,7 +300,7 @@ class AreaSearchApplicationPage extends Component<Props, State> {
     }
 
     if (!isFetching && prevProps.isFetching) {
-      setPageTitle(`Hakemus ${currentAreaSearch?.identifier || ""}`);
+      setPageTitle(`Permohonan ${currentAreaSearch?.identifier || ""}`);
     }
 
     if (!isEditMode && prevProps.isEditMode) {
@@ -408,7 +408,7 @@ class AreaSearchApplicationPage extends Component<Props, State> {
     if (!isFetching && !currentAreaSearch) {
       return (
         <PageContainer>
-          <AuthorizationError text="Aluehakua ei löytynyt." />
+          <AuthorizationError text="Pencarian area tidak ditemukan." />
         </PageContainer>
       );
     }
@@ -449,18 +449,18 @@ class AreaSearchApplicationPage extends Component<Props, State> {
             isEditMode={isEditMode}
             tabs={[
               {
-                label: "Hakemus",
+                label: "Permohonan",
                 allow: true,
                 isDirty: false,
                 //isApplicationFormDirty,
                 hasError: isSaveClicked && !areFormsValid,
               },
               {
-                label: "Muutoshistoria",
+                label: "Riwayat perubahan",
                 allow: true,
               },
               {
-                label: "Kartta",
+                label: "Peta",
                 allow: true,
               },
             ]}

@@ -125,9 +125,7 @@ class ApplicantInfoCheckEdit extends Component<Props, State> {
         content.push(JSON.stringify(infoCheckItem.error));
       }
     });
-    return (
-      <FormText className="alert">Tallennus ei onnistunut: {content}</FormText>
-    );
+    return <FormText className="alert">Gagal menyimpan: {content}</FormText>;
   }
 
   render(): JSX.Element {

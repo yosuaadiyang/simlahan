@@ -43,7 +43,7 @@ const PlotSearchTargetListing = ({
     <>
       {searchableTargets.length > 0 && (
         <WhiteBox>
-          <SubTitle>HAETTAVAT KOHTEET</SubTitle>
+          <SubTitle>OBJEK YANG DIMOHON</SubTitle>
           {searchableTargets.map((target, index) => (
             <Row key={index}>
               {target.plan_unit ? (

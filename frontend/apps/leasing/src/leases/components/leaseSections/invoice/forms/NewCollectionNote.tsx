@@ -261,13 +261,13 @@ const NewCollectionNote: React.FC<Props> = ({ onSave }) => {
             <Button
               className={ButtonColors.SECONDARY}
               onClick={handleCancel}
-              text="Peruuta"
+              text="Batal"
             />
             <Button
               className={ButtonColors.SUCCESS}
               disabled={!valid}
               onClick={handleSave}
-              text="Tallenna"
+              text="Simpan"
             />
           </div>
         </>
@@ -279,7 +279,7 @@ const NewCollectionNote: React.FC<Props> = ({ onSave }) => {
         )}
       >
         {!isAddingNote && (
-          <AddButtonThird label="Lisää huomautus" onClick={handleAdd} />
+          <AddButtonThird label="Tambah catatan" onClick={handleAdd} />
         )}
       </Authorization>
     </>

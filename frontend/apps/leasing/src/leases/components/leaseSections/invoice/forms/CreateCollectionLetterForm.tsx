@@ -137,7 +137,7 @@ const Invoices = ({
         })}
       <Row>
         <Column>
-          <AddButtonThird label="Lisää lasku" onClick={handleAdd} />
+          <AddButtonThird label="Tambah tagihan" onClick={handleAdd} />
         </Column>
       </Row>
       <Row>
@@ -282,7 +282,7 @@ const CreateCollectionLetterForm: React.FC = () => {
             >
               <FileDownloadButton
                 disabled={!valid}
-                label="Luo perintäkirje"
+                label="Buat surat penagihan"
                 payload={{
                   lease: lease.id,
                   template: values.template,

@@ -107,7 +107,7 @@ class PlotSearchSiteCustomDetailedPlan extends PureComponent<Props, State> {
           defaultOpen={collapseState !== undefined ? collapseState : true}
           headerTitle={
             get(currentCustomDetailedPlan, "identifier")
-              ? `${get(currentCustomDetailedPlan, "identifier")} ${get(currentCustomDetailedPlan, "state.name")} - OMA MUU ALUE`
+              ? `${get(currentCustomDetailedPlan, "identifier")} ${get(currentCustomDetailedPlan, "state.name")} - AREA LAIN MILIK SENDIRI`
               : "-"
           }
           onToggle={this.handleCollapseToggle}
@@ -380,7 +380,7 @@ class PlotSearchSiteCustomDetailedPlan extends PureComponent<Props, State> {
                     <Column small={4} medium={4} large={12}>
                       <FormText>
                         {/* TODO: add a link here if a by-target filter is implemented for the application list view */}
-                        Hakemukset ({applicationCount})
+                        Permohonan ({applicationCount})
                       </FormText>
                     </Column>
                     <Column small={4} medium={4} large={12}>

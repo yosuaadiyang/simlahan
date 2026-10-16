@@ -123,90 +123,84 @@ describe("Application", () => {
     });
   });
   describe("validators", () => {
-    describe("personalIdentifierValidator", () => {
+    describe("personalIdentifierValidator (NIK)", () => {
       it("should ignore an empty identifier", () => {
-        const error = personalIdentifierValidator("", "fail");
-        expect(error).to.not.exist;
+        expect(personalIdentifierValidator("", "fail")).to.not.exist;
       });
       it("should not accept a non-string value", () => {
-        const error = personalIdentifierValidator(
-          {
-            personalIdentifier: "180670-399C",
-          },
+        expect(
+          personalIdentifierValidator({ nik: "2171010101900001" }, "fail"),
+        ).to.equal("fail");
+      });
+      it("should accept a valid NIK (male)", () => {
+        expect(personalIdentifierValidator("2171011501900001", "fail")).to.not
+          .exist;
+      });
+      it("should accept a valid NIK (female, day + 40)", () => {
+        expect(personalIdentifierValidator("2171015501900002", "fail")).to.not
+          .exist;
+      });
+      it("should not accept a NIK with wrong length", () => {
+        expect(personalIdentifierValidator("217101150190001", "fail")).to.equal(
           "fail",
         );
-        expect(error).to.equal("fail");
+        expect(
+          personalIdentifierValidator("21710115019000011", "fail"),
+        ).to.equal("fail");
       });
-      it("should accept a typical personal identifier from the 20th century", () => {
-        const error = personalIdentifierValidator("180670-399C", "fail");
-        expect(error).to.not.exist;
+      it("should not accept letters", () => {
+        expect(
+          personalIdentifierValidator("21710115019000A1", "fail"),
+        ).to.equal("fail");
       });
-      it("should accept a typical personal identifier from the 19th century", () => {
-        const error = personalIdentifierValidator("090595+596K", "fail");
-        expect(error).to.not.exist;
+      it("should not accept an impossible birth date", () => {
+        expect(
+          personalIdentifierValidator("2171013213900001", "fail"),
+        ).to.equal("fail");
+        expect(
+          personalIdentifierValidator("2171017201900001", "fail"),
+        ).to.equal("fail");
       });
-      it("should accept a typical personal identifier from the 21st century", () => {
-        const error = personalIdentifierValidator("090710A800U", "fail");
-        expect(error).to.not.exist;
-      });
-      it("should accept a personal identifier using the newly adopted additional separator characters", () => {
-        const error = personalIdentifierValidator("020504E347J", "fail");
-        expect(error).to.not.exist;
-      });
-      it("should not accept a personal identifier using an invalid separator character", () => {
-        const error = personalIdentifierValidator("020504Z347J", "fail");
-        expect(error).to.equal("fail");
-      });
-      it("should not accept a personal identifier with too many characters", () => {
-        const error = personalIdentifierValidator("18061970-399C", "fail");
-        expect(error).to.equal("fail");
-      });
-      it("should not accept a personal identifier with too few characters", () => {
-        const error = personalIdentifierValidator("180670399C", "fail");
-        expect(error).to.equal("fail");
-      });
-      it("should not accept a personal identifier with an impossible date", () => {
-        const error = personalIdentifierValidator("310298-144J", "fail");
-        expect(error).to.equal("fail");
+      it("should not accept a zero region or sequence", () => {
+        expect(
+          personalIdentifierValidator("0071011501900001", "fail"),
+        ).to.equal("fail");
+        expect(
+          personalIdentifierValidator("2171011501900000", "fail"),
+        ).to.equal("fail");
       });
     });
-    describe("companyIdentifierValidator", () => {
+    describe("companyIdentifierValidator (NPWP)", () => {
       it("should ignore an empty identifier", () => {
-        const error = companyIdentifierValidator("", "fail");
-        expect(error).to.not.exist;
+        expect(companyIdentifierValidator("", "fail")).to.not.exist;
       });
       it("should not accept a non-string value", () => {
-        const error = companyIdentifierValidator(
-          {
-            companyIdentifier: "0346848-5",
-          },
+        expect(
+          companyIdentifierValidator({ npwp: "012345678901000" }, "fail"),
+        ).to.equal("fail");
+      });
+      it("should accept a 15 digit NPWP", () => {
+        expect(companyIdentifierValidator("012345678901000", "fail")).to.not
+          .exist;
+      });
+      it("should accept a formatted 15 digit NPWP", () => {
+        expect(companyIdentifierValidator("01.234.567.8-901.000", "fail")).to
+          .not.exist;
+      });
+      it("should accept a 16 digit NPWP", () => {
+        expect(companyIdentifierValidator("2171011501900001", "fail")).to.not
+          .exist;
+      });
+      it("should not accept invalid lengths or formats", () => {
+        expect(companyIdentifierValidator("0346848-5", "fail")).to.equal(
           "fail",
         );
-        expect(error).to.equal("fail");
-      });
-      it("should accept a modern format company identifier", () => {
-        const error = companyIdentifierValidator("0346848-5", "fail");
-        expect(error).to.not.exist;
-      });
-      it("should accept an old format company identifier", () => {
-        const error = companyIdentifierValidator("346848-5", "fail");
-        expect(error).to.not.exist;
-      });
-      it("should not accept a company identifier with an invalid check number", () => {
-        const error = companyIdentifierValidator("0346848-8", "fail");
-        expect(error).to.equal("fail");
-      });
-      it("should not accept a company identifier with a check number that is too long", () => {
-        const error = companyIdentifierValidator("00346848-5", "fail");
-        expect(error).to.equal("fail");
-      });
-      it("should not accept a company identifier with a check number that is too short", () => {
-        const error = companyIdentifierValidator("62202-9", "fail");
-        expect(error).to.equal("fail");
-      });
-      it("should not accept a company identifier that is not in use due to a sum remainder of 1", () => {
-        const error = companyIdentifierValidator("7453796-1", "fail");
-        expect(error).to.equal("fail");
+        expect(companyIdentifierValidator("01234567890100", "fail")).to.equal(
+          "fail",
+        );
+        expect(companyIdentifierValidator("01.234.567.8-901", "fail")).to.equal(
+          "fail",
+        );
       });
     });
     describe("emailValidator", () => {
@@ -324,10 +318,10 @@ describe("Application", () => {
         });
         expect(
           get(error, "formEntries.sections.test[0].fields.hallintaosuus.value"),
-        ).to.equal("Hallintaosuuksien yhteismäärän on oltava 100%");
+        ).to.equal("Total porsi penguasaan harus 100%");
         expect(
           get(error, "formEntries.sections.test[1].fields.hallintaosuus.value"),
-        ).to.equal("Hallintaosuuksien yhteismäärän on oltava 100%");
+        ).to.equal("Total porsi penguasaan harus 100%");
       });
       it("should not care about unrelated fractional fields when validating the control share ratio", () => {
         const error = validateApplicationForm("formEntries")({

@@ -66,7 +66,7 @@ function* fetchReportsSaga(): Generator<any, any, any> {
         yield put(
           receiveError(
             new SubmissionError({
-              _error: "Server error 403",
+              _error: "Galat server 403",
               ...bodyAsJson,
             }),
           ),
@@ -140,7 +140,7 @@ function* sendReportToMailSaga({
         yield put(
           receiveError(
             new SubmissionError({
-              _error: "Server error 400",
+              _error: "Galat server 400",
               ...bodyAsJson,
             }),
           ),
@@ -152,7 +152,7 @@ function* sendReportToMailSaga({
         yield put(
           receiveError(
             new SubmissionError({
-              _error: "Server error 403",
+              _error: "Galat server 403",
               ...bodyAsJson,
             }),
           ),
@@ -165,7 +165,7 @@ function* sendReportToMailSaga({
         yield put(
           receiveError(
             new SubmissionError({
-              _error: "Server error 500",
+              _error: "Galat server 500",
               ...bodyAsJson,
             }),
           ),

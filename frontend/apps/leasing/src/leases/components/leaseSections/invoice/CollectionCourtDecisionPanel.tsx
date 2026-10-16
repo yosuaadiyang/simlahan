@@ -150,13 +150,13 @@ const CollectionCourtDecisionPanel: React.FC<Props> = ({
         <Button
           className={ButtonColors.ALERT}
           onClick={handleClose}
-          text="Peruuta"
+          text="Batal"
         />
         <Button
           className={ButtonColors.SUCCESS}
           disabled={!file || !valid || isSaveClicked}
           onClick={handleSave}
-          text="Tallenna"
+          text="Simpan"
         />
       </ButtonWrapper>
     </>

@@ -71,10 +71,10 @@ class PlotApplicationTargetInfoCheckManagements extends PureComponent<TargetSubF
           <div role="table">
             <Row>
               <Column small={4} medium={4} large={2} role="columnheader">
-                <FormTextTitle>Rahoitusmuoto</FormTextTitle>
+                <FormTextTitle>Bentuk pembiayaan</FormTextTitle>
               </Column>
               <Column small={4} medium={4} large={2} role="columnheader">
-                <FormTextTitle>Hallintamuoto</FormTextTitle>
+                <FormTextTitle>Bentuk pengelolaan</FormTextTitle>
               </Column>
               <Column small={3} medium={3} large={2} role="columnheader">
                 <FormTextTitle>HITAS</FormTextTitle>
@@ -161,7 +161,7 @@ class PlotApplicationTargetInfoCheckManagements extends PureComponent<TargetSubF
                         style={{
                           height: "unset",
                         }}
-                        title="Poista hallinta- ja rahoitusmuoto"
+                        title="Hapus bentuk pengelolaan dan pembiayaan"
                         disabled={disabled}
                       />
                     </Column>
@@ -172,7 +172,7 @@ class PlotApplicationTargetInfoCheckManagements extends PureComponent<TargetSubF
               <Row>
                 <Column>
                   <AddButtonThird
-                    label="Lisää rahoitus- ja hallintamuoto"
+                    label="Tambah bentuk pembiayaan dan pengelolaan"
                     onClick={handleAdd}
                   />
                 </Column>
@@ -199,7 +199,7 @@ class PlotApplicationTargetInfoCheckConditions extends PureComponent<TargetSubFi
           <div role="table">
             <Row>
               <Column large={11} role="columnheader">
-                <FormTextTitle>Erityiset varausehdot</FormTextTitle>
+                <FormTextTitle>Syarat pencadangan khusus</FormTextTitle>
               </Column>
               <Column large={1} />
             </Row>
@@ -251,7 +251,7 @@ class PlotApplicationTargetInfoCheckConditions extends PureComponent<TargetSubFi
                         style={{
                           height: "unset",
                         }}
-                        title="Poista ehto"
+                        title="Hapus persyaratan"
                         disabled={disabled}
                       />
                     </Column>
@@ -261,7 +261,10 @@ class PlotApplicationTargetInfoCheckConditions extends PureComponent<TargetSubFi
             {!disabled && (
               <Row>
                 <Column>
-                  <AddButtonThird label="Lisää ehto" onClick={handleAdd} />
+                  <AddButtonThird
+                    label="Tambah persyaratan"
+                    onClick={handleAdd}
+                  />
                 </Column>
               </Row>
             )}
@@ -305,7 +308,7 @@ const PlotApplicationTargetInfoCheckMeetingMemos = connect(null, {
         <div role="table">
           <Row>
             <Column large={11} role="columnheader">
-              <FormTextTitle>Kokous-/neuvottelumuistiot</FormTextTitle>
+              <FormTextTitle>Notulen rapat/negosiasi</FormTextTitle>
             </Column>
             <Column large={1} />
           </Row>
@@ -420,7 +423,7 @@ const PlotApplicationTargetInfoCheckMeetingMemos = connect(null, {
                           <RemoveButton
                             className="third-level"
                             onClick={handleRemove}
-                            title="Poista muistio"
+                            title="Hapus notulen"
                           />
                         </Column>
                       </Row>
@@ -428,11 +431,11 @@ const PlotApplicationTargetInfoCheckMeetingMemos = connect(null, {
                   })}
                 </Fragment>
               ) : (
-                <FormText>Ei lisättyjä muistioita.</FormText>
+                <FormText>Belum ada notulen.</FormText>
               )}
               {!disabled && (
                 <AddFileButton
-                  label="Lisää tiedosto"
+                  label="Tambah berkas"
                   name={`addFileButton--${targetInfoCheck}--${fields.name}`}
                   onChange={handleAdd}
                 />
@@ -513,9 +516,7 @@ class PlotApplicationTargetInfoCheck extends PureComponent<Props> {
       content = JSON.stringify(submissionErrors);
     }
 
-    return (
-      <FormText className="alert">Tallennus ei onnistunut: {content}</FormText>
-    );
+    return <FormText className="alert">Gagal menyimpan: {content}</FormText>;
   }
 
   render(): JSX.Element {
@@ -531,7 +532,7 @@ class PlotApplicationTargetInfoCheck extends PureComponent<Props> {
     return (
       <PlotApplicationInfoCheckCollapse
         className="PlotApplicationTargetInfoCheckEdit"
-        headerTitle="Kohteen käsittelytiedot"
+        headerTitle="Data pemrosesan objek"
       >
         <>
           <form>

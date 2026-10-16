@@ -67,20 +67,20 @@ const CollectionLetterTotalRow = ({ fields, selectedInvoices }: Props) => {
   return (
     <Row>
       <Column small={4}>
-        <FormText>Yhteensä</FormText>
+        <FormText>Total</FormText>
       </Column>
       <Column small={2}>
-        <FormText>{`${formatNumber(totalOutstandingAmount)} €`}</FormText>
+        <FormText>{`Rp ${formatNumber(totalOutstandingAmount)}`}</FormText>
       </Column>
       <Column small={2}>
-        <FormText>{`${formatNumber(totalInterestAmount)} €`}</FormText>
+        <FormText>{`Rp ${formatNumber(totalInterestAmount)}`}</FormText>
       </Column>
       <Column small={2}>
-        <FormText>{`${formatNumber(totalCollectionCharge)} €`}</FormText>
+        <FormText>{`Rp ${formatNumber(totalCollectionCharge)}`}</FormText>
       </Column>
       <Column small={2}>
         <FormText>
-          <strong>{`${formatNumber(total)} €`}</strong>
+          <strong>{`Rp ${formatNumber(total)}`}</strong>
         </FormText>
       </Column>
     </Row>

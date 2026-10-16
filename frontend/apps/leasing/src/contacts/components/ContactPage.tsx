@@ -13,7 +13,6 @@ import ContactLeaseTable from "./ContactLeaseTable";
 import ContentContainerHds from "@/components/content/ContentContainerHds";
 import ControlButtonBar from "@/components/controlButtons/ControlButtonBar";
 import ControlButtons from "@/components/controlButtons/ControlButtons";
-import CreditDecisionTemplate from "@/creditDecision/components/CreditDecisionTemplate";
 import Divider from "@/components/content/Divider";
 import Loader from "@/components/loader/Loader";
 import LoaderWrapper from "@/components/loader/LoaderWrapper";
@@ -23,7 +22,6 @@ import Tabs from "@/components/tabs/Tabs";
 import TabPane from "@/components/tabs/TabPane";
 import TabContent from "@/components/tabs/TabContent";
 import Title from "@/components/content/Title";
-import TradeRegisterTemplate from "@/tradeRegister/components/TradeRegisterTemplate";
 import {
   editContact,
   fetchSingleContact,
@@ -132,7 +130,7 @@ const ContactPageView: React.FC<{
 
   const setContactPageTitle = useCallback(() => {
     const nameInfo = getContactFullName(contact);
-    setPageTitle(`${nameInfo ? `${nameInfo} | ` : ""}Asiakas`);
+    setPageTitle(`${nameInfo ? `${nameInfo} | ` : ""}Kontak`);
   }, [contact]);
 
   const stopAutoSaveTimer = useCallback(() => {
@@ -185,7 +183,7 @@ const ContactPageView: React.FC<{
     dispatch(
       receiveTopNavigationSettings({
         linkUrl: getRouteById(Routes.CONTACTS),
-        pageTitle: "Asiakkaat",
+        pageTitle: "Kontak",
         showSearch: false,
       }),
     );
@@ -395,30 +393,13 @@ const ContactPageView: React.FC<{
           isEditMode={isEditMode}
           tabs={[
             {
-              label: "Perustiedot",
+              label: "Data dasar",
               allow: true,
               isDirty: isTabDirty(0),
               hasError: isSaveClicked && !isContactFormValid,
             },
             {
-              label: "Kaupparekisteri",
-              allow:
-                hasPermissions(
-                  usersPermissions,
-                  UsersPermissions.VIEW_INVOICE,
-                ) &&
-                !!contact.business_id &&
-                contact.type !== ContactTypes.PERSON,
-            },
-            {
-              label: "Asiakastieto",
-              allow: hasPermissions(
-                usersPermissions,
-                UsersPermissions.VIEW_CREDITDECISION,
-              ),
-            },
-            {
-              label: "Muutoshistoria",
+              label: "Riwayat perubahan",
               allow: hasPermissions(
                 usersPermissions,
                 UsersPermissions.VIEW_CONTACT,
@@ -508,65 +489,6 @@ const ContactPageContent: React.FC<{
             <ContactReadonly contact={contact} />
           )}
           <ContactLeaseTable contact={contact} />
-        </ContentContainerHds>
-      </TabPane>
-
-      <TabPane>
-        <ContentContainerHds>
-          <Authorization
-            allow={hasPermissions(
-              usersPermissions,
-              UsersPermissions.VIEW_INVOICE,
-            )}
-            errorComponent={
-              <AuthorizationError text={PermissionMissingTexts.GENERAL} />
-            }
-          >
-            {!!contact.business_id && contact.type !== ContactTypes.PERSON && (
-              <>
-                <Title
-                  enableUiDataEdit={isEditMode}
-                  uiDataKey={getUiDataContactKey(
-                    ContactFieldPaths.TRADE_REGISTER,
-                  )}
-                >
-                  {ContactFieldTitles.TRADE_REGISTER}
-                </Title>
-                <Divider />
-                <TradeRegisterTemplate businessId={contact.business_id} />
-              </>
-            )}
-          </Authorization>
-        </ContentContainerHds>
-      </TabPane>
-
-      <TabPane>
-        <ContentContainerHds>
-          <Authorization
-            allow={hasPermissions(
-              usersPermissions,
-              UsersPermissions.VIEW_CREDITDECISION,
-            )}
-            errorComponent={
-              <AuthorizationError text={PermissionMissingTexts.GENERAL} />
-            }
-          >
-            <>
-              <Title
-                enableUiDataEdit={isEditMode}
-                uiDataKey={getUiDataContactKey(
-                  ContactFieldPaths.CREDIT_DECISION,
-                )}
-              >
-                {ContactFieldTitles.CREDIT_DECISION}
-              </Title>
-              <Divider />
-              <CreditDecisionTemplate
-                contactType={contact.type}
-                contactId={contactId}
-              />
-            </>
-          </Authorization>
         </ContentContainerHds>
       </TabPane>
 

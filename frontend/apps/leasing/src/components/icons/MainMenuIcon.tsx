@@ -6,7 +6,7 @@ type Props = {
 
 const MainMenuIcon = ({ className }: Props) => (
   <svg className={classNames("icons", className)} viewBox="0 0 22 13">
-    <title>Avaa/sulje päävalikko</title>
+    <title>Buka/tutup menu utama</title>
     <g fill="none">
       <g transform="translate(-1355.000000, -24.000000)" strokeWidth="2.5">
         <polyline

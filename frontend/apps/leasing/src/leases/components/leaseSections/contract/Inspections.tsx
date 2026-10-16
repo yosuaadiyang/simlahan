@@ -22,7 +22,7 @@ const Inspections: React.FC = () => {
   if (!inspections || !inspections.length) {
     return (
       <FormText className="no-margin">
-        Ei tarkastuksia tai huomautuksia
+        Tidak ada pemeriksaan atau catatan
       </FormText>
     );
   }

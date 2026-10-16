@@ -5,17 +5,14 @@ import App from "@/app/App";
 import AreaNoteListPage from "@/areaNote/components/AreaNoteListPage";
 import BasisOfRentCalculatorPage from "@/basisOfRentCalculator/components/BasisOfRentCalculatorPage";
 import BatchRunPage from "@/batchrun/components/BatchRunPage";
-import CallbackPage from "@/auth/components/CallbackPage";
 import ContactListPage from "@/contacts/components/ContactsListPage";
 import ContactPage from "@/contacts/components/ContactPage";
-import CreditDecisionSearchPage from "@/creditDecision/components/CreditDecisionSearchPage";
 import IndexListPage from "@/index/components/IndexListPage";
 import InfillDevelopmentPage from "@/infillDevelopment/components/InfillDevelopmentPage";
 import InfillDevelopmentListPage from "@/infillDevelopment/components/InfillDevelopmentListPage";
 import InvoiceNoteListPage from "@/invoiceNote/components/InvoiceNoteListPage";
 import LeaseListPage from "@/leases/components/LeaseListPage";
 import LeasePage from "@/leases/components/LeasePage";
-import LeaseholdTransferListPage from "@/leaseholdTransfer/components/LeaseholdTransferListPage";
 import NewContactPage from "@/contacts/components/NewContactPage";
 import NewInfillDevelopmentPage from "@/infillDevelopment/components/NewInfillDevelopmentPage";
 import NewRentBasisPage from "@/rentbasis/components/NewRentBasisPage";
@@ -25,41 +22,42 @@ import PlotSearchPage from "@/plotSearch/components/PlotSearchPage";
 import PlotApplicationsPage from "@/plotApplications/components/PlotApplicationPage";
 import RentBasisListPage from "@/rentbasis/components/RentBasisListPage";
 import RentBasisPage from "@/rentbasis/components/RentBasisPage";
-import SapInvoicesListPage from "@/sapInvoice/components/SapInvoicesListPage";
 import LeaseReportsPage from "@/reports/components/LeaseReportsPage";
-import TradeRegisterSearchPage from "@/tradeRegister/components/TradeRegisterSearchPage";
 import PlotApplicationCreatePage from "@/plotApplications/components/PlotApplicationCreatePage";
 import AreaSearchApplicationListPage from "@/areaSearch/components/AreaSearchApplicationListPage";
 import AreaSearchApplicationPage from "@/areaSearch/components/AreaSearchApplicationPage";
 import AreaSearchApplicationCreatePage from "@/areaSearch/components/AreaSearchApplicationCreatePage";
+import AcquisitionDashboardPage from "@/acquisition/components/AcquisitionDashboardPage";
+import AcquisitionListPage from "@/acquisition/components/AcquisitionListPage";
+import AcquisitionProjectPage from "@/acquisition/components/AcquisitionProjectPage";
+import AcquisitionParcelPage from "@/acquisition/components/AcquisitionParcelPage";
+import AcquisitionSettingsPage from "@/acquisition/components/AcquisitionSettingsPage";
 
 /**
  * Routes enumerate
  * @enum {string}
  */
 export const Routes = {
+  ACQUISITIONS: "acquisitions",
+  ACQUISITION_DASHBOARD: "acquisition_dashboard",
+  ACQUISITION_SETTINGS: "acquisition_settings",
   AREA_NOTES: "area_notes",
   AREA_SEARCH: "area_search",
   BASIS_OF_RENT_CALCULATOR: "basis_of_rent_calculator",
   BATCH_RUN: "batch_jobs",
-  CALLBACK: "callback",
   CONTACTS: "contacts",
   CONTACT_NEW: "contact_new",
-  CREDIT_DECISION: "asiakastieto",
   INDEX: "index",
   INFILL_DEVELOPMENTS: "infill_developments",
   INFILL_DEVELOPMENT_NEW: "infill_development_new",
   INVOICE_NOTES: "invoice_notes",
   LEASES: "leases",
-  LEASEHOLD_TRANSFER: "leasehold_transfer",
   LOGOUT: "logout",
   PLOT_SEARCH: "plotSearch",
   PLOT_APPLICATIONS: "plotApplications",
   RENT_BASIS: "rent_basis",
   RENT_BASIS_NEW: "rent_basis_new",
-  SAP_INVOICES: "sap_invoices",
   LEASE_REPORTS: "reports",
-  TRADE_REGISTER: "trade_register",
 };
 
 /**
@@ -69,28 +67,26 @@ export const Routes = {
  */
 export const getRouteById = (id: string): string => {
   const routes = {
-    [Routes.AREA_NOTES]: "/muistettavatehdot",
-    [Routes.AREA_SEARCH]: "/aluehaut",
-    [Routes.BASIS_OF_RENT_CALCULATOR]: "/vuokralaskuri",
-    [Routes.BATCH_RUN]: "/eraajot",
-    [Routes.CALLBACK]: "/callback",
-    [Routes.CONTACTS]: "/asiakkaat",
-    [Routes.CONTACT_NEW]: "/uusiasiakas",
-    [Routes.CREDIT_DECISION]: "/asiakastieto",
-    [Routes.INDEX]: "/indeksi",
-    [Routes.INFILL_DEVELOPMENTS]: "/taydennysrakennuskorvaus",
-    [Routes.INFILL_DEVELOPMENT_NEW]: "/uusitaydennysrakennuskorvaus",
-    [Routes.INVOICE_NOTES]: "/laskujentiedotteet",
-    [Routes.LEASES]: "/vuokraukset",
-    [Routes.LEASEHOLD_TRANSFER]: "/vuokraoikeudensiirrot",
-    [Routes.LOGOUT]: "/logout",
-    [Routes.PLOT_SEARCH]: "/tonttihaku",
-    [Routes.PLOT_APPLICATIONS]: "/tonttihakemukset",
-    [Routes.RENT_BASIS]: "/vuokrausperusteet",
-    [Routes.RENT_BASIS_NEW]: "/uusivuokrausperuste",
-    [Routes.SAP_INVOICES]: "/saplaskut",
-    [Routes.LEASE_REPORTS]: "/tilastoraportti",
-    [Routes.TRADE_REGISTER]: "/kaupparekisteri",
+    [Routes.ACQUISITIONS]: "/pengadaan-tanah",
+    [Routes.ACQUISITION_DASHBOARD]: "/dasbor-pengadaan",
+    [Routes.ACQUISITION_SETTINGS]: "/pengaturan-pengadaan",
+    [Routes.AREA_NOTES]: "/catatan-area",
+    [Routes.AREA_SEARCH]: "/pencarian-area",
+    [Routes.BASIS_OF_RENT_CALCULATOR]: "/kalkulator-sewa",
+    [Routes.BATCH_RUN]: "/tugas-terjadwal",
+    [Routes.CONTACTS]: "/kontak",
+    [Routes.CONTACT_NEW]: "/kontak-baru",
+    [Routes.INDEX]: "/indeks",
+    [Routes.INFILL_DEVELOPMENTS]: "/kompensasi-pembangunan-sisipan",
+    [Routes.INFILL_DEVELOPMENT_NEW]: "/kompensasi-pembangunan-sisipan-baru",
+    [Routes.INVOICE_NOTES]: "/catatan-tagihan",
+    [Routes.LEASES]: "/sewa",
+    [Routes.LOGOUT]: "/keluar",
+    [Routes.PLOT_SEARCH]: "/pencarian-kavling",
+    [Routes.PLOT_APPLICATIONS]: "/permohonan-kavling",
+    [Routes.RENT_BASIS]: "/dasar-sewa",
+    [Routes.RENT_BASIS_NEW]: "/dasar-sewa-baru",
+    [Routes.LEASE_REPORTS]: "/laporan",
   };
   return routes[id] ? routes[id] : "";
 };
@@ -99,6 +95,26 @@ export default (
     <RouterRoutes>
       <Route path="/" element={<Navigate to={getRouteById(Routes.LEASES)} />} />
       <Route path={getRouteById(Routes.LEASES)} element={<LeaseListPage />} />
+      <Route
+        path={getRouteById(Routes.ACQUISITION_DASHBOARD)}
+        element={<AcquisitionDashboardPage />}
+      />
+      <Route
+        path={getRouteById(Routes.ACQUISITIONS)}
+        element={<AcquisitionListPage />}
+      />
+      <Route
+        path={`${getRouteById(Routes.ACQUISITIONS)}/:projectId`}
+        element={<AcquisitionProjectPage />}
+      />
+      <Route
+        path={`${getRouteById(Routes.ACQUISITIONS)}/:projectId/bidang/:parcelId`}
+        element={<AcquisitionParcelPage />}
+      />
+      <Route
+        path={getRouteById(Routes.ACQUISITION_SETTINGS)}
+        element={<AcquisitionSettingsPage />}
+      />
       <Route
         path={`${getRouteById(Routes.LEASES)}/:leaseId`}
         element={<LeasePage />}
@@ -140,20 +156,8 @@ export default (
         element={<NewInfillDevelopmentPage />}
       />
       <Route
-        path={getRouteById(Routes.TRADE_REGISTER)}
-        element={<TradeRegisterSearchPage />}
-      />
-      <Route
-        path={getRouteById(Routes.SAP_INVOICES)}
-        element={<SapInvoicesListPage />}
-      />
-      <Route
         path={getRouteById(Routes.LEASE_REPORTS)}
         element={<LeaseReportsPage />}
-      />
-      <Route
-        path={getRouteById(Routes.LEASEHOLD_TRANSFER)}
-        element={<LeaseholdTransferListPage />}
       />
       <Route
         path={getRouteById(Routes.RENT_BASIS)}
@@ -172,7 +176,6 @@ export default (
         path={getRouteById(Routes.BASIS_OF_RENT_CALCULATOR)}
         element={<BasisOfRentCalculatorPage />}
       />
-      <Route path={getRouteById(Routes.CALLBACK)} element={<CallbackPage />} />
       <Route
         path={getRouteById(Routes.PLOT_SEARCH)}
         element={<PlotSearchListPage />}
@@ -186,7 +189,7 @@ export default (
         element={<PlotApplicationsListPage />}
       />
       <Route
-        path={`${getRouteById(Routes.PLOT_APPLICATIONS)}/uusi`}
+        path={`${getRouteById(Routes.PLOT_APPLICATIONS)}/baru`}
         element={<PlotApplicationCreatePage />}
       />
       <Route
@@ -198,16 +201,12 @@ export default (
         element={<AreaSearchApplicationListPage />}
       />
       <Route
-        path={`${getRouteById(Routes.AREA_SEARCH)}/uusi`}
+        path={`${getRouteById(Routes.AREA_SEARCH)}/baru`}
         element={<AreaSearchApplicationCreatePage />}
       />
       <Route
         path={`${getRouteById(Routes.AREA_SEARCH)}/:areaSearchId`}
         element={<AreaSearchApplicationPage />}
-      />
-      <Route
-        path={getRouteById(Routes.CREDIT_DECISION)}
-        element={<CreditDecisionSearchPage />}
       />
       <Route path="*" element={<ErrorPage />} />
     </RouterRoutes>

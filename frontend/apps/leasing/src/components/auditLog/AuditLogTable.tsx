@@ -16,49 +16,49 @@ const AuditLogTable = ({ items }: Props) => {
                 width: "16.7%",
               }}
             >
-              <div>Pvm</div>
+              <div>Tgl</div>
             </th>
             <th
               style={{
                 width: "16.7%",
               }}
             >
-              <div>Nimi</div>
+              <div>Nama</div>
             </th>
             <th
               style={{
                 width: "16.7%",
               }}
             >
-              <div>Muutoksen tyyppi</div>
+              <div>Jenis perubahan</div>
             </th>
             <th
               style={{
                 width: "16.7%",
               }}
             >
-              <div>Muutoksen kohde</div>
+              <div>Objek perubahan</div>
             </th>
             <th
               style={{
                 width: "16.7%",
               }}
             >
-              <div>Vanha arvo</div>
+              <div>Nilai lama</div>
             </th>
             <th
               style={{
                 width: "16.7%",
               }}
             >
-              <div>Uusi arvo</div>
+              <div>Nilai baru</div>
             </th>
           </tr>
         </thead>
         <tbody>
           {!items.length && (
             <tr className="no-data-row">
-              <td colSpan={7}>Ei muutoksia</td>
+              <td colSpan={7}>Tidak ada perubahan</td>
             </tr>
           )}
 

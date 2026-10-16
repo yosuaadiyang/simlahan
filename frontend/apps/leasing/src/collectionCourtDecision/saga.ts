@@ -107,7 +107,7 @@ function* uploadCollectionCourtDecisionSaga({
         yield put(hideCollectionCourtDecisionPanel());
         displayUIMessage({
           title: "",
-          body: "Käräjäoikeuden päätös tallennettu",
+          body: "Putusan pengadilan disimpan",
         });
         break;
 
@@ -155,7 +155,7 @@ function* deleteCollectionCourtDecisionSaga({
         );
         displayUIMessage({
           title: "",
-          body: "Käräjäoikeuden päätös poistettu",
+          body: "Putusan pengadilan dihapus",
         });
         break;
       }

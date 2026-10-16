@@ -9,7 +9,7 @@ const SuccessIcon = ({ className }: Props) => (
     viewBox="0 0 20 20"
     className={classNames("icons", "icons__success", className)}
   >
-    <title>Onnistuminen</title>
+    <title>Berhasil</title>
     <g stroke="none" fill="none">
       <g id="Artboard" transform="translate(-460.000000, -212.000000)">
         <g transform="translate(460.000000, 212.000000)">

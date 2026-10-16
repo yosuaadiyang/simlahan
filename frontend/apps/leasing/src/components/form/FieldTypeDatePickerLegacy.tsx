@@ -5,10 +5,10 @@ import DatePicker, {
 } from "react-datepicker";
 import format from "date-fns/format";
 import parse from "date-fns/parse";
-import fi from "date-fns/locale/fi";
+import idLocale from "date-fns/locale/id";
 import classNames from "classnames";
 import { isValidDate } from "@/util/date";
-registerLocale("fi", fi);
+registerLocale("id", idLocale);
 type Props = {
   disabled: boolean;
   displayError: boolean;
@@ -46,7 +46,7 @@ const FieldTypeDatePicker = ({
 
   const getParsedDate = (value: string) =>
     parse(value, "dd.MM.yyyy", new Date(), {
-      locale: fi,
+      locale: idLocale,
     });
 
   const handleChange = (value: Date | null) => {
@@ -87,7 +87,7 @@ const FieldTypeDatePicker = ({
         ref={handleSetReference}
         disabled={disabled}
         id={name}
-        locale="fi"
+        locale="id"
         selected={value ? new Date(value) : null}
         dateFormat="dd.MM.yyyy"
         showYearDropdown

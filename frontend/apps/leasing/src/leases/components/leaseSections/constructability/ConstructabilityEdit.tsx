@@ -53,7 +53,7 @@ const renderAreas = ({
     <>
       {!fields ||
         (!fields.length && (
-          <FormText className="no-margin">Ei vuokra-alueita</FormText>
+          <FormText className="no-margin">Tidak ada area sewa</FormText>
         ))}
       {savedAreas &&
         !!savedAreas.length &&

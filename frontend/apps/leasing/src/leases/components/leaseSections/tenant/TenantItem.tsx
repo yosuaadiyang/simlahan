@@ -44,7 +44,7 @@ const RentShares = ({
   return (
     <Fragment>
       <SubTitle>{LeaseTenantRentSharesFieldTitles.RENT_SHARES}</SubTitle>
-      {!rentShares.length && <FormText>Ei laskutusosuuksia</FormText>}
+      {!rentShares.length && <FormText>Tidak ada porsi tagihan</FormText>}
 
       {!!rentShares.length && (
         <Fragment>
@@ -297,7 +297,7 @@ const TenantItem = ({ attributes, contact, tenant }: Props) => {
         )}
       >
         <>
-          <SubTitle>Asiakkaan tiedot</SubTitle>
+          <SubTitle>Data kontak</SubTitle>
           <ContactTemplate contact={contact} />
         </>
       </Authorization>

@@ -67,7 +67,7 @@ const Search: React.FC<Props> = ({ initialValues, onSearch }) => {
               <FormField
                 disableDirty
                 fieldAttributes={{
-                  label: "Hae hakusanalla",
+                  label: "Cari dengan kata kunci",
                   type: FieldTypes.SEARCH,
                   read_only: false,
                 }}
@@ -80,7 +80,7 @@ const Search: React.FC<Props> = ({ initialValues, onSearch }) => {
             <Column small={6}></Column>
             <Column small={6}>
               <SearchClearLink onClick={handleClear}>
-                Tyhjennä haku
+                Kosongkan pencarian
               </SearchClearLink>
             </Column>
           </Row>

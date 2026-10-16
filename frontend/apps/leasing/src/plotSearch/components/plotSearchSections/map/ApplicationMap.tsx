@@ -41,7 +41,7 @@ class ApplicationMap extends Component<Props> {
               areaNotes={areaNotes}
             />
           ),
-          name: "Muistettavat ehdot",
+          name: "Catatan area",
         });
     }
     return layers;

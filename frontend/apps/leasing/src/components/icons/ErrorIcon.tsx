@@ -9,7 +9,7 @@ const ErrorIcon = ({ className }: Props) => (
     viewBox="0 0 16 16"
     className={classNames("icons", "icons__error", className)}
   >
-    <title>Virhe</title>
+    <title>Galat</title>
     <g stroke="none">
       <g transform="translate(-610.000000, -338.000000)">
         <g transform="translate(610.000000, 338.000000)">

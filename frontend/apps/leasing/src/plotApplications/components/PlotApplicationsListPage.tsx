@@ -69,12 +69,12 @@ const MIN_QUERY_LENGTH = 6;
 const visualizationTypeOptions = [
   {
     value: VisualizationTypes.TABLE,
-    label: "Taulukko",
+    label: "Tabel",
     icon: <TableIcon className="icon-medium" />,
   },
   {
     value: VisualizationTypes.MAP,
-    label: "Kartta",
+    label: "Peta",
     icon: <MapIcon className="icon-medium" />,
   },
 ];
@@ -131,7 +131,7 @@ class PlotApplicationsListPage extends PureComponent<
       location: { search },
     } = this.props;
     const searchQuery = getUrlParams(search);
-    setPageTitle("Tonttihakemukset");
+    setPageTitle("Permohonan kavling");
 
     if (searchQuery.visualization === VisualizationTypes.MAP) {
       this.setState({
@@ -144,7 +144,7 @@ class PlotApplicationsListPage extends PureComponent<
 
     receiveTopNavigationSettings({
       linkUrl: getRouteById(Routes.PLOT_APPLICATIONS),
-      pageTitle: "Tonttihakemukset",
+      pageTitle: "Permohonan kavling",
       showSearch: false,
     });
     fetchPlotSearchAttributes();
@@ -281,7 +281,7 @@ class PlotApplicationsListPage extends PureComponent<
   openCreatePlotApplication = () => {
     const { navigate } = this.props;
     navigate({
-      pathname: `${getRouteById(Routes.PLOT_APPLICATIONS)}/uusi`,
+      pathname: `${getRouteById(Routes.PLOT_APPLICATIONS)}/baru`,
     });
   };
   updateTableData = () => {
@@ -301,7 +301,7 @@ class PlotApplicationsListPage extends PureComponent<
     const columns = [];
     columns.push({
       key: "plot_search",
-      text: "Haku",
+      text: "Pencarian",
       sortable: false,
       renderer: ({ name, id }) =>
         name ? (
@@ -313,23 +313,23 @@ class PlotApplicationsListPage extends PureComponent<
     });
     columns.push({
       key: "plot_search_type",
-      text: "Hakutyyppi",
+      text: "Jenis pencarian",
       sortable: false,
     });
     columns.push({
       key: "plot_search_subtype",
-      text: "Haun alatyyppi",
+      text: "Subjenis pencarian",
       sortable: false,
       renderer: (subtype) => subtype?.name,
     });
     columns.push({
       key: "applicants",
-      text: "Hakija",
+      text: "Pemohon",
       sortable: false,
     });
     columns.push({
       key: "target_identifier",
-      text: "Kohteen tunnus",
+      text: "Pengenal objek",
       sortable: false,
       renderer: ({ identifier, application }) =>
         identifier ? (
@@ -341,14 +341,14 @@ class PlotApplicationsListPage extends PureComponent<
     });
     columns.push({
       key: "target_address",
-      text: "Haetun kohteen osoite",
+      text: "Alamat objek yang dimohon",
       sortable: false,
     });
     columns.push({
       key: "target_reserved",
-      text: "Varaus",
+      text: "Pencadangan",
       sortable: false,
-      renderer: (isReserved) => (isReserved ? "Kyllä" : "Ei"),
+      renderer: (isReserved) => (isReserved ? "Ya" : "Tidak"),
     });
     return columns;
   };
@@ -500,7 +500,7 @@ class PlotApplicationsListPage extends PureComponent<
     let amountText;
 
     if ((isMap && isFetchingByBBox) || (isTable && isFetching)) {
-      amountText = "Ladataan...";
+      amountText = "Memuat...";
     } else {
       if (
         isMap &&
@@ -508,7 +508,7 @@ class PlotApplicationsListPage extends PureComponent<
       ) {
         amountText = <>&nbsp;</>;
       } else {
-        amountText = `Löytyi ${count} kpl`;
+        amountText = `Ditemukan ${count} kpl`;
       }
     }
 
@@ -521,7 +521,7 @@ class PlotApplicationsListPage extends PureComponent<
             >
               <AddButtonSecondary
                 className="no-top-margin"
-                label="Luo tonttihakemus"
+                label="Buat permohonan kavling"
                 onClick={this.openCreatePlotApplication}
               />
             </Authorization>
@@ -547,7 +547,7 @@ class PlotApplicationsListPage extends PureComponent<
           visualizationComponent={
             <VisualisationTypeWrapper>
               <IconRadioButtons
-                legend={"Kartta/taulukko"}
+                legend={"Peta/tabel"}
                 onChange={(value) => this.handleVisualizationTypeChange(value)}
                 options={visualizationTypeOptions}
                 radioName="visualization-type-radio"

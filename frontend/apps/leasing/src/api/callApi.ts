@@ -1,9 +1,15 @@
 import { call, select } from "redux-saga/effects";
 import { getApiToken } from "@/auth/selectors";
+import { refreshAccessToken } from "@/auth/session";
 import { UI_ACCEPT_LANGUAGE_VALUE } from "@/api/constants";
 
-function* callApi(request: Request): Generator<any, any, any> {
+function* callApi(
+  request: Request,
+  isRetry: boolean = false,
+): Generator<any, any, any> {
   const apiToken = yield select(getApiToken);
+  // Simpan salinan untuk percobaan ulang setelah token diperbarui.
+  const retryRequest = isRetry ? null : request.clone();
 
   if (apiToken) {
     request.headers.set("Authorization", `Bearer ${apiToken}`);
@@ -21,6 +27,13 @@ function* callApi(request: Request): Generator<any, any, any> {
 
   const response = yield call(fetch, request);
   const status = response.status;
+
+  if (status === 401 && apiToken && retryRequest) {
+    const newToken = yield call(refreshAccessToken);
+    if (newToken) {
+      return yield call(callApi, retryRequest, true);
+    }
+  }
 
   switch (status) {
     case 204:

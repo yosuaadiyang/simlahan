@@ -206,7 +206,7 @@ const LeaseReportsForm: React.FC = () => {
                     <Button
                       className={ButtonColors.SUCCESS}
                       disabled={isFetchingReportData}
-                      text="Luo raportti"
+                      text="Buat laporan"
                       onClick={getReportData}
                     />
                   </Column>
@@ -221,7 +221,7 @@ const LeaseReportsForm: React.FC = () => {
                     <Button
                       className={ButtonColors.SUCCESS}
                       disabled={isSendingMail}
-                      text="Lähetä sähköpostiin"
+                      text="Kirim ke email"
                       onClick={sendToMail}
                     />
                   </Column>

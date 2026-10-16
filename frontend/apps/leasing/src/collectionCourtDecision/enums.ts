@@ -18,10 +18,10 @@ export const CollectionCourtDecisionFieldPaths = {
  * @enum {string}
  */
 export const CollectionCourtDecisionFieldTitles = {
-  COLLECTION_COURT_DECISIONS: "Käräjäoikeuden päätökset",
-  DECISION_DATE: "Päätöksen pvm",
-  FILE: "Tiedosto",
-  NOTE: "Päätöksen huomautus",
-  UPLOADED_AT: "Lisätty",
-  UPLOADER: "Lisääjä",
+  COLLECTION_COURT_DECISIONS: "Putusan pengadilan",
+  DECISION_DATE: "Tgl keputusan",
+  FILE: "Berkas",
+  NOTE: "Catatan keputusan",
+  UPLOADED_AT: "Ditambahkan",
+  UPLOADER: "Ditambahkan oleh",
 };

@@ -25,3 +25,7 @@ coverage.xml
 
 .vscode/launch.json
 .vscode/settings.json
+
+# Berkas yang wajib ikut repo
+!.env.example
+!apps/leasing/public/assets/images/*.png

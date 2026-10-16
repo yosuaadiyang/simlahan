@@ -116,11 +116,11 @@ class FieldTypeSelectLegacy extends PureComponent<Props, State> {
           isLoading={isLoading}
           onBlur={this.handleBlur}
           onChange={this.handleChange}
-          noOptionsMessage={() => "Ei tuloksia"}
+          noOptionsMessage={() => "Tidak ada hasil"}
           onInputChange={this.handleInputChange}
           onMenuOpen={this.handleMenuOpen}
           options={options}
-          placeholder={placeholder || "Valitse..."}
+          placeholder={placeholder || "Pilih..."}
           value={
             (options && options.find((option) => option.value == value)) || ""
           }

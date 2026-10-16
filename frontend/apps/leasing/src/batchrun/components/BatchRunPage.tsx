@@ -45,11 +45,11 @@ const BatchJobsPage: React.FC = () => {
   const usersPermissions = useAppSelector(getUsersPermissions);
 
   useEffect(() => {
-    setPageTitle("Eräajot");
+    setPageTitle("Tugas terjadwal");
     dispatch(
       receiveTopNavigationSettings({
         linkUrl: getRouteById(Routes.BATCH_RUN),
-        pageTitle: "Eräajot",
+        pageTitle: "Tugas terjadwal",
         showSearch: false,
       }),
     );
@@ -85,11 +85,11 @@ const BatchJobsPage: React.FC = () => {
           active={activeTab}
           tabs={[
             {
-              label: "Ajot",
+              label: "Eksekusi",
               allow: true,
             },
             {
-              label: "Ajastukset",
+              label: "Jadwal",
               allow: true,
             },
           ]}
@@ -101,7 +101,7 @@ const BatchJobsPage: React.FC = () => {
         <TabContent active={activeTab}>
           <TabPane>
             <ContentContainer>
-              <Title>Ajot</Title>
+              <Title>Eksekusi</Title>
               <Divider />
 
               <JobRuns />
@@ -110,7 +110,7 @@ const BatchJobsPage: React.FC = () => {
 
           <TabPane>
             <ContentContainer>
-              <Title>Ajastukset</Title>
+              <Title>Jadwal</Title>
               <Divider />
 
               <ScheduledJobs />

@@ -67,7 +67,7 @@ export const transformApplicantSectionTitle = (
           sectionsWithIdentifier instanceof Array
             ? sectionsWithIdentifier[0]
             : sectionsWithIdentifier;
-        const typeText = identifiers?.LABEL || "Hakija";
+        const typeText = identifiers?.LABEL || "Pemohon";
         const nameText =
           identifiers?.NAME_FIELDS?.map((field) => {
             return sectionWithIdentifier.fields[field]?.value || "";
@@ -84,49 +84,49 @@ export const getApplicantInfoCheckFormName = (infoCheckId: number): string =>
 const APPLICATION_INFO_CHECK_DEFINITIONS = [
   {
     type: ApplicantInfoCheckTypes.TRADE_REGISTER,
-    label: "Kaupparekisteriote",
+    label: "Data badan usaha",
     useIfCompany: true,
     useIfPerson: false,
     external: ApplicantInfoCheckExternalTypes.TRADE_REGISTER_INQUIRY,
   },
   {
     type: ApplicantInfoCheckTypes.CREDITWORTHINESS,
-    label: "Luottokelpoisuustodistus / luottotiedot",
+    label: "Keterangan kelayakan kredit / data kredit",
     useIfCompany: true,
     useIfPerson: true,
     external: ApplicantInfoCheckExternalTypes.CREDIT_INQUIRY,
   },
   {
     type: ApplicantInfoCheckTypes.PENSION_CONTRIBUTIONS,
-    label: "Selvitys työeläkemaksujen maksamisesta",
+    label: "Bukti pembayaran iuran BPJS Ketenagakerjaan",
     useIfCompany: true,
     useIfPerson: true,
     external: null,
   },
   {
     type: ApplicantInfoCheckTypes.VAT_REGISTER,
-    label: "Todistus arvonlisärekisteriin lisäämisestä",
+    label: "Surat Pengukuhan Pengusaha Kena Pajak (PKP)",
     useIfCompany: true,
     useIfPerson: false,
     external: ApplicantInfoCheckExternalTypes.TRADE_REGISTER_INQUIRY,
   },
   {
     type: ApplicantInfoCheckTypes.ADVANCE_PAYMENT,
-    label: "Todistus ennakkoperintärekisteriin lisäämisestä",
+    label: "Bukti pembayaran angsuran PPh Pasal 25",
     useIfCompany: true,
     useIfPerson: false,
     external: ApplicantInfoCheckExternalTypes.TRADE_REGISTER_INQUIRY,
   },
   {
     type: ApplicantInfoCheckTypes.TAX_DEBT,
-    label: "Verovelkatodistus",
+    label: "Surat Keterangan Fiskal (SKF)",
     useIfCompany: true,
     useIfPerson: false,
     external: ApplicantInfoCheckExternalTypes.TRADE_REGISTER_INQUIRY,
   },
   {
     type: ApplicantInfoCheckTypes.EMPLOYER_REGISTER,
-    label: "Todistus työnantajarekisteriin lisäämisestä",
+    label: "Bukti Wajib Lapor Ketenagakerjaan (WLKP)",
     useIfCompany: true,
     useIfPerson: false,
     external: ApplicantInfoCheckExternalTypes.TRADE_REGISTER_INQUIRY,
@@ -494,7 +494,7 @@ export const prepareApplicationForSubmission = (
                 displayUIMessage(
                   {
                     title: "",
-                    body: "Hakijan henkilö- tai Y-tunnuksen käsittely epäonnistui!",
+                    body: "Pemrosesan NIK atau NPWP pemohon gagal!",
                   },
                   {
                     type: "error",

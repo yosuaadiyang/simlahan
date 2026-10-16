@@ -227,7 +227,7 @@ class SingleLeaseMap extends PureComponent<Props & WithRouterProps, State> {
             plotDivisionStateOptions={plotDivisionStateOptions}
           />
         ),
-        name: "Kaavayksiköt",
+        name: "Unit rencana",
       });
       layers.push({
         checked: false,
@@ -245,7 +245,7 @@ class SingleLeaseMap extends PureComponent<Props & WithRouterProps, State> {
             plotDivisionStateOptions={plotDivisionStateOptions}
           />
         ),
-        name: "Kaavayksiköt sopimuksessa",
+        name: "Unit rencana dalam kontrak",
       });
     }
 
@@ -261,7 +261,7 @@ class SingleLeaseMap extends PureComponent<Props & WithRouterProps, State> {
             typeOptions={plotTypeOptions}
           />
         ),
-        name: "Kiinteistöt/määräalat",
+        name: "Bidang tanah",
       });
       layers.push({
         checked: false,
@@ -274,7 +274,7 @@ class SingleLeaseMap extends PureComponent<Props & WithRouterProps, State> {
             typeOptions={plotTypeOptions}
           />
         ),
-        name: "Kiinteistöt/määräalat sopimuksessa",
+        name: "Bidang tanah dalam kontrak",
       });
     }
 
@@ -293,7 +293,7 @@ class SingleLeaseMap extends PureComponent<Props & WithRouterProps, State> {
             typeOptions={areaTypeOptions}
           />
         ),
-        name: "Vuokrakohteet",
+        name: "Objek sewa",
       });
     }
 
@@ -310,7 +310,7 @@ class SingleLeaseMap extends PureComponent<Props & WithRouterProps, State> {
             areaNotes={areaNotes}
           />
         ),
-        name: "Muistettavat ehdot",
+        name: "Catatan area",
       });
     }
 

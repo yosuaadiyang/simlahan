@@ -9,7 +9,7 @@ const CopyToClipboardIcon = ({ className }: Props) => (
     viewBox="0 0 21 21"
     className={classNames("icons", "icons__copy-to-clipboard", className)}
   >
-    <title>Kopio leikepöydälle</title>
+    <title>Salin ke papan klip</title>
     <g stroke="none" fill="none">
       <g id="Artboard" transform="translate(-614.000000, -334.000000)">
         <path

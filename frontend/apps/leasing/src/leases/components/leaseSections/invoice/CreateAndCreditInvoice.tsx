@@ -201,7 +201,7 @@ const CreateAndCreditInvoice: React.FC<Props> = ({ invoiceToCredit }) => {
           className={`${ButtonColors.NEUTRAL} no-margin`}
           disabled={!invoiceToCredit || isCreditInvoicePanelOpen}
           onClick={handleOpenCreditInvoicePanelButtonClick}
-          text="Hyvitä lasku"
+          text="Kreditkan tagihan"
         />
       </Authorization>
 
@@ -240,7 +240,7 @@ const CreateAndCreditInvoice: React.FC<Props> = ({ invoiceToCredit }) => {
                   invoiceToCredit.number,
                 )}
                 onClick={handleDelete}
-                text="Poista lasku"
+                text="Hapus tagihan"
               />
             </Authorization>
           );
@@ -276,7 +276,7 @@ const CreateAndCreditInvoice: React.FC<Props> = ({ invoiceToCredit }) => {
           <Column>
             <AddButton
               disabled={isCreateInvoicePanelOpen || !isInvoicingEnabled}
-              label="Luo lasku"
+              label="Buat tagihan"
               onClick={handleOpenCreateInvoicePanelButtonClick}
               style={{
                 marginTop: 15,

@@ -3,10 +3,6 @@ import Modal from "@/components/modal/Modal";
 import ModalButtonWrapper from "@/components/modal/ModalButtonWrapper";
 import Button from "@/components/button/Button";
 import AreaSearchApplicantInfoCheckForm from "@/areaSearch/components/infoCheck/AreaSearchApplicantInfoCheckForm";
-import TradeRegisterTemplate from "@/tradeRegister/components/TradeRegisterTemplate";
-import CreditDecisionTemplate from "@/creditDecision/components/CreditDecisionTemplate";
-import { ContactTypes } from "@/contacts/enums";
-import { ApplicantInfoCheckExternalTypes } from "@/application/enums";
 import type { AreaSearchApplicantInfoCheckFormProps } from "@/areaSearch/components/infoCheck/AreaSearchApplicantInfoCheckForm";
 
 type Props = {
@@ -59,7 +55,7 @@ class AreaSearchApplicantInfoCheckModal extends Component<Props, State> {
 
     if (infoCheck) {
       if (modalPage === 1) {
-        title = "Ulkoinen palvelu / " + infoCheck.kind.label;
+        title = "Layanan eksternal / " + infoCheck.kind.label;
       } else if (modalPage === 2) {
         title = infoCheck.kind.label;
       }
@@ -69,42 +65,18 @@ class AreaSearchApplicantInfoCheckModal extends Component<Props, State> {
       <Modal isOpen={isOpen} onClose={onClose} title={title}>
         {infoCheck && modalPage === 1 && (
           <div>
-            {infoCheck.kind.external ===
-              ApplicantInfoCheckExternalTypes.CREDIT_INQUIRY && (
-              <>
-                {businessId && (
-                  <CreditDecisionTemplate
-                    businessId={businessId}
-                    contactType={ContactTypes.BUSINESS}
-                  />
-                )}
-                {personId && (
-                  <CreditDecisionTemplate
-                    nin={personId}
-                    contactType={ContactTypes.PERSON}
-                  />
-                )}
-              </>
-            )}
-            {infoCheck.kind.external ===
-              ApplicantInfoCheckExternalTypes.TRADE_REGISTER_INQUIRY && (
-              <>
-                {businessId ? (
-                  <TradeRegisterTemplate businessId={businessId} />
-                ) : (
-                  <div className="alert">
-                    Kaupparekisteriotetta ei voi hakea henkilöhakijalle.
-                  </div>
-                )}
-              </>
-            )}
+            <div className="alert">
+              Lakukan pemeriksaan ini secara manual melalui layanan resmi (mis.
+              OSS untuk NIB, DJP Online untuk status pajak, BPJS
+              Ketenagakerjaan), lalu catat hasilnya pada langkah berikutnya.
+            </div>
             {!businessId && !personId && (
               <div className="alert">
-                Hakemuksen osiosta ei löytynyt hakijan tunnistetietoa!
+                Identitas pemohon tidak ditemukan pada bagian permohonan!
               </div>
             )}
             <ModalButtonWrapper>
-              <Button onClick={() => setPage(2)} text="Jatka" />
+              <Button onClick={() => setPage(2)} text="Lanjutkan" />
             </ModalButtonWrapper>
           </div>
         )}

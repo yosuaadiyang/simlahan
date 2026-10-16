@@ -78,7 +78,7 @@ const RentAdjustments: React.FC<Props> = ({ rentAdjustments }) => {
   return (
     <BoxItemContainer>
       {(!rentAdjustments || !rentAdjustments.length) && (
-        <FormText>Ei alennuksia tai korotuksia</FormText>
+        <FormText>Tidak ada potongan atau kenaikan</FormText>
       )}
 
       {rentAdjustments &&
@@ -234,7 +234,7 @@ const RentAdjustments: React.FC<Props> = ({ rentAdjustments }) => {
                         </FormTextTitle>
                         <FormText>
                           {adjustment.amount_left
-                            ? `${formatNumber(adjustment.amount_left)} €`
+                            ? `Rp ${formatNumber(adjustment.amount_left)}`
                             : "-"}
                         </FormText>
                       </>
@@ -335,7 +335,7 @@ const RentAdjustments: React.FC<Props> = ({ rentAdjustments }) => {
                           </SubTitle>
                           {!managementSubventions ||
                             (!managementSubventions.length && (
-                              <FormText>Ei hallintamuotoja</FormText>
+                              <FormText>Tidak ada bentuk pengelolaan</FormText>
                             ))}
                           {managementSubventions &&
                             managementSubventions.length && (
@@ -524,7 +524,7 @@ const RentAdjustments: React.FC<Props> = ({ rentAdjustments }) => {
                         </SubTitle>
                         {!temporarySubventions ||
                           (!temporarySubventions.length && (
-                            <FormText>Ei tilapäisalennuksia</FormText>
+                            <FormText>Tidak ada potongan sementara</FormText>
                           ))}
                         {temporarySubventions &&
                           temporarySubventions.length && (
@@ -612,7 +612,7 @@ const RentAdjustments: React.FC<Props> = ({ rentAdjustments }) => {
                     </Row>
                     <Row>
                       <Column small={6} medium={4} large={2}>
-                        <FormText className="semibold">Yhteensä</FormText>
+                        <FormText className="semibold">Total</FormText>
                       </Column>
                       <Column small={6} medium={4} large={2}>
                         <FormText className="semibold">

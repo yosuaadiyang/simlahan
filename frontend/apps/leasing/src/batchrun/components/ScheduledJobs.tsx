@@ -108,7 +108,7 @@ const ScheduledJobs: React.FC = () => {
                 whiteSpace: "nowrap",
               }}
             >
-              Käytössä
+              Digunakan
             </FormText>
           ) : (
             <FormText
@@ -117,7 +117,7 @@ const ScheduledJobs: React.FC = () => {
                 whiteSpace: "nowrap",
               }}
             >
-              Ei käytössä
+              Tidak digunakan
             </FormText>
           ),
         style: {

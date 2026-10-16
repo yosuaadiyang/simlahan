@@ -265,7 +265,7 @@ const renderRentShares = ({
                               <RemoveButton
                                 className="third-level"
                                 onClick={handleRemove}
-                                title="Poista laskutusosuus"
+                                title="Hapus porsi tagihan"
                               />
                             </Authorization>
                           }
@@ -286,7 +286,7 @@ const renderRentShares = ({
                 <Row>
                   <Column>
                     <AddButtonThird
-                      label="Lisää laskutusosuus"
+                      label="Tambah porsi tagihan"
                       onClick={handleAdd}
                     />
                   </Column>
@@ -373,8 +373,8 @@ const renderOtherTenants = ({
                       className="no-top-margin"
                       label={
                         contactType === TenantContactType.BILLING
-                          ? "Lisää laskunsaaja"
-                          : "Lisää yhteyshenkilö"
+                          ? "Tambah penerima tagihan"
+                          : "Tambah narahubung"
                       }
                       onClick={handleAdd}
                     />
@@ -515,7 +515,7 @@ const TenantItemEdit: React.FC<Props> = ({
                 }
               >
                 <CollapseHeaderSubtitle>
-                  <span>Välillä:</span>
+                  <span>Antara:</span>
                   {formatDateRange(
                     get(savedTenant, "tenant.start_date"),
                     get(savedTenant, "tenant.end_date"),
@@ -581,7 +581,7 @@ const TenantItemEdit: React.FC<Props> = ({
                 >
                   <div className="contact-buttons-wrapper">
                     <AddButtonThird
-                      label="Luo asiakas"
+                      label="Buat kontak"
                       onClick={handleAddClick}
                     />
                   </div>
@@ -802,14 +802,14 @@ const TenantItemEdit: React.FC<Props> = ({
         <>
           {!!contact && (
             <SubTitle>
-              Asiakkaan tiedot
+              Data kontak
               <Authorization
                 allow={isMethodAllowed(contactMethods, Methods.PATCH)}
               >
                 <EditButton
                   className="inline-button"
                   onClick={handleEditClick}
-                  title="Muokkaa asiakasta"
+                  title="Ubah kontak"
                 />
               </Authorization>
             </SubTitle>

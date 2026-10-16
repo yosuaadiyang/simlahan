@@ -4,7 +4,7 @@ type Props = {
   onClick: (...args: Array<any>) => any;
 };
 
-const MapLinkButton = ({ label = "Kartta", onClick }: Props) => (
+const MapLinkButton = ({ label = "Peta", onClick }: Props) => (
   <a
     className="map-link-button"
     role="button"

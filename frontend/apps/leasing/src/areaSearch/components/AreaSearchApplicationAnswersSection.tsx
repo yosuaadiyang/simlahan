@@ -19,8 +19,7 @@ import { isArray } from "lodash-es";
 type Props = {
   section: FormSection;
   answerSection:
-    | SavedApplicationFormSection
-    | Array<SavedApplicationFormSection>;
+    SavedApplicationFormSection | Array<SavedApplicationFormSection>;
   topLevel?: boolean;
   fieldTypes: any;
   sectionExtraComponent?: React.ComponentType<SectionExtraComponentProps>;
@@ -53,7 +52,7 @@ const AreaSearchApplicationAnswersSection = ({
       answerSection,
     );
 
-  const title = section.title || "(tuntematon osio)";
+  const title = section.title || "(bagian tidak dikenal)";
   const Wrapper = topLevel
     ? ({ children }) => (
         <Collapse defaultOpen={true} headerTitle={title}>
@@ -66,7 +65,7 @@ const AreaSearchApplicationAnswersSection = ({
             <SubTitle>{title}</SubTitle>
             {isCreateContactButtonVisible && (
               <AddButtonThird
-                label="Luo asiakas"
+                label="Buat kontak"
                 onClick={() =>
                   handleShowContactModal(
                     contactType,

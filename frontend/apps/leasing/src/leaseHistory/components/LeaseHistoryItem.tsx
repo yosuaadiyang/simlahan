@@ -149,7 +149,7 @@ const LeaseHistoryItem = ({
                   )}
                 </p>
                 {receivedAt && (
-                  <FormText>Saapunut {formatDate(receivedAt)}</FormText>
+                  <FormText>Diterima {formatDate(receivedAt)}</FormText>
                 )}
                 {(startDate || endDate) && (
                   <FormText>
@@ -175,7 +175,7 @@ const LeaseHistoryItem = ({
                     <RemoveButton
                       className="related-leases-item_remove-button"
                       onClick={handleDelete}
-                      title="Poista liitos"
+                      title="Hapus keterkaitan"
                     />
                   )}
                 </Authorization>

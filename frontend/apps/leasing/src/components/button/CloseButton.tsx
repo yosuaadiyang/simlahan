@@ -33,7 +33,7 @@ const CloseButton = ({
   return (
     <button
       ref={handleSetReference}
-      aria-label="Sulje"
+      aria-label="Tutup"
       className={classNames("close-button-component", className)}
       type={type}
       title={title}
@@ -42,7 +42,7 @@ const CloseButton = ({
     >
       <i
         className={classNames(".close-button-component.i", className)}
-        aria-label="Poista"
+        aria-label="Hapus"
       />
     </button>
   );

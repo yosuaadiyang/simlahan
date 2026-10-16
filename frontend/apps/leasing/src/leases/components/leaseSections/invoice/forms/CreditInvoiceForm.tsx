@@ -107,7 +107,7 @@ const CreditInvoiceForm = ({
         <form onSubmit={handleSubmit} className="invoice__credit-invoice_form">
           <WhiteBox>
             <BoxContentWrapper>
-              <h3>Hyvitys</h3>
+              <h3>Kredit</h3>
               <CloseButton className="position-topright" onClick={onClose} />
 
               <Row>
@@ -117,7 +117,7 @@ const CreditInvoiceForm = ({
                     fieldAttributes={{
                       type: "choice",
                       required: true,
-                      label: "Hyvityksen tyyppi",
+                      label: "Jenis kredit",
                       read_only: false,
                     }}
                     name="type"
@@ -173,12 +173,12 @@ const CreditInvoiceForm = ({
                         type: "decimal",
                         required: true,
                         read_only: false,
-                        label: "Hyvitettävä summa (alviton)",
+                        label: "Jumlah dikreditkan (tanpa PPN)",
                         decimal_places: 2,
                         max_digits: 10,
                       }}
                       name="amount"
-                      unit="€"
+                      unit="Rp"
                       enableUiDataEdit
                       tooltipStyle={{
                         right: 12,
@@ -220,13 +220,13 @@ const CreditInvoiceForm = ({
                     <Button
                       className={ButtonColors.SECONDARY}
                       onClick={onClose}
-                      text="Peruuta"
+                      text="Batal"
                     />
                     <Button
                       className={ButtonColors.SUCCESS}
                       disabled={isCreditClicked || !valid}
                       type="submit"
-                      text="Tallenna"
+                      text="Simpan"
                     />
                   </div>
                 </Column>

@@ -16,8 +16,8 @@ export const InfillDevelopmentCompensationAttachmentFieldPaths = {
  * @enum {string}
  */
 export const InfillDevelopmentCompensationAttachmentFieldTitles = {
-  ATTACHMENTS: "Liitetiedostot",
-  FILE: "Tiedoston nimi",
-  UPLOADED_AT: "Ladattu",
-  UPLOADER: "Lataaja",
+  ATTACHMENTS: "Lampiran",
+  FILE: "Nama berkas",
+  UPLOADED_AT: "Diunggah",
+  UPLOADER: "Pengunggah",
 };

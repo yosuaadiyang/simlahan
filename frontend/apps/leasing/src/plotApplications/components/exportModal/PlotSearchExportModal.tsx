@@ -42,22 +42,22 @@ export const ExportModes = {
 const ModalDetailColumns: Record<string, Column> = {
   CHECKBOX: {
     key: "checkbox",
-    text: "Tulosta",
+    text: "Cetak",
     sortable: false,
   },
   IDENTIFIER: {
     key: "application_identifier",
-    text: "Hakemustunnus",
+    text: "Nomor permohonan",
     sortable: false,
   },
   TARGET: {
     key: "target_identifier",
-    text: "Kohteen tunnus",
+    text: "Pengenal objek",
     sortable: false,
   },
   APPLICANT: {
     key: "applicants",
-    text: "Hakija",
+    text: "Pemohon",
     sortable: false,
   },
 };
@@ -125,8 +125,8 @@ class PlotSearchExportModal extends Component<Props> {
     } = this.props;
     let guideText: JSX.Element = (
       <p>
-        Voit tulostaa hakemuksien tietoja tiedostoon. Aloita valitsemalla
-        tulostusalue.
+        Anda dapat mencetak data permohonan ke berkas. Mulailah dengan memilih
+        cakupan cetak.
       </p>
     );
     let columns: Array<Column> = [];
@@ -137,9 +137,9 @@ class PlotSearchExportModal extends Component<Props> {
         case ExportModes.BASIC_DATA_XLS:
           guideText = (
             <p>
-              Tulostus sisältää taulukkomuodossa kaikki tonttihaun perustiedot,
-              haettavan kohteen tiedot sekä hakemuksen tiedot käsittelijän
-              tiedoilla.
+              Hasil cetak berisi seluruh data dasar pencarian kavling dalam
+              bentuk tabel, data objek yang dimohon, serta data permohonan
+              beserta data petugas.
             </p>
           );
           downloadUrl = createUrl(
@@ -150,8 +150,8 @@ class PlotSearchExportModal extends Component<Props> {
         case ExportModes.APPLICATIONS_PDF:
           guideText = (
             <p>
-              Tulostus sisältää .pdf-muodossa yhden tai usean hakemuksen
-              liitteineen.
+              Hasil cetak berisi satu atau beberapa permohonan beserta
+              lampirannya dalam format .pdf.
             </p>
           );
           columns = [
@@ -172,8 +172,8 @@ class PlotSearchExportModal extends Component<Props> {
         case ExportModes.APPLICATIONS_BY_TARGET_PDF:
           guideText = (
             <p>
-              Tulostus sisältää .pdf-muodossa yhden kohteen kaikki hakemukset
-              liitteineen.
+              Hasil cetak berisi seluruh permohonan satu objek beserta
+              lampirannya dalam format .pdf.
             </p>
           );
           columns = [
@@ -194,8 +194,8 @@ class PlotSearchExportModal extends Component<Props> {
         case ExportModes.APPLICATIONS_BY_APPLICANT_PDF:
           guideText = (
             <p>
-              Tulostus sisältää .pdf-muodossa yhden hakijan kaikki hakemukset
-              liitteineen.
+              Hasil cetak berisi seluruh permohonan satu pemohon beserta
+              lampirannya dalam format .pdf.
             </p>
           );
           columns = [
@@ -222,7 +222,7 @@ class PlotSearchExportModal extends Component<Props> {
       <Modal
         isOpen={isOpen}
         onClose={onClose}
-        title="Tulosta tiedostoon"
+        title="Cetak ke berkas"
         className="PlotSearchExportModal"
       >
         <FormFieldLegacy
@@ -231,23 +231,23 @@ class PlotSearchExportModal extends Component<Props> {
             type: FieldTypes.CHOICE,
             required: false,
             read_only: false,
-            label: "Tulostusalue",
+            label: "Cakupan cetak",
             choices: [
               {
                 value: ExportModes.APPLICATIONS_PDF,
-                display_name: "Tulosta hakemukset (PDF)",
+                display_name: "Cetak permohonan (PDF)",
               },
               {
                 value: ExportModes.APPLICATIONS_BY_TARGET_PDF,
-                display_name: "Tulosta hakemukset kohteittain (PDF)",
+                display_name: "Cetak permohonan per objek (PDF)",
               },
               {
                 value: ExportModes.APPLICATIONS_BY_APPLICANT_PDF,
-                display_name: "Tulosta hakemukset hakijoittain (PDF)",
+                display_name: "Cetak permohonan per pemohon (PDF)",
               },
               {
                 value: ExportModes.BASIC_DATA_XLS,
-                display_name: "Tulosta tonttihaun perustiedot (XLS)",
+                display_name: "Cetak data dasar pencarian kavling (XLS)",
               },
             ],
           }}
@@ -277,12 +277,12 @@ class PlotSearchExportModal extends Component<Props> {
           <Button
             className={ButtonColors.SECONDARY}
             onClick={onClose}
-            text="Peruuta"
+            text="Batal"
           />
           <FileDownloadButton
             disabled={!selectedMode || !downloadUrl}
             url={downloadUrl}
-            label="Tulosta"
+            label="Cetak"
             onSuccess={() => onClose()}
           />
         </ModalButtonWrapper>

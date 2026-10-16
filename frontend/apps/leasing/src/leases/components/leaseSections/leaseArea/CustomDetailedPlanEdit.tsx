@@ -122,7 +122,7 @@ const UsageDistributions = ({
                             {fields.length > 1 && (
                               <RemoveButton
                                 onClick={handleRemove}
-                                title="Poista käyttöjakauma"
+                                title="Hapus distribusi penggunaan"
                               />
                             )}
                           </Authorization>
@@ -303,7 +303,7 @@ const InfoLinks = ({
                           >
                             <RemoveButton
                               onClick={handleRemove}
-                              title="Poista lisätietolinkki"
+                              title="Hapus tautan informasi"
                             />
                           </Authorization>
                         </ActionButtonWrapper>
@@ -441,7 +441,10 @@ const CustomDetailedPlanEdit: React.FC<Props> = ({ field, onRemove }) => {
               UsersPermissions.DELETE_CUSTOMDETAILEDPLAN,
             )}
           >
-            <RemoveButton onClick={onRemove} title="Poista oma muu alue" />
+            <RemoveButton
+              onClick={onRemove}
+              title="Hapus area lain milik sendiri"
+            />
           </Authorization>
         </ActionButtonWrapper>
         <Row>
@@ -744,10 +747,10 @@ const CustomDetailedPlanEdit: React.FC<Props> = ({ field, onRemove }) => {
                 {(fieldArrayProps) =>
                   UsageDistributions({
                     ...fieldArrayProps,
-                    buttonTitle: "Lisää käyttöjakauma",
+                    buttonTitle: "Tambah distribusi penggunaan",
                     errors: { errors },
-                    noDataText: "Ei käyttöjakaumia",
-                    title: "Käyttöjakaumat",
+                    noDataText: "Tidak ada distribusi penggunaan",
+                    title: "Distribusi penggunaan",
                     uiDataKey: getUiDataLeaseKey(
                       LeaseAreaCustomDetailedPlanFieldPaths.USAGE_DISTRIBUTIONS,
                     ),
@@ -770,10 +773,10 @@ const CustomDetailedPlanEdit: React.FC<Props> = ({ field, onRemove }) => {
                 {(fieldArrayProps) =>
                   InfoLinks({
                     ...fieldArrayProps,
-                    buttonTitle: "Lisää lisätietolinkki",
+                    buttonTitle: "Tambah tautan informasi",
                     errors: { errors },
-                    noDataText: "Ei lisätietolinkkejä",
-                    title: "Lisätietolinkit",
+                    noDataText: "Tidak ada tautan informasi",
+                    title: "Tautan informasi",
                     uiDataKey: getUiDataLeaseKey(
                       LeaseAreaCustomDetailedPlanFieldPaths.INFO_LINKS,
                     ),

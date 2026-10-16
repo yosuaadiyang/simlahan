@@ -238,7 +238,7 @@ const ApplicationFormFileField = connect(
                   <Authorization
                     allow={isFieldAllowedToRead(attachmentAttributes, "name")}
                   >
-                    <FormTextTitle>Tiedoston nimi</FormTextTitle>
+                    <FormTextTitle>Nama berkas</FormTextTitle>
                   </Authorization>
                 </Column>
                 <Column small={3} large={3}>
@@ -248,7 +248,7 @@ const ApplicationFormFileField = connect(
                       "created_at",
                     )}
                   >
-                    <FormTextTitle>{"Ladattu"}</FormTextTitle>
+                    <FormTextTitle>{"Diunggah"}</FormTextTitle>
                   </Authorization>
                 </Column>
               </Row>
@@ -294,7 +294,7 @@ const ApplicationFormFileField = connect(
                           style={{
                             right: 12,
                           }}
-                          title="Poista liitetiedosto"
+                          title="Hapus lampiran"
                           disabled={busy}
                         />
                       </Authorization>
@@ -305,7 +305,7 @@ const ApplicationFormFileField = connect(
             {uploads.length === 0 && !busy && (
               <Row>
                 <Column small={12}>
-                  <FormHintText>Ei lisättyjä liitteitä.</FormHintText>
+                  <FormHintText>Belum ada lampiran.</FormHintText>
                 </Column>
               </Row>
             )}
@@ -316,7 +316,7 @@ const ApplicationFormFileField = connect(
                 <LoadingIndicator />
               ) : (
                 <AddFileButton
-                  label="Lisää tiedosto"
+                  label="Tambah berkas"
                   name={fieldName}
                   onChange={(e) => submitFile(field.id, e)}
                 />
@@ -608,7 +608,7 @@ const ApplicationFormSubsectionFieldArray = ({
               getSectionTemplate(formName, formPath, section.identifier),
             )
           }
-          label={section.add_new_text || "Lisää uusi"}
+          label={section.add_new_text || "Tambah baru"}
         />
       )}
     </div>
@@ -661,7 +661,7 @@ const AreaSearchApplicationSubsection = ({
 
   const isArray = section.add_new_allowed;
   const pathName = [...path, section.identifier].join(".");
-  const title = section.title || "(tuntematon osio)";
+  const title = section.title || "(bagian tidak dikenal)";
   return (
     <div className="ApplicationFormSubsection">
       {isArray ? (

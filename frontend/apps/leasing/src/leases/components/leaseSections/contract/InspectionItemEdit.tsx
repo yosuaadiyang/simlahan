@@ -98,7 +98,7 @@ const InspectionItemEdit: React.FC<Props> = ({
                   UsersPermissions.DELETE_INSPECTION,
                 )}
               >
-                <RemoveButton onClick={onRemove} title="Poista tarkastus" />
+                <RemoveButton onClick={onRemove} title="Hapus pemeriksaan" />
               </Authorization>
             </ActionButtonWrapper>
             <Row>
@@ -225,7 +225,7 @@ const InspectionItemEdit: React.FC<Props> = ({
                     UsersPermissions.ADD_INSPECTIONATTACHMENT,
                   ) &&
                     !inspectionAttachments.length && (
-                      <FormText>Ei tiedostoja</FormText>
+                      <FormText>Tidak ada berkas</FormText>
                     )}
 
                   {!!inspectionAttachments.length && (
@@ -342,7 +342,7 @@ const InspectionItemEdit: React.FC<Props> = ({
                                     right: 12,
                                     height: "unset",
                                   }}
-                                  title="Poista liitetiedosto"
+                                  title="Hapus lampiran"
                                 />
                               </Authorization>
                             </Column>
@@ -359,7 +359,7 @@ const InspectionItemEdit: React.FC<Props> = ({
                     )}
                   >
                     <AddFileButton
-                      label="Lisää tiedosto"
+                      label="Tambah berkas"
                       name={`add_inspection_attachment_button_${inspectionId}`}
                       onChange={handleAddInspectionAttachment}
                     />

@@ -17,9 +17,9 @@ export const PenaltyInterestFieldPaths = {
  * @enum {string}
  */
 export const PenaltyInterestFieldTitles = {
-  COLLECTION_CHARGE: "Perimispalkkio",
-  INVOICE: "Perittävä lasku",
-  OUTSTANDING_AMOUNT: "Perittävä maksuerä",
-  TOTAL: "Yhteensä",
-  TOTAL_INTEREST_AMOUNT: "Korko",
+  COLLECTION_CHARGE: "Biaya penagihan",
+  INVOICE: "Tagihan yang ditagihkan",
+  OUTSTANDING_AMOUNT: "Angsuran yang ditagihkan",
+  TOTAL: "Total",
+  TOTAL_INTEREST_AMOUNT: "Bunga",
 };

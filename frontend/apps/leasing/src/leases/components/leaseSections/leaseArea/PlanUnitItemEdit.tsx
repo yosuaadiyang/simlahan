@@ -67,7 +67,7 @@ const PlanUnitItemEdit: React.FC<Props> = ({ field, onRemove }) => {
               UsersPermissions.DELETE_PLANUNIT,
             )}
           >
-            <RemoveButton onClick={onRemove} title="Poista kaavayksikkö" />
+            <RemoveButton onClick={onRemove} title="Hapus unit rencana" />
           </Authorization>
         </ActionButtonWrapper>
         <Row>

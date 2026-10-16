@@ -151,13 +151,13 @@ class PlotApplication extends PureComponent<Props> {
     );
     return (
       <div className="PlotApplication">
-        <Title>Hakemus</Title>
+        <Title>Permohonan</Title>
         <Divider />
         <Loader isLoading={isLoading} />
         <Row className="summary__content-wrapper">
           <Column small={12}>
             {plotApplication.opening_record && (
-              <Collapse defaultOpen={true} headerTitle="Hakemuksen avaaminen">
+              <Collapse defaultOpen={true} headerTitle="Pembukaan permohonan">
                 <Row>
                   <Authorization
                     allow={isFieldAllowedToRead(
@@ -257,7 +257,7 @@ class PlotApplication extends PureComponent<Props> {
                   ? applicationCollapseState
                   : true
               }
-              headerTitle="Hakemuksen käsittelytiedot"
+              headerTitle="Data pemrosesan permohonan"
               onToggle={this.handleBasicInfoCollapseToggle}
             >
               <Row>
@@ -265,7 +265,7 @@ class PlotApplication extends PureComponent<Props> {
                   allow={isFieldAllowedToRead(attributes, "plot_search")}
                 >
                   <Column small={12} medium={6} large={4}>
-                    <FormTextTitle>Tonttihakemus</FormTextTitle>
+                    <FormTextTitle>Permohonan kavling</FormTextTitle>
                     <FormText>{plotApplication.plot_search}</FormText>
                   </Column>
                 </Authorization>
@@ -273,13 +273,13 @@ class PlotApplication extends PureComponent<Props> {
                   allow={isFieldAllowedToRead(attributes, "arrival_time")}
                 >
                   <Column small={6} medium={4} large={2}>
-                    <FormTextTitle>Saapumisajankohta</FormTextTitle>
+                    <FormTextTitle>Waktu kedatangan</FormTextTitle>
                     <FormText>{plotApplication.arrival_time}</FormText>
                   </Column>
                 </Authorization>
                 <Authorization allow={isFieldAllowedToRead(attributes, "time")}>
                   <Column small={6} medium={4} large={2}>
-                    <FormTextTitle>Klo</FormTextTitle>
+                    <FormTextTitle>Pukul</FormTextTitle>
                     <FormText>{plotApplication.time}</FormText>
                   </Column>
                 </Authorization>
@@ -287,7 +287,7 @@ class PlotApplication extends PureComponent<Props> {
                   allow={isFieldAllowedToRead(attributes, "saver")}
                 >
                   <Column small={6} medium={4} large={2}>
-                    <FormTextTitle>Tallentaja</FormTextTitle>
+                    <FormTextTitle>Penyimpan</FormTextTitle>
                     <FormText>{plotApplication.saver}</FormText>
                   </Column>
                 </Authorization>
@@ -295,7 +295,7 @@ class PlotApplication extends PureComponent<Props> {
                   allow={isFieldAllowedToRead(attributes, "disapproval_reason")}
                 >
                   <Column small={6} medium={4} large={2}>
-                    <FormTextTitle>Hylkäämisen syy</FormTextTitle>
+                    <FormTextTitle>Alasan penolakan</FormTextTitle>
                     <FormText>{plotApplication.disapproval_reason}</FormText>
                   </Column>
                 </Authorization>
@@ -303,7 +303,7 @@ class PlotApplication extends PureComponent<Props> {
                   allow={isFieldAllowedToRead(attributes, "notice")}
                 >
                   <Column small={6} medium={4} large={2}>
-                    <FormTextTitle>Huomautus</FormTextTitle>
+                    <FormTextTitle>Catatan</FormTextTitle>
                     <FormText>{plotApplication.notice}</FormText>
                   </Column>
                 </Authorization>

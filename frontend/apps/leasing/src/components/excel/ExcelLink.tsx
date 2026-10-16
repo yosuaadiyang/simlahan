@@ -25,7 +25,7 @@ class ExcelLink extends PureComponent<Props, State> {
   handleClick = () => {
     const {
       apiToken,
-      fileName = "Raportti",
+      fileName = "Laporan",
       identifier,
       url,
       query,
@@ -65,7 +65,7 @@ class ExcelLink extends PureComponent<Props, State> {
             displayUIMessage(
               {
                 title: "",
-                body: "Tiedoston lataaminen epäonnistui",
+                body: "Pengunduhan berkas gagal",
               },
               {
                 type: "error",
@@ -80,7 +80,7 @@ class ExcelLink extends PureComponent<Props, State> {
         displayUIMessage(
           {
             title: "",
-            body: "Tiedoston lataaminen epäonnistui",
+            body: "Pengunduhan berkas gagal",
           },
           {
             type: "error",

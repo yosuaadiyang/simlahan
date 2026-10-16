@@ -11,7 +11,7 @@ const TrashIcon = ({
     className={classNames("icons", "icons__trash", className)}
     viewBox="0 0 20 20"
   >
-    <title>Poista</title>
+    <title>Hapus</title>
     <g stroke="none" strokeWidth="1" fill="none">
       <g id="Artboard" transform="translate(-397.000000, -211.000000)">
         <g transform="translate(397.000000, 211.000000)">

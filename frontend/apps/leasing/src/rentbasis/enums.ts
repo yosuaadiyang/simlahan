@@ -25,19 +25,19 @@ export const RentBasisFieldPaths = {
  * @enum {string}
  */
 export const RentBasisFieldTitles = {
-  IDENTIFIER: "Vuokrausperiaatetunnus",
-  BASIC_INFO: "Perustiedot",
-  DETAILED_PLAN_IDENTIFIER: "Asemakaava",
-  END_DATE: "Loppupvm",
-  FINANCING: "Rahoitusmuoto",
-  GEOMETRY: "Karttalinkki",
-  INDEX: "Indeksi",
-  LEASE_RIGHTS_END_DATE: "Vuokraoikeus päättyy",
-  MANAGEMENT: "Hallintamuoto",
-  MAP: "Kartta",
-  NOTE: "Huomautus",
-  PLOT_TYPE: "Tonttityyppi",
-  START_DATE: "Alkupvm",
+  IDENTIFIER: "Pengenal prinsip sewa",
+  BASIC_INFO: "Data dasar",
+  DETAILED_PLAN_IDENTIFIER: "Rencana detail",
+  END_DATE: "Tgl akhir",
+  FINANCING: "Bentuk pembiayaan",
+  GEOMETRY: "Tautan peta",
+  INDEX: "Indeks",
+  LEASE_RIGHTS_END_DATE: "Hak sewa berakhir",
+  MANAGEMENT: "Bentuk pengelolaan",
+  MAP: "Peta",
+  NOTE: "Catatan",
+  PLOT_TYPE: "Jenis kavling",
+  START_DATE: "Tgl mulai",
 };
 
 /**
@@ -56,8 +56,8 @@ export const RentBasisPropertyIdentifiersFieldPaths = {
  * @enum {string}
  */
 export const RentBasisPropertyIdentifiersFieldTitles = {
-  PROPERTY_IDENTIFIERS: "Kiinteistötunnukset",
-  IDENTIFIER: "Kiinteistötunnus",
+  PROPERTY_IDENTIFIERS: "Pengenal bidang (NIB)",
+  IDENTIFIER: "Pengenal bidang (NIB)",
 };
 
 /**
@@ -79,11 +79,11 @@ export const RentBasisDecisionsFieldPaths = {
  * @enum {string}
  */
 export const RentBasisDecisionsFieldTitles = {
-  DECISIONS: "Päätökset",
-  DECISION_DATE: "Pvm",
-  DECISION_MAKER: "Päättäjä",
-  REFERENCE_NUMBER: "Hel diaarinumero",
-  SECTION: "Pykälä",
+  DECISIONS: "Keputusan",
+  DECISION_DATE: "Tgl",
+  DECISION_MAKER: "Pengambil keputusan",
+  REFERENCE_NUMBER: "Nomor agenda",
+  SECTION: "Pasal",
 };
 
 /**
@@ -104,8 +104,8 @@ export const RentBasisRentRatesFieldPaths = {
  * @enum {string}
  */
 export const RentBasisRentRatesFieldTitles = {
-  RENT_RATES: "Hinnat",
-  AMOUNT: "Euroa",
-  AREA_UNIT: "Yksikkö",
-  BUILD_PERMISSION_TYPE: "Pääkäyttötarkoitus",
+  RENT_RATES: "Harga",
+  AMOUNT: "Rupiah",
+  AREA_UNIT: "Satuan",
+  BUILD_PERMISSION_TYPE: "Peruntukan utama",
 };

@@ -231,7 +231,7 @@ class CommentPanel extends PureComponent<Props, State> {
         <div hidden={!isOpen && !isClosing && !isOpening}>
           <div className="comment-panel__wrapper">
             <div className="comment-panel__title">
-              <h1>Kommentit</h1>
+              <h1>Komentar</h1>
               <ModalConsumer>
                 {({ modalDispatch }) => {
                   const isAnyCommentEditOpen = () => {
@@ -270,7 +270,7 @@ class CommentPanel extends PureComponent<Props, State> {
                     <CloseButton
                       className="position-topright"
                       onClick={handleClose}
-                      title="Sulje"
+                      title="Tutup"
                     />
                   );
                 }}
@@ -291,11 +291,13 @@ class CommentPanel extends PureComponent<Props, State> {
               topicOptions &&
               !!topicOptions.length && (
                 <div className="comment-panel__filters">
-                  <span className="comment-panel__filters-title">Suodatus</span>
+                  <span className="comment-panel__filters-title">
+                    Penyaringan
+                  </span>
 
                   <CheckboxInput
                     checkboxName="checkbox-buttons-document-type"
-                    legend="Suodata kommentteja"
+                    legend="Saring komentar"
                     onChange={this.handleFilterChange}
                     options={topicOptions}
                     value={selectedTopics}
@@ -306,7 +308,7 @@ class CommentPanel extends PureComponent<Props, State> {
             {!filteredComments ||
               (!filteredComments.length && (
                 <div className="comment-panel__comments">
-                  <FormText>Ei kommentteja</FormText>
+                  <FormText>Tidak ada komentar</FormText>
                 </div>
               ))}
             {filteredComments && !!filteredComments.length && (

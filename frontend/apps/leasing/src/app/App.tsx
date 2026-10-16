@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { withRouterLegacy } from "@/root/withRouterLegacy";
-import { useLocation, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { flowRight, get } from "lodash-es";
 import { setNavigate } from "@/root/navigationService";
 import { ActionTypes, ModalConsumer, ModalProvider } from "@/app/ModalContext";
@@ -13,7 +13,6 @@ import useAuth from "@/auth/useAuth";
 import LoginPage from "@/auth/components/LoginPage";
 import SideMenu from "@/components/sideMenu/SideMenu";
 import TopNavigation from "@/components/topNavigation/TopNavigation";
-import { Routes, getRouteById } from "@/root/routes";
 import { clearError } from "@/api/slice";
 import { getError } from "@/api/selectors";
 import { getLoggedInUser } from "@/auth/selectors";
@@ -36,8 +35,7 @@ import type {
 import type { RootState } from "@/root/types";
 import "@/main.scss";
 
-const url = window.location.toString();
-const IS_DEVELOPMENT_URL = url.includes("ninja") || url.includes("localhost");
+const IS_DEVELOPMENT_URL = import.meta.env.VITE_SHOW_DEV_BANNER === "true";
 type OwnProps = {
   children: JSX.Element;
 };
@@ -56,28 +54,18 @@ type State = {
   displaySideMenu: boolean;
   loggedIn: boolean;
   displayUserGroups: boolean;
-  isLoggingIn: boolean;
 };
 
 const App: React.FC<Props> = (props) => {
-  const location = useLocation();
   const [displaySideMenu, setDisplaySideMenu] =
     useState<State["displaySideMenu"]>(false);
   const [displayUserGroups, setDisplayUserGroups] =
     useState<State["displayUserGroups"]>(false);
-  const [isLoggingIn, setIsLoggingIn] = useState<State["isLoggingIn"]>(false);
-  const { loggedIn, authenticatedUser, login, logout } = useAuth();
+  const { loggedIn, isRestoring, authenticatedUser, login, logout } = useAuth();
   const navigate = useNavigate();
   useEffect(() => {
     setNavigate(navigate);
   }, [navigate]);
-
-  const handleLogin = () => {
-    const { pathname, search } = location;
-    const redirectPath = `${pathname}${search}`;
-    setIsLoggingIn(true);
-    login(redirectPath);
-  };
 
   const logOut = () => {
     logout();
@@ -119,10 +107,11 @@ const App: React.FC<Props> = (props) => {
           handleDismiss={handleDismissErrorModal}
         />
 
-        <LoginPage buttonDisabled={isLoggingIn} onLoginClick={handleLogin} />
-        <Loader isLoading={!loggedIn && isLoggingIn} />
-
-        {location.pathname === getRouteById(Routes.CALLBACK) && children}
+        {isRestoring ? (
+          <Loader isLoading={true} />
+        ) : (
+          <LoginPage onLogin={login} />
+        )}
       </div>
     );
   }
@@ -186,9 +175,9 @@ const App: React.FC<Props> = (props) => {
 
               {displayUserGroups && (
                 <section className="app__usergroup-list">
-                  <strong>Käyttäjäryhmät ja palvelukokonaisuudet</strong>
+                  <strong>Grup pengguna dan unit layanan</strong>
                   {userGroups &&
-                    userGroups.length > 1 &&
+                    userGroups.length > 0 &&
                     userGroups.map((group, index) => {
                       return (
                         <p className="usergroup-list-item" key={group}>

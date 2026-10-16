@@ -85,14 +85,14 @@ const Rents: React.FC = () => {
           {currentLease.rent_info_completed_at ? (
             <SuccessField
               meta={{
-                warning: "Tiedot kunnossa",
+                warning: "Data lengkap",
               }}
               showWarning={true}
             />
           ) : (
             <WarningField
               meta={{
-                warning: "Tiedot keskeneräiset",
+                warning: "Data belum lengkap",
               }}
               showWarning={true}
             />
@@ -133,7 +133,7 @@ const Rents: React.FC = () => {
         <>
           {!rents ||
             (!rents.length && (
-              <FormText className="no-margin">Ei vuokria</FormText>
+              <FormText className="no-margin">Tidak ada sewa</FormText>
             ))}
           {rents &&
             !!rents.length &&
@@ -148,7 +148,7 @@ const Rents: React.FC = () => {
                 marginBottom: 5,
               }}
             >
-              Arkisto
+              Arsip
             </h3>
           )}
           {!!rentsArchived.length &&

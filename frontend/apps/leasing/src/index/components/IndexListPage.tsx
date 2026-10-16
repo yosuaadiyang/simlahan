@@ -28,11 +28,11 @@ const IndexListPage: React.FC = () => {
   const usersPermissions = useAppSelector(getUsersPermissions);
 
   useEffect(() => {
-    setPageTitle("Elinkustannusindeksit");
+    setPageTitle("Indeks biaya hidup");
     dispatch(
       receiveTopNavigationSettings({
         linkUrl: getRouteById(Routes.INDEX),
-        pageTitle: "Elinkustannusindeksit",
+        pageTitle: "Indeks biaya hidup",
         showSearch: false,
       }),
     );

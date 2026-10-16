@@ -290,7 +290,9 @@ const DecisionItem: React.FC<Props> = ({
           )}
         >
           {!decision.conditions ||
-            (!decision.conditions.length && <FormText>Ei ehtoja</FormText>)}
+            (!decision.conditions.length && (
+              <FormText>Tidak ada persyaratan</FormText>
+            ))}
           {decision.conditions && !!decision.conditions.length && (
             <BoxItemContainer>
               {largeScreen && (

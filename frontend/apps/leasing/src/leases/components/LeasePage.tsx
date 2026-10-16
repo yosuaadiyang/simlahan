@@ -429,7 +429,7 @@ const LeasePage: React.FC = () => {
     dispatch(
       receiveTopNavigationSettings({
         linkUrl: getRouteById(Routes.LEASES),
-        pageTitle: "Vuokraukset",
+        pageTitle: "Sewa",
         showSearch: true,
       }),
     );
@@ -709,7 +709,7 @@ const LeasePage: React.FC = () => {
 
   const getLeasePageTitle = (lease: Lease) => {
     const identifier = getContentLeaseIdentifier(lease);
-    const pageTitle = `${identifier ? `${identifier} | ` : ""}Vuokraus`;
+    const pageTitle = `${identifier ? `${identifier} | ` : ""}Sewa`;
     return pageTitle;
   };
 
@@ -1327,13 +1327,13 @@ const LeasePage: React.FC = () => {
           isEditMode={isEditMode}
           tabs={[
             {
-              label: "Yhteenveto",
+              label: "Ringkasan",
               allow: true,
               isDirty: summaryFormState.dirty,
               hasError: isSaveClicked && !summaryFormState.valid,
             },
             {
-              label: "Vuokra-alue",
+              label: "Area sewa",
               allow: isFieldAllowedToRead(
                 leaseAttributes,
                 LeaseAreasFieldPaths.LEASE_AREAS,
@@ -1342,7 +1342,7 @@ const LeasePage: React.FC = () => {
               hasError: isSaveClicked && !leaseAreasFormState.valid,
             },
             {
-              label: "Vuokralaiset",
+              label: "Penyewa",
               allow: isFieldAllowedToRead(
                 leaseAttributes,
                 LeaseTenantsFieldPaths.TENANTS,
@@ -1351,7 +1351,7 @@ const LeasePage: React.FC = () => {
               hasError: isSaveClicked && !tenantsFormState.valid,
             },
             {
-              label: "Vuokrat",
+              label: "Sewa",
               allow:
                 isFieldAllowedToRead(
                   leaseAttributes,
@@ -1369,7 +1369,7 @@ const LeasePage: React.FC = () => {
                   !basisOfRentsFormState.valid),
             },
             {
-              label: "Päätökset ja sopimukset",
+              label: "Keputusan dan kontrak",
               allow:
                 isFieldAllowedToRead(
                   leaseAttributes,
@@ -1394,7 +1394,7 @@ const LeasePage: React.FC = () => {
                   !inspectionsFormState.valid),
             },
             {
-              label: "Rakentamiskelpoisuus",
+              label: "Kelayakan bangun",
               allow: isFieldAllowedToRead(
                 leaseAttributes,
                 LeaseAreasFieldPaths.LEASE_AREAS,
@@ -1403,18 +1403,18 @@ const LeasePage: React.FC = () => {
               hasError: isSaveClicked && !constructabilityFormState.valid,
             },
             {
-              label: "Laskutus",
+              label: "Penagihan",
               allow: hasPermissions(
                 usersPermissions,
                 UsersPermissions.VIEW_INVOICE,
               ),
             },
             {
-              label: "Kartta",
+              label: "Peta",
               allow: isMethodAllowed(leaseMethods, Methods.GET),
             },
             {
-              label: "Muutoshistoria",
+              label: "Riwayat perubahan",
               allow: isMethodAllowed(leaseMethods, Methods.GET),
             },
           ]}

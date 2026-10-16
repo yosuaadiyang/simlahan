@@ -37,12 +37,12 @@ const AreasLayer = ({
       onEachFeature={(feature, layer) => {
         if (feature.properties) {
           const { area, id, identifier, location, type } = feature.properties;
-          const popupContent = `<p class='title'><strong>Vuokrakohde</strong></p>
+          const popupContent = `<p class='title'><strong>Objek sewa</strong></p>
             <p><strong>Id:</strong> ${id}</p>
-            <p><strong>Tunnus:</strong> ${identifier}</p>
-            <p><strong>Määritelmä:</strong> ${getLabelOfOption(typeOptions, type) || "-"}</p>
-            <p><strong>Kokonaisala:</strong> ${area || area === 0 ? `${formatNumber(area)} m²` : ""}</p>
-            <p><strong>Sijainti:</strong> ${getLabelOfOption(locationOptions, location) || "-"}</p>`;
+            <p><strong>Pengenal:</strong> ${identifier}</p>
+            <p><strong>Definisi:</strong> ${getLabelOfOption(typeOptions, type) || "-"}</p>
+            <p><strong>Luas total:</strong> ${area || area === 0 ? `${formatNumber(area)} m²` : ""}</p>
+            <p><strong>Lokasi:</strong> ${getLabelOfOption(locationOptions, location) || "-"}</p>`;
           layer.bindPopup(popupContent);
 
           if (id === defaultArea) {

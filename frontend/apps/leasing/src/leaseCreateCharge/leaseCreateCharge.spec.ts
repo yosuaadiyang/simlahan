@@ -109,7 +109,7 @@ describe("Lease create charge", () => {
             },
             {
               value: 2,
-              display_name: "Korko",
+              display_name: "Bunga",
             },
             {
               value: 8,
@@ -160,7 +160,7 @@ describe("Lease create charge", () => {
           },
           {
             id: 2,
-            name: "Korko",
+            name: "Bunga",
             sap_material_code: null,
             sap_order_item_number: null,
             is_active: false,

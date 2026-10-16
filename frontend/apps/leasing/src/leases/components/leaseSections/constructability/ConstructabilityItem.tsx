@@ -523,7 +523,7 @@ const ConstructabilityItem: React.FC<Props> = ({
               {LeaseAreasFieldTitles.POLLUTED_LAND_MATTI_REPORTS}
             </SubTitle>
             {!pollutedLandMattiAttachments.length && (
-              <FormText>Ei Matti raportteja</FormText>
+              <FormText>Tidak ada laporan MATTI</FormText>
             )}
             {!!pollutedLandMattiAttachments.length && (
               <>
@@ -763,7 +763,7 @@ const ConstructabilityItem: React.FC<Props> = ({
               }
             </SubTitle>
             {!constructabilityReportGeotechnicalAttachments.length && (
-              <FormText>Ei geoteknisen palvelun tiedostoja</FormText>
+              <FormText>Tidak ada berkas layanan geoteknik</FormText>
             )}
             {!!constructabilityReportGeotechnicalAttachments.length && (
               <>

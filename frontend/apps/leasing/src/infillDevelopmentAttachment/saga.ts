@@ -58,7 +58,7 @@ function* createInfillDevelopmentAttachmentSaga({
         yield put(fetchSingleInfillDevelopment(payload.id));
         displayUIMessage({
           title: "",
-          body: "Tiedosto ladattu",
+          body: "Berkas diunduh",
         });
         break;
 
@@ -87,7 +87,7 @@ function* deleteInfillDevelopmentAttachmentSaga({
         yield put(fetchSingleInfillDevelopment(payload.id));
         displayUIMessage({
           title: "",
-          body: "Tiedosto poistettu",
+          body: "Berkas dihapus",
         });
         break;
 

@@ -30,16 +30,16 @@ const InvoiceSimulatorInvoiceRows = ({
     <div>
       <Row>
         <Column small={6} medium={4}>
-          <FormTextTitle title="Vuokralainen" />
+          <FormTextTitle title="Penyewa" />
         </Column>
         <Column small={2} medium={2}>
-          <FormTextTitle title="Saamislaji" />
+          <FormTextTitle title="Jenis piutang" />
         </Column>
         <Column small={2} medium={2}>
-          <FormTextTitle title="Osuus" />
+          <FormTextTitle title="Porsi" />
         </Column>
         <Column small={2} medium={4}>
-          <FormTextTitle title="Summa" />
+          <FormTextTitle title="Jumlah" />
         </Column>
       </Row>
       {rows.map((row, index) => {
@@ -70,7 +70,7 @@ const InvoiceSimulatorInvoiceRows = ({
       <Row>
         <Column small={10} medium={8}>
           <FormText>
-            <strong>Yhteensä</strong>
+            <strong>Total</strong>
           </FormText>
         </Column>
         <Column small={2} medium={2}>

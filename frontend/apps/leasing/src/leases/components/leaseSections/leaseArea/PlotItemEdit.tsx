@@ -7,7 +7,6 @@ import Authorization from "@/components/authorization/Authorization";
 import BoxContentWrapper from "@/components/content/BoxContentWrapper";
 import BoxItem from "@/components/content/BoxItem";
 import FormField from "@/components/form/final-form/FormField";
-import KtjLink from "@/components/ktj/KtjLink";
 import RemoveButton from "@/components/form/RemoveButton";
 import SubTitle from "@/components/content/SubTitle";
 import {
@@ -76,10 +75,7 @@ const PlotItemsEdit: React.FC<Props> = ({
               UsersPermissions.DELETE_PLOT,
             )}
           >
-            <RemoveButton
-              onClick={onRemove}
-              title="Poista kiinteistö / määräala"
-            />
+            <RemoveButton onClick={onRemove} title="Hapus bidang tanah" />
           </Authorization>
         </ActionButtonWrapper>
         <Row>
@@ -241,67 +237,6 @@ const PlotItemsEdit: React.FC<Props> = ({
             </Authorization>
           </Column>
         </Row>
-        <Authorization
-          allow={isFieldAllowedToRead(
-            attributes,
-            LeasePlotsFieldPaths.IDENTIFIER,
-          )}
-        >
-          {savedPlot && savedPlot.identifier && (
-            <>
-              <SubTitle
-                enableUiDataEdit
-                uiDataKey={getUiDataLeaseKey(LeasePlotsFieldPaths.KTJ_LINK)}
-              >
-                {LeasePlotsFieldTitles.KTJ_LINK}
-              </SubTitle>
-              <Row>
-                {savedPlot.type === PlotType.REAL_PROPERTY && (
-                  <Column small={12} medium={6}>
-                    <KtjLink
-                      fileKey="kiinteistorekisteriote/rekisteriyksikko"
-                      fileName="kiinteistorekisteriote"
-                      identifier={savedPlot.identifier}
-                      idKey="kiinteistotunnus"
-                      label="Kiinteistörekisteriote"
-                      prefix="ktjkii"
-                    />
-                  </Column>
-                )}
-                {savedPlot.type === PlotType.UNSEPARATED_PARCEL && (
-                  <Column small={12} medium={6}>
-                    <KtjLink
-                      fileKey="kiinteistorekisteriote/maaraala"
-                      fileName="kiinteistorekisteriote"
-                      identifier={savedPlot.identifier}
-                      idKey="maaraalatunnus"
-                      label="Kiinteistörekisteriote"
-                      prefix="ktjkii"
-                    />
-                  </Column>
-                )}
-                <Column small={12} medium={6}>
-                  <KtjLink
-                    fileKey="lainhuutotodistus"
-                    fileName="lainhuutotodistus"
-                    identifier={savedPlot.identifier}
-                    idKey="kohdetunnus"
-                    label="Lainhuutotodistus"
-                  />
-                </Column>
-                <Column small={12} medium={6}>
-                  <KtjLink
-                    fileKey="rasitustodistus"
-                    fileName="rasitustodistus"
-                    identifier={savedPlot.identifier}
-                    idKey="kohdetunnus"
-                    label="Rasitustodistus"
-                  />
-                </Column>
-              </Row>
-            </>
-          )}
-        </Authorization>
       </BoxContentWrapper>
     </BoxItem>
   );

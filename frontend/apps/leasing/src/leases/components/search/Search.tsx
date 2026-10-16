@@ -62,7 +62,7 @@ import {
 import useLocalStorageState from "@/util/useLocalStorageState";
 
 const PreparerOwnLeasesOption = {
-  label: "Omat vuokraukset",
+  label: "Sewa saya",
   value: "preparers_own_leases",
 };
 
@@ -83,7 +83,7 @@ const hasInputValue = (value: unknown) =>
 
 const SECTIONS = {
   target: {
-    label: "Kohde",
+    label: "Objek",
     fields: [
       "lessor",
       "intended_use",
@@ -96,7 +96,7 @@ const SECTIONS = {
     ],
   },
   dates: {
-    label: "Voimassaolo",
+    label: "Masa berlaku",
     fields: [
       "lease_start_date_start",
       "lease_start_date_end",
@@ -107,7 +107,7 @@ const SECTIONS = {
     ],
   },
   decision: {
-    label: "Päätös ja sopimus",
+    label: "Keputusan dan kontrak",
     fields: [
       "decision_date",
       "decision_maker",
@@ -119,7 +119,7 @@ const SECTIONS = {
     ],
   },
   tenant: {
-    label: "Asiakas",
+    label: "Kontak",
     fields: [
       "tenant_name",
       "tenantcontact_type",
@@ -255,7 +255,7 @@ const Search: React.FC<Props> = ({
 
     const intendedUsesByServiceUnit = Object.groupBy(
       intendedUseList,
-      (item) => allServiceUnits[item.service_unit] || "Muut",
+      (item) => allServiceUnits[item.service_unit] || "Lainnya",
     );
     // Note: This gets all IntendedUse's on purpose, even those that are not active (is_active=false).
     // For now no reason to not allow filtering for inactive IntendedUse's has come up.
@@ -286,16 +286,24 @@ const Search: React.FC<Props> = ({
   );
 
   const municipalityGroupedOptions = useMemo(() => {
-    const helsinki = municipalityOptions.filter((opt) =>
-      opt.label.toLocaleLowerCase().includes("helsinki"),
-    );
-    const others = municipalityOptions.filter(
-      (opt) => !opt.label.toLocaleLowerCase().includes("helsinki"),
-    );
-
+    // Kabupaten/kota utama instansi ditampilkan paling atas
+    // (VITE_PRIMARY_MUNICIPALITY, mis. "Kota Batam").
+    const primary = (import.meta.env.VITE_PRIMARY_MUNICIPALITY || "")
+      .trim()
+      .toLocaleLowerCase();
+    if (!primary) {
+      return [{ label: "Kabupaten/Kota", options: municipalityOptions }];
+    }
+    const isPrimary = (opt) => opt.label.toLocaleLowerCase().includes(primary);
     return [
-      { label: "Helsinki", options: helsinki },
-      { label: "Ulkokunnat", options: others },
+      {
+        label: import.meta.env.VITE_PRIMARY_MUNICIPALITY,
+        options: municipalityOptions.filter(isPrimary),
+      },
+      {
+        label: "Kabupaten/Kota lain",
+        options: municipalityOptions.filter((opt) => !isPrimary(opt)),
+      },
     ];
   }, [municipalityOptions]);
 
@@ -403,9 +411,9 @@ const Search: React.FC<Props> = ({
                 <Select
                   id="lessor"
                   texts={{
-                    label: "Vuokranantaja",
-                    placeholder: "Valitse vuokranantaja",
-                    language: "fi",
+                    label: "Pemberi sewa",
+                    placeholder: "Pilih pemberi sewa",
+                    language: "en",
                   }}
                   value={filterSelectedOptions(value, lessorOptions)}
                   options={lessorOptions}
@@ -430,9 +438,9 @@ const Search: React.FC<Props> = ({
                 <Select
                   id="intended_use"
                   texts={{
-                    label: "Vuokrauksen käyttötarkoitus",
-                    placeholder: "Valitse käyttötarkoitus",
-                    language: "fi",
+                    label: "Peruntukan sewa",
+                    placeholder: "Pilih peruntukan",
+                    language: "en",
                   }}
                   disabled={isFetchingIntendedUses}
                   value={filterSelectedGroupedOptions(
@@ -465,7 +473,7 @@ const Search: React.FC<Props> = ({
               return (
                 <TextInput
                   id="address"
-                  label="Vuokrakohteen osoite"
+                  label="Alamat objek sewa"
                   invalid={invalid}
                   value={value || ""}
                   onBlur={onBlur}
@@ -487,7 +495,7 @@ const Search: React.FC<Props> = ({
               return (
                 <TextInput
                   id="property_identifier"
-                  label="Kiinteistötunnus"
+                  label="Pengenal bidang (NIB)"
                   invalid={invalid}
                   value={value || ""}
                   onBlur={onBlur}
@@ -518,9 +526,9 @@ const Search: React.FC<Props> = ({
                 <Select
                   id="type"
                   texts={{
-                    label: "Vuokraustunnuksen laji",
-                    placeholder: "Valitse laji",
-                    language: "fi",
+                    label: "Jenis pengenal sewa",
+                    placeholder: "Pilih jenis",
+                    language: "en",
                   }}
                   value={selectedOption}
                   options={typeOptions}
@@ -548,9 +556,9 @@ const Search: React.FC<Props> = ({
                 <Select
                   id="municipality"
                   texts={{
-                    label: "Kunta",
-                    placeholder: "Valitse kunta",
-                    language: "fi",
+                    label: "Kabupaten/Kota",
+                    placeholder: "Pilih kabupaten/kota",
+                    language: "en",
                   }}
                   value={filterSelectedGroupedOptions(
                     value,
@@ -583,9 +591,9 @@ const Search: React.FC<Props> = ({
                 <Select
                   id="district"
                   texts={{
-                    label: "Kaupunginosa",
-                    placeholder: "Valitse kaupunginosa",
-                    language: "fi",
+                    label: "Kecamatan",
+                    placeholder: "Pilih kecamatan",
+                    language: "en",
                   }}
                   value={selectedOption}
                   options={districtOptions}
@@ -625,7 +633,7 @@ const Search: React.FC<Props> = ({
               return (
                 <TextInput
                   id="sequence"
-                  label="MVJ-Tunnus"
+                  label="Pengenal SimLahan"
                   invalid={invalid}
                   value={value || ""}
                   onBlur={onBlur}
@@ -657,8 +665,8 @@ const Search: React.FC<Props> = ({
                 <DateInput
                   id="lease_start_date_start"
                   initialMonth={new Date()}
-                  label="Vuokrauksen alkupvm alkaen"
-                  language="fi"
+                  label="Tgl mulai sewa dari"
+                  language="en"
                   value={value || ""}
                   onBlur={onBlur}
                   onFocus={onFocus}
@@ -681,8 +689,8 @@ const Search: React.FC<Props> = ({
                 <DateInput
                   id="lease_start_date_end"
                   initialMonth={new Date()}
-                  label="Vuokrauksen alkupvm loppuen"
-                  language="fi"
+                  label="Tgl mulai sewa sampai"
+                  language="en"
                   value={value || ""}
                   onBlur={onBlur}
                   onFocus={onFocus}
@@ -705,8 +713,8 @@ const Search: React.FC<Props> = ({
                 <DateInput
                   id="lease_end_date_start"
                   initialMonth={new Date()}
-                  label="Vuokrauksen loppupvm alkaen"
-                  language="fi"
+                  label="Tgl akhir sewa dari"
+                  language="en"
                   value={value || ""}
                   onBlur={onBlur}
                   onFocus={onFocus}
@@ -729,8 +737,8 @@ const Search: React.FC<Props> = ({
                 <DateInput
                   id="lease_end_date_end"
                   initialMonth={new Date()}
-                  label="Vuokrauksen loppupvm loppuen"
-                  language="fi"
+                  label="Tgl akhir sewa sampai"
+                  language="en"
                   value={value || ""}
                   onBlur={onBlur}
                   onFocus={onFocus}
@@ -758,7 +766,7 @@ const Search: React.FC<Props> = ({
                 }) => {
                   return (
                     <Checkbox
-                      label="Voimassa"
+                      label="Berlaku"
                       id="only_active_leases"
                       checked={value === true || value === "true"}
                       onBlur={onBlur}
@@ -777,7 +785,7 @@ const Search: React.FC<Props> = ({
                 }) => {
                   return (
                     <Checkbox
-                      label="Päättyneet"
+                      label="Telah berakhir"
                       id="only_expired_leases"
                       checked={value === true || value === "true"}
                       onBlur={onBlur}
@@ -812,9 +820,9 @@ const Search: React.FC<Props> = ({
                 <Select
                   id="decision_maker"
                   texts={{
-                    label: "Päätöksentekijä",
-                    placeholder: "Valitse päätöksentekijä",
-                    language: "fi",
+                    label: "Pengambil keputusan",
+                    placeholder: "Pilih pengambil keputusan",
+                    language: "en",
                   }}
                   value={selectedOption}
                   options={decisionMakerOptions}
@@ -842,8 +850,8 @@ const Search: React.FC<Props> = ({
                 <DateInput
                   id="decision_date"
                   initialMonth={new Date()}
-                  label="Päätöspvm"
-                  language="fi"
+                  label="Tgl keputusan"
+                  language="en"
                   value={value || ""}
                   onBlur={onBlur}
                   onFocus={onFocus}
@@ -865,7 +873,7 @@ const Search: React.FC<Props> = ({
               return (
                 <TextInput
                   id="decision_section"
-                  label="Pykälä (§)"
+                  label="Pasal (§)"
                   invalid={invalid}
                   value={value || ""}
                   onBlur={onBlur}
@@ -887,7 +895,7 @@ const Search: React.FC<Props> = ({
               return (
                 <TextInput
                   id="reference_number"
-                  label="Diaarinro"
+                  label="No. agenda"
                   invalid={invalid}
                   value={value || ""}
                   onBlur={onBlur}
@@ -913,7 +921,7 @@ const Search: React.FC<Props> = ({
               return (
                 <TextInput
                   id="contract_number"
-                  label="Sopimusnro"
+                  label="No. kontrak"
                   invalid={invalid}
                   value={value || ""}
                   onBlur={onBlur}
@@ -935,7 +943,7 @@ const Search: React.FC<Props> = ({
               return (
                 <TextInput
                   id="institution_identifier"
-                  label="Laitostunnus"
+                  label="Pengenal lembaga"
                   invalid={invalid}
                   value={value || ""}
                   onBlur={onBlur}
@@ -957,7 +965,7 @@ const Search: React.FC<Props> = ({
               return (
                 <TextInput
                   id="invoice_number"
-                  label="Laskunro"
+                  label="No. tagihan"
                   invalid={invalid}
                   value={value || ""}
                   onBlur={onBlur}
@@ -988,7 +996,7 @@ const Search: React.FC<Props> = ({
               return (
                 <TextInput
                   id="tenant_name"
-                  label="Asiakkaan nimi"
+                  label="Nama kontak"
                   invalid={invalid}
                   value={value || ""}
                   onBlur={onBlur}
@@ -1011,9 +1019,9 @@ const Search: React.FC<Props> = ({
                 <Select
                   id="tenantcontact_type"
                   texts={{
-                    label: "Asiakkaan rooli",
-                    placeholder: "Valitse rooli",
-                    language: "fi",
+                    label: "Peran kontak",
+                    placeholder: "Pilih peran",
+                    language: "en",
                   }}
                   value={filterSelectedOptions(value, tenantTypeOptions)}
                   options={tenantTypeOptions}
@@ -1037,7 +1045,7 @@ const Search: React.FC<Props> = ({
               return (
                 <TextInput
                   id="business_id"
-                  label="Y-tunnus"
+                  label="NPWP"
                   invalid={invalid}
                   value={value || ""}
                   onBlur={onBlur}
@@ -1059,7 +1067,7 @@ const Search: React.FC<Props> = ({
               return (
                 <TextInput
                   id="national_identification_number"
-                  label="Henkilötunnus"
+                  label="NIK"
                   invalid={invalid}
                   value={value || ""}
                   onBlur={onBlur}
@@ -1077,7 +1085,7 @@ const Search: React.FC<Props> = ({
       </SearchRow>
       <SearchRow>
         <SelectionGroup
-          label="Asiakkaan tila"
+          label="Status kontak"
           direction="horizontal"
           style={{ width: "100%" }}
         >
@@ -1091,7 +1099,7 @@ const Search: React.FC<Props> = ({
                   id="tenant_activity-1"
                   name="tenant_activity"
                   value=""
-                  label="Kaikki asiakkaat"
+                  label="Semua kontak"
                   checked={value === ""}
                   onChange={onChange}
                   onBlur={onBlur}
@@ -1110,7 +1118,7 @@ const Search: React.FC<Props> = ({
                   id="tenant_activity-2"
                   name="tenant_activity"
                   value="past"
-                  label="Vain entiset asiakkaat"
+                  label="Hanya mantan kontak"
                   checked={value === "past"}
                   onChange={onChange}
                   onBlur={onBlur}
@@ -1129,7 +1137,7 @@ const Search: React.FC<Props> = ({
                   id="tenant_activity-3"
                   name="tenant_activity"
                   value="active"
-                  label="Vain nykyiset asiakkaat"
+                  label="Hanya kontak saat ini"
                   checked={value === "active"}
                   onChange={onChange}
                   onBlur={onBlur}
@@ -1166,14 +1174,14 @@ const Search: React.FC<Props> = ({
               id="search"
               label=""
               hideLabel
-              placeholder="Hae hakusanalla"
+              placeholder="Cari dengan kata kunci"
               invalid={invalid}
               value={value || ""}
               onBlur={onBlur}
               onChange={onChange}
               onFocus={onFocus}
               buttonIcon={<IconSearch aria-hidden />}
-              buttonAriaLabel="Hae"
+              buttonAriaLabel="Cari"
               onButtonClick={form.submit}
               className={
                 hasInputValue(value) ? "hds-input-with-value" : undefined
@@ -1188,7 +1196,7 @@ const Search: React.FC<Props> = ({
           onClick={handleClear}
           style={{ marginLeft: "auto" }}
         >
-          Tyhjennä haku
+          Kosongkan pencarian
         </Button>
       </Row>
 
@@ -1241,8 +1249,8 @@ const Search: React.FC<Props> = ({
                 id="service_unit"
                 texts={{
                   label: LeaseFieldTitles.SERVICE_UNIT,
-                  placeholder: "Valitse palvelukokonaisuus",
-                  language: "fi",
+                  placeholder: "Pilih unit layanan",
+                  language: "en",
                 }}
                 value={filterSelectedOptions(value, serviceUnitOptions)}
                 options={serviceUnitOptions}
@@ -1274,9 +1282,9 @@ const Search: React.FC<Props> = ({
                 <Select
                   id="lease_state"
                   texts={{
-                    label: "Tyyppi",
-                    placeholder: "Valitse tyyppi",
-                    language: "fi",
+                    label: "Jenis",
+                    placeholder: "Pilih tipe",
+                    language: "en",
                   }}
                   value={selected}
                   options={leaseStateOptions}
@@ -1313,9 +1321,9 @@ const Search: React.FC<Props> = ({
                 <Select
                   id="preparer"
                   texts={{
-                    label: "Valmistelija",
-                    placeholder: "Valitse valmistelija",
-                    language: "fi",
+                    label: "Penyiap",
+                    placeholder: "Pilih penyiap",
+                    language: "en",
                   }}
                   value={selected}
                   options={allPreparers}
@@ -1355,9 +1363,9 @@ const Search: React.FC<Props> = ({
                 <Select
                   id="preparation_state"
                   texts={{
-                    label: "Valmistelu kesken",
-                    placeholder: "Valitse vaihe",
-                    language: "fi",
+                    label: "Persiapan belum selesai",
+                    placeholder: "Pilih tahap",
+                    language: "en",
                   }}
                   value={selectedOptions}
                   options={preparationStateFilterOptions}

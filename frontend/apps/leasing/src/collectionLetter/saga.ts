@@ -93,7 +93,7 @@ function* uploadCollectionLetterSaga({
         yield put(fetchCollectionLettersByLeaseAction(payload.data.lease));
         displayUIMessage({
           title: "",
-          body: "Perintäkirje tallennettu",
+          body: "Surat penagihan disimpan",
         });
         break;
 
@@ -133,7 +133,7 @@ function* deleteCollectionLetterSaga({
         );
         displayUIMessage({
           title: "",
-          body: "Perintäkirje poistettu",
+          body: "Surat penagihan dihapus",
         });
         break;
       }

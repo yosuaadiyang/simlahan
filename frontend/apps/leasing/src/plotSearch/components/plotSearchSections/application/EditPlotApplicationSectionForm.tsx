@@ -140,7 +140,7 @@ const EditPlotApplicationSectionFormSectionFields = ({
             onClick={() => {
               fields.push(getDefaultNewFormField(fieldIdentifiers));
             }}
-            text="Lisää kenttä"
+            text="Tambah kolom"
           />
         </Column>
         <Column small={1} />
@@ -259,7 +259,7 @@ const EditPlotApplicationSectionFormSectionSubsections = ({
             onClick={() => {
               fields.push(getDefaultNewFormSection(subsectionIdentifiers));
             }}
-            text={`Lisää aliosio osioon ${section.title || ""}`}
+            text={`Tambah subbagian ke bagian ${section.title || ""}`}
           />
         </div>
       </div>
@@ -399,7 +399,7 @@ const EditPlotApplicationSectionFormSubsectionSecondLevelWrapper = ({
             fieldAttributes={get(attributes, "sections.child.children.visible")}
             name={`${sectionPath}.visible`}
             overrideValues={{
-              label: "Lohko käytössä",
+              label: "Blok digunakan",
             }}
             className="edit-plot-application-section-form__subsection-header-visible-field"
           />
@@ -414,7 +414,7 @@ const EditPlotApplicationSectionFormSubsectionSecondLevelWrapper = ({
                 fieldType: "checkbox",
                 options: [
                   {
-                    label: "Monistettava lohko",
+                    label: "Blok berulang",
                     value: true,
                   },
                 ],
@@ -453,7 +453,7 @@ const EditPlotApplicationSectionFormSubsectionSecondLevelWrapper = ({
             fieldAttributes={get(attributes, "sections.child.children.title")}
             name={`${sectionPath}.title`}
             overrideValues={{
-              label: "Nimi suomeksi",
+              label: "Nama dalam bahasa Indonesia",
             }}
             onChange={(newName) =>
               updateAutoIdentifier(autoIdentifier, sectionPath, newName)
@@ -468,19 +468,7 @@ const EditPlotApplicationSectionFormSubsectionSecondLevelWrapper = ({
             )}
             name={`${sectionPath}.title_en`}
             overrideValues={{
-              label: "Nimi englanniksi",
-            }}
-          />
-        </Column>
-        <Column small={sectionValuesColumnWidth}>
-          <FormFieldLegacy
-            fieldAttributes={get(
-              attributes,
-              "sections.child.children.title_sv",
-            )}
-            name={`${sectionPath}.title_sv`}
-            overrideValues={{
-              label: "Nimi ruotsiksi",
+              label: "Nama dalam bahasa Inggris",
             }}
           />
         </Column>
@@ -492,7 +480,7 @@ const EditPlotApplicationSectionFormSubsectionSecondLevelWrapper = ({
             )}
             name={`${sectionPath}.identifier`}
             overrideValues={{
-              label: "Sisäinen tunnus",
+              label: "Pengenal internal",
             }}
             disabled={autoIdentifier || isProtected}
           />
@@ -508,7 +496,7 @@ const EditPlotApplicationSectionFormSubsectionSecondLevelWrapper = ({
             overrideValues={{
               options: [
                 {
-                  label: "Täytä automaattisesti",
+                  label: "Isi otomatis",
                   value: true,
                 },
               ],
@@ -534,7 +522,7 @@ const EditPlotApplicationSectionFormSubsectionSecondLevelWrapper = ({
               )}
               name={`${sectionPath}.applicant_type`}
               overrideValues={{
-                label: "Hakijatyyppi, jota osio koskee",
+                label: "Jenis pemohon yang dicakup bagian ini",
               }}
               disabled={isProtected}
             />
@@ -610,7 +598,7 @@ const EditPlotApplicationSectionFormSubsection: React.ComponentType<
               value &&
               uniq(value.map((v) => v.identifier)).length < value.length
             ) {
-              return "Kahdella kentällä ei saa olla samaa sisäistä tunnusta!";
+              return "Dua kolom tidak boleh memiliki pengenal internal yang sama!";
             }
           }}
         />
@@ -632,7 +620,7 @@ const EditPlotApplicationSectionFormSubsection: React.ComponentType<
               value &&
               uniq(value.map((v) => v.identifier)).length < value.length
             ) {
-              return "Kahdella osiolla ei saa olla samaa sisäistä tunnusta!";
+              return "Dua bagian tidak boleh memiliki pengenal internal yang sama!";
             }
           }}
         />
@@ -751,7 +739,7 @@ class EditPlotApplicationSectionForm extends Component<Props> {
                   )}
                   name={"section.visible"}
                   overrideValues={{
-                    label: "Osio käytössä",
+                    label: "Bagian digunakan",
                   }}
                 />
               </Column>
@@ -763,7 +751,7 @@ class EditPlotApplicationSectionForm extends Component<Props> {
                   )}
                   name={"section.add_new_allowed"}
                   overrideValues={{
-                    label: "Monistettava osio",
+                    label: "Bagian berulang",
                   }}
                 />
               </Column>
@@ -787,13 +775,13 @@ class EditPlotApplicationSectionForm extends Component<Props> {
               <Button
                 className={ButtonColors.SECONDARY}
                 onClick={onClose}
-                text="Peruuta"
+                text="Batal"
               />
               <Button
                 className={ButtonColors.SUCCESS}
                 disabled={!valid}
                 onClick={this.handleSubmit}
-                text="Valmis"
+                text="Selesai"
               />
             </ModalButtonWrapper>
           </form>

@@ -119,7 +119,7 @@ const IndexAdjustedRents = ({ indexAdjustedRents }: Props) => {
       defaultSortKey="start_date"
       defaultSortOrder={TableSortOrder.DESCENDING}
       fixedHeader={true}
-      noDataText="Ei indeksitarkistettuja vuokria"
+      noDataText="Tidak ada sewa yang disesuaikan indeks"
       sortable={true}
     />
   );

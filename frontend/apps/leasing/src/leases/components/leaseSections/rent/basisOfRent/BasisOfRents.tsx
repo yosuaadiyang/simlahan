@@ -94,7 +94,7 @@ const BasisOfRents = () => {
     <>
       {!basisOfRents ||
         (!basisOfRents.length && (
-          <FormText className="no-margin">Ei vuokralaskureita</FormText>
+          <FormText className="no-margin">Tidak ada kalkulator sewa</FormText>
         ))}
       {basisOfRents && !!basisOfRents.length && (
         <GreenBox>
@@ -135,7 +135,7 @@ const BasisOfRents = () => {
             marginBottom: 5,
           }}
         >
-          Arkisto
+          Arsip
         </h3>
       )}
       {basisOfRentsArchived && !!basisOfRentsArchived.length && (

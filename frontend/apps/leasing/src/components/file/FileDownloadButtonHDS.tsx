@@ -89,7 +89,7 @@ const FileDownloadButton = ({
                 : "";
             displayUIMessage(
               {
-                title: "Tiedoston lataaminen epäonnistui",
+                title: "Pengunduhan berkas gagal",
                 body: errorMessage,
               },
               {
@@ -109,7 +109,7 @@ const FileDownloadButton = ({
         displayUIMessage(
           {
             title: "",
-            body: `Tiedoston lataaminen keskeytettiin ${abortTimeoutS}s jälkeen.`,
+            body: `Pengunduhan berkas dibatalkan ${abortTimeoutS}detik.`,
           },
           {
             type: "error",
@@ -120,7 +120,7 @@ const FileDownloadButton = ({
         displayUIMessage(
           {
             title: "",
-            body: "Tiedoston lataaminen epäonnistui",
+            body: "Pengunduhan berkas gagal",
           },
           {
             type: "error",

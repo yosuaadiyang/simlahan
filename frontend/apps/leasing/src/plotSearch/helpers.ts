@@ -263,7 +263,6 @@ export const getDefaultNewFormSection = (
   identifier: generateSectionIdentifierFromName("", peerIdentifiers),
   title: "",
   title_en: "",
-  title_sv: "",
   visible: true,
   required: false,
   add_new_allowed: false,
@@ -280,10 +279,8 @@ export const getDefaultNewFormField = (
   identifier: generateFieldIdentifierFromName("", peerIdentifiers),
   label: "",
   label_en: "",
-  label_sv: "",
   hint_text: "",
   hint_text_en: "",
-  hint_text_sv: "",
   enabled: true,
   required: false,
   type: null,
@@ -428,11 +425,11 @@ export const generateIdentifierFromName = (
 export const generateSectionIdentifierFromName = (
   name: string,
   peerIdentifiers: Array<string>,
-): string => generateIdentifierFromName(name, peerIdentifiers, "Uusi osio");
+): string => generateIdentifierFromName(name, peerIdentifiers, "Bagian baru");
 export const generateFieldIdentifierFromName = (
   name: string,
   peerIdentifiers: Array<string>,
-): string => generateIdentifierFromName(name, peerIdentifiers, "Uusi kenttä");
+): string => generateIdentifierFromName(name, peerIdentifiers, "Kolom baru");
 export const transformCommittedFormSectionEditorData = (
   section: Record<string, any>,
 ): FormSection => {
@@ -441,7 +438,7 @@ export const transformCommittedFormSectionEditorData = (
     index: number,
   ): Record<string, any> => {
     const { text, ...rest } = choice;
-    return { ...cloneDeep(rest), sort_order: index, text, text_fi: text };
+    return { ...cloneDeep(rest), sort_order: index, text, text_ind: text };
   };
 
   const transformField = (
@@ -469,7 +466,7 @@ export const transformCommittedFormSectionEditorData = (
           ? default_value
           : JSON.stringify(default_value) || "",
       label,
-      label_fi: label,
+      label_ind: label,
     };
   };
 
@@ -496,8 +493,8 @@ export const transformCommittedFormSectionEditorData = (
       sort_order: index,
       label,
       help_text,
-      label_fi: label,
-      help_text_fi: help_text,
+      label_ind: label,
+      help_text_ind: help_text,
     };
   };
 

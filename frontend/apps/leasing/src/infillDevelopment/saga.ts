@@ -135,7 +135,7 @@ function* createInfillDevelopmentSaga({
         );
         displayUIMessage({
           title: "",
-          body: "Täydennysrakentamiskorvaus luotu",
+          body: "Kompensasi pembangunan sisipan dibuat",
         });
         break;
 
@@ -176,7 +176,7 @@ function* editInfillDevelopmentSaga({
         yield put(hideEditMode());
         displayUIMessage({
           title: "",
-          body: "Täydennysrakentamiskorvaus tallennettu",
+          body: "Kompensasi pembangunan sisipan disimpan",
         });
         break;
 
@@ -185,7 +185,7 @@ function* editInfillDevelopmentSaga({
         yield put(
           receiveError(
             new SubmissionError({
-              _error: "Server error 400",
+              _error: "Galat server 400",
               ...bodyAsJson,
             }),
           ),

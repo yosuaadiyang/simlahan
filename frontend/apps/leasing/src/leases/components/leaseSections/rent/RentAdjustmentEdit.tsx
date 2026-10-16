@@ -85,7 +85,7 @@ const ManagementSubventions = ({
               RentAdjustmentManagementSubventionsFieldPaths.MANAGEMENT_SUBVENTIONS,
             ) &&
               (!fields || !fields.length) && (
-                <FormText>Ei hallintamuotoja</FormText>
+                <FormText>Tidak ada bentuk pengelolaan</FormText>
               )}
 
             {fields && !!fields.length && (
@@ -176,7 +176,7 @@ const ManagementSubventions = ({
               <Row>
                 <Column>
                   <AddButtonThird
-                    label="Lisää hallintamuoto"
+                    label="Tambah bentuk pengelolaan"
                     onClick={handleAdd}
                   />
                 </Column>
@@ -214,7 +214,7 @@ const TemporarySubventions = ({
               RentAdjustmentTemporarySubventionsFieldPaths.TEMPORARY_SUBVENTIONS,
             ) &&
               (!fields || !fields.length) && (
-                <FormText>Ei tilapäisalennuksia</FormText>
+                <FormText>Tidak ada potongan sementara</FormText>
               )}
 
             {fields && !!fields.length && (
@@ -305,7 +305,7 @@ const TemporarySubventions = ({
                 <Column>
                   <AddButtonThird
                     className="no-bottom-margin"
-                    label="Lisää tilapäisalennus"
+                    label="Tambah potongan sementara"
                     onClick={handleAdd}
                   />
                 </Column>
@@ -449,7 +449,7 @@ const RentAdjustmentsEdit: React.FC<Props> = ({
               UsersPermissions.DELETE_RENTADJUSTMENT,
             )}
           >
-            <RemoveButton onClick={onRemove} title="Poista alennus/korotus" />
+            <RemoveButton onClick={onRemove} title="Hapus potongan/kenaikan" />
           </Authorization>
         </ActionButtonWrapper>
         <Row>
@@ -670,7 +670,7 @@ const RentAdjustmentsEdit: React.FC<Props> = ({
                     LeaseRentAdjustmentsFieldPaths.AMOUNT_LEFT,
                   )}
                   name={`${field}.amount_left`}
-                  unit="€"
+                  unit="Rp"
                   overrideValues={{
                     label: LeaseRentAdjustmentsFieldTitles.AMOUNT_LEFT,
                   }}
@@ -749,7 +749,7 @@ const RentAdjustmentsEdit: React.FC<Props> = ({
             <Row>
               <Column>
                 <AddButtonSecondary
-                  label="Lisää subventio"
+                  label="Tambah subsidi"
                   onClick={handleAddSubventions}
                 />
               </Column>
@@ -780,7 +780,7 @@ const RentAdjustmentsEdit: React.FC<Props> = ({
                   <ActionButtonWrapper>
                     <RemoveButton
                       onClick={handleRemoveSubventions}
-                      title="Poista subventiot"
+                      title="Hapus subsidi"
                     />
                   </ActionButtonWrapper>
                   <Row>
@@ -961,7 +961,7 @@ const RentAdjustmentsEdit: React.FC<Props> = ({
                   </Row>
                   <Row>
                     <Column small={6} medium={4} large={2}>
-                      <FormText className="semibold">Yhteensä</FormText>
+                      <FormText className="semibold">Total</FormText>
                     </Column>
                     <Column small={6} medium={4} large={2}>
                       <FormText className="semibold">

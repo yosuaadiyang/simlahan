@@ -7,10 +7,10 @@ import {
 } from "@/components/notification/notificationService";
 
 const fallbackLabelByType = {
-  alert: "Varoitus",
-  error: "Virhe",
-  info: "Ilmoitus",
-  success: "Onnistui",
+  alert: "Peringatan",
+  error: "Galat",
+  info: "Pemberitahuan",
+  success: "Berhasil",
 };
 
 const NotificationCenter = () => {
@@ -31,7 +31,7 @@ const NotificationCenter = () => {
       key={id}
       autoClose={autoCloseDuration > 0}
       autoCloseDuration={autoCloseDuration}
-      closeButtonLabelText="Sulje ilmoitus"
+      closeButtonLabelText="Tutup pemberitahuan"
       dismissible
       label={title || fallbackLabelByType[type]}
       onClose={() => dismissNotification(id)}

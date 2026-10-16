@@ -47,7 +47,7 @@ const Contracts: React.FC = () => {
       />
 
       {(!contracts || !contracts.length) && (
-        <FormText className="no-margin">Ei sopimuksia</FormText>
+        <FormText className="no-margin">Tidak ada kontrak</FormText>
       )}
       {contracts &&
         !!contracts.length &&

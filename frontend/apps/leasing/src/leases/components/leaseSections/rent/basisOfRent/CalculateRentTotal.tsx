@@ -58,17 +58,17 @@ const CalculateRentTotal = ({ basisOfRents, indexOptions }: Props) => {
       <Row>
         <Column small={4} large={4}>
           <FormText className="semibold">
-            {formatNumber(discountedInitialYearRentsUnlocked)} €
+            Rp {formatNumber(discountedInitialYearRentsUnlocked)}
           </FormText>
         </Column>
         <Column small={4} large={4}>
           <FormText className="semibold">
-            {formatNumber(discountedInitialYearRentsLocked)} €
+            Rp {formatNumber(discountedInitialYearRentsLocked)}
           </FormText>
         </Column>
         <Column small={4} large={4}>
           <FormText className="semibold">
-            {formatNumber(discountedInitialYearRentsTotal)} €
+            Rp {formatNumber(discountedInitialYearRentsTotal)}
           </FormText>
         </Column>
       </Row>
@@ -100,17 +100,17 @@ const CalculateRentTotal = ({ basisOfRents, indexOptions }: Props) => {
       <Row>
         <Column small={4} large={4}>
           <FormText className="semibold">
-            {formatNumber(initialYearRentsUnlocked)} €
+            Rp {formatNumber(initialYearRentsUnlocked)}
           </FormText>
         </Column>
         <Column small={4} large={4}>
           <FormText className="semibold">
-            {formatNumber(initialYearRentsLocked)} €
+            Rp {formatNumber(initialYearRentsLocked)}
           </FormText>
         </Column>
         <Column small={4} large={4}>
           <FormText className="semibold">
-            {formatNumber(initialYearRentsTotal)} €
+            Rp {formatNumber(initialYearRentsTotal)}
           </FormText>
         </Column>
       </Row>

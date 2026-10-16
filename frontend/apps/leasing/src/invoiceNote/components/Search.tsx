@@ -87,7 +87,7 @@ const Search: React.FC<Props> = ({ onSearch, initialValues }) => {
                 autoBlur
                 disableDirty
                 fieldAttributes={{
-                  label: "Palvelukokonaisuus",
+                  label: "Unit layanan",
                   type: FieldTypes.CHOICE,
                   read_only: false,
                 }}

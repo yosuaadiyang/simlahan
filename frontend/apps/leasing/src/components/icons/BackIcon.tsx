@@ -10,7 +10,7 @@ const BackIcon = ({ className }: Props) => (
     focusable="false"
     viewBox="0 0 30 30"
   >
-    <title>Takaisin</title>
+    <title>Kembali</title>
     <path
       transform="rotate(-90 14 15)"
       d="m14,6.77l0.84,0.71l14.07,14.060001l-1.689999,1.689999l-13.220001,-13.289999l-13.220001,13.289999l-1.689999,-1.689999l14.07,-14.060001l0.84,-0.71z"

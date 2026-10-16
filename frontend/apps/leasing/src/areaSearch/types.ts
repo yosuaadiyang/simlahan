@@ -69,7 +69,7 @@ export type UploadedAreaSearchAttachmentMeta = {
   field: number;
   created_at: string;
   user?: User;
-  is_user_helsinki_ad?: boolean;
+  is_user_officer?: boolean;
 };
 export type HandleShowContactModal = (
   contactType: Contact["type"],

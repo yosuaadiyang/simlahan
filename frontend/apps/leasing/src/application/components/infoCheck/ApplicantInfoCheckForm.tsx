@@ -122,13 +122,13 @@ class ApplicantInfoCheckForm extends Component<Props> {
           <Button
             className={ButtonColors.SECONDARY}
             onClick={onClose}
-            text="Peruuta"
+            text="Batal"
           />
           <Button
             className={ButtonColors.SUCCESS}
             disabled={!valid}
             onClick={this.handleSave}
-            text="Tallenna"
+            text="Simpan"
           />
         </ModalButtonWrapper>
       </form>

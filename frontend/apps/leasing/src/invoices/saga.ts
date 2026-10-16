@@ -119,7 +119,7 @@ function* createInvoiceSaga({
         yield put(receiveIsCreateInvoicePanelOpen(false));
         displayUIMessage({
           title: "",
-          body: "Lasku luotu",
+          body: "Tagihan dibuat",
         });
         break;
 
@@ -161,7 +161,7 @@ function* creditInvoiceSaga({
         yield put(receiveInvoiceToCredit(null));
         displayUIMessage({
           title: "",
-          body: "Hyvityslasku luotu",
+          body: "Nota kredit dibuat",
         });
         break;
 
@@ -192,7 +192,7 @@ function* patchInvoiceSaga({
         yield put(receivePatchedInvoice(bodyAsJson));
         displayUIMessage({
           title: "",
-          body: "Lasku tallennettu",
+          body: "Tagihan disimpan",
         });
         break;
 
@@ -201,7 +201,7 @@ function* patchInvoiceSaga({
         yield put(
           receiveError(
             new SubmissionError({
-              _error: "Server error 400",
+              _error: "Galat server 400",
               ...bodyAsJson,
             }),
           ),
@@ -250,7 +250,7 @@ function* exportInvoiceToLaskeAndUpdateListSaga({
       yield put(fetchInvoicesByLease(lease));
       displayUIMessage({
         title: "",
-        body: "Lasku lähetetty SAP:iin",
+        body: "Tagihan dikirim ke SAP",
       });
     } else {
       yield put(notFound());
@@ -276,7 +276,7 @@ function* deleteInvoiceSaga({
       yield put(fetchInvoicesByLease(invoice.lease));
       displayUIMessage({
         title: "",
-        body: "Lasku poistettu",
+        body: "Tagihan dihapus",
       });
     } else {
       yield put(notFound());

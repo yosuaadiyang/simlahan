@@ -1,0 +1,515 @@
+// Modul pengadaan tanah
+$acq-green: #1f6f4a;
+$acq-green-dark: #0f3d28;
+$acq-border: #d9dde1;
+$acq-muted: #5c6670;
+$acq-danger: #b01038;
+$acq-warning: #b26a00;
+$acq-success: #1b6b3a;
+
+.acq-page {
+  padding-bottom: 3rem;
+
+  h1 {
+    font-size: 1.75rem;
+    margin: 0.25rem 0;
+  }
+
+  &__header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.25rem;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+}
+
+.acq-muted {
+  color: $acq-muted;
+}
+
+.acq-error {
+  color: $acq-danger;
+  font-weight: 600;
+}
+
+.acq-success {
+  color: $acq-success;
+  font-weight: 600;
+}
+
+.acq-empty {
+  color: $acq-muted;
+  padding: 1rem 0;
+  margin: 0;
+}
+
+.acq-section {
+  background: #fff;
+  border: 1px solid $acq-border;
+  border-radius: 4px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+
+  &__header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+
+    h2 {
+      font-size: 1.15rem;
+      margin: 0;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+
+    select {
+      margin: 0;
+      width: auto;
+    }
+  }
+}
+
+.acq-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 1.25rem;
+  align-items: start;
+
+  > .acq-section {
+    margin-bottom: 0;
+  }
+
+  margin-bottom: 1.25rem;
+}
+
+.acq-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.acq-stat {
+  background: #fff;
+  border: 1px solid $acq-border;
+  border-left: 4px solid $acq-green;
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+
+  &__label {
+    color: $acq-muted;
+    font-size: 0.85rem;
+  }
+
+  &__value {
+    font-size: 1.35rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__hint {
+    color: $acq-muted;
+    font-size: 0.8rem;
+  }
+
+  &--danger {
+    border-left-color: $acq-danger;
+  }
+
+  &--warning {
+    border-left-color: #e0a100;
+  }
+
+  &--success {
+    border-left-color: $acq-success;
+  }
+}
+
+.acq-progress {
+  position: relative;
+  background: #eef1f3;
+  border-radius: 3px;
+  height: 1.4rem;
+  min-width: 120px;
+  overflow: hidden;
+
+  &__bar {
+    background: $acq-green;
+    height: 100%;
+    transition: width 0.3s ease;
+  }
+
+  &__text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #111;
+    text-shadow:
+      0 0 3px #fff,
+      0 0 3px #fff;
+  }
+}
+
+.acq-bars {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    display: grid;
+    grid-template-columns: minmax(140px, 40%) 1fr;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 0.4rem;
+  }
+}
+
+.acq-tag {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.1rem 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  background: #e8edf0;
+  color: #22303a;
+
+  &--success {
+    background: #dff2e6;
+    color: $acq-success;
+  }
+
+  &--warning {
+    background: #fff1cc;
+    color: $acq-warning;
+  }
+
+  &--danger {
+    background: #fbe3e8;
+    color: $acq-danger;
+  }
+
+  &--muted {
+    background: #eceff1;
+    color: $acq-muted;
+  }
+}
+
+.acq-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  border-bottom: 2px solid $acq-border;
+  margin-bottom: 1.25rem;
+
+  &__tab {
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    padding: 0.6rem 0.8rem;
+    cursor: pointer;
+    font-weight: 600;
+    color: $acq-muted;
+
+    &:hover,
+    &:focus-visible {
+      color: $acq-green-dark;
+    }
+
+    &.is-active {
+      color: $acq-green-dark;
+      border-bottom-color: $acq-green;
+    }
+  }
+
+  &__badge {
+    display: inline-block;
+    margin-left: 0.35rem;
+    background: $acq-danger;
+    color: #fff;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    padding: 0 0.4rem;
+  }
+}
+
+.acq-table-wrapper {
+  overflow-x: auto;
+}
+
+.acq-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+
+  th,
+  td {
+    text-align: left;
+    padding: 0.5rem 0.6rem;
+    border-bottom: 1px solid $acq-border;
+    vertical-align: top;
+  }
+
+  th {
+    background: #f5f7f8;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  tr.is-clickable {
+    cursor: pointer;
+
+    &:hover td {
+      background: #f2f8f4;
+    }
+  }
+
+  .acq-num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  &__actions {
+    width: 1%;
+    white-space: nowrap;
+  }
+}
+
+.acq-row-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.acq-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: $acq-green;
+  color: #fff;
+  border: 2px solid $acq-green;
+  border-radius: 3px;
+  padding: 0.45rem 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  line-height: 1.2;
+
+  &:hover,
+  &:focus-visible {
+    background: $acq-green-dark;
+    border-color: $acq-green-dark;
+    color: #fff;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &--secondary {
+    background: #fff;
+    color: $acq-green-dark;
+
+    &:hover,
+    &:focus-visible {
+      background: #eef6f1;
+      color: $acq-green-dark;
+    }
+  }
+
+  &--danger {
+    background: $acq-danger;
+    border-color: $acq-danger;
+  }
+
+  &--link {
+    background: none;
+    border-color: transparent;
+    color: $acq-green-dark;
+    padding: 0.2rem 0.4rem;
+    text-decoration: underline;
+
+    &:hover,
+    &:focus-visible {
+      background: none;
+      border-color: transparent;
+      color: $acq-green;
+    }
+  }
+}
+
+.acq-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+
+  input,
+  select {
+    margin: 0;
+    width: auto;
+    min-width: 180px;
+  }
+
+  input[type="search"] {
+    flex: 1 1 280px;
+  }
+}
+
+.acq-form {
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 0.75rem 1rem;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+
+    label {
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+
+    input,
+    select,
+    textarea {
+      margin: 0;
+    }
+
+    &--wide {
+      grid-column: 1 / -1;
+    }
+
+    &.has-error {
+      input,
+      select,
+      textarea {
+        border-color: $acq-danger;
+      }
+    }
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+}
+
+.acq-checkbox {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-weight: 600;
+  margin-top: 1.4rem;
+
+  input {
+    margin: 0;
+  }
+}
+
+.acq-dl {
+  display: grid;
+  grid-template-columns: minmax(160px, 35%) 1fr;
+  gap: 0.35rem 1rem;
+  margin: 0;
+
+  dt {
+    color: $acq-muted;
+    font-weight: 600;
+  }
+
+  dd {
+    margin: 0;
+  }
+}
+
+.acq-pagination {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  margin: 1rem 0;
+}
+
+.acq-map {
+  position: relative;
+  border: 1px solid $acq-border;
+
+  .leaflet-container {
+    height: 100%;
+    width: 100%;
+  }
+
+  &__legend {
+    position: absolute;
+    left: 0.5rem;
+    bottom: 0.5rem;
+    z-index: 500;
+    list-style: none;
+    margin: 0;
+    padding: 0.4rem 0.6rem;
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 3px;
+    font-size: 0.75rem;
+    max-width: 60%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.15rem 0.6rem;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    span {
+      width: 0.8rem;
+      height: 0.8rem;
+      display: inline-block;
+      border: 1px solid #333;
+    }
+  }
+}
+
+.acq-modal {
+  max-width: 960px;
+}
+
+@media (max-width: 640px) {
+  .acq-dl {
+    grid-template-columns: 1fr;
+  }
+
+  .acq-columns {
+    grid-template-columns: 1fr;
+  }
+}

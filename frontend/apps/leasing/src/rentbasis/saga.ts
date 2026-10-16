@@ -128,7 +128,7 @@ function* createRentBasisSaga({
         );
         displayUIMessage({
           title: "",
-          body: "Vuokrausperiaate luotu",
+          body: "Prinsip sewa dibuat",
         });
         break;
 
@@ -164,14 +164,14 @@ function* editRentBasisSaga({
         yield put(hideEditMode());
         displayUIMessage({
           title: "",
-          body: "Vuokrausperiaate tallennettu",
+          body: "Prinsip sewa disimpan",
         });
         break;
 
       case 400:
         yield put(notFound());
         yield put(
-          receiveError(new SubmissionError({ ...bodyAsJson, _error: "Virhe" })),
+          receiveError(new SubmissionError({ ...bodyAsJson, _error: "Galat" })),
         );
         break;
 

@@ -50,7 +50,7 @@ const Inspections = ({
         )}
         errorComponent={
           <FormText className="no-margin">
-            Ei tarkastuksia tai huomautuksia
+            Tidak ada pemeriksaan atau catatan
           </FormText>
         }
       >
@@ -60,7 +60,7 @@ const Inspections = ({
               style={{
                 marginTop: 0,
               }}
-              label="Lisää tarkastus"
+              label="Tambah pemeriksaan"
               onClick={handleAdd}
             />
           </Column>
@@ -114,7 +114,7 @@ const Inspections = ({
               <Row>
                 <Column>
                   <AddButtonSecondary
-                    label="Lisää tarkastus"
+                    label="Tambah pemeriksaan"
                     onClick={handleAdd}
                   />
                 </Column>

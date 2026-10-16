@@ -139,7 +139,7 @@ const ArchiveAreaModal: React.FC<Props> = ({
               <Button
                 className={ButtonColors.SECONDARY}
                 onClick={onCancel}
-                text="Peruuta"
+                text="Batal"
               />
               <Button
                 className={ButtonColors.SUCCESS}

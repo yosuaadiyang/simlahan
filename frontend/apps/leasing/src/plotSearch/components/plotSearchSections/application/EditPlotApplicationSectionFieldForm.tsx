@@ -120,9 +120,8 @@ const EditPlotApplicationSectionFieldChoice = ({
     const initialValue = autoFillValues ? String(fields.length + 1) : "";
     fields.push({
       text: "",
-      text_fi: "",
+      text_ind: "",
       text_en: "",
-      text_sv: "",
       value: initialValue,
       has_text_input: false,
       protected_values: [],
@@ -216,7 +215,7 @@ const EditPlotApplicationSectionFieldChoice = ({
                       name={`${field}.text`}
                       disabled={disabled}
                       overrideValues={{
-                        label: "Nimi suomeksi",
+                        label: "Nama dalam bahasa Indonesia",
                       }}
                     />
                   </Column>
@@ -229,20 +228,7 @@ const EditPlotApplicationSectionFieldChoice = ({
                       name={`${field}.text_en`}
                       disabled={disabled}
                       overrideValues={{
-                        label: "Nimi englanniksi",
-                      }}
-                    />
-                  </Column>
-                  <Column small={4}>
-                    <FormFieldLegacy
-                      fieldAttributes={get(
-                        attributes,
-                        "sections.child.children.fields.child.children.choices.child.children.text_sv",
-                      )}
-                      name={`${field}.text_sv`}
-                      disabled={disabled}
-                      overrideValues={{
-                        label: "Nimi ruotsiksi",
+                        label: "Nama dalam bahasa Inggris",
                       }}
                     />
                   </Column>
@@ -290,7 +276,7 @@ const EditPlotApplicationSectionFieldChoice = ({
                       name={`${field}.value`}
                       disabled={disabled || autoFillValues || isProtected}
                       overrideValues={{
-                        label: "Arvo",
+                        label: "Nilai",
                       }}
                       onChange={(newValue) =>
                         handleSingleValueChange(i, newValue)
@@ -308,12 +294,12 @@ const EditPlotApplicationSectionFieldChoice = ({
                       overrideValues={{
                         options: [
                           {
-                            label: "Näytä tekstikenttä",
+                            label: "Tampilkan kolom teks",
                             value: true,
                           },
                         ],
                         type: FieldTypes.BOOLEAN,
-                        label: "Näytä tekstikenttä",
+                        label: "Tampilkan kolom teks",
                       }}
                       onChange={() => setOtherChoicesTextInputOff(field)}
                     />
@@ -326,7 +312,7 @@ const EditPlotApplicationSectionFieldChoice = ({
         );
       })}
       <IconButton onClick={handleAdd}>
-        <AddIcon className="icon-medium" /> Lisää vaihtoehto
+        <AddIcon className="icon-medium" /> Tambah pilihan
       </IconButton>
     </>
   );
@@ -566,7 +552,7 @@ const EditPlotApplicationSectionFieldForm = ({
               fieldType: "checkbox",
               options: [
                 {
-                  label: "Pakollinen tieto",
+                  label: "Data wajib",
                   value: true,
                 },
               ],
@@ -578,7 +564,7 @@ const EditPlotApplicationSectionFieldForm = ({
         </Column>
         <Column small={1}>
           <IconButton
-            title="Avaa/sulje muokkaustila"
+            title="Buka/tutup mode ubah"
             onClick={() =>
               setSectionEditorCollapseState(`field-${id}`, !isOpen)
             }
@@ -586,14 +572,14 @@ const EditPlotApplicationSectionFieldForm = ({
             <EditIcon className="icon-medium" />
           </IconButton>
           <IconButton
-            title="Poista kenttä"
+            title="Hapus kolom"
             onClick={onDelete}
             disabled={fieldValues.is_protected}
           >
             <TrashIcon className="icon-medium" />
           </IconButton>
           <IconButton
-            title="Siirrä ylös"
+            title="Pindah ke atas"
             disabled={!onMoveUp}
             onClick={() => onMoveUp?.(id)}
             id={upButtonId}
@@ -602,7 +588,7 @@ const EditPlotApplicationSectionFieldForm = ({
             <MoveUpIcon className="icon-medium" />
           </IconButton>
           <IconButton
-            title="Siirrä alas"
+            title="Pindah ke bawah"
             disabled={!onMoveDown}
             onClick={() => onMoveDown?.(id)}
             id={downButtonId}
@@ -625,7 +611,7 @@ const EditPlotApplicationSectionFieldForm = ({
                   name={`${field}.label`}
                   disabled={disabled}
                   overrideValues={{
-                    label: "Nimi suomeksi",
+                    label: "Nama dalam bahasa Indonesia",
                   }}
                   onChange={(newName) =>
                     updateAutoIdentifier(
@@ -644,20 +630,7 @@ const EditPlotApplicationSectionFieldForm = ({
                   name={`${field}.label_en`}
                   disabled={disabled}
                   overrideValues={{
-                    label: "Nimi englanniksi",
-                  }}
-                />
-              </Column>
-              <Column small={4}>
-                <FormFieldLegacy
-                  fieldAttributes={get(
-                    attributes,
-                    "sections.child.children.fields.child.children.label_sv",
-                  )}
-                  name={`${field}.label_sv`}
-                  disabled={disabled}
-                  overrideValues={{
-                    label: "Nimi ruotsiksi",
+                    label: "Nama dalam bahasa Inggris",
                   }}
                 />
               </Column>
@@ -672,7 +645,7 @@ const EditPlotApplicationSectionFieldForm = ({
                   name={`${field}.type`}
                   disabled={disabled}
                   overrideValues={{
-                    label: "Tyyppi",
+                    label: "Jenis",
                     options: typeChoices,
                   }}
                   onChange={handleTypeChanged}
@@ -691,7 +664,7 @@ const EditPlotApplicationSectionFieldForm = ({
                     fieldValues.is_protected
                   }
                   overrideValues={{
-                    label: "Sisäinen tunnus",
+                    label: "Pengenal internal",
                   }}
                 />
                 <FormFieldLegacy
@@ -707,7 +680,7 @@ const EditPlotApplicationSectionFieldForm = ({
                   overrideValues={{
                     options: [
                       {
-                        label: "Täytä tunnus automaattisesti",
+                        label: "Isi pengenal secara otomatis",
                         value: true,
                       },
                     ],
@@ -730,7 +703,7 @@ const EditPlotApplicationSectionFieldForm = ({
                   name={`${field}.hint_text`}
                   disabled={disabled}
                   overrideValues={{
-                    label: "Ohjeteksti suomeksi",
+                    label: "Teks bantuan dalam bahasa Indonesia",
                   }}
                 />
               </Column>
@@ -743,20 +716,7 @@ const EditPlotApplicationSectionFieldForm = ({
                   name={`${field}.hint_text_en`}
                   disabled={disabled}
                   overrideValues={{
-                    label: "Ohjeteksti englanniksi",
-                  }}
-                />
-              </Column>
-              <Column small={4}>
-                <FormFieldLegacy
-                  fieldAttributes={get(
-                    attributes,
-                    "sections.child.children.fields.child.children.hint_text_sv",
-                  )}
-                  name={`${field}.hint_text_sv`}
-                  disabled={disabled}
-                  overrideValues={{
-                    label: "Ohjeteksti ruotsiksi",
+                    label: "Teks bantuan dalam bahasa Inggris",
                   }}
                 />
               </Column>
@@ -769,7 +729,7 @@ const EditPlotApplicationSectionFieldForm = ({
               )) && (
               <Row>
                 <Column small={12}>
-                  <SubTitle>Kentän arvot</SubTitle>
+                  <SubTitle>Nilai kolom</SubTitle>
                 </Column>
               </Row>
             )}
@@ -802,8 +762,8 @@ const EditPlotApplicationSectionFieldForm = ({
                       label: fieldFeatures.includes(
                         FieldTypeFeatures.UNCHANGEABLE_VALUE,
                       )
-                        ? "Vakioarvo"
-                        : "Oletusarvo",
+                        ? "Nilai tetap"
+                        : "Nilai bawaan",
                     }}
                   />
                 </Column>
@@ -823,7 +783,7 @@ const EditPlotApplicationSectionFieldForm = ({
                     name={`${field}.default_value`}
                     disabled={disabled}
                     overrideValues={{
-                      label: "Oletusarvo",
+                      label: "Nilai bawaan",
                       options: optionChoices || [],
                     }}
                   />
@@ -839,7 +799,7 @@ const EditPlotApplicationSectionFieldForm = ({
               <>
                 <Row>
                   <Column small={12}>
-                    <SubTitle>Vaihtoehdot</SubTitle>
+                    <SubTitle>Pilihan</SubTitle>
                   </Column>
                 </Row>
                 <Row>
@@ -859,7 +819,7 @@ const EditPlotApplicationSectionFieldForm = ({
                       overrideValues={{
                         options: [
                           {
-                            label: "Täytä arvot automaattisesti",
+                            label: "Isi nilai secara otomatis",
                             value: true,
                           },
                         ],

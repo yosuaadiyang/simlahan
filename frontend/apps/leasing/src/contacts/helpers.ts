@@ -21,6 +21,14 @@ export const getContactFullName = (
 };
 
 /**
+ * NPWP valid: 15 digit (boleh berformat 00.000.000.0-000.000) atau 16 digit.
+ */
+export const isValidNpwp = (value: string | null | undefined): boolean =>
+  !!value &&
+  (/^(\d{15}|\d{16})$/.test(value.trim()) ||
+    /^\d{2}\.\d{3}\.\d{3}\.\d-\d{3}\.\d{3}$/.test(value.trim()));
+
+/**
  * Get Contact business id field errors
  * @param {string} businessId
  * @returns {boolean}
@@ -28,7 +36,7 @@ export const getContactFullName = (
 export const getContactBusinessIdFieldError = (
   businessId: string | null | undefined,
 ): boolean => {
-  return businessId && businessId.length === 9 ? false : true;
+  return !isValidNpwp(businessId);
 };
 
 /**
@@ -39,7 +47,7 @@ export const getContactBusinessIdFieldError = (
 export const getContactBusinessIdError = (
   contact: Record<string, any>,
 ): boolean => {
-  return contact.business_id && contact.business_id.length === 9 ? false : true;
+  return !isValidNpwp(contact.business_id);
 };
 
 /**

@@ -166,7 +166,7 @@ class PlotApplicationPage extends Component<Props & WithRouterProps, State> {
     receiveIsSaveClicked(false);
     receiveTopNavigationSettings({
       linkUrl: getRouteById(Routes.PLOT_APPLICATIONS),
-      pageTitle: "Tonttihakemukset",
+      pageTitle: "Permohonan kavling",
       showSearch: true,
     });
 
@@ -177,7 +177,7 @@ class PlotApplicationPage extends Component<Props & WithRouterProps, State> {
     }
 
     fetchSinglePlotApplication(plotApplicationId);
-    setPageTitle("Hakemus");
+    setPageTitle("Permohonan");
   }
 
   componentWillUnmount() {
@@ -341,7 +341,7 @@ class PlotApplicationPage extends Component<Props & WithRouterProps, State> {
     }
 
     if (!isFetching && prevProps.isFetching) {
-      setPageTitle(`Hakemus ${currentPlotApplication.id}`);
+      setPageTitle(`Permohonan ${currentPlotApplication.id}`);
     }
 
     if (!isEditMode && prevProps.isEditMode) {
@@ -541,7 +541,7 @@ class PlotApplicationPage extends Component<Props & WithRouterProps, State> {
     if (!isFetching && !isSingleAllowed) {
       return (
         <PageContainer>
-          <AuthorizationError text="Sinulla ei tällä hetkellä ole oikeutta nähdä tätä hakemusta. Mikäli hakemukseen liittyvä haku on päättynyt, valmistelija voi avata hakemuksen listanäkymän kautta." />
+          <AuthorizationError text="Saat ini Anda tidak berwenang melihat permohonan ini. Jika pencarian terkait permohonan sudah berakhir, penyiap dapat membuka permohonan melalui tampilan daftar." />
         </PageContainer>
       );
     }
@@ -549,7 +549,7 @@ class PlotApplicationPage extends Component<Props & WithRouterProps, State> {
     if (!isFetching && !currentPlotApplication.id) {
       return (
         <PageContainer>
-          <AuthorizationError text="Hakemusta ei löydy." />
+          <AuthorizationError text="Permohonan tidak ditemukan." />
         </PageContainer>
       );
     }
@@ -598,14 +598,14 @@ class PlotApplicationPage extends Component<Props & WithRouterProps, State> {
             isEditMode={isEditMode}
             tabs={[
               {
-                label: "Hakemus",
+                label: "Permohonan",
                 allow: true,
                 isDirty: false,
                 //isApplicationFormDirty,
                 hasError: isSaveClicked && !areFormsValid,
               },
               {
-                label: "Muutoshistoria",
+                label: "Riwayat perubahan",
                 allow: true,
               },
             ]}
@@ -630,7 +630,7 @@ class PlotApplicationPage extends Component<Props & WithRouterProps, State> {
             </TabPane>
 
             <TabPane>
-              <ContentContainer>{"Muutoshistoria"}</ContentContainer>
+              <ContentContainer>{"Riwayat perubahan"}</ContentContainer>
             </TabPane>
           </TabContent>
         </PageContainer>

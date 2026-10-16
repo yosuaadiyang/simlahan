@@ -7,7 +7,6 @@ import Authorization from "@/components/authorization/Authorization";
 import BoxItem from "@/components/content/BoxItem";
 import FormText from "@/components/form/FormText";
 import FormTextTitle from "@/components/form/FormTextTitle";
-import KtjLink from "@/components/ktj/KtjLink";
 import SubTitle from "@/components/content/SubTitle";
 import {
   LeasePlotsFieldPaths,
@@ -177,68 +176,6 @@ const PlotItem: React.FC<Props> = ({ areaArchived, plot }) => {
           </Authorization>
         </Column>
       </Row>
-
-      <Authorization
-        allow={isFieldAllowedToRead(
-          attributes,
-          LeasePlotsFieldPaths.IDENTIFIER,
-        )}
-      >
-        {plot.identifier && (
-          <>
-            <SubTitle
-              uiDataKey={getUiDataLeaseKey(LeasePlotsFieldPaths.KTJ_LINK)}
-            >
-              {LeasePlotsFieldTitles.KTJ_LINK}
-            </SubTitle>
-
-            <Row>
-              {plot.type === PlotType.REAL_PROPERTY && (
-                <Column small={12} medium={6}>
-                  <KtjLink
-                    fileKey="kiinteistorekisteriote/rekisteriyksikko"
-                    fileName="kiinteistorekisteriote"
-                    identifier={plot.identifier}
-                    idKey="kiinteistotunnus"
-                    label="Kiinteistörekisteriote"
-                    prefix="ktjkii"
-                  />
-                </Column>
-              )}
-              {plot.type === PlotType.UNSEPARATED_PARCEL && (
-                <Column small={12} medium={6}>
-                  <KtjLink
-                    fileKey="kiinteistorekisteriote/maaraala"
-                    fileName="kiinteistorekisteriote"
-                    identifier={plot.identifier}
-                    idKey="maaraalatunnus"
-                    label="Kiinteistörekisteriote"
-                    prefix="ktjkii"
-                  />
-                </Column>
-              )}
-              <Column small={12} medium={6}>
-                <KtjLink
-                  fileKey="lainhuutotodistus"
-                  fileName="lainhuutotodistus"
-                  identifier={plot.identifier}
-                  idKey="kohdetunnus"
-                  label="Lainhuutotodistus"
-                />
-              </Column>
-              <Column small={12} medium={6}>
-                <KtjLink
-                  fileKey="rasitustodistus"
-                  fileName="rasitustodistus"
-                  identifier={plot.identifier}
-                  idKey="kohdetunnus"
-                  label="Rasitustodistus"
-                />
-              </Column>
-            </Row>
-          </>
-        )}
-      </Authorization>
     </BoxItem>
   );
 };

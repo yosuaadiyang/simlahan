@@ -1,1 +1,8 @@
-@import url("https://hds.hel.fi/fonts/fonts.css");
+// Font sistem (tanpa unduhan eksternal). Helsinki Grotesk berlisensi khusus
+// Kota Helsinki sehingga tidak dipakai.
+$font-stack: "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
+  sans-serif;
+
+:root {
+  --font-default: #{$font-stack};
+}

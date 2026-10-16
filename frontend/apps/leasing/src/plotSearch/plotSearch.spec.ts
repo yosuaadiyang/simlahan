@@ -504,7 +504,7 @@ describe("PlotSearch", () => {
             ...mockData[0],
             stage: {
               id: 1,
-              name: "Valmisteilla",
+              name: "Dalam persiapan",
               stage: "in_preparation",
             },
           }),

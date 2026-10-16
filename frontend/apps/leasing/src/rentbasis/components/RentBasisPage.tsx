@@ -166,12 +166,12 @@ const RentBasisPage: React.FC = () => {
 
   useEffect(() => {
     const query = getUrlParams(location.search);
-    setPageTitle(`${params.rentBasisId} | Vuokrausperiaate`);
+    setPageTitle(`${params.rentBasisId} | Prinsip sewa`);
     dispatch(receiveIsSaveClicked(false));
     dispatch(
       receiveTopNavigationSettings({
         linkUrl: getRouteById(Routes.RENT_BASIS),
-        pageTitle: "Vuokrausperiaatteet",
+        pageTitle: "Prinsip sewa",
         showSearch: false,
       }),
     );

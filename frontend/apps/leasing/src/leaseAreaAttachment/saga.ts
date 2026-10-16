@@ -27,7 +27,7 @@ function* createLeaseAreaAttachmentSaga({
         yield put(
           fetchSingleLeaseAfterEdit({
             leaseId: payload.lease,
-            successMessage: "Tiedosto lisätty",
+            successMessage: "Berkas ditambahkan",
           }),
         );
         break;
@@ -58,7 +58,7 @@ function* deleteLeaseAreaAttachmentSaga({
         yield put(
           fetchSingleLeaseAfterEdit({
             leaseId: payload.lease,
-            successMessage: "Tiedosto poistettu",
+            successMessage: "Berkas dihapus",
           }),
         );
         break;

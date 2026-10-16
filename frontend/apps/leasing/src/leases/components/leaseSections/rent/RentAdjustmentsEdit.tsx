@@ -126,7 +126,7 @@ const RentAdjustmentsEdit: React.FC<Props> = ({ fields }) => {
     !hasPermissions(usersPermissions, UsersPermissions.ADD_RENTADJUSTMENT) &&
     (!fields || !fields.length)
   ) {
-    return <FormText>Ei alennuksia tai korotuksia</FormText>;
+    return <FormText>Tidak ada potongan atau kenaikan</FormText>;
   }
 
   return (
@@ -181,7 +181,7 @@ const RentAdjustmentsEdit: React.FC<Props> = ({ fields }) => {
                 <Column>
                   <AddButtonSecondary
                     className={!fields || !fields.length ? "no-top-margin" : ""}
-                    label="Lisää alennus/korotus"
+                    label="Tambah potongan/kenaikan"
                     onClick={handleAdd}
                   />
                 </Column>
@@ -196,7 +196,7 @@ const RentAdjustmentsEdit: React.FC<Props> = ({ fields }) => {
               <Row>
                 <Column>
                   <AddButtonSecondary
-                    label="Lisää porrastettu alennus"
+                    label="Tambah potongan bertingkat"
                     onClick={handleOpenSteppedDiscountModal}
                   />
                 </Column>

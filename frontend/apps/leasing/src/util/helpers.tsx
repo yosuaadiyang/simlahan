@@ -3,7 +3,6 @@ import isFuture from "date-fns/isFuture";
 import isPast from "date-fns/isPast";
 import { forEach, get, isArray, isBoolean, isEmpty, isNumber } from "lodash-es";
 import { enqueueNotification } from "@/components/notification/notificationService";
-import { PAIKKATIETOPALVELU_URL } from "@/util/constants";
 import { Breakpoints } from "@/foundation/enums";
 import type {
   ApiResponse,
@@ -25,7 +24,7 @@ export const composePageTitle = (
   prepend: boolean = true,
 ): string => {
   return prepend
-    ? `${title ? `${title} | ` : ""}Maanvuokrausjärjestelmä | Helsingin Kaupunki`
+    ? `${title ? `${title} | ` : ""}SimLahan | Sistem Informasi Manajemen Lahan`
     : title;
 };
 
@@ -340,18 +339,32 @@ export const getApiUrlWithOutVersionSuffix = (): string => {
 };
 
 /**
- * Get reference number link from Päätökset
+ * Tautan nomor referensi keputusan ke sistem arsip/JDIH instansi
+ * (VITE_DECISION_URL_TEMPLATE, mis. "https://jdih.contoh.go.id/cari?q={id}").
  * @param referenceNumber
  * @returns {string}
  */
 export const getReferenceNumberLink = (
   referenceNumber: string | null | undefined,
-): string | null | undefined => {
-  const apiUrl = "https://paatokset.hel.fi/asia";
-  return referenceNumber
-    ? `${apiUrl}/${referenceNumber.replace(" ", "-").toLowerCase()}`
+): string | null | undefined =>
+  referenceNumber
+    ? fillUrlTemplate(
+        import.meta.env.VITE_DECISION_URL_TEMPLATE,
+        referenceNumber.trim(),
+      )
     : null;
-};
+
+/**
+ * Isi templat URL ("https://contoh/{id}") dengan nilai; null bila templat kosong.
+ * @param {string} template
+ * @param {string} value
+ * @returns {string|null}
+ */
+export const fillUrlTemplate = (
+  template: string | null | undefined,
+  value: string,
+): string | null =>
+  template ? template.replace("{id}", encodeURIComponent(value)) : null;
 
 /**
  * Find item from collection with ID
@@ -773,20 +786,25 @@ export const findFromOcdString = (
 };
 
 /**
- * Create url to ptp.hel.fi
+ * Tautan laporan rencana tata ruang (VITE_PLAN_REPORT_URL_TEMPLATE).
  * @param {string} reportId
- * @returns {string}
+ * @returns {string|null}
  */
-export const createPTPPlanReportUrl = (reportId: string): string =>
-  `${PAIKKATIETOPALVELU_URL}/DataForms/planreport/?id=${reportId}`;
+export const createPTPPlanReportUrl = (reportId: string): string | null =>
+  fillUrlTemplate(import.meta.env.VITE_PLAN_REPORT_URL_TEMPLATE, reportId);
 
 /**
- * Create url to ptp.hel.fi
+ * Tautan data pemecahan bidang (VITE_PLOT_DIVISION_URL_TEMPLATE).
  * @param {string} plotDivisionId
- * @returns {string}
+ * @returns {string|null}
  */
-export const createPTPPlotDivisionUrl = (plotDivisionId: string): string =>
-  `${PAIKKATIETOPALVELU_URL}/DataHandlers/Tonttijaot/?q=${plotDivisionId}`;
+export const createPTPPlotDivisionUrl = (
+  plotDivisionId: string,
+): string | null =>
+  fillUrlTemplate(
+    import.meta.env.VITE_PLOT_DIVISION_URL_TEMPLATE,
+    plotDivisionId,
+  );
 
 /**
  * Get count of results from api response

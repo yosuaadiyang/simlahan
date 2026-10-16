@@ -56,7 +56,7 @@ const PlanUnitsLayer = ({
             plot_division_state,
             section_area,
           } = feature.properties;
-          const popupContent = `<p class='title'><strong>Kaavayksikkö</strong></p>
+          const popupContent = `<p class='title'><strong>Unit rencana</strong></p>
             <p><strong>Id:</strong> ${id}</p>
             <p><strong>${LeasePlanUnitsFieldTitles.IDENTIFIER}:</strong> ${identifier}</p>
             <p><strong>${LeasePlanUnitsFieldTitles.AREA}:</strong> ${area || area === 0 ? `${formatNumber(area)} m²` : ""}</p>

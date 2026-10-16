@@ -100,7 +100,7 @@ class ApplicationListMap extends PureComponent<Props & WithRouterProps, State> {
           stateOptions={stateOptions}
         />
       ),
-      name: "Kohteet",
+      name: "Objek",
     });
     return layers;
   };
@@ -143,7 +143,7 @@ class ApplicationListMap extends PureComponent<Props & WithRouterProps, State> {
           overlayLayers={overlayLayers}
           showZoomLevelWarning={zoom < MAX_ZOOM_LEVEL_TO_FETCH_LEASES}
           zoom={zoom}
-          zoomLevelWarningText="Tarkenna lähemmäksi kartalla hakeaksesi hakemusten kohteet"
+          zoomLevelWarningText="Perbesar peta untuk menampilkan objek permohonan"
         />
       </Fragment>
     );

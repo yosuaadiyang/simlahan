@@ -230,7 +230,7 @@ class PlotApplicationCreate extends PureComponent<Props, State> {
     }));
     return (
       <form className="PlotApplicationEdit">
-        <Title>Hakemus</Title>
+        <Title>Permohonan</Title>
         <Divider />
         <Row className="summary__content-wrapper">
           <Column small={12}>
@@ -239,7 +239,7 @@ class PlotApplicationCreate extends PureComponent<Props, State> {
                 collapseStateCommon !== undefined ? collapseStateCommon : true
               }
               hasErrors={isSaveClicked && !isEmpty(errors)}
-              headerTitle="Hakemus"
+              headerTitle="Permohonan"
               onToggle={this.handleCommonFieldsCollapseToggle}
             >
               <Row>
@@ -249,7 +249,7 @@ class PlotApplicationCreate extends PureComponent<Props, State> {
                       disableTouched={isSaveClicked}
                       fieldAttributes={{
                         ...get(attributes, "form"),
-                        label: "Tonttihaku",
+                        label: "Pencarian kavling",
                         choices: plotSearchChoices,
                       }}
                       overrideValues={{
@@ -282,7 +282,7 @@ class PlotApplicationCreate extends PureComponent<Props, State> {
                       fieldAttributes={{
                         ...get(attributes, "targets"),
                         type: "multiselect",
-                        label: "Haettavat kohteet",
+                        label: "Objek yang dimohon",
                       }}
                       overrideValues={{
                         options: targetOptions,

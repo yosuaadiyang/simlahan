@@ -483,7 +483,7 @@ class Summary extends PureComponent<Props, State> {
                         {LeaseFieldTitles.TRANSFERABLE}
                       </FormTextTitle>
                       <FormText>
-                        {summary.transferable ? "Kyllä" : "Ei"}
+                        {summary.transferable ? "Ya" : "Tidak"}
                       </FormText>
                     </>
                   </Authorization>
@@ -760,7 +760,7 @@ class Summary extends PureComponent<Props, State> {
                         {LeaseFieldTitles.IS_SUBJECT_TO_VAT}
                       </FormTextTitle>
                       <FormText>
-                        {summary.is_subject_to_vat ? "Kyllä" : "Ei"}
+                        {summary.is_subject_to_vat ? "Ya" : "Tidak"}
                       </FormText>
                     </>
                   </Authorization>
@@ -782,7 +782,7 @@ class Summary extends PureComponent<Props, State> {
                           {LeaseFieldTitles.ARRANGEMENT_DECISION}
                         </FormTextTitle>
                         <FormText>
-                          {summary.arrangement_decision ? "Kyllä" : "Ei"}
+                          {summary.arrangement_decision ? "Ya" : "Tidak"}
                         </FormText>
                       </>
                     </Authorization>
@@ -981,7 +981,7 @@ class Summary extends PureComponent<Props, State> {
                       </FormTextTitle>
                       <FormText>
                         {!isEmptyValue(summary.building_selling_price)
-                          ? `${formatNumber(summary.building_selling_price)} €`
+                          ? `Rp ${formatNumber(summary.building_selling_price)}`
                           : "-"}
                       </FormText>
                     </>
@@ -1002,7 +1002,7 @@ class Summary extends PureComponent<Props, State> {
                       >
                         {LeaseFieldTitles.REGULATED}
                       </FormTextTitle>
-                      <FormText>{summary.regulated ? "Kyllä" : "Ei"}</FormText>
+                      <FormText>{summary.regulated ? "Ya" : "Tidak"}</FormText>
                     </>
                   </Authorization>
                 </Column>

@@ -51,7 +51,7 @@ const InvoiceNotesReadOnly = ({ invoiceNotes }: ReadOnlyProps) => {
   );
 
   if (!invoiceNotes.length) {
-    return <FormText>Ei laskujen tiedotteita</FormText>;
+    return <FormText>Tidak ada catatan tagihan</FormText>;
   }
 
   return (
@@ -289,7 +289,7 @@ const InvoiceNotesEdit = ({ fields }: EditProps): ReactElement => {
                           <RemoveButton
                             className="third-level"
                             onClick={handleRemove}
-                            title="Poista tiedote"
+                            title="Hapus pengumuman"
                           />
                         </Authorization>
                       }
@@ -303,7 +303,7 @@ const InvoiceNotesEdit = ({ fields }: EditProps): ReactElement => {
             >
               <Row>
                 <Column>
-                  <AddButton label="Lisää tiedote" onClick={handleAdd} />
+                  <AddButton label="Tambah pengumuman" onClick={handleAdd} />
                 </Column>
               </Row>
             </Authorization>
@@ -405,13 +405,13 @@ const InvoiceNotes: React.FC<Props> = ({ invoiceNotes }) => {
                           <Button
                             className={ButtonColors.SECONDARY}
                             onClick={handleCancel}
-                            text="Peruuta"
+                            text="Batal"
                           />
                           <Button
                             className={ButtonColors.SUCCESS}
                             disabled={!valid}
                             type="submit"
-                            text="Tallenna"
+                            text="Simpan"
                           />
                         </ButtonWrapper>
                       </Column>

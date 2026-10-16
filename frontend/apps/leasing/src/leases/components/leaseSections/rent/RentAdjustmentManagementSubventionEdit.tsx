@@ -100,7 +100,7 @@ const RentAdjustmentManagementSubventionEdit: React.FC<Props> = ({
           <RemoveButton
             className="third-level"
             onClick={onRemove}
-            title="Poista hallintamuoto"
+            title="Hapus bentuk pengelolaan"
           />
         </Authorization>
       </Column>

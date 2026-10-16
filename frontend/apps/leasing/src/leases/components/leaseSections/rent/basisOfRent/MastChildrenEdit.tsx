@@ -51,8 +51,8 @@ const MastChildrenEdit: React.FC<Props> = ({
             }
           >
             <>
-              {index === 0 && <FormText>{`Laitekaappi`}</FormText>}
-              {index === 1 && <FormText>{`Masto`}</FormText>}
+              {index === 0 && <FormText>{`Lemari perangkat`}</FormText>}
+              {index === 1 && <FormText>{`Menara`}</FormText>}
             </>
           </Authorization>
         </Column>
@@ -64,8 +64,8 @@ const MastChildrenEdit: React.FC<Props> = ({
             )}
           >
             <>
-              {index === 0 && <FormText>{`1000,00 €`}</FormText>}
-              {index === 1 && <FormText>{`600,00 €`}</FormText>}
+              {index === 0 && <FormText>{`Rp 1000,00`}</FormText>}
+              {index === 1 && <FormText>{`Rp 600,00`}</FormText>}
             </>
           </Authorization>
         </Column>
@@ -99,7 +99,7 @@ const MastChildrenEdit: React.FC<Props> = ({
               name={`${parentField}.children[${index}].area`}
               invisibleLabel={true}
               overrideValues={{
-                label: "Ala/korkeus",
+                label: "Luas/tinggi",
               }}
               disabled={fieldsDisabled}
             />
@@ -140,7 +140,7 @@ const MastChildrenEdit: React.FC<Props> = ({
             }
           >
             <FormText>
-              {!isEmptyValue(rent) ? `${formatNumber(rent)} €` : "-"}
+              {!isEmptyValue(rent) ? `Rp ${formatNumber(rent)}` : "-"}
             </FormText>
           </Authorization>
         </Column>

@@ -26,8 +26,7 @@ function* fetchUsersPermissionsSaga(): Generator<any, any, any> {
           yield put(
             receiveError(
               new Error(
-                `Käyttäjälle ei ole asetettu palvelukokonaisuuksia. Kokeile päivittää sivu, ja ota yhteyttä tukeen, jotta puuttuvat käyttäjäryhmät voidaan asettaa.
-        User has no service units assigned. Try to refresh the page and contact support to configure correct user groups.`,
+                `Pengguna belum memiliki unit layanan. Coba muat ulang halaman, lalu hubungi administrator untuk mengatur grup pengguna yang benar.`,
               ),
             ),
           );

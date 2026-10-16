@@ -194,7 +194,7 @@ const LeaseHistoryEdit: React.FC<Props> = (props) => {
                     RelatedLeasePaths.TO_LEASE,
                   )}
                 >
-                  Liitä vuokratunnukseen
+                  Kaitkan ke pengenal sewa
                 </FormFieldLabel>
                 <Row>
                   <Column>

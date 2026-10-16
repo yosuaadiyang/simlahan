@@ -15,4 +15,4 @@ export const standardStringifyQuery = (query: Record<string, any>): string =>
     )
     .join("&");
 export default (url: string, params?: Record<string, any>): string =>
-  `${import.meta.env.VITE_API_URL || ""}/${url}${params ? `?${stringifyQuery(params)}` : ""}`;
+  `${import.meta.env.VITE_API_URL || "/v1"}/${url}${params ? `?${stringifyQuery(params)}` : ""}`;

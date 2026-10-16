@@ -32,7 +32,7 @@ const Decisions: React.FC = () => {
     <Fragment>
       {!decisions ||
         (!decisions.length && (
-          <FormText className="no-margin">Ei päätöksiä</FormText>
+          <FormText className="no-margin">Tidak ada keputusan</FormText>
         ))}
       {decisions &&
         !!decisions.length &&

@@ -97,7 +97,7 @@ const RentAdjustmentTemporarySubventionEdit = ({ field, onRemove }: Props) => {
           <RemoveButton
             className="third-level"
             onClick={onRemove}
-            title="Poista tilapäisalennus"
+            title="Hapus potongan sementara"
           />
         </Authorization>
       </Column>

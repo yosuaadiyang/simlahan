@@ -91,7 +91,7 @@ const SendEmail: React.FC = () => {
               style={{
                 marginBottom: 15,
               }}
-              text="Lähetä sähköposti"
+              text="Kirim email"
             />
           </Authorization>
         </Column>
@@ -110,19 +110,19 @@ const SendEmail: React.FC = () => {
           >
             <>
               {!emailLogs.length && (
-                <FormText>Ei lähetettyjä sähköposteja</FormText>
+                <FormText>Tidak ada email terkirim</FormText>
               )}
               {!!emailLogs.length && (
                 <div className="constructability__send-email_sent-emails">
                   <Row>
                     <Column small={4} medium={3} large={2}>
-                      <FormTextTitle title="Lähetetty" />
+                      <FormTextTitle title="Terkirim" />
                     </Column>
                     <Column small={4} medium={3} large={2}>
-                      <FormTextTitle title="Lähettäjä" />
+                      <FormTextTitle title="Pengirim" />
                     </Column>
                     <Column small={4} medium={6} large={8}>
-                      <FormTextTitle title="Vastaanottajat" />
+                      <FormTextTitle title="Penerima" />
                     </Column>
                   </Row>
                   {emailLogs.map((email, index) => {

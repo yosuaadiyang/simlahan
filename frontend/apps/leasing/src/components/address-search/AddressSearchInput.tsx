@@ -1,44 +1,47 @@
 import React, { Component } from "react";
 import classNames from "classnames";
-import { capitalize, debounce } from "lodash-es";
+import { debounce } from "lodash-es";
 import Loader from "@/components/loader/Loader";
 import LoaderWrapper from "@/components/loader/LoaderWrapper";
 import { stringifyQuery } from "@/api/createUrl";
 import { KeyCodes } from "@/enums";
-import { findFromOcdString } from "@/util/helpers";
-import { SERVICE_MAP_URL } from "@/util/constants";
-type Language = "fi" | "sv";
 const MINIMUM_SEARCH_STRING = 3;
 const DEBOUNCE_TIME_MILLISECONDS = 500;
+const NOMINATIM_URL =
+  import.meta.env.VITE_GEOCODER_URL || "https://nominatim.openstreetmap.org";
+
+/** Hasil geocoding Nominatim (OpenStreetMap). */
 type Address = {
-  object_type: string;
-  name: {
-    fi: string;
-    sv: string;
-    en: string;
-  };
-  number: string;
-  number_end: string;
-  letter: string;
-  modified_at: string;
-  municipality: {
-    id: string;
-    name: {
-      fi: string;
-      sv: string;
-    };
-  };
-  street: {
-    name: {
-      fi: string;
-      sv: string;
-    };
-  };
-  location: {
-    type: string;
-    coordinates: Array<number>;
+  place_id: number;
+  display_name: string;
+  lat: string;
+  lon: string;
+  address: {
+    road?: string;
+    house_number?: string;
+    village?: string;
+    suburb?: string;
+    city?: string;
+    town?: string;
+    county?: string;
+    state?: string;
+    postcode?: string;
+    country?: string;
+    country_code?: string;
   };
 };
+
+const getStreetAddress = (address: Address): string => {
+  const { road, house_number } = address.address || {};
+  if (road) return house_number ? `${road} No. ${house_number}` : road;
+  return address.display_name.split(",")[0];
+};
+
+const getCity = (address: Address): string => {
+  const parts = address.address || {};
+  return parts.city || parts.town || parts.county || parts.state || "";
+};
+
 type Props = {
   addressDetailsCallBack?: (...args: Array<any>) => any;
   id?: string;
@@ -74,10 +77,6 @@ class AddressSearchInput extends Component<Props, State> {
     selectedAddress: null,
     value: this.props.selected || "",
   };
-  static defaultProps = {
-    language: "fi",
-  };
-
   constructor(props: Props) {
     super(props);
     this.rootRef = React.createRef();
@@ -234,23 +233,17 @@ class AddressSearchInput extends Component<Props, State> {
     }
   };
   searchByKeyword = debounce((input: string) => {
-    const fetchByKeyword = (language: Language) => {
-      const url = `${SERVICE_MAP_URL}/search/?${stringifyQuery({
-        page_size: 25,
-        type: "address",
-        input: input,
-        language: language,
+    const fetchResults = async (): Promise<Array<Address>> => {
+      const url = `${NOMINATIM_URL}/search?${stringifyQuery({
+        q: input,
+        format: "jsonv2",
+        addressdetails: 1,
+        countrycodes: "id",
+        limit: 15,
+        "accept-language": "id",
       })}`;
-      const request = new Request(url);
-      return fetch(request);
-    };
-
-    const fetchResults = async () => {
-      const fiResponse = await fetchByKeyword("fi");
-      const fiResults = await fiResponse.json();
-      return [
-        ...fiResults.results.map((address) => ({ ...address, language: "fi" })),
-      ];
+      const response = await fetch(new Request(url));
+      return response.json();
     };
 
     this.setState({
@@ -304,7 +297,7 @@ class AddressSearchInput extends Component<Props, State> {
   };
   handleAddressItemClick = (address: Address) => {
     const { onChange } = this.props,
-      newValue = address.name.fi;
+      newValue = getStreetAddress(address);
     this.setState({
       value: newValue,
     });
@@ -321,46 +314,13 @@ class AddressSearchInput extends Component<Props, State> {
   };
   fetchAddressDetails = (address: Address) => {
     const { addressDetailsCallBack } = this.props;
-    const coordinates = address.location.coordinates;
 
-    if (coordinates.length >= 2) {
-      const url = `${SERVICE_MAP_URL}/administrative_division/?${stringifyQuery(
-        {
-          lon: coordinates[0],
-          lat: coordinates[1],
-          type: "postcode_area",
-        },
-      )}`;
-      const request = new Request(url);
-      fetch(request)
-        .then((response) => response.json())
-        .then((results) => {
-          const details = results.results;
-          const postalCode =
-            details.length && details[0].name && details[0].name.fi
-              ? details[0].name.fi
-              : details.length
-                ? details[0].origin_id || ""
-                : "";
-          const country = details.length
-            ? findFromOcdString(details[0].ocd_id, "country") || ""
-            : "";
-
-          if (addressDetailsCallBack) {
-            addressDetailsCallBack({
-              postalCode,
-              city: address.municipality.name.fi
-                ? capitalize(address.municipality.name.fi)
-                : "",
-              country,
-            });
-          }
-        })
-        .catch((error) => {
-          console.error(`Failed to fetch address details with error ${error}`);
-        });
-    } else {
-      console.error(`Failed to fetch address details. Coordinates are missing`);
+    if (addressDetailsCallBack) {
+      addressDetailsCallBack({
+        postalCode: address.address?.postcode || "",
+        city: getCity(address),
+        country: (address.address?.country_code || "").toUpperCase(),
+      });
     }
   };
 
@@ -404,7 +364,7 @@ class AddressSearchInput extends Component<Props, State> {
         >
           <ul ref={this.refMenuListRef}>
             {selectedAddress && !addresses.length && (
-              <li className="no-result-item">Ei osoitteita.</li>
+              <li className="no-result-item">Alamat tidak ditemukan.</li>
             )}
             {selectedAddress &&
               !!addresses.length &&
@@ -413,7 +373,7 @@ class AddressSearchInput extends Component<Props, State> {
                   this.handleAddressItemClick(address);
                 };
 
-                const text = `${address.name.fi}, ${address.municipality.name.fi}`;
+                const text = address.display_name;
                 return (
                   <li
                     key={index}

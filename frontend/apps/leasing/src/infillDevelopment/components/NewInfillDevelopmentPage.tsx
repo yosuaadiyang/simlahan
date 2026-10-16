@@ -179,11 +179,11 @@ const NewInfillDevelopmentPage = () => {
   }, [initialValues]);
 
   useEffect(() => {
-    setPageTitle("Uusi täydennysrakentamiskorvaus");
+    setPageTitle("Kompensasi pembangunan sisipan baru");
     dispatch(
       receiveTopNavigationSettings({
         linkUrl: getRouteById(Routes.INFILL_DEVELOPMENTS),
-        pageTitle: "Täydennysrakantamiskorvaus",
+        pageTitle: "Kompensasi pembangunan sisipan",
         showSearch: false,
       }),
     );
@@ -256,7 +256,7 @@ const NewInfillDevelopmentPage = () => {
               showCopyButton={true}
             />
           }
-          infoComponent={<h1>Uusi täydennysrakentamiskorvaus</h1>}
+          infoComponent={<h1>Kompensasi pembangunan sisipan baru</h1>}
           onBack={handleBack}
         />
       </PageNavigationWrapper>

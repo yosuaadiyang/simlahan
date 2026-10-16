@@ -119,7 +119,7 @@ const BasisOfRentTemporarySubventionEdit: React.FC<Props> = ({
               )}
             >
               <FormText className="full-width">
-                {formatNumber(subventionAmount, 3)} €
+                Rp {formatNumber(subventionAmount, 3)}
               </FormText>
             </Authorization>
           }
@@ -134,7 +134,7 @@ const BasisOfRentTemporarySubventionEdit: React.FC<Props> = ({
                 <RemoveButton
                   className="third-level"
                   onClick={onRemove}
-                  title="Poista tilapäisalennus"
+                  title="Hapus potongan sementara"
                 />
               )}
             </Authorization>

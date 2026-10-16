@@ -112,7 +112,7 @@ const CollateralFinancialGuarantee = ({
               </FormTextTitle>
               <FormText>
                 {!isEmptyValue(collateral.total_amount)
-                  ? `${formatNumber(collateral.total_amount)} €`
+                  ? `Rp ${formatNumber(collateral.total_amount)}`
                   : "-"}
               </FormText>
             </>
@@ -310,7 +310,7 @@ const CollateralMortgageDocument = ({
               </FormTextTitle>
               <FormText>
                 {!isEmptyValue(collateral.total_amount)
-                  ? `${formatNumber(collateral.total_amount)} €`
+                  ? `Rp ${formatNumber(collateral.total_amount)}`
                   : "-"}
               </FormText>
             </>
@@ -470,7 +470,7 @@ const CollateralOther = ({
               </FormTextTitle>
               <FormText>
                 {!isEmptyValue(collateral.total_amount)
-                  ? `${formatNumber(collateral.total_amount)} €`
+                  ? `Rp ${formatNumber(collateral.total_amount)}`
                   : "-"}
               </FormText>
             </>

@@ -123,9 +123,9 @@ class EditAreaSearchPreparerForm extends Component<Props> {
           <Button
             onClick={onClose}
             className={ButtonColors.SECONDARY}
-            text="Peruuta"
+            text="Batal"
           />
-          <Button onClick={() => onSubmit(formValues)} text={"Tallenna"} />
+          <Button onClick={() => onSubmit(formValues)} text={"Simpan"} />
         </ModalButtonWrapper>
       </form>
     );

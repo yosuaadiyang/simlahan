@@ -1,10 +1,10 @@
 import React from "react";
 import DatePicker, { registerLocale } from "react-datepicker";
-import fi from "date-fns/locale/fi";
+import idLocale from "date-fns/locale/id";
 import classNames from "classnames";
 import type { FieldComponentProps } from "@/components/form/final-form/FormField";
 
-registerLocale("fi", fi);
+registerLocale("id", idLocale);
 
 const FieldTypeTime = ({
   disabled = false,
@@ -40,7 +40,7 @@ const FieldTypeTime = ({
         ref={handleSetReference}
         disabled={disabled}
         id={name}
-        locale="fi"
+        locale="id"
         selected={value ? new Date(value) : null}
         dateFormat="dd.MM.yyyy HH:mm"
         showYearDropdown

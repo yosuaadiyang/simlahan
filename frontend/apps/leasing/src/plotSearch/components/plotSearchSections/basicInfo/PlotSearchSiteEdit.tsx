@@ -78,10 +78,12 @@ const renderSuggested = ({
               {fields && !!fields.length && (
                 <Row>
                   <Column large={7}>
-                    <FormTextTitle>{"Ehdotettu varauksensaaja"}</FormTextTitle>
+                    <FormTextTitle>
+                      {"Penerima pencadangan yang diusulkan"}
+                    </FormTextTitle>
                   </Column>
                   <Column large={4}>
-                    <FormTextTitle>{"Osuus"}</FormTextTitle>
+                    <FormTextTitle>{"Porsi"}</FormTextTitle>
                   </Column>
                 </Row>
               )}
@@ -120,7 +122,7 @@ const renderSuggested = ({
               {!disabled && (
                 <Row>
                   <Column>
-                    <AddButtonThird label="Lisää ehdotus" onClick={handleAdd} />
+                    <AddButtonThird label="Tambah usulan" onClick={handleAdd} />
                   </Column>
                 </Row>
               )}
@@ -154,7 +156,7 @@ const renderInfoLinks = ({
       {({ modalDispatch }) => {
         return (
           <div>
-            <FormTextTitle>Lisätietolinkit</FormTextTitle>
+            <FormTextTitle>Tautan informasi</FormTextTitle>
             <div role="table">
               <Row>
                 <Column small={4} medium={4} large={4} role="columnheader">
@@ -248,7 +250,7 @@ const renderInfoLinks = ({
                           style={{
                             height: "unset",
                           }}
-                          title="Poista lisätietolinkki"
+                          title="Hapus tautan informasi"
                           disabled={disabled}
                         />
                       </Column>
@@ -259,7 +261,7 @@ const renderInfoLinks = ({
                 <Row>
                   <Column>
                     <AddButtonThird
-                      label="Lisää lisätietolinkki"
+                      label="Tambah tautan informasi"
                       onClick={handleAdd}
                     />
                   </Column>
@@ -444,7 +446,7 @@ class PlotSearchSiteEdit extends Component<Props, State> {
     } else {
       const payload = {
         value: plotSearchSite.custom_detailed_plan_id,
-        label: "Oma muu alue",
+        label: "Area lain milik sendiri",
       };
       fetchCustomDetailedPlan(payload);
     }
@@ -593,7 +595,7 @@ class PlotSearchSiteEdit extends Component<Props, State> {
     const label = get(currentTarget, "message_label");
     const planUnitTitle = get(planUnitNew, "label")
       ? `${get(planUnitNew, "label") || ""} ${get(planUnitByValue, "plan_unit_status") || ""}`
-      : "Uusi kohde";
+      : "Objek baru";
 
     if (customDetailedPlanByValue) {
       return (
@@ -656,7 +658,7 @@ class PlotSearchSiteEdit extends Component<Props, State> {
               >
                 <WarningField
                   meta={{
-                    warning: label + " Päivitä tiedot",
+                    warning: label + " Perbarui data",
                   }}
                   showWarning={isDeleted || isNewer}
                 />
@@ -686,7 +688,7 @@ class PlotSearchSiteEdit extends Component<Props, State> {
               >
                 <WarningField
                   meta={{
-                    warning: label + " Poista kohde hausta",
+                    warning: label + " Hapus objek dari pencarian",
                   }}
                   showWarning={isDeleted || isNewer}
                 />

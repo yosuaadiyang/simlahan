@@ -14,7 +14,7 @@ type Props = {
 
 const SteppedDiscountModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Porrastettu alennus">
+    <Modal isOpen={isOpen} onClose={onClose} title="Potongan bertingkat">
       <Form onSubmit={onSave} key={isOpen.toString()}>
         {({ valid, handleSubmit }) => (
           <>
@@ -24,14 +24,14 @@ const SteppedDiscountModal: React.FC<Props> = ({ isOpen, onClose, onSave }) => {
               <Button
                 className={ButtonColors.SECONDARY}
                 onClick={onClose}
-                text="Peruuta"
+                text="Batal"
                 type="button"
               />
               <Button
                 className={ButtonColors.SUCCESS}
                 disabled={!valid}
                 onClick={handleSubmit}
-                text="Tallenna"
+                text="Simpan"
                 type="button"
               />
             </ModalButtonWrapper>

@@ -269,7 +269,7 @@ const DebtCollectionForm: React.FC = () => {
                   ) &&
                     (!sortedCollectionLetters ||
                       !sortedCollectionLetters.length) && (
-                      <FormText>Ei perintäkirjeitä</FormText>
+                      <FormText>Tidak ada surat penagihan</FormText>
                     )}
                   {sortedCollectionLetters &&
                     !!sortedCollectionLetters.length && (
@@ -397,7 +397,7 @@ const DebtCollectionForm: React.FC = () => {
                                     style={{
                                       height: "unset",
                                     }}
-                                    title="Poista tiedosto"
+                                    title="Hapus berkas"
                                   />
                                 </Authorization>
                               }
@@ -416,7 +416,7 @@ const DebtCollectionForm: React.FC = () => {
                     }
                   >
                     <AddFileButton
-                      label="Lisää perintäkirje"
+                      label="Tambah surat penagihan"
                       name={"collectionLetterFileButtonId"}
                       onChange={handleCollectionLetterFileChange}
                     />
@@ -450,7 +450,7 @@ const DebtCollectionForm: React.FC = () => {
                   ) &&
                     (!sortedCollectionCourtDecisions ||
                       !sortedCollectionCourtDecisions.length) && (
-                      <FormText>Ei käräjaoikeuden päätöksiä</FormText>
+                      <FormText>Tidak ada putusan pengadilan</FormText>
                     )}
                   {largeScreen &&
                     ((sortedCollectionCourtDecisions &&
@@ -633,7 +633,7 @@ const DebtCollectionForm: React.FC = () => {
                                       style={{
                                         height: "unset",
                                       }}
-                                      title="Poista käräjäoikeuden päätös"
+                                      title="Hapus putusan pengadilan"
                                     />
                                   </Authorization>
                                 }
@@ -685,7 +685,7 @@ const DebtCollectionForm: React.FC = () => {
                                   <ActionButtonWrapper>
                                     <RemoveButton
                                       onClick={handleRemove}
-                                      title="Poista käräjäoikeuden päätös"
+                                      title="Hapus putusan pengadilan"
                                     />
                                   </ActionButtonWrapper>
                                 </Authorization>
@@ -814,12 +814,12 @@ const DebtCollectionForm: React.FC = () => {
                               largeScreen={largeScreen}
                               onClose={handleHideCollectionCourtDecisionPanel}
                               onSave={handleSaveCourtDecisionFile}
-                              title="Lisää käräjäoikeuden päätös"
+                              title="Tambah putusan pengadilan"
                               valid={valid}
                             />
                             {!isCollectionCourtDecisionPanelOpen && (
                               <AddButtonThird
-                                label="Lisää käräjäoikeuden päätös"
+                                label="Tambah putusan pengadilan"
                                 onClick={handleShowCollectionCourtDecisionPanel}
                                 style={{
                                   margin: 0,
@@ -859,7 +859,7 @@ const DebtCollectionForm: React.FC = () => {
                   </SubTitle>
 
                   {!debtCollectionDecisions.length && (
-                    <FormText>Ei purkamispäätöksiä</FormText>
+                    <FormText>Tidak ada keputusan pembongkaran</FormText>
                   )}
                   {!!debtCollectionDecisions.length &&
                     debtCollectionDecisions.map((decision, index) => (

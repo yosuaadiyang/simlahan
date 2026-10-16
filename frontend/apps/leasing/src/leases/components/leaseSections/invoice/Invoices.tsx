@@ -416,14 +416,14 @@ const Invoices: React.FC = () => {
                     <Button
                       className={ButtonColors.NEUTRAL}
                       onClick={handleStopInvoicing}
-                      text="Keskeytä laskutus"
+                      text="Hentikan penagihan"
                     />
                   ) : (
                     <Button
                       disabled={!currentLease.rent_info_completed_at}
                       className={ButtonColors.NEUTRAL}
                       onClick={handleStartInvoicing}
-                      text="Käynnistä laskutus"
+                      text="Mulai penagihan"
                     />
                   )}
                 </Authorization>

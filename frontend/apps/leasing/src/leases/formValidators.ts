@@ -173,7 +173,7 @@ const getFixedInitialYearRentsErrors = (
         case RentCycles.JANUARY_TO_DECEMBER:
           endDateError = item.end_date
             ? format(new Date(item.end_date), "dd.MM") !== "31.12"
-              ? "Loppupvm tulee olla 31.12."
+              ? "Tgl akhir harus 31.12."
               : null
             : null;
           break;
@@ -181,7 +181,7 @@ const getFixedInitialYearRentsErrors = (
         case RentCycles.APRIL_TO_MARCH:
           endDateError = item.end_date
             ? format(new Date(item.end_date), "dd.MM") !== "31.03"
-              ? "Loppupvm tulee olla 31.3."
+              ? "Tgl akhir harus 31.3."
               : null
             : null;
           break;

@@ -111,14 +111,14 @@ const LeaseReportsResults: React.FC = () => {
         </Column>
         {payload && (
           <ExcelLink
-            fileName="Raportti"
+            fileName="Laporan"
             identifier={getLabelOfOption(
               reportTypeOptions,
               payload.report_type,
             )}
             url={payload.url}
             query={payload.query}
-            label="VIE EXCELIIN"
+            label="EKSPOR KE EXCEL"
           />
         )}
       </Row>

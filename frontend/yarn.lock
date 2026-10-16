@@ -2472,59 +2472,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mvj/landuse@workspace:apps/landuse":
-  version: 0.0.0-use.local
-  resolution: "@mvj/landuse@workspace:apps/landuse"
-  dependencies:
-    "@tanstack/query-persist-client-core": "npm:5.101.4"
-    "@tanstack/react-query": "npm:5.101.4"
-    "@tanstack/react-query-persist-client": "npm:5.101.4"
-    final-form-calculate: "npm:2.0.0"
-  languageName: unknown
-  linkType: soft
-
-"@mvj/leasing@workspace:apps/leasing":
-  version: 0.0.0-use.local
-  resolution: "@mvj/leasing@workspace:apps/leasing"
-  dependencies:
-    "@reduxjs/toolkit": "npm:2.12.0"
-    "@types/file-saver": "npm:2.0.7"
-    "@types/history": "npm:4.7.11"
-    "@types/leaflet": "npm:1.9.21"
-    "@types/leaflet-draw": "npm:1.0.13"
-    "@types/lodash-es": "npm:4.17.12"
-    "@types/proj4leaflet": "npm:1.0.12"
-    "@types/react-redux": "npm:7.1.34"
-    "@types/redux-actions": "npm:2.6.5"
-    "@types/redux-form": "npm:8.3.11"
-    classnames: "npm:2.5.1"
-    copy-to-clipboard: "npm:3.3.3"
-    date-fns: "npm:2.30.0"
-    file-saver: "npm:2.0.5"
-    foundation-sites: "npm:6.9.0"
-    history: "npm:4.10.1"
-    leaflet: "npm:1.9.4"
-    leaflet-draw: "npm:1.0.4"
-    leaflet-geosearch: "npm:4.2.2"
-    leaflet-measure-path: "npm:1.4.2"
-    leaflet-zoombox: "npm:0.5.2"
-    lodash-es: "npm:4.18.1"
-    proj4: "npm:2.21.0"
-    proj4leaflet: "npm:1.0.2"
-    react-datepicker: "npm:8.10.0"
-    react-dual-listbox: "npm:6.1.0"
-    react-leaflet: "npm:2.8.0"
-    react-leaflet-draw: "npm:0.19.0"
-    react-leaflet-fullscreen: "npm:1.0.2"
-    react-redux: "npm:7.2.9"
-    react-select: "npm:5.10.2"
-    redux: "npm:4.1.2"
-    redux-actions: "npm:2.6.5"
-    redux-form: "npm:8.3.10"
-    redux-saga: "npm:1.5.1"
-  languageName: unknown
-  linkType: soft
-
 "@napi-rs/wasm-runtime@npm:^1.1.6":
   version: 1.1.6
   resolution: "@napi-rs/wasm-runtime@npm:1.1.6"
@@ -3368,6 +3315,45 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@simlahan/leasing@workspace:apps/leasing":
+  version: 0.0.0-use.local
+  resolution: "@simlahan/leasing@workspace:apps/leasing"
+  dependencies:
+    "@reduxjs/toolkit": "npm:2.12.0"
+    "@types/file-saver": "npm:2.0.7"
+    "@types/history": "npm:4.7.11"
+    "@types/leaflet": "npm:1.9.21"
+    "@types/leaflet-draw": "npm:1.0.13"
+    "@types/lodash-es": "npm:4.17.12"
+    "@types/react-redux": "npm:7.1.34"
+    "@types/redux-actions": "npm:2.6.5"
+    "@types/redux-form": "npm:8.3.11"
+    classnames: "npm:2.5.1"
+    copy-to-clipboard: "npm:3.3.3"
+    date-fns: "npm:2.30.0"
+    file-saver: "npm:2.0.5"
+    foundation-sites: "npm:6.9.0"
+    history: "npm:4.10.1"
+    leaflet: "npm:1.9.4"
+    leaflet-draw: "npm:1.0.4"
+    leaflet-geosearch: "npm:4.2.2"
+    leaflet-measure-path: "npm:1.4.2"
+    leaflet-zoombox: "npm:0.5.2"
+    lodash-es: "npm:4.18.1"
+    react-datepicker: "npm:8.10.0"
+    react-dual-listbox: "npm:6.1.0"
+    react-leaflet: "npm:2.8.0"
+    react-leaflet-draw: "npm:0.19.0"
+    react-leaflet-fullscreen: "npm:1.0.2"
+    react-redux: "npm:7.2.9"
+    react-select: "npm:5.10.2"
+    redux: "npm:4.1.2"
+    redux-actions: "npm:2.6.5"
+    redux-form: "npm:8.3.10"
+    redux-saga: "npm:1.5.1"
+  languageName: unknown
+  linkType: soft
+
 "@standard-schema/spec@npm:^1.0.0, @standard-schema/spec@npm:^1.1.0":
   version: 1.1.0
   resolution: "@standard-schema/spec@npm:1.1.0"
@@ -3388,45 +3374,6 @@ __metadata:
   dependencies:
     tslib: "npm:^2.8.0"
   checksum: 10c0/fe1f33ebb968558c5a0c595e54f2e479e4609bff844f9ca9a2d1ffd8dd8504c26f862a11b031f48f75c95b0381c2966c3dd156e25942f90089badd24341e7dbb
-  languageName: node
-  linkType: hard
-
-"@tanstack/query-core@npm:5.101.4":
-  version: 5.101.4
-  resolution: "@tanstack/query-core@npm:5.101.4"
-  checksum: 10c0/a407960303431e6498c6518cf6f8cc7283d3e4a95dbdc5e9fa42c217b9dd7afaffb82a4f2d36b38f578f745e8cf69ff8551abb947f5abcc0a290f3e3e75dc654
-  languageName: node
-  linkType: hard
-
-"@tanstack/query-persist-client-core@npm:5.101.4":
-  version: 5.101.4
-  resolution: "@tanstack/query-persist-client-core@npm:5.101.4"
-  dependencies:
-    "@tanstack/query-core": "npm:5.101.4"
-  checksum: 10c0/095ee23577e9ebc3024cb07755ecc39e88444e36f1b6ad303dbb6f413fcbf8461ad94bc51bbad457f238690a12330b7c5057b3e09062dff4dfb8d837ff42a5a3
-  languageName: node
-  linkType: hard
-
-"@tanstack/react-query-persist-client@npm:5.101.4":
-  version: 5.101.4
-  resolution: "@tanstack/react-query-persist-client@npm:5.101.4"
-  dependencies:
-    "@tanstack/query-persist-client-core": "npm:5.101.4"
-  peerDependencies:
-    "@tanstack/react-query": ^5.101.4
-    react: ^18 || ^19
-  checksum: 10c0/f6a2d6b5f537c3a32c742aa1be6b73d6441448f25bc18a59d892c9010c269bd4006021f88d89294217530a256a94b33da80925e91d86b8ce678d8ac23ab07408
-  languageName: node
-  linkType: hard
-
-"@tanstack/react-query@npm:5.101.4":
-  version: 5.101.4
-  resolution: "@tanstack/react-query@npm:5.101.4"
-  dependencies:
-    "@tanstack/query-core": "npm:5.101.4"
-  peerDependencies:
-    react: ^18 || ^19
-  checksum: 10c0/92e7c5b44740e753b05a6a19c166ea1a000df64c1bf5edb315d08a5b555a9f16a9d35288ac38f650bd38fc3015b135c392749fd6db24d09db42bfaf758d119fa
   languageName: node
   linkType: hard
 
@@ -3681,17 +3628,6 @@ __metadata:
   version: 4.0.0
   resolution: "@types/parse-json@npm:4.0.0"
   checksum: 10c0/1d3012ab2fcdad1ba313e1d065b737578f6506c8958e2a7a5bdbdef517c7e930796cb1599ee067d5dee942fb3a764df64b5eef7e9ae98548d776e86dcffba985
-  languageName: node
-  linkType: hard
-
-"@types/proj4leaflet@npm:1.0.12":
-  version: 1.0.12
-  resolution: "@types/proj4leaflet@npm:1.0.12"
-  dependencies:
-    "@types/geojson": "npm:*"
-    "@types/leaflet": "npm:^1.9"
-    proj4: "npm:^2.19.0"
-  checksum: 10c0/53897620d82202056ad81ba691b634ea567812c144c7865bb035eee63707d7585da24255a45410162bba063280159ceecc675783254c267c50e596bfbe1fe173
   languageName: node
   linkType: hard
 
@@ -6020,15 +5956,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"final-form-calculate@npm:2.0.0":
-  version: 2.0.0
-  resolution: "final-form-calculate@npm:2.0.0"
-  peerDependencies:
-    final-form: ">=5.0.0"
-  checksum: 10c0/7013d939cfbcbd3bc7fe324e5ca5cd39b1c0823a571be912064a9527fe6321a412f030f798a18a8afff6b3d0394684ea9ece02eab3fcdef84efcc1a949075417
-  languageName: node
-  linkType: hard
-
 "final-form@npm:5.0.1":
   version: 5.0.1
   resolution: "final-form@npm:5.0.1"
@@ -7754,13 +7681,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mgrs@npm:1.0.0":
-  version: 1.0.0
-  resolution: "mgrs@npm:1.0.0"
-  checksum: 10c0/a360853be5a3b4f4734dbf0a193851c08039ccb6077362ab0f890cccd170ef88b59585129757da9fea4d7a313d7dc3ee88f37f594fc1ae3e4e8efc5353144d77
-  languageName: node
-  linkType: hard
-
 "micromatch@npm:^4.0.5, micromatch@npm:^4.0.8":
   version: 4.0.8
   resolution: "micromatch@npm:4.0.8"
@@ -7859,55 +7779,6 @@ __metadata:
   checksum: 10c0/d924b57e7312b3b63ad21fc5b3dc0af5e78d61a1fc7cfb5457edaf26326bf62be5307cc87ffb6862ef1c2b33b0233cdb5d4f01c4c958cc0d660948b65a287a48
   languageName: node
   linkType: hard
-
-"mvj-ui@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "mvj-ui@workspace:."
-  dependencies:
-    "@babel/core": "npm:7.29.7"
-    "@babel/eslint-parser": "npm:7.29.7"
-    "@babel/preset-env": "npm:7.29.7"
-    "@babel/preset-react": "npm:7.29.7"
-    "@eslint/js": "npm:9.39.5"
-    "@rollup/plugin-babel": "npm:6.1.0"
-    "@sentry/react": "npm:10.69.0"
-    "@testing-library/dom": "npm:10.4.1"
-    "@testing-library/react": "npm:16.3.2"
-    "@types/node": "npm:24.13.3"
-    "@types/react": "npm:18.3.31"
-    "@types/react-dom": "npm:18.3.7"
-    "@vitejs/plugin-react": "npm:5.2.0"
-    "@vitest/coverage-v8": "npm:4.1.10"
-    "@vitest/ui": "npm:4.1.10"
-    eslint: "npm:9.39.5"
-    eslint-plugin-react: "npm:7.37.5"
-    eslint-plugin-react-hooks: "npm:7.1.1"
-    eslint-plugin-react-refresh: "npm:0.4.26"
-    final-form: "npm:5.0.1"
-    final-form-arrays: "npm:4.0.1"
-    globals: "npm:16.5.0"
-    hds-design-tokens: "npm:5.2.2"
-    hds-react: "npm:5.2.2"
-    jsdom: "npm:30.0.1"
-    postcss: "npm:8.5.25"
-    postcss-url: "npm:10.1.4"
-    prettier: "npm:3.9.6"
-    react: "npm:18.3.1"
-    react-dom: "npm:18.3.1"
-    react-final-form: "npm:6.5.9"
-    react-final-form-arrays: "npm:4.0.0"
-    react-router: "npm:7.18.2"
-    sass: "npm:1.79.6"
-    ts-node: "npm:10.9.2"
-    tsconfig-paths: "npm:4.2.0"
-    typescript: "npm:5.9.3"
-    typescript-eslint: "npm:8.65.0"
-    vite: "npm:7.3.6"
-    vite-plugin-commonjs: "npm:0.10.4"
-    vite-plugin-static-copy: "npm:3.4.0"
-    vitest: "npm:4.1.10"
-  languageName: unknown
-  linkType: soft
 
 "nanoid@npm:^3.3.11":
   version: 3.3.11
@@ -8390,50 +8261,6 @@ __metadata:
   version: 6.1.0
   resolution: "proc-log@npm:6.1.0"
   checksum: 10c0/4f178d4062733ead9d71a9b1ab24ebcecdfe2250916a5b1555f04fe2eda972a0ec76fbaa8df1ad9c02707add6749219d118a4fc46dc56bdfe4dde4b47d80bb82
-  languageName: node
-  linkType: hard
-
-"proj4@npm:2.21.0":
-  version: 2.21.0
-  resolution: "proj4@npm:2.21.0"
-  dependencies:
-    mgrs: "npm:1.0.0"
-    wkt-parser: "npm:^1.5.5"
-  peerDependencies:
-    geotiff: "*"
-  peerDependenciesMeta:
-    geotiff:
-      optional: true
-  checksum: 10c0/7a4c5d160492636114ecb3719191734dc2b0094b421b9139466a363e479cd907c63ac35a10277f3b7a4649470c8f02446acd45cc6155829364c2fa0ae2d91aae
-  languageName: node
-  linkType: hard
-
-"proj4@npm:^2.19.0":
-  version: 2.19.10
-  resolution: "proj4@npm:2.19.10"
-  dependencies:
-    mgrs: "npm:1.0.0"
-    wkt-parser: "npm:^1.5.1"
-  checksum: 10c0/75891dc138f5c2d5647a963a5f6196280d56f7fd89a959870c69a0527580ffae2c37a02dcba0a67ba842af717adc6f5d6b75e1f778a81abdc016f472fc9c5f97
-  languageName: node
-  linkType: hard
-
-"proj4@npm:^2.3.14":
-  version: 2.6.2
-  resolution: "proj4@npm:2.6.2"
-  dependencies:
-    mgrs: "npm:1.0.0"
-    wkt-parser: "npm:^1.2.4"
-  checksum: 10c0/b184519aac86a8b4c28299cd71ddd109f85d76ec3cb9a67e6990718996033ea12ae862827ad5beb6ed96050a2ffaaceccf4bd553e880efc74b82718b4fc10668
-  languageName: node
-  linkType: hard
-
-"proj4leaflet@npm:1.0.2":
-  version: 1.0.2
-  resolution: "proj4leaflet@npm:1.0.2"
-  dependencies:
-    proj4: "npm:^2.3.14"
-  checksum: 10c0/9e3d0a0cf3ee21285ab7636b27ca3dfedf92d4b10b7982be98331aabad634f82294ea1896a1e2f34fbcddaaa6b85313381091deb7bcfe4e0b376d2eae4aad291
   languageName: node
   linkType: hard
 
@@ -9596,6 +9423,55 @@ __metadata:
   checksum: 10c0/3def8f8e516fbb34cb6ae415b07ccc5d9c018d85b4b8611e3dc6f8be6d1899f693a4382913c9ed51a06babb5201639d76453ab297d1c54a456544acf5c892e34
   languageName: node
   linkType: hard
+
+"simlahan-ui@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "simlahan-ui@workspace:."
+  dependencies:
+    "@babel/core": "npm:7.29.7"
+    "@babel/eslint-parser": "npm:7.29.7"
+    "@babel/preset-env": "npm:7.29.7"
+    "@babel/preset-react": "npm:7.29.7"
+    "@eslint/js": "npm:9.39.5"
+    "@rollup/plugin-babel": "npm:6.1.0"
+    "@sentry/react": "npm:10.69.0"
+    "@testing-library/dom": "npm:10.4.1"
+    "@testing-library/react": "npm:16.3.2"
+    "@types/node": "npm:24.13.3"
+    "@types/react": "npm:18.3.31"
+    "@types/react-dom": "npm:18.3.7"
+    "@vitejs/plugin-react": "npm:5.2.0"
+    "@vitest/coverage-v8": "npm:4.1.10"
+    "@vitest/ui": "npm:4.1.10"
+    eslint: "npm:9.39.5"
+    eslint-plugin-react: "npm:7.37.5"
+    eslint-plugin-react-hooks: "npm:7.1.1"
+    eslint-plugin-react-refresh: "npm:0.4.26"
+    final-form: "npm:5.0.1"
+    final-form-arrays: "npm:4.0.1"
+    globals: "npm:16.5.0"
+    hds-design-tokens: "npm:5.2.2"
+    hds-react: "npm:5.2.2"
+    jsdom: "npm:30.0.1"
+    postcss: "npm:8.5.25"
+    postcss-url: "npm:10.1.4"
+    prettier: "npm:3.9.6"
+    react: "npm:18.3.1"
+    react-dom: "npm:18.3.1"
+    react-final-form: "npm:6.5.9"
+    react-final-form-arrays: "npm:4.0.0"
+    react-router: "npm:7.18.2"
+    sass: "npm:1.79.6"
+    ts-node: "npm:10.9.2"
+    tsconfig-paths: "npm:4.2.0"
+    typescript: "npm:5.9.3"
+    typescript-eslint: "npm:8.65.0"
+    vite: "npm:7.3.6"
+    vite-plugin-commonjs: "npm:0.10.4"
+    vite-plugin-static-copy: "npm:3.4.0"
+    vitest: "npm:4.1.10"
+  languageName: unknown
+  linkType: soft
 
 "sirv@npm:^3.0.2":
   version: 3.0.2
@@ -10927,27 +10803,6 @@ __metadata:
   bin:
     why-is-node-running: cli.js
   checksum: 10c0/1cde0b01b827d2cf4cb11db962f3958b9175d5d9e7ac7361d1a7b0e2dc6069a263e69118bd974c4f6d0a890ef4eedfe34cf3d5167ec14203dbc9a18620537054
-  languageName: node
-  linkType: hard
-
-"wkt-parser@npm:^1.2.4":
-  version: 1.2.4
-  resolution: "wkt-parser@npm:1.2.4"
-  checksum: 10c0/1e7be09672af3c44be67625d79da5115a989a69f33d9f2f97001eaa88b493075161fb1d5580cc49102b805b9878f222f4f444fd5a5b1777470c72f0e35d9d5f3
-  languageName: node
-  linkType: hard
-
-"wkt-parser@npm:^1.5.1":
-  version: 1.5.2
-  resolution: "wkt-parser@npm:1.5.2"
-  checksum: 10c0/0522173da6e4e2dddc735d7899a74847c6e448b5bdc1b7994d86e1d193e81c704d39629ed9be456cd1ded564a1d5ac7c2a5686c1838ff6dc4ef1e58ad768144b
-  languageName: node
-  linkType: hard
-
-"wkt-parser@npm:^1.5.5":
-  version: 1.5.6
-  resolution: "wkt-parser@npm:1.5.6"
-  checksum: 10c0/67f938ffb6a1721dbc733823677327ff858a0a1f2f0d224e2ecbdf9e879f27764434dd6e44c89a2e94e3d37cc6e5f9874f878e4a1b1e2fd29a1279be38c322ca
   languageName: node
   linkType: hard
 

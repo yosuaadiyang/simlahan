@@ -1,5 +1,4 @@
-import { describe, expect, it } from "vitest";
-import { User } from "oidc-client-ts";
+import { describe, expect, it, vi } from "vitest";
 import {
   clearApiToken,
   receiveApiToken,
@@ -7,68 +6,68 @@ import {
   clearUser,
 } from "./actions";
 import { authReducer } from "./reducer";
+import { getTokenExpiry, normalizeUser } from "./session";
+import type { AuthUser } from "./types";
 
-const getMockUser = (): User =>
-  new User({
-    id_token: "id123",
-    session_state: "state",
-    access_token: "access321",
-    refresh_token: "refresh123",
-    token_type: "id_token",
-    scope: "openid profile",
-    profile: {
-      sub: "",
-      iss: "",
-      aud: "",
-      exp: 1725539282918,
-      iat: 1725539270573,
-    },
-    expires_at: 1725539282918,
-    userState: "",
-    url_state: "localhost:3000",
+vi.mock("@/root/store", () => ({
+  default: { dispatch: vi.fn(), getState: vi.fn() },
+}));
+
+const getMockUser = (): AuthUser =>
+  normalizeUser({
+    id: 1,
+    uuid: "0b4a0c3e-3c55-4d0f-9f7f-6a2c1f1d2e3f",
+    username: "petugas",
+    first_name: "Budi",
+    last_name: "Santoso",
+    name: "Budi Santoso",
+    email: "budi@example.go.id",
+    is_superuser: false,
+    is_staff: false,
+    groups: ["Pelaksana Pengadaan"],
+    service_units: [],
   });
+
+const makeJwt = (payload: Record<string, any>) =>
+  ["header", btoa(JSON.stringify(payload)), "signature"].join(".");
 
 describe("Auth", () => {
   describe("Reducer", () => {
-    describe("authReducer", () => {
-      it("should set user", () => {
-        const mockUser = getMockUser();
-        const mockState = Object.assign({}, { user: mockUser, apiToken: "" });
-        const state = authReducer({ user: "" }, userFound(mockUser));
-        expect(state).to.deep.equal(mockState);
+    it("should set user", () => {
+      const mockUser = getMockUser();
+      const state = authReducer({ user: "" }, userFound(mockUser));
+      expect(state).to.deep.equal({ user: mockUser, apiToken: "" });
+    });
+    it("should clear user", () => {
+      const state = authReducer(
+        { user: getMockUser(), apiToken: "" },
+        clearUser(),
+      );
+      expect(state).to.deep.equal({ user: "", apiToken: "" });
+    });
+    it("should update apiToken", () => {
+      const state = authReducer({}, receiveApiToken("token-123"));
+      expect(state).to.deep.equal({ apiToken: "token-123", user: "" });
+    });
+    it("should clear apiToken", () => {
+      let state = authReducer({}, receiveApiToken("token-123"));
+      state = authReducer(state, clearApiToken());
+      expect(state).to.deep.equal({ apiToken: "", user: "" });
+    });
+  });
+
+  describe("Session helpers", () => {
+    it("exposes a profile compatible with legacy components", () => {
+      const user = getMockUser();
+      expect(user.profile).to.deep.equal({
+        sub: user.uuid,
+        name: "Budi Santoso",
+        email: "budi@example.go.id",
       });
-      it("should clear user", () => {
-        const mockUser = getMockUser();
-        const state = authReducer(
-          { user: mockUser, apiToken: "" },
-          clearUser(),
-        );
-        const nullUserState = { user: "", apiToken: "" };
-        expect(state).to.deep.equal(nullUserState);
-      });
-      it("should update apiToken", () => {
-        const dummyApiToken = {
-          foo: "Lorem ipsum",
-        };
-        const newState = {
-          apiToken: dummyApiToken,
-          user: "",
-        };
-        const state = authReducer({}, receiveApiToken(dummyApiToken));
-        expect(state).to.deep.equal(newState);
-      });
-      it("should clear apiToken", () => {
-        const dummyApiToken = {
-          foo: "Lorem ipsum",
-        };
-        const newState = {
-          apiToken: "",
-          user: "",
-        };
-        let state = authReducer({}, receiveApiToken(dummyApiToken));
-        state = authReducer(state, clearApiToken());
-        expect(state).to.deep.equal(newState);
-      });
+    });
+    it("reads the expiry claim of a JWT", () => {
+      expect(getTokenExpiry(makeJwt({ exp: 1893456000 }))).toBe(1893456000);
+      expect(getTokenExpiry("not-a-jwt")).toBe(null);
     });
   });
 });

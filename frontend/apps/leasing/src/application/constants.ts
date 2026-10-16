@@ -17,12 +17,12 @@ export const APPLICANT_MAIN_IDENTIFIERS: Record<
     DATA_SECTION: "yrityksen-tiedot",
     IDENTIFIER_FIELD: "y-tunnus",
     NAME_FIELDS: ["yrityksen-nimi"],
-    LABEL: "Yritys",
+    LABEL: "Badan usaha",
   },
   [ApplicantTypes.PERSON]: {
     DATA_SECTION: "henkilon-tiedot",
     IDENTIFIER_FIELD: "henkilotunnus",
-    NAME_FIELDS: ["etunimi", "Sukunimi"],
-    LABEL: "Henkilö",
+    NAME_FIELDS: ["etunimi", "Nama belakang"],
+    LABEL: "Perorangan",
   },
 };

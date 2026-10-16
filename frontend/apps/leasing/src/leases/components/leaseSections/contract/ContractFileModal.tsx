@@ -40,26 +40,26 @@ const ContractFileModal: React.FC<Props> = ({ contractId, onClose, open }) => {
   }, [open, files, contractId, dispatch]);
 
   return (
-    <Modal isOpen={open} onClose={onClose} title="Sopimuksen tiedostot">
+    <Modal isOpen={open} onClose={onClose} title="Berkas kontrak">
       {isFetching && (
         <LoaderWrapper>
           <Loader isLoading={true} />
         </LoaderWrapper>
       )}
       {files && !files.length && (
-        <FormText>Sopimuksella {contractId} ei ole tiedostoja</FormText>
+        <FormText>Dalam kontrak {contractId} tidak ada berkas</FormText>
       )}
       {files && !!files.length && (
         <>
           <Row>
             <Column small={4}>
-              <FormTextTitle>Tiedosto</FormTextTitle>
+              <FormTextTitle>Berkas</FormTextTitle>
             </Column>
             <Column small={4}>
-              <FormTextTitle>Tyyppi</FormTextTitle>
+              <FormTextTitle>Jenis</FormTextTitle>
             </Column>
             <Column small={4}>
-              <FormTextTitle>Koko</FormTextTitle>
+              <FormTextTitle>Seluruh</FormTextTitle>
             </Column>
           </Row>
 
@@ -67,13 +67,13 @@ const ContractFileModal: React.FC<Props> = ({ contractId, onClose, open }) => {
             const getCategoryText = () => {
               switch (file.fileCategory) {
                 case "CONTRACT":
-                  return "Sopimus";
+                  return "Kontrak";
 
                 case "CONTRACT_ATTACHMENT":
-                  return "Sopimusliite";
+                  return "Lampiran kontrak";
 
                 case "OTHER_ATTACHMENT":
-                  return "Muu";
+                  return "Lainnya";
 
                 default:
                   return file.fileCategory;
@@ -105,7 +105,7 @@ const ContractFileModal: React.FC<Props> = ({ contractId, onClose, open }) => {
         <Button
           className={ButtonColors.SECONDARY}
           onClick={onClose}
-          text="Sulje"
+          text="Tutup"
         />
       </ModalButtonWrapper>
     </Modal>

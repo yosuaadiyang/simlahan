@@ -240,7 +240,7 @@ const RentItem = ({ rent, rents }: Props) => {
                   ? oldDwellingsInHousingCompaniesPriceIndexCollapseState
                   : true
               }
-              headerTitle="Tasotarkistus"
+              headerTitle="Penyesuaian sewa berkala"
             >
               <OldDwellingsInHousingCompaniesPriceIndexView
                 oldDwellingsInHousingCompaniesPriceIndex={

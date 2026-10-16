@@ -1,9 +1,9 @@
 import { ContactTypes } from "@/contacts/enums";
 
 export const ApplicantTypeSectionToContactTypeEnum = {
-  'yrityksen-tiedot': ContactTypes.BUSINESS,
-  'henkilon-tiedot': ContactTypes.PERSON,
-}
+  "yrityksen-tiedot": ContactTypes.BUSINESS,
+  "henkilon-tiedot": ContactTypes.PERSON,
+};
 
 export const AreaSearchFieldPaths = {
   INTENDED_USE: "intended_use",
@@ -12,22 +12,22 @@ export const AreaSearchFieldPaths = {
   AREA_SEARCH_STATUS: "area_search_status",
 };
 export const AreaSearchFieldTitles = {
-  INTENDED_USE: "Käyttötarkoitus",
-  LESSOR: "Vuokranantaja",
-  STATE: "Tila",
-  RECEIVED_DATE: "Saapumisajankohta",
-  SETTLED_DATE: "Päätetty pvm",
-  PREPARER: "Käsittelijä",
-  RENT_PERIOD: "Vuokra-aika",
-  DESCRIPTION_INTENDED_USE: "Käyttötarkoitus",
-  DESCRIPTION_AREA: "Alueen kuvaus",
-  AREA: "Pinta-ala",
-  PROPERTY_IDENTIFIER: "Kiinteistötunnus",
-  DECLINE_REASON: "Hylkäämisen syy",
-  PREPARER_NOTE: "Käsittelytietojen huomautus",
-  STATUS_NOTES: "Käsittelijän muistiinpanot",
-  AUDIT_LOG: "Muutoshistoria",
-  LEASE: "Vuokraus",
+  INTENDED_USE: "Peruntukan",
+  LESSOR: "Pemberi sewa",
+  STATE: "Status",
+  RECEIVED_DATE: "Waktu kedatangan",
+  SETTLED_DATE: "Tgl diputuskan",
+  PREPARER: "Petugas",
+  RENT_PERIOD: "Masa sewa",
+  DESCRIPTION_INTENDED_USE: "Peruntukan",
+  DESCRIPTION_AREA: "Uraian area",
+  AREA: "Luas",
+  PROPERTY_IDENTIFIER: "Pengenal bidang (NIB)",
+  DECLINE_REASON: "Alasan penolakan",
+  PREPARER_NOTE: "Catatan data pemrosesan",
+  STATUS_NOTES: "Catatan petugas",
+  AUDIT_LOG: "Riwayat perubahan",
+  LEASE: "Sewa",
 };
 
 export const ApplicantInfoSectionIdentifiers = {
@@ -38,7 +38,7 @@ export const ApplicantInfoSectionIdentifiers = {
   // Example: "yhteyshenkilo-1"
   CONTACT_PERSON: "yhteyshenkilo",
   BILL_RECIPIENT: "laskunsaaja",
-}
+};
 
 /**
  * Map form answer to contact fields enumerable.
@@ -47,7 +47,7 @@ export const ApplicantInfoSectionIdentifiers = {
  */
 export const MapFormAnswerFieldsToContactFields = {
   first_name: "etunimi",
-  last_name: "Sukunimi",
+  last_name: "Nama belakang",
   name: "nimi",
   c_o: "c_o",
   business_id: "y-tunnus",
@@ -60,10 +60,10 @@ export const MapFormAnswerFieldsToContactFields = {
   language: "kieli",
   national_identification_number: "henkilotunnus",
   address_protection: "turvakielto",
-}
+};
 
 export const MapLanguageNameToCodeEnum = {
-  suomi: "fi",
-  ruotsi: "sv",
+  indonesia: "id",
+  inggris: "en",
   englanti: "en",
-}
+};

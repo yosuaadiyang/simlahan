@@ -46,21 +46,5 @@ export default [
       
       "@typescript-eslint/no-unsafe-function-type": "off"
     }
-  },
-  {
-    files: ["apps/landuse/src/**/*.{js,mjs,cjs,ts,jsx,tsx}"],
-    rules: {
-      "no-restricted-imports": [
-        "error",
-        {
-          "paths": [
-            "redux",
-            "react-redux",
-            "redux-saga",
-            "redux-form"
-          ]
-        }
-      ]
-    }
   }
 ];

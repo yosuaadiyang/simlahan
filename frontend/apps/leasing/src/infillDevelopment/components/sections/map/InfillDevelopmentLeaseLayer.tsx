@@ -104,7 +104,7 @@ const InfillDevelopmentLeaseLayer = ({
 
           switch (feature_type) {
             case "area":
-              popupContent = `<p class='title'><strong>${leaseIdentifier}: Vuokrakohde</strong></p>
+              popupContent = `<p class='title'><strong>${leaseIdentifier}: Objek sewa</strong></p>
                   <p><strong>Id:</strong> ${id}</p>
                   <p><strong>${LeaseAreasFieldTitles.IDENTIFIER}:</strong> ${identifier}</p>
                   <p><strong>${LeaseAreasFieldTitles.TYPE}:</strong> ${getLabelOfOption(areaTypeOptions, type) || "-"}</p>
@@ -113,7 +113,7 @@ const InfillDevelopmentLeaseLayer = ({
               break;
 
             case "plan_unit":
-              popupContent = `<p class='title'><strong>${leaseIdentifier}: Kaavayksikkö</strong></p>
+              popupContent = `<p class='title'><strong>${leaseIdentifier}: Unit rencana</strong></p>
                   <p><strong>Id:</strong> ${id}</p>
                   <p><strong>${LeasePlanUnitsFieldTitles.IDENTIFIER}:</strong> ${identifier}</p>
                   <p><strong>${LeasePlanUnitsFieldTitles.AREA}:</strong> ${!isEmptyValue(area) ? `${formatNumber(area)} m²` : ""}</p>

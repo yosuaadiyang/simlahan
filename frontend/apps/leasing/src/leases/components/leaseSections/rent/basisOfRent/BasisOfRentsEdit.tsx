@@ -117,7 +117,7 @@ const BasisOfRentsEdit = ({
           UsersPermissions.ADD_LEASEBASISOFRENT,
         )}
         errorComponent={
-          <FormText className="no-margin">Ei vuokralaskureita</FormText>
+          <FormText className="no-margin">Tidak ada kalkulator sewa</FormText>
         }
       >
         <Row>
@@ -126,7 +126,7 @@ const BasisOfRentsEdit = ({
               className={classNames(addButtonClass, {
                 "no-top-margin": !fields || !fields.length,
               })}
-              label="Lisää vuokralaskuri"
+              label="Tambah kalkulator sewa"
               onClick={handleAdd}
             />
           </Column>
@@ -148,7 +148,7 @@ const BasisOfRentsEdit = ({
                   marginBottom: 5,
                 }}
               >
-                Arkisto
+                Arsip
               </h3>
               <GrayBox>
                 <BoxItemContainer>
@@ -310,7 +310,7 @@ const BasisOfRentsEdit = ({
                       className={classNames({
                         "no-top-margin": !fields || !fields.length,
                       })}
-                      label="Lisää vuokralaskuri"
+                      label="Tambah kalkulator sewa"
                       onClick={handleAdd}
                     />
                   </Column>

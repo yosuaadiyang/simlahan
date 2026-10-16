@@ -178,14 +178,17 @@ const renderDecisions = ({
                 showError={hasUnidentifiedDecisions}
                 meta={{
                   error:
-                    "Kunkin päätöksen on liityttävä johonkin valituista kohteista. Kohteiden ulkopuoliset päätökset poistetaan tallennettaessa.",
+                    "Setiap keputusan harus terkait dengan salah satu objek terpilih. Keputusan di luar objek akan dihapus saat disimpan.",
                 }}
               />
 
               {!disabled && (
                 <Row>
                   <Column>
-                    <AddButtonThird label="Lisää päätös" onClick={handleAdd} />
+                    <AddButtonThird
+                      label="Tambah keputusan"
+                      onClick={handleAdd}
+                    />
                   </Column>
                 </Row>
               )}
@@ -273,7 +276,7 @@ const renderPlotSearchSites = ({
               {!disabled && (
                 <Row>
                   <Column>
-                    <AddButtonThird label="Lisää kohde" onClick={handleAdd} />
+                    <AddButtonThird label="Tambah objek" onClick={handleAdd} />
                   </Column>
                 </Row>
               )}
@@ -563,7 +566,7 @@ class BasicInfoEdit extends PureComponent<Props, State> {
                       fieldAttributes={get(attributes, "begin_at")}
                       name="begin_at"
                       overrideValues={{
-                        label: "Alkupvm ja klo",
+                        label: "Tgl dan jam mulai",
                         fieldType: FieldTypeOptions.TIME,
                         allowEdit: !isLockedForModifications,
                       }}
@@ -581,7 +584,7 @@ class BasicInfoEdit extends PureComponent<Props, State> {
                       fieldAttributes={get(attributes, "end_at")}
                       name="end_at"
                       overrideValues={{
-                        label: "Loppupvm ja klo",
+                        label: "Tgl dan jam akhir",
                         fieldType: FieldTypeOptions.TIME,
                         allowEdit: !isLockedForModifications,
                       }}
@@ -624,12 +627,12 @@ class BasicInfoEdit extends PureComponent<Props, State> {
               </Row>
               {!isLockedForModifications && (
                 <WhiteBox>
-                  <SubTitle>KOHTEET</SubTitle>
+                  <SubTitle>OBJEK</SubTitle>
                   <WarningField
                     showWarning={!hasMinimumRequiredFieldsFilled}
                     meta={{
                       warning:
-                        "Ole hyvä ja täytä ensin pakolliset perustiedot.",
+                        "Silakan isi terlebih dahulu data dasar yang wajib.",
                     }}
                   />
                   <FieldArray

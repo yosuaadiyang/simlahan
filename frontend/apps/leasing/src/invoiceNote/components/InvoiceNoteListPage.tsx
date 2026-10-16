@@ -172,7 +172,7 @@ const InvoiceNoteListPage: React.FC = () => {
     dispatch(
       receiveTopNavigationSettings({
         linkUrl: getRouteById(Routes.INVOICE_NOTES),
-        pageTitle: "Laskujen tiedotteet",
+        pageTitle: "Catatan tagihan",
         showSearch: false,
       }),
     );
@@ -325,7 +325,7 @@ const InvoiceNoteListPage: React.FC = () => {
           >
             <AddButtonSecondary
               className="no-top-margin"
-              label="Luo tiedote"
+              label="Buat pengumuman"
               onClick={handleShowCreateInvoiceNoteModal}
             />
           </Authorization>
@@ -343,7 +343,7 @@ const InvoiceNoteListPage: React.FC = () => {
         <Column small={12} medium={6}></Column>
         <Column small={12} medium={6}>
           <TableFiltersLegacy
-            amountText={isFetching ? "Ladataan..." : `Löytyi ${count} kpl`}
+            amountText={isFetching ? "Memuat..." : `Ditemukan ${count} kpl`}
             filterOptions={[]}
             filterValue={[]}
           />

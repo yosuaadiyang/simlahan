@@ -74,7 +74,7 @@ const FileDownloadButton = ({
             const errorMessage = errors?.error ? errors.error : "";
             displayUIMessage(
               {
-                title: "Tiedoston lataaminen epäonnistui",
+                title: "Pengunduhan berkas gagal",
                 body: errorMessage,
               },
               {
@@ -93,7 +93,7 @@ const FileDownloadButton = ({
       displayUIMessage(
         {
           title: "",
-          body: "Tiedoston lataaminen epäonnistui",
+          body: "Pengunduhan berkas gagal",
         },
         {
           type: "error",

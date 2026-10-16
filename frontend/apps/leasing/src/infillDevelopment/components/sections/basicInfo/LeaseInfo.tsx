@@ -96,7 +96,7 @@ const LeaseInfo = ({
                   LeaseTenantsFieldPaths.TENANTS,
                 )}
               >
-                Vuokralainen
+                Penyewa
               </FormTextTitle>
 
               {!tenants.length && <FormText>-</FormText>}
@@ -129,7 +129,7 @@ const LeaseInfo = ({
                   LeasePlotsFieldPaths.PLOTS,
                 )}
               >
-                Kiinteistö
+                Bidang tanah
               </FormTextTitle>
 
               {!plots.length && <FormText>-</FormText>}
@@ -156,7 +156,7 @@ const LeaseInfo = ({
                   LeasePlanUnitsFieldPaths.PLAN_UNITS,
                 )}
               >
-                Kaavayksikkö
+                Unit rencana
               </FormTextTitle>
 
               {!planUnits.length && <FormText>-</FormText>}
@@ -179,7 +179,7 @@ const LeaseInfo = ({
               InfillDevelopmentCompensationLeasesFieldPaths.LEASE,
             )}
           >
-            <Link to={mapLinkUrl}>Karttalinkki</Link>
+            <Link to={mapLinkUrl}>Tautan peta</Link>
           </Authorization>
         </Column>
       </Row>

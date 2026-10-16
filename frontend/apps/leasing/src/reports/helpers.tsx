@@ -95,7 +95,7 @@ export const getFormattedValue = (
 
     case LeaseReportsFormatOptions.MONEY:
     case LeaseReportsFormatOptions.BOLD_MONEY:
-      return `${formatNumber(value, decimals)} €`;
+      return `Rp ${formatNumber(value, decimals)}`;
 
     case LeaseReportsFormatOptions.PERCENTAGE:
       return `${formatNumber(value, decimals)} %`;

@@ -12,7 +12,7 @@ const MoveUpIcon = ({
     viewBox="0 0 16 27"
     version="1.1"
   >
-    <title>Siirrä ylös</title>
+    <title>Pindah ke atas</title>
     <g id="icon_sort2" stroke="none" strokeWidth="1" fillRule="evenodd">
       <polygon
         id="Path"
