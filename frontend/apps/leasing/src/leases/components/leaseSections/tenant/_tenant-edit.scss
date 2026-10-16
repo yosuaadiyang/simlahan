@@ -1,0 +1,23 @@
+@use "foundation-sites/scss/foundation" as *;
+
+.contact-modal {
+  .button-wrapper {
+    text-align: right;
+    padding-top: rem-calc(20px);
+
+    .button:last-child {
+      margin-right: 0;
+    }
+  }
+}
+
+.contact-buttons-wrapper {
+  padding-top: rem-calc(15px);
+  line-height: 1;
+
+  a {
+    font-size: rem-calc(14px);
+    line-height: rem-calc(20px);
+    white-space: nowrap;
+  }
+}

@@ -1,0 +1,62 @@
+@use "hds-design-tokens/lib/all" as hds;
+
+$font-family-source: hds.$font-default;
+
+/// @type Font
+$body-font-family: $font-family-source;
+
+/// @type Number
+$global-font-size: 100% !default;
+$global-lineheight: 1.5 !default;
+$font-xsmall: 0.8125rem !default;
+$font-small: 0.875rem !default;
+$font-regular: 1rem !default;
+$font-large: 1.25rem !default;
+$font-xlarge: 1.5rem !default;
+$content-max-width: hds.$breakpoint-xxl !default;
+$semibold: 600;
+
+/// @type Map
+$foundation-palette: (
+  primary: #0072c6,
+  secondary: #6692ac,
+  success: #3adb76,
+  warning: #ffae00,
+  alert: #eb1414,
+);
+
+/// @type Color
+$neutral-color: #666666 !default;
+$focus-color: #d5d5d5 !default;
+$is-dirty-color: #e5f1f9 !default;
+$red: #bd2719 !default;
+$red-hover: #ca5247 !default;
+$dark-green: #007a3a !default;
+$dark-green-hover: #338e55 !default;
+$green: #e3f3eb !default;
+$light-green: #f9fcfb !default;
+$dark-yellow: #ffd600;
+$dark-yellow-hover: #ffde33 !default;
+$yellow: #ffe977 !default;
+$light-yellow: #fff6c9 !default;
+$yellow-enquiry-sent: #e1ae1a !default;
+
+$black: #000000 !default;
+$dark-gray: #666666 !default;
+$medium-dark-gray: #b7b7b7 !default;
+$medium-gray: #d5d5d5 !default;
+$light-gray: #f4f4f4 !default;
+$light-gray-secondary: #e6e6e6 !default;
+$lightest-gray: #fafafa !default;
+$white: #ffffff !default;
+
+$mvj-text-color: $black;
+$mvj-focus-color: #9bdcfb;
+$body-background: $light-gray !default;
+$body-font-color: $mvj-text-color !default;
+
+$gray-separator: #979797 !default;
+
+$blue: #0078c0 !default;
+$blue-hover: #0084d6 !default;
+$light-blue: #e5f1f9 !default;

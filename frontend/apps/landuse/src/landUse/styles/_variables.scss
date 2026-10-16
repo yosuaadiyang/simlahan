@@ -1,0 +1,23 @@
+// ============================================================================
+// Design Tokens & Variables
+// ============================================================================
+// Single source of truth for spacing, breakpoints, shadows, and z-index.
+// HDS CSS custom properties (--color-*, --font-*) are used directly in rules;
+// only project-level constants live here.
+// ============================================================================
+
+// -- Shadows ----------------------------------------------------------------
+$shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+$shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+// -- Z-index layers ---------------------------------------------------------
+$z-dropdown: 1000;
+
+// -- Border radius ----------------------------------------------------------
+$radius-sm: 4px;
+$radius-pill: 9999px;
+
+// -- Breakpoints ------------------------------------------------------------
+$breakpoint-m: 768px;
+$breakpoint-xl: 1248px;
+$breakpoint-xxl: 1440px;

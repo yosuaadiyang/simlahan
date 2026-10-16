@@ -1,0 +1,33 @@
+@use "foundation-sites/scss/foundation" as *;
+@use "../../styles/variables";
+
+.show-more {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: rem-calc(10px);
+
+  &.no-margin {
+    margin: 0;
+  }
+
+  &.inside-table {
+    max-width: 200px;
+  }
+
+  p {
+    margin: 0;
+    font-size: rem-calc(14px);
+    line-height: rem-calc(16px);
+  }
+
+  &__read-more {
+    font-size: rem-calc(13px);
+    color: variables.$blue;
+    margin-top: 0;
+    display: inline-block;
+
+    &:hover {
+      color: variables.$blue;
+    }
+  }
+}

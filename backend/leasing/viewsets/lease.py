@@ -1,0 +1,754 @@
+import datetime
+import re
+
+from dateutil.parser import ParserError, parse, parserinfo
+from django.db.models import DurationField, Exists, OuterRef, Q, QuerySet, Subquery
+from django.db.models.functions import Cast
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import status
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.filters import OrderingFilter
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework_gis.filters import InBBoxFilter
+
+from field_permissions.viewsets import FieldPermissionsViewsetMixin
+from leasing.enums import LeaseState, PreparationState, RentType
+from leasing.filters import (
+    DistrictFilter,
+    IntendedUseFilter,
+    LeaseFilter,
+    LeaseTypeFilter,
+)
+from leasing.forms import LeaseSearchForm
+from leasing.models import (
+    District,
+    Financing,
+    Hitas,
+    IntendedUse,
+    Lease,
+    LeaseType,
+    Management,
+    Municipality,
+    NoticePeriod,
+    Regulation,
+    RelatedLease,
+    ReservationProcedure,
+    SpecialProject,
+    StatisticalUse,
+    SupportiveHousing,
+)
+from leasing.models.contract import Contract
+from leasing.models.land_area import ConstructabilityDescription, LeaseArea
+from leasing.models.rent import Rent
+from leasing.models.utils import normalize_property_identifier
+from leasing.serializers.common import ManagementSerializer
+from leasing.serializers.lease import (
+    DistrictSerializer,
+    FinancingSerializer,
+    HitasSerializer,
+    IntendedUseSerializer,
+    LeaseCreateSerializer,
+    LeaseListSerializer,
+    LeaseRetrieveSerializer,
+    LeaseSuccinctSerializer,
+    LeaseSuccinctWithGeometrySerializer,
+    LeaseTypeSerializer,
+    LeaseUpdateSerializer,
+    MunicipalitySerializer,
+    NoticePeriodSerializer,
+    RegulationSerializer,
+    RelatedLeaseSerializer,
+    ReservationProcedureSerializer,
+    SpecialProjectSerializer,
+    StatisticalUseSerializer,
+    SupportiveHousingSerializer,
+)
+
+from ..permissions import IsMemberOfSameServiceUnit, MvjDjangoModelPermissions
+from .utils import AtomicTransactionModelViewSet
+
+
+class DistrictViewSet(AtomicTransactionModelViewSet):
+    queryset = District.objects.all()
+    serializer_class = DistrictSerializer
+    filterset_class = DistrictFilter
+
+
+class FinancingViewSet(AtomicTransactionModelViewSet):
+    queryset = Financing.objects.all()
+    serializer_class = FinancingSerializer
+
+
+class HitasViewSet(AtomicTransactionModelViewSet):
+    queryset = Hitas.objects.all()
+    serializer_class = HitasSerializer
+
+
+class IntendedUseViewSet(AtomicTransactionModelViewSet):
+    queryset = IntendedUse.objects.all()
+    serializer_class = IntendedUseSerializer
+    filterset_class = IntendedUseFilter
+
+
+class LeaseTypeViewSet(AtomicTransactionModelViewSet):
+    queryset = LeaseType.objects.all()
+    serializer_class = LeaseTypeSerializer
+    filterset_class = LeaseTypeFilter
+
+
+class ManagementViewSet(AtomicTransactionModelViewSet):
+    queryset = Management.objects.all()
+    serializer_class = ManagementSerializer
+
+
+class MunicipalityViewSet(AtomicTransactionModelViewSet):
+    queryset = Municipality.objects.all()
+    serializer_class = MunicipalitySerializer
+
+
+class NoticePeriodViewSet(AtomicTransactionModelViewSet):
+    queryset = (
+        NoticePeriod.objects.all()
+        .annotate(duration_as_interval=Cast("duration", DurationField()))
+        .order_by("duration_as_interval")
+    )
+    serializer_class = NoticePeriodSerializer
+
+
+class RegulationViewSet(AtomicTransactionModelViewSet):
+    queryset = Regulation.objects.all()
+    serializer_class = RegulationSerializer
+
+
+class StatisticalUseViewSet(AtomicTransactionModelViewSet):
+    queryset = StatisticalUse.objects.all()
+    serializer_class = StatisticalUseSerializer
+
+
+class SupportiveHousingViewSet(AtomicTransactionModelViewSet):
+    queryset = SupportiveHousing.objects.all()
+    serializer_class = SupportiveHousingSerializer
+
+
+class SpecialProjectViewSet(AtomicTransactionModelViewSet):
+    queryset = SpecialProject.objects.all()
+    serializer_class = SpecialProjectSerializer
+
+
+class ReservationProcedureViewSet(AtomicTransactionModelViewSet):
+    queryset = ReservationProcedure.objects.all()
+    serializer_class = ReservationProcedureSerializer
+
+
+class RelatedLeaseViewSet(AtomicTransactionModelViewSet):
+    queryset = RelatedLease.objects.all()
+    serializer_class = RelatedLeaseSerializer
+
+
+class LeaseViewSet(FieldPermissionsViewsetMixin, AtomicTransactionModelViewSet):
+    serializer_class = LeaseRetrieveSerializer
+    filterset_class = LeaseFilter
+    filter_backends = (DjangoFilterBackend, OrderingFilter, InBBoxFilter)
+    ordering = (
+        "type__identifier",
+        "municipality__identifier",
+        "district__identifier",
+        "identifier__sequence",
+    )
+    ordering_fields = (
+        "type__identifier",
+        "municipality__identifier",
+        "district__identifier",
+        "identifier__sequence",
+        "lessor__name",
+        "state",
+        "start_date",
+        "end_date",
+    )
+    bbox_filter_field = "lease_areas__geometry"
+    bbox_filter_include_overlapping = True
+    permission_classes = [
+        IsAuthenticated,
+        MvjDjangoModelPermissions,
+        IsMemberOfSameServiceUnit,
+    ]
+
+    def get_queryset(self):  # noqa: C901
+        """Allow filtering leases by various query parameters
+
+        `identifier` query parameter can be used to find the Lease with the provided identifier.
+        example: .../lease/?identifier=S0120-219
+        `search` query parameter can be used to find leases by identifier and multiple other fields
+        """
+        succinct = self.request.query_params.get("succinct")
+        queryset: QuerySet[Lease]
+
+        if succinct:
+            queryset = Lease.objects.succinct_select_related_and_prefetch_related()
+        else:
+            queryset = Lease.objects.full_select_related_and_prefetch_related()
+
+        if self.action != "list":
+            return queryset
+
+        # Used for checking were filters added
+        initial_query = str(queryset.query)
+
+        # Simple search
+        identifier = self.request.query_params.get("identifier")
+        search = self.request.query_params.get("search")
+
+        if identifier is not None or search is not None:
+            if search is None:
+                raw_search = identifier.strip()
+                search_by_other = False
+            else:
+                raw_search = search.strip()
+                search_by_other = True
+
+            # Separate comma-separated search values to individual search strings, e.g. "A1111-1,A1111-2"
+            search_strings = [s.strip() for s in raw_search.split(",") if s.strip()]
+
+            combined_q = Q()
+            for search_string in search_strings:
+                looks_like_identifier = bool(
+                    re.match(r"[A-Z]+\d{3,4}-\d+$", search_string, re.IGNORECASE)
+                )
+
+                # Search by identifier or parts of it
+                if len(search_string) < 3:
+                    identifier_q = Q(type__identifier__istartswith=search_string)
+                elif len(search_string) == 3:
+                    identifier_q = Q(
+                        type__identifier__iexact=search_string[:2],
+                        municipality__identifier=search_string[2:3],
+                    )
+                elif len(search_string) < 7:
+                    district_identifier = search_string[3:5]
+                    if district_identifier == "0":
+                        identifier_q = Q(
+                            type__identifier__iexact=search_string[:2],
+                            municipality__identifier=search_string[2:3],
+                            district__identifier__in=range(0, 10),
+                        )
+                    else:
+                        if district_identifier == "00":
+                            district_identifier = "0"
+                        else:
+                            district_identifier = district_identifier.lstrip("0")
+
+                        identifier_q = Q(
+                            type__identifier__iexact=search_string[:2],
+                            municipality__identifier=search_string[2:3],
+                            district__identifier__startswith=district_identifier,
+                        )
+                elif looks_like_identifier:
+                    district_identifier = search_string[3:5]
+                    if district_identifier == "00":
+                        district_identifier = "0"
+                    else:
+                        district_identifier = district_identifier.lstrip("0")
+
+                    identifier_q = Q(
+                        type__identifier__iexact=search_string[:2],
+                        municipality__identifier=search_string[2:3],
+                        district__identifier=district_identifier,
+                        identifier__sequence__startswith=search_string[6:],
+                    )
+                else:
+                    identifier_q = Q()
+
+                other_q = Q()
+
+                # Search also by other fields if the search string is clearly not a lease identifier
+                if search_by_other and not looks_like_identifier:
+                    # Address
+                    other_q |= Q(
+                        lease_areas__addresses__address__icontains=search_string
+                    )
+
+                    # Property identifier
+                    other_q |= Q(lease_areas__identifier__icontains=search_string)
+                    normalized_identifier = normalize_property_identifier(search_string)
+                    if search_string != normalized_identifier:
+                        other_q |= Q(
+                            lease_areas__identifier__icontains=normalized_identifier
+                        )
+
+                    # Tenantcontact name
+                    other_q |= Q(
+                        tenants__tenantcontact__contact__name__icontains=search_string
+                    )
+
+                    if " " in search_string:
+                        tenant_name_parts = search_string.split(" ", 2)
+                        other_q |= Q(
+                            tenants__tenantcontact__contact__first_name__icontains=tenant_name_parts[
+                                0
+                            ]
+                        ) & Q(
+                            tenants__tenantcontact__contact__last_name__icontains=tenant_name_parts[
+                                1
+                            ]
+                        )
+                        other_q |= Q(
+                            tenants__tenantcontact__contact__first_name__icontains=tenant_name_parts[
+                                1
+                            ]
+                        ) & Q(
+                            tenants__tenantcontact__contact__last_name__icontains=tenant_name_parts[
+                                0
+                            ]
+                        )
+                    else:
+                        other_q |= Q(
+                            tenants__tenantcontact__contact__first_name__icontains=search_string
+                        )
+                        other_q |= Q(
+                            tenants__tenantcontact__contact__last_name__icontains=search_string
+                        )
+
+                    # Lessor
+                    other_q |= Q(lessor__name__icontains=search_string)
+                    other_q |= Q(lessor__first_name__icontains=search_string)
+                    other_q |= Q(lessor__last_name__icontains=search_string)
+
+                    # Date
+                    try:
+                        search_date = parse(
+                            search_string, parserinfo=parserinfo(dayfirst=True)
+                        )
+                        if search_date:
+                            other_q |= Q(start_date=search_date.date())
+                            other_q |= Q(end_date=search_date.date())
+                    except ValueError:
+                        pass
+                    # Raised for invalid or unknown string formats --> not a date
+                    except ParserError:
+                        pass
+                    # Raised if the parsed date exceeds the largest valid C integer on your system --> not a date
+                    except OverflowError:
+                        pass
+
+                combined_q |= identifier_q | other_q
+
+            queryset = queryset.filter(combined_q)
+
+        # Advanced search
+        search_form = LeaseSearchForm(self.request.query_params)
+        search_form.is_valid()
+
+        if search_form.cleaned_data:
+            if (
+                search_form.cleaned_data.get("tenant_name")
+                or search_form.cleaned_data.get("business_id")
+                or search_form.cleaned_data.get("national_identification_number")
+            ):
+                q = Q()
+                tenant_name = search_form.cleaned_data.get("tenant_name")
+
+                # Tenantcontact name
+                if tenant_name:
+                    q = Q(tenants__tenantcontact__contact__name__icontains=tenant_name)
+
+                    if " " in tenant_name:
+                        tenant_name_parts = tenant_name.split(" ", 2)
+                        q |= Q(
+                            tenants__tenantcontact__contact__first_name__icontains=tenant_name_parts[
+                                0
+                            ]
+                        ) & Q(
+                            tenants__tenantcontact__contact__last_name__icontains=tenant_name_parts[
+                                1
+                            ]
+                        )
+                        q |= Q(
+                            tenants__tenantcontact__contact__first_name__icontains=tenant_name_parts[
+                                1
+                            ]
+                        ) & Q(
+                            tenants__tenantcontact__contact__last_name__icontains=tenant_name_parts[
+                                0
+                            ]
+                        )
+                    else:
+                        q |= Q(
+                            tenants__tenantcontact__contact__first_name__icontains=tenant_name
+                        )
+                        q |= Q(
+                            tenants__tenantcontact__contact__last_name__icontains=tenant_name
+                        )
+
+                if search_form.cleaned_data.get("business_id"):
+                    q &= Q(
+                        tenants__tenantcontact__contact__business_id__icontains=search_form.cleaned_data.get(
+                            "business_id"
+                        )
+                    )
+
+                if search_form.cleaned_data.get("national_identification_number"):
+                    nat_id = search_form.cleaned_data.get(
+                        "national_identification_number"
+                    )
+                    q &= Q(
+                        tenants__tenantcontact__contact__national_identification_number__icontains=nat_id
+                    )
+
+                if search_form.cleaned_data.get("tenantcontact_type"):
+                    q &= Q(
+                        tenants__tenantcontact__type__in=search_form.cleaned_data.get(
+                            "tenantcontact_type"
+                        )
+                    )
+
+                if search_form.cleaned_data.get("only_past_tenants"):
+                    q &= Q(tenants__tenantcontact__end_date__lte=timezone.now().date())
+
+                if search_form.cleaned_data.get("tenant_activity"):
+                    if search_form.cleaned_data.get("tenant_activity") == "past":
+                        q &= Q(
+                            tenants__tenantcontact__end_date__lte=timezone.now().date()
+                        )
+
+                    if search_form.cleaned_data.get("tenant_activity") == "active":
+                        # No need to filter by start date because future start dates are also considered active
+                        q &= Q(tenants__tenantcontact__end_date=None) | Q(
+                            tenants__tenantcontact__end_date__gte=timezone.now().date()
+                        )
+
+                queryset = queryset.filter(q)
+
+            if search_form.cleaned_data.get("sequence"):
+                queryset = queryset.filter(
+                    identifier__sequence=search_form.cleaned_data.get("sequence")
+                )
+
+            if search_form.cleaned_data.get("lease_start_date_start"):
+                queryset = queryset.filter(
+                    start_date__gte=search_form.cleaned_data.get(
+                        "lease_start_date_start"
+                    )
+                )
+
+            if search_form.cleaned_data.get("lease_start_date_end"):
+                queryset = queryset.filter(
+                    start_date__lte=search_form.cleaned_data.get("lease_start_date_end")
+                )
+
+            if search_form.cleaned_data.get("lease_end_date_start"):
+                queryset = queryset.filter(
+                    end_date__gte=search_form.cleaned_data.get("lease_end_date_start")
+                )
+
+            if search_form.cleaned_data.get("lease_end_date_end"):
+                queryset = queryset.filter(
+                    end_date__lte=search_form.cleaned_data.get("lease_end_date_end")
+                )
+
+            # Filter by active / expired only when only one of the options is set
+            if bool(search_form.cleaned_data.get("only_active_leases")) ^ bool(
+                search_form.cleaned_data.get("only_expired_leases")
+            ):
+                if search_form.cleaned_data.get("only_active_leases"):
+                    # No need to filter by start date because future start dates are also considered active
+                    queryset = queryset.filter(
+                        Q(end_date__isnull=True)
+                        | Q(end_date__gte=timezone.now().date())
+                    )
+
+                if search_form.cleaned_data.get("only_expired_leases"):
+                    queryset = queryset.filter(end_date__lte=timezone.now().date())
+
+            if "has_geometry" in search_form.cleaned_data:
+                if search_form.cleaned_data.get("has_geometry") is True:
+                    queryset = queryset.exclude(lease_areas__geometry__isnull=True)
+
+                if search_form.cleaned_data.get("has_geometry") is False:
+                    queryset = queryset.exclude(lease_areas__geometry__isnull=False)
+
+            if search_form.cleaned_data.get("preparers_own_leases", False) is True:
+                queryset = queryset.filter(preparer=self.request.user)
+
+            if search_form.cleaned_data.get("property_identifier"):
+                property_identifier = search_form.cleaned_data.get(
+                    "property_identifier"
+                )
+                normalized_identifier = normalize_property_identifier(
+                    property_identifier
+                )
+
+                queryset = queryset.filter(
+                    Q(lease_areas__identifier__icontains=property_identifier)
+                    | Q(lease_areas__identifier__icontains=normalized_identifier)
+                )
+
+            if search_form.cleaned_data.get("address"):
+                queryset = queryset.filter(
+                    lease_areas__addresses__address__icontains=search_form.cleaned_data.get(
+                        "address"
+                    )
+                )
+
+            if search_form.cleaned_data.get("lease_state"):
+                queryset = queryset.filter(
+                    state__in=search_form.cleaned_data.get("lease_state")
+                )
+
+            if search_form.cleaned_data.get("municipality"):
+                queryset = queryset.filter(
+                    municipality_id__in=search_form.cleaned_data.get("municipality")
+                )
+
+            if search_form.cleaned_data.get("lessor"):
+                queryset = queryset.filter(
+                    lessor=search_form.cleaned_data.get("lessor")
+                )
+
+            if search_form.cleaned_data.get("contract_number"):
+                queryset = queryset.filter(
+                    contracts__contract_number__icontains=search_form.cleaned_data.get(
+                        "contract_number"
+                    )
+                )
+
+            if search_form.cleaned_data.get("institution_identifier"):
+                queryset = queryset.filter(
+                    contracts__institution_identifier__icontains=search_form.cleaned_data.get(
+                        "institution_identifier"
+                    )
+                )
+
+            if search_form.cleaned_data.get("decision_maker"):
+                queryset = queryset.filter(
+                    decisions__decision_maker=search_form.cleaned_data.get(
+                        "decision_maker"
+                    ),
+                    decisions__deleted__isnull=True,
+                )
+
+            if search_form.cleaned_data.get("decision_date"):
+                queryset = queryset.filter(
+                    decisions__decision_date=search_form.cleaned_data.get(
+                        "decision_date"
+                    )
+                )
+
+            if search_form.cleaned_data.get("decision_section"):
+                queryset = queryset.filter(
+                    decisions__section=search_form.cleaned_data.get("decision_section")
+                )
+
+            if search_form.cleaned_data.get("reference_number"):
+                reference_number = search_form.cleaned_data.get("reference_number")
+                queryset = queryset.filter(
+                    Q(reference_number__icontains=reference_number)
+                    | Q(decisions__reference_number__icontains=reference_number)
+                )
+
+            if search_form.cleaned_data.get("invoice_number"):
+                queryset = queryset.filter(
+                    invoices__number__icontains=search_form.cleaned_data.get(
+                        "invoice_number"
+                    )
+                )
+
+            if search_form.cleaned_data.get("service_unit"):
+                queryset = queryset.filter(
+                    service_unit_id__in=search_form.cleaned_data.get("service_unit")
+                )
+
+            if search_form.cleaned_data.get("intended_use"):
+                queryset = queryset.filter(
+                    intended_use_id__in=search_form.cleaned_data.get("intended_use")
+                )
+
+            if search_form.cleaned_data.get("preparer"):
+                queryset = queryset.filter(
+                    preparer=search_form.cleaned_data.get("preparer")
+                )
+
+            if search_form.cleaned_data.get("preparation_state"):
+                queryset = self.get_preparation_state_filters(
+                    queryset, search_form.cleaned_data.get("preparation_state")
+                )
+
+        final_query = str(queryset.query)
+        queryset_has_filters_applied = initial_query != final_query
+        if queryset_has_filters_applied:
+            return queryset.distinct()
+
+        return queryset
+
+    def get_preparation_state_filters(
+        self, queryset: QuerySet[Lease], preparation_state: PreparationState
+    ):
+        if PreparationState.MISSING_LEASE_PROPERTY.value in preparation_state:
+            queryset = queryset.filter(lease_areas__isnull=True)
+
+        if PreparationState.MISSING_LEASE_AREA_GEOMETRY.value in preparation_state:
+            queryset = queryset.filter(
+                Exists(LeaseArea.objects.filter(lease_id=OuterRef("pk"))),
+                lease_areas__geometry__isnull=True,
+            )
+
+        if PreparationState.MISSING_TENANT.value in preparation_state:
+            queryset = queryset.filter(tenants__isnull=True).exclude(
+                # Reservations and reserves are excluded from results, as they don't have tenants.
+                state__in=[
+                    LeaseState.RESERVATION,
+                    LeaseState.RESERVE,
+                ]
+            )
+
+        if PreparationState.MISSING_RENT.value in preparation_state:
+            queryset = queryset.filter(rents__isnull=True).exclude(
+                # Reservations, preliminaries, reserves and POA's are excluded from results, as they don't have rents.
+                state__in=[
+                    LeaseState.RESERVATION,
+                    LeaseState.PRELIMINARY,
+                    LeaseState.RESERVE,
+                    LeaseState.POWER_OF_ATTORNEY,
+                ]
+            )
+
+        if PreparationState.MISSING_DECISION.value in preparation_state:
+            queryset = queryset.filter(decisions__isnull=True).exclude(
+                state__in=[
+                    # Reserves don't have decisions.
+                    LeaseState.RESERVE,
+                ]
+            )
+
+        # Filter for missing constructability description.
+        if PreparationState.MISSING_CONSTRUCTABILITY.value in preparation_state:
+            has_no_description = ~Exists(
+                ConstructabilityDescription.objects.filter(lease_area_id=OuterRef("pk"))
+            )
+            queryset = (
+                queryset.filter(
+                    lease_areas__in=LeaseArea.objects.filter(has_no_description)
+                )
+                .filter(
+                    Q(end_date__isnull=True) | Q(end_date__gte=timezone.now().date())
+                )
+                # Constructability descriptions started being recorded on leases created from 1.1.2020 onwards.
+                .filter(
+                    Q(created_at__isnull=True)
+                    | Q(created_at__gte=datetime.date(2020, 1, 1))
+                )
+                .filter(
+                    Q(
+                        state__in=[
+                            # Only lease-type leases have constructability descriptions.
+                            LeaseState.LEASE,
+                            LeaseState.LONG_TERM_LEASE,
+                            LeaseState.SHORT_TERM_LEASE,
+                        ]
+                    )
+                )
+            )
+
+        if PreparationState.CONTRACT_NOT_SIGNED.value in preparation_state:
+            # Find leases where the newest contract exists and is unsigned.
+            latest_contract_signing_date = Subquery(
+                Contract.objects.filter(lease=OuterRef("pk"))
+                .order_by("-pk")
+                .values("signing_date")[:1]
+            )
+            queryset = (
+                queryset.filter(Exists(Contract.objects.filter(lease=OuterRef("pk"))))
+                .annotate(latest_contract_signing_date=latest_contract_signing_date)
+                .filter(latest_contract_signing_date__isnull=True)
+            )
+
+        if PreparationState.RENT_NOT_MARKED_READY.value in preparation_state:
+            queryset = queryset.filter(
+                Exists(Rent.objects.filter(lease=OuterRef("pk"))),
+                rent_info_completed_at__isnull=True,
+            )
+
+        if PreparationState.INVOICING_NOT_STARTED.value in preparation_state:
+            queryset = (
+                queryset.filter(invoicing_enabled_at__isnull=True)
+                # Filter out leases with only archived rents and leases with only FREE rents.
+                .filter(
+                    Exists(
+                        Rent.objects.filter(
+                            lease=OuterRef("pk"),
+                        )
+                        .exclude(type=RentType.FREE)
+                        .filter(
+                            Q(end_date__isnull=True)
+                            | Q(end_date__gte=timezone.now().date())
+                        )
+                    )
+                )
+                # Filter out leases not marked ready for invoicing.
+                .filter(rent_info_completed_at__isnull=False)
+                # Reservations and preliminary leases are excluded from results, as they're not expected be invoiced.
+                .exclude(
+                    state__in=[
+                        LeaseState.RESERVATION,
+                        LeaseState.PRELIMINARY,
+                    ]
+                )
+            )
+
+        return queryset
+
+    def get_serializer_class(self):
+        if self.action in ("create", "metadata"):
+            return LeaseCreateSerializer
+
+        if self.action in ("update", "partial_update"):
+            return LeaseUpdateSerializer
+
+        if self.request.query_params.get("succinct"):
+            return LeaseSuccinctSerializer
+
+        if self.request.query_params.get("in_bbox") or self.request.query_params.get(
+            "succinct_with_geometry"
+        ):
+            return LeaseSuccinctWithGeometrySerializer
+
+        if self.action == "list":
+            return LeaseListSerializer
+
+        return LeaseRetrieveSerializer
+
+    def perform_create(self, serializer):
+        relate_to = None
+        if "relate_to" in serializer.validated_data:
+            relate_to = serializer.validated_data.pop("relate_to")
+
+        relation_type = None
+        if "relation_type" in serializer.validated_data:
+            relation_type = serializer.validated_data.pop("relation_type")
+
+        instance = serializer.save()
+
+        if relate_to and relation_type:
+            RelatedLease.objects.create(
+                from_lease=relate_to, to_lease=instance, type=relation_type
+            )
+
+    def create(self, request, *args, **kwargs):
+        if "preparer" not in request.data:
+            request.data["preparer"] = request.user.id
+
+        return super().create(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        if (
+            instance.preparer == request.user and instance.is_empty()
+        ) or request.user.has_perm("leasing.delete_nonempty_lease"):
+            self.perform_destroy(instance)
+
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        raise PermissionDenied(_("No permission. Can only delete own empty leases."))

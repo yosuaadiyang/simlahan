@@ -1,0 +1,7 @@
+@use "foundation-sites/scss/foundation";
+
+.AreaSearchMap {
+  &--has-error .map {
+    border: 1px solid foundation.$input-error-color;
+  }
+}

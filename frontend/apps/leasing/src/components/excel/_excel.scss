@@ -1,0 +1,26 @@
+@use "foundation-sites/scss/foundation" as *;
+@use "../../styles/variables";
+
+.excel {
+  &__excel-link {
+    span {
+      margin-right: rem-calc(5px);
+    }
+
+    .icons__excel-icon {
+      fill: variables.$blue;
+      height: rem-calc(2px);
+      width: rem-calc(3px);
+      vertical-align: middle;
+    }
+
+    &:hover {
+      text-decoration: underline;
+      color: variables.$blue-hover;
+
+      .icons__excel-icon {
+        fill: variables.$blue-hover;
+      }
+    }
+  }
+}

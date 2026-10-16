@@ -1,0 +1,161 @@
+import React, { ReactElement } from "react";
+import { useAppSelector } from "@/root/hooks";
+import { Row, Column } from "@/components/grid/Grid";
+import { FieldArray } from "react-final-form-arrays";
+import { Form } from "react-final-form";
+import type { FormApi } from "final-form";
+import { ActionTypes, ModalConsumer } from "@/app/ModalContext";
+import AddButtonSecondary from "@/components/form/AddButtonSecondary";
+import Authorization from "@/components/authorization/Authorization";
+import { getLoggedInUser } from "@/auth/selectors";
+import BoxItemContainer from "@/components/content/BoxItemContainer";
+import FormText from "@/components/form/FormText";
+import GreenBox from "@/components/content/GreenBox";
+import InspectionItemEdit from "./InspectionItemEdit";
+import { ConfirmationModalTexts, FormNames } from "@/enums";
+import { ButtonColors } from "@/components/enums";
+import { LeaseInspectionsFieldPaths } from "@/leases/enums";
+import { UsersPermissions } from "@/usersPermissions/enums";
+import { hasPermissions, isFieldAllowedToEdit } from "@/util/helpers";
+import { getAttributes as getLeaseAttributes } from "@/leases/selectors";
+import { getUsersPermissions } from "@/usersPermissions/selectors";
+import { get } from "lodash-es";
+import type { Attributes } from "types";
+import type { UsersPermissions as UsersPermissionsType } from "@/usersPermissions/types";
+type InspectionsProps = {
+  fields: any;
+  leaseAttributes: Attributes;
+  usersPermissions: UsersPermissionsType;
+  username: String;
+};
+
+const Inspections = ({
+  fields,
+  leaseAttributes,
+  username,
+  usersPermissions,
+}: InspectionsProps): ReactElement => {
+  const handleAdd = () => {
+    fields.push({
+      inspector: username,
+    });
+  };
+
+  if (!fields || !fields.length) {
+    return (
+      <Authorization
+        allow={isFieldAllowedToEdit(
+          leaseAttributes,
+          LeaseInspectionsFieldPaths.INSPECTIONS,
+        )}
+        errorComponent={
+          <FormText className="no-margin">
+            Ei tarkastuksia tai huomautuksia
+          </FormText>
+        }
+      >
+        <Row>
+          <Column>
+            <AddButtonSecondary
+              style={{
+                marginTop: 0,
+              }}
+              label="Lisää tarkastus"
+              onClick={handleAdd}
+            />
+          </Column>
+        </Row>
+      </Authorization>
+    );
+  }
+
+  return (
+    <ModalConsumer>
+      {({ modalDispatch }) => {
+        return (
+          <GreenBox>
+            {fields && !!fields.length && (
+              <BoxItemContainer>
+                {fields.map((field, index) => {
+                  const handleRemove = () => {
+                    modalDispatch({
+                      type: ActionTypes.SHOW_CONFIRMATION_MODAL,
+                      confirmationFunction: () => {
+                        fields.remove(index);
+                      },
+                      confirmationModalButtonClassName: ButtonColors.ALERT,
+                      confirmationModalButtonText:
+                        ConfirmationModalTexts.DELETE_INSPECTION.BUTTON,
+                      confirmationModalLabel:
+                        ConfirmationModalTexts.DELETE_INSPECTION.LABEL,
+                      confirmationModalTitle:
+                        ConfirmationModalTexts.DELETE_INSPECTION.TITLE,
+                    });
+                  };
+
+                  return (
+                    <InspectionItemEdit
+                      key={index}
+                      field={field}
+                      onRemove={handleRemove}
+                      inspectionId={fields.value?.[index]?.id}
+                    />
+                  );
+                })}
+              </BoxItemContainer>
+            )}
+
+            <Authorization
+              allow={hasPermissions(
+                usersPermissions,
+                UsersPermissions.ADD_INSPECTION,
+              )}
+            >
+              <Row>
+                <Column>
+                  <AddButtonSecondary
+                    label="Lisää tarkastus"
+                    onClick={handleAdd}
+                  />
+                </Column>
+              </Row>
+            </Authorization>
+          </GreenBox>
+        );
+      }}
+    </ModalConsumer>
+  );
+};
+
+type Props = {
+  formApi: FormApi;
+};
+
+const InspectionsEdit: React.FC<Props> = ({ formApi }) => {
+  const usersPermissions = useAppSelector(getUsersPermissions);
+  const leaseAttributes = useAppSelector(getLeaseAttributes);
+  const user = useAppSelector(getLoggedInUser);
+
+  return (
+    <Form form={formApi} onSubmit={formApi.submit}>
+      {() => (
+        <form>
+          <GreenBox>
+            <FieldArray name="inspections">
+              {(fieldArrayProps) =>
+                Inspections({
+                  ...fieldArrayProps,
+                  leaseAttributes: leaseAttributes,
+                  usersPermissions: usersPermissions,
+                  username: get(user, "profile.name"),
+                })
+              }
+            </FieldArray>
+          </GreenBox>
+        </form>
+      )}
+    </Form>
+  );
+};
+
+export default InspectionsEdit;

@@ -1,0 +1,522 @@
+[
+  {
+    "model": "leasing.leasetype",
+    "pk": 1,
+    "fields": {
+      "name": "Asuntotontit",
+      "identifier": "A1",
+      "sap_material_code": "20002009",
+      "sap_order_item_number": "2813101001",
+      "sap_project_number": "2810K00281310101",
+      "due_dates_position": "middle_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 2,
+    "fields": {
+      "name": "Opiskelija-asuntotontit",
+      "identifier": "A2",
+      "sap_material_code": "20002009",
+      "sap_order_item_number": "2813101001",
+      "sap_project_number": "2810K00281310101",
+      "due_dates_position": "middle_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 3,
+    "fields": {
+      "name": "Vanhusten asunto- ja vanhainkotitontit",
+      "identifier": "A3",
+      "sap_material_code": "20002009",
+      "sap_order_item_number": "2813101001",
+      "sap_project_number": "2810K00281310101",
+      "due_dates_position": "middle_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 4,
+    "fields": {
+      "name": "Asuntotontteihin liittyvä pysäköintit.",
+      "identifier": "A4",
+      "sap_material_code": "20002007",
+      "sap_order_item_number": "2813101002",
+      "sap_project_number": "2810K00281310102",
+      "due_dates_position": "middle_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 5,
+    "fields": {
+      "name": "Sekalaiset vuokraukset",
+      "identifier": "S0",
+      "sap_material_code": "20002009",
+      "sap_order_item_number": "2813104106",
+      "sap_project_number": "2810K00281310412",
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 6,
+    "fields": {
+      "name": "Teollisuus- ja varastotontit",
+      "identifier": "T1",
+      "sap_material_code": "20002006",
+      "sap_order_item_number": "2813104100",
+      "sap_project_number": "2810K00281310406",
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 7,
+    "fields": {
+      "name": "Käyttöoikeudet",
+      "identifier": "O1",
+      "sap_material_code": "20002009",
+      "sap_order_item_number": "2813104105",
+      "sap_project_number": "2810K00281310411",
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 8,
+    "fields": {
+      "name": "Teollis./varastot. liittyv. pysäköintit.",
+      "identifier": "T2",
+      "sap_material_code": "20002007",
+      "sap_order_item_number": "2813104101",
+      "sap_project_number": "2810K00281310407",
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 9,
+    "fields": {
+      "name": "Huoltoasema",
+      "identifier": "H1",
+      "sap_material_code": "20002008",
+      "sap_order_item_number": "2813104102",
+      "sap_project_number": "2810K00281310408",
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 10,
+    "fields": {
+      "name": "Jakeluasema",
+      "identifier": "H2",
+      "sap_material_code": "20002008",
+      "sap_order_item_number": "2813104102",
+      "sap_project_number": "2810K00281310408",
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 11,
+    "fields": {
+      "name": "Liike- ja toimistotontit",
+      "identifier": "L1",
+      "sap_material_code": "20002005",
+      "sap_order_item_number": "2813104103",
+      "sap_project_number": "2810K00281310409",
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 12,
+    "fields": {
+      "name": "Yleisen rakennuksen tontit",
+      "identifier": "L2",
+      "sap_material_code": "20002005",
+      "sap_order_item_number": "2813104103",
+      "sap_project_number": "2810K00281310409",
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 13,
+    "fields": {
+      "name": "Liike/Yleistenr. tonttien pysäköintit.",
+      "identifier": "L3",
+      "sap_material_code": "20002007",
+      "sap_order_item_number": "2813104104",
+      "sap_project_number": "2810K00281310410",
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 14,
+    "fields": {
+      "name": "Laiturinpito ja poijuluvat",
+      "identifier": "O2",
+      "sap_material_code": "20002009",
+      "sap_order_item_number": "2813104105",
+      "sap_project_number": "2810K00281310411",
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 15,
+    "fields": {
+      "name": "Kokoontumisluvat (ei käytössä)",
+      "identifier": "O3",
+      "sap_material_code": "20002009",
+      "sap_order_item_number": "2813102006",
+      "sap_project_number": "2810K00281310206",
+      "due_dates_position": "start_of_month",
+      "is_active": false
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 16,
+    "fields": {
+      "name": "Muut luvat",
+      "identifier": "O4",
+      "sap_material_code": "20002009",
+      "sap_order_item_number": "2813104105",
+      "sap_project_number": "2810K00281310411",
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 17,
+    "fields": {
+      "name": "Kaupungin sisäiset (tilapäiset vuokr.)",
+      "identifier": "K0",
+      "sap_material_code": "20002009",
+      "sap_order_item_number": "2813100001",
+      "sap_project_number": "2810K00281310001",
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 18,
+    "fields": {
+      "name": "Helsingin Satama",
+      "identifier": "V5",
+      "sap_material_code": "20002009",
+      "sap_order_item_number": "2813100002",
+      "sap_project_number": null,
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 19,
+    "fields": {
+      "name": "Helen (Helsingin Energia)",
+      "identifier": "V2",
+      "sap_material_code": "20002009",
+      "sap_order_item_number": "2813100002",
+      "sap_project_number": "2810K00281310002",
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 20,
+    "fields": {
+      "name": "Helsingin Vesi",
+      "identifier": "V6",
+      "sap_material_code": "20002009",
+      "sap_order_item_number": null,
+      "sap_project_number": null,
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 21,
+    "fields": {
+      "name": "HKL (Liikennelaitos)",
+      "identifier": "V4",
+      "sap_material_code": "20002009",
+      "sap_order_item_number": "2813100002",
+      "sap_project_number": "2810K00281310002",
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 22,
+    "fields": {
+      "name": "Elintarviketukkukaupan keskus",
+      "identifier": "V1",
+      "sap_material_code": "20002009",
+      "sap_order_item_number": "2813100002",
+      "sap_project_number": "2810K00281310002",
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 23,
+    "fields": {
+      "name": "Keskuspesula (ei käytössä)",
+      "identifier": "V3",
+      "sap_material_code": "20002009",
+      "sap_order_item_number": "2813100002",
+      "sap_project_number": "2810K00281310002",
+      "due_dates_position": "start_of_month",
+      "is_active": false
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 24,
+    "fields": {
+      "name": "KUVA (Liikuntavirasto)",
+      "identifier": "Y3",
+      "sap_material_code": "20002009",
+      "sap_order_item_number": "2813100003",
+      "sap_project_number": "2810K00281310003",
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 25,
+    "fields": {
+      "name": "Muut sisäiset (Rakennusvirasto - ei käytössä)",
+      "identifier": "Y5",
+      "sap_material_code": "20002009",
+      "sap_order_item_number": "2813100003",
+      "sap_project_number": "2810K00281310003",
+      "due_dates_position": "start_of_month",
+      "is_active": false
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 26,
+    "fields": {
+      "name": "SOTEPE (Sosiaalivirasto)",
+      "identifier": "Y6",
+      "sap_material_code": "20002009",
+      "sap_order_item_number": "2813100003",
+      "sap_project_number": "2810K00281310003",
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 27,
+    "fields": {
+      "name": "SOTEPE (Terveysvirasto)",
+      "identifier": "Y7",
+      "sap_material_code": "20002009",
+      "sap_order_item_number": "2813100003",
+      "sap_project_number": "2810K00281310003",
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 28,
+    "fields": {
+      "name": "KASKO (Opetusvirasto)",
+      "identifier": "Y2",
+      "sap_material_code": "20002009",
+      "sap_order_item_number": "2813100003",
+      "sap_project_number": "2810K00281310003",
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 29,
+    "fields": {
+      "name": "SOTEPE (Pelastuslaitos)",
+      "identifier": "Y4",
+      "sap_material_code": "20002009",
+      "sap_order_item_number": "2813100003",
+      "sap_project_number": "2810K00281310003",
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 30,
+    "fields": {
+      "name": "Korkeasaari (ei käytössä)",
+      "identifier": "Y1",
+      "sap_material_code": "20002009",
+      "sap_order_item_number": "2813100003",
+      "sap_project_number": "2810K00281310003",
+      "due_dates_position": "start_of_month",
+      "is_active": false
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 31,
+    "fields": {
+      "name": "KUVA (Nuorisoasiainkeskus)",
+      "identifier": "Y8",
+      "sap_material_code": "20002009",
+      "sap_order_item_number": "2813100003",
+      "sap_project_number": "2810K00281310003",
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 32,
+    "fields": {
+      "name": "TYHJÄ TONTTI",
+      "identifier": "TY",
+      "sap_material_code": null,
+      "sap_order_item_number": null,
+      "sap_project_number": null,
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 33,
+    "fields": {
+      "name": "Maapoliittinen sopimus",
+      "identifier": "MA",
+      "sap_material_code": null,
+      "sap_order_item_number": null,
+      "sap_project_number": null,
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 34,
+    "fields": {
+      "name": "KYMP, RYA",
+      "identifier": "Y9",
+      "sap_material_code": "20002009",
+      "sap_order_item_number": "2813100003",
+      "sap_project_number": "2810K00281310003",
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 35,
+    "fields": {
+      "name": "Myynti/maksamaton kauppahinta",
+      "identifier": "MY",
+      "sap_material_code": null,
+      "sap_order_item_number": null,
+      "sap_project_number": null,
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 36,
+    "fields": {
+      "name": "Siirtolapuutarha (ei käytössä)",
+      "identifier": "R0",
+      "sap_material_code": null,
+      "sap_order_item_number": null,
+      "sap_project_number": null,
+      "due_dates_position": "start_of_month",
+      "is_active": false
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 37,
+    "fields": {
+      "name": "Väestönsuojakorvaukset",
+      "identifier": "VS",
+      "sap_material_code": null,
+      "sap_order_item_number": null,
+      "sap_project_number": null,
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 38,
+    "fields": {
+      "name": "KASKO (Varhaiskasvatusvirasto)",
+      "identifier": "Y0",
+      "sap_material_code": "20002009",
+      "sap_order_item_number": "2813100003",
+      "sap_project_number": "2810K00281310003",
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 39,
+    "fields": {
+      "name": "Teollisuus- ja varastotontit (alv:set)",
+      "identifier": "T3",
+      "sap_material_code": "10003610",
+      "sap_order_item_number": "2813104100",
+      "sap_project_number": "2810K00281310406",
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  },
+  {
+    "model": "leasing.leasetype",
+    "pk": 40,
+    "fields": {
+      "name": "KUVA:n ulosvuokraus",
+      "identifier": "S1",
+      "sap_material_code": null,
+      "sap_order_item_number": null,
+      "sap_project_number": null,
+      "due_dates_position": "start_of_month",
+      "is_active": true
+    }
+  }
+]

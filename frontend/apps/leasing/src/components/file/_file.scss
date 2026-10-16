@@ -1,0 +1,25 @@
+@use "foundation-sites/scss/foundation" as *;
+@use "../../styles/variables";
+
+.file {
+  &__file-download-link {
+    max-width: 100%;
+    word-wrap: break-word;
+  }
+
+  &__file-input {
+    input {
+      display: none;
+    }
+
+    label {
+      background-color: transparent;
+      cursor: pointer;
+      color: variables.$blue;
+      font-weight: variables.$semibold;
+      font-size: rem-calc(14px);
+      padding: 0;
+      margin: rem-calc(2px 0 0);
+    }
+  }
+}

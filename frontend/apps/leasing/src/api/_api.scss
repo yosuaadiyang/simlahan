@@ -1,0 +1,44 @@
+@use "../styles/variables";
+
+.api-error-modal {
+  &__title {
+    margin-bottom: 20px;
+  }
+
+  &__message {
+    background: variables.$light-gray;
+    margin-bottom: 20px;
+    padding: 20px;
+  }
+
+  &__source {
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+
+  &__error-list {
+    ul li {
+      list-style: square;
+    }
+  }
+
+  &__error-list-heading {
+    margin-bottom: 10px;
+  }
+
+  &__trace-heading {
+    margin-bottom: 10px;
+  }
+
+  &__trace-nav {
+    font-size: 14px;
+  }
+
+  &__trace-source {
+    font-weight: bold;
+  }
+
+  &__close {
+    margin-bottom: 0;
+  }
+}

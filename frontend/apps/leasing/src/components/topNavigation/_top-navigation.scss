@@ -1,0 +1,177 @@
+@use "foundation-sites/scss/foundation" as *;
+@use "../../styles/variables";
+@use "../../styles/mixins";
+
+.top-navigation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: rem-calc(60px);
+  font-family: variables.$font-family-source;
+  font-weight: 600;
+  font-size: rem-calc(20px);
+  padding: 0 rem-calc(20px);
+  background: variables.$white;
+  z-index: 1060;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.06);
+  background-color: variables.$white;
+
+  &__left-wrapper {
+    display: flex;
+    flex: 1 1 0%;
+    align-items: center;
+
+    .page-title {
+      font-size: rem-calc(20px);
+      margin: 0;
+      padding: 0 rem-calc(20px);
+      line-height: rem-calc(60px);
+      background-color: variables.$white;
+
+      a {
+        color: variables.$black;
+
+        &:hover {
+          color: variables.$blue;
+        }
+      }
+    }
+  }
+
+  &__title {
+    &_button {
+      font-size: rem-calc(20px);
+      margin-left: rem-calc(-20px);
+      padding: 0 rem-calc(20px);
+      line-height: rem-calc(60px);
+      background-color: variables.$blue;
+      font-family: variables.$font-family-source;
+      font-weight: 600;
+      outline-offset: -2px !important;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+
+      span {
+        color: variables.$white;
+        margin-right: rem-calc(10px);
+      }
+
+      .icons {
+        stroke: variables.$white;
+        @include mixins.transform(rotateX(180deg));
+        @include mixins.transition(0.3s, transform, ease-in-out);
+      }
+    }
+
+    &.is-open {
+      .icons {
+        @include mixins.transform(rotateX(0));
+      }
+    }
+  }
+
+  &__right-wrapper {
+    display: flex;
+
+    .username-wrapper {
+      line-height: 1;
+      margin-left: 20px;
+      text-align: right;
+
+      .username {
+        display: flex;
+        justify-content: flex-end;
+        font-weight: 500;
+        font-size: rem-calc(16px);
+        margin-bottom: 0;
+
+        .user-group-button {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: rem-calc(24px);
+          width: rem-calc(24px);
+          padding: rem-calc(2px);
+          border-radius: 50%;
+          margin-left: rem-calc(5px);
+          background-color: #0078c0;
+        }
+      }
+      .logout-link {
+        color: variables.$blue;
+        font-weight: variables.$semibold;
+        font-size: rem-calc(16px);
+        font-family: variables.$font-family-source;
+        margin: 0;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+          color: variables.$blue-hover;
+        }
+      }
+    }
+
+    .menuIcon,
+    .userIcon,
+    .flagIcon {
+      width: 27px;
+      height: 27px;
+      fill: variables.$black;
+      cursor: pointer;
+    }
+
+    .menuIcon:hover,
+    .userIcon:hover {
+      fill: variables.$blue;
+    }
+
+    .menuIcon {
+      width: rem-calc(25px);
+      height: rem-calc(25px);
+      baseline-shift: rem-calc(10px);
+    }
+
+    .search {
+      margin: 0 rem-calc(40px) 0 0;
+    }
+
+    .flag {
+      position: relative;
+      margin: 0 rem-calc(60px) 0 0;
+    }
+
+    .user-service-unit {
+      border-right: 1px solid #ddd;
+      padding-right: 20px;
+
+      form {
+        min-width: 200px;
+        label {
+          display: inline;
+        }
+      }
+
+      .user-service-unit-text {
+        line-height: 1.25;
+        text-align: right;
+      }
+
+      .service-unit-label {
+        font-size: 0.8rem;
+        color: #666666;
+        font-weight: 400;
+      }
+
+      .service-unit-name {
+        font-size: 0.85rem;
+        font-weight: 500;
+      }
+    }
+  }
+}

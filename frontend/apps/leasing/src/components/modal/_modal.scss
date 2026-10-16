@@ -1,0 +1,103 @@
+@use "foundation-sites/scss/foundation" as *;
+@use "../../styles/variables";
+@use "../../styles/mixins";
+
+.modal {
+  &__wrapper {
+    z-index: 1080;
+    background-color: variables.$white;
+    width: rem-calc(800px);
+    max-width: 100%;
+    max-height: 95%;
+    position: fixed;
+    top: -50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.06);
+    overflow: visible;
+
+    @include mixins.transition(0.5s, top, ease);
+  }
+
+  &__scrollable {
+    overflow: scroll;
+  }
+
+  &__header {
+    padding: rem-calc(20px) rem-calc(20px) 0;
+
+    h1.title {
+      font-family: variables.$font-family-source;
+      font-size: rem-calc(22px);
+      line-height: rem-calc(24px);
+      font-weight: variables.$semibold;
+      color: variables.$black;
+      margin: 0;
+    }
+
+    &_wrapper {
+      position: relative;
+    }
+  }
+
+  &__content {
+    padding: rem-calc(20px) rem-calc(20px);
+    height: auto;
+  }
+
+  &__overlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1070;
+    background-color: rgba(0, 0, 0, 0.65);
+    opacity: 0;
+    visibility: hidden;
+
+    @include mixins.transition(0.5s, all, ease);
+  }
+
+  &.modal-open {
+    .modal__wrapper {
+      top: 50%;
+    }
+
+    .modal__overlay {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  &.modal-small {
+    .modal__wrapper {
+      width: rem-calc(500px);
+    }
+  }
+
+  &.modal-large {
+    .modal__wrapper {
+      width: rem-calc(variables.$content-max-width);
+    }
+  }
+
+  &.modal-autoheight {
+    .modal__content {
+      height: auto;
+    }
+  }
+
+  &__button-wrapper {
+    margin-top: 10px;
+    text-align: right;
+
+    button:first-child {
+      margin-left: 0;
+    }
+
+    button:last-child {
+      margin-right: 0;
+    }
+  }
+}

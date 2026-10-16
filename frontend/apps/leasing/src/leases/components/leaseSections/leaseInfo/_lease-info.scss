@@ -1,0 +1,30 @@
+@use "foundation-sites/scss/foundation" as *;
+@use "../../../../styles/variables";
+
+.lease-info {
+  width: 100%;
+  max-width: rem-calc(900px);
+
+  &__identifier {
+    font-family: variables.$font-family-source;
+    font-size: rem-calc(22px);
+    font-weight: variables.$semibold;
+    line-height: rem-calc(24px);
+    color: variables.$black;
+    margin: 0;
+    margin-right: rem-calc(20px);
+  }
+
+  &__text {
+    font-size: rem-calc(16px);
+    line-height: rem-calc(18px);
+    font-weight: variables.$semibold;
+    margin-bottom: 0;
+  }
+}
+
+@media only screen and (max-width: 900px) {
+  .hide_narrow {
+    display: none;
+  }
+}

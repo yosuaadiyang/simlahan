@@ -1,0 +1,100 @@
+@use "foundation-sites/scss/foundation" as *;
+@use "../../styles/variables";
+@use "../../styles/mixins";
+
+.control-buttons {
+  display: flex;
+  float: right;
+
+  &__comment-button {
+    display: inline-block;
+    margin-left: 3rem;
+    margin-right: 0;
+    cursor: pointer;
+    position: relative;
+    line-height: rem-calc(30px);
+
+    @include mixins.focus();
+
+    &:hover {
+      outline: none;
+    }
+
+    .icons__comment {
+      vertical-align: middle;
+
+      &:hover {
+        fill: variables.$blue;
+        stroke: variables.$blue;
+      }
+    }
+
+    .comment-amount {
+      position: absolute;
+      font-size: rem-calc(13px);
+      line-height: 1;
+      padding: rem-calc(3px);
+      color: variables.$white;
+      font-weight: 600;
+      text-align: center;
+      border-radius: 50%;
+      background-color: variables.$black;
+      top: rem-calc(-4px);
+      right: rem-calc(-10px);
+      min-width: rem-calc(19px);
+    }
+  }
+
+  &__left-button-wrapper {
+    .mvj-button:last-child {
+      margin-right: 0;
+    }
+  }
+}
+
+.control-button-bar {
+  background-color: variables.$light-gray;
+  width: 100%;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.2);
+
+  &__wrapper {
+    display: flex;
+    justify-content: space-between;
+    display: flex;
+    position: relative;
+    width: 100%;
+    margin: 0 auto;
+    max-width: variables.$content-max-width;
+    padding: rem-calc(10px 20px);
+  }
+
+  .back-button-wrapper {
+    flex: 0 0 0;
+    align-self: center;
+    padding-right: rem-calc(15px);
+
+    button {
+      top: unset;
+      cursor: pointer;
+    }
+  }
+
+  .info-component-wrapper {
+    flex: 1 1 0%;
+    padding-right: rem-calc(7.5px);
+    align-self: center;
+
+    h1 {
+      font-family: variables.$font-family-source;
+      font-size: rem-calc(22px);
+      font-weight: variables.$semibold;
+      line-height: rem-calc(24px);
+      color: variables.$black;
+      margin: 0;
+    }
+  }
+
+  .control-buttons-wrapper {
+    align-self: flex-end;
+  }
+}

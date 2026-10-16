@@ -1,0 +1,20 @@
+import type { ApiResponse, Attributes, Methods } from "types";
+export type BatchRunState = {
+  isFetchingJobRunAttributes: boolean;
+  isFetchingJobRuns: boolean;
+  isFetchingJobRunLogEntryAttributes: boolean;
+  isFetchingJobRunLogEntriesByRun: any;
+  isFetchingScheduledJobAttributes: boolean;
+  isFetchingScheduledJobs: boolean;
+  jobRunAttributes: Attributes;
+  jobRunMethods: Methods;
+  jobRuns: JobRuns;
+  jobRunLogEntryAttributes: Attributes;
+  jobRunLogEntryMethods: Methods;
+  jobRunLogEntriesByRun: Record<string, any>;
+  scheduledJobAttributes: Attributes;
+  scheduledJobMethods: Methods;
+  scheduledJobs: ScheduledJobs;
+};
+export type JobRuns = ApiResponse;
+export type ScheduledJobs = ApiResponse;

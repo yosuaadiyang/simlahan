@@ -1,0 +1,32 @@
+@use "sass:color";
+@use "../../styles/variables";
+
+.AreaSearchApplicantInfoCheck {
+  &,
+  span,
+  a {
+    font-size: variables.$font-small;
+  }
+
+  .row {
+    line-height: 1.5rem;
+  }
+}
+
+.AreaSearchApplicantInfoCheckEdit {
+  &,
+  span,
+  a {
+    font-size: variables.$font-small;
+    color: black;
+  }
+
+  .AreaSearchApplicantInfoCheckEditItem--dirty {
+    .column:nth-child(2) > * {
+      background-color: color.adjust(
+        variables.$is-dirty-color,
+        $lightness: -5%
+      );
+    }
+  }
+}

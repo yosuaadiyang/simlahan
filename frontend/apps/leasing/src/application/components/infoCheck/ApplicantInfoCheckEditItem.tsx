@@ -1,0 +1,108 @@
+import React from "react";
+import { flowRight } from "lodash-es";
+import { connect } from "react-redux";
+import { getFormValues, reduxForm } from "redux-form";
+import { Column, Row } from "@/components/grid/Grid";
+import classNames from "classnames";
+import { getApplicantInfoCheckAttributes } from "@/application/selectors";
+import { getFieldOptions, getLabelOfOption } from "@/util/helpers";
+import { getUserFullName } from "@/users/helpers";
+import type { Attributes } from "types";
+
+type OwnProps = {
+  openModal: (
+    checkItem: Record<string, any>,
+    form: string,
+    skipToForm: boolean,
+  ) => void;
+  formName: string;
+};
+
+type Props = OwnProps & {
+  dirty: boolean;
+  infoCheckAttributes: Attributes;
+  formValues: Record<string, any>;
+};
+
+const ApplicantInfoCheckEditItem = ({
+  formValues,
+  dirty,
+  openModal,
+  formName,
+  infoCheckAttributes,
+}: Props) => {
+  const infoCheckStatusOptions = getFieldOptions(infoCheckAttributes, "state");
+  const statusText = getLabelOfOption(
+    infoCheckStatusOptions,
+    formValues.data.state,
+  );
+
+  const handleClick = (skipToForm: boolean) => {
+    openModal(formValues, formName, skipToForm);
+  };
+
+  const handleKeyDown = (skipToForm: boolean) => (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleClick(skipToForm);
+    }
+  };
+
+  return (
+    <Column
+      small={6}
+      key={formValues.kind.type}
+      className={classNames("ApplicantInfoCheckEditItem", {
+        "ApplicantInfoCheckEditItem--dirty": dirty,
+      })}
+    >
+      <Row>
+        <Column small={8}>
+          {formValues.kind.external && (
+            <a
+              role="button"
+              tabIndex={0}
+              onClick={() => handleClick(false)}
+              onKeyDown={handleKeyDown(false)}
+            >
+              {formValues.kind.label}
+            </a>
+          )}
+          {!formValues.kind.external && <span>{formValues.kind.label}</span>}
+        </Column>
+        <Column small={4}>
+          {formValues.kind.external && !formValues.data.preparer && (
+            <span>{statusText}</span>
+          )}
+          {(!formValues.kind.external || formValues.data.preparer) && (
+            <a
+              role="button"
+              tabIndex={0}
+              onClick={() => handleClick(true)}
+              onKeyDown={handleKeyDown(true)}
+            >
+              {statusText}
+              {formValues.data.preparer && (
+                <>, {getUserFullName(formValues.data.preparer)}</>
+              )}
+            </a>
+          )}
+        </Column>
+      </Row>
+    </Column>
+  );
+};
+
+export default flowRight(
+  connect((state, props) => {
+    const formValues = getFormValues(props.formName)(state);
+    return {
+      formValues,
+      form: props.formName,
+      infoCheckAttributes: getApplicantInfoCheckAttributes(state),
+    };
+  }),
+  reduxForm({
+    destroyOnUnmount: false,
+  }),
+)(ApplicantInfoCheckEditItem) as React.ComponentType<OwnProps>;

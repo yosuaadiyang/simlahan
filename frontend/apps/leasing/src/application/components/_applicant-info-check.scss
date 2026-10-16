@@ -1,0 +1,32 @@
+@use "sass:color";
+@use "../../styles/variables";
+
+.ApplicantInfoCheck {
+  &,
+  span,
+  a {
+    font-size: variables.$font-small;
+  }
+
+  .row {
+    line-height: 1.5rem;
+  }
+}
+
+.ApplicantInfoCheckEdit {
+  &,
+  span,
+  a {
+    font-size: variables.$font-small;
+    color: black;
+  }
+
+  .ApplicantInfoCheckEditItem--dirty {
+    .column:nth-child(2) > * {
+      background-color: color.adjust(
+        variables.$is-dirty-color,
+        $lightness: -5%
+      );
+    }
+  }
+}

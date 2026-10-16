@@ -1,0 +1,18 @@
+@use "../../styles/variables";
+
+.map {
+  flex: 1;
+  height: 70vh;
+  .leaflet-container {
+    height: 100%;
+    z-index: 1;
+  }
+  .leaflet-tooltip {
+    border-radius: 0;
+    border: none;
+    span {
+      font-family: variables.$font-family-source;
+      font-size: variables.$font-xsmall;
+    }
+  }
+}

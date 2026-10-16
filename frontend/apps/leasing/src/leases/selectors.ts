@@ -1,0 +1,112 @@
+import { get, isEmpty } from "lodash-es";
+import type { RootState } from "@/root/types";
+import type { Attributes, Methods, Selector } from "types";
+import type { LeaseFormFlags, LeaseId, Lease, LeaseList } from "./types";
+export const getIsAttachDecisionModalOpen: Selector<boolean, void> = (
+  state: RootState,
+): boolean => state.lease.isAttachDecisionModalOpen;
+export const getIsCreateModalOpen: Selector<boolean, void> = (
+  state: RootState,
+): boolean => state.lease.isCreateModalOpen;
+export const getIsEditMode: Selector<boolean, void> = (
+  state: RootState,
+): boolean => state.lease.isEditMode;
+export const getIsFetching: Selector<boolean, void> = (
+  state: RootState,
+): boolean => state.lease.isFetching;
+export const getIsFetchingByBBox: Selector<boolean, void> = (
+  state: RootState,
+): boolean => state.lease.isFetchingByBBox;
+export const getIsSaving: Selector<boolean, void> = (
+  state: RootState,
+): boolean => state.lease.isSaving;
+export const getIsFetchingAllLeases: Selector<Record<string, any>, void> = (
+  state: RootState,
+): Record<string, any> => state.lease.isFetchingById;
+export const getIsFetchingById: Selector<boolean, LeaseId> = (
+  state: RootState,
+  id: LeaseId,
+): boolean => state.lease.isFetchingById[id];
+export const getIsFetchingAttributes: Selector<boolean, void> = (
+  state: RootState,
+): boolean => state.lease.isFetchingAttributes;
+export const getIsFormDirtyFlags: Selector<LeaseFormFlags, void> = (
+  state: RootState,
+): LeaseFormFlags => state.lease.isFormDirtyById;
+export const getIsSaveClicked: Selector<boolean, void> = (
+  state: RootState,
+): boolean => state.lease.isSaveClicked;
+export const getIsCreateClicked: Selector<boolean, void> = (
+  state: RootState,
+): boolean => state.lease.isCreateClicked;
+export const getAttributes: Selector<Attributes, void> = (
+  state: RootState,
+): Attributes => state.lease.attributes;
+export const getMethods: Selector<Methods, void> = (
+  state: RootState,
+): Methods => state.lease.methods;
+export const getLeasesList: Selector<LeaseList, void> = (
+  state: RootState,
+): LeaseList => state.lease.list;
+export const getLeasesByBBox: Selector<LeaseList, void> = (
+  state: RootState,
+): LeaseList => state.lease.listByBBox;
+export const getCurrentLease: Selector<Lease, void> = (
+  state: RootState,
+): Lease => state.lease.current;
+export const getAllLeases: Selector<Record<string, any>, void> = (
+  state: RootState,
+): Record<string, any> => state.lease.byId;
+export const getLeaseById: Selector<Lease, LeaseId> = (
+  state: RootState,
+  id: LeaseId,
+): Lease => state.lease.byId[id];
+export const getErrorsByFormName: Selector<
+  Record<string, any> | null | undefined,
+  string
+> = (
+  state: Record<string, any>,
+  formName: string,
+): Record<string, any> | null | undefined => {
+  const form = state.form[formName];
+
+  if (!isEmpty(form)) {
+    return form.syncErrors;
+  }
+
+  return null;
+};
+export const getCollapseStateByKey: Selector<boolean | undefined, string> = (
+  state: RootState,
+  key: string,
+): boolean | undefined => {
+  return get(state.lease.collapseStates, key);
+};
+export const getLeasesForContractNumbers: Selector<LeaseList, void> = (
+  state: RootState,
+): LeaseList => state.lease.leasesForContractNumbers;
+export const getIsFetchingLeasesForContractNumbers: Selector<boolean, void> = (
+  state: RootState,
+): boolean => state.lease.isFetchingLeasesForContractNumbers;
+export const getLeasesForContactAttributes: Selector<Attributes, void> = (
+  state: RootState,
+): Attributes => state.lease.leasesForContactAttributes;
+export const getIsFetchingLeasesForContactAttributes: Selector<
+  boolean,
+  void
+> = (state: RootState): boolean =>
+  state.lease.isFetchingLeasesForContactAttributes;
+export const getLeasesForContact: Selector<LeaseList, void> = (
+  state: RootState,
+): LeaseList => state.lease.leasesForContact;
+export const getIsFetchingLeasesForContact: Selector<boolean, void> = (
+  state: RootState,
+): boolean => state.lease.isFetchingLeasesForContact;
+
+// Selectors for lease properties
+export const getCurrentLeaseStartDate: Selector<string, void> = (
+  state: RootState,
+): string => get(state.lease.current, "start_date", "");
+export const getCurrentLeaseTypeIdentifier: Selector<string, void> = (
+  state: RootState,
+): string => get(state.lease.current, "type.identifier", "");

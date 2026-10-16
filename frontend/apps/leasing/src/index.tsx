@@ -1,0 +1,30 @@
+import React from "react";
+import * as Sentry from "@sentry/react";
+import { createRoot } from "react-dom/client";
+import { Provider } from "react-redux";
+import { BrowserRouter } from "react-router";
+import { LoginProvider } from "hds-react";
+import store from "@/root/store";
+import routes from "@/root/routes";
+import { loginProviderProperties } from "@/auth/constants";
+
+const container = document.getElementById("root");
+const root = createRoot(container);
+
+root.render(
+  <Sentry.ErrorBoundary
+    fallback={
+      <p>
+        Järjestelmässä tapahtui odottamaton virhe. Ole hyvä ja lataa sivu
+        uudelleen.
+      </p>
+    }
+    showDialog // Shows Sentry's report dialog
+  >
+    <Provider store={store}>
+      <LoginProvider {...loginProviderProperties}>
+        <BrowserRouter>{routes}</BrowserRouter>
+      </LoginProvider>
+    </Provider>
+  </Sentry.ErrorBoundary>,
+);

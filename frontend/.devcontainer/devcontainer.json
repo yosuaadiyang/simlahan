@@ -1,0 +1,23 @@
+{
+	"name": "mvj-ui devcontainer",
+    "image": "mcr.microsoft.com/devcontainers/javascript-node:24-trixie",
+	"forwardPorts": [3000],
+    "features":{},
+	"postCreateCommand": "sudo apt-get update && sudo apt-get install -y ripgrep && sudo corepack enable && corepack install",
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"editor.codeActionsOnSave": {
+					"source.fixAll.eslint": "never"
+				},
+				"editor.defaultFormatter": "esbenp.prettier-vscode",
+  				"editor.formatOnSave": true
+			},
+			"extensions": [
+				"esbenp.prettier-vscode"
+			]
+			// If you want extra extensions, add them to your local settings.json:
+			// "dev.containers.defaultExtensions": [],
+		}
+	}
+}

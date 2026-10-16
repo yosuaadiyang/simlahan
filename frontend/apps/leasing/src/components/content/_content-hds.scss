@@ -1,0 +1,43 @@
+@use "foundation-sites/scss/foundation" as *;
+@use "../../styles/variables";
+
+.content-hds {
+  &__page-container {
+    min-height: calc(100vh - 60px);
+    display: block;
+    width: 100%;
+    padding: rem-calc(20px 20 120px);
+
+    &--white-background {
+      background-color: variables.$white;
+    }
+
+    &.with-control-bar {
+      margin-top: 59px;
+    }
+
+    &.with-control-bar-and-tabs {
+      margin-top: 101px;
+    }
+
+    &.with-small-control-bar {
+      margin-top: 50px;
+    }
+
+    &.with-small-control-bar-and-tabs {
+      margin-top: 92px;
+    }
+
+    &.with-tabs {
+      margin-top: 42px;
+    }
+  }
+}
+
+.content-container-hds {
+  position: relative;
+  width: 100%;
+  background-color: variables.$white;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
+  padding: rem-calc(15px);
+}

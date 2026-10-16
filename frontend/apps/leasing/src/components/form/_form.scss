@@ -1,0 +1,875 @@
+@use "foundation-sites/scss/foundation" as *;
+@use "../../styles/variables";
+@use "../../styles/mixins";
+
+.form-wrapper {
+  display: flex;
+  flex-flow: row wrap;
+
+  &__left {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding-right: 0;
+
+    @media print, screen and (min-width: 40em) {
+      flex: 0 0 50%;
+      max-width: 50%;
+      padding-right: rem-calc(35px);
+    }
+  }
+
+  &__right {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding-right: 0;
+
+    @media print, screen and (min-width: 40em) {
+      flex: 0 0 50%;
+      max-width: 50%;
+      padding-left: rem-calc(35px);
+    }
+  }
+}
+
+.form-field {
+  line-height: 1;
+  margin-bottom: rem-calc(10px);
+  font-family: variables.$font-family-source;
+  align-self: flex-end;
+  width: 100%;
+
+  &.align-top {
+    align-self: flex-start;
+  }
+
+  &__fractional {
+    display: inline-flex;
+    input {
+      font-family: variables.$font-family-source;
+      padding: 0 rem-calc(5px);
+      height: rem-calc(20px);
+      font-size: rem-calc(14px);
+      line-height: normal;
+      color: variables.$black;
+      width: 45%;
+      margin-bottom: 0;
+      border: 1px solid variables.$medium-gray;
+      box-shadow: none;
+    }
+    &-divider {
+      display: flex;
+      flex-grow: 1;
+      justify-content: center;
+    }
+  }
+
+  &__label {
+    overflow: visible;
+    max-width: 100%;
+    font-size: rem-calc(13px);
+    line-height: rem-calc(15px);
+    color: variables.$dark-gray;
+    white-space: nowrap;
+    position: relative;
+
+    .tooltip__component {
+      .tooltip__add-button {
+        display: none;
+      }
+    }
+
+    &.show-add-button {
+      .tooltip__component {
+        .tooltip__add-button {
+          display: inherit;
+        }
+      }
+    }
+
+    &.invisible {
+      position: absolute;
+      visibility: hidden;
+    }
+
+    .required {
+      color: variables.$red;
+      font-size: 18px;
+      font-weight: variables.$semibold;
+      position: absolute;
+    }
+  }
+
+  &__error-block {
+    color: variables.$red;
+    display: block;
+    font-size: rem-calc(13px);
+    line-height: rem-calc(15px);
+    margin-bottom: 0;
+  }
+
+  &__error-field {
+    color: variables.$red;
+    display: block;
+    font-size: rem-calc(13px);
+    line-height: rem-calc(15px);
+    margin-bottom: rem-calc(10px);
+  }
+
+  &__success-field {
+    color: variables.$blue;
+    display: block;
+    font-size: rem-calc(13px);
+    line-height: rem-calc(15px);
+    margin-bottom: rem-calc(10px);
+  }
+
+  &__warning-field {
+    color: variables.$red;
+    display: block;
+    font-size: rem-calc(13px);
+    line-height: rem-calc(15px);
+    margin-bottom: rem-calc(10px);
+  }
+
+  &__boolean,
+  &__checkbox {
+    legend {
+      visibility: hidden;
+      position: absolute;
+    }
+
+    .option-label {
+      color: variables.$neutral-color;
+      display: inline-block;
+      font-size: rem-calc(14px);
+      line-height: rem-calc(20px);
+      height: rem-calc(20px);
+      margin-right: rem-calc(10px);
+    }
+
+    .option-label:last-child {
+      margin-right: 0;
+    }
+
+    fieldset {
+      line-height: 1;
+    }
+
+    &.is-dirty {
+      .option-label {
+        span {
+          background-color: variables.$is-dirty-color;
+        }
+      }
+    }
+  }
+
+  &__checkbox-date-time {
+    color: variables.$black !important;
+    font-size: rem-calc(14px) !important;
+    line-height: rem-calc(20px) !important;
+
+    input {
+      margin-bottom: 0;
+    }
+
+    &.is-dirty {
+      span {
+        background-color: variables.$is-dirty-color;
+      }
+    }
+  }
+
+  &__address {
+    &.is-dirty {
+      input {
+        background-color: variables.$is-dirty-color;
+      }
+    }
+
+    &.has-error {
+      input {
+        border: 1px solid variables.$red !important;
+
+        &:focus {
+          box-shadow: 0 0 0 1px variables.$red;
+        }
+      }
+    }
+  }
+
+  &__input {
+    font-family: variables.$font-family-source;
+    padding: 0 rem-calc(5px);
+    height: rem-calc(20px);
+    font-size: rem-calc(14px);
+    line-height: normal;
+    color: variables.$black;
+    width: 100%;
+    margin-bottom: 0;
+    border: 1px solid variables.$medium-gray;
+    box-shadow: none;
+
+    @include mixins.focusInput();
+
+    &.is-dirty {
+      background-color: variables.$is-dirty-color;
+    }
+
+    &.has-error {
+      border: 1px solid variables.$red !important;
+
+      &:focus {
+        box-shadow: 0 0 0 1px variables.$red;
+      }
+    }
+  }
+
+  &__radio-with-field {
+    fieldset {
+      line-height: 1;
+    }
+
+    legend {
+      visibility: hidden;
+      position: absolute;
+    }
+
+    &_option {
+      display: flex;
+    }
+
+    &_option-label {
+      color: variables.$black !important;
+      display: inline-block;
+      font-size: rem-calc(14px) !important;
+      line-height: rem-calc(20px) !important;
+      max-width: 100%;
+    }
+
+    &_option-text {
+      margin-right: rem-calc(10px);
+      color: variables.$neutral-color;
+    }
+
+    &_option-field {
+      display: block;
+      max-width: 100%;
+    }
+
+    &_option-error-field {
+      display: block;
+    }
+
+    &.is-dirty {
+      .form-field__radio-with-field_option-label {
+        span.form-field__radio-with-field_option-text {
+          background-color: variables.$is-dirty-color;
+        }
+      }
+    }
+  }
+
+  &__search {
+    position: relative;
+
+    input {
+      border: 1px solid variables.$medium-dark-gray;
+      width: 100%;
+      margin: 0;
+      height: rem-calc(30px);
+      padding: 0 rem-calc(8px);
+      font-size: rem-calc(14px);
+
+      &::-webkit-input-placeholder {
+        line-height: normal;
+      }
+
+      @include mixins.focusInput();
+    }
+
+    &_icon {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      height: 20px;
+      width: 20px;
+      background-size: cover;
+      background-image: url(/assets/icons/icon-search.svg);
+      cursor: pointer;
+    }
+  }
+
+  &__textarea {
+    padding: 0.25rem 0.5rem;
+    color: variables.$black;
+    border: 1px solid variables.$medium-gray;
+    width: 100%;
+    font-size: variables.$font-small;
+    box-shadow: none;
+    margin-bottom: 0;
+    min-height: rem-calc(65px);
+
+    @include mixins.focusInput();
+
+    &.is-dirty {
+      background-color: variables.$is-dirty-color;
+    }
+
+    &.has-error {
+      border-color: variables.$red !important;
+
+      &:focus {
+        box-shadow: 0 0 0 1px variables.$red;
+      }
+    }
+  }
+
+  &__datepicker {
+    line-height: 1;
+
+    select {
+      height: unset;
+      font-size: 14px;
+      margin: 0;
+    }
+
+    .react-datepicker-wrapper {
+      width: 100%;
+    }
+
+    .react-datepicker__input-container {
+      width: 100%;
+    }
+
+    .react-datepicker-popper {
+      z-index: 4;
+    }
+
+    input {
+      padding: 0 rem-calc(5px);
+      height: rem-calc(20px);
+      font-size: rem-calc(14px);
+      line-height: normal;
+      color: variables.$black;
+      width: 100%;
+      margin-bottom: 0;
+
+      @include mixins.focusInput();
+    }
+
+    &.is-dirty {
+      input {
+        background-color: variables.$is-dirty-color;
+      }
+    }
+
+    &.has-error {
+      input {
+        border: 1px solid variables.$red;
+
+        &:focus {
+          box-shadow: 0 0 0 1px variables.$red;
+        }
+      }
+    }
+  }
+
+  &__multiselect {
+    &.has-error {
+      .multi-select__dropdown-content {
+        border: 1px solid variables.$red;
+        box-shadow: 0 1px 0 1px variables.$red;
+      }
+
+      .multi-select__dropdown-heading {
+        border: 1px solid variables.$red;
+
+        &.is-expanded {
+          outline: none !important;
+          border: 1px solid variables.$red;
+          box-shadow: 0 0 0 1px variables.$red;
+        }
+
+        &.is-focused {
+          outline: none !important;
+          border: 1px solid variables.$red;
+          box-shadow: 0 0 0 1px variables.$red;
+        }
+      }
+    }
+  }
+
+  &__select {
+    width: 100%;
+    &.is-dirty {
+      .select-input__control {
+        background-color: variables.$is-dirty-color !important;
+      }
+    }
+
+    &.has-error {
+      .select-input {
+        .select-input__control {
+          border-color: variables.$red !important;
+          box-shadow: 0px 0px 0px 1px variables.$red !important;
+          outline: none !important;
+        }
+
+        .select-input__menu {
+          border-color: variables.$red;
+        }
+      }
+    }
+
+    .select-input__multi-value {
+      border-radius: 0;
+
+      &__label {
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+
+      &__remove {
+        height: auto !important;
+        margin-left: 3px !important;
+      }
+    }
+  }
+
+  &.no-margin {
+    margin: 0;
+  }
+
+  &.with-dash {
+    position: relative;
+
+    .form-field__component::before {
+      position: absolute;
+      content: "–";
+      left: rem-calc(-11px);
+    }
+  }
+
+  &.with-dot {
+    position: relative;
+
+    .form-field__component::before {
+      position: absolute;
+      content: ".";
+      left: rem-calc(-9px);
+      top: rem-calc(5px);
+    }
+  }
+
+  &.with-slash {
+    position: relative;
+
+    .form-field__component::before {
+      position: absolute;
+      content: "/";
+      left: rem-calc(-10px);
+    }
+  }
+
+  &.with-top-padding {
+    .form-field__component {
+      padding-top: rem-calc(15px);
+    }
+  }
+
+  &__component {
+    &.has-unit {
+      display: table;
+      width: 100%;
+
+      input {
+        display: table-cell;
+      }
+    }
+  }
+
+  &__unit {
+    line-height: rem-calc(20px);
+    font-size: rem-calc(14px);
+    padding-left: rem-calc(5px);
+    display: table-cell;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+}
+
+.form {
+  &__action-button-wrapper {
+    position: relative;
+    top: rem-calc(-5px);
+    padding: rem-calc(5px 0);
+    text-align: right;
+
+    button {
+      margin-left: rem-calc(3px);
+      margin-right: rem-calc(3px);
+    }
+
+    button:first-child {
+      margin-left: 0;
+    }
+
+    button:last-child {
+      margin-right: 0;
+    }
+  }
+
+  &__text {
+    font-size: rem-calc(14px);
+    line-height: rem-calc(16px);
+    font-weight: normal;
+    color: variables.$black;
+    margin-bottom: rem-calc(10px);
+    max-width: 100%;
+
+    label {
+      font-size: rem-calc(14px);
+      line-height: rem-calc(16px);
+      font-weight: normal;
+      color: variables.$black;
+    }
+
+    &.align-right {
+      text-align: right;
+    }
+
+    &.full-width {
+      width: 100%;
+    }
+
+    &.no-margin {
+      margin: 0;
+    }
+
+    &.alert {
+      color: variables.$red;
+    }
+
+    &.success {
+      color: variables.$blue;
+    }
+
+    &.semibold {
+      font-weight: variables.$semibold;
+    }
+  }
+
+  &__text-title {
+    display: block;
+    overflow: visible;
+    width: 100%;
+    font-size: rem-calc(13px);
+    line-height: rem-calc(15px);
+    color: variables.$dark-gray;
+    white-space: nowrap;
+    position: relative;
+    margin-bottom: 0;
+
+    .required {
+      color: variables.$red;
+      font-size: 18px;
+      font-weight: variables.$semibold;
+      position: absolute;
+    }
+
+    .tooltip__component {
+      .tooltip__add-button {
+        display: none;
+      }
+    }
+
+    &.show-add-button {
+      .tooltip__component {
+        .tooltip__add-button {
+          display: inherit;
+        }
+      }
+    }
+  }
+
+  &__hint-text {
+    font-size: rem-calc(13px);
+    line-height: rem-calc(16px);
+    font-weight: normal;
+    color: variables.$neutral-color;
+    margin-bottom: rem-calc(10px);
+    max-width: 100%;
+
+    .form-field + & {
+      margin-top: rem-calc(-10px);
+    }
+  }
+
+  &__add-button {
+    font-family: variables.$font-family-source;
+    font-size: rem-calc(16px) !important;
+    line-height: rem-calc(20px) !important;
+    font-weight: variables.$semibold !important;
+    color: variables.$blue;
+    margin: 0;
+    cursor: pointer;
+    display: block;
+    text-align: left;
+    white-space: nowrap;
+
+    .icons {
+      margin-right: rem-calc(5px);
+      fill: variables.$blue;
+      height: rem-calc(20px) !important;
+      width: rem-calc(20px) !important;
+    }
+
+    &:hover {
+      text-decoration: underline;
+      color: variables.$blue-hover;
+
+      .icons {
+        fill: variables.$blue-hover;
+      }
+    }
+
+    &.secondary {
+      margin: rem-calc(5px) 0 rem-calc(10px);
+    }
+
+    &.third-level {
+      font-size: rem-calc(14px) !important;
+      line-height: rem-calc(20px);
+      margin: 0 0 rem-calc(10px);
+
+      .icons {
+        height: rem-calc(15px) !important;
+        width: rem-calc(15px) !important;
+      }
+    }
+
+    &:disabled {
+      color: variables.$dark-gray;
+      text-decoration: none;
+      cursor: not-allowed;
+
+      .icons {
+        fill: variables.$dark-gray;
+      }
+    }
+
+    &.no-top-margin {
+      margin-top: 0;
+    }
+
+    &.no-bottom-margin {
+      margin-bottom: 0;
+    }
+  }
+
+  &__add-file-button {
+    display: inline-block;
+    vertical-align: text-top;
+
+    &__label {
+      font-family: variables.$font-family-source;
+      font-size: rem-calc(14px) !important;
+      line-height: rem-calc(20px) !important;
+      font-weight: variables.$semibold !important;
+      color: variables.$blue !important;
+      margin: 0 !important;
+      cursor: pointer;
+
+      @include mixins.focus();
+
+      .icons {
+        vertical-align: middle;
+        margin-top: rem-calc(-3px);
+        height: rem-calc(15px);
+        width: rem-calc(15px);
+        margin-right: rem-calc(5px);
+        fill: variables.$blue;
+      }
+
+      &:hover {
+        text-decoration: underline;
+        color: variables.$blue-hover !important;
+
+        .icons {
+          fill: variables.$blue-hover;
+        }
+      }
+    }
+
+    &__input {
+      display: none;
+    }
+  }
+
+  &__archive-button {
+    z-index: 1;
+    cursor: pointer;
+    position: relative;
+    top: 0;
+
+    .icons {
+      fill: variables.$black !important;
+    }
+
+    &:hover {
+      .icons {
+        fill: variables.$blue !important;
+      }
+    }
+  }
+
+  &__attach-button {
+    z-index: 1;
+    cursor: pointer;
+    position: relative;
+    top: 0;
+
+    .icons {
+      #Artboard {
+        fill: variables.$black !important;
+      }
+    }
+
+    &:hover {
+      .icons {
+        #Artboard {
+          fill: variables.$blue !important;
+        }
+      }
+    }
+  }
+
+  &__copy-to-clipboard-button {
+    z-index: 1;
+    cursor: pointer;
+    position: relative;
+    top: 0;
+
+    .icons {
+      #Artboard {
+        fill: variables.$black !important;
+      }
+    }
+
+    &:hover {
+      .icons {
+        #Artboard {
+          fill: variables.$blue !important;
+        }
+      }
+    }
+  }
+
+  &__edit-button {
+    z-index: 1;
+    cursor: pointer;
+    position: relative;
+    top: 0;
+
+    .icons {
+      fill: variables.$black !important;
+    }
+
+    &:hover {
+      .icons {
+        fill: variables.$blue !important;
+      }
+    }
+
+    &.inline-button {
+      margin-left: rem-calc(10px);
+    }
+
+    &.position-topright {
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+  }
+
+  &__remove-button {
+    z-index: 1;
+    cursor: pointer;
+    position: relative;
+    top: 0;
+    height: rem-calc(20px);
+
+    #Artboard {
+      fill: variables.$black !important;
+    }
+
+    &:hover {
+      .icons {
+        #Artboard {
+          fill: variables.$blue !important;
+        }
+      }
+    }
+
+    &.position-topright {
+      position: absolute;
+      top: rem-calc(-7px);
+      right: 0;
+    }
+
+    &.third-level {
+      vertical-align: top;
+      top: rem-calc(-1px);
+      height: rem-calc(20px);
+
+      .icons {
+        vertical-align: middle;
+        height: rem-calc(15px);
+        width: rem-calc(15px);
+      }
+    }
+
+    &.no-label {
+      top: 0;
+      margin-top: rem-calc(17px);
+    }
+  }
+
+  &__unarchive-button {
+    z-index: 1;
+    cursor: pointer;
+    position: relative;
+    top: 0;
+
+    .icons {
+      fill: variables.$black !important;
+    }
+
+    &:hover {
+      .icons {
+        fill: variables.$blue !important;
+      }
+    }
+  }
+
+  &__field-and-remove-button-wrapper {
+    display: flex;
+
+    &_button {
+      padding-left: rem-calc(5px);
+      line-height: 1;
+    }
+
+    &.absolute-remove-button-position {
+      position: relative;
+
+      .form__field-and-remove-button-wrapper_button {
+        position: absolute;
+        padding-left: 0;
+        right: -22px;
+        top: 0;
+      }
+    }
+  }
+}

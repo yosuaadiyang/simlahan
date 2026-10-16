@@ -1,0 +1,4 @@
+#!/bin/sh
+mypy --version
+echo "-----"
+PYTHONPATH=${PYTHONPATH}:${PWD} mypy

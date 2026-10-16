@@ -1,0 +1,31 @@
+@use "foundation-sites/scss/foundation" as *;
+@use "../../../../styles/variables";
+
+.rent-section {
+  .discount-item {
+    margin-top: 0.5rem;
+    padding: 1rem 0 0;
+    border-top: 1px dashed variables.$blue;
+
+    a {
+      color: variables.$blue;
+
+      .link-icon {
+        background-image: url(/assets/icons/icon_link_green.svg);
+        height: rem-calc(20px);
+        width: rem-calc(20px);
+        margin-left: rem-calc(8px);
+        display: inline-block;
+        background-position: 0 rem-calc(9px);
+        background-size: contain;
+        background-repeat: no-repeat;
+      }
+    }
+  }
+
+  .discount-item:first-child {
+    margin: 0;
+    padding: 0;
+    border: none;
+  }
+}

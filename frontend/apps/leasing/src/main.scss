@@ -1,0 +1,139 @@
+@use "./styles/fonts";
+@use "./styles/variables";
+@use "./styles/foundation-reset";
+@use "./foundation-setup" as *;
+
+@use "react-leaflet-fullscreen/dist/styles" as *;
+@use "styles/mixins";
+
+// Vendor
+@use "react-datepicker/src/stylesheets/datepicker.scss";
+@use "leaflet-draw/dist/leaflet.draw" as *;
+@use "react-dual-listbox/src/scss/react-dual-listbox.scss";
+
+// Components
+@use "components/authorization/authorization";
+@use "components/address-search/address-search-input";
+@use "components/button/button";
+@use "components/button/close-button";
+@use "components/button/icon-radio-buttons";
+@use "components/collapse/collapse";
+@use "components/content/content";
+@use "components/content/content-hds";
+@use "components/grid/grid";
+@use "components/controlButtons/control-buttons";
+@use "components/file/file";
+@use "components/form/form";
+@use "components/icons/icons";
+@use "components/inputs/inputs";
+@use "components/inputs/dual-list-box-input";
+@use "components/inputs/search-input";
+@use "components/inputs/select-input";
+@use "components/inputs/text-area-input";
+@use "components/inputs/text-input";
+@use "components/invoice-simulator/invoice-simulator";
+@use "components/links/links";
+@use "components/loader/loader";
+@use "components/map/leaflet";
+@use "components/map/map";
+@use "components/modal/modal";
+@use "components/modal/confirmation-modal";
+@use "components/multi-select/multi-select";
+@use "components/rent-calculator/rent-calculator";
+@use "components/search/search" as *;
+@use "components/showMore/show-more";
+@use "components/sideMenu/side-menu";
+@use "components/table/table";
+@use "components/tabs/tabs";
+@use "components/tooltip/tooltip";
+@use "components/topNavigation/top-navigation";
+
+// App
+@use "api/api";
+@use "app/app";
+@use "areaNote/components/area-note-map";
+@use "auth/components/login-page";
+@use "contacts/components/search/search";
+@use "creditDecision/components/credit-decision";
+@use "errorPage/error-page";
+@use "leases/components/createLease/create-lease";
+@use "leases/components/lease-list-page";
+@use "leases/components/leaseSections/comments/comment-panel";
+@use "leases/components/leaseSections/constructability/constructability";
+@use "leases/components/leaseSections/invoice/invoice";
+@use "leases/components/leaseSections/invoice/invoice-panel";
+@use "leases/components/leaseSections/leaseInfo/lease-info";
+@use "leases/components/leaseSections/rent/rent";
+@use "leases/components/leaseSections/summary/summary";
+@use "leases/components/leaseSections/tenant/tenant-edit";
+@use "rentbasis/components/rent-basis-page";
+@use "plotSearch/components/plotSearchSections/application/application";
+@use "plotSearch/components/plotSearchSections/basicInfo/basic-info";
+@use "plotSearch/components/reservationIdentifiers/reservation-identifiers-modal";
+@use "plotSearch/components/directReservationLinkModal/direct-reservation-link-modal";
+@use "plotApplications/components/plotApplication";
+@use "plotApplications/components/plotApplicationEdit";
+@use "plotApplications/components/infoCheck/plotApplicationInfoCheckCollapse";
+@use "plotApplications/components/exportModal/PlotSearchExportModal";
+@use "areaSearch/components/area-search-applicant-info-check";
+@use "areaSearch/components/area-search-application";
+@use "areaSearch/components/area-search-application-answers-section";
+@use "areaSearch/components/area-search-application-create";
+@use "areaSearch/components/area-search-application-list-page";
+@use "areaSearch/components/area-search-export-modal";
+@use "areaSearch/components/area-search-status-note-history";
+@use "areaSearch/components/edit-area-search-preparer-modal";
+@use "areaSearch/components/map/area-search-map";
+@use "areaSearch/components/map/single-area-search-map";
+@use "application/components/applicant-info-check";
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  height: 100%;
+}
+
+body {
+  overflow-y: auto;
+  height: calc(100% - 60px);
+  background-color: variables.$body-background;
+}
+
+abbr {
+  border-bottom: none;
+  cursor: default;
+}
+
+abbr[title] {
+  text-decoration: none;
+  cursor: help;
+}
+
+#root {
+  display: block;
+  height: 100%;
+  font-family: variables.$font-family-source;
+  background-color: variables.$body-background;
+  color: variables.$black;
+}
+
+// Safari-specific fix for hiding contact information autofill buttons
+//noinspection CssInvalidPseudoSelector
+input::-webkit-contacts-auto-fill-button {
+  visibility: hidden;
+  display: none !important;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+}
+
+/**
+ * HDS Tabs z-index fix
+ *
+ * HDS Tabs buttons have z-index: 100 by default, which can overlap with
+ * Select dropdowns that are placed above the tabs in the DOM.
+ */
+.hds-tabs__tab,
+[class*="Tabs-module_tab"] {
+  z-index: 1 !important;
+}

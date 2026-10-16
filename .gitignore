@@ -1,0 +1,10 @@
+node_modules/
+dist/
+__pycache__/
+*.pyc
+.env
+backend/media/
+backend/static/
+backend/private_files/
+*.mo
+.venv/

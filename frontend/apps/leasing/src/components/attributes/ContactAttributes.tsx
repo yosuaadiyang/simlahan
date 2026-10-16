@@ -1,0 +1,87 @@
+import React, { PureComponent, useEffect } from "react";
+import { connect } from "react-redux";
+import { useAppDispatch, useAppSelector } from "@/root/hooks";
+import { flowRight } from "lodash-es";
+import { fetchAttributes as fetchContactAttributes } from "@/contacts/actions";
+import {
+  getAttributes as getContactAttributes,
+  getIsFetchingAttributes as getIsFetchingContactAttributes,
+  getMethods as getContactMethods,
+} from "@/contacts/selectors";
+import type { Attributes, Methods } from "types";
+
+export function useContactAttributes() {
+  const dispatch = useAppDispatch();
+
+  const contactAttributes = useAppSelector(getContactAttributes);
+  const contactMethods = useAppSelector(getContactMethods);
+  const isFetchingContactAttributes = useAppSelector(
+    getIsFetchingContactAttributes,
+  );
+
+  useEffect(() => {
+    if (!isFetchingContactAttributes && !contactMethods && !contactAttributes) {
+      dispatch(fetchContactAttributes());
+    }
+  }, [
+    contactAttributes,
+    contactMethods,
+    isFetchingContactAttributes,
+    dispatch,
+  ]);
+
+  return {
+    contactAttributes,
+    contactMethods,
+    isFetchingContactAttributes,
+  };
+}
+
+function ContactAttributes(WrappedComponent: any) {
+  type Props = {
+    contactAttributes: Attributes;
+    contactMethods: Methods;
+    fetchContactAttributes: (...args: Array<any>) => any;
+    isFetchingContactAttributes: boolean;
+  };
+  return class ContactAttributes extends PureComponent<Props> {
+    componentDidMount() {
+      const {
+        contactAttributes,
+        contactMethods,
+        fetchContactAttributes,
+        isFetchingContactAttributes,
+      } = this.props;
+
+      if (
+        !isFetchingContactAttributes &&
+        !contactMethods &&
+        !contactAttributes
+      ) {
+        fetchContactAttributes();
+      }
+    }
+
+    render() {
+      return <WrappedComponent {...this.props} />;
+    }
+  };
+}
+
+const withContactAttributes = flowRight(
+  connect(
+    (state) => {
+      return {
+        contactAttributes: getContactAttributes(state),
+        contactMethods: getContactMethods(state),
+        isFetchingContactAttributes: getIsFetchingContactAttributes(state),
+      };
+    },
+    {
+      fetchContactAttributes,
+    },
+  ),
+  ContactAttributes,
+);
+
+export { withContactAttributes };

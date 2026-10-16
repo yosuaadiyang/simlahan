@@ -1,0 +1,123 @@
+@use "foundation-sites/scss/foundation" as *;
+@use "../../../../styles/variables";
+@use "../../../../styles/mixins";
+
+.invoice {
+  &__new-invoice {
+    margin-top: 0;
+    margin-bottom: rem-calc(10px);
+
+    button:nth-child(3) {
+      margin-top: rem-calc(15px);
+    }
+
+    &_form {
+      margin-top: rem-calc(15px);
+
+      h3 {
+        margin-bottom: rem-calc(10px);
+      }
+
+      .button-wrapper {
+        margin-top: 0;
+        margin-bottom: rem-calc(10px);
+        text-align: right;
+        padding-top: rem-calc(5px);
+
+        .mvj-button:last-child {
+          margin-right: 0;
+        }
+      }
+    }
+  }
+
+  &__credit-invoice {
+    margin-top: rem-calc(5px);
+    margin-bottom: rem-calc(10px);
+
+    &_form {
+      margin-top: rem-calc(15px);
+
+      h3 {
+        margin-bottom: rem-calc(10px);
+      }
+
+      .button-wrapper {
+        margin-top: 0;
+        margin-bottom: rem-calc(10px);
+        text-align: right;
+        padding-top: rem-calc(5px);
+
+        .mvj-button:last-child {
+          margin-right: 0;
+        }
+      }
+    }
+  }
+
+  &__invoice-table {
+    position: relative;
+    z-index: 3;
+    overflow: hidden;
+
+    .fixed-table-container {
+      border: none;
+      margin-bottom: 0;
+    }
+
+    &_loader-wrapper {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background-color: rgba(255, 255, 255, 0.45);
+    }
+
+    &_wrapper {
+      width: 100%;
+      margin-bottom: rem-calc(10px);
+      z-index: 1;
+      background-color: variables.$white;
+
+      @include mixins.transition(0.5s, max-width, ease-in-out);
+    }
+
+    .sortable-table {
+      th.recipient-full {
+        div {
+          width: 190px;
+        }
+      }
+    }
+  }
+
+  &__rows {
+    &_amount {
+      text-align: right;
+      white-space: nowrap;
+      overflow: visible;
+    }
+  }
+
+  &__credit-invoice-modal {
+    &_footer {
+      margin-top: rem-calc(10px);
+
+      .mvj-button:first-child {
+        margin-left: 0;
+      }
+    }
+  }
+
+  &__new-collection-note {
+    &_button-wrapper {
+      padding: rem-calc(0 0 10px);
+      text-align: right;
+
+      .mvj-button:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+}

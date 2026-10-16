@@ -1,0 +1,380 @@
+[
+  {
+    "model": "plotsearch.plotsearchsubtype",
+    "pk": 1,
+    "fields": {
+      "name": "Yleinen asuntotonttien varauskierros",
+      "name_fi": "Yleinen asuntotonttien varauskierros",
+      "name_sv": null,
+      "name_en": "Yleinen asuntotonttien varauskierros",
+      "plot_search_type": 1,
+      "show_district": true,
+      "target_selection": true,
+      "ordering": 0
+    }
+  },
+  {
+    "model": "plotsearch.plotsearchsubtype",
+    "pk": 2,
+    "fields": {
+      "name": "Laatukilpailu",
+      "name_fi": "Laatukilpailu",
+      "name_sv": null,
+      "name_en": "Laatukilpailu",
+      "plot_search_type": 1,
+      "show_district": true,
+      "target_selection": false,
+      "ordering": 0
+    }
+  },
+  {
+    "model": "plotsearch.plotsearchsubtype",
+    "pk": 3,
+    "fields": {
+      "name": "Hintakilpailu",
+      "name_fi": "Hintakilpailu",
+      "name_sv": null,
+      "name_en": "Hintakilpailu",
+      "plot_search_type": 1,
+      "show_district": true,
+      "target_selection": false,
+      "ordering": 0
+    }
+  },
+  {
+    "model": "plotsearch.plotsearchsubtype",
+    "pk": 4,
+    "fields": {
+      "name": "Hinta- ja laatukilpailu",
+      "name_fi": "Hinta- ja laatukilpailu",
+      "name_sv": null,
+      "name_en": "Hinta- ja laatukilpailu",
+      "plot_search_type": 1,
+      "show_district": true,
+      "target_selection": false,
+      "ordering": 0
+    }
+  },
+  {
+    "model": "plotsearch.plotsearchsubtype",
+    "pk": 5,
+    "fields": {
+      "name": "Muu kilpailu",
+      "name_fi": "Muu kilpailu",
+      "name_sv": null,
+      "name_en": "Muu kilpailu",
+      "plot_search_type": 1,
+      "show_district": true,
+      "target_selection": false,
+      "ordering": 0
+    }
+  },
+  {
+    "model": "plotsearch.plotsearchsubtype",
+    "pk": 6,
+    "fields": {
+      "name": "Tonttihaku",
+      "name_fi": "Tonttihaku",
+      "name_sv": null,
+      "name_en": "Tonttihaku",
+      "plot_search_type": 1,
+      "show_district": true,
+      "target_selection": false,
+      "ordering": 0
+    }
+  },
+  {
+    "model": "plotsearch.plotsearchsubtype",
+    "pk": 7,
+    "fields": {
+      "name": "Jatkuva tonttihaku",
+      "name_fi": "Jatkuva tonttihaku",
+      "name_sv": null,
+      "name_en": "Jatkuva tonttihaku",
+      "plot_search_type": 1,
+      "show_district": true,
+      "target_selection": false,
+      "ordering": 0
+    }
+  },
+  {
+    "model": "plotsearch.plotsearchsubtype",
+    "pk": 8,
+    "fields": {
+      "name": "Vapaa haku",
+      "name_fi": "Vapaa haku",
+      "name_sv": null,
+      "name_en": "Vapaa haku",
+      "plot_search_type": 1,
+      "show_district": true,
+      "target_selection": false,
+      "ordering": 0
+    }
+  },
+  {
+    "model": "plotsearch.plotsearchsubtype",
+    "pk": 9,
+    "fields": {
+      "name": "Vireillä oleva omakotitonttihaku",
+      "name_fi": "Vireillä oleva omakotitonttihaku",
+      "name_sv": null,
+      "name_en": "Vireillä oleva omakotitonttihaku",
+      "plot_search_type": 2,
+      "show_district": true,
+      "target_selection": false,
+      "ordering": 0
+    }
+  },
+  {
+    "model": "plotsearch.plotsearchsubtype",
+    "pk": 10,
+    "fields": {
+      "name": "Hintakilpailu",
+      "name_fi": "Hintakilpailu",
+      "name_sv": null,
+      "name_en": "Hintakilpailu",
+      "plot_search_type": 2,
+      "show_district": true,
+      "target_selection": false,
+      "ordering": 0
+    }
+  },
+  {
+    "model": "plotsearch.plotsearchsubtype",
+    "pk": 11,
+    "fields": {
+      "name": "Jatkuva tonttihaku",
+      "name_fi": "Jatkuva tonttihaku",
+      "name_sv": null,
+      "name_en": "Jatkuva tonttihaku",
+      "plot_search_type": 2,
+      "show_district": true,
+      "target_selection": false,
+      "ordering": 0
+    }
+  },
+  {
+    "model": "plotsearch.plotsearchsubtype",
+    "pk": 12,
+    "fields": {
+      "name": "Vapaa haku",
+      "name_fi": "Vapaa haku",
+      "name_sv": null,
+      "name_en": "Vapaa haku",
+      "plot_search_type": 2,
+      "show_district": true,
+      "target_selection": false,
+      "ordering": 0
+    }
+  },
+  {
+    "model": "plotsearch.plotsearchsubtype",
+    "pk": 13,
+    "fields": {
+      "name": "Muu kilpailu",
+      "name_fi": "Muu kilpailu",
+      "name_sv": null,
+      "name_en": "Muu kilpailu",
+      "plot_search_type": 2,
+      "show_district": true,
+      "target_selection": false,
+      "ordering": 0
+    }
+  },
+  {
+    "model": "plotsearch.plotsearchsubtype",
+    "pk": 14,
+    "fields": {
+      "name": "Laatukilpailu",
+      "name_fi": "Laatukilpailu",
+      "name_sv": null,
+      "name_en": "Laatukilpailu",
+      "plot_search_type": 3,
+      "show_district": true,
+      "target_selection": false,
+      "ordering": 0
+    }
+  },
+  {
+    "model": "plotsearch.plotsearchsubtype",
+    "pk": 15,
+    "fields": {
+      "name": "Hintakilpailu",
+      "name_fi": "Hintakilpailu",
+      "name_sv": null,
+      "name_en": "Hintakilpailu",
+      "plot_search_type": 3,
+      "show_district": true,
+      "target_selection": false,
+      "ordering": 0
+    }
+  },
+  {
+    "model": "plotsearch.plotsearchsubtype",
+    "pk": 16,
+    "fields": {
+      "name": "Hinta- ja laatukilpailu",
+      "name_fi": "Hinta- ja laatukilpailu",
+      "name_sv": null,
+      "name_en": "Hinta- ja laatukilpailu",
+      "plot_search_type": 3,
+      "show_district": true,
+      "target_selection": false,
+      "ordering": 0
+    }
+  },
+  {
+    "model": "plotsearch.plotsearchsubtype",
+    "pk": 17,
+    "fields": {
+      "name": "Muu kilpailu",
+      "name_fi": "Muu kilpailu",
+      "name_sv": null,
+      "name_en": "Muu kilpailu",
+      "plot_search_type": 3,
+      "show_district": true,
+      "target_selection": false,
+      "ordering": 0
+    }
+  },
+  {
+    "model": "plotsearch.plotsearchsubtype",
+    "pk": 18,
+    "fields": {
+      "name": "Nimetty tonttihaku",
+      "name_fi": "Nimetty tonttihaku",
+      "name_sv": null,
+      "name_en": "Nimetty tonttihaku",
+      "plot_search_type": 3,
+      "show_district": true,
+      "target_selection": false,
+      "ordering": 0
+    }
+  },
+  {
+    "model": "plotsearch.plotsearchsubtype",
+    "pk": 19,
+    "fields": {
+      "name": "Jatkuva tonttihaku",
+      "name_fi": "Jatkuva tonttihaku",
+      "name_sv": null,
+      "name_en": "Jatkuva tonttihaku",
+      "plot_search_type": 3,
+      "show_district": true,
+      "target_selection": false,
+      "ordering": 0
+    }
+  },
+  {
+    "model": "plotsearch.plotsearchsubtype",
+    "pk": 20,
+    "fields": {
+      "name": "Vapaa haku",
+      "name_fi": "Vapaa haku",
+      "name_sv": null,
+      "name_en": "Vapaa haku",
+      "plot_search_type": 3,
+      "show_district": true,
+      "target_selection": false,
+      "ordering": 0
+    }
+  },
+  {
+    "model": "plotsearch.plotsearchsubtype",
+    "pk": 21,
+    "fields": {
+      "name": "Laatukilpailu",
+      "name_fi": "Laatukilpailu",
+      "name_sv": null,
+      "name_en": "Laatukilpailu",
+      "plot_search_type": 4,
+      "show_district": false,
+      "target_selection": false,
+      "ordering": 0
+    }
+  },
+  {
+    "model": "plotsearch.plotsearchsubtype",
+    "pk": 22,
+    "fields": {
+      "name": "Hintakilpailu",
+      "name_fi": "Hintakilpailu",
+      "name_sv": null,
+      "name_en": "Hintakilpailu",
+      "plot_search_type": 4,
+      "show_district": false,
+      "target_selection": false,
+      "ordering": 0
+    }
+  },
+  {
+    "model": "plotsearch.plotsearchsubtype",
+    "pk": 23,
+    "fields": {
+      "name": "Hinta- ja laatukilpailu",
+      "name_fi": "Hinta- ja laatukilpailu",
+      "name_sv": null,
+      "name_en": "Hinta- ja laatukilpailu",
+      "plot_search_type": 4,
+      "show_district": false,
+      "target_selection": false,
+      "ordering": 0
+    }
+  },
+  {
+    "model": "plotsearch.plotsearchsubtype",
+    "pk": 24,
+    "fields": {
+      "name": "Muu kilpailu",
+      "name_fi": "Muu kilpailu",
+      "name_sv": null,
+      "name_en": "Muu kilpailu",
+      "plot_search_type": 4,
+      "show_district": false,
+      "target_selection": false,
+      "ordering": 0
+    }
+  },
+  {
+    "model": "plotsearch.plotsearchsubtype",
+    "pk": 25,
+    "fields": {
+      "name": "Nimetty aluehaku",
+      "name_fi": "Nimetty aluehaku",
+      "name_sv": null,
+      "name_en": "Nimetty aluehaku",
+      "plot_search_type": 4,
+      "show_district": false,
+      "target_selection": false,
+      "ordering": 0
+    }
+  },
+  {
+    "model": "plotsearch.plotsearchsubtype",
+    "pk": 26,
+    "fields": {
+      "name": "Jatkuva tonttihaku",
+      "name_fi": "Jatkuva tonttihaku",
+      "name_sv": null,
+      "name_en": "Jatkuva tonttihaku",
+      "plot_search_type": 4,
+      "show_district": false,
+      "target_selection": false,
+      "ordering": 0
+    }
+  },
+  {
+    "model": "plotsearch.plotsearchsubtype",
+    "pk": 27,
+    "fields": {
+      "name": "Ilmoittautumis- ja neuvottelumenettely",
+      "name_fi": "Ilmoittautumis- ja neuvottelumenettely",
+      "name_sv": null,
+      "name_en": "Ilmoittautumis- ja neuvottelumenettely",
+      "plot_search_type": 1,
+      "show_district": true,
+      "target_selection": false,
+      "ordering": 0
+    }
+  }
+]

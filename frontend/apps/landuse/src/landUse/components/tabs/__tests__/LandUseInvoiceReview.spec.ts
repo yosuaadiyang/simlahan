@@ -1,0 +1,213 @@
+import { describe, expect, it } from "vitest";
+import {
+  createAcceptedBillingInvoices,
+  getSchedulesPendingInvoiceReview,
+  setPaymentScheduleStatus,
+} from "@/landUse/utils/invoiceReview";
+import {
+  LAND_USE_INVOICE_STATUSES,
+  LAND_USE_PAYMENT_SCHEDULE_STATUSES,
+  type LandUseInvoice,
+} from "@/landUse/options";
+import {
+  isInvoiceContentEditableInBilling,
+  type LandUseBillingInvoice,
+} from "@/landUse/components/tabs/LandUseBilling";
+import {
+  getMissingPaymentScheduleFieldLabels,
+  type LandUsePaymentScheduleEntry,
+  validateRequiredInstallmentField,
+} from "@/landUse/components/tabs/LandUsePaymentSchedule";
+
+const createInvoice = (installmentNumber: string): LandUseInvoice => ({
+  recipientPartyIndex: "0",
+  contractIndex: "0",
+  installmentNumber,
+  installmentTotal: "2",
+  signedDate: "2026-01-20",
+  asemakaavanLainvoimaisuusPvm: "2026-02-20",
+  dueDate: "2026-04-15",
+  laskentajaksonAlkupvm: "",
+  laskentajaksonLoppupvm: "",
+  invoiceNumber: "",
+  type: "Maankäyttökorvaus",
+  status: LAND_USE_INVOICE_STATUSES.DRAFT,
+  billedAmount: "",
+  remainingAmount: "",
+  invoiceItems: [],
+});
+
+const createSchedule = (): LandUsePaymentScheduleEntry => ({
+  id: "schedule-1",
+  recipientPartyIndex: "0",
+  contractIndex: "0",
+  status: LAND_USE_PAYMENT_SCHEDULE_STATUSES.DRAFT,
+  rejectedReason: null,
+  signedDate: "2026-01-20",
+  korotusProsentti: "",
+  korkoPeruskorko: "",
+  korkoMarginaali: "",
+  daysInYear: "365",
+  installments: [createInvoice("1"), createInvoice("2")],
+});
+
+describe("invoice review workflow", () => {
+  it("requires a non-empty installment field value", () => {
+    expect(validateRequiredInstallmentField("")).toBe("Pakollinen tieto");
+    expect(validateRequiredInstallmentField("   ")).toBe("Pakollinen tieto");
+    expect(validateRequiredInstallmentField("2026-04-15")).toBeUndefined();
+    expect(validateRequiredInstallmentField(0)).toBeUndefined();
+  });
+
+  it("lists required party and installment fields missing before invoicing", () => {
+    const schedule = createSchedule();
+
+    expect(
+      getMissingPaymentScheduleFieldLabels(schedule, {
+        name: "",
+        streetAddress: "",
+        city: "Helsinki", // correct
+        postalCode: "",
+        ovtCode: "", // not required
+        reference: "", // not required
+        sapCustomerNumber: "",
+        businessId: "",
+        isCompany: true, // correct
+      }),
+    ).toEqual([
+      "Nimi",
+      "Y-tunnus",
+      "Katuosoite",
+      "Postinumero",
+      "SAP-asiakasnumero",
+      "Korotusprosentti %",
+      "Korko %",
+      "Koron marginaali %",
+      "Erä 1: Korotuksen alkupäivä",
+      "Erä 1: Korotuksen loppupäivä",
+      "Erä 1: Maksurivit",
+      "Erä 2: Korotuksen alkupäivä",
+      "Erä 2: Korotuksen loppupäivä",
+      "Erä 2: Maksurivit",
+    ]);
+  });
+
+  it("creates one open billing invoice per accepted schedule installment", () => {
+    const result = createAcceptedBillingInvoices(createSchedule(), []);
+
+    expect(result).toHaveLength(2);
+    expect(result[0]).toMatchObject({
+      status: LAND_USE_INVOICE_STATUSES.OPEN,
+      sourcePaymentScheduleId: "schedule-1",
+      sourceInstallmentIndex: 0,
+    });
+    expect(result[0].sentAt).toBeTruthy();
+    expect(result[0].invoiceNumber).toBeTruthy();
+    expect(result[1].sourceInstallmentIndex).toBe(1);
+  });
+
+  it("does not duplicate installments already represented in billing", () => {
+    const existingInvoice: LandUseBillingInvoice = {
+      ...createInvoice("1"),
+      sourcePaymentScheduleId: "schedule-1",
+      sourceInstallmentIndex: 0,
+    };
+
+    const result = createAcceptedBillingInvoices(createSchedule(), [
+      existingInvoice,
+    ]);
+
+    expect(result).toHaveLength(1);
+    expect(result[0].sourceInstallmentIndex).toBe(1);
+  });
+
+  it("derives review rows only from schedules pending approval", () => {
+    const pendingSchedule = {
+      ...createSchedule(),
+      status: LAND_USE_PAYMENT_SCHEDULE_STATUSES.PENDING_APPROVAL,
+    };
+    const draftSchedule = { ...createSchedule(), id: "schedule-2" };
+
+    expect(
+      getSchedulesPendingInvoiceReview([pendingSchedule, draftSchedule]),
+    ).toEqual([pendingSchedule]);
+  });
+
+  it("rejects only the matching payment schedule and stores the reason", () => {
+    const schedule = createSchedule();
+    const otherSchedule = { ...createSchedule(), id: "schedule-2" };
+
+    const result = setPaymentScheduleStatus(
+      [schedule, otherSchedule],
+      schedule.id,
+      LAND_USE_PAYMENT_SCHEDULE_STATUSES.REJECTED,
+      "Tarkista laskurivit",
+    );
+
+    expect(result[0].status).toBe(LAND_USE_PAYMENT_SCHEDULE_STATUSES.REJECTED);
+    expect(result[0].rejectedReason).toBe("Tarkista laskurivit");
+    expect(result[1]).toBe(otherSchedule);
+  });
+
+  it("preserves a rejection reason unless explicitly cleared", () => {
+    const rejectedSchedule = {
+      ...createSchedule(),
+      status: LAND_USE_PAYMENT_SCHEDULE_STATUSES.REJECTED,
+      rejectedReason: "Tarkista laskurivit",
+    };
+
+    const pendingResult = setPaymentScheduleStatus(
+      [rejectedSchedule],
+      rejectedSchedule.id,
+      LAND_USE_PAYMENT_SCHEDULE_STATUSES.PENDING_APPROVAL,
+    );
+    const approvedResult = setPaymentScheduleStatus(
+      pendingResult,
+      rejectedSchedule.id,
+      LAND_USE_PAYMENT_SCHEDULE_STATUSES.APPROVED,
+      null,
+    );
+
+    expect(pendingResult[0].rejectedReason).toBe("Tarkista laskurivit");
+    expect(approvedResult[0].rejectedReason).toBeNull();
+  });
+
+  it("keeps schedule-derived review invoices read-only in billing", () => {
+    const reviewInvoice = createAcceptedBillingInvoices(
+      createSchedule(),
+      [],
+    )[0];
+
+    expect(isInvoiceContentEditableInBilling(reviewInvoice)).toBe(false);
+    expect(
+      isInvoiceContentEditableInBilling({
+        ...reviewInvoice,
+        status: LAND_USE_INVOICE_STATUSES.OPEN,
+      }),
+    ).toBe(false);
+  });
+
+  it("allows manual draft invoices to be edited but locks them when open", () => {
+    const manualInvoice = createInvoice("1");
+
+    expect(isInvoiceContentEditableInBilling(manualInvoice)).toBe(true);
+    expect(
+      isInvoiceContentEditableInBilling({
+        ...manualInvoice,
+        status: LAND_USE_INVOICE_STATUSES.OPEN,
+      }),
+    ).toBe(false);
+    expect(
+      isInvoiceContentEditableInBilling({
+        ...manualInvoice,
+        status: LAND_USE_INVOICE_STATUSES.PAID,
+      }),
+    ).toBe(false);
+    expect(
+      isInvoiceContentEditableInBilling({
+        ...manualInvoice,
+        status: LAND_USE_INVOICE_STATUSES.CREDITED,
+      }),
+    ).toBe(false);
+  });
+});

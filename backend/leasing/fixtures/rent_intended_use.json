@@ -1,0 +1,114 @@
+[
+  {
+    "model": "leasing.RentIntendedUse",
+    "pk": 1,
+    "fields": {
+      "name": "Asunto"
+    }
+  },
+  {
+    "model": "leasing.RentIntendedUse",
+    "pk": 2,
+    "fields": {
+      "name": "Liike"
+    }
+  },
+  {
+    "model": "leasing.RentIntendedUse",
+    "pk": 3,
+    "fields": {
+      "name": "Teollisuus/varasto"
+    }
+  },
+  {
+    "model": "leasing.RentIntendedUse",
+    "pk": 4,
+    "fields": {
+      "name": "Toimisto teoll.tont."
+    }
+  },
+  {
+    "model": "leasing.RentIntendedUse",
+    "pk": 5,
+    "fields": {
+      "name": "Päiväkoti"
+    }
+  },
+  {
+    "model": "leasing.RentIntendedUse",
+    "pk": 6,
+    "fields": {
+      "name": "Yleinen"
+    }
+  },
+  {
+    "model": "leasing.RentIntendedUse",
+    "pk": 7,
+    "fields": {
+      "name": "Muu"
+    }
+  },
+  {
+    "model": "leasing.RentIntendedUse",
+    "pk": 8,
+    "fields": {
+      "name": "Erittelemätön"
+    }
+  },
+  {
+    "model": "leasing.RentIntendedUse",
+    "pk": 9,
+    "fields": {
+      "name": "Pysäköinti (tasot)"
+    }
+  },
+  {
+    "model": "leasing.RentIntendedUse",
+    "pk": 10,
+    "fields": {
+      "name": "Pysäköinti"
+    }
+  },
+  {
+    "model": "leasing.RentIntendedUse",
+    "pk": 11,
+    "fields": {
+      "name": "Jakelulaite tontilla"
+    }
+  },
+  {
+    "model": "leasing.RentIntendedUse",
+    "pk": 12,
+    "fields": {
+      "name": "Asunto, lisärakent."
+    }
+  },
+  {
+    "model": "leasing.RentIntendedUse",
+    "pk": 13,
+    "fields": {
+      "name": "Asunto 2"
+    }
+  },
+  {
+    "model": "leasing.RentIntendedUse",
+    "pk": 14,
+    "fields": {
+      "name": "Muu 2"
+    }
+  },
+  {
+    "model": "leasing.RentIntendedUse",
+    "pk": 15,
+    "fields": {
+      "name": "Pysäköinti 2"
+    }
+  },
+  {
+    "model": "leasing.RentIntendedUse",
+    "pk": 24,
+    "fields": {
+      "name": "ALV"
+    }
+  }
+]

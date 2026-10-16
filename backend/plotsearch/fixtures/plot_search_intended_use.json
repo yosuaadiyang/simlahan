@@ -1,0 +1,72 @@
+[
+  {
+    "model": "plotsearch.areasearchintendeduse",
+    "pk": 1,
+    "fields": {
+      "name": "Ravitsemus, myynti ja mainonta",
+      "name_fi": "Ravitsemus, myynti ja mainonta",
+      "name_sv": "Nutritionstjänster, försäljning och reklam",
+      "name_en": "Services, sales and marketing"
+    }
+  },
+  {
+    "model": "plotsearch.areasearchintendeduse",
+    "pk": 2,
+    "fields": {
+      "name": "Urheilu ja Liikunta",
+      "name_fi": "Urheilu ja Liikunta",
+      "name_sv": "Idrott och träning",
+      "name_en": "Sport and training"
+    }
+  },
+  {
+    "model": "plotsearch.areasearchintendeduse",
+    "pk": 3,
+    "fields": {
+      "name": "Taide ja kulttuuri",
+      "name_fi": "Taide ja kulttuuri",
+      "name_sv": "Konst och kultur",
+      "name_en": "Arts and culture"
+    }
+  },
+  {
+    "model": "plotsearch.areasearchintendeduse",
+    "pk": 4,
+    "fields": {
+      "name": "Veneily ja laiturit",
+      "name_fi": "Veneily ja laiturit",
+      "name_sv": "Båtliv och bryggor",
+      "name_en": "Boating and piers"
+    }
+  },
+  {
+    "model": "plotsearch.areasearchintendeduse",
+    "pk": 5,
+    "fields": {
+      "name": "Varastointi ja jakelu",
+      "name_fi": "Varastointi ja jakelu",
+      "name_sv": "Lagring och utdelning",
+      "name_en": "Storage and distribution"
+    }
+  },
+  {
+    "model": "plotsearch.areasearchintendeduse",
+    "pk": 6,
+    "fields": {
+      "name": "Työmaat",
+      "name_fi": "Työmaat",
+      "name_sv": "Arbetsområde",
+      "name_en": "Work zone"
+    }
+  },
+  {
+    "model": "plotsearch.areasearchintendeduse",
+    "pk": 7,
+    "fields": {
+      "name": "Muu alueen käyttö",
+      "name_fi": "Muu alueen käyttö",
+      "name_sv": "Övriga användning",
+      "name_en": "Other uses"
+    }
+  }
+]

@@ -1,0 +1,67 @@
+@use "foundation-sites/scss/foundation" as *;
+@use "../../styles/variables";
+
+.address-search-input {
+  position: relative;
+
+  input {
+    padding: 0 rem-calc(5px);
+    font-size: rem-calc(14px);
+    height: rem-calc(20px);
+    width: 100%;
+    margin: 0;
+  }
+
+  &__dropdown {
+    position: absolute;
+    background-color: variables.$white;
+    box-shadow: 0 1px 0 1px variables.$blue;
+    border: 1px solid variables.$blue;
+    border-top: none;
+    border-bottom: none;
+    z-index: 1020;
+    top: 20px;
+    left: 0;
+    min-width: 100%;
+    display: none;
+
+    ul {
+      list-style: none;
+      margin: 0;
+      max-height: rem-calc(178px);
+      overflow: auto;
+    }
+
+    &.open {
+      display: block;
+    }
+    .no-result-item {
+      padding: 0 rem-calc(5px);
+      font-size: rem-calc(14px);
+      background-color: variables.$lightest-gray;
+    }
+
+    .list-item {
+      padding: 0 rem-calc(5px);
+      font-size: rem-calc(14px);
+      color: variables.$black;
+      cursor: pointer;
+
+      &.is-focused {
+        background-color: variables.$light-blue !important;
+      }
+
+      &:hover {
+        background-color: variables.$light-blue !important;
+      }
+    }
+  }
+
+  &.open {
+    input {
+      outline: none !important;
+      border: 1px solid variables.$blue;
+      box-shadow: 0px 0px 0px 1px variables.$blue;
+    }
+  }
+}

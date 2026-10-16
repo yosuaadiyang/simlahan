@@ -1,0 +1,76 @@
+@use "foundation-sites/scss/foundation" as *;
+@use "../../styles/variables";
+
+.rent-calculator {
+  &__button-wrapper {
+    padding-top: rem-calc(5px);
+    padding-bottom: rem-calc(10px);
+    display: flex;
+    align-items: flex-end;
+    height: 100%;
+
+    @include breakpoint(small only) {
+      text-align: right;
+      padding-bottom: rem-calc(10px);
+    }
+  }
+
+  &__title {
+    display: block;
+    font-size: rem-calc(16px);
+    line-height: rem-calc(18px);
+    font-weight: variables.$semibold;
+    text-transform: uppercase;
+    color: variables.$black;
+    margin-bottom: rem-calc(5px);
+  }
+
+  &__rent-wrapper {
+    display: inline-block;
+    width: 100%;
+    text-align: top;
+    padding: rem-calc(10px 10px 0);
+    background-color: variables.$light-green;
+    margin-top: rem-calc(5px);
+    margin-bottom: rem-calc(10px);
+  }
+
+  &__rent-inner-wrapper {
+    position: relative;
+  }
+
+  &__rent-title {
+    display: block;
+    font-size: rem-calc(16px);
+    line-height: rem-calc(18px);
+    font-weight: variables.$semibold;
+    text-transform: uppercase;
+    color: variables.$black;
+    margin-bottom: rem-calc(10px);
+  }
+
+  &__rent {
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &_amount {
+      text-align: right;
+      overflow: visible !important;
+    }
+  }
+
+  &__explanation {
+    &_amount {
+      text-align: right;
+      overflow: visible !important;
+    }
+  }
+
+  &__sub-item {
+    &_amount {
+      text-align: right;
+      overflow: visible !important;
+    }
+  }
+}

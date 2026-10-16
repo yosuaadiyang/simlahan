@@ -1,0 +1,27 @@
+@use "foundation-sites/scss/foundation" as *;
+@use "../../styles/variables";
+
+.links {
+  &__external-link {
+    span {
+      margin-right: rem-calc(5px);
+    }
+
+    .icons__external-link {
+      fill: variables.$blue;
+      height: rem-calc(10px);
+      width: rem-calc(13px);
+      vertical-align: middle;
+      margin-top: rem-calc(-2px);
+    }
+
+    &:hover {
+      text-decoration: underline;
+      color: variables.$blue-hover;
+
+      .icons__external-link {
+        fill: variables.$blue-hover;
+      }
+    }
+  }
+}

@@ -1,0 +1,109 @@
+@use "foundation-sites/scss/foundation" as *;
+@use "../../styles/variables";
+@use "../../styles/mixins";
+
+.tabs {
+  background-color: variables.$light-gray;
+  width: 100%;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.2);
+
+  &__wrapper {
+    width: 100%;
+    margin: 0 auto;
+    max-width: variables.$content-max-width;
+    padding: rem-calc(0 20px);
+  }
+
+  ul {
+    margin: 0;
+
+    > li {
+      float: none;
+      color: variables.$black;
+      background: variables.$light-gray;
+      display: inline-block;
+      vertical-align: top;
+      height: rem-calc(40px);
+
+      > a {
+        @include mixins.transition(none);
+
+        color: variables.$black !important;
+        text-decoration: none !important;
+        font-size: rem-calc(14px);
+        font-weight: 600;
+        padding: 0;
+        display: flex;
+        height: 40px;
+        align-items: center;
+        position: relative;
+        border: 2px solid variables.$light-gray;
+
+        &:focus {
+          border-color: variables.$blue !important;
+          outline: none;
+          border-style: dotted;
+        }
+
+        &:hover {
+          background-color: variables.$light-gray-secondary;
+          border-color: variables.$light-gray-secondary !important;
+        }
+      }
+    }
+    > li.is-active {
+      background: variables.$white !important;
+
+      > a {
+        border-color: variables.$white;
+
+        &:hover {
+          background: variables.$white;
+          border-color: variables.$white !important;
+        }
+      }
+    }
+  }
+
+  &__label {
+    padding: rem-calc(0 23px);
+  }
+
+  &__error-badge {
+    background-image: url(/assets/icons/icon_error.svg);
+    height: 14px;
+    width: 14px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: 50%;
+    right: 3px;
+    top: calc(50% - 7px);
+    position: absolute;
+    z-index: 1;
+  }
+
+  &__dirty-badge {
+    background-image: url(/assets/icons/icon_unsaved.svg);
+    height: 14px;
+    width: 14px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: 50%;
+    right: 3px;
+    top: calc(50% - 7px);
+    position: absolute;
+    z-index: 1;
+  }
+
+  &__content {
+    &_pane-container {
+      visibility: hidden;
+      max-height: 0;
+
+      &.active {
+        visibility: visible;
+        max-height: none;
+      }
+    }
+  }
+}

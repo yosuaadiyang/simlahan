@@ -1,0 +1,4174 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-07 10:29+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "View auditlog"
+msgstr "Visa auditeringslogg"
+
+msgid "View auditlog of a lease or a contact"
+msgstr "Visa auditeringsloggen för den valda arrenderingen eller kunden"
+
+msgid "executable or script"
+msgstr "Fil som ska köras"
+
+msgid "Django management command"
+msgstr "Django-kommando"
+
+msgid "Invalid integer set specifier"
+msgstr "Felaktig definition"
+
+msgid "creation time"
+msgstr "Tidpunkt då skapades"
+
+msgid "modification time"
+msgstr "Tidpunkt då redigerades"
+
+msgid "name"
+msgstr "Namn"
+
+msgid ""
+"Name of the command to run e.g. name of a program in PATH or a full path to "
+"an executable, or name of a management command."
+msgstr ""
+"Namn på kommando som körs. T.ex. programmets namn i PATH-miljövariabeln, "
+"hela sökvägen för den fil som ska köras eller namnet på Django-kommandot"
+
+msgid "parameters"
+msgstr "parametrar"
+
+msgid "parameter format string"
+msgstr "parameterns format"
+
+#, python-brace-format
+msgid ""
+"String that defines how the parameters are formatted when calling the "
+"command. E.g. if this is \"--rent-id {rent_id}\" and value 123 is passed as "
+"an argument to the rent_id parameter, then the command will be called as "
+"\"COMMAND --rent-id 123\"."
+msgstr ""
+"Sträng som definierar hur parametrarna bildas när kommandot kallas. Till "
+"exempel, om \"--rent-id {rent_id}\" definieras här och värdet 123 tilldelas "
+"rent_id som argument, körs kommandot i formatet \"COMMAND --rent-id 123\"."
+
+msgid "command"
+msgstr "Kommando"
+
+msgid "commands"
+msgstr "Kommandon"
+
+msgid "identifier"
+msgstr "identifieringskod"
+
+msgid "log compacting delay"
+msgstr "väntetid vid komprimering av en logg"
+
+msgid ""
+"Days to wait before compacting log entries. Calculated from the start time "
+"of the job. Compacting log entries means that the individual log entries are "
+"concatenated to a single string and the original entries are deleted. This "
+"allows PostgreSQL to compress the log contents (check \"TOAST\" from "
+"PostgreSQL documentation). The metadata information about the log entry "
+"kinds (stdout/stderr) and timestamps are stored separately so that the "
+"original contents of the log entries are still recoverable."
+msgstr ""
+"Antal dagar som väntas innan loggmarkeringarna komprimeras. Räknas från "
+"tiden arbetet börjades. Komprimering av loggmarkeringar innebär att enskilda "
+"loggmarkeringar kombineras till en enda teckensträng och att de ursprungliga "
+"markeringarna raderas. Detta gör att PostgreSQL kan packa logginnehållet (se "
+"avsnittet ”TOAST” i PostgreSQL-dokumentationen). Metadata om typen av "
+"loggmarkeringarna (stdout/stderr) och tidstämplarna sparas separat. Då kan "
+"de ursprungliga loggmarkeringarna fortfarande återställas."
+
+msgid "log deleting delay"
+msgstr "väntetid vid radering av en logg"
+
+msgid ""
+"Days to wait before deleting logs. Calculated from the start time of the job."
+msgstr ""
+"Antal dagar som väntas innan loggmarkeringarna raderas. Räknas från tiden "
+"arbetet börjades."
+
+msgid "run inforomation deleting delay"
+msgstr "väntetid vid radering av körningsdata"
+
+msgid ""
+"Days to wait before deleting all inforomation about the run. Calculated from "
+"the start time of the job."
+msgstr ""
+"Antal dagar som väntas innan alla uppgifter om en körning raderas. Räknas "
+"från tiden arbetet börjades."
+
+msgid "job history retention policy"
+msgstr "praxis för lagring av arbetshistorik"
+
+msgid "job history retention policies"
+msgstr "praxis för lagring av arbetshistorik"
+
+msgid "Descriptive name for the job"
+msgstr "Arbetets beskrivande namn"
+
+msgid "comment"
+msgstr "Kommentar"
+
+msgid "arguments"
+msgstr "Argument"
+
+msgid ""
+"Argument for the command as a JSON object. These will be formatted with the "
+"parameter format string of the command. E.g. to pass value 123 as an "
+"argument to the rent_id parameter, set this to {\"rent_id\": 123}."
+msgstr ""
+"Kommandots argument i JSON-format. Argumentet formuleras i enlighet med "
+"parameterns formatdefinition. T.ex. om man vill ge numret 123 som rent_id-"
+"argument, placeras {\"rent_id\": 123} här."
+
+msgid "history retention policy"
+msgstr "praxis för lagring av historik"
+
+msgid ""
+"Defines how long logs and information about completed runs is preserved."
+msgstr "Anger hur länge loggarna lagras och uppgifter om genomförda körningar."
+
+msgid "job"
+msgstr "Arbete"
+
+msgid "jobs"
+msgstr "Arbeten"
+
+msgid ""
+"Name of the timezone, e.g. \"Europe/Helsinki\" or \"UTC\". See https://"
+"en.wikipedia.org/wiki/List_of_tz_database_time_zones for a list of possible "
+"values."
+msgstr ""
+"Namn på tidszonen, t.ex. \"Europe/Helsinki\" eller \"UTC\". Se en lista över "
+"möjliga namn på tidszoner på adressen https://en.wikipedia.org/wiki/"
+"List_of_tz_database_time_zones"
+
+msgid "timezone"
+msgstr "Tidszon"
+
+msgid "timezones"
+msgstr "Tidszoner"
+
+msgid "Timezone name can't be empty"
+msgstr ""
+
+msgid "Invalid timezone name"
+msgstr "Odugligt namn på tidszon"
+
+msgid "enabled"
+msgstr "på"
+
+msgid "years"
+msgstr "År"
+
+msgid "months"
+msgstr "Månader"
+
+msgid "days of month"
+msgstr "Dagar i månaden"
+
+msgid "weekdays"
+msgstr "Veckodagar"
+
+msgid ""
+"Limit execution to specified weekdays. Use integer values to represent the "
+"weekdays with the following mapping: 0=Sunday, 1=Monday, 2=Tuesday, ..., "
+"6=Saturday."
+msgstr ""
+"Körs endast vissa veckodagar. Använd siffror som motsvarar veckodagarna: "
+"0=söndag, 1=måndag, 2=tisdag, 3=onsdag, 4=torsdag, 5=fredag, 6=lördag."
+
+msgid "hours"
+msgstr "Timmar"
+
+msgid "minutes"
+msgstr "Minuter"
+
+msgid "scheduled job"
+msgstr "Tidsinställt arbete"
+
+msgid "scheduled jobs"
+msgstr "Tidsinställda arbeten"
+
+#, python-brace-format
+msgid "Scheduled job \"{job}\" @ {schedule}"
+msgstr "Tidsinställt arbete \"{job}\" @ {schedule}"
+
+msgid "PID"
+msgstr "permanent identifieringskod"
+
+msgid "Records the process id of the process, which is/was executing this job"
+msgstr "Nummer på processen som körde arbetet"
+
+msgid "start time"
+msgstr "Starttid"
+
+msgid "stop time"
+msgstr "Sluttid"
+
+msgid "exit code"
+msgstr "Exit-kod"
+
+msgid "job run"
+msgstr "Körning av arbetet"
+
+msgid "job runs"
+msgstr "Körningar av arbetet"
+
+msgid "run"
+msgstr "Körning"
+
+msgid "kind"
+msgstr "Art"
+
+msgid "line number"
+msgstr "radnummer"
+
+msgid "number"
+msgstr "Nummer"
+
+msgid "time"
+msgstr "Tid"
+
+msgid "text"
+msgstr "Text"
+
+msgid "log entry"
+msgstr "logganteckning"
+
+msgid "log entries"
+msgstr "logganteckningar"
+
+#, python-brace-format
+msgid "{run_name}: {kind} entry {linenum}({number})"
+msgstr "{run_name}: {kind} anteckning {linenum}({number})"
+
+msgid "content"
+msgstr "innehåll"
+
+msgid "log entry metadata"
+msgstr "metadata om logganteckning"
+
+msgid "timestamp of the first entry"
+msgstr "tidstämpel av den första anteckningen"
+
+msgid "timestamp of the last entry"
+msgstr "tidstämpel av den sista anteckningen"
+
+msgid "total count of entries"
+msgstr "antal anteckningar totalt"
+
+msgid "count of error entries"
+msgstr "antal felmarkeringar"
+
+msgid "log"
+msgstr "logg"
+
+msgid "logs"
+msgstr "loggar"
+
+msgid "scheduled run time"
+msgstr "Tidpunkt för körning"
+
+msgid "assignment time"
+msgstr "Tidpunkt för körorder"
+
+msgid "assignee process id (PID)"
+msgstr "Processnummer för körordern (PID)"
+
+msgctxt "Credit decision status"
+msgid "Yes"
+msgstr "Ja"
+
+msgctxt "Credit decision status"
+msgid "No"
+msgstr "Nej"
+
+msgctxt "Credit decision status"
+msgid "Consideration"
+msgstr "Övervägande"
+
+msgid "Reason code"
+msgstr "Orsakskod"
+
+msgid "Reason"
+msgstr "Orsak"
+
+msgctxt "Model name"
+msgid "Credit decision reason"
+msgstr "Orsak till kreditbeslutet"
+
+msgctxt "Model name"
+msgid "Credit decision reasons"
+msgstr "Orsaker till kreditbeslutet"
+
+msgid "Customer"
+msgstr "Kund"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Reasons"
+msgstr "Orsaker"
+
+msgid "Business ID"
+msgstr "FO-nummer"
+
+msgid "Official name"
+msgstr "Officiellt namn"
+
+msgid "Address"
+msgstr "Adress"
+
+msgid "Phone number"
+msgstr "Telefonnummer"
+
+msgid "Business entity"
+msgstr "Bolagsform"
+
+msgid "Date of commencement of operations"
+msgstr "Startdatum för verksamheten"
+
+msgid "Industry code"
+msgstr "Sektorskod"
+
+msgid "Claimant"
+msgstr "Sökande"
+
+msgid "original_data"
+msgstr "Ursprungliga data"
+
+msgctxt "Model name"
+msgid "Credit decision"
+msgstr "Kreditbeslut"
+
+msgctxt "Model name"
+msgid "Credit decisions"
+msgstr "Kreditbeslut"
+
+msgid "Identification"
+msgstr "Identifieringskod"
+
+msgid "User"
+msgstr "Användare"
+
+msgid "Text"
+msgstr "Text"
+
+msgctxt "Model name"
+msgid "Credit decision log"
+msgstr "Logg för kreditbeslutet"
+
+msgctxt "Model name"
+msgid "Credit decision logs"
+msgstr "Loggar för kreditbeslutet"
+
+msgid ""
+"Cannot find business id or national identification number in customer data."
+msgstr ""
+"Kunduppgifterna innehåller inget FO-nummer eller ingen personbeteckning."
+
+msgid "filepath"
+msgstr ""
+
+msgid "scan time"
+msgstr ""
+
+msgid "deletion time"
+msgstr ""
+
+msgid "error message"
+msgstr ""
+
+msgid "File Scan Status"
+msgstr ""
+
+msgid "File Scan Statuses"
+msgstr ""
+
+msgid ""
+"File has not yet been scanned for viruses, and is unsafe to download at this "
+"time."
+msgstr ""
+"Filen har ännu inte genomsökts efter virus och är osäker att ladda ner just "
+"nu."
+
+msgid ""
+"File was found to contain virus or malware, and the file has been deleted."
+msgstr ""
+"Filen visade sig innehålla virus eller skadlig programvara och har raderats."
+
+msgid ""
+"File scan failed. File is unsafe to download before it has been successfully "
+"scanned for viruses and malware."
+msgstr ""
+"Filskanning misslyckades. Filen är osäker att ladda ner innan den har "
+"genomsökts framgångsrikt efter virus och skadlig programvara."
+
+msgid "Unknown error related to virus scanning: '{}'"
+msgstr "Okänt fel relaterat till virusskanning: '{}'"
+
+msgid "File '{}' does not have an extension."
+msgstr ""
+
+msgid "File extension '.{}' is not allowed."
+msgstr ""
+
+#, python-brace-format
+msgid "File '{filename}' exceeds maximum file size of {max_size} MB."
+msgstr ""
+
+msgctxt "Form state"
+msgid "Work in progress"
+msgstr "Oavslutad"
+
+msgctxt "Form state"
+msgid "Ready"
+msgstr "Färdig"
+
+msgctxt "Form state"
+msgid "Deleted"
+msgstr "Makulerad"
+
+msgctxt "Section type"
+msgid "Show always"
+msgstr "Visa alltid"
+
+msgctxt "Section type"
+msgid "Show if"
+msgstr "Visa om"
+
+msgctxt "Applicant type"
+msgid "Person"
+msgstr "Person"
+
+msgctxt "Applicant type"
+msgid "Company"
+msgstr "Företag"
+
+msgctxt "Applicant type"
+msgid "Both"
+msgstr "Båda"
+
+msgid "Time created"
+msgstr "Skapad"
+
+msgid "Time modified"
+msgstr "Redigerad"
+
+msgid "Tekstikenttä"
+msgstr "Textfält"
+
+msgid "Tekstialue"
+msgstr "Textområde"
+
+msgid "Alasvetovalikko"
+msgstr "Rullgardinsmeny"
+
+msgid "Valintaruutu"
+msgstr "Valruta"
+
+msgid "Radiopainike"
+msgstr "Radioknapp"
+
+msgid "Radiopainike linjassa"
+msgstr "Radioknapp på linje"
+
+msgid "Lataa tiedosto"
+msgstr "Ladda ner filen"
+
+msgid "Murtoluku"
+msgstr "Bråktal"
+
+msgid "Piilotettu"
+msgstr ""
+
+msgid "Invalid personal identity code"
+msgstr ""
+
+msgid "Invalid business ID"
+msgstr ""
+
+msgid "Lessor"
+msgstr "Arrendegivare"
+
+msgid "Description area"
+msgstr "Närmare beskrivning om området"
+
+msgid "District"
+msgstr "Stadsdel"
+
+msgid "Intended use"
+msgstr "Användningsändamål"
+
+msgid "Description intended use"
+msgstr "Närmare beskrivning om hur området används"
+
+msgid "Start date"
+msgstr "Startdatum"
+
+msgid "End date"
+msgstr "Slutdatum"
+
+msgid "Received date"
+msgstr "Mottagen"
+
+msgid "Identifier"
+msgstr "Kod"
+
+msgid "State"
+msgstr "Status"
+
+msgid "Preparer"
+msgstr "Beredd av"
+
+msgid "Decline reason"
+msgstr "Orsaken till avslaget"
+
+msgid "Preparer note"
+msgstr "Beredares anmärkning"
+
+msgid "Status notes"
+msgstr "Statusanmärkningar"
+
+msgid "Copy of plot application(s) {}"
+msgstr "Kopia av tomtansökningar {}"
+
+msgid "Copy of area rental application {}"
+msgstr "Kopia av ansökningar för områdessökning {}"
+
+msgid "This field is required"
+msgstr ""
+
+msgid "Control share is not even"
+msgstr ""
+
+msgid "Invoice"
+msgstr "Faktura"
+
+msgid "Invoices"
+msgstr "Fakturor"
+
+msgid "Lease identifier"
+msgstr "Arrendekod"
+
+msgid "Invoice number"
+msgstr "Fakturanummer "
+
+msgid "Due date"
+msgstr "Förfallodag"
+
+msgid "Service unit"
+msgstr ""
+
+msgid "Invoice count"
+msgstr "Antal fakturor"
+
+msgid "Invoice payment"
+msgstr ""
+
+msgid "Invoice payments"
+msgstr "Betalningar"
+
+msgid "Paid amount"
+msgstr "Betald mängd"
+
+msgid "Paid date"
+msgstr "Betalt datum"
+
+msgid "Filing code"
+msgstr "Arkiveringskod"
+
+msgid "Payment count"
+msgstr ""
+
+msgid "Value should be a string"
+msgstr "Värdet måste vara en sträng"
+
+msgid "Value should be of type {}"
+msgstr "Värdet måste vara av typ {}"
+
+msgid "Value is required"
+msgstr "Värdet är obligatoriskt"
+
+msgid "Value should be an Iterable"
+msgstr "Värdet måste vara \"Iterable\""
+
+msgid "Contact information cannot be null."
+msgstr "Uppgiften om kontakt får inte vara tom."
+
+msgctxt "Laske export log invoice status"
+msgid "Sent"
+msgstr "Sändning lyckades"
+
+msgctxt "Laske export log invoice status"
+msgid "Failed"
+msgstr "Misslyckades"
+
+msgid "Directory \"{}\" does not exist. Please create it."
+msgstr "Index {} finns inte. Skapa ett index."
+
+msgid "Can not create file in directory \"{}\"."
+msgstr "Fil kan inte skapas till indexet {}."
+
+msgid "MVJ ({}) transfer failed!"
+msgstr "Överföringen av MVJ ({}) misslyckades!"
+
+msgid ""
+"Sending invoices to the Laske system has been crashed during the processing. "
+"Please contact your administrator.\n"
+"Service unit: {}\n"
+"\n"
+"Error message: {}"
+msgstr ""
+
+msgid "MVJ ({}) transfer"
+msgstr "MVJ ({}) överföring"
+
+msgid ""
+"MVJ ({}) processed a total of {} invoices to Laske system on {}. Of the "
+"invoices, {} succeeded and {} failed.\n"
+"Service unit: {}"
+msgstr ""
+
+msgid "Failed invoice numbers:"
+msgstr "Fakturanummer för fakturor som misslyckades:"
+
+msgid "Time started"
+msgstr "Starttid"
+
+msgid "Time ended"
+msgstr "Sluttid"
+
+msgid "Finished?"
+msgstr "Färdig?"
+
+msgid "Filename"
+msgstr "Filnamn"
+
+msgctxt "Model name"
+msgid "Laske export log"
+msgstr "Logg för Laske-exporten"
+
+msgctxt "Model name"
+msgid "Laske export logs"
+msgstr "Loggar för Laske-exporten"
+
+msgid "status"
+msgstr "status"
+
+msgid "information"
+msgstr "uppgifter"
+
+msgctxt "Model name"
+msgid "Laske payments log"
+msgstr "Logg för Laske-avgifter"
+
+msgctxt "Model name"
+msgid "Laske payments logs"
+msgstr "Loggar för Laske-exporten"
+
+msgid "Lease"
+msgstr "Arrendering"
+
+msgid "Tenant names"
+msgstr ""
+
+msgid "Search by identifier"
+msgstr "Sök med identifieringskod"
+
+msgid "Lease Area Identifier"
+msgstr ""
+
+msgid "Color"
+msgstr "Färg"
+
+#, python-brace-format
+msgid "Ratio {ratio}… ({current_index}/{rent_index})"
+msgstr "Beräkningsfaktor {ratio}… ({current_index}/{rent_index})"
+
+#, python-brace-format
+msgid "Ratio {ratio}"
+msgstr "Beräkningsfaktor {ratio})"
+
+msgid "New base rent"
+msgstr "Nytt basarrende"
+
+msgid "New base rent {}"
+msgstr "Nytt basarrende {}"
+
+msgid "Total payable"
+msgstr "Arrende som ska debiteras"
+
+msgctxt "Classification"
+msgid "Public"
+msgstr "Offentligt"
+
+msgctxt "Classification"
+msgid "Confidential"
+msgstr "Hemligt"
+
+msgctxt "Classification"
+msgid "Official"
+msgstr "Myndighetsanvändning"
+
+msgctxt "Lease state"
+msgid "Lease"
+msgstr "Arrendering"
+
+msgctxt "Lease state"
+msgid "Short term lease"
+msgstr "Kortfristig arrendering"
+
+msgctxt "Lease state"
+msgid "Long term lease"
+msgstr "Långfristig arrendering"
+
+msgctxt "Lease state"
+msgid "Reservation"
+msgstr "Reservering"
+
+msgctxt "Lease state"
+msgid "Reserve"
+msgstr "Reserv"
+
+msgctxt "Lease state"
+msgid "Permission"
+msgstr "Tillstånd"
+
+msgctxt "Lease state"
+msgid "Tenure"
+msgstr "Besittningsrätt"
+
+msgctxt "Lease state"
+msgid "Buildings and public areas"
+msgstr "Byggnader och allmänna områden internt (RYA)"
+
+msgctxt "Lease state"
+msgid "Power of attorney"
+msgstr "Fullmakt"
+
+msgctxt "Lease state"
+msgid "Preliminary"
+msgstr "Föravtal"
+
+msgctxt "Lease relation"
+msgid "Transfer"
+msgstr "Överföring"
+
+msgctxt "Lease relation"
+msgid "Other"
+msgstr "Övrigt"
+
+msgctxt "Notice period"
+msgid "No period"
+msgstr "Ingen uppsägningstid"
+
+msgctxt "Notice period"
+msgid "Time period"
+msgstr "Uppsägningstid"
+
+msgctxt "Notice period"
+msgid "Other"
+msgstr "Annan uppsägningstid"
+
+msgctxt "Tenant contact type"
+msgid "Tenant"
+msgstr "Arrendator"
+
+msgctxt "Tenant contact type"
+msgid "Billing contact"
+msgstr "Fakturamottagare"
+
+msgctxt "Tenant contact type"
+msgid "Contact"
+msgstr "Kontaktperson"
+
+msgctxt "Location type"
+msgid "Surface"
+msgstr "Ovan om"
+
+msgctxt "Location type"
+msgid "Underground"
+msgstr "Nedan om"
+
+msgctxt "Lease area type"
+msgid "Plan unit"
+msgstr "Planenhet"
+
+msgctxt "Lease area type"
+msgid "Real property"
+msgstr "Fastighet"
+
+msgctxt "Lease area type"
+msgid "Unseparated parcel"
+msgstr "Outbrutet område"
+
+msgctxt "Lease area type"
+msgid "Other"
+msgstr "Övrigt"
+
+msgctxt "Lease area attachment type"
+msgid "MATTI report"
+msgstr "MATTI-rapport"
+
+msgctxt "Lease area attachment type"
+msgid "Geotechnical"
+msgstr "Geoteknisk tjänst"
+
+msgctxt "Plot type"
+msgid "Real property"
+msgstr "Fastighet"
+
+msgctxt "Plot type"
+msgid "Unseparated parcel"
+msgstr "Outbrutet område"
+
+msgctxt "Plot type"
+msgid "Searchable"
+msgstr "Ska ansökas"
+
+msgctxt "Plot type"
+msgid "Procedural reservation"
+msgstr "Processanvisning"
+
+msgctxt "Plot type"
+msgid "Direct reservation"
+msgstr "Direktanvisning"
+
+msgctxt "Period type"
+msgid "/ month"
+msgstr "/ mån."
+
+msgctxt "Period type"
+msgid "/ year"
+msgstr "/ år"
+
+msgctxt "Area unit"
+msgid "m^2"
+msgstr "m^2"
+
+msgctxt "Area unit"
+msgid "Floor area m^2"
+msgstr "kem^2"
+
+msgctxt "Area unit"
+msgid "Apartment area m^2"
+msgstr "hm^2"
+
+msgctxt "Constructability state"
+msgid "Unverified"
+msgstr "Ogranskat"
+
+msgctxt "Constructability state"
+msgid "Requires measures"
+msgstr "Kräver åtgärder"
+
+msgctxt "Constructability state"
+msgid "Enquiry sent"
+msgstr "Förfrågan har skickats"
+
+msgctxt "Constructability state"
+msgid "Complete"
+msgstr "Färdig"
+
+msgctxt "Constructability type"
+msgid "Preconstruction"
+msgstr "Förkonstruktion, flyttning av ledningar och kommunalteknik"
+
+msgctxt "Constructability type"
+msgid "Demolition"
+msgstr "Rivning"
+
+msgctxt "Constructability type"
+msgid "Polluted land"
+msgstr "PIMA"
+
+msgctxt "Constructability type"
+msgid "Report"
+msgstr "Byggbarhetsutredning"
+
+msgctxt "Constructability type"
+msgid "Other"
+msgstr "Annat"
+
+msgctxt "Polluted Land rent condition state"
+msgid "Asked"
+msgstr "Frågat"
+
+msgctxt "Polluted Land rent condition state"
+msgid "Ready"
+msgstr "Färdig"
+
+msgctxt "Constructability Report investigation state"
+msgid "No need"
+msgstr "Behövs inte"
+
+msgctxt "Constructability Report investigation state"
+msgid "Ongoing"
+msgstr "Under arbete"
+
+msgctxt "Constructability Report investigation state"
+msgid "Ready"
+msgstr "Färdig"
+
+msgctxt "Rent type"
+msgid "Index"
+msgstr "Index"
+
+msgctxt "Rent type"
+msgid "Index (old)"
+msgstr "Index (gammalt)"
+
+msgctxt "Rent type"
+msgid "One time"
+msgstr "Fullständigt"
+
+msgctxt "Rent type"
+msgid "Fixed"
+msgstr "Fast"
+
+msgctxt "Rent type"
+msgid "Free"
+msgstr "Utan ersättning"
+
+msgctxt "Rent type"
+msgid "Manual"
+msgstr "Manuell beräkning"
+
+msgctxt "Rent cycle"
+msgid "January to december"
+msgstr "1.1. –31.12."
+
+msgctxt "Rent cycle"
+msgid "April to march"
+msgstr "1.4. –31.3."
+
+msgctxt "Index type"
+msgid "ind 50620 / 10/20%:n vaihtelut"
+msgstr "ind 50620 / 10/20 %:s variationer"
+
+msgctxt "Index type"
+msgid "ind 4661 / 10/20%:n vaihtelut"
+msgstr "ind 4661 / 10/20 %:s variationer"
+
+msgctxt "Index type"
+msgid "ind 418 / 10%:n vaihtelu"
+msgstr "ind 418 / 10/10 %:s variationer"
+
+msgctxt "Index type"
+msgid "ind 418 / 20%:n vaihtelu"
+msgstr "ind 418 / 10/20 %:s variationer"
+
+msgctxt "Index type"
+msgid "ind 392"
+msgstr "ind 392"
+
+msgctxt "Index type"
+msgid "ind 100 (pyöristys)"
+msgstr "ind 100 (avrundning)"
+
+msgctxt "Index type"
+msgid "ind 100"
+msgstr "ind 100"
+
+msgctxt "Due dates type"
+msgid "Custom"
+msgstr "Separat definierad"
+
+msgctxt "Due dates type"
+msgid "Fixed"
+msgstr "Fasta"
+
+msgctxt "Due dates position"
+msgid "Start of month"
+msgstr "I början av månaden"
+
+msgctxt "Due dates position"
+msgid "Middle of month"
+msgstr "Mitt i månaden"
+
+msgctxt "Rent adjustment type"
+msgid "Discount"
+msgstr "Rabatt "
+
+msgctxt "Rent adjustment type"
+msgid "Increase"
+msgstr "Förhöjning"
+
+msgctxt "Rent Adjustment amount type"
+msgid "% per year"
+msgstr "% per år"
+
+msgctxt "Rent Adjustment amount type"
+msgid "€ per year"
+msgstr "€ per år"
+
+msgctxt "Rent Adjustment amount type"
+msgid "€ total"
+msgstr "€ totalt"
+
+msgctxt "Subvention type"
+msgid "Form of management"
+msgstr "Upplåtelseform"
+
+msgctxt "Subvention type"
+msgid "Re-lease"
+msgstr "Återarrendering"
+
+msgctxt "Invoice delivery method"
+msgid "Mail"
+msgstr "Post"
+
+msgctxt "Invoice delivery method"
+msgid "Electronic"
+msgstr "E-räkning"
+
+msgctxt "Invoice state"
+msgid "Open"
+msgstr "Öppen"
+
+msgctxt "Invoice state"
+msgid "Paid"
+msgstr "Betald"
+
+msgctxt "Invoice state"
+msgid "Refunded"
+msgstr "Gottskriven"
+
+msgctxt "Invoice type"
+msgid "Charge"
+msgstr "Faktura"
+
+msgctxt "Invoice type"
+msgid "Credit note"
+msgstr "Kreditfaktura"
+
+msgctxt "Contact type"
+msgid "Person"
+msgstr "Person"
+
+msgctxt "Contact type"
+msgid "Business"
+msgstr "Företag"
+
+msgctxt "Contact type"
+msgid "Unit"
+msgstr "Enhet"
+
+msgctxt "Contact type"
+msgid "Association"
+msgstr "Gemenskap"
+
+msgctxt "Contact type"
+msgid "Other"
+msgstr "Övrigt"
+
+msgctxt "Infill development compensation"
+msgid "Ongoing"
+msgstr "Anhängig"
+
+msgctxt "Infill development compensation"
+msgid "Negotiating"
+msgstr "Förhandling"
+
+msgctxt "Infill development compensation"
+msgid "Decision"
+msgstr "Beslut"
+
+msgctxt "Area type"
+msgid "Lease area"
+msgstr "Arrendeområde"
+
+msgctxt "Area type"
+msgid "Plan unit"
+msgstr "Planenhet"
+
+msgctxt "Area type"
+msgid "Real property"
+msgstr "Fastighet"
+
+msgctxt "Area type"
+msgid "Unseparated parcel"
+msgstr "Outbrutet område"
+
+msgctxt "Area type"
+msgid "Plot division"
+msgstr "Tomtindelning"
+
+msgctxt "Area type"
+msgid "Basis of rent"
+msgstr "Arrenderingsprincip "
+
+msgctxt "Area type"
+msgid "Infill development compensation"
+msgstr "Ersättning för kompletteringsbyggande"
+
+msgctxt "Area type"
+msgid "Detailed plan"
+msgstr "Detaljplan"
+
+msgctxt "Area type"
+msgid "Other"
+msgstr "Övrigt"
+
+msgctxt "Email log type"
+msgid "Constructability"
+msgstr "Byggbarhet"
+
+msgctxt "Leasehold transfer party type"
+msgid "Lessor"
+msgstr "Arrendegivare"
+
+msgctxt "Leasehold transfer party type"
+msgid "Conveyor"
+msgstr "Överlåtare"
+
+msgctxt "Leasehold transfer party type"
+msgid "Acquirer"
+msgstr "Mottagare"
+
+msgctxt "Decision type kind"
+msgid "Lease cancellation"
+msgstr "Uppsägning av arrendeavtal"
+
+msgctxt "Decision type kind"
+msgid "Basis of Rent"
+msgstr "Arrenderingsprincip"
+
+msgctxt "Decision type kind"
+msgid "Lease service unit transfer"
+msgstr ""
+
+msgctxt "Detailed plan class"
+msgid "Pending"
+msgstr "Öppen"
+
+msgctxt "Detailed plan class"
+msgid "Effective"
+msgstr "Gällande"
+
+msgctxt "Basis of rent type"
+msgid "Lease"
+msgstr "Arrende"
+
+msgctxt "Basis of rent type"
+msgid "Lease (old)"
+msgstr "Arrende (gammalt)"
+
+msgctxt "Basis of rent type"
+msgid "Temporary"
+msgstr "Tillfälligt"
+
+msgctxt "Basis of rent type"
+msgid "Additional yard"
+msgstr "Tilläggsgård"
+
+msgctxt "Basis of rent type"
+msgid "Field"
+msgstr "Åker"
+
+msgctxt "Basis of rent type"
+msgid "Mast"
+msgstr "Mast"
+
+msgctxt "Basis of rent zone"
+msgid "Zone 1"
+msgstr "Zon 1"
+
+msgctxt "Basis of rent zone"
+msgid "Zone 2"
+msgstr "Zon 2"
+
+msgctxt "Basis of rent zone"
+msgid "Zone 3"
+msgstr "Zon 3"
+
+msgctxt "Plan Unit Status"
+msgid "Present"
+msgstr "Nutid"
+
+msgctxt "Plan Unit Status"
+msgid "Pending"
+msgstr "Anhängig"
+
+msgctxt "Periodic Rent Adjustment Type"
+msgid "Periodic Rent Adjustment 20y/20y"
+msgstr ""
+
+msgctxt "Periodic Rent Adjustment Type"
+msgid "Periodic Rent Adjustment 20y/10y"
+msgstr ""
+
+msgctxt "Collection stage"
+msgid "Risk of demolition"
+msgstr ""
+
+msgctxt "Collection stage"
+msgid "Risk of demolition and litigation"
+msgstr ""
+
+msgctxt "Collection stage"
+msgid "Risk of litigation"
+msgstr ""
+
+msgctxt "Collection stage"
+msgid "Risk of termination and litigation"
+msgstr ""
+
+msgctxt "Collection stage"
+msgid "Simple payment reminder"
+msgstr ""
+
+msgctxt "Collection stage"
+msgid "Payment demand"
+msgstr ""
+
+msgctxt "Collection stage"
+msgid "Payment deferral"
+msgstr ""
+
+msgctxt "Collection stage"
+msgid "Contract change"
+msgstr ""
+
+msgctxt "Collection stage"
+msgid "Bankruptcy or reorganization"
+msgstr ""
+
+msgctxt "Collection stage"
+msgid "Distraint"
+msgstr ""
+
+msgctxt "Collection stage"
+msgid "Distraint notice"
+msgstr ""
+
+msgctxt "Collection stage"
+msgid "Notice"
+msgstr ""
+
+msgctxt "Collection stage"
+msgid "Complaint or other obstruction"
+msgstr ""
+
+msgctxt "Preparation state"
+msgid "Missing lease property"
+msgstr ""
+
+msgctxt "Preparation state"
+msgid "Missing lease area geometry"
+msgstr ""
+
+msgctxt "Preparation state"
+msgid "Missing tenant"
+msgstr ""
+
+msgctxt "Preparation state"
+msgid "Missing rent"
+msgstr ""
+
+msgctxt "Preparation state"
+msgid "Missing decision"
+msgstr ""
+
+msgctxt "Preparation state"
+msgid "Missing constructability"
+msgstr ""
+
+msgctxt "Preparation state"
+msgid "Contract not signed"
+msgstr ""
+
+msgctxt "Preparation state"
+msgid "Rent not marked ready"
+msgstr ""
+
+msgctxt "Preparation state"
+msgid "Invoicing not started"
+msgstr ""
+
+msgid "Going to SAP"
+msgstr "På väg till SAP"
+
+msgctxt "Model name"
+msgid "Area source"
+msgstr "Källa till området"
+
+msgid "Area type"
+msgstr "Typ av området"
+
+msgid "External ID"
+msgstr "Yttre identifierare"
+
+msgid "Geometry"
+msgstr "Form"
+
+msgid "Metadata"
+msgstr "Metainformation"
+
+msgid "Source"
+msgstr "Källa"
+
+msgctxt "Model name"
+msgid "Area"
+msgstr "Område"
+
+msgid "Note"
+msgstr "Kommentar"
+
+msgctxt "Model name"
+msgid "Area note"
+msgstr "Villkor att komma ihåg"
+
+msgctxt "Model name"
+msgid "Area notes"
+msgstr "Villkor att komma ihåg"
+
+msgctxt "Model name"
+msgid "Basis of rent plot type"
+msgstr "Typ av tomt"
+
+msgctxt "Model name"
+msgid "Basis of rent plot types"
+msgstr "Typer av tomt"
+
+msgctxt "Model name"
+msgid "Basis of rent build permission type"
+msgstr "Typ av byggrätt"
+
+msgctxt "Model name"
+msgid "Basis of rent build permission types"
+msgstr "Typer av byggrätt"
+
+msgid "Plot type"
+msgstr "Typ av tomt"
+
+msgid "Detailed plan identifier"
+msgstr "Detaljplan"
+
+msgid "Form of management"
+msgstr "Upplåtelseform"
+
+msgid "Form of financing"
+msgstr "Finansieringsform"
+
+msgid "Lease rights end date"
+msgstr "Arrenderätten upphör"
+
+msgid "Index"
+msgstr "Index"
+
+msgctxt "Model name"
+msgid "Basis of rent"
+msgstr "Arrenderingssprincip"
+
+msgctxt "Model name"
+msgid "Basis of rents"
+msgstr "Arrenderingsprinciper"
+
+msgid "Basis of rent"
+msgstr "Arrenderingssprincip"
+
+msgid "Build permission type"
+msgstr "Typ av byggrätt"
+
+msgid "Amount"
+msgstr "Mängd"
+
+msgid "Area unit"
+msgstr "Arealenhet"
+
+msgctxt "Model name"
+msgid "Basis of rent rate"
+msgstr "Pris för arrenderingsprincip"
+
+msgctxt "Model name"
+msgid "Basis of rent rates"
+msgstr "Priser för arrenderingsprincip"
+
+msgctxt "Model name"
+msgid "Basis of rent property identifier"
+msgstr "Arrenderingsprincipens Fastighetsbeteckning"
+
+msgctxt "Model name"
+msgid "Basis of rent property identifiers"
+msgstr "Arrenderingsprincipens Fastighetsbeteckningar"
+
+msgid "Reference number"
+msgstr "Diarienummer"
+
+msgid "Decision maker"
+msgstr "Beslutsfattare"
+
+msgid "Decision date"
+msgstr "Beslutsdatum"
+
+msgid "Section"
+msgstr "Paragraf"
+
+msgctxt "Model name"
+msgid "Basis of rent decision"
+msgstr "Beslut om arrenderingsprincip"
+
+msgctxt "Model name"
+msgid "Basis of rent decisions"
+msgstr "Beslut om arrenderingsprincip"
+
+msgctxt "Model name"
+msgid "Comment topic"
+msgstr "Kommentarens ämne"
+
+msgctxt "Model name"
+msgid "Comment topics"
+msgstr "Kommentarens ämnen"
+
+msgid "Topic"
+msgstr "Ämne"
+
+msgctxt "Model name"
+msgid "Comment"
+msgstr "Kommentar"
+
+msgctxt "Model name"
+msgid "Comments"
+msgstr "Kommentarer"
+
+msgid "Type"
+msgstr "Typ"
+
+msgid "First name"
+msgstr "Förnamn"
+
+msgid "Last name"
+msgstr "Efternamn"
+
+msgid "Name"
+msgstr "Namn"
+
+msgid "c/o"
+msgstr "c/o"
+
+msgid "Postal code"
+msgstr "Postnummer"
+
+msgid "City"
+msgstr "Stad"
+
+msgid "Country"
+msgstr "Land"
+
+msgid "Email"
+msgstr "E-post"
+
+msgid "Phone"
+msgstr "Telefon"
+
+msgid "Language"
+msgstr "Språk"
+
+msgid "National identification number"
+msgstr "Personbeteckning"
+
+msgid "Address protection"
+msgstr "Spärrmarkering"
+
+msgid "SAP customer number"
+msgstr "SAP kundnummer"
+
+msgid "Electronic billing address"
+msgstr "Nätfaktureringsadress"
+
+msgid "Partner code"
+msgstr "Partnerkod"
+
+msgid "Is a lessor"
+msgstr "Är det arrendegivaren"
+
+msgid "SAP sales office"
+msgstr "SAP säljkontor"
+
+msgctxt "Model name"
+msgid "Contact"
+msgstr "Kontaktuppgift"
+
+msgctxt "Model name"
+msgid "Contacts"
+msgstr "Kontaktuppgifter"
+
+#. Translators: Replaces the name of a person with a generic term.
+msgctxt "Replaces persons name"
+msgid "PRIVATE"
+msgstr "PRIVAT"
+
+#, python-brace-format
+msgid "{name} (National Identification Number {id})"
+msgstr "{name} (Personbeteckning {id})"
+
+#, python-brace-format
+msgid "{name} (Business ID {id})"
+msgstr "{name} (FO-nummer {id})"
+
+msgctxt "Model name"
+msgid "Contract type"
+msgstr "Typ av avtal"
+
+msgctxt "Model name"
+msgid "Contract types"
+msgstr "Typer av avtal"
+
+msgid "Contract type"
+msgstr "Typ av avtal"
+
+msgid "Contract number"
+msgstr "Avtalsnummer"
+
+msgid "Signing date"
+msgstr "Datum för underteckning"
+
+msgid "Sign by date"
+msgstr "Ska undertecknas senast"
+
+msgid "Signing note"
+msgstr "Kommentar till underteckningen"
+
+msgid "First call sent"
+msgstr "1. inbjudan skickats"
+
+msgid "Second call sent"
+msgstr "2. inbjudan skickats"
+
+msgid "Third call sent"
+msgstr "3. inbjudan skickats"
+
+msgid "Is readjustment decision"
+msgstr "Beslut om arrangemang"
+
+msgid "Decision"
+msgstr "Beslut"
+
+msgid "KTJ link"
+msgstr "Länk till KTJ:s intyg om arrenderätt"
+
+msgid "Institution identifier"
+msgstr "Inrättningskod"
+
+msgid "Executor"
+msgstr "Exekutor"
+
+msgctxt "Model name"
+msgid "Contract"
+msgstr "Avtal"
+
+msgctxt "Model name"
+msgid "Contracts"
+msgstr "Avtal"
+
+msgctxt "Model name"
+msgid "Collateral type"
+msgstr "Typ av säkerhet"
+
+msgctxt "Model name"
+msgid "Collateral types"
+msgstr "Typer av säkerhet"
+
+msgid "Contract"
+msgstr "Avtal"
+
+msgid "Collateral type"
+msgstr "Typ av säkerhet"
+
+msgid "Other type"
+msgstr "Annan typ av säkerhet"
+
+msgid "Number"
+msgstr "Nummer"
+
+msgid "Deed date"
+msgstr "Datum för pantbrev"
+
+msgid "Total amount"
+msgstr "Kapital"
+
+msgid "Returned date"
+msgstr "Returnerat datum"
+
+msgctxt "Model name"
+msgid "Collateral"
+msgstr "Säkerhet"
+
+msgctxt "Model name"
+msgid "Collaterals"
+msgstr "Säkerheter"
+
+msgid "Description"
+msgstr "Förklaring"
+
+msgctxt "Model name"
+msgid "Contract change"
+msgstr "Avtalsändring"
+
+msgctxt "Model name"
+msgid "Contract changes"
+msgstr "Avtalsändringar"
+
+msgid "File"
+msgstr "Fil"
+
+msgid "Uploader"
+msgstr "Laddare"
+
+msgid "Time uploaded"
+msgstr "Laddningsdatum"
+
+msgctxt "Model name"
+msgid "Collection letter"
+msgstr "Inkassobrev"
+
+msgctxt "Model name"
+msgid "Collection letters"
+msgstr "Inkassobrev"
+
+msgctxt "Model name"
+msgid "Collection letter template"
+msgstr "Mall för inkassobrev"
+
+msgctxt "Model name"
+msgid "Collection letter templates"
+msgstr "Mallar för inkassobrev"
+
+msgid "Collection stage"
+msgstr ""
+
+msgid "Sent date"
+msgstr ""
+
+msgid "Inspection date"
+msgstr ""
+
+msgid "Postpone date"
+msgstr "Uppskovsdatum"
+
+msgid "Entire lease"
+msgstr ""
+
+msgctxt "Model name"
+msgid "Collection letter note"
+msgstr "Påminnelse om inkasso"
+
+msgctxt "Model name"
+msgid "Collection letter notes"
+msgstr "Påminnelser om inkasso"
+
+msgctxt "Model name"
+msgid "Collection court decision"
+msgstr "Tingsrättens beslut"
+
+msgctxt "Model name"
+msgid "Collection court decisions"
+msgstr "Tingsrättens beslut"
+
+msgid "Reference rate"
+msgstr "Referensränta"
+
+msgid "Penalty rate"
+msgstr "Förseningsränta"
+
+msgctxt "Model name"
+msgid "Interest rate"
+msgstr "Ränta"
+
+msgctxt "Model name"
+msgid "Interest rates"
+msgstr "Räntor"
+
+msgctxt "Model name"
+msgid "Decision maker"
+msgstr "Beslutsfattare"
+
+msgctxt "Model name"
+msgid "Decision makers"
+msgstr "Beslutsfattare"
+
+msgid "Decision type kind"
+msgstr "Beslutstypens art"
+
+msgctxt "Model name"
+msgid "Decision type"
+msgstr "Beslutstyp"
+
+msgctxt "Model name"
+msgid "Decision types"
+msgstr "Beslutstyper"
+
+msgctxt "Model name"
+msgid "Decision"
+msgstr "Beslut"
+
+msgctxt "Model name"
+msgid "Decisions"
+msgstr "Beslut"
+
+msgctxt "Model name"
+msgid "Condition type"
+msgstr "Typ av villkor"
+
+msgctxt "Model name"
+msgid "Condition types"
+msgstr "Typer av villkor"
+
+msgid "Supervision date"
+msgstr "Övervakningsdatum"
+
+msgid "Supervised date"
+msgstr "Övervakat datum"
+
+msgctxt "Model name"
+msgid "Condition"
+msgstr "Villkor"
+
+msgctxt "Model name"
+msgid "Conditions"
+msgstr "Villkor"
+
+msgid "Accepter"
+msgstr "Godkänd av"
+
+msgid "Class"
+msgstr "Kategori"
+
+msgid "Diary number"
+msgstr "Diarienummer"
+
+msgid "Plan stage"
+msgstr "Planeringsfas"
+
+msgid "Lawfulness date"
+msgstr "Ikraftträdande"
+
+msgctxt "Model name"
+msgid "Detailed plan"
+msgstr "Detaljplan"
+
+msgctxt "Model name"
+msgid "Detailed plans"
+msgstr "Detaljplaner"
+
+msgid "Email log type"
+msgstr "Typ av e-postlogg"
+
+msgctxt "Model name"
+msgid "Email log"
+msgstr "E-postlogg"
+
+msgctxt "Model name"
+msgid "Email logs"
+msgstr "E-postloggar"
+
+msgid "Lease contract change date"
+msgstr "Ändringsdatum för arrendeavtal"
+
+msgctxt "Model name"
+msgid "Infill development compensation"
+msgstr "Ersättning för kompletteringsbyggande"
+
+msgctxt "Model name"
+msgid "Infill development compensations"
+msgstr "Ersättningar för kompletteringsbyggande"
+
+msgid "Infill development compensation"
+msgstr "Ersättning för kompletteringsbyggande"
+
+msgid "Monetary compensation amount"
+msgstr "Penningersättning"
+
+msgid "Compensation investment amount"
+msgstr "Ersättningsinvesteringar"
+
+msgid "Increase in value"
+msgstr "Värdeökning"
+
+msgid "Part of the increase in value"
+msgstr "Andel av värdeökningen"
+
+msgid "Discount in rent"
+msgstr "Arrenderabatt"
+
+msgid "Year"
+msgstr "År"
+
+msgid "Sent to SAP date"
+msgstr "Betalningen skickats SAP"
+
+msgctxt "Model name"
+msgid "Infill development compensation lease"
+msgstr "Ersättning för arrende för kompletteringsbyggande"
+
+msgctxt "Model name"
+msgid "Infill development compensation leases"
+msgstr "Ersättning för arrenden för kompletteringsbyggande"
+
+msgid "Infill development compensation lease"
+msgstr "Ersättning för arrende för kompletteringsbyggande"
+
+msgctxt "Model name"
+msgid "Infill development compensation decision"
+msgstr "Beslut om ersättning för kompletteringsbyggande"
+
+msgctxt "Model name"
+msgid "Infill development compensation decisions"
+msgstr "Beslut om ersättning för kompletteringsbyggande"
+
+msgid "Floor m2"
+msgstr "K-m2"
+
+msgid "Amount per floor m^2"
+msgstr "€ / k-m2"
+
+msgctxt "Model name"
+msgid "Infill development compensation intended use"
+msgstr "Användningsändamål för ersättning för kompletteringsbyggande"
+
+msgctxt "Model name"
+msgid "Infill development compensation intended uses"
+msgstr "Användningsändamål för ersättning för kompletteringsbyggande"
+
+msgctxt "Model name"
+msgid "Infill development compensation attachment"
+msgstr "Bifogad fil till ersättning för kompletteringsbyggande"
+
+msgctxt "Model name"
+msgid "Infill development compensation attachments"
+msgstr "Bifogad filer till ersättning för kompletteringsbyggande"
+
+msgid "Inspector"
+msgstr "Inspektör"
+
+msgctxt "Model name"
+msgid "Inspection"
+msgstr "Inspektion"
+
+msgctxt "Model name"
+msgid "Inspections"
+msgstr "Inspektioner"
+
+msgctxt "Model name"
+msgid "Inspection attachment"
+msgstr "Bilaga till inspektion"
+
+msgctxt "Model name"
+msgid "Inspection attachments"
+msgstr "Bilagor till inspektion"
+
+msgid "Billing period start date"
+msgstr "Startdatum för faktureringsperiod"
+
+msgid "Billing period end date"
+msgstr "Slutdatum för faktureringsperiod"
+
+msgctxt "Model name"
+msgid "Invoice set"
+msgstr "Fakturagrupp"
+
+msgid "Invoice set"
+msgstr "Fakturagrupper"
+
+msgid "Recipient"
+msgstr "Fakturamottagare"
+
+msgid "Sent to SAP at"
+msgstr "Skickats till SAP"
+
+msgid "SAP ID"
+msgstr "SAP-nummer"
+
+msgid "Adjusted due date"
+msgstr "Förfallodatum (överfört)"
+
+msgid "Invoicing date"
+msgstr "Faktureringsdatum"
+
+msgid "Billed amount"
+msgstr "Fakturerat antal"
+
+msgid "Outstanding amount"
+msgstr "Obetald mängd"
+
+msgid "Payment notification date"
+msgstr "Datum för betalningspåminnelse"
+
+msgid "Collection charge"
+msgstr "Inkassoavgift"
+
+msgid "Payment notification catalog date"
+msgstr "Betalningsuppmaning förteckning"
+
+msgid "Delivery method"
+msgstr "E eller pappersfaktura"
+
+msgid "Notes"
+msgstr "Meddelande"
+
+msgid "Is automatically generated?"
+msgstr "Automatiskt skapat?"
+
+msgid "Credited invoice"
+msgstr "Gottskriven faktura"
+
+msgid "Interest invoice for"
+msgstr "Ränta på fakturan"
+
+msgctxt "Model name"
+msgid "Invoice"
+msgstr "Faktura"
+
+msgctxt "Model name"
+msgid "Invoices"
+msgstr "Fakturor"
+
+msgid "Cannot credit an invoice that has been refunded."
+msgstr ""
+
+msgctxt "Model name"
+msgid "Invoice note"
+msgstr "Fakturans meddelande"
+
+msgctxt "Model name"
+msgid "Invoice notes"
+msgstr "Fakturans meddelanden"
+
+msgid "Tenant"
+msgstr "Arrendator"
+
+msgid "Receivable type"
+msgstr "Fordringsart"
+
+msgctxt "Model name"
+msgid "Invoice row"
+msgstr "Fakturarad"
+
+msgctxt "Model name"
+msgid "Invoice rows"
+msgstr "Fakturarader "
+
+msgctxt "Model name"
+msgid "Invoice payment"
+msgstr "Betalning"
+
+msgctxt "Model name"
+msgid "Invoice payments"
+msgstr "Betalningar"
+
+msgid "Is master?"
+msgstr "Är det originalet?"
+
+msgid "Master timestamp"
+msgstr "Originalets tidsstämpel"
+
+msgid ""
+"The master land item has already created. There can be only one master land "
+"item per lease area and identifier."
+msgstr ""
+"Den ursprungliga planenheten har redan skapats. Det kan endast finnas en "
+"ursprunglig planenhet per arrendeområdets planenhetsidentifierare."
+
+msgid "Area in square meters"
+msgstr "Total areal i kvadratmeter"
+
+msgid "Section area"
+msgstr "Skärningsyta"
+
+msgid "Location"
+msgstr "Läge"
+
+msgid "Preconstruction state"
+msgstr ""
+"Utredningsgrad (Förkonstruktion, flyttning av ledningar och kommunalteknik)"
+
+msgid "Preconstruction estimated construction readiness"
+msgstr "Uppskattad tidpunkt för byggberedskap (Förkonstruktion)"
+
+msgid "Preconstruction inspection"
+msgstr ""
+"Tidpunkt för granskning (Förkonstruktion, flyttning av ledningar och "
+"kommunalteknik)"
+
+msgid "Demolition state"
+msgstr "Utredningsgrad (Rivning)"
+
+msgid "Polluted land state"
+msgstr "Utredningsgrad (Förorenat markområde (PIMA))"
+
+msgid "Polluted land rent condition state"
+msgstr "Arrendevillkor (fråga)"
+
+msgid "Polluted land rent condition date"
+msgstr "Datum för fråga om arrendevillkor"
+
+msgid "ProjectWise number"
+msgstr "ProjectWise objektnummer"
+
+msgid "Constructability report state"
+msgstr "Utredningsgrad (Byggbarhetsutredning)"
+
+msgid "Constructability report investigation state"
+msgstr "Status för byggbarhetsutredning"
+
+msgid "Constructability report signing date"
+msgstr "Datum för underteckning"
+
+msgid "Constructability report signer"
+msgstr "Undertecknare"
+
+msgid "Other state"
+msgstr "Utredningsgrad (Övriga)"
+
+msgid "Archived decision"
+msgstr "Arkiveringsbeslut"
+
+msgctxt "Model name"
+msgid "Lease area"
+msgstr "Arrendeområde"
+
+msgctxt "Model name"
+msgid "Lease areas"
+msgstr "Arrendeområden"
+
+msgid "Is primary?"
+msgstr "Primär?"
+
+msgctxt "Model name"
+msgid "Lease area address"
+msgstr "Adress till arrendeområdet"
+
+msgctxt "Model name"
+msgid "Lease area addresses"
+msgstr "Adresser till arrendeområdet"
+
+msgctxt "Model name"
+msgid "Lease area attachment"
+msgstr "Bilaga till arrendeområdet"
+
+msgctxt "Model name"
+msgid "Lease area attachments"
+msgstr "Bilagor till arrendeområdet"
+
+msgid "AHJO reference number"
+msgstr "AHJO diarienummer"
+
+msgid "Is static?"
+msgstr "Permanent?"
+
+msgctxt "Model name"
+msgid "Constructability description"
+msgstr "Redogörelse om byggbarhet"
+
+msgctxt "Model name"
+msgid "Constructability descriptions"
+msgstr "Redogörelser om byggbarhet"
+
+msgid "Registration date"
+msgstr "Registreringsdatum"
+
+msgid "Repeal date"
+msgstr "Upphävningsdatum"
+
+msgid "At time of contract"
+msgstr "Vid tidpunkten för avtalet"
+
+msgctxt "Model name"
+msgid "Plot"
+msgstr "Tomt"
+
+msgctxt "Model name"
+msgid "Plots"
+msgstr "Tomter"
+
+msgctxt "Model name"
+msgid "Plan unit type"
+msgstr "Planenhetens art"
+
+msgctxt "Model name"
+msgid "Plan unit types"
+msgstr "Planenhetens arter"
+
+msgctxt "Model name"
+msgid "Plot divisions state"
+msgstr "Tomtindelningens skede"
+
+msgctxt "Model name"
+msgid "Plot division states"
+msgstr "Tomtindelningens skeden"
+
+msgctxt "Model name"
+msgid "Plan unit state"
+msgstr "Planenhetens form"
+
+msgctxt "Model name"
+msgid "Plan unit states"
+msgstr "Planenhetens former"
+
+msgctxt "Model name"
+msgid "Plan unit intended use"
+msgstr "Planenhetens användningsändamål"
+
+msgctxt "Model name"
+msgid "Plan unit intended uses"
+msgstr "Planenhetens användningsändamål"
+
+msgid "Plot division identifier"
+msgstr "Tomtindelningens identifierare"
+
+msgid "Plot division date of approval"
+msgstr "Datum för godkännande av tomtindelning"
+
+msgid "Plot division effective date"
+msgstr "Tomtindelning Datum för ifkraftträdande av tomtindelningen"
+
+msgid "Plot division state"
+msgstr "Tomtindelningens form"
+
+msgid "Detailed plan latest processing date"
+msgstr "Sista behandlingsdatum för detaljplanen"
+
+msgid "Note for latest processing date"
+msgstr "Sista behandlingsdatum för detaljplanen. förklaring"
+
+msgid "Plan unit type"
+msgstr "Planenhetens art"
+
+msgid "Plan unit state"
+msgstr "Planenhetens form"
+
+msgid "Plan unit intended use"
+msgstr "Planenhetens användningsändamål"
+
+msgid "Plan unit status"
+msgstr "Status för planenheten"
+
+msgctxt "Model name"
+msgid "Plan unit"
+msgstr "Planenhet"
+
+msgctxt "Model name"
+msgid "Plan units"
+msgstr "Planenheter"
+
+msgid "SAP material code"
+msgstr "SAP materialnummer"
+
+msgid "SAP order item number"
+msgstr "SAP beställningsnummer"
+
+msgid "If 'SAP project number' is set, it will be used instead of this value."
+msgstr ""
+
+msgid "SAP project number"
+msgstr ""
+
+msgid "This field takes priority over 'SAP order item number' if both are set."
+msgstr ""
+
+msgid "Due dates position"
+msgstr "Läge för förfallodatum"
+
+msgid "Is the Lease Type active?"
+msgstr ""
+
+msgid "Is active?"
+msgstr "Disponibelt?"
+
+msgctxt "Model name"
+msgid "Lease type"
+msgstr "Art"
+
+msgctxt "Model name"
+msgid "Lease types"
+msgstr "Arter"
+
+msgctxt "Model name"
+msgid "Municipality"
+msgstr "Stad"
+
+msgctxt "Model name"
+msgid "Municipalities"
+msgstr "Stad"
+
+msgid "Municipality"
+msgstr "Stad"
+
+msgctxt "Model name"
+msgid "District"
+msgstr "Stadsdel"
+
+msgctxt "Model name"
+msgid "Districts"
+msgstr "Stadsdelar"
+
+msgid "Is the intended use active?"
+msgstr "Är den avsedda användningen aktiv?"
+
+msgctxt "Model name"
+msgid "Intended use"
+msgstr "Användningsändamål"
+
+msgctxt "Model name"
+msgid "Intended uses"
+msgstr "Användningsändamål"
+
+msgctxt "Model name"
+msgid "Statistical use"
+msgstr "Statistiskt huvudanvändningsändamål"
+
+msgctxt "Model name"
+msgid "Statistical uses"
+msgstr "Statistiska huvudanvändningsändamål"
+
+msgctxt "Model name"
+msgid "Supportive housing"
+msgstr "Specialbostad"
+
+msgctxt "Model name"
+msgid "Supportive housings"
+msgstr "Specialbostäder"
+
+msgctxt "Model name"
+msgid "Form of financing"
+msgstr "Finansieringsform"
+
+msgctxt "Model name"
+msgid "Forms of financing"
+msgstr "Finansieringsformer"
+
+msgctxt "Model name"
+msgid "Form of management"
+msgstr "Upplåtelseform"
+
+msgctxt "Model name"
+msgid "Forms of management"
+msgstr "Upplåtelseformer"
+
+msgctxt "Model name"
+msgid "Form of regulation"
+msgstr "Regleringsform"
+
+msgctxt "Model name"
+msgid "Forms of regulation"
+msgstr "Regleringformer"
+
+msgctxt "Model name"
+msgid "Hitas"
+msgstr "Hitas"
+
+msgid "Period type"
+msgstr "Typ av uppsägningstid"
+
+msgid "Duration"
+msgstr "Längd"
+
+msgid "In ISO 8601 Duration format"
+msgstr "I ISO 8601 Duration-form"
+
+msgctxt "Model name"
+msgid "Notice period"
+msgstr "Uppsägningstid"
+
+msgctxt "Model name"
+msgid "Notice periods"
+msgstr "Uppsägningtider"
+
+msgctxt "Model name"
+msgid "Special project"
+msgstr "Specialprojekt"
+
+msgctxt "Model name"
+msgid "Special projects"
+msgstr "Specialprojekt"
+
+msgctxt "Model name"
+msgid "Reservation procedure"
+msgstr "Förfaring för anvisningen"
+
+msgctxt "Model name"
+msgid "Reservation Procedures"
+msgstr "Förfaringar för anvisningen"
+
+msgid "Lease type"
+msgstr "Art"
+
+msgid "Sequence number"
+msgstr "Löpande nummer"
+
+msgctxt "Model name"
+msgid "Lease identifier"
+msgstr "Arrendekod"
+
+msgctxt "Model name"
+msgid "Lease identifiers"
+msgstr "Arrendekoder"
+
+msgid "Classification"
+msgstr "Offentlighetsklass"
+
+msgid "Intended use note"
+msgstr "Förklaring för användningsändamålet"
+
+msgid "Transferable"
+msgstr "Överföringsrätt"
+
+msgid "Regulated"
+msgstr "Reglerad"
+
+msgid "Notice note"
+msgstr "Förklaring för uppsägningsanmälan"
+
+msgid "Supportive housing"
+msgstr "Specialbostäder"
+
+msgid "Statistical use"
+msgstr "Statistiskt huvudanvändningsändamål"
+
+msgid "Form of regulation"
+msgstr "Regleringsform"
+
+msgid "Hitas"
+msgstr "Hitas"
+
+msgid "Notice period"
+msgstr "Uppsägningstid"
+
+msgid "Rent info completed at?"
+msgstr "Är arrendeuppgifterna i ordning?"
+
+msgid "Invoicing enabled at?"
+msgstr "Är faktureringen igång?"
+
+msgid "Is subject to VAT?"
+msgstr "Är den underställd mervärdesskatt"
+
+msgid "Real estate developer"
+msgstr "Byggherre"
+
+msgid "Conveyance number"
+msgstr "Överlåtelsenummer"
+
+msgid "Building selling price"
+msgstr "Byggnadens köpeskilling"
+
+msgid "Special project"
+msgstr "Specialprojekt"
+
+msgid "Reservation procedure"
+msgstr "Förfaring för anvisningen"
+
+msgid "Internal order"
+msgstr ""
+
+msgctxt "Model name"
+msgid "Lease"
+msgstr "Arrendering"
+
+msgctxt "Model name"
+msgid "Leases"
+msgstr "Arrenderingar "
+
+msgid "The intended use's service unit must match the lease's service_unit."
+msgstr ""
+
+#, python-brace-format
+msgid "{area_identifier}, {area_addresses}, {area_m2}m2"
+msgstr "{area_identifier}, {area_addresses}, {area_m2}m2"
+
+#, python-brace-format
+msgid "Contract #{contract_number}"
+msgstr "Avtal #{contract_number}"
+
+msgid "Lease must have a start date to generate invoices."
+msgstr ""
+
+msgid "Lease must have a start date to enable invoicing."
+msgstr ""
+
+msgctxt "Model name"
+msgid "Lease state log"
+msgstr "Logg över statusändring för arrenderingen"
+
+msgctxt "Model name"
+msgid "Lease state logs"
+msgstr "Loggar över statusändring för arrenderingen"
+
+msgid "Application received at"
+msgstr "Ansökan inkom kl"
+
+msgid "The date the application was received."
+msgstr "Datumet då ansökan inkom."
+
+msgid "From lease"
+msgstr "Från arrendering"
+
+msgid "To lease"
+msgstr "Till arrendering"
+
+msgid "Lease relation type"
+msgstr "Typ av relation"
+
+msgctxt "Model name"
+msgid "Related lease"
+msgstr "Anknytande arrendering"
+
+msgctxt "Model name"
+msgid "Related leases"
+msgstr "Anknytande arrenderingar"
+
+msgid "File name"
+msgstr "Filnamn"
+
+msgctxt "Model name"
+msgid "Leasehold transfer import log"
+msgstr "Logg över import av arrenderättsöverföringar"
+
+msgctxt "Model name"
+msgid "Leasehold transfer import logs"
+msgstr "Loggar över import av arrenderättsöverföringar"
+
+msgctxt "Model name"
+msgid "Leasehold transfer"
+msgstr "Överföring av arrenderätt"
+
+msgctxt "Model name"
+msgid "Leasehold transfers"
+msgstr "Överföringar av arrenderätt"
+
+msgid "Leasehold transfer"
+msgstr "Överföring av arrenderätt"
+
+msgctxt "Model name"
+msgid "Leasehold transfer property"
+msgstr "Objekt för överföring av arrenderätt"
+
+msgctxt "Model name"
+msgid "Leasehold transfer properties"
+msgstr "Objekt för överföring av arrenderätt"
+
+msgid "Numerator"
+msgstr "Att dela"
+
+msgid "Denominator"
+msgstr "Delad av"
+
+msgctxt "Model name"
+msgid "Leasehold transfer party"
+msgstr "Part vid överföring av arrenderätt"
+
+msgctxt "Model name"
+msgid "Leasehold transfer parties"
+msgstr "Parter vid överföring av arrenderätt"
+
+msgid "Time archived"
+msgstr "Arkiveringstid"
+
+msgid "Archived note"
+msgstr "Arkiveringsanmärkning"
+
+msgctxt "Model name"
+msgid "Receivable type"
+msgstr "Fordringsart"
+
+msgctxt "Model name"
+msgid "Receivable types"
+msgstr "Fordringsarter"
+
+msgctxt "Model name"
+msgid "Rent intended use"
+msgstr "Användningsändamål för arrende"
+
+msgctxt "Model name"
+msgid "Rent intended uses"
+msgstr "Användningsändamål för arrende"
+
+msgid "Index code"
+msgstr ""
+
+msgid "Index name"
+msgstr ""
+
+msgid "Region"
+msgstr ""
+
+msgid "Data source"
+msgstr ""
+
+msgid "Source table updated"
+msgstr ""
+
+msgid "Source table label"
+msgstr ""
+
+msgid "API endpoint URL"
+msgstr ""
+
+msgctxt "model name"
+msgid "price index of old dwellings in housing companies"
+msgstr ""
+
+msgctxt "model name"
+msgid "price indexes of old dwellings in housing companies"
+msgstr ""
+
+msgid "Cycle"
+msgstr "Arrendeperiod"
+
+msgid "Index type"
+msgstr "Identifieringsnumer för indexet"
+
+msgid "Due dates type"
+msgstr "Faktureringsfördelning"
+
+msgid "Due dates per year"
+msgstr "Förfallodagar per år"
+
+msgid "Elementary index"
+msgstr "Basindex "
+
+msgid "Index rounding"
+msgstr "Avrundning"
+
+msgid "X value"
+msgstr "X-tal"
+
+msgid "Y value"
+msgstr "Y-tal"
+
+msgid "Y value start date"
+msgstr "Y-från och med datum"
+
+msgid "Equalization start date"
+msgstr "Utjämning startdatum"
+
+msgid "Equalization end date"
+msgstr "Utjämning slutdatum"
+
+msgid "Manual ratio"
+msgstr "Manuell beräkningsfaktor"
+
+msgid "Manual ratio (previous)"
+msgstr "Manuell beräkningsfaktor (föregående)"
+
+msgid "Payable rent amount"
+msgstr "Hyresbeloppet som ska betalas"
+
+msgid "Payable rent start date"
+msgstr "Startdatum för arrendebetalning"
+
+msgid "Payable rent end date"
+msgstr "Slutdatum för arrendebetalning"
+
+msgid "Override receivable type"
+msgstr "Ersättande Fordringsart"
+
+msgid "Old dwellings in housing companies price index"
+msgstr ""
+
+msgid "Periodic Rent Adjustment Type"
+msgstr ""
+
+msgid "Start price index point figure value"
+msgstr ""
+
+msgid "Start price index point figure year"
+msgstr ""
+
+msgctxt "Model name"
+msgid "Rent"
+msgstr "Arrende"
+
+msgctxt "Model name"
+msgid "Rents"
+msgstr "Arrenden"
+
+msgid "Cannot calculate payable rent. The rent cycle '{}' is not defined."
+msgstr ""
+"Arrendebelopp som ska betalas kan inte beräknas. Arrendeperioden {} har inte "
+"fastställts."
+
+#, python-brace-format
+msgid "Manual ratio {ratio}"
+msgstr "Manuell beräkningsfaktor {ratio}"
+
+msgid "Manual ratio not found!"
+msgstr "Den manuella beräkningsfaktorn hittades inte!"
+
+msgid "Average index for the year {} is not available!"
+msgstr "Årets {} genomsnittsindex är inte känt!"
+
+msgid "Rent"
+msgstr "Arrende"
+
+msgid "Day"
+msgstr "Dag"
+
+msgid "Month"
+msgstr "Månad"
+
+msgctxt "Model name"
+msgid "Rent due date"
+msgstr "Förfallodag"
+
+msgctxt "Model name"
+msgid "Rent due dates"
+msgstr "Förfallodagar"
+
+msgctxt "Model name"
+msgid "Fixed initial year rent"
+msgstr "Fast arrende för början av året"
+
+msgctxt "Model name"
+msgid "Fixed initial year rents"
+msgstr "Fasta arrenden för början av året"
+
+msgid "Period"
+msgstr "Enhet"
+
+msgid "Base amount"
+msgstr "Arrende som ligger till grund för arrendeberäkningen"
+
+msgid "Base amount period"
+msgstr "Enhet"
+
+msgid "Base year rent"
+msgstr "Nytt arrende för basår"
+
+msgctxt "Model name"
+msgid "Contract rent"
+msgstr "Avtalsarrende"
+
+msgctxt "Model name"
+msgid "Contract rents"
+msgstr "Avtalsarrenden"
+
+msgid "Factor"
+msgstr "Beräkningsfaktor"
+
+msgctxt "Model name"
+msgid "Index adjusted rent"
+msgstr "Indexjusterat arrende"
+
+msgctxt "Model name"
+msgid "Index adjusted rents"
+msgstr "Indexjusterade arrenden"
+
+msgid "Full amount"
+msgstr "Total mängd"
+
+msgid "Amount type"
+msgstr "Mängdtyp"
+
+msgid "Amount left"
+msgstr "Kvar"
+
+msgid "Subvention type"
+msgstr "Typ av subvention"
+
+msgid "Subvention base percent"
+msgstr "Basrabatt på marknadsarrende"
+
+msgid "Graduated subvention percent"
+msgstr "Stegvis rabatt"
+
+msgctxt "Model name"
+msgid "Rent adjustment"
+msgstr "Rabatt/Höjning"
+
+msgctxt "Model name"
+msgid "Rent adjustments"
+msgstr "Rabatter/Höjningar"
+
+msgctxt "Model name"
+msgid "Form of management (Subvention)"
+msgstr "Upplåtelseform (Subvention)"
+
+msgid "Rent adjustment"
+msgstr "Rabatt/Höjning"
+
+msgid "Subvention amount"
+msgstr "Subventionens mängd"
+
+msgctxt "Model name"
+msgid "Management subvention (Rent adjustment)"
+msgstr "Subvention för upplåtelseformen (Rabatt)"
+
+msgctxt "Model name"
+msgid "Management subventions (Rent adjustment)"
+msgstr "Subventioner för upplåtelseformen (Rabatt)"
+
+msgid "Subvention percent"
+msgstr "Subventionsprocent"
+
+msgctxt "Model name"
+msgid "Temporary subvention (Rent adjustment)"
+msgstr "Tillfällig rabatt (Rabatt)"
+
+msgctxt "Model name"
+msgid "Temporary subventions (Rent adjustment)"
+msgstr "Tillfälliga rabatter (Rabatt)"
+
+msgid "Difference percent"
+msgstr "Höjning %"
+
+msgid "Calendar year rent"
+msgstr "Arrende för kalenderår"
+
+msgctxt "Model name"
+msgid "Payable rent"
+msgstr "Arrende som ska debiteras"
+
+msgctxt "Model name"
+msgid "Payable rents"
+msgstr "Arrenden som ska debiteras"
+
+msgid "Payable amount"
+msgstr "Arrende som ska debiteras"
+
+msgid "Equalized payable amount"
+msgstr "Utjämnat arrende som ska debiteras"
+
+msgid "Equalization factor"
+msgstr "Utjämningsfaktor "
+
+msgctxt "Model name"
+msgid "Equalized rent"
+msgstr "Utjämnat arrende"
+
+msgctxt "Model name"
+msgid "Equalized rents"
+msgstr "Utjämnade arrenden"
+
+msgctxt "Model name"
+msgid "Index"
+msgstr "Index"
+
+msgctxt "Model name"
+msgid "Indexes"
+msgstr "Index"
+
+msgid "Index {}{} = {}"
+msgstr "Index {}{} = {}"
+
+msgid "Index 1914:1-6=100"
+msgstr "Index 1914:1-6=100"
+
+msgid "Index 1938:8-1939:7=100"
+msgstr "Index 1938:8–1939:7=100"
+
+msgid "Value"
+msgstr "Värde"
+
+msgid "Comment"
+msgstr ""
+
+msgctxt "Model name"
+msgid "Index point figure, yearly"
+msgstr ""
+
+msgctxt "Model name"
+msgid "Index point figures, yearly"
+msgstr ""
+
+msgid "Lease basis of rent"
+msgstr "Arrenderingsprincip för arrenderingen"
+
+msgid "Area amount"
+msgstr "Areal"
+
+msgid "Zone"
+msgstr "Zon"
+
+msgid "Amount per area (index 100)"
+msgstr "Summa per areal (ind 100)"
+
+msgid "Profit margin percentage"
+msgstr "Vinstprocent"
+
+msgid "Discount percentage"
+msgstr "Rabattprocent "
+
+msgid "Plans inspected at"
+msgstr "Ritningarna har granskats datum"
+
+msgid "Plans inspected by"
+msgstr "Ritningarna har granskats av"
+
+msgid "Locked at"
+msgstr "Låst datum"
+
+msgid "Locked by"
+msgstr "Låst av"
+
+msgid "Subvention graduated percent"
+msgstr "Stegvis rabatt"
+
+msgctxt "Model name"
+msgid "Lease basis of rent"
+msgstr "Arrenderingsprincip"
+
+msgctxt "Model name"
+msgid "Lease basis of rents"
+msgstr "Arrenderingsprinciper för arrenderingen"
+
+msgctxt "Model name"
+msgid "Management subvention (Basis of rent)"
+msgstr "Subvention för upplåtelseformen (Arrenderingsprincip)"
+
+msgctxt "Model name"
+msgid "Management subventions (Basis of rent)"
+msgstr "Subventioner för upplåtelseformen (Arrenderingsprincip)"
+
+msgctxt "Model name"
+msgid "Temporary subvention (Basis of rent)"
+msgstr "Tillfällig rabatt (Arrenderingsprincip)"
+
+msgctxt "Model name"
+msgid "Temporary subventions (Basis of rent)"
+msgstr "Tillfälliga rabatter (Arrenderingsprincip)"
+
+msgid "Invoice number sequence name"
+msgstr ""
+
+msgid "First invoice number"
+msgstr ""
+
+msgid "Sender ID in Laske"
+msgstr ""
+
+msgid "Import ID in Laske"
+msgstr ""
+
+msgid "Sales Organisation in Laske"
+msgstr ""
+
+msgid "Fill priority and info?"
+msgstr ""
+
+msgid ""
+"Fill Info and Priority data from a contact into OrderParty and BillingParty "
+"in SalesOrder when creating LASKE XML"
+msgstr ""
+
+msgid "Contract number sequence name"
+msgstr ""
+
+msgid "First contract number"
+msgstr ""
+
+msgid "Default receivable type (rent)"
+msgstr ""
+
+msgid "Receivable type used when creating rent invoices"
+msgstr ""
+
+msgid "Default receivable type (collateral)"
+msgstr ""
+
+msgid ""
+"Receivable type which should be used when creating collateral invoices. On "
+"SAP export, the profit center is filled from this receivable type's "
+"sap_project_number or sap_order_item_number."
+msgstr ""
+
+msgid "Use the override receivable type from rent in automatic invoices?"
+msgstr ""
+
+msgid ""
+"Use the override receivable type from rent in automatic invoices, if it is "
+"present. When creating a rent, some service units (such as KAMA and KuVa) "
+"want to select a receivable type to be used in future automatic invoices. "
+"This helps avoid some technical difficulties in invoice XML generation. "
+"Generation logic would otherwise be unaware of the desired receivable type, "
+"if it is different from the service unit's default receivable type, or the "
+"leasetype's receivable type."
+msgstr ""
+
+msgid "Require 'Application received at' field on lease summary page?"
+msgstr "Är det obligatoriskt att fylla i fältet 'Ansökan inkom kl'?"
+
+msgid ""
+"Make 'Application received at' / 'Hakemuksen saapumispäivä' a required field "
+"on lease summary page."
+msgstr ""
+"Gör 'Ansökan inkom kl' / 'Application received at' till ett obligatoriskt "
+"fält på översiktssidan för hyresavtalet."
+
+msgctxt "Model name"
+msgid "Service unit"
+msgstr ""
+
+msgctxt "Model name"
+msgid "Service units"
+msgstr ""
+
+msgctxt "Model name"
+msgid "Service unit group mapping"
+msgstr ""
+
+msgctxt "Model name"
+msgid "Service unit group mappings"
+msgstr ""
+
+msgid "Reference"
+msgstr "Referens "
+
+msgctxt "Model name"
+msgid "Tenant"
+msgstr "Arrendator"
+
+msgctxt "Model name"
+msgid "Tenants"
+msgstr "Arrendatorer"
+
+msgid "Contact"
+msgstr "Kontaktuppgift"
+
+msgctxt "Model name"
+msgid "Tenant contact"
+msgstr "Arrendatorns kontaktuppgift"
+
+msgctxt "Model name"
+msgid "Tenant contacts"
+msgstr "Arrendatorns kontaktuppgifter"
+
+msgid "Rent share numerator"
+msgstr "Att dela (Fakturaandel)"
+
+msgid "Rent share denominator"
+msgstr "Delad av (Fakturaandel)"
+
+msgctxt "Model name"
+msgid "Tenant rent share"
+msgstr "Arrendatorns fakturaandel"
+
+msgctxt "Model name"
+msgid "Tenant rent shares"
+msgstr "Arrendatorns fakturaandelar"
+
+msgid "Key"
+msgstr "Nyckel"
+
+msgctxt "Model name"
+msgid "UI Datum"
+msgstr "Användargränssnittets datum"
+
+msgctxt "Model name"
+msgid "UI Data"
+msgstr "Användargränssnittets uppgifter"
+
+msgid "Percent"
+msgstr "Procent"
+
+msgctxt "Model name"
+msgid "VAT"
+msgstr "Mervärdesskatt"
+
+msgctxt "Model name"
+msgid "VATs"
+msgstr "Mervärdesskatter"
+
+msgid "VAT {}% {} - {}"
+msgstr "Mervärdesskatt {}% {} - {}"
+
+msgid "Only one VAT can be active at a time"
+msgstr "Endast en mervärdesskatt kan gälla i taget"
+
+msgid "Collaterals"
+msgstr "Säkerheter"
+
+msgid "Show all collaterals"
+msgstr "Visa alla säkerheter"
+
+msgid "Paid"
+msgstr "Betald"
+
+msgid "Returned"
+msgstr "Returnerad"
+
+msgid "Lease id"
+msgstr "Arrendering"
+
+msgid "Lease start date"
+msgstr "Startdatum för arrendering"
+
+msgid "Lease end date"
+msgstr "Slutdatum för arrendering"
+
+msgid ""
+"Show all the payments that have been paid between the start and the end date"
+msgstr "Visa betalningar mellan startdatum och slutdatum"
+
+msgid "Total"
+msgstr "Totalt"
+
+msgid "Invoces in period"
+msgstr "Fakturor under perioden"
+
+msgid "Show all the invoices that have due date between start and end date"
+msgstr ""
+"Visa alla fakturor vars förfallodag ligger mellan start- och slutdatumen"
+
+msgid "Laskutuslaji"
+msgstr "Faktureringstyp"
+
+msgid "Invoice state"
+msgstr "Status för fakturan"
+
+msgid "Recipient name"
+msgstr "Fakturamottagare"
+
+msgid "Recipient address"
+msgstr "Fakturamottagarens adress"
+
+msgctxt "Invoicing review"
+msgid "Invoicing not enabled"
+msgstr "Arrenderingar för vilka fakturering inte pågår"
+
+msgctxt "Invoicing review"
+msgid "Rent info not complete"
+msgstr "Arrenderingar för vilka utarrenderingsuppgifterna inte är i ordning"
+
+msgctxt "Invoicing review"
+msgid "No rents"
+msgstr "Arrenderingar för vilka utarrenderingsuppgifterna saknas"
+
+msgctxt "Invoicing review"
+msgid "No due date"
+msgstr "Arrenderingar utan förfallodatum"
+
+msgctxt "Invoicing review"
+msgid "One time rents with no invoice from max 5 year old leases"
+msgstr ""
+"Arrenderingar (max 5 år gamla) som har fullständigt arrende men inga fakturor"
+
+msgctxt "Invoicing review"
+msgid "Incorrect management shares"
+msgstr "Arrenderingar som har en felaktig besittningsandel"
+
+msgctxt "Invoicing review"
+msgid "Incorrect rent shares"
+msgstr "Arrenderingar som har en felaktig faktureringsandel"
+
+msgctxt "Invoicing review"
+msgid "No tenant contact"
+msgstr "Arrenderingar utan en giltig arrendator"
+
+msgctxt "Invoicing review"
+msgid "No lease area"
+msgstr "Arrenderingar utan ett arrendeobjekt"
+
+msgctxt "Invoicing review"
+msgid "Index type missing"
+msgstr "Indexarten fattas"
+
+msgctxt "Invoicing review"
+msgid "Ongoing rent without rent shares"
+msgstr "Arrenderingar som har giltig hyra men inga faktureringsandel"
+
+msgctxt "Invoicing review"
+msgid "Gaps in billing periods for last 5 years"
+msgstr "Luckor i faktureringsperioder för de senaste 5 åren"
+
+msgid "Invoicing review"
+msgstr "Granskningsrapport för arrenderingens faktureringsuppgifter"
+
+msgid "Show leases that might have errors in their invoicing"
+msgstr "Arrenderingar för vilka det kan finnas fel i faktureringsuppgifterna"
+
+msgctxt "Invoicing review"
+msgid "Section"
+msgstr "Avsnitt"
+
+msgid "Count of Invoices sent to Laske per day"
+msgstr "Antalet fakturor per dag som skickats till Laske-systemet"
+
+msgid ""
+"Shows actual sent invoice counts until yesterday, and estimated counts for "
+"today and beyond"
+msgstr ""
+"Visar antalet fakturor som har skickats fram tills i går. För innevarande "
+"dag och framöver är antalet en uppskattning."
+
+msgid "Send date"
+msgstr "Datum för sändning"
+
+msgid "Estimated invoice count"
+msgstr ""
+
+msgid "Open invoices"
+msgstr "Öppna fakturor"
+
+msgid "Show all the invoices that have their state as \"open\""
+msgstr "Visar alla fakturor för vilka status är \"öppen\""
+
+msgid "Lease database id"
+msgstr ""
+
+msgid "Grand total"
+msgstr "Alla sammanlagt"
+
+msgid "Invoices paid by a contact"
+msgstr "Betalda fakturor per kundnummer"
+
+msgid "Show invoices paid by a contact"
+msgstr "Visar de fakturor en viss kund har betalat"
+
+msgid "Contact identifier"
+msgstr "Kundnummer"
+
+msgid "Number of rows"
+msgstr "Antalet rader"
+
+msgid "Contact rents"
+msgstr "Arrende som ska debiteras av kunden"
+
+msgid "Show all rent amounts from all of the leases the contact is a part of"
+msgstr "Arrendebelopp för alla arrenderingar där kunden är delaktig"
+
+msgid "Lease area identifier"
+msgstr "Objektets identifierare"
+
+msgid "Tenants"
+msgstr "Arrendatorer"
+
+msgid "Rent amount"
+msgstr "Arrendets belopp"
+
+msgid "Rent amount for contact"
+msgstr "Kundens hyra"
+
+msgid "Contact not found"
+msgstr "Klienten hittades inte"
+
+msgid "Decision conditions"
+msgstr "Villkor för beslutet"
+
+msgid ""
+"Show decision conditions that have their supervision date between the given "
+"dates. Excluding conditions that have a supervised date."
+msgstr ""
+"Visar de villkor vars övervakningsdatum är mellan de givna datumen. Med "
+"undantag av de villkor som har ett övervakat datum."
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nej"
+
+msgid "Supervision date exists"
+msgstr "Övervakningsdatum har fastställts"
+
+msgid "Lease area"
+msgstr "Arrendeområde"
+
+msgid "Extra city rent"
+msgstr "Arrenden i andra kommuner"
+
+msgid "The invoiced rent of the leases that are not in the main city"
+msgstr ""
+"Visar beloppen för de fakturerade arrenden som inte är belägna i Helsingfors"
+
+msgid "Tenant name"
+msgstr "Arrendatorns namn"
+
+msgid "Area identifier"
+msgstr "Fastighetsbeteckning"
+
+msgid "Total area"
+msgstr "Total areal"
+
+msgid "Index type leases"
+msgstr "Identifieringsnumer för indexet"
+
+msgid "Show leases with a certain index type"
+msgstr "Visar arrenderingarna för ett visst indexkodnummer"
+
+msgid "Only active leases"
+msgstr "Endast giltiga arrenderingar"
+
+msgid "Leases where invoicing is disabled"
+msgstr "Arrenderingar för vilka fakturering inte pågår"
+
+msgid "Shows active leases where invoicing is not enabled"
+msgstr "Visar pågående arrenderingar för vilka fakturering inte pågår"
+
+msgid "Lease bases of rent"
+msgstr ""
+
+msgid "Shows lease bases of rent"
+msgstr ""
+
+msgid "Lease intended use"
+msgstr ""
+
+msgid "Active lease"
+msgstr ""
+
+msgid "Unit price (index)"
+msgstr "Enhetspris (ind)"
+
+msgid "Initial year rent"
+msgstr "Arrende för början av året"
+
+msgid "Discounted rent"
+msgstr ""
+
+msgid "Subvented initial year rent"
+msgstr "Subventionerat arrende för början av året (ind)"
+
+msgid "Subvention euros per year"
+msgstr "Subvention i euro/år"
+
+msgid "Subvention amount per area"
+msgstr "Subventionerat enhetspris"
+
+msgid "Temporary subvention percentage"
+msgstr "Tillfällig rabatt på subventionerat arrende för början av året %"
+
+msgid "Temporary discount amount euros per year"
+msgstr "Tillfällig rabatt i euro/år"
+
+msgid "Lease count"
+msgstr "Antal arrenderingar"
+
+msgid "Show the count of leases by type"
+msgstr "Visar antalet arrenderingar per arrenderingsart"
+
+msgid "Count"
+msgstr "Antal"
+
+msgid "Temporary subvention percentage (short)"
+msgstr ""
+
+msgid "Lease statistics report"
+msgstr "Statistikrapport för arrenderingar"
+
+msgid ""
+"Shows information about all leases or if start date is provided the leases "
+"that have started on or after it"
+msgstr ""
+"Visar en statistikrapport om alla arrenderingar eller om startdatum har "
+"angetts, de arrenderingar som har börjat vid startdatumet eller senare"
+
+msgid "Contract signing date"
+msgstr ""
+
+msgid "Lease state"
+msgstr "Status för arrenderingen"
+
+msgid "Latest decision maker"
+msgstr "Senaste beslutsfattaren"
+
+msgid "Latest decision date"
+msgstr "Senaste beslutsdatum"
+
+msgid "Latest decision type"
+msgstr ""
+
+#, python-brace-format
+msgid "Permitted building volume {unit} (Residential)"
+msgstr "Byggnadsrätt {unit} (boende)"
+
+msgid "Rent amount (Residential)"
+msgstr "Årsarrende (boende)"
+
+#, python-brace-format
+msgid "Permitted building volume {unit} (Business)"
+msgstr "Byggnadsrätt {unit} (företagslokal)"
+
+msgid "Rent amount (Business)"
+msgstr "Årsarrende (företagslokal)"
+
+#, python-brace-format
+msgid "Permitted building volume total {unit}"
+msgstr "Total byggnadsrätt {unit}"
+
+msgid "Total rent amount for year"
+msgstr "Årsarrende sammanlagt"
+
+#, python-brace-format
+msgid "Average amount per area {unit} (Residential)"
+msgstr "Genomsnittligt enhetspris {unit} (boende)"
+
+#, python-brace-format
+msgid "Average amount per area {unit} (Business)"
+msgstr "Genomsnittligt enhetspris {unit} (företagslokal)"
+
+#, python-brace-format
+msgid "Unit price {unit} (index)"
+msgstr "Enhetspris {unit} (ind)"
+
+msgid "Subsidy percent"
+msgstr "Subvention i procent"
+
+msgid "Form of management (Subvention)"
+msgstr "Subvention för upplåtelseform"
+
+msgid "Re-lease"
+msgstr "Återarrendering"
+
+msgid "Option to purchase"
+msgstr "Köprätt"
+
+msgid "Matti report"
+msgstr "MATTI-rapport"
+
+msgid "Results will be sent by email to {}"
+msgstr "Rapporten lämnas in per e-post till adressen {}"
+
+msgid "Basis of rents"
+msgstr "Arrenderingssprinciper"
+
+msgid "Rent adjustments"
+msgstr "Rabatter/Höjningar"
+
+msgid "Shows all of the rent adjustments"
+msgstr "Rabatter/höjningar för alla giltiga arrenderingar"
+
+msgid "Management subventions"
+msgstr "Subventioner för upplåtelseform"
+
+msgid "Temporary subventions"
+msgstr "Tillfälliga rabatter"
+
+msgid "Rent compare"
+msgstr "Jämförelse av arrenden"
+
+msgid "Show difference in rent between two years"
+msgstr "Skillnad mellan arrendebeloppen för två olika år"
+
+msgid "First year"
+msgstr "Första året"
+
+msgid "Second year"
+msgstr "Andra året"
+
+msgid "Rent type"
+msgstr "Arrendeart"
+
+msgid "First year rent"
+msgstr "Arrende för första året"
+
+msgid "Second year rent"
+msgstr "Arrende för andra året"
+
+msgid "Rent forecast"
+msgstr "Arrendeprognos"
+
+msgid "Calculate total yearly rent by lease type"
+msgstr "Visar en prognos för arrendebeloppen per arrendeart"
+
+msgid "Start year"
+msgstr "Siffra för början av året"
+
+msgid "End year"
+msgstr "Siffra för slutet av året"
+
+msgid "Internal"
+msgstr "Interna"
+
+msgid "External"
+msgstr "Externa"
+
+#, python-brace-format
+msgid "Total {year} {internal_external_text}"
+msgstr "{internal_external_text} totalt år {year}"
+
+msgid "Rent type leases"
+msgstr "Arrenderingar enligt arrendeart"
+
+msgid "Show leases with a certain rent type"
+msgstr "Alla arrenderingar där arrendearten har valts"
+
+msgid "Reservations"
+msgstr "Anvisningar"
+
+msgid "Show reservations"
+msgstr "Visa anvisningar"
+
+msgid "Start date start"
+msgstr "Startdatum från"
+
+msgid "Start date end"
+msgstr "Startdatum senast"
+
+msgid "End date start"
+msgstr "Slutdatum från"
+
+msgid "End date end"
+msgstr "Slutdatum senast"
+
+msgid "Exclude ones that are related to a lease"
+msgstr "Avgränsar de anvisningar som har kopplats till arrenderingen"
+
+msgid "Exclude sold"
+msgstr "Avgränsar sålda objekt"
+
+msgid "Reservation id"
+msgstr "Anvisningskod"
+
+msgid "Reservee name"
+msgstr "Anvisningens mottagare"
+
+msgid "Plan number"
+msgstr "Detaljplanens nummer"
+
+msgid "Main permitted build area (floor-m²)"
+msgstr "Huvudbostadsbyggsrätt (k-m²)"
+
+msgid "Other permitted build area (floor-m²)"
+msgstr "Annan bostadsbyggsrätt (k-m²)"
+
+msgid "Financing method"
+msgstr "Finansieringsform"
+
+msgid "Management method"
+msgstr "Upplåtelseform"
+
+msgid "Message"
+msgstr "Meddelande"
+
+msgid "Report \"{}\" successfully generated"
+msgstr "Rapport \"{}\" skapades"
+
+msgid "Generated report attached"
+msgstr "Den skapade rapporten är bifogad."
+
+msgid "Failed to generate report \"{}\""
+msgstr "Rapport \"{}\" kunde inte skapas"
+
+msgid "Please try again"
+msgstr "Vänligen försök på nytt"
+
+msgid "Report type not found"
+msgstr "Rapporttypen hittades inte"
+
+msgid "No permission to generate report"
+msgstr "Ingen rätt att skapa rapporten"
+
+msgid "Can only add contacts to service units the user is a member of"
+msgstr ""
+
+msgid "Cannot change service unit"
+msgstr ""
+
+msgid ""
+"Can not add a court decision for an invoice belonging to another service unit"
+msgstr ""
+
+msgid ""
+"Can not add a collection letter for an invoice belonging to another service "
+"unit"
+msgstr ""
+
+msgid ""
+"Can not create a collection note for an invoice belonging to another service "
+"unit"
+msgstr ""
+
+msgid "Invoices must be provided for this type of collection note"
+msgstr ""
+
+msgid "Payment deferrals must be targeted to a single invoice"
+msgstr ""
+
+msgid "Missing postpone date for payment deferral"
+msgstr ""
+
+msgid "Postpone date can only be set for payment deferrals"
+msgstr ""
+
+msgid "'Entire lease' can only be set for contract changes"
+msgstr ""
+
+msgid "Inspection date can only be set for contract changes"
+msgstr ""
+
+msgid "Cannot use an inactive receivable type"
+msgstr "Fordringsarten är inte tillgänglig"
+
+msgid ""
+"Can only use receivable types from service units the user is a member of"
+msgstr ""
+
+msgid "Can only add invoices to service units the user is a member of"
+msgstr ""
+
+msgid "Either recipient or tenant is required."
+msgstr "Mottagaren eller arrendatorn måste anges."
+
+msgid "Tenant not found in lease"
+msgstr "Ingen arrendator hittades för arrenderingen"
+
+msgid "Billing contact not found for tenant"
+msgstr "Arrendatorns kontaktuppgift för fakturering hittades inte"
+
+msgid "Tenant share"
+msgstr ""
+
+msgid "Rent share"
+msgstr ""
+
+msgid ""
+"Both Billing period start and end are required if one of them is provided"
+msgstr ""
+"Både start- och slutdatum för faktureringsperioden är obligatoriska ifall "
+"någondera är vald"
+
+msgid "Billing period end must be the same or after the start"
+msgstr "Slutdatum för faktureringsperioden ska vara startdatum eller senare"
+
+msgid "No active tenants found for the lease during the billing period"
+msgstr ""
+
+msgid "No rent share found for invoice recipient"
+msgstr ""
+
+msgid "from_lease and to_lease cannot be the same Lease"
+msgstr "Får inte vara samma arrendering"
+
+msgid "Must be from the same service unit as the parent"
+msgstr ""
+
+msgid "'Application received at' is a mandatory field for this service unit"
+msgstr "'Ansökan inkom kl' är ett obligatoriskt fält för denna serviceenhet."
+
+msgid "Can only add leases to service units the user is a member of"
+msgstr ""
+
+msgid "Fixed initial rent end date must match rent cycle end date"
+msgstr ""
+"Slutet på arrendet för början av året ska vara samma som slutet av "
+"arrendeperioden"
+
+msgid "Index is mandatory if the rent type is Index"
+msgstr "Indexet ska väljas då arrendearten är Index"
+
+msgid "Amount total adjustment type cannot have an end date"
+msgstr "Rabatt-/höjningstypen \"€ totalt\" kan inte ha ett slutdatum"
+
+msgid ""
+"This number of custom due dates per year is not allowed: {}. Must be one of "
+"{}"
+msgstr ""
+"Detta antal anpassade förfallodatum per år är inte tillåtet: {}. Måste vara "
+"ett av {}"
+
+msgid "Adjustment type is required when periodic rent adjustment is added"
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"Override receivable type '{type_name}' was unexpected. Service unit "
+"'{unit_name}' does not use this feature. Please contact MVJ developers about "
+"this error."
+msgstr ""
+
+msgid ""
+"Override receivable type '{}' was unexpected. This rent type does not "
+"generate automatic invoices. Please contact MVJ developers about this error."
+msgstr ""
+
+msgid ""
+"Override receivable type is required for this rent type in service unit {}"
+msgstr ""
+
+msgid "Basis of rent item id {} not found"
+msgstr "Arrenderingsprincipen med identifieraren {} hittas inte"
+
+msgid "Can't edit locked basis of rent item"
+msgstr "Låsta arrenderingsprinciper kan inte redigeras"
+
+msgid "Enter a valid business id."
+msgstr "Ange ett giltigt FO-nummer."
+
+msgid "Error in upstream service"
+msgstr "Fel i ett externt system"
+
+msgid "Cloudia Proxy"
+msgstr "Cloudia-proxyserver"
+
+msgid "file_id parameter is not valid"
+msgstr "fiel_id-parametern är felaktig"
+
+msgid "Virre Proxy"
+msgstr "Virre-proxyserver"
+
+msgid "service parameter is not valid"
+msgstr "service-parametern är felaktig"
+
+msgid "business id is invalid"
+msgstr "FO-numret är felaktigt"
+
+msgid "File not available"
+msgstr "Filen hittas inte"
+
+msgid "Ryyti API Proxy"
+msgstr ""
+
+#, python-brace-format
+msgid "Unknown API: {api_name}"
+msgstr ""
+
+#, python-brace-format
+msgid "Ryyti API error: {error_msg}"
+msgstr ""
+
+msgid "Data not available"
+msgstr ""
+
+msgid "Check if contact already exist"
+msgstr "Granska huruvida kontakten redan finns"
+
+msgid ""
+"Check if contact already exist by business id or national identification "
+"number"
+msgstr "Kontakten finns redan med samma FO-nummer eller personbeteckning"
+
+msgid "Query parameter \"identifier\" is mandatory"
+msgstr "\"identifier\"-parametern är obligatorisk"
+
+msgid "Copy decision to leases"
+msgstr "Kopiera besluten i arrenderingen"
+
+msgid "Duplicates chosen decision to chosen leases"
+msgstr "Kopiera det valda beslutet till de valda arrenderingarna"
+
+msgid "Send email"
+msgstr "Skicka e-post"
+
+msgid "MVJ lease {} {}"
+msgstr "MVJ arrendering {} {}"
+
+msgid "Reminder: {}"
+msgstr "Påminnelse: {}"
+
+msgid "Can't create invoices if invoicing is not enabled."
+msgstr "Fakturor går inte att skapa om faktureringen inte har startats"
+
+msgid "Can't edit invoices that have been sent to SAP"
+msgstr "Fakturor som har skickats till SAP går inte att redigera"
+
+msgid "Can't edit fully refunded invoices"
+msgstr "En helt gottskriven faktura går inte att redigera"
+
+msgid "Can't delete numbered invoices"
+msgstr "Numrerade fakturor går inte att ta bort"
+
+msgid "Can't delete invoices that have been sent to SAP"
+msgstr "Fakturor som har skickats till SAP går inte att redigera"
+
+msgid "Invalid amount"
+msgstr "Odugligt antal"
+
+msgid "Amount must be bigger than zero"
+msgstr "Antalet ska vara större än noll"
+
+msgid "Calculate penalty interest"
+msgstr "Räkna förseningsräntan"
+
+msgid "Calculate penalty interest for the outstanding amount until today"
+msgstr "Räkna förseningsräntan på det uteblivna beloppet fram till i dag"
+
+msgid "Credit invoice"
+msgstr "Gottskriv fakturan"
+
+msgid "Credit invoice or part of it"
+msgstr "Gottskriv fakturan eller en del av den"
+
+msgid "Cannot credit invoices belonging to a different service unit"
+msgstr ""
+
+msgid "Cannot credit invoices that have not been sent to SAP"
+msgstr "Fakturor som har skickats till SAP går inte att gottskriva"
+
+msgid "Credit invoice row"
+msgstr "Gottskriv fakturaraden"
+
+msgid "Credit invoice row or part of it"
+msgstr "Gottskriv fakturaraden eller en del av den"
+
+msgid "Export invoice to Laske"
+msgstr "Exportera fakturan till Laske"
+
+msgid "Export chosen invoice to Laske SAP system"
+msgstr "Exportera den valda fakturan till Laske SAP-systemet"
+
+msgid "This invoice has already been sent to SAP"
+msgstr "Fakturan har redan skickats till SAP"
+
+msgid "Can't send invoices that already have a number to SAP"
+msgstr "Numrerade fakturor går inte att skicka till SAP"
+
+msgid "No permission. Can only delete own empty leases."
+msgstr "Ingen behörighet. Du kan endast ta bort egna tomma arrenderingar."
+
+msgid "Create charge"
+msgstr "Skapa faktura"
+
+msgid "Create charge shared to tenants by their shares"
+msgstr "Skapa faktura som delas mellan arrendatorerna enligt andelar"
+
+#, python-brace-format
+msgid "the penalty interest rate is {interest_percent} %"
+msgstr "förseningsräntans storlek är {interest_percent} %"
+
+#, python-brace-format
+msgid ""
+"The penalty interest rate starting on {start_date} is {interest_percent} %"
+msgstr ""
+"Förseningsräntans storlek från och med {start_date} är {interest_percent} %"
+
+#, python-brace-format
+msgid ""
+"The penalty interest rate between {start_date} and {end_date} is "
+"{interest_percent} %"
+msgstr ""
+"Förseningsräntans storlek under perioden {start_date} - {end_date} är "
+"{interest_percent} %"
+
+msgid "Create collection letter document"
+msgstr "Skapa ett inkassobrev"
+
+msgid "No billing info or billing info does not have a contact address"
+msgstr ""
+"Inga faktureringsuppgifter eller det finns ingen adress i "
+"faktureringsuppgifterna"
+
+#, python-brace-format
+msgid ""
+"Penalty interest for the invoice with the due date of {due_date} is "
+"{interest_amount} euroa"
+msgstr ""
+"Räntan på en faktura vars förfallodatum har varit {due_date} är "
+"{interest_amount} euro"
+
+#, python-brace-format
+msgid "{due_date}, {debt_amount} euro (between {start_date} and {end_date})"
+msgstr ""
+"{due_date}, {debt_amount} euro (från perioden {start_date} - {end_date})"
+
+msgid "Error creating the document from the template"
+msgstr "Fel då dokumentet skapades med dokumentmallen"
+
+msgid "Rent for period"
+msgstr "Arrende för perioden"
+
+msgid "View rent amounts for a given period"
+msgstr "Visa arrendet för det definierade tidsintervallet"
+
+msgid "Start date or end date is invalid"
+msgstr "Start- eller slutdatumet är felaktigt"
+
+msgid "Start date cannot be after end date"
+msgstr "Startdatumet kan inte vara efter slutdatumet"
+
+msgid "List billing periods for year"
+msgstr "Visa årets faktureringsperioder"
+
+msgid "Year parameter is not valid"
+msgstr "Årsparametern är felaktig"
+
+msgid "Preview invoices for year"
+msgstr "Förhandsgranska årets fakturor"
+
+msgid "Set invoicing state"
+msgstr "Starta eller avbryt fakturering"
+
+msgid "Sets invoicing state for lease to true or false"
+msgstr "Startar eller avbryter faktureringen"
+
+msgid "Cannot change invoicing state belonging to a different service unit"
+msgstr ""
+
+msgid "Cannot enable invoicing if rent info is not completed"
+msgstr "Faktureringen kan inte startas om arrendeuppgifterna är ofullständiga"
+
+msgid "Failed to set invoicing state: {}"
+msgstr ""
+
+msgid "Set rent info completion state"
+msgstr "Fastställ uppgiften arrendeuppgifterna i ordning"
+
+msgid "Cannot complete rent info: {}"
+msgstr ""
+
+msgid "This query parameter is required."
+msgstr ""
+
+msgid "Must be an integer."
+msgstr ""
+
+msgid "Can't create global ui data"
+msgstr "Ingen behörighet att lägga till ui data"
+
+msgid "Can't create other users ui data"
+msgstr "Ingen behörighet att lägga till andra användares ui data"
+
+msgid "Data integrity error"
+msgstr "Dataintegritetsfel"
+
+msgid "Finnish"
+msgstr "Finska"
+
+msgid "Swedish"
+msgstr "Svenska"
+
+msgid "English"
+msgstr "Engelska"
+
+msgctxt "Area search lessor"
+msgid "Area use and control"
+msgstr "Områdesanvändning och -övervakning"
+
+msgctxt "Area search lessor"
+msgid "Development of land assets"
+msgstr "Utveckling av jordegendom och tomter"
+
+msgctxt "Area search lessor"
+msgid "Sports venue services"
+msgstr "Motionsplatstjänster "
+
+msgctxt "Area search lessor"
+msgid "Outdoor services"
+msgstr "Friluftstjänster "
+
+msgctxt "Area search lessor"
+msgid "Youth services"
+msgstr "Ungdomstjänster"
+
+msgctxt "Search class"
+msgid "Plot search"
+msgstr "Tomtansökan eller -tävling"
+
+msgctxt "Search class"
+msgid "Other"
+msgstr "Annan tävling eller ansökning"
+
+msgctxt "Search stage"
+msgid "In preparation"
+msgstr "Under beredning"
+
+msgctxt "Search stage"
+msgid "In action"
+msgstr "Pågående"
+
+msgctxt "Search stage"
+msgid "Processing"
+msgstr "Behandlas"
+
+msgctxt "Search stage"
+msgid "Decision making"
+msgstr "Under beslutsfattande"
+
+msgctxt "Search stage"
+msgid "Settled"
+msgstr "Beslutat "
+
+msgctxt "Information state"
+msgid "Checked"
+msgstr "Granskat"
+
+msgctxt "Information state"
+msgid "Not checked"
+msgstr "Inte granskat"
+
+msgctxt "Information state"
+msgid "Not needed"
+msgstr "Behövs inte"
+
+msgctxt "Information state"
+msgid "Requires further action"
+msgstr "Behöver ytterligare information"
+
+msgctxt "Information check name"
+msgid "Trade register extract"
+msgstr "Handelsregisterutdrag"
+
+msgctxt "Information check name"
+msgid "Creditworthiness certificate"
+msgstr "Kreditvärdighetsintyg"
+
+msgctxt "Information check name"
+msgid "Statement of payment of earning-related pension contributions"
+msgstr "Utredning om betalning av arbetspensionsavgifter"
+
+msgctxt "Information check name"
+msgid "Certificate of entry in the VAT register"
+msgstr "Intyg över införande i mervärdesskatteregistret"
+
+msgctxt "Information check name"
+msgid "Certificate of entry in the advance payment register"
+msgstr "Intyg över införande i förskottsuppbördsregistret"
+
+msgctxt "Information check name"
+msgid "Tax debt certificate"
+msgstr "Intyg över skatteskuld"
+
+msgctxt "Information check name"
+msgid "Certificate of entry in the register of employers"
+msgstr "Intyg över införande i arbetsgivarregistret"
+
+msgctxt "Decline reason"
+msgid "Application expired"
+msgstr "Ansökan har förfallit"
+
+msgctxt "Decline reason"
+msgid "Application missed deadline"
+msgstr "Ansökan kom inte in inom tidsfristen"
+
+msgctxt "Decline reason"
+msgid "Application missing details"
+msgstr "Ansökan är ofullständig"
+
+msgctxt "Decline reason"
+msgid "Applicant not qualified"
+msgstr "Den sökande uppfyller inte behörighetskriterierna"
+
+msgctxt "Decline reason"
+msgid "Applicant withdrew application"
+msgstr "Sökanden har dragit tillbaka sin ansökan"
+
+msgctxt "Decline reason"
+msgid "Area not controlled by city"
+msgstr "Området förvaltas inte av staden"
+
+msgctxt "Decline reason"
+msgid "Area not available for lease"
+msgstr "Området går inte att arrendera"
+
+msgctxt "Decline reason"
+msgid "Other reason"
+msgstr "Annan orsak"
+
+msgctxt "Area search state"
+msgid "Received"
+msgstr "Fordringsart"
+
+msgctxt "Area search state"
+msgid "Pending additional information"
+msgstr "Väntar på mer information"
+
+msgctxt "Area search state"
+msgid "In action"
+msgstr "Inspektion"
+
+msgctxt "Area search state"
+msgid "Settled"
+msgstr "Avgjort"
+
+msgctxt "Area search state"
+msgid "Revoked"
+msgstr "Upphävt"
+
+msgctxt "Area search state"
+msgid "Declined"
+msgstr "Avslaget"
+
+msgctxt "Model name"
+msgid "Plot search type"
+msgstr "Typ av tomtansökan"
+
+msgctxt "Model name"
+msgid "Plot search types"
+msgstr "Typer av tomtansökan"
+
+msgctxt "Model name"
+msgid "Plot search subtype"
+msgstr "Undertyper av tomtansökan"
+
+msgctxt "Model name"
+msgid "Plot search subtypes"
+msgstr "Undertyper av tomtansökan"
+
+msgctxt "Model name"
+msgid "Plot search stage"
+msgstr "Tomtansökningens skede"
+
+msgctxt "Model name"
+msgid "Plot search stages"
+msgstr "Tomtansökningens skeden"
+
+msgid "Subtype"
+msgstr "Undertyp"
+
+msgid "Begin at"
+msgstr "Börjar"
+
+msgid "End at"
+msgstr "Slutar"
+
+msgid "Stage"
+msgstr "Skede"
+
+msgctxt "Model name"
+msgid "Plot search"
+msgstr "Tomtansökan"
+
+msgctxt "Model name"
+msgid "Plot searches"
+msgstr "Tomtansökningar"
+
+msgid "Target type"
+msgstr "Objekt typ"
+
+msgctxt "Model name"
+msgid "Area search intended use"
+msgstr "Användningsändamål för områdesansökan"
+
+msgctxt "Model name"
+msgid "Area search intended uses"
+msgstr "Användningsändamål för områdesansökan"
+
+msgctxt "Model name"
+msgid "Area search status"
+msgstr ""
+
+msgctxt "Model name"
+msgid "Area search statuses"
+msgstr ""
+
+msgid "Time received"
+msgstr "Arkiveringstid"
+
+msgid "Time settled"
+msgstr "Bestämt datum"
+
+msgid "Area search state"
+msgstr "Status"
+
+msgctxt "Model name"
+msgid "Area search"
+msgstr ""
+
+msgctxt "Model name"
+msgid "Area searches"
+msgstr ""
+
+msgid "User amr"
+msgstr ""
+
+msgid "Authentication method reference"
+msgstr ""
+
+msgid "The target has been removed from the system!"
+msgstr "Objektet har avlägsnats från systemet!"
+
+msgid "The target information has changed!"
+msgstr "Objektets uppgifter har ändrats!"
+
+msgid "Area search application"
+msgstr "Applikation för områdesansökning"
+
+msgid "Area search information"
+msgstr "Uppgifter för områdesansökan"
+
+msgid "City of Helsinki"
+msgstr "Helsingfors stad"
+
+msgid "Information check"
+msgstr "Kontroll av uppgifter"
+
+msgid "Time stamp"
+msgstr "Tidsstämpel"
+
+msgid ""
+"This is a copy of your area search application sent to the City of Helsinki."
+msgstr ""
+"Detta är en kopia av ansökan om områdensansökan som har skickats till "
+"Helsingfors stad."
+
+msgid ""
+"You can find a detailed copy of your application as an attachment in this "
+"email."
+msgstr "Kopian av ansökan har fogats till detta e-postmeddelande."
+
+msgid "Plot search information"
+msgstr "Uppgifter om tomtansökan"
+
+msgid ""
+"This is a confirmation that the following plot application sent to the City "
+"of Helsinki were received."
+msgstr ""
+"Tomtansökningar som har skickats till Helsingfors stad har mottagits "
+"bekräftat med följande koder."
+
+msgctxt "list of identifiers in email"
+msgid "Application identifiers"
+msgstr "Ansökningskoder"
+
+msgid "yes"
+msgstr "ja"
+
+msgid "no"
+msgstr "nej"
+
+msgid "You have received a link for a direct reservation plot search"
+msgstr "Du har mottagit en länk till ansökningen om direktanvisning"
+
+# python-brace-format
+#, python-brace-format
+msgid ""
+"Hi {receiver}! Here is the link for the direct reservation plot search: "
+"{url} \n"
+"\n"
+"{covering_note}"
+msgstr ""
+"Hej {receiver}! Här är en länk till direktanvisningstomtansökan: {url} \n"
+"\n"
+"{covering_note}"
+
+msgid "The deadline for applications"
+msgstr "Ansökan upphör"
+
+msgid "Plot"
+msgstr "Tomt"
+
+msgid "Detailed plan state"
+msgstr "Behandlingsfas av detaljplan"
+
+msgid "Permitted build floor area (floor-m²)"
+msgstr "Byggrätt (k-m²)"
+
+msgid "Permitted build residential floor area (floor-m²)"
+msgstr "Bostadsbyggsrätt (k-m²)"
+
+msgid "Permitted build commercial floor area (floor-m²)"
+msgstr "Affärsbyggnadsrätt (k-m²)"
+
+msgid "Area (m²)"
+msgstr "Area (m²)"
+
+msgid "First suitable construction year"
+msgstr "Byggbar"
+
+msgid "HITAS"
+msgstr "HITAS"
+
+msgid "Token exists"
+msgstr "Token existerar"
+
+msgid "Users permissions"
+msgstr "Användarens rättigheter"

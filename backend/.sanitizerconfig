@@ -1,0 +1,1441 @@
+config:
+  addons: []
+  extra_parameters:
+    # These are passed to pg_dump via python-database-sanitizer library.
+    pg_dump:
+      - "--format=plain" # Plain-text SQL script format. Default value.
+                         # Also, it's the only possible format for this sanitizer library
+                         # because it relies on plain-text standard output for sanitizing objects.
+      - "--clean" # Output the commands to drop objects before recreating them. Does not drop objects during dumping.
+      - "--if-exists" # Don't warn about missing objects during cleaning.
+      - "--no-owner" # Don't set ownership of objects to match the source database. Prod roles don't exist in local/dev/test/stage.
+      - "--no-acl" # No access privileges (grant/revoke) commands. Same reason as above.
+      # The following table contents are omitted for security, or due to large table size,
+      # or as otherwise unnecessary in target environment.
+      - "--exclude-table-data=public.auditlog_logentry"
+      - "--exclude-table-data=public.batchrun_jobrun"
+      - "--exclude-table-data=public.batchrun_jobrunlog"
+      - "--exclude-table-data=public.batchrun_jobrunlogentry"
+      - "--exclude-table-data=public.batchrun_jobrunqueueitem"
+      - "--exclude-table-data=public.django_q_task"
+      - "--exclude-table-data=public.leasing_reportstorage"
+      - "--exclude-table-data=public.spatial_ref_sys"
+      - "--verbose"
+
+strategy:
+  # Top-level keys under strategy are DB table names, as interpreted by init_sanitizer command.
+  # `skip_rows` means that the table definition is included in the dump, but the table will have zero rows.
+  #
+  # Second-level keys are model's fields.
+  #
+  # Values specify which sanitization function to use.
+  # MVJ's custom functions are defined in `sanitizer/mvj.py`. For example `mvj.paragraph_if_exist`.
+  # Sanitizer library's predefined functions are namespaced. For example `constant.empty_json_list`, and `string.random`.
+  # `null` means that no sanitization function is used, so the field value will be dumped as-is.
+  auditlog_logentry: skip_rows
+  auth_group:
+    id: null
+    name: null
+  auth_group_permissions:
+    group_id: null
+    id: null
+    permission_id: null
+  auth_permission:
+    codename: null
+    content_type_id: null
+    id: null
+    name: null
+  authtoken_token: skip_rows
+  batchrun_command:
+    deleted: null
+    deleted_by_cascade: null
+    id: null
+    name: null
+    parameter_format_string: null
+    parameters: null
+    type: null
+  batchrun_job:
+    arguments: null
+    command_id: null
+    comment: null
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    history_retention_policy_id: null
+    id: null
+    modified_at: null
+    name: null
+  batchrun_jobhistoryretentionpolicy:
+    compact_logs_delay: null
+    delete_logs_delay: null
+    delete_run_delay: null
+    id: null
+    identifier: null
+  batchrun_jobrun: skip_rows
+  batchrun_jobrunlog: skip_rows
+  batchrun_jobrunlogentry: skip_rows
+  batchrun_jobrunqueueitem: skip_rows
+  batchrun_scheduledjob:
+    comment: null
+    created_at: null
+    days_of_month: null
+    enabled: null
+    hours: null
+    id: null
+    job_id: null
+    minutes: null
+    modified_at: null
+    months: null
+    timezone_id: null
+    weekdays: null
+    years: null
+  batchrun_timezone:
+    id: null
+    name: null
+  credit_integration_creditdecision:
+    address: mvj.address_if_exist
+    business_entity: null
+    business_id: mvj.business_id_if_exist
+    claimant_id: null
+    created_at: null
+    customer_id: null
+    id: null
+    industry_code: null
+    modified_at: null
+    official_name: mvj.company_if_exist
+    operation_start_date: null
+    original_data: constant.empty_json_dict
+    phone_number: mvj.phone_number_if_exist
+    status: null
+  credit_integration_creditdecision_reasons:
+    creditdecision_id: null
+    creditdecisionreason_id: null
+    id: null
+  credit_integration_creditdecisionlog:
+    created_at: null
+    id: null
+    identification: mvj.national_identification_number_if_exist
+    modified_at: null
+    text: null
+    user_id: null
+  credit_integration_creditdecisionreason:
+    created_at: null
+    id: null
+    modified_at: null
+    reason: mvj.paragraph_if_exist
+    reason_code: null
+  django_admin_log: skip_rows
+  django_content_type:
+    app_label: null
+    id: null
+    model: null
+  django_q_ormq: skip_rows
+  django_q_schedule: skip_rows
+  django_q_task: skip_rows
+  django_session: skip_rows
+  file_operations_filescanstatus: skip_rows
+  file_operations_genericattachmenttestmodel:
+    file_attachment: null
+    id: null
+  file_operations_genericsafedeleteattachmenttestmodel:
+    deleted: null
+    deleted_by_cascade: null
+    file_attachment: null
+    id: null
+  forms_answer:
+    created_at: null
+    form_id: null
+    id: null
+    ready: null
+    user_id: null
+  forms_answeropeningrecord:
+    answer_id: null
+    id: null
+    note: mvj.paragraph_if_exist
+    time_stamp: null
+  forms_answeropeningrecord_openers:
+    answeropeningrecord_id: null
+    id: null
+    user_id: null
+  forms_attachment: skip_rows
+  forms_choice:
+    action: null
+    field_id: null
+    has_text_input: null
+    id: null
+    text: null
+    text_en: null
+    text_fi: null
+    text_sv: null
+    value: null
+  forms_entry: skip_rows
+  forms_entrysection:
+    answer_id: null
+    id: null
+    identifier: null
+    metadata: null
+  forms_field:
+    action: null
+    default_value: null
+    enabled: null
+    hint_text: null
+    hint_text_en: null
+    hint_text_fi: null
+    hint_text_sv: null
+    id: null
+    identifier: null
+    label: null
+    label_en: null
+    label_fi: null
+    label_sv: null
+    required: null
+    section_id: null
+    sort_order: null
+    type: null
+    validation: null
+  forms_form:
+    created_at: null
+    description: null
+    id: null
+    is_area_form: null
+    is_template: null
+    modified_at: null
+    name: null
+    state: null
+    title: null
+    title_en: null
+    title_fi: null
+    title_sv: null
+  forms_section:
+    add_new_allowed: null
+    add_new_text: null
+    add_new_text_en: null
+    add_new_text_fi: null
+    add_new_text_sv: null
+    applicant_type: null
+    form_id: null
+    id: null
+    identifier: null
+    parent_id: null
+    show_duplication_check: null
+    sort_order: null
+    title: null
+    title_en: null
+    title_fi: null
+    title_sv: null
+    type: null
+    visible: null
+  geometry_columns:
+    coord_dimension: null
+    f_geometry_column: null
+    f_table_catalog: null
+    f_table_name: null
+    f_table_schema: null
+    srid: null
+    type: null
+  helusers_adgroup:
+    display_name: null
+    id: null
+    name: null
+  helusers_adgroupmapping:
+    ad_group_id: null
+    group_id: null
+    id: null
+  helusers_oidcbackchannellogoutevent: skip_rows
+  laske_export_laskeexportlog:
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    ended_at: null
+    filename: null
+    id: null
+    is_finished: null
+    modified_at: null
+    service_unit_id: null
+    started_at: null
+  laske_export_laskeexportloginvoiceitem: skip_rows
+  laske_export_laskepaymentslog:
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    ended_at: null
+    filename: null
+    id: null
+    is_finished: null
+    modified_at: null
+    started_at: null
+  laske_export_laskepaymentslog_payments: skip_rows
+  leasing_applicationmetadata:
+    application_received_at: null
+    id: null
+  leasing_area:
+    created_at: null
+    external_id: null
+    geometry: null
+    id: null
+    identifier: null
+    metadata: null
+    modified_at: null
+    source_id: null
+    type: null
+  leasing_areanote:
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    geometry: null
+    id: null
+    modified_at: null
+    note: mvj.paragraph_if_exist
+    user_id: null
+  leasing_areasource:
+    id: null
+    identifier: null
+    name: null
+  leasing_basisofrent:
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    detailed_plan_identifier: null
+    end_date: null
+    financing_id: null
+    geometry: null
+    id: null
+    index_id: null
+    lease_rights_end_date: null
+    management_id: null
+    modified_at: null
+    note: mvj.paragraph_if_exist
+    plot_type_id: null
+    start_date: null
+  leasing_basisofrentbuildpermissiontype:
+    id: null
+    name: null
+  leasing_basisofrentdecision:
+    basis_of_rent_id: null
+    decision_date: null
+    decision_maker_id: null
+    id: null
+    reference_number: null
+    section: null
+  leasing_basisofrentplottype:
+    id: null
+    name: null
+  leasing_basisofrentpropertyidentifier:
+    basis_of_rent_id: null
+    geometry: null
+    id: null
+    identifier: null
+  leasing_basisofrentrate:
+    amount: null
+    area_unit: null
+    basis_of_rent_id: null
+    build_permission_type_id: null
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    id: null
+    modified_at: null
+  leasing_collateral:
+    contract_id: null
+    deed_date: null
+    end_date: null
+    id: null
+    note: mvj.paragraph_if_exist
+    number: null
+    other_type: null
+    paid_date: null
+    returned_date: null
+    start_date: null
+    total_amount: null
+    type_id: null
+  leasing_collateraltype:
+    id: null
+    name: null
+  leasing_collectioncourtdecision: skip_rows
+  leasing_collectionletter: skip_rows
+  leasing_collectionlettertemplate:
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    file: null
+    id: null
+    modified_at: null
+    name: null
+  leasing_collectionnote:
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    id: null
+    lease_id: null
+    modified_at: null
+    note: mvj.paragraph_if_exist
+    collection_stage: null
+    invoices: null
+    sent_date: null
+    inspection_date: null
+    postpone_date: null
+    entire_lease: null
+    user_id: null
+  leasing_comment:
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    id: null
+    lease_id: null
+    modified_at: null
+    text: mvj.paragraph_if_exist
+    topic_id: null
+    user_id: null
+  leasing_commenttopic:
+    id: null
+    name: null
+  leasing_condition:
+    created_at: null
+    decision_id: null
+    deleted: null
+    deleted_by_cascade: null
+    description: mvj.paragraph_if_exist
+    id: null
+    modified_at: null
+    supervised_date: null
+    supervision_date: null
+    type_id: null
+  leasing_conditiontype:
+    id: null
+    name: null
+  leasing_constructabilitydescription:
+    ahjo_reference_number: null
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    id: null
+    is_static: null
+    lease_area_id: null
+    modified_at: null
+    text: mvj.paragraph_if_exist
+    type: null
+    user_id: null
+  leasing_contact:
+    address: mvj.street_address_if_exist
+    address_protection: null
+    business_id: null
+    care_of: mvj.company_if_exist
+    city: mvj.city_if_exist
+    country: null
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    electronic_billing_address: mvj.generate_random_numbers_if_exist
+    email: mvj.email_if_exist
+    first_name: mvj.first_name_if_exist
+    id: null
+    is_lessor: null
+    language: null
+    last_name: mvj.last_name_if_exist
+    modified_at: null
+    name: null
+    national_identification_number: mvj.national_identification_number_if_exist
+    note: mvj.paragraph_if_exist
+    partner_code: mvj.generate_random_numbers_if_exist
+    phone: mvj.phone_number_if_exist
+    postal_code: mvj.postcode_if_exist
+    sap_customer_number: mvj.generate_random_numbers_if_exist
+    sap_sales_office: mvj.generate_random_numbers_if_exist
+    service_unit_id: null
+    type: null
+  leasing_contract:
+    contract_number: null
+    created_at: null
+    decision_id: null
+    deleted: null
+    deleted_by_cascade: null
+    first_call_sent: null
+    id: null
+    institution_identifier: null
+    is_readjustment_decision: null
+    ktj_link: null
+    lease_id: null
+    modified_at: null
+    second_call_sent: null
+    sign_by_date: null
+    signing_date: null
+    signing_note: mvj.paragraph_if_exist
+    third_call_sent: null
+    type_id: null
+    executor_id: null
+  leasing_contractchange:
+    contract_id: null
+    decision_id: null
+    description: mvj.paragraph_if_exist
+    first_call_sent: null
+    id: null
+    second_call_sent: null
+    sign_by_date: null
+    signing_date: null
+    third_call_sent: null
+    executor_id: null
+  leasing_contractrent:
+    amount: null
+    base_amount: null
+    base_amount_period: null
+    base_year_rent: null
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    end_date: null
+    id: null
+    index_id: null
+    intended_use_id: null
+    modified_at: null
+    period: null
+    rent_id: null
+    start_date: null
+  leasing_contracttype:
+    id: null
+    name: null
+  leasing_customdetailedplan:
+    address: null
+    area: null
+    created_at: null
+    detailed_plan: null
+    detailed_plan_latest_processing_date: null
+    detailed_plan_latest_processing_date_note: mvj.paragraph_if_exist
+    id: null
+    identifier: null
+    intended_use_id: null
+    lease_area_id: null
+    modified_at: null
+    preconstruction_estimated_construction_readiness_moment: null
+    rent_build_permission: null
+    state_id: null
+    type_id: null
+  leasing_decision:
+    created_at: null
+    decision_date: null
+    decision_maker_id: null
+    deleted: null
+    deleted_by_cascade: null
+    description: mvj.paragraph_if_exist
+    id: null
+    lease_id: null
+    modified_at: null
+    reference_number: null
+    section: null
+    type_id: null
+  leasing_decisionmaker:
+    id: null
+    name: null
+  leasing_decisiontype:
+    id: null
+    kind: null
+    name: null
+  leasing_detailedplan:
+    acceptor: string.random
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    detailed_plan_class: null
+    diary_number: null
+    id: null
+    identifier: null
+    lawfulness_date: null
+    modified_at: null
+    plan_stage: null
+  leasing_district:
+    id: null
+    identifier: null
+    municipality_id: null
+    name: null
+    name_en: null
+    name_fi: null
+    name_sv: null
+  leasing_emaillog:
+    content_type_id: null
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    id: null
+    modified_at: null
+    object_id: null
+    sent_at: null
+    text: mvj.paragraph
+    type: null
+    user_id: null
+  leasing_emaillog_recipients:
+    emaillog_id: null
+    id: null
+    user_id: null
+  leasing_equalizedrent:
+    end_date: null
+    equalization_factor: null
+    equalized_payable_amount: null
+    id: null
+    payable_amount: null
+    rent_id: null
+    start_date: null
+  leasing_financing:
+    id: null
+    name: null
+    name_en: null
+    name_fi: null
+    name_sv: null
+  leasing_fixedinitialyearrent:
+    amount: null
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    end_date: null
+    id: null
+    intended_use_id: null
+    modified_at: null
+    rent_id: null
+    start_date: null
+  leasing_hitas:
+    id: null
+    name: null
+    name_en: null
+    name_fi: null
+    name_sv: null
+  leasing_index:
+    id: null
+    month: null
+    number: null
+    year: null
+  leasing_indexadjustedrent:
+    amount: null
+    end_date: null
+    factor: null
+    id: null
+    intended_use_id: null
+    rent_id: null
+    start_date: null
+  leasing_indexpointfigureyearly:
+    comment: null
+    created_at: null
+    id: null
+    index_id: null
+    modified_at: null
+    region: null
+    value: null
+    year: null
+  leasing_infilldevelopmentcompensation:
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    detailed_plan_identifier: null
+    geometry: null
+    id: null
+    lease_contract_change_date: null
+    modified_at: null
+    name: null
+    note: mvj.paragraph_if_exist
+    reference_number: null
+    state: null
+    user_id: null
+  leasing_infilldevelopmentcompensationattachment: skip_rows
+  leasing_infilldevelopmentcompensationdecision:
+    created_at: null
+    decision_date: null
+    decision_maker_id: null
+    deleted: null
+    deleted_by_cascade: null
+    id: null
+    infill_development_compensation_lease_id: null
+    modified_at: null
+    reference_number: null
+    section: null
+  leasing_infilldevelopmentcompensationintendeduse:
+    amount_per_floor_m2: null
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    floor_m2: null
+    id: null
+    infill_development_compensation_lease_id: null
+    intended_use_id: null
+    modified_at: null
+  leasing_infilldevelopmentcompensationlease:
+    compensation_investment_amount: null
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    discount_in_rent: null
+    id: null
+    increase_in_value: null
+    infill_development_compensation_id: null
+    lease_id: null
+    modified_at: null
+    monetary_compensation_amount: null
+    note: mvj.paragraph_if_exist
+    paid_date: null
+    part_of_the_increase_in_value: null
+    sent_to_sap_date: null
+    year: null
+  leasing_inspection:
+    description: mvj.paragraph_if_exist
+    id: null
+    inspector: string.random
+    lease_id: null
+    supervised_date: null
+    supervision_date: null
+  leasing_inspectionattachment: skip_rows
+  leasing_intendeduse:
+    id: null
+    is_active: null
+    name: null
+    name_en: null
+    name_fi: null
+    name_sv: null
+    service_unit_id: null
+  leasing_interestrate:
+    end_date: null
+    id: null
+    penalty_rate: null
+    reference_rate: null
+    start_date: null
+  leasing_invoice:
+    adjusted_due_date: null
+    billed_amount: null
+    billing_period_end_date: null
+    billing_period_start_date: null
+    collection_charge: null
+    created_at: null
+    credited_invoice_id: null
+    deleted: null
+    deleted_by_cascade: null
+    delivery_method: null
+    description: mvj.paragraph_if_exist
+    due_date: null
+    generated: null
+    id: null
+    interest_invoice_for_id: null
+    invoiceset_id: null
+    invoicing_date: null
+    lease_id: null
+    modified_at: null
+    notes: mvj.paragraph_if_exist
+    number: null
+    outstanding_amount: null
+    payment_notification_catalog_date: null
+    payment_notification_date: null
+    postpone_date: null
+    recipient_id: null
+    sap_id: null
+    sent_to_sap_at: null
+    service_unit_id: null
+    state: null
+    total_amount: null
+    type: null
+  leasing_invoicenote:
+    billing_period_end_date: null
+    billing_period_start_date: null
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    id: null
+    lease_id: null
+    modified_at: null
+    notes: mvj.paragraph_if_exist
+  leasing_invoicepayment:
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    filing_code: null
+    id: null
+    invoice_id: null
+    modified_at: null
+    paid_amount: null
+    paid_date: null
+  leasing_invoicerow:
+    amount: null
+    billing_period_end_date: null
+    billing_period_start_date: null
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    description: mvj.paragraph_if_exist
+    id: null
+    intended_use_id: null
+    invoice_id: null
+    modified_at: null
+    receivable_type_id: null
+    tenant_id: null
+  leasing_invoiceset:
+    billing_period_end_date: null
+    billing_period_start_date: null
+    id: null
+    lease_id: null
+  leasing_lease:
+    application_metadata_id: null
+    building_selling_price: null
+    classification: null
+    conveyance_number: null
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    district_id: null
+    end_date: null
+    financing_id: null
+    hitas_id: null
+    id: null
+    identifier_id: null
+    intended_use_id: null
+    intended_use_note: mvj.paragraph_if_exist
+    internal_order: null
+    invoicing_enabled_at: null
+    rent_info_completed_at: null
+    is_subject_to_vat: null
+    lessor_id: null
+    management_id: null
+    modified_at: null
+    municipality_id: null
+    note: mvj.paragraph_if_exist
+    notice_note: mvj.paragraph_if_exist
+    notice_period_id: null
+    preparer_id: null
+    real_estate_developer: null
+    reference_number: null
+    regulated: null
+    regulation_id: null
+    reservation_procedure_id: null
+    service_unit_id: null
+    special_project_id: null
+    start_date: null
+    state: null
+    statistical_use_id: null
+    supportive_housing_id: null
+    transferable: null
+    type_id: null
+  leasing_leasearea:
+    archived_at: null
+    archived_decision_id: null
+    archived_note: mvj.paragraph_if_exist
+    area: null
+    constructability_report_investigation_state: null
+    constructability_report_signer: null
+    constructability_report_signing_date: null
+    constructability_report_state: null
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    demolition_state: null
+    geometry: null
+    id: null
+    identifier: null
+    lease_id: null
+    location: null
+    modified_at: null
+    other_state: null
+    polluted_land_planner_id: null
+    polluted_land_projectwise_number: null
+    polluted_land_rent_condition_date: null
+    polluted_land_rent_condition_state: null
+    polluted_land_state: null
+    preconstruction_estimated_construction_readiness_moment: null
+    preconstruction_inspection_moment: null
+    preconstruction_state: null
+    section_area: null
+    type: null
+  leasing_leaseareaaddress:
+    address: null
+    address_en: null
+    address_fi: null
+    address_sv: null
+    city: null
+    created_at: null
+    id: null
+    is_primary: null
+    lease_area_id: null
+    modified_at: null
+    postal_code: null
+  leasing_leaseareaattachment: skip_rows
+  leasing_leasebasisofrent:
+    amount_per_area: null
+    archived_at: null
+    archived_note: mvj.paragraph_if_exist
+    area: null
+    area_unit: null
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    discount_percentage: null
+    id: null
+    index_id: null
+    intended_use_id: null
+    lease_id: null
+    locked_at: null
+    locked_by_id: null
+    modified_at: null
+    parent_id: null
+    plans_inspected_at: null
+    plans_inspected_by_id: null
+    profit_margin_percentage: null
+    subvention_base_percent: null
+    subvention_graduated_percent: null
+    subvention_type: null
+    type: null
+    zone: null
+  leasing_leasebasisofrentmanagementsubvention:
+    id: null
+    lease_basis_of_rent_id: null
+    management_id: null
+    subvention_amount: null
+  leasing_leasebasisofrenttemporarysubvention:
+    description: null
+    id: null
+    lease_basis_of_rent_id: null
+    subvention_percent: null
+  leasing_leaseholdtransfer:
+    created_at: null
+    decision_date: null
+    deleted: null
+    deleted_by_cascade: null
+    id: null
+    institution_identifier: null
+    modified_at: null
+  leasing_leaseholdtransferimportlog:
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    file_name: null
+    id: null
+    modified_at: null
+  leasing_leaseholdtransferparty:
+    business_id: mvj.business_id_if_exist
+    id: null
+    name: mvj.company_if_exist
+    national_identification_number: mvj.national_identification_number_if_exist
+    share_denominator: null
+    share_numerator: null
+    transfer_id: null
+    type: null
+  leasing_leaseholdtransferproperty:
+    id: null
+    identifier: null
+    transfer_id: null
+  leasing_leaseidentifier:
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    district_id: null
+    id: null
+    identifier: null
+    modified_at: null
+    municipality_id: null
+    sequence: null
+    type_id: null
+  leasing_leasestatelog:
+    created_at: null
+    id: null
+    lease_id: null
+    modified_at: null
+    state: null
+  leasing_leasetype:
+    due_dates_position: null
+    id: null
+    identifier: null
+    name: null
+    sap_material_code: null
+    sap_order_item_number: null
+    sap_project_number: null
+    is_active: null
+  leasing_legacyindex:
+    id: null
+    index_id: null
+    number_1914: null
+    number_1938: null
+  leasing_management:
+    id: null
+    name: null
+    name_en: null
+    name_fi: null
+    name_sv: null
+  leasing_managementsubvention:
+    id: null
+    management_id: null
+    rent_adjustment_id: null
+    subvention_amount: null
+  leasing_managementsubventionformofmanagement:
+    id: null
+    name: null
+  leasing_municipality:
+    id: null
+    identifier: null
+    name: null
+    name_en: null
+    name_fi: null
+    name_sv: null
+  leasing_noticeperiod:
+    duration: null
+    id: null
+    name: null
+    type: null
+  leasing_olddwellingsinhousingcompaniespriceindex:
+    code: null
+    comment: null
+    created_at: null
+    id: null
+    modified_at: null
+    name: null
+    source: null
+    source_table_label: null
+    source_table_updated: null
+    url: null
+  leasing_payablerent:
+    amount: null
+    calendar_year_rent: null
+    difference_percent: null
+    end_date: null
+    id: null
+    rent_id: null
+    start_date: null
+  leasing_planunit:
+    area: null
+    created_at: null
+    detailed_plan_identifier: null
+    detailed_plan_latest_processing_date: null
+    detailed_plan_latest_processing_date_note: mvj.paragraph_if_exist
+    geometry: null
+    id: null
+    identifier: null
+    in_contract: null
+    is_master: null
+    lease_area_id: null
+    master_timestamp: null
+    modified_at: null
+    plan_unit_intended_use_id: null
+    plan_unit_state_id: null
+    plan_unit_status: null
+    plan_unit_type_id: null
+    plot_division_date_of_approval: null
+    plot_division_effective_date: null
+    plot_division_identifier: null
+    plot_division_state_id: null
+    section_area: null
+  leasing_planunitintendeduse:
+    id: null
+    name: null
+  leasing_planunitstate:
+    id: null
+    name: null
+  leasing_planunittype:
+    id: null
+    name: null
+  leasing_plot:
+    area: null
+    created_at: null
+    geometry: null
+    id: null
+    identifier: null
+    in_contract: null
+    is_master: null
+    lease_area_id: null
+    master_timestamp: null
+    modified_at: null
+    registration_date: null
+    repeal_date: null
+    section_area: null
+    type: null
+  leasing_plotdivisionstate:
+    id: null
+    name: null
+  leasing_receivabletype:
+    id: null
+    is_active: null
+    name: null
+    sap_material_code: null
+    sap_order_item_number: null
+    sap_project_number: null
+    service_unit_id: null
+  leasing_regulation:
+    id: null
+    name: null
+  leasing_relatedlease:
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    end_date: null
+    from_lease_id: null
+    id: null
+    modified_at: null
+    start_date: null
+    to_lease_id: null
+    type: null
+  leasing_rent:
+    amount: null
+    created_at: null
+    cycle: null
+    deleted: null
+    deleted_by_cascade: null
+    due_dates_per_year: null
+    due_dates_type: null
+    elementary_index: null
+    end_date: null
+    equalization_end_date: null
+    equalization_start_date: null
+    id: null
+    index_rounding: null
+    index_type: null
+    lease_id: null
+    manual_ratio: null
+    manual_ratio_previous: null
+    modified_at: null
+    note: mvj.paragraph_if_exist
+    old_dwellings_in_housing_companies_price_index_id: null
+    override_receivable_type_id: null
+    payable_rent_amount: null
+    payable_rent_end_date: null
+    payable_rent_start_date: null
+    periodic_rent_adjustment_type: null
+    start_date: null
+    start_price_index_point_figure_value: null
+    start_price_index_point_figure_year: null
+    type: null
+    x_value: null
+    y_value: null
+    y_value_start: null
+  leasing_rentadjustment:
+    amount_left: null
+    amount_type: null
+    created_at: null
+    decision_id: null
+    deleted: null
+    deleted_by_cascade: null
+    end_date: null
+    full_amount: null
+    id: null
+    intended_use_id: null
+    modified_at: null
+    note: mvj.paragraph_if_exist
+    rent_id: null
+    start_date: null
+    subvention_base_percent: null
+    subvention_graduated_percent: null
+    subvention_type: null
+    type: null
+  leasing_rentduedate:
+    created_at: null
+    day: null
+    deleted: null
+    deleted_by_cascade: null
+    id: null
+    modified_at: null
+    month: null
+    rent_id: null
+  leasing_rentintendeduse:
+    id: null
+    name: null
+  leasing_reportstorage: skip_rows
+  leasing_reservationprocedure:
+    id: null
+    name: null
+  leasing_serviceunit:
+    contract_number_sequence_name: null
+    created_at: null
+    default_receivable_type_collateral_id: null
+    default_receivable_type_rent_id: null
+    deleted: null
+    deleted_by_cascade: null
+    description: null
+    first_contract_number: null
+    first_invoice_number: null
+    hex_color: null
+    id: null
+    invoice_number_sequence_name: null
+    laske_fill_priority_and_info: null
+    laske_import_id: null
+    laske_sales_org: null
+    laske_sender_id: null
+    modified_at: null
+    name: null
+    use_rent_override_receivable_type: null
+    is_application_received_at_mandatory: null
+  leasing_serviceunitgroupmapping:
+    group_id: null
+    id: null
+    service_unit_id: null
+  leasing_specialproject:
+    id: null
+    name: null
+  leasing_statisticaluse:
+    id: null
+    name: null
+  leasing_supportivehousing:
+    id: null
+    name: null
+  leasing_temporarysubvention:
+    description: null
+    id: null
+    rent_adjustment_id: null
+    subvention_percent: null
+  leasing_tenant:
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    id: null
+    lease_id: null
+    modified_at: null
+    reference: mvj.generate_random_numbers_if_exist
+    share_denominator: null
+    share_numerator: null
+  leasing_tenantcontact:
+    contact_id: null
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    end_date: null
+    id: null
+    modified_at: null
+    start_date: null
+    tenant_id: null
+    type: null
+  leasing_tenantrentshare:
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    id: null
+    intended_use_id: null
+    modified_at: null
+    share_denominator: null
+    share_numerator: null
+    tenant_id: null
+  leasing_uidata:
+    created_at: null
+    id: null
+    key: null
+    modified_at: null
+    user_id: null
+    value: null
+  leasing_usagedistribution:
+    build_permission: null
+    custom_detailed_plan_id: null
+    distribution: null
+    id: null
+    note: mvj.paragraph_if_exist
+    plan_unit_id: null
+  leasing_vat:
+    end_date: null
+    id: null
+    percent: null
+    start_date: null
+  leasing_vipunenmaplayer:
+    filter_by_service_unit_id: null
+    hex_color: null
+    id: null
+    keywords: null
+    name_en: null
+    name_fi: null
+    name_sv: null
+    order_in_parent: null
+    parent_id: null
+  leasing_vipunenmaplayer_filter_by_intended_use:
+    id: null
+    intendeduse_id: null
+    vipunenmaplayer_id: null
+  leasing_vipunenmaplayer_filter_by_lease_type:
+    id: null
+    leasetype_id: null
+    vipunenmaplayer_id: null
+  plotsearch_areasearch:
+    address: null
+    answer_id: null
+    area_search_status_id: null
+    description_area: mvj.paragraph_if_exist
+    description_intended_use: mvj.paragraph_if_exist
+    district: null
+    end_date: null
+    form_id: null
+    geometry: null
+    id: null
+    identifier: null
+    intended_use_id: null
+    lease_id: null
+    lessor: null
+    preparer_id: null
+    received_date: null
+    settled_date: null
+    service_unit_id: null
+    start_date: null
+    state: null
+    user_id: null
+  plotsearch_areasearchattachment: skip_rows
+  plotsearch_areasearchintendeduse:
+    deleted: null
+    deleted_by_cascade: null
+    id: null
+    name: null
+    name_en: null
+    name_fi: null
+    name_sv: null
+  plotsearch_areasearchstatus:
+    decline_reason: null
+    id: null
+    preparer_note: mvj.paragraph_if_exist
+  plotsearch_areasearchstatusnote:
+    area_search_status_id: null
+    id: null
+    note: mvj.paragraph_if_exist
+    preparer_id: null
+    time_stamp: null
+  plotsearch_directreservationlink:
+    uuid: null
+  plotsearch_directreservationlink_targets:
+    directreservationlink_id: null
+    id: null
+    plotsearchtarget_id: null
+  plotsearch_faq:
+    answer: null
+    answer_en: null
+    answer_fi: null
+    answer_sv: null
+    id: null
+    question: null
+    question_en: null
+    question_fi: null
+    question_sv: null
+  plotsearch_favourite:
+    created_at: null
+    id: null
+    modified_at: null
+    user_id: null
+  plotsearch_favouritetarget:
+    favourite_id: null
+    id: null
+    plot_search_target_id: null
+  plotsearch_informationcheck:
+    comment: mvj.paragraph_if_exist
+    created_at: null
+    entry_section_id: null
+    id: null
+    modified_at: null
+    name: null
+    preparer_id: null
+    state: null
+  plotsearch_meetingmemo: skip_rows
+  plotsearch_plotsearch:
+    begin_at: null
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    end_at: null
+    form_id: null
+    id: null
+    modified_at: null
+    name: null
+    search_class: null
+    stage_id: null
+    subtype_id: null
+  plotsearch_plotsearch_decisions:
+    decision_id: null
+    id: null
+    plotsearch_id: null
+  plotsearch_plotsearch_preparers:
+    id: null
+    plotsearch_id: null
+    user_id: null
+  plotsearch_plotsearchstage:
+    id: null
+    name: null
+    stage: null
+  plotsearch_plotsearchsubtype:
+    id: null
+    name: null
+    name_en: null
+    name_fi: null
+    name_sv: null
+    ordering: null
+    plot_search_type_id: null
+    require_opening_record: null
+    show_district: null
+    target_selection: null
+  plotsearch_plotsearchtarget:
+    custom_detailed_plan_id: null
+    id: null
+    plan_unit_id: null
+    plot_search_id: null
+    reservation_identifier_id: null
+    target_type: null
+  plotsearch_plotsearchtype:
+    id: null
+    name: null
+    name_en: null
+    name_fi: null
+    name_sv: null
+    ordering: null
+  plotsearch_proposedfinancingmanagement:
+    hitas_id: null
+    id: null
+    proposed_financing_id: null
+    proposed_management_id: null
+    target_status_id: null
+  plotsearch_relatedplotapplication:
+    content_type_id: null
+    created_at: null
+    deleted: null
+    deleted_by_cascade: null
+    id: null
+    lease_id: null
+    modified_at: null
+    object_id: null
+  plotsearch_targetinfolink:
+    custom_detailed_plan_id: null
+    description: null
+    id: null
+    language: null
+    plot_search_target_id: null
+    url: null
+  plotsearch_targetstatus:
+    added_target_to_applicant: null
+    answer_id: null
+    application_identifier: null
+    arguments: mvj.paragraph_if_exist
+    counsel_date: null
+    decline_reason: null
+    id: null
+    lease_id: null
+    plot_search_target_id: null
+    reservation_conditions: null
+    reserved: null
+    share_of_rental_denominator: null
+    share_of_rental_indicator: null
+  sequences_sequence:
+    last: null
+    name: null
+  spatial_ref_sys:
+    auth_name: null
+    auth_srid: null
+    proj4text: null
+    srid: null
+    srtext: null
+  users_user:
+    date_joined: null
+    department_name: null
+    email: mvj.email
+    first_name: mvj.first_name
+    id: null
+    is_active: null
+    is_staff: null
+    is_superuser: null
+    last_login: null
+    last_name: mvj.last_name
+    password: constant.invalid_django_password
+    username: user.username
+    uuid: null
+    last_api_use: null
+  users_user_ad_groups:
+    adgroup_id: null
+    id: null
+    user_id: null
+  users_user_groups:
+    group_id: null
+    id: null
+    user_id: null
+  users_user_service_units:
+    id: null
+    serviceunit_id: null
+    user_id: null
+  users_user_user_permissions:
+    id: null
+    permission_id: null
+    user_id: null
+  resilient_logger_resilientlogentry: skip_rows

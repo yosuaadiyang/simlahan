@@ -1,0 +1,97 @@
+@use "sass:list";
+@use "sass:color";
+@use "foundation-sites/scss/foundation" as *;
+@use "./variables";
+
+@mixin focus() {
+  &:focus {
+    outline-color: variables.$blue;
+    outline-style: dotted;
+    outline-offset: 2px;
+    outline-width: 2px;
+  }
+}
+
+@mixin focusInput() {
+  &:focus {
+    transition: none !important;
+    outline: 2px dotted variables.$blue;
+    outline-offset: 0px;
+    border: 1px solid variables.$medium-gray;
+  }
+}
+
+@mixin transition(
+  $speed: 300ms,
+  $property: all,
+  $ease: ease-out,
+  $delay: null
+) {
+  $transition: none;
+
+  @if list.length($property) > 1 {
+    @each $transition_list in $property {
+      @for $i from 1 through list.length($transition_list) {
+        @if $i == 1 {
+          $_property: nth($transition_list, $i);
+        }
+
+        @if length($transition_list) > 1 {
+          @if $i == 2 {
+            $_speed: nth($transition_list, $i);
+          }
+        } @else {
+          $_speed: $speed;
+        }
+
+        @if length($transition_list) > 2 {
+          @if $i == 3 {
+            $_ease: nth($transition_list, $i);
+          }
+        } @else {
+          $_ease: $ease;
+        }
+
+        @if length($transition_list) > 3 {
+          @if $i == 4 {
+            $_delay: nth($transition_list, $i);
+          }
+        } @else {
+          $_delay: $delay;
+        }
+      }
+
+      @if $transition == none {
+        $transition: $_property $_speed $_ease $_delay;
+      } @else {
+        $transition:
+          $transition,
+          $_property $_speed $_ease $_delay;
+      }
+    }
+  } @else {
+    @each $prop in $property {
+      @if $transition == none {
+        $transition: $prop $speed $ease $delay;
+      } @else {
+        $transition:
+          $transition,
+          $prop $speed $ease $delay;
+      }
+    }
+  }
+
+  transition: $transition;
+}
+
+@mixin transform($args...) {
+  -webkit-transform: $args;
+  -moz-transform: $args;
+  -ms-transform: $args;
+  -o-transform: $args;
+  transform: $args;
+}
+
+@mixin rotate($deg: 0deg) {
+  @include transform(rotate($deg));
+}

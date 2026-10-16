@@ -1,0 +1,16 @@
+.EditAreaSearchPreparerModal {
+  .modal__wrapper {
+    // Let the type/municipality/district dropdowns cross outside the modal boundaries,
+    // since they're otherwise a bit annoying to use.
+    overflow: visible;
+  }
+
+  .AreaSearchStatusNoteHistory {
+    background-color: transparent;
+  }
+  // Due to .modal__wrapper having overflow: visible, this makes long lists of status notes scrollable.
+  .row.statusNotes {
+    overflow: auto;
+    max-height: 50vh;
+  }
+}

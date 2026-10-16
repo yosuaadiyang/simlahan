@@ -1,0 +1,153 @@
+@use "foundation-sites/scss/foundation" as *;
+@use "../../styles/variables";
+
+.mvj-button {
+  font-size: variables.$font-small;
+  font-family: variables.$font-family-source;
+  font-weight: 600;
+  color: variables.$white;
+  background: variables.$blue;
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.1);
+  height: rem-calc(30px);
+  padding: 0 1rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin: rem-calc(0 7.5px);
+  white-space: nowrap;
+
+  &:hover {
+    background-color: variables.$blue-hover;
+  }
+
+  &:disabled {
+    background-color: variables.$medium-dark-gray !important;
+    color: variables.$white !important;
+    opacity: 1;
+    cursor: not-allowed;
+  }
+
+  &.success {
+    background-color: variables.$blue;
+    color: variables.$white;
+
+    &:hover {
+      background-color: variables.$blue-hover;
+    }
+  }
+
+  &.alert {
+    background-color: variables.$red;
+    color: variables.$white;
+
+    &:hover {
+      background-color: variables.$red-hover;
+    }
+  }
+
+  &.neutral {
+    background-color: variables.$white;
+    color: variables.$blue;
+    border: 1px solid variables.$blue;
+
+    &:hover {
+      background-color: variables.$light-blue;
+    }
+  }
+
+  &.secondary {
+    background-color: variables.$white;
+    color: variables.$black;
+    border: 1px solid variables.$medium-dark-gray;
+
+    &:hover {
+      background-color: variables.$lightest-gray;
+    }
+  }
+
+  &.link {
+    background-color: transparent;
+    color: variables.$blue;
+    border: none;
+    box-shadow: none;
+    text-transform: none;
+    padding: 0;
+    margin: 0;
+    display: inline-block;
+
+    &:hover {
+      text-decoration: underline;
+      color: variables.$blue-hover;
+    }
+  }
+
+  &.button-xs {
+    height: rem-calc(26px);
+  }
+
+  &.no-margin {
+    margin: 0;
+  }
+
+  &.no-margin-right {
+    margin-right: 0;
+  }
+
+  &.full-width {
+    width: 100%;
+  }
+
+  &.pull-right {
+    float: right;
+  }
+}
+
+.icon-button-component {
+  cursor: pointer;
+  position: relative;
+  top: rem-calc(-1px);
+
+  &:hover {
+    .icons {
+      fill: variables.$blue !important;
+      stroke: variables.$blue !important;
+    }
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+
+    .icons {
+      fill: variables.$dark-gray !important;
+    }
+  }
+
+  &.position-topright {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+}
+
+.sendup-button {
+  color: variables.$blue;
+  font-size: rem-calc(14px);
+  font-weight: variables.$semibold;
+  font-family: variables.$body-font-family;
+  cursor: pointer;
+
+  .icons__sendup {
+    vertical-align: bottom;
+    margin-left: rem-calc(5px);
+    fill: variables.$blue;
+    stroke: variables.$blue;
+  }
+
+  &:hover {
+    color: variables.$blue-hover;
+
+    .icons__sendup {
+      fill: variables.$blue-hover;
+      stroke: variables.$blue-hover;
+    }
+  }
+}

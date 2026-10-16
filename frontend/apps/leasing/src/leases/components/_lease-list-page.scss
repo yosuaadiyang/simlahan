@@ -1,0 +1,106 @@
+@use "hds-design-tokens/lib/all" as hds;
+
+.lease-search-row {
+  align-items: start;
+}
+
+.lease-search-section-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.75rem 1rem;
+
+  button[id^="lease-search-toggle-"] {
+    border-radius: 999px;
+  }
+}
+
+.lease-search-advanced-section {
+  > .lease-search-fieldset-group:nth-child(odd) {
+    background-color: hds.$color-black-5;
+  }
+
+  > .lease-search-fieldset-group:nth-child(even) {
+    background-color: hds.$color-black-10;
+  }
+}
+
+.lease-search-fieldset-group {
+  padding: 0.5rem;
+  justify-content: space-between;
+}
+
+.lease-search-fieldset-group > [class*="TextInput-module_textInput__"],
+.lease-search-fieldset-group > [class*="Select-module_select__"] {
+  min-width: 0;
+}
+
+// Emphasize active lease search HDS inputs.
+// The parent selector helps this rule win over HDS component defaults
+// regardless of production stylesheet order.
+.search__container .hds-input-with-value {
+  // TextInput, DateInput
+  --input-background-default: #{hds.$color-coat-of-arms-light};
+  // Select
+  --dropdown-background-default: #{hds.$color-coat-of-arms-light};
+}
+
+#lease-list-table tbody tr:hover td,
+#lease-list-table tbody tr:focus-within td {
+  background-color: hds.$color-bus-light;
+  transition: background-color 120ms ease-in-out;
+}
+
+#lease-list-table tbody td:has(.lease-list-row-link) {
+  padding: 0;
+}
+
+#lease-list-table .lease-list-row-link {
+  all: unset;
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 0.4rem 0.6rem;
+}
+
+#lease-list-table .lease-list-row-link:focus-visible {
+  outline: 2px solid hds.$color-focus-outline;
+  outline-offset: -2px;
+}
+
+#lease-list-table .lease-list-identifier-link {
+  display: inline;
+  line-height: inherit;
+  margin-bottom: 0;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+#lease-list-table .lease-list-expand-button {
+  all: unset;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+#lease-list-table .lease-list-expand-button:focus-visible {
+  outline: 2px solid hds.$color-focus-outline;
+  outline-offset: 1px;
+}
+
+#lease-list-table .lease-list-expand-icon {
+  width: 14px;
+  height: 14px;
+  transition: transform 120ms ease-in-out;
+}
+
+#lease-list-table .lease-list-expand-icon.is-open {
+  transform: rotate(90deg);
+}

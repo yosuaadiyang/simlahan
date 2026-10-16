@@ -1,0 +1,20 @@
+@use "foundation-sites/scss/foundation" as *;
+
+.invoice-simulator {
+  display: inline-block;
+  width: 100%;
+
+  .mvj-button {
+    margin-top: rem-calc(5px);
+    margin-bottom: rem-calc(10px);
+  }
+
+  &__container {
+    position: relative;
+
+    &.is-loading {
+      min-height: rem-calc(80px);
+      margin-bottom: rem-calc(10px);
+    }
+  }
+}

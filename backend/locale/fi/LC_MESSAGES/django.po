@@ -1,0 +1,4189 @@
+# MVJ.
+# Copyright (C) 2018
+# This file is distributed under the same license as the MVJ package.
+# Mikko Keskinen <mikko.keskinen@anders.fi>, 2018.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: MVJ 0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-07 10:29+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: \n"
+"Language: fi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "View auditlog"
+msgstr "Näytä auditointiloki"
+
+msgid "View auditlog of a lease or a contact"
+msgstr "Näytä valitun vuokrauksen tai asiakkaan auditointiloki"
+
+msgid "executable or script"
+msgstr "Ajettava tiedosto"
+
+msgid "Django management command"
+msgstr "Django-komento"
+
+msgid "Invalid integer set specifier"
+msgstr "Virheellinen määrittely"
+
+msgid "creation time"
+msgstr "Luontiaika"
+
+msgid "modification time"
+msgstr "Muokkausaika"
+
+msgid "name"
+msgstr "Nimi"
+
+msgid ""
+"Name of the command to run e.g. name of a program in PATH or a full path to "
+"an executable, or name of a management command."
+msgstr ""
+"Komennon nimi joka ajetaan. Esim. ohjelman nimi PATH-ympäristömuuttujassa , "
+"ajettavan tiedoston koko polku tai Django-komennon nimi"
+
+msgid "parameters"
+msgstr "parametrit"
+
+msgid "parameter format string"
+msgstr "parametrin muoto"
+
+#, python-brace-format
+msgid ""
+"String that defines how the parameters are formatted when calling the "
+"command. E.g. if this is \"--rent-id {rent_id}\" and value 123 is passed as "
+"an argument to the rent_id parameter, then the command will be called as "
+"\"COMMAND --rent-id 123\"."
+msgstr ""
+"Merkkinojo, jossa määritellään miten parametrit muodostetaan kun komentoa "
+"kutsutaan.Esim. jos tässä määritellään \"--rent-id {rent_id}\" ja rent_id "
+"argumentiksi annetaan arvo 123, niin komento ajetaan muodossa \"COMMAND --"
+"rent-id 123\"."
+
+msgid "command"
+msgstr "Komento"
+
+msgid "commands"
+msgstr "Komennot"
+
+msgid "identifier"
+msgstr ""
+
+msgid "log compacting delay"
+msgstr ""
+
+msgid ""
+"Days to wait before compacting log entries. Calculated from the start time "
+"of the job. Compacting log entries means that the individual log entries are "
+"concatenated to a single string and the original entries are deleted. This "
+"allows PostgreSQL to compress the log contents (check \"TOAST\" from "
+"PostgreSQL documentation). The metadata information about the log entry "
+"kinds (stdout/stderr) and timestamps are stored separately so that the "
+"original contents of the log entries are still recoverable."
+msgstr ""
+
+msgid "log deleting delay"
+msgstr ""
+
+msgid ""
+"Days to wait before deleting logs. Calculated from the start time of the job."
+msgstr ""
+
+msgid "run inforomation deleting delay"
+msgstr ""
+
+msgid ""
+"Days to wait before deleting all inforomation about the run. Calculated from "
+"the start time of the job."
+msgstr ""
+
+msgid "job history retention policy"
+msgstr ""
+
+msgid "job history retention policies"
+msgstr ""
+
+msgid "Descriptive name for the job"
+msgstr "Työn kuvaava nimi"
+
+msgid "comment"
+msgstr "Kommentti"
+
+msgid "arguments"
+msgstr "Argumentit"
+
+msgid ""
+"Argument for the command as a JSON object. These will be formatted with the "
+"parameter format string of the command. E.g. to pass value 123 as an "
+"argument to the rent_id parameter, set this to {\"rent_id\": 123}."
+msgstr ""
+"Komennon argumentit JSON-muodossa. Argumentit muotoillaan parametrin muoto-"
+"määrittelyn mukaisesti. Esim. jos rent_id-argumentiksi halutaan antaa numero "
+"123, asetetaan tähän {\"rent_id\": 123}."
+
+msgid "history retention policy"
+msgstr ""
+
+msgid ""
+"Defines how long logs and information about completed runs is preserved."
+msgstr ""
+
+msgid "job"
+msgstr "Työ"
+
+msgid "jobs"
+msgstr "Työt"
+
+msgid ""
+"Name of the timezone, e.g. \"Europe/Helsinki\" or \"UTC\". See https://"
+"en.wikipedia.org/wiki/List_of_tz_database_time_zones for a list of possible "
+"values."
+msgstr ""
+"Aikavyöhykkeen nimi. esim. \"Europe/Helsinki\" tai \"UTC\". Katso lista "
+"mahdollisista aikavyöhykenimistä osoittesta https://en.wikipedia.org/wiki/"
+"List_of_tz_database_time_zones"
+
+msgid "timezone"
+msgstr "Aikavyöhyke"
+
+msgid "timezones"
+msgstr "Aikavyöhykkeet"
+
+msgid "Timezone name can't be empty"
+msgstr ""
+
+msgid "Invalid timezone name"
+msgstr "Epäkelpo aikavyöhykkeen nimi"
+
+msgid "enabled"
+msgstr "päällä"
+
+msgid "years"
+msgstr "Vuodet"
+
+msgid "months"
+msgstr "Kuukaudet"
+
+msgid "days of month"
+msgstr "Kuukaudenpäivät"
+
+msgid "weekdays"
+msgstr "Viikonpäivät"
+
+msgid ""
+"Limit execution to specified weekdays. Use integer values to represent the "
+"weekdays with the following mapping: 0=Sunday, 1=Monday, 2=Tuesday, ..., "
+"6=Saturday."
+msgstr ""
+"Ajetaan vain tiettyinä viikonpäivinä. Käytä viikonpäiviä vastaavia "
+"numeroita: 0=sunnuntai, 1=maanantai, 2=tiistai, 3=keskiviikko, 4=torstai, "
+"5=perjantai, 6=lauantai."
+
+msgid "hours"
+msgstr "Tunnit"
+
+msgid "minutes"
+msgstr "Minuutit"
+
+msgid "scheduled job"
+msgstr "Ajastettu työ"
+
+msgid "scheduled jobs"
+msgstr "Ajastetut työt"
+
+#, python-brace-format
+msgid "Scheduled job \"{job}\" @ {schedule}"
+msgstr "Ajastettu työ \"{job}\" @ {schedule}"
+
+msgid "PID"
+msgstr "PID"
+
+msgid "Records the process id of the process, which is/was executing this job"
+msgstr "Työn ajaneen prosessin numero"
+
+msgid "start time"
+msgstr "Alkuaika"
+
+msgid "stop time"
+msgstr "Loppuaika"
+
+msgid "exit code"
+msgstr "Exit-koodi"
+
+msgid "job run"
+msgstr "Työn ajo"
+
+msgid "job runs"
+msgstr "Työn ajot"
+
+msgid "run"
+msgstr "Ajo"
+
+msgid "kind"
+msgstr "Laji"
+
+msgid "line number"
+msgstr "rivinumero"
+
+msgid "number"
+msgstr "Numero"
+
+msgid "time"
+msgstr "Aika"
+
+msgid "text"
+msgstr "Teksti"
+
+msgid "log entry"
+msgstr "lokimerkintä"
+
+msgid "log entries"
+msgstr "lokimerkinnät"
+
+#, python-brace-format
+msgid "{run_name}: {kind} entry {linenum}({number})"
+msgstr "{run_name}: {kind} merkintä {linenum}({number})"
+
+msgid "content"
+msgstr ""
+
+msgid "log entry metadata"
+msgstr ""
+
+msgid "timestamp of the first entry"
+msgstr ""
+
+msgid "timestamp of the last entry"
+msgstr ""
+
+msgid "total count of entries"
+msgstr ""
+
+msgid "count of error entries"
+msgstr ""
+
+msgid "log"
+msgstr ""
+
+msgid "logs"
+msgstr ""
+
+msgid "scheduled run time"
+msgstr "Ajoajankohta"
+
+msgid "assignment time"
+msgstr "Ajomääräyksen ajankohta"
+
+msgid "assignee process id (PID)"
+msgstr "Ajomääräyksen prosessinumero (PID)"
+
+msgctxt "Credit decision status"
+msgid "Yes"
+msgstr "Kyllä"
+
+msgctxt "Credit decision status"
+msgid "No"
+msgstr "Ei"
+
+msgctxt "Credit decision status"
+msgid "Consideration"
+msgstr "Harkinta"
+
+msgid "Reason code"
+msgstr "Syykoodi"
+
+msgid "Reason"
+msgstr "Syy"
+
+msgctxt "Model name"
+msgid "Credit decision reason"
+msgstr "Luottopäätöksen syy"
+
+msgctxt "Model name"
+msgid "Credit decision reasons"
+msgstr "Luottopäätöksien syyt"
+
+msgid "Customer"
+msgstr "Asiakas"
+
+msgid "Status"
+msgstr "Tila"
+
+msgid "Reasons"
+msgstr "Syyt"
+
+msgid "Business ID"
+msgstr "Y-tunnus"
+
+msgid "Official name"
+msgstr "Virallinen nimi"
+
+msgid "Address"
+msgstr "Osoite"
+
+msgid "Phone number"
+msgstr "Puhelinnumero"
+
+msgid "Business entity"
+msgstr "Yhtiömuoto"
+
+msgid "Date of commencement of operations"
+msgstr "Toiminnan käynnistämispäivämäärä"
+
+msgid "Industry code"
+msgstr "Toimialakoodi"
+
+msgid "Claimant"
+msgstr "Hakija"
+
+msgid "original_data"
+msgstr "Alkuperäinen data"
+
+msgctxt "Model name"
+msgid "Credit decision"
+msgstr "Luottopäätös"
+
+msgctxt "Model name"
+msgid "Credit decisions"
+msgstr "Luottopäätökset"
+
+msgid "Identification"
+msgstr "Tunniste"
+
+msgid "User"
+msgstr "Käyttäjä"
+
+msgid "Text"
+msgstr "Teksti"
+
+msgctxt "Model name"
+msgid "Credit decision log"
+msgstr "Luottopäätöksen loki"
+
+msgctxt "Model name"
+msgid "Credit decision logs"
+msgstr "Luottopäätöksien lokit"
+
+msgid ""
+"Cannot find business id or national identification number in customer data."
+msgstr "Asiakastiedoista ei löydy y-tunnusta tai henkilötunnusta."
+
+msgid "filepath"
+msgstr "tiedostopolku"
+
+msgid "scan time"
+msgstr "skannaushetki"
+
+msgid "deletion time"
+msgstr "poistohetki"
+
+msgid "error message"
+msgstr "virheviesti"
+
+msgid "File Scan Status"
+msgstr "Tiedoston skannauksen tila"
+
+msgid "File Scan Statuses"
+msgstr "Tiedoston skannauksen tilat"
+
+msgid ""
+"File has not yet been scanned for viruses, and is unsafe to download at this "
+"time."
+msgstr ""
+"Tiedostoa ei ole vielä skannattu virusten varalta, joten sitä ei ole "
+"turvallista ladata tällä hetkellä."
+
+msgid ""
+"File was found to contain virus or malware, and the file has been deleted."
+msgstr ""
+"Tiedostosta löydettiin virus tai muu haittaohjelma, joten tiedosto on "
+"poistettu."
+
+msgid ""
+"File scan failed. File is unsafe to download before it has been successfully "
+"scanned for viruses and malware."
+msgstr ""
+"Tiedoston skannaus epäonnistui. Tiedostoa ei ole turvallista ladata ennen "
+"kuin se on onnistuneesti skannattu virusten ja haittaohjelmien varalta."
+
+msgid "Unknown error related to virus scanning: '{}'"
+msgstr "Tuntematon virhe virusskannaukseen liittyen: '{}'"
+
+msgid "File '{}' does not have an extension."
+msgstr "Tiedostolta '{}' puuttuu tiedostopääte"
+
+msgid "File extension '.{}' is not allowed."
+msgstr "Tiedostomuoto '.{}' ei ole sallittu."
+
+#, python-brace-format
+msgid "File '{filename}' exceeds maximum file size of {max_size} MB."
+msgstr ""
+"Tiedosto '{filename}' ylittää suurimman sallitun tiedostokoon {max_size} MB"
+
+msgctxt "Form state"
+msgid "Work in progress"
+msgstr "Kesken"
+
+msgctxt "Form state"
+msgid "Ready"
+msgstr "Valmis"
+
+msgctxt "Form state"
+msgid "Deleted"
+msgstr "Poistettu"
+
+msgctxt "Section type"
+msgid "Show always"
+msgstr "Näytä aina"
+
+msgctxt "Section type"
+msgid "Show if"
+msgstr "Näytä, jos"
+
+msgctxt "Applicant type"
+msgid "Person"
+msgstr "Henkilö"
+
+msgctxt "Applicant type"
+msgid "Company"
+msgstr "Yritys"
+
+msgctxt "Applicant type"
+msgid "Both"
+msgstr "Molemmat"
+
+msgid "Time created"
+msgstr "Luotu"
+
+msgid "Time modified"
+msgstr "Muokattu"
+
+msgid "Tekstikenttä"
+msgstr ""
+
+msgid "Tekstialue"
+msgstr ""
+
+msgid "Alasvetovalikko"
+msgstr ""
+
+msgid "Valintaruutu"
+msgstr ""
+
+msgid "Radiopainike"
+msgstr ""
+
+msgid "Radiopainike linjassa"
+msgstr ""
+
+msgid "Lataa tiedosto"
+msgstr ""
+
+msgid "Murtoluku"
+msgstr ""
+
+msgid "Piilotettu"
+msgstr ""
+
+msgid "Invalid personal identity code"
+msgstr "Virheellinen henkilötunnus"
+
+msgid "Invalid business ID"
+msgstr "Virheellinen Y-tunnus"
+
+msgid "Lessor"
+msgstr "Vuokranantaja"
+
+msgid "Description area"
+msgstr "Tarkempi kuvaus alueesta"
+
+msgid "District"
+msgstr "Kaupunginosa"
+
+msgid "Intended use"
+msgstr "Käyttötarkoitus"
+
+msgid "Description intended use"
+msgstr "Tarkempi kuvaus käyttötarkoituksesta"
+
+msgid "Start date"
+msgstr "Alkupvm"
+
+msgid "End date"
+msgstr "Loppupvm"
+
+msgid "Received date"
+msgstr "Vastaanotettu"
+
+msgid "Identifier"
+msgstr "Tunnus"
+
+msgid "State"
+msgstr "Tila"
+
+msgid "Preparer"
+msgstr "Valmistelija"
+
+msgid "Decline reason"
+msgstr "Hylkäämisen syy"
+
+msgid "Preparer note"
+msgstr "Käsittelijän muistiinpano"
+
+msgid "Status notes"
+msgstr "Tilan muistiinpanot"
+
+msgid "Copy of plot application(s) {}"
+msgstr "Kopio tonttihakemuksista {}"
+
+msgid "Copy of area rental application {}"
+msgstr "Kopio aluehaun hakemuksista {}"
+
+msgid "This field is required"
+msgstr "Tämä kenttä vaaditaan"
+
+msgid "Control share is not even"
+msgstr "Hallintaosuutta ei ole jaettu tasan"
+
+msgid "Invoice"
+msgstr "Lasku"
+
+msgid "Invoices"
+msgstr "Laskut"
+
+msgid "Lease identifier"
+msgstr "Vuokraustunnus"
+
+msgid "Invoice number"
+msgstr "Laskun numero"
+
+msgid "Due date"
+msgstr "Eräpäivä"
+
+msgid "Service unit"
+msgstr "Palvelukokonaisuus"
+
+msgid "Invoice count"
+msgstr "Laskujen määrä"
+
+msgid "Invoice payment"
+msgstr "Maksusuoritus"
+
+msgid "Invoice payments"
+msgstr "Maksusuoritukset"
+
+msgid "Paid amount"
+msgstr "Maksettu määrä"
+
+msgid "Paid date"
+msgstr "Maksettu pvm"
+
+msgid "Filing code"
+msgstr "Arkistotunnus"
+
+msgid "Payment count"
+msgstr "Maksujen määrä"
+
+msgid "Value should be a string"
+msgstr "Arvon pitää olla merkkijono"
+
+msgid "Value should be of type {}"
+msgstr "Arvon pitää olla tyyppiä {}"
+
+msgid "Value is required"
+msgstr "Arvo on pakollinen"
+
+msgid "Value should be an Iterable"
+msgstr "Arvon pitää olla \"Iterable\""
+
+msgid "Contact information cannot be null."
+msgstr "Kontaktin tieto ei voi olla tyhjä."
+
+msgctxt "Laske export log invoice status"
+msgid "Sent"
+msgstr "Lähetetty"
+
+msgctxt "Laske export log invoice status"
+msgid "Failed"
+msgstr "Epäonnistui"
+
+msgid "Directory \"{}\" does not exist. Please create it."
+msgstr ""
+
+msgid "Can not create file in directory \"{}\"."
+msgstr ""
+
+msgid "MVJ ({}) transfer failed!"
+msgstr "MVJ ({}) siirto epäonnistui!"
+
+msgid ""
+"Sending invoices to the Laske system has been crashed during the processing. "
+"Please contact your administrator.\n"
+"Service unit: {}\n"
+"\n"
+"Error message: {}"
+msgstr ""
+"Laskujen lähetys Laske-järjestelmään kaatui prosessin aikana. Ota yhteys "
+"järjestelmänvalvojaan.\n"
+"Palvelukokonaisuus: {}\n"
+"\n"
+"Virheviesti: {}"
+
+msgid "MVJ ({}) transfer"
+msgstr "MVJ ({}) siirto"
+
+msgid ""
+"MVJ ({}) processed a total of {} invoices to Laske system on {}. Of the "
+"invoices, {} succeeded and {} failed.\n"
+"Service unit: {}"
+msgstr ""
+"Maanvuokrausjärjestelmä ({}) käsitteli yhteensä {} laskua Laske-"
+"järjestelmään {}. Laskuista {} onnistui ja {} epäonnistui.\n"
+"Palvelukokonaisuus: {}"
+
+msgid "Failed invoice numbers:"
+msgstr "Epäonnistuneet laskunumerot:"
+
+msgid "Time started"
+msgstr "Aloitusaika"
+
+msgid "Time ended"
+msgstr "Lopetusaika"
+
+msgid "Finished?"
+msgstr "Valmis?"
+
+msgid "Filename"
+msgstr "Tiedostonimi"
+
+msgctxt "Model name"
+msgid "Laske export log"
+msgstr "Laske-viennin loki"
+
+msgctxt "Model name"
+msgid "Laske export logs"
+msgstr "Laske-viennin lokit"
+
+msgid "status"
+msgstr "tila"
+
+msgid "information"
+msgstr "tiedot"
+
+msgctxt "Model name"
+msgid "Laske payments log"
+msgstr "Laske-maksujen loki"
+
+msgctxt "Model name"
+msgid "Laske payments logs"
+msgstr "Laske-maksujen lokit"
+
+msgid "Lease"
+msgstr "Vuokraus"
+
+msgid "Tenant names"
+msgstr ""
+
+msgid "Search by identifier"
+msgstr "Etsi tunnisteella"
+
+msgid "Lease Area Identifier"
+msgstr ""
+
+msgid "Color"
+msgstr "Väri"
+
+#, python-brace-format
+msgid "Ratio {ratio}… ({current_index}/{rent_index})"
+msgstr "Laskentakerroin {ratio}… ({current_index}/{rent_index})"
+
+#, python-brace-format
+msgid "Ratio {ratio}"
+msgstr "Laskentakerroin {ratio}"
+
+msgid "New base rent"
+msgstr "Uusi perusvuokra"
+
+msgid "New base rent {}"
+msgstr "Uusi perusvuokra {}"
+
+msgid "Total payable"
+msgstr "Perittävä vuokra"
+
+msgctxt "Classification"
+msgid "Public"
+msgstr "Julkinen"
+
+msgctxt "Classification"
+msgid "Confidential"
+msgstr "Salainen"
+
+msgctxt "Classification"
+msgid "Official"
+msgstr "Viranomaiskäyttö"
+
+msgctxt "Lease state"
+msgid "Lease"
+msgstr "Vuokraus"
+
+msgctxt "Lease state"
+msgid "Short term lease"
+msgstr "Lyhytaikainen vuokraus"
+
+msgctxt "Lease state"
+msgid "Long term lease"
+msgstr "Pitkäaikainen vuokraus"
+
+msgctxt "Lease state"
+msgid "Reservation"
+msgstr "Varaus"
+
+msgctxt "Lease state"
+msgid "Reserve"
+msgstr "Varanto"
+
+msgctxt "Lease state"
+msgid "Permission"
+msgstr "Lupa"
+
+msgctxt "Lease state"
+msgid "Tenure"
+msgstr "Hallintaoikeus"
+
+msgctxt "Lease state"
+msgid "Buildings and public areas"
+msgstr "Rakennukset ja yleiset alueet sisäinen (RYA)"
+
+msgctxt "Lease state"
+msgid "Power of attorney"
+msgstr "Valtakirja"
+
+msgctxt "Lease state"
+msgid "Preliminary"
+msgstr "Esisopimus"
+
+msgctxt "Lease relation"
+msgid "Transfer"
+msgstr "Siirto"
+
+msgctxt "Lease relation"
+msgid "Other"
+msgstr "Muu"
+
+msgctxt "Notice period"
+msgid "No period"
+msgstr "Ei irtisanomisaikaa"
+
+msgctxt "Notice period"
+msgid "Time period"
+msgstr "Irtisanomisaika"
+
+msgctxt "Notice period"
+msgid "Other"
+msgstr "Muu irtisanomisaika"
+
+msgctxt "Tenant contact type"
+msgid "Tenant"
+msgstr "Vuokralainen"
+
+msgctxt "Tenant contact type"
+msgid "Billing contact"
+msgstr "Laskunsaaja"
+
+msgctxt "Tenant contact type"
+msgid "Contact"
+msgstr "Yhteyshenkilö"
+
+msgctxt "Location type"
+msgid "Surface"
+msgstr "Yläpuolella"
+
+msgctxt "Location type"
+msgid "Underground"
+msgstr "Alapuolella"
+
+msgctxt "Lease area type"
+msgid "Plan unit"
+msgstr "Kaavayksikkö"
+
+msgctxt "Lease area type"
+msgid "Real property"
+msgstr "Kiinteistö"
+
+msgctxt "Lease area type"
+msgid "Unseparated parcel"
+msgstr "Määräala"
+
+msgctxt "Lease area type"
+msgid "Other"
+msgstr "Muu"
+
+msgctxt "Lease area attachment type"
+msgid "MATTI report"
+msgstr "MATTI-raportti"
+
+msgctxt "Lease area attachment type"
+msgid "Geotechnical"
+msgstr "Geotekninen palvelu"
+
+msgctxt "Plot type"
+msgid "Real property"
+msgstr "Kiinteistö"
+
+msgctxt "Plot type"
+msgid "Unseparated parcel"
+msgstr "Määräala"
+
+msgctxt "Plot type"
+msgid "Searchable"
+msgstr "Haettava"
+
+msgctxt "Plot type"
+msgid "Procedural reservation"
+msgstr "Menettelyvaraus"
+
+msgctxt "Plot type"
+msgid "Direct reservation"
+msgstr "Suoravaraus"
+
+msgctxt "Period type"
+msgid "/ month"
+msgstr "/ kk"
+
+msgctxt "Period type"
+msgid "/ year"
+msgstr "/ vuosi"
+
+msgctxt "Area unit"
+msgid "m^2"
+msgstr "m^2"
+
+msgctxt "Area unit"
+msgid "Floor area m^2"
+msgstr "kem^2"
+
+msgctxt "Area unit"
+msgid "Apartment area m^2"
+msgstr "hm^2"
+
+msgctxt "Constructability state"
+msgid "Unverified"
+msgstr "Tarkistamatta"
+
+msgctxt "Constructability state"
+msgid "Requires measures"
+msgstr "Vaatii toimenpiteitä"
+
+msgctxt "Constructability state"
+msgid "Enquiry sent"
+msgstr "Kysely lähetetty"
+
+msgctxt "Constructability state"
+msgid "Complete"
+msgstr "Valmis"
+
+msgctxt "Constructability type"
+msgid "Preconstruction"
+msgstr "Esirakentaminen, johtosiirrot ja kunnallistekniikka"
+
+msgctxt "Constructability type"
+msgid "Demolition"
+msgstr "Purku"
+
+msgctxt "Constructability type"
+msgid "Polluted land"
+msgstr "PIMA"
+
+msgctxt "Constructability type"
+msgid "Report"
+msgstr "Rakennettavuusselvitys"
+
+msgctxt "Constructability type"
+msgid "Other"
+msgstr "Muut"
+
+msgctxt "Polluted Land rent condition state"
+msgid "Asked"
+msgstr "Kysytty"
+
+msgctxt "Polluted Land rent condition state"
+msgid "Ready"
+msgstr "Valmis"
+
+msgctxt "Constructability Report investigation state"
+msgid "No need"
+msgstr "Ei tarvetta"
+
+msgctxt "Constructability Report investigation state"
+msgid "Ongoing"
+msgstr "Tekeillä"
+
+msgctxt "Constructability Report investigation state"
+msgid "Ready"
+msgstr "Valmis"
+
+msgctxt "Rent type"
+msgid "Index"
+msgstr "Indeksi"
+
+msgctxt "Rent type"
+msgid "Index (old)"
+msgstr "Indeksi (vanha)"
+
+msgctxt "Rent type"
+msgid "One time"
+msgstr "Kertakaikkinen"
+
+msgctxt "Rent type"
+msgid "Fixed"
+msgstr "Kiinteä"
+
+msgctxt "Rent type"
+msgid "Free"
+msgstr "Korvauksetta"
+
+msgctxt "Rent type"
+msgid "Manual"
+msgstr "Käsinlaskenta"
+
+msgctxt "Rent cycle"
+msgid "January to december"
+msgstr "1.1. - 31.12."
+
+msgctxt "Rent cycle"
+msgid "April to march"
+msgstr "1.4. - 31.3."
+
+msgctxt "Index type"
+msgid "ind 50620 / 10/20%:n vaihtelut"
+msgstr "ind 50620 / 10/20%:n vaihtelut"
+
+msgctxt "Index type"
+msgid "ind 4661 / 10/20%:n vaihtelut"
+msgstr "ind 4661 / 10/20%:n vaihtelut"
+
+msgctxt "Index type"
+msgid "ind 418 / 10%:n vaihtelu"
+msgstr "ind 418 / 10%:n vaihtelu"
+
+msgctxt "Index type"
+msgid "ind 418 / 20%:n vaihtelu"
+msgstr "ind 418 / 20%:n vaihtelu"
+
+msgctxt "Index type"
+msgid "ind 392"
+msgstr "ind 392"
+
+msgctxt "Index type"
+msgid "ind 100 (pyöristys)"
+msgstr "ind 100 (pyöristys)"
+
+msgctxt "Index type"
+msgid "ind 100"
+msgstr "ind 100"
+
+msgctxt "Due dates type"
+msgid "Custom"
+msgstr "Erikseen määritelty"
+
+msgctxt "Due dates type"
+msgid "Fixed"
+msgstr "Kiinteät"
+
+msgctxt "Due dates position"
+msgid "Start of month"
+msgstr "Kuukauden alussa"
+
+msgctxt "Due dates position"
+msgid "Middle of month"
+msgstr "Kuukauden keskellä"
+
+msgctxt "Rent adjustment type"
+msgid "Discount"
+msgstr "Alennus"
+
+msgctxt "Rent adjustment type"
+msgid "Increase"
+msgstr "Korotus"
+
+msgctxt "Rent Adjustment amount type"
+msgid "% per year"
+msgstr "% per vuosi"
+
+msgctxt "Rent Adjustment amount type"
+msgid "€ per year"
+msgstr "€ per vuosi"
+
+msgctxt "Rent Adjustment amount type"
+msgid "€ total"
+msgstr "€ yhteensä"
+
+msgctxt "Subvention type"
+msgid "Form of management"
+msgstr "Hallintamuoto"
+
+msgctxt "Subvention type"
+msgid "Re-lease"
+msgstr "Uudelleenvuokraus"
+
+msgctxt "Invoice delivery method"
+msgid "Mail"
+msgstr "Posti"
+
+msgctxt "Invoice delivery method"
+msgid "Electronic"
+msgstr "E-lasku"
+
+msgctxt "Invoice state"
+msgid "Open"
+msgstr "Avoin"
+
+msgctxt "Invoice state"
+msgid "Paid"
+msgstr "Maksettu"
+
+msgctxt "Invoice state"
+msgid "Refunded"
+msgstr "Hyvitetty"
+
+msgctxt "Invoice type"
+msgid "Charge"
+msgstr "Lasku"
+
+msgctxt "Invoice type"
+msgid "Credit note"
+msgstr "Hyvityslasku"
+
+msgctxt "Contact type"
+msgid "Person"
+msgstr "Henkilö"
+
+msgctxt "Contact type"
+msgid "Business"
+msgstr "Yritys"
+
+msgctxt "Contact type"
+msgid "Unit"
+msgstr "Yksikkö"
+
+msgctxt "Contact type"
+msgid "Association"
+msgstr "Yhteisö"
+
+msgctxt "Contact type"
+msgid "Other"
+msgstr "Muu"
+
+msgctxt "Infill development compensation"
+msgid "Ongoing"
+msgstr "Vireillä"
+
+msgctxt "Infill development compensation"
+msgid "Negotiating"
+msgstr "Neuvottelu"
+
+msgctxt "Infill development compensation"
+msgid "Decision"
+msgstr "Päätös"
+
+msgctxt "Area type"
+msgid "Lease area"
+msgstr "Vuokra-alue"
+
+msgctxt "Area type"
+msgid "Plan unit"
+msgstr "Kaavayksikkö"
+
+msgctxt "Area type"
+msgid "Real property"
+msgstr "Kiinteistö"
+
+msgctxt "Area type"
+msgid "Unseparated parcel"
+msgstr "Määräala"
+
+msgctxt "Area type"
+msgid "Plot division"
+msgstr "Tonttijako"
+
+msgctxt "Area type"
+msgid "Basis of rent"
+msgstr "Vuokrausperiaate"
+
+msgctxt "Area type"
+msgid "Infill development compensation"
+msgstr "Täydennysrakentamiskorvaus"
+
+msgctxt "Area type"
+msgid "Detailed plan"
+msgstr "Asemakaava"
+
+msgctxt "Area type"
+msgid "Other"
+msgstr "Muu"
+
+msgctxt "Email log type"
+msgid "Constructability"
+msgstr "Rakentamiskelpoisuus"
+
+msgctxt "Leasehold transfer party type"
+msgid "Lessor"
+msgstr "Vuokranantaja"
+
+msgctxt "Leasehold transfer party type"
+msgid "Conveyor"
+msgstr "Luovuttaja"
+
+msgctxt "Leasehold transfer party type"
+msgid "Acquirer"
+msgstr "Saaja"
+
+msgctxt "Decision type kind"
+msgid "Lease cancellation"
+msgstr "Vuokrasopimuksen purkaminen"
+
+msgctxt "Decision type kind"
+msgid "Basis of Rent"
+msgstr "Vuokrausperiaate"
+
+msgctxt "Decision type kind"
+msgid "Lease service unit transfer"
+msgstr "Vuokrauksen siirto palvelukokonaisuuteen"
+
+msgctxt "Detailed plan class"
+msgid "Pending"
+msgstr ""
+
+msgctxt "Detailed plan class"
+msgid "Effective"
+msgstr ""
+
+msgctxt "Basis of rent type"
+msgid "Lease"
+msgstr "Vuokra"
+
+msgctxt "Basis of rent type"
+msgid "Lease (old)"
+msgstr "Vuokra (vanha)"
+
+msgctxt "Basis of rent type"
+msgid "Temporary"
+msgstr "Tilapäinen"
+
+msgctxt "Basis of rent type"
+msgid "Additional yard"
+msgstr "Lisäpiha"
+
+msgctxt "Basis of rent type"
+msgid "Field"
+msgstr "Pelto"
+
+msgctxt "Basis of rent type"
+msgid "Mast"
+msgstr "Masto"
+
+msgctxt "Basis of rent zone"
+msgid "Zone 1"
+msgstr "Vyöhyke 1"
+
+msgctxt "Basis of rent zone"
+msgid "Zone 2"
+msgstr "Vyöhyke 2"
+
+msgctxt "Basis of rent zone"
+msgid "Zone 3"
+msgstr "Vyöhyke 3"
+
+msgctxt "Plan Unit Status"
+msgid "Present"
+msgstr "Nykyhetkellä"
+
+msgctxt "Plan Unit Status"
+msgid "Pending"
+msgstr "Vireillä"
+
+msgctxt "Periodic Rent Adjustment Type"
+msgid "Periodic Rent Adjustment 20y/20y"
+msgstr "Tasotarkistus 20v/20v"
+
+msgctxt "Periodic Rent Adjustment Type"
+msgid "Periodic Rent Adjustment 20y/10y"
+msgstr "Tasotarkistus 20v/10v"
+
+msgctxt "Collection stage"
+msgid "Risk of demolition"
+msgstr "Purku-uhkainen"
+
+msgctxt "Collection stage"
+msgid "Risk of demolition and litigation"
+msgstr "Purku- ja oikeudenkäyntiuhkainen"
+
+msgctxt "Collection stage"
+msgid "Risk of litigation"
+msgstr "Oikeudenkäyntiuhkainen"
+
+msgctxt "Collection stage"
+msgid "Risk of termination and litigation"
+msgstr "Irtisanomis- ja oikeudenkäyntiuhkainen"
+
+msgctxt "Collection stage"
+msgid "Simple payment reminder"
+msgstr "Yksinkertainen maksukehotus"
+
+msgctxt "Collection stage"
+msgid "Payment demand"
+msgstr "Svean maksuvaatimus"
+
+msgctxt "Collection stage"
+msgid "Payment deferral"
+msgstr "Maksulykkäys"
+
+msgctxt "Collection stage"
+msgid "Contract change"
+msgstr "Sopimusmuutos"
+
+msgctxt "Collection stage"
+msgid "Bankruptcy or reorganization"
+msgstr "Konkurssi, saneeraus tmv."
+
+msgctxt "Collection stage"
+msgid "Distraint"
+msgstr "Ulosotto (estää Svea perintään siirron)"
+
+msgctxt "Collection stage"
+msgid "Distraint notice"
+msgstr "Ulosotto (huomautus)"
+
+msgctxt "Collection stage"
+msgid "Notice"
+msgstr "Huomautus"
+
+msgctxt "Collection stage"
+msgid "Complaint or other obstruction"
+msgstr "Reklamaatio tai muu este"
+
+msgctxt "Preparation state"
+msgid "Missing lease property"
+msgstr "Vuokrakohde puuttuu"
+
+msgctxt "Preparation state"
+msgid "Missing lease area geometry"
+msgstr "Vuokra-alueen geometria puuttuu"
+
+msgctxt "Preparation state"
+msgid "Missing tenant"
+msgstr "Vuokralainen puuttuu"
+
+msgctxt "Preparation state"
+msgid "Missing rent"
+msgstr "Vuokra puuttuu"
+
+msgctxt "Preparation state"
+msgid "Missing decision"
+msgstr "Päätös puuttuu"
+
+msgctxt "Preparation state"
+msgid "Missing constructability"
+msgstr "Rakentamiskelpoisuus puuttuu"
+
+msgctxt "Preparation state"
+msgid "Contract not signed"
+msgstr "Sopimusta ei allekirjoitettu"
+
+msgctxt "Preparation state"
+msgid "Rent not marked ready"
+msgstr "Vuokraus ei merkitty valmiiksi"
+
+msgctxt "Preparation state"
+msgid "Invoicing not started"
+msgstr "Laskutus ei käynnistetty"
+
+msgid "Going to SAP"
+msgstr "Lähdössä SAP:iin"
+
+msgctxt "Model name"
+msgid "Area source"
+msgstr "Alueen lähde"
+
+msgid "Area type"
+msgstr "Alueen tyyppi"
+
+msgid "External ID"
+msgstr "Ulkoinen tunniste"
+
+msgid "Geometry"
+msgstr "Muoto"
+
+msgid "Metadata"
+msgstr "Metadata"
+
+msgid "Source"
+msgstr "Lähde"
+
+msgctxt "Model name"
+msgid "Area"
+msgstr "Alue"
+
+msgid "Note"
+msgstr "Kommentti"
+
+msgctxt "Model name"
+msgid "Area note"
+msgstr "Muistettava ehto"
+
+msgctxt "Model name"
+msgid "Area notes"
+msgstr "Muistettavat ehdot"
+
+msgctxt "Model name"
+msgid "Basis of rent plot type"
+msgstr "Tonttityyppi"
+
+msgctxt "Model name"
+msgid "Basis of rent plot types"
+msgstr "Tonttityypit"
+
+msgctxt "Model name"
+msgid "Basis of rent build permission type"
+msgstr "Rakennusoikeustyyppi"
+
+msgctxt "Model name"
+msgid "Basis of rent build permission types"
+msgstr "Rakennusoikeustyypit"
+
+msgid "Plot type"
+msgstr "Tonttityyppi"
+
+msgid "Detailed plan identifier"
+msgstr "Asemakaava"
+
+msgid "Form of management"
+msgstr "Hallintamuoto"
+
+msgid "Form of financing"
+msgstr "Rahoitusmuoto"
+
+msgid "Lease rights end date"
+msgstr "Vuokraoikeus päättyy"
+
+msgid "Index"
+msgstr "Indeksi"
+
+msgctxt "Model name"
+msgid "Basis of rent"
+msgstr "Vuokrausperiaate"
+
+msgctxt "Model name"
+msgid "Basis of rents"
+msgstr "Vuokrausperiaatteet"
+
+msgid "Basis of rent"
+msgstr "Vuokrausperiaate"
+
+msgid "Build permission type"
+msgstr "Rakennusoikeustyyppi"
+
+msgid "Amount"
+msgstr "Määrä"
+
+msgid "Area unit"
+msgstr "Pinta-alayksikkö"
+
+msgctxt "Model name"
+msgid "Basis of rent rate"
+msgstr "Vuokrausperiaatteen hinta"
+
+msgctxt "Model name"
+msgid "Basis of rent rates"
+msgstr "Vuokrausperiaatteen hinnat"
+
+msgctxt "Model name"
+msgid "Basis of rent property identifier"
+msgstr "Vuokrausperiaatteen Kiinteistötunnus"
+
+msgctxt "Model name"
+msgid "Basis of rent property identifiers"
+msgstr "Vuokrausperiaatteen Kiinteistötunnukset"
+
+msgid "Reference number"
+msgstr "Diaarinumero"
+
+msgid "Decision maker"
+msgstr "Päättäjä"
+
+msgid "Decision date"
+msgstr "Päätöspäivämäärä"
+
+msgid "Section"
+msgstr "Pykälä"
+
+msgctxt "Model name"
+msgid "Basis of rent decision"
+msgstr "Vuokrausperiaatteen päätös"
+
+msgctxt "Model name"
+msgid "Basis of rent decisions"
+msgstr "Vuokrausperiaatteen päätös"
+
+msgctxt "Model name"
+msgid "Comment topic"
+msgstr "Kommentin aihe"
+
+msgctxt "Model name"
+msgid "Comment topics"
+msgstr "Kommentin aiheet"
+
+msgid "Topic"
+msgstr "Aihe"
+
+msgctxt "Model name"
+msgid "Comment"
+msgstr "Kommentti"
+
+msgctxt "Model name"
+msgid "Comments"
+msgstr "Kommentit"
+
+msgid "Type"
+msgstr "Tyyppi"
+
+msgid "First name"
+msgstr "Etunimi"
+
+msgid "Last name"
+msgstr "Sukunimi"
+
+msgid "Name"
+msgstr "Nimi"
+
+msgid "c/o"
+msgstr "c/o"
+
+msgid "Postal code"
+msgstr "Postinumero"
+
+msgid "City"
+msgstr "Kaupunki"
+
+msgid "Country"
+msgstr "Maa"
+
+msgid "Email"
+msgstr "Sähköposti"
+
+msgid "Phone"
+msgstr "Puhelin"
+
+msgid "Language"
+msgstr "Kieli"
+
+msgid "National identification number"
+msgstr "Henkilötunnus"
+
+msgid "Address protection"
+msgstr "Turvakielto"
+
+msgid "SAP customer number"
+msgstr "SAP asiakasnumero"
+
+msgid "Electronic billing address"
+msgstr "Verkkolaskutusosoite"
+
+msgid "Partner code"
+msgstr "Kumppanitunnus"
+
+msgid "Is a lessor"
+msgstr "Onko vuokranantaja"
+
+msgid "SAP sales office"
+msgstr "SAP myyntitoimisto"
+
+msgctxt "Model name"
+msgid "Contact"
+msgstr "Yhteystieto"
+
+msgctxt "Model name"
+msgid "Contacts"
+msgstr "Yhteystiedot"
+
+#. Translators: Replaces the name of a person with a generic term.
+msgctxt "Replaces persons name"
+msgid "PRIVATE"
+msgstr "YKSITYINEN"
+
+#, python-brace-format
+msgid "{name} (National Identification Number {id})"
+msgstr "{name} (Henkilötunnus {id})"
+
+#, python-brace-format
+msgid "{name} (Business ID {id})"
+msgstr "{name} (Y-tunnus {id})"
+
+msgctxt "Model name"
+msgid "Contract type"
+msgstr "Sopimuksen tyyppi"
+
+msgctxt "Model name"
+msgid "Contract types"
+msgstr "Sopimuksen tyypit"
+
+msgid "Contract type"
+msgstr "Sopimuksen tyyppi"
+
+msgid "Contract number"
+msgstr "Sopimusnumero"
+
+msgid "Signing date"
+msgstr "Allekirjoituspäivämäärä"
+
+msgid "Sign by date"
+msgstr "Allekirjoitettava mennessä"
+
+msgid "Signing note"
+msgstr "Kommentti allekirjoitukselle"
+
+msgid "First call sent"
+msgstr "1. kutsu lähetetty"
+
+msgid "Second call sent"
+msgstr "2. kutsu lähetetty"
+
+msgid "Third call sent"
+msgstr "3. kutsu lähetetty"
+
+msgid "Is readjustment decision"
+msgstr "Järjestelypäätös"
+
+msgid "Decision"
+msgstr "Päätös"
+
+msgid "KTJ link"
+msgstr "KTJ vuokraoikeustodistuksen linkki"
+
+msgid "Institution identifier"
+msgstr "Laitostunnus"
+
+msgid "Executor"
+msgstr "Toimeenpanija"
+
+msgctxt "Model name"
+msgid "Contract"
+msgstr "Sopimus"
+
+msgctxt "Model name"
+msgid "Contracts"
+msgstr "Sopimukset"
+
+msgctxt "Model name"
+msgid "Collateral type"
+msgstr "Vakuuden tyyppi"
+
+msgctxt "Model name"
+msgid "Collateral types"
+msgstr "Vakuuden tyypit"
+
+msgid "Contract"
+msgstr "Sopimus"
+
+msgid "Collateral type"
+msgstr "Vakuuden tyyppi"
+
+msgid "Other type"
+msgstr "Muu vakuuden tyyppi"
+
+msgid "Number"
+msgstr "Numero"
+
+msgid "Deed date"
+msgstr "Panttikirjan pvm"
+
+msgid "Total amount"
+msgstr "Pääoma"
+
+msgid "Returned date"
+msgstr "Palautettu pvm"
+
+msgctxt "Model name"
+msgid "Collateral"
+msgstr "Vakuus"
+
+msgctxt "Model name"
+msgid "Collaterals"
+msgstr "Vakuudet"
+
+msgid "Description"
+msgstr "Selite"
+
+msgctxt "Model name"
+msgid "Contract change"
+msgstr "Sopimusmuutos"
+
+msgctxt "Model name"
+msgid "Contract changes"
+msgstr "Sopimusmuutokset"
+
+msgid "File"
+msgstr "Tiedosto"
+
+msgid "Uploader"
+msgstr "Lataaja"
+
+msgid "Time uploaded"
+msgstr "Latauspäivämäärä"
+
+msgctxt "Model name"
+msgid "Collection letter"
+msgstr "Perintäkirje"
+
+msgctxt "Model name"
+msgid "Collection letters"
+msgstr "Perintäkirjeet"
+
+msgctxt "Model name"
+msgid "Collection letter template"
+msgstr "Perintäkirjepohja"
+
+msgctxt "Model name"
+msgid "Collection letter templates"
+msgstr "Perintäkirjepohjat"
+
+msgid "Collection stage"
+msgstr "Perintävaihe"
+
+msgid "Sent date"
+msgstr "Lähetyspäivämäärä"
+
+msgid "Inspection date"
+msgstr "Valvontapvm"
+
+msgid "Postpone date"
+msgstr "Lykkäyspvm"
+
+msgid "Entire lease"
+msgstr "Koko vuokraus"
+
+msgctxt "Model name"
+msgid "Collection letter note"
+msgstr "Perintähuomautus"
+
+msgctxt "Model name"
+msgid "Collection letter notes"
+msgstr "Perintähuomautukset"
+
+msgctxt "Model name"
+msgid "Collection court decision"
+msgstr "Käräjäoikeuden päätös"
+
+msgctxt "Model name"
+msgid "Collection court decisions"
+msgstr "Käräjäoikeuden päätökset"
+
+msgid "Reference rate"
+msgstr "Viitekorko"
+
+msgid "Penalty rate"
+msgstr "Viivästyskorko"
+
+msgctxt "Model name"
+msgid "Interest rate"
+msgstr "Korko"
+
+msgctxt "Model name"
+msgid "Interest rates"
+msgstr "Korot"
+
+msgctxt "Model name"
+msgid "Decision maker"
+msgstr "Päättäjä"
+
+msgctxt "Model name"
+msgid "Decision makers"
+msgstr "Päättäjät"
+
+msgid "Decision type kind"
+msgstr "Päätöstyypin laji"
+
+msgctxt "Model name"
+msgid "Decision type"
+msgstr "Päätöstyyppi"
+
+msgctxt "Model name"
+msgid "Decision types"
+msgstr "Päätöstyypit"
+
+msgctxt "Model name"
+msgid "Decision"
+msgstr "Päätös"
+
+msgctxt "Model name"
+msgid "Decisions"
+msgstr "Päätökset"
+
+msgctxt "Model name"
+msgid "Condition type"
+msgstr "Ehdon tyyppi"
+
+msgctxt "Model name"
+msgid "Condition types"
+msgstr "Ehdon tyypit"
+
+msgid "Supervision date"
+msgstr "Valvontapäivämäärä"
+
+msgid "Supervised date"
+msgstr "Valvottupäivämäärä"
+
+msgctxt "Model name"
+msgid "Condition"
+msgstr "Ehto"
+
+msgctxt "Model name"
+msgid "Conditions"
+msgstr "Ehdot"
+
+msgid "Accepter"
+msgstr ""
+
+msgid "Class"
+msgstr ""
+
+msgid "Diary number"
+msgstr ""
+
+msgid "Plan stage"
+msgstr ""
+
+msgid "Lawfulness date"
+msgstr ""
+
+msgctxt "Model name"
+msgid "Detailed plan"
+msgstr ""
+
+msgctxt "Model name"
+msgid "Detailed plans"
+msgstr ""
+
+msgid "Email log type"
+msgstr "Sähköpostilokityyppi"
+
+msgctxt "Model name"
+msgid "Email log"
+msgstr "Sähköpostiloki"
+
+msgctxt "Model name"
+msgid "Email logs"
+msgstr "Sähköpostilokit"
+
+msgid "Lease contract change date"
+msgstr "Vuokrasopimuksen muutospäivämäärä"
+
+msgctxt "Model name"
+msgid "Infill development compensation"
+msgstr "Täydennysrakentamiskorvaus"
+
+msgctxt "Model name"
+msgid "Infill development compensations"
+msgstr "Täydennysrakentamiskorvaukset"
+
+msgid "Infill development compensation"
+msgstr "Täydennysrakentamiskorvaus"
+
+msgid "Monetary compensation amount"
+msgstr "Rahakorvaus"
+
+msgid "Compensation investment amount"
+msgstr "Korvausinvestoinnit"
+
+msgid "Increase in value"
+msgstr "Arvonnousu"
+
+msgid "Part of the increase in value"
+msgstr "Osuus arvonnoususta"
+
+msgid "Discount in rent"
+msgstr "Vuokranalennus"
+
+msgid "Year"
+msgstr "Vuosi"
+
+msgid "Sent to SAP date"
+msgstr "Maksu lähetetty SAP"
+
+msgctxt "Model name"
+msgid "Infill development compensation lease"
+msgstr "Täydennysrakentamiskorvausvuokraus"
+
+msgctxt "Model name"
+msgid "Infill development compensation leases"
+msgstr "Täydennysrakentamiskorvausvuokraukset"
+
+msgid "Infill development compensation lease"
+msgstr "Täydennysrakentamiskorvausvuokraus"
+
+msgctxt "Model name"
+msgid "Infill development compensation decision"
+msgstr "Täydennysrakentamiskorvauspäätös"
+
+msgctxt "Model name"
+msgid "Infill development compensation decisions"
+msgstr "Täydennysrakentamiskorvauspäätökset"
+
+msgid "Floor m2"
+msgstr "K-m2"
+
+msgid "Amount per floor m^2"
+msgstr "€ / k-m2"
+
+msgctxt "Model name"
+msgid "Infill development compensation intended use"
+msgstr "Täydennysrakentamiskorvauskäyttötarkoitus"
+
+msgctxt "Model name"
+msgid "Infill development compensation intended uses"
+msgstr "Täydennysrakentamiskorvauskäyttötarkoitukset"
+
+msgctxt "Model name"
+msgid "Infill development compensation attachment"
+msgstr "Täydennysrakentamiskorvausliitetiedosto"
+
+msgctxt "Model name"
+msgid "Infill development compensation attachments"
+msgstr "Täydennysrakentamiskorvausliitetiedostot"
+
+msgid "Inspector"
+msgstr "Tarkastaja"
+
+msgctxt "Model name"
+msgid "Inspection"
+msgstr "Tarkastus"
+
+msgctxt "Model name"
+msgid "Inspections"
+msgstr "Tarkastukset"
+
+msgctxt "Model name"
+msgid "Inspection attachment"
+msgstr "Tarkastuksen liite"
+
+msgctxt "Model name"
+msgid "Inspection attachments"
+msgstr "Tarkastuksen liitteet"
+
+msgid "Billing period start date"
+msgstr "Laskutuskauden alkupvm"
+
+msgid "Billing period end date"
+msgstr "Laskutuskauden loppupvm"
+
+msgctxt "Model name"
+msgid "Invoice set"
+msgstr "Laskuryhmä"
+
+msgid "Invoice set"
+msgstr "Laskuryhmät"
+
+msgid "Recipient"
+msgstr "Laskunsaaja"
+
+msgid "Sent to SAP at"
+msgstr "Lähetetty SAP:iin"
+
+msgid "SAP ID"
+msgstr "SAP-numero"
+
+msgid "Adjusted due date"
+msgstr "Eräpäivä (siirretty)"
+
+msgid "Invoicing date"
+msgstr "Laskutuspvm"
+
+msgid "Billed amount"
+msgstr "Laskutettu määrä"
+
+msgid "Outstanding amount"
+msgstr "Maksamaton määrä"
+
+msgid "Payment notification date"
+msgstr "Maksukehotuspvm"
+
+msgid "Collection charge"
+msgstr "Perintäkulu"
+
+msgid "Payment notification catalog date"
+msgstr "Maksukehotus luettelo"
+
+msgid "Delivery method"
+msgstr "E vai paperilasku"
+
+msgid "Notes"
+msgstr "Tiedote"
+
+msgid "Is automatically generated?"
+msgstr "Automaattisesti luotu?"
+
+msgid "Credited invoice"
+msgstr "Hyvitetty lasku"
+
+msgid "Interest invoice for"
+msgstr "Korko laskulle"
+
+msgctxt "Model name"
+msgid "Invoice"
+msgstr "Lasku"
+
+msgctxt "Model name"
+msgid "Invoices"
+msgstr "Laskut"
+
+msgid "Cannot credit an invoice that has been refunded."
+msgstr ""
+"Hyvitettyä laskua ei voida hyvittää uudelleen."
+
+msgctxt "Model name"
+msgid "Invoice note"
+msgstr "Laskun tiedote"
+
+msgctxt "Model name"
+msgid "Invoice notes"
+msgstr "Laskun tiedotteet"
+
+msgid "Tenant"
+msgstr "Vuokralainen"
+
+msgid "Receivable type"
+msgstr "Saamislaji"
+
+msgctxt "Model name"
+msgid "Invoice row"
+msgstr "Laskun rivi"
+
+msgctxt "Model name"
+msgid "Invoice rows"
+msgstr "Laskun rivit"
+
+msgctxt "Model name"
+msgid "Invoice payment"
+msgstr "Maksusuoritus"
+
+msgctxt "Model name"
+msgid "Invoice payments"
+msgstr "Maksusuoritukset"
+
+msgid "Is master?"
+msgstr "Onko alkuperäinen?"
+
+msgid "Master timestamp"
+msgstr "Alkuperäiskappaleen aikaleima"
+
+msgid ""
+"The master land item has already created. There can be only one master land "
+"item per lease area and identifier."
+msgstr ""
+"Alkuperäinen kaavayksikkö on jo luotu. Alkuperäisiä kaavayksiköitä voi olla "
+"vain yksi per vuokra-alueen kaavayksikön tunnus."
+
+msgid "Area in square meters"
+msgstr "Kokonaisala neliömetreissä"
+
+msgid "Section area"
+msgstr "Leikkausala"
+
+msgid "Location"
+msgstr "Sijainti"
+
+msgid "Preconstruction state"
+msgstr "Selvitysaste (Esirakentaminen, johtosiirrot ja kunnallistekniikka)"
+
+msgid "Preconstruction estimated construction readiness"
+msgstr "Arvioitu rakentamisvalmiusajankohta (Esirakentaminen)"
+
+msgid "Preconstruction inspection"
+msgstr ""
+"Tarkistusajankohta (Esirakentaminen, johtosiirrot ja kunnallistekniikka)"
+
+msgid "Demolition state"
+msgstr "Selvitysaste (Purku)"
+
+msgid "Polluted land state"
+msgstr "Selvitysaste (Pilaantunut maa-alue (PIMA))"
+
+msgid "Polluted land rent condition state"
+msgstr "Vuokraehdot (kysyminen)"
+
+msgid "Polluted land rent condition date"
+msgstr "Vuokraehtojen kysymisen päivämäärä"
+
+msgid "ProjectWise number"
+msgstr "ProjectWise kohdenumero"
+
+msgid "Constructability report state"
+msgstr "Selvitysaste (Rakennettavuusselvitys)"
+
+msgid "Constructability report investigation state"
+msgstr "Rakennettavuusselvityksen tila"
+
+msgid "Constructability report signing date"
+msgstr "Allekirjoituspäivämäärä"
+
+msgid "Constructability report signer"
+msgstr "Allekirjoittaja"
+
+msgid "Other state"
+msgstr "Selvitysaste (Muut)"
+
+msgid "Archived decision"
+msgstr "Arkistointipäätös"
+
+msgctxt "Model name"
+msgid "Lease area"
+msgstr "Vuokra-alue"
+
+msgctxt "Model name"
+msgid "Lease areas"
+msgstr "Vuokra-alueet"
+
+msgid "Is primary?"
+msgstr "Ensisijainen?"
+
+msgctxt "Model name"
+msgid "Lease area address"
+msgstr "Vuokra-alueen osoite"
+
+msgctxt "Model name"
+msgid "Lease area addresses"
+msgstr "Vuokra-alueen osoitteet"
+
+msgctxt "Model name"
+msgid "Lease area attachment"
+msgstr "Vuokra-alueen liite"
+
+msgctxt "Model name"
+msgid "Lease area attachments"
+msgstr "Vuokra-alueen liitteet"
+
+msgid "AHJO reference number"
+msgstr "AHJO diaarinumero"
+
+msgid "Is static?"
+msgstr "Pysyvä?"
+
+msgctxt "Model name"
+msgid "Constructability description"
+msgstr "Rakentamiskelpoisuus-selitys"
+
+msgctxt "Model name"
+msgid "Constructability descriptions"
+msgstr "Rakentamiskelpoisuus-selitykset"
+
+msgid "Registration date"
+msgstr "Rekisteröintipäivä"
+
+msgid "Repeal date"
+msgstr "Kumoamispvm"
+
+msgid "At time of contract"
+msgstr "Sopimushetkellä"
+
+msgctxt "Model name"
+msgid "Plot"
+msgstr "Tontti"
+
+msgctxt "Model name"
+msgid "Plots"
+msgstr "Tontit"
+
+msgctxt "Model name"
+msgid "Plan unit type"
+msgstr "Kaavayksikön laji"
+
+msgctxt "Model name"
+msgid "Plan unit types"
+msgstr "Kaavayksikön lajit"
+
+msgctxt "Model name"
+msgid "Plot divisions state"
+msgstr "Tonttijaon vaihe"
+
+msgctxt "Model name"
+msgid "Plot division states"
+msgstr "Tonttijaon vaiheet"
+
+msgctxt "Model name"
+msgid "Plan unit state"
+msgstr "Kaavayksikön olotila"
+
+msgctxt "Model name"
+msgid "Plan unit states"
+msgstr "Kaavayksikön olotilat"
+
+msgctxt "Model name"
+msgid "Plan unit intended use"
+msgstr "Kaavayksikön käyttötarkoitus"
+
+msgctxt "Model name"
+msgid "Plan unit intended uses"
+msgstr "Kaavayksikön käyttötarkoitukset"
+
+msgid "Plot division identifier"
+msgstr "Tonttijaon tunnus"
+
+msgid "Plot division date of approval"
+msgstr "Tonttijaon hyväksymispvm"
+
+msgid "Plot division effective date"
+msgstr "Tonttijaon Tonttijaon voimaantulopvm"
+
+msgid "Plot division state"
+msgstr "Tonttijaon olotila"
+
+msgid "Detailed plan latest processing date"
+msgstr "Asemakaavan viimeisin käsittelypvm"
+
+msgid "Note for latest processing date"
+msgstr "Asemakaavan viimeisin käsittelypvm. selite"
+
+msgid "Plan unit type"
+msgstr "Kaavayksikön laji"
+
+msgid "Plan unit state"
+msgstr "Kaavayksikön olotila"
+
+msgid "Plan unit intended use"
+msgstr "Kaavayksikön käyttötarkoitus"
+
+msgid "Plan unit status"
+msgstr "Kaavayksikön tila"
+
+msgctxt "Model name"
+msgid "Plan unit"
+msgstr "Kaavayksikkö"
+
+msgctxt "Model name"
+msgid "Plan units"
+msgstr "Kaavayksiköt"
+
+msgid "SAP material code"
+msgstr "SAP materiaalinumero"
+
+msgid "SAP order item number"
+msgstr "SAP tilausnumero"
+
+msgid "If 'SAP project number' is set, it will be used instead of this value."
+msgstr ""
+"Jos 'SAP projektinumero' on asetettu, sitä käytetään tämän arvon sijaan."
+
+msgid "SAP project number"
+msgstr "SAP projektinumero"
+
+msgid "This field takes priority over 'SAP order item number' if both are set."
+msgstr ""
+"Tätä kenttää käytetään 'SAP tilausnumeron' sijaan jos kumpikin on asetettu."
+
+msgid "Due dates position"
+msgstr "Eräpäivien sijainti"
+
+msgid "Is the Lease Type active?"
+msgstr "Onko vuokraustyyppi aktiivinen?"
+
+msgid "Is active?"
+msgstr "Käytettävissä?"
+
+msgctxt "Model name"
+msgid "Lease type"
+msgstr "Laji"
+
+msgctxt "Model name"
+msgid "Lease types"
+msgstr "Lajit"
+
+msgctxt "Model name"
+msgid "Municipality"
+msgstr "Kaupunki"
+
+msgctxt "Model name"
+msgid "Municipalities"
+msgstr "Kaupunki"
+
+msgid "Municipality"
+msgstr "Kaupunki"
+
+msgctxt "Model name"
+msgid "District"
+msgstr "Kaupunginosa"
+
+msgctxt "Model name"
+msgid "Districts"
+msgstr "Kaupunginosat"
+
+msgid "Is the intended use active?"
+msgstr "Onko käyttötarkoitus käytössä?"
+
+msgctxt "Model name"
+msgid "Intended use"
+msgstr "Käyttötarkoitus"
+
+msgctxt "Model name"
+msgid "Intended uses"
+msgstr "Käyttötarkoitukset"
+
+msgctxt "Model name"
+msgid "Statistical use"
+msgstr "Tilastollinen pääkäyttötarkoitus"
+
+msgctxt "Model name"
+msgid "Statistical uses"
+msgstr "Tilastolliset pääkäyttötarkoitukset"
+
+msgctxt "Model name"
+msgid "Supportive housing"
+msgstr "Erityisasunto"
+
+msgctxt "Model name"
+msgid "Supportive housings"
+msgstr "Erityisasunnot"
+
+msgctxt "Model name"
+msgid "Form of financing"
+msgstr "Rahoitusmuoto"
+
+msgctxt "Model name"
+msgid "Forms of financing"
+msgstr "Rahoitusmuodot"
+
+msgctxt "Model name"
+msgid "Form of management"
+msgstr "Hallintamuoto"
+
+msgctxt "Model name"
+msgid "Forms of management"
+msgstr "Hallintamuodot"
+
+msgctxt "Model name"
+msgid "Form of regulation"
+msgstr "Sääntelymuoto"
+
+msgctxt "Model name"
+msgid "Forms of regulation"
+msgstr "Sääntelymuodot"
+
+msgctxt "Model name"
+msgid "Hitas"
+msgstr "Hitas"
+
+msgid "Period type"
+msgstr "Irtisanomisajan tyyppi"
+
+msgid "Duration"
+msgstr "Kesto"
+
+msgid "In ISO 8601 Duration format"
+msgstr "ISO 8601 Duration-muodossa"
+
+msgctxt "Model name"
+msgid "Notice period"
+msgstr "Irtisanomisaika"
+
+msgctxt "Model name"
+msgid "Notice periods"
+msgstr "Irtisanomisajat"
+
+msgctxt "Model name"
+msgid "Special project"
+msgstr "Erityshanke"
+
+msgctxt "Model name"
+msgid "Special projects"
+msgstr "Erityishankkeet"
+
+msgctxt "Model name"
+msgid "Reservation procedure"
+msgstr "Varauksen menettely"
+
+msgctxt "Model name"
+msgid "Reservation Procedures"
+msgstr "Varauksen menettelyt"
+
+msgid "Lease type"
+msgstr "Laji"
+
+msgid "Sequence number"
+msgstr "Juokseva numero"
+
+msgctxt "Model name"
+msgid "Lease identifier"
+msgstr "Vuokraustunnus"
+
+msgctxt "Model name"
+msgid "Lease identifiers"
+msgstr "Vuokraustunnukset"
+
+msgid "Classification"
+msgstr "Julkisuusluokka"
+
+msgid "Intended use note"
+msgstr "Käyttötarkoituksen selite"
+
+msgid "Transferable"
+msgstr "Siirto-oikeus"
+
+msgid "Regulated"
+msgstr "Säännelty"
+
+msgid "Notice note"
+msgstr "Irtisanomisilmoituksen selite"
+
+msgid "Supportive housing"
+msgstr "Erityisasunnot"
+
+msgid "Statistical use"
+msgstr "Tilastollinen pääkäyttötarkoitus"
+
+msgid "Form of regulation"
+msgstr "Sääntelymuoto"
+
+msgid "Hitas"
+msgstr "Hitas"
+
+msgid "Notice period"
+msgstr "Irtisanomisaika"
+
+msgid "Rent info completed at?"
+msgstr "Vuokratiedot kunnossa?"
+
+msgid "Invoicing enabled at?"
+msgstr "Laskutus käynnissä?"
+
+msgid "Is subject to VAT?"
+msgstr "Onko ALV:n alainen"
+
+msgid "Real estate developer"
+msgstr "Rakennuttaja"
+
+msgid "Conveyance number"
+msgstr "Luovutusnumero"
+
+msgid "Building selling price"
+msgstr "Rakennuksen kauppahinta"
+
+msgid "Special project"
+msgstr "Erityishanke"
+
+msgid "Reservation procedure"
+msgstr "Varauksen menettely"
+
+msgid "Internal order"
+msgstr "Sisäinen tilaus"
+
+msgctxt "Model name"
+msgid "Lease"
+msgstr "Vuokraus"
+
+msgctxt "Model name"
+msgid "Leases"
+msgstr "Vuokraukset"
+
+msgid "The intended use's service unit must match the lease's service_unit."
+msgstr ""
+"Käyttötarkoituksen ja vuokrauksen palvelukokonaisuuden pitää olla sama."
+
+#, python-brace-format
+msgid "{area_identifier}, {area_addresses}, {area_m2}m2"
+msgstr "{area_identifier}, {area_addresses}, {area_m2}m2"
+
+#, python-brace-format
+msgid "Contract #{contract_number}"
+msgstr "Sopimus #{contract_number}"
+
+msgid "Lease must have a start date to generate invoices."
+msgstr "Vuokrauksella on oltava aloituspäivämäärä laskujen luomiseksi"
+
+msgid "Lease must have a start date to enable invoicing."
+msgstr "Vuokrauksella on oltava aloituspäivämäärä laskutuksen aloittamiseksi"
+
+msgctxt "Model name"
+msgid "Lease state log"
+msgstr "Vuokrauksen tilamuutosloki"
+
+msgctxt "Model name"
+msgid "Lease state logs"
+msgstr "Vuokrauksen tilamuutoslokit"
+
+msgid "Application received at"
+msgstr "Hakemuksen saapumispäivämäärä"
+
+msgid "The date the application was received."
+msgstr "Hakemuksen saapumispäivämäärä."
+
+msgid "From lease"
+msgstr "Vuokrauksesta"
+
+msgid "To lease"
+msgstr "Vuokraukseen"
+
+msgid "Lease relation type"
+msgstr "Suhdetyyppi"
+
+msgctxt "Model name"
+msgid "Related lease"
+msgstr "Liittyvä vuokraus"
+
+msgctxt "Model name"
+msgid "Related leases"
+msgstr "Liittyvät vuokraukset"
+
+msgid "File name"
+msgstr "Tiedostonimi"
+
+msgctxt "Model name"
+msgid "Leasehold transfer import log"
+msgstr "Vuokraoikeuden siirtojen tuonnin loki"
+
+msgctxt "Model name"
+msgid "Leasehold transfer import logs"
+msgstr "Vuokraoikeuden siirtojen tuonnin lokit"
+
+msgctxt "Model name"
+msgid "Leasehold transfer"
+msgstr "Vuokraoikeuden siirto"
+
+msgctxt "Model name"
+msgid "Leasehold transfers"
+msgstr "Vuokraoikeuden siirrot"
+
+msgid "Leasehold transfer"
+msgstr "Vuokraoikeuden siirto"
+
+msgctxt "Model name"
+msgid "Leasehold transfer property"
+msgstr "Vuokraoikeuden siirron kohde"
+
+msgctxt "Model name"
+msgid "Leasehold transfer properties"
+msgstr "Vuokraoikeuden siirron kohteet"
+
+msgid "Numerator"
+msgstr "Jaettava"
+
+msgid "Denominator"
+msgstr "Jakaja"
+
+msgctxt "Model name"
+msgid "Leasehold transfer party"
+msgstr "Vuokraoikeuden siirron osapuoli"
+
+msgctxt "Model name"
+msgid "Leasehold transfer parties"
+msgstr "Vuokraoikeuden siirtojen osapuolet"
+
+msgid "Time archived"
+msgstr "Arkistointiaika"
+
+msgid "Archived note"
+msgstr "Arkistointihuomautus"
+
+msgctxt "Model name"
+msgid "Receivable type"
+msgstr "Saamislaji"
+
+msgctxt "Model name"
+msgid "Receivable types"
+msgstr "Saamislajit"
+
+msgctxt "Model name"
+msgid "Rent intended use"
+msgstr "Vuokran käyttötarkoitus"
+
+msgctxt "Model name"
+msgid "Rent intended uses"
+msgstr "Vuokran käyttötarkoitus"
+
+msgid "Index code"
+msgstr "Indeksin tunniste"
+
+msgid "Index name"
+msgstr "Indeksin nimi"
+
+msgid "Region"
+msgstr "Alue"
+
+msgid "Data source"
+msgstr "Tiedonlähde"
+
+msgid "Source table updated"
+msgstr "Lähdetietokantapöytä päivitetty"
+
+msgid "Source table label"
+msgstr "Lähdetietokantapöydän selite"
+
+msgid "API endpoint URL"
+msgstr "Ohjelmointirajapinnan päätepisteen verkko-osoite"
+
+msgctxt "model name"
+msgid "price index of old dwellings in housing companies"
+msgstr "Vanhojen osakeasuntojen hintaindeksi"
+
+msgctxt "model name"
+msgid "price indexes of old dwellings in housing companies"
+msgstr "Vanhojen osakeasuntojen hintaindeksit"
+
+msgid "Cycle"
+msgstr "Vuokrakausi"
+
+msgid "Index type"
+msgstr "Indeksin tunnusnumero"
+
+msgid "Due dates type"
+msgstr "Laskutusjako"
+
+msgid "Due dates per year"
+msgstr "Eräpäiviä vuodessa"
+
+msgid "Elementary index"
+msgstr "Perusindeksi"
+
+msgid "Index rounding"
+msgstr "Pyöristys"
+
+msgid "X value"
+msgstr "X-luku"
+
+msgid "Y value"
+msgstr "Y-luku"
+
+msgid "Y value start date"
+msgstr "Y-alkaen pvm"
+
+msgid "Equalization start date"
+msgstr "Tasaus alkupvm"
+
+msgid "Equalization end date"
+msgstr "Tasaus loppupvm"
+
+msgid "Manual ratio"
+msgstr "Käsinlaskentakerroin"
+
+msgid "Manual ratio (previous)"
+msgstr "Käsinlaskentakerroin (edellinen)"
+
+msgid "Payable rent amount"
+msgstr ""
+
+msgid "Payable rent start date"
+msgstr ""
+
+msgid "Payable rent end date"
+msgstr ""
+
+msgid "Override receivable type"
+msgstr "Korvaava saamislaji"
+
+msgid "Old dwellings in housing companies price index"
+msgstr "Vanhojen osakeasuntojen hintaindeksi"
+
+msgid "Periodic Rent Adjustment Type"
+msgstr "Vanhojen osakeasuntojen hintaindeksin tyyppi"
+
+msgid "Start price index point figure value"
+msgstr "Hintaindeksin pisteluvun arvo vuokran alkaessa"
+
+msgid "Start price index point figure year"
+msgstr "Hintaindeksin pisteluvun vuosi vuokran alkaessa"
+
+msgctxt "Model name"
+msgid "Rent"
+msgstr "Vuokra"
+
+msgctxt "Model name"
+msgid "Rents"
+msgstr "Vuokrat"
+
+msgid "Cannot calculate payable rent. The rent cycle '{}' is not defined."
+msgstr ""
+
+#, python-brace-format
+msgid "Manual ratio {ratio}"
+msgstr "Käsinlaskentakerroin {ratio}"
+
+msgid "Manual ratio not found!"
+msgstr "Käsinlaskentakerrointa ei löytynyt!"
+
+msgid "Average index for the year {} is not available!"
+msgstr "Vuoden {} keskiarvoindeksi ei ole tiedossa!"
+
+msgid "Rent"
+msgstr "Vuokra"
+
+msgid "Day"
+msgstr "Päivä"
+
+msgid "Month"
+msgstr "Kuukausi"
+
+msgctxt "Model name"
+msgid "Rent due date"
+msgstr "Eräpäivä"
+
+msgctxt "Model name"
+msgid "Rent due dates"
+msgstr "Eräpäivät"
+
+msgctxt "Model name"
+msgid "Fixed initial year rent"
+msgstr "Kiinteä alkuvuosivuokra"
+
+msgctxt "Model name"
+msgid "Fixed initial year rents"
+msgstr "Kiinteät alkuvuosivuokrat"
+
+msgid "Period"
+msgstr "Yksikkö"
+
+msgid "Base amount"
+msgstr "Vuokranlaskennan perusteena oleva vuokra"
+
+msgid "Base amount period"
+msgstr "Yksikkö"
+
+msgid "Base year rent"
+msgstr "Uusi perusvuosi vuokra"
+
+msgctxt "Model name"
+msgid "Contract rent"
+msgstr "Sopimusvuokra"
+
+msgctxt "Model name"
+msgid "Contract rents"
+msgstr "Sopimusvuokrat"
+
+msgid "Factor"
+msgstr "Laskentakerroin"
+
+msgctxt "Model name"
+msgid "Index adjusted rent"
+msgstr "Indeksitarkistettu vuokra"
+
+msgctxt "Model name"
+msgid "Index adjusted rents"
+msgstr "Indeksitarkistetut vuokrat"
+
+msgid "Full amount"
+msgstr "Kokonaismäärä"
+
+msgid "Amount type"
+msgstr "Määrän tyyppi"
+
+msgid "Amount left"
+msgstr "Jäljellä"
+
+msgid "Subvention type"
+msgstr "Subvention tyyppi"
+
+msgid "Subvention base percent"
+msgstr "Markkinavuokran subventio"
+
+msgid "Graduated subvention percent"
+msgstr "Porrastettu alennus"
+
+msgctxt "Model name"
+msgid "Rent adjustment"
+msgstr "Alennus/Korotus"
+
+msgctxt "Model name"
+msgid "Rent adjustments"
+msgstr "Alennukset/Korotukset"
+
+msgctxt "Model name"
+msgid "Form of management (Subvention)"
+msgstr "Hallintamuoto (Subventio)"
+
+msgid "Rent adjustment"
+msgstr "Alennus/Korotus"
+
+msgid "Subvention amount"
+msgstr "Subvention määrä"
+
+msgctxt "Model name"
+msgid "Management subvention (Rent adjustment)"
+msgstr "Hallintamuotosubventio (Alennus)"
+
+msgctxt "Model name"
+msgid "Management subventions (Rent adjustment)"
+msgstr "Hallintamuotosubventiot (Alennus)"
+
+msgid "Subvention percent"
+msgstr "Subventioprosentti"
+
+msgctxt "Model name"
+msgid "Temporary subvention (Rent adjustment)"
+msgstr "Tilapäisalennus (Alennus)"
+
+msgctxt "Model name"
+msgid "Temporary subventions (Rent adjustment)"
+msgstr "Tilapäisalennukset (Alennus)"
+
+msgid "Difference percent"
+msgstr "Nousu %"
+
+msgid "Calendar year rent"
+msgstr "Kalenterivuosivuokra"
+
+msgctxt "Model name"
+msgid "Payable rent"
+msgstr "Perittävä vuokra"
+
+msgctxt "Model name"
+msgid "Payable rents"
+msgstr "Perittävät vuokrat"
+
+msgid "Payable amount"
+msgstr "Perittävä vuokra"
+
+msgid "Equalized payable amount"
+msgstr "Tasattu perittävä vuokra"
+
+msgid "Equalization factor"
+msgstr "Tasauskerroin"
+
+msgctxt "Model name"
+msgid "Equalized rent"
+msgstr "Tasattu vuokra"
+
+msgctxt "Model name"
+msgid "Equalized rents"
+msgstr "Tasatut vuokrat"
+
+msgctxt "Model name"
+msgid "Index"
+msgstr "Indeksi"
+
+msgctxt "Model name"
+msgid "Indexes"
+msgstr "Indeksit"
+
+msgid "Index {}{} = {}"
+msgstr "Indeksi {}{} = {}"
+
+msgid "Index 1914:1-6=100"
+msgstr ""
+
+msgid "Index 1938:8-1939:7=100"
+msgstr ""
+
+msgid "Value"
+msgstr "Arvo"
+
+msgid "Comment"
+msgstr "Kommentti"
+
+msgctxt "Model name"
+msgid "Index point figure, yearly"
+msgstr "Indeksipisteluku, vuosittainen"
+
+msgctxt "Model name"
+msgid "Index point figures, yearly"
+msgstr "Indeksipisteluvut, vuosittaiset"
+
+msgid "Lease basis of rent"
+msgstr "Vuokrauksen vuokrausperiaate"
+
+msgid "Area amount"
+msgstr "Pinta-ala"
+
+msgid "Zone"
+msgstr "Vyöhyke"
+
+msgid "Amount per area (index 100)"
+msgstr "Summa per pinta-ala (ind 100)"
+
+msgid "Profit margin percentage"
+msgstr "Tuottoprosentti"
+
+msgid "Discount percentage"
+msgstr "Alennusprosentti"
+
+msgid "Plans inspected at"
+msgstr "Piirustukset tarkastettu pvm"
+
+msgid "Plans inspected by"
+msgstr "Piirustusten tarkastaja"
+
+msgid "Locked at"
+msgstr "Lukittu pvm"
+
+msgid "Locked by"
+msgstr "Lukitsija"
+
+msgid "Subvention graduated percent"
+msgstr "Siirtymäajan subventio"
+
+msgctxt "Model name"
+msgid "Lease basis of rent"
+msgstr "Vuokrausperiaate"
+
+msgctxt "Model name"
+msgid "Lease basis of rents"
+msgstr "Vuokrauksen vuokrausperiaatteet"
+
+msgctxt "Model name"
+msgid "Management subvention (Basis of rent)"
+msgstr "Hallintamuotosubventio (Vuokrausperiaate)"
+
+msgctxt "Model name"
+msgid "Management subventions (Basis of rent)"
+msgstr "Hallintamuotosubventiot (Vuokrausperiaate)"
+
+msgctxt "Model name"
+msgid "Temporary subvention (Basis of rent)"
+msgstr "Tilapäisalennus (Vuorausperiaate)"
+
+msgctxt "Model name"
+msgid "Temporary subventions (Basis of rent)"
+msgstr "Tilapäisalennukset (Vuokrausperiaate)"
+
+msgid "Invoice number sequence name"
+msgstr "Laskunumerosarjan nimi"
+
+msgid "First invoice number"
+msgstr "Ensimmäinen laskunumero"
+
+msgid "Sender ID in Laske"
+msgstr "Lähettäjätunnus (Sender ID) Laske:ssa"
+
+msgid "Import ID in Laske"
+msgstr "Tuontitunnus (Import ID) Laske:ssa"
+
+msgid "Sales Organisation in Laske"
+msgstr "Myyntiorganisaatio Laske:ssa"
+
+msgid "Fill priority and info?"
+msgstr "Täytetäänkö priority- ja info-kentät?"
+
+msgid ""
+"Fill Info and Priority data from a contact into OrderParty and BillingParty "
+"in SalesOrder when creating LASKE XML"
+msgstr ""
+"Jos tämä on valittuna, Laske-viennin XML-tiedostossa täytetään Info- ja "
+"Priority-kentät SalesOrder-tietueen OrderParty- ja BillingParty-tietueissa."
+
+msgid "Contract number sequence name"
+msgstr "Sopimusnumerosarjan nimi"
+
+msgid "First contract number"
+msgstr "Ensimmäinen sopimusnumero"
+
+msgid "Default receivable type (rent)"
+msgstr "Oletus-saamislaji (vuokra)"
+
+msgid "Receivable type used when creating rent invoices"
+msgstr "Saamislaji kun luodaan vuokralaskuja"
+
+msgid "Default receivable type (collateral)"
+msgstr "Oletus-saamislaji (rahavakuus)"
+
+msgid ""
+"Receivable type which should be used when creating collateral invoices. On "
+"SAP export, the profit center is filled from this receivable type's "
+"sap_project_number or sap_order_item_number."
+msgstr ""
+
+msgid "Use the override receivable type from rent in automatic invoices?"
+msgstr ""
+
+msgid ""
+"Use the override receivable type from rent in automatic invoices, if it is "
+"present. When creating a rent, some service units (such as KAMA and KuVa) "
+"want to select a receivable type to be used in future automatic invoices. "
+"This helps avoid some technical difficulties in invoice XML generation. "
+"Generation logic would otherwise be unaware of the desired receivable type, "
+"if it is different from the service unit's default receivable type, or the "
+"leasetype's receivable type."
+msgstr ""
+
+msgid "Require 'Application received at' field on lease summary page?"
+msgstr ""
+"Vaadi 'Hakemuksen saapumispäivämäärä' kentän täyttäminen vuokrauksen "
+"yhteenvetosivulla?"
+
+msgid ""
+"Make 'Application received at' / 'Hakemuksen saapumispäivä' a required field "
+"on lease summary page."
+msgstr ""
+"Tee 'Hakemuksen saapumispäivämäärä' / 'Application received at' kentästä "
+"pakollinen vuokrauksen yhteenvetosivulla"
+
+msgctxt "Model name"
+msgid "Service unit"
+msgstr "Palvelukokonaisuus"
+
+msgctxt "Model name"
+msgid "Service units"
+msgstr "Palvelukokonaisuudet"
+
+msgctxt "Model name"
+msgid "Service unit group mapping"
+msgstr "Palvelukokonaisuuden ryhmävastaavuus"
+
+msgctxt "Model name"
+msgid "Service unit group mappings"
+msgstr "Palvelukokonaisuuden ryhmävastaavuudet"
+
+msgid "Reference"
+msgstr "Viite"
+
+msgctxt "Model name"
+msgid "Tenant"
+msgstr "Vuokralainen"
+
+msgctxt "Model name"
+msgid "Tenants"
+msgstr "Vuokralaiset"
+
+msgid "Contact"
+msgstr "Yhteystieto"
+
+msgctxt "Model name"
+msgid "Tenant contact"
+msgstr "Vuokralaisen yhteystieto"
+
+msgctxt "Model name"
+msgid "Tenant contacts"
+msgstr "Vuokralaiset yhteystiedot"
+
+msgid "Rent share numerator"
+msgstr "Jaettava (Laskuosuus)"
+
+msgid "Rent share denominator"
+msgstr "Jakaja (Laskuosuus)"
+
+msgctxt "Model name"
+msgid "Tenant rent share"
+msgstr "Vuokralaisen laskuosuus"
+
+msgctxt "Model name"
+msgid "Tenant rent shares"
+msgstr "Vuokralaiset laskuosuudet"
+
+msgid "Key"
+msgstr "Avain"
+
+msgctxt "Model name"
+msgid "UI Datum"
+msgstr "UI Datum"
+
+msgctxt "Model name"
+msgid "UI Data"
+msgstr "UI Data"
+
+msgid "Percent"
+msgstr "Prosenttia"
+
+msgctxt "Model name"
+msgid "VAT"
+msgstr "ALV"
+
+msgctxt "Model name"
+msgid "VATs"
+msgstr "ALV:t"
+
+msgid "VAT {}% {} - {}"
+msgstr "ALV {}% {} - {}"
+
+msgid "Only one VAT can be active at a time"
+msgstr "Vain yksi ALV voi olla voimassa kerrallaan"
+
+msgid "Collaterals"
+msgstr "Vakuudet"
+
+msgid "Show all collaterals"
+msgstr "Näyttää kaikki vakuudet"
+
+msgid "Paid"
+msgstr "Maksettu"
+
+msgid "Returned"
+msgstr "Palautettu"
+
+msgid "Lease id"
+msgstr "Vuokraus"
+
+msgid "Lease start date"
+msgstr "Vuokrauksen alkupvm"
+
+msgid "Lease end date"
+msgstr "Vuokrauksen loppupvm"
+
+msgid ""
+"Show all the payments that have been paid between the start and the end date"
+msgstr "Näytä maksusuoritukset, jotka on maksettu alkupvm ja loppupvm välillä"
+
+msgid "Total"
+msgstr "Yhteensä"
+
+msgid "Invoces in period"
+msgstr "Laskut aikavälillä"
+
+msgid "Show all the invoices that have due date between start and end date"
+msgstr ""
+"Näytä kaikki laskut joiden eräpäivä on alku- ja loppupäivämäärien välissä"
+
+msgid "Laskutuslaji"
+msgstr ""
+
+msgid "Invoice state"
+msgstr "Laskun tila"
+
+msgid "Recipient name"
+msgstr "Laskunsaaja"
+
+msgid "Recipient address"
+msgstr "Laskunsaajan osoite"
+
+msgctxt "Invoicing review"
+msgid "Invoicing not enabled"
+msgstr "Vuokraukset, joissa laskutus ei ole käynnissä"
+
+msgctxt "Invoicing review"
+msgid "Rent info not complete"
+msgstr "Vuokraukset, joissa ei ole vuokratiedot kunnossa"
+
+msgctxt "Invoicing review"
+msgid "No rents"
+msgstr "Vuokraukset, joissa ei ole vuokratietoja"
+
+msgctxt "Invoicing review"
+msgid "No due date"
+msgstr "Vuokraukset, joissa ei ole eräpäivää"
+
+msgctxt "Invoicing review"
+msgid "One time rents with no invoice from max 5 year old leases"
+msgstr ""
+"Vuokraukset (max 5v vanhat), joilla on kertakaikkinen vuokra mutta ei ole "
+"laskuja"
+
+msgctxt "Invoicing review"
+msgid "Incorrect management shares"
+msgstr "Vuokraukset, joissa on virheellinen hallintaosuus"
+
+msgctxt "Invoicing review"
+msgid "Incorrect rent shares"
+msgstr "Vuokraukset, joissa on virheellinen laskutusosuus"
+
+msgctxt "Invoicing review"
+msgid "No tenant contact"
+msgstr "Vuokraukset, joissa ei ole voimassaolevaa vuokraajaa"
+
+msgctxt "Invoicing review"
+msgid "No lease area"
+msgstr "Vuokraukset, joissa ei ole vuokrakohdetta"
+
+msgctxt "Invoicing review"
+msgid "Index type missing"
+msgstr "Indeksilaji puuttuu"
+
+msgctxt "Invoicing review"
+msgid "Ongoing rent without rent shares"
+msgstr "Vuokraukset, joissa voimassa oleva vuokra, mutta ei laskutusosuuksia"
+
+msgctxt "Invoicing review"
+msgid "Gaps in billing periods for last 5 years"
+msgstr "Aukkoja laskutuskausissa 5 vuoden ajalla"
+
+msgid "Invoicing review"
+msgstr "Vuokrauksen laskutustietojen tarkastusraportti"
+
+msgid "Show leases that might have errors in their invoicing"
+msgstr "Vuokrauksia joiden laskutustiedoissa voi olla virheitä"
+
+msgctxt "Invoicing review"
+msgid "Section"
+msgstr "Osio"
+
+msgid "Count of Invoices sent to Laske per day"
+msgstr "Laske-järjestelmään lähetettyjen laskujen määrä per päivä"
+
+msgid ""
+"Shows actual sent invoice counts until yesterday, and estimated counts for "
+"today and beyond"
+msgstr ""
+"Näyttää lähetettyjen laskujen määrän eiliseen asti. Kuluvalle päivälle ja "
+"siitä eteenpäin määrä on arvio."
+
+msgid "Send date"
+msgstr "Lähetyspvm"
+
+msgid "Estimated invoice count"
+msgstr "Tulevien laskujen arvioitu määrä"
+
+msgid "Open invoices"
+msgstr "Avoimet laskut"
+
+msgid "Show all the invoices that have their state as \"open\""
+msgstr "Näyttää kaikki laskut joiden tila on \"avoin\""
+
+msgid "Lease database id"
+msgstr "Vuokrauksen tietokanta-id"
+
+msgid "Grand total"
+msgstr "Kaikki yhteensä"
+
+msgid "Invoices paid by a contact"
+msgstr "Maksetut laskut per asiakasnumero"
+
+msgid "Show invoices paid by a contact"
+msgstr "Näyttää tietyn asiakkaan maksamat laskut"
+
+msgid "Contact identifier"
+msgstr "Asiakasnumero"
+
+msgid "Number of rows"
+msgstr "Rivien määrä"
+
+msgid "Contact rents"
+msgstr "Asiakkaalta perittävät vuokrat"
+
+msgid "Show all rent amounts from all of the leases the contact is a part of"
+msgstr "Kaikkien vuokrausten vuokramäärät joissa asiakas on osallisena"
+
+msgid "Lease area identifier"
+msgstr "Kohteen tunnus"
+
+msgid "Tenants"
+msgstr "Vuokralaiset"
+
+msgid "Rent amount"
+msgstr "Vuokran määrä"
+
+msgid "Rent amount for contact"
+msgstr "Asiakkaan vuokran määrä"
+
+msgid "Contact not found"
+msgstr "Asiakasta ei löytynyt"
+
+msgid "Decision conditions"
+msgstr "Päätöksen ehdot"
+
+msgid ""
+"Show decision conditions that have their supervision date between the given "
+"dates. Excluding conditions that have a supervised date."
+msgstr ""
+"Näyttää ehdot joiden valvontapäivämäärä on annettujen päivämäärien välissä. "
+"Lukuunottamatta ehtoja joilla on valvottupäivämäärä."
+
+msgid "Yes"
+msgstr "Kyllä"
+
+msgid "No"
+msgstr "Ei"
+
+msgid "Supervision date exists"
+msgstr "Valvontapäivämäärä asetettu"
+
+msgid "Lease area"
+msgstr "Vuokra-alue"
+
+msgid "Extra city rent"
+msgstr "Ulkokuntien vuokrat"
+
+msgid "The invoiced rent of the leases that are not in the main city"
+msgstr ""
+"Näyttää laskutettujen vuokrien määrät vuokrauksille jotka eivät ole "
+"Helsingissä"
+
+msgid "Tenant name"
+msgstr "Vuokralaisen nimi"
+
+msgid "Area identifier"
+msgstr "Kiinteistötunnus"
+
+msgid "Total area"
+msgstr "Kokonaispinta-ala"
+
+msgid "Index type leases"
+msgstr "Indeksin tunnusnumero"
+
+msgid "Show leases with a certain index type"
+msgstr "Näyttää tietyn indeksitunnusnumeron vuokraukset"
+
+msgid "Only active leases"
+msgstr "Vain voimassa olevat vuokraukset"
+
+msgid "Leases where invoicing is disabled"
+msgstr "Vuokraukset joissa laskutus ei ole käynnissä"
+
+msgid "Shows active leases where invoicing is not enabled"
+msgstr "Näyttää käynnissä olevat vuokraukset joissa laskutus ei ole käynnissä"
+
+msgid "Lease bases of rent"
+msgstr "Vuokrausten perusteet"
+
+msgid "Shows lease bases of rent"
+msgstr "Näyttää vuokrausten perusteet"
+
+msgid "Lease intended use"
+msgstr "Vuokrauksen käyttötarkoitus"
+
+msgid "Active lease"
+msgstr "Aktiivinen vuokraus"
+
+msgid "Unit price (index)"
+msgstr "Yksikköhinta (ind)"
+
+msgid "Initial year rent"
+msgstr "Alkuvuosivuokra"
+
+msgid "Discounted rent"
+msgstr "Alennettu vuokra"
+
+msgid "Subvented initial year rent"
+msgstr "Subventoitu alkuvuosivuokra (ind)"
+
+msgid "Subvention euros per year"
+msgstr "Subventio euroina / vuosi"
+
+msgid "Subvention amount per area"
+msgstr "Subventoitu yksikköhinta"
+
+msgid "Temporary subvention percentage"
+msgstr "Tilapäisalennus subventoidusta alkuvuosivuokrasta %"
+
+msgid "Temporary discount amount euros per year"
+msgstr "Tilapäisalennus euroa/vuosi"
+
+msgid "Lease count"
+msgstr "Vuokrausten määrä"
+
+msgid "Show the count of leases by type"
+msgstr "Näyttää vuokrausten lukumäärän per vuokrauslaji"
+
+msgid "Count"
+msgstr "Lukumäärä"
+
+msgid "Temporary subvention percentage (short)"
+msgstr "Tilapäisalennuksen prosentti"
+
+msgid "Lease statistics report"
+msgstr "Vuokrausten tilastoraportti"
+
+msgid ""
+"Shows information about all leases or if start date is provided the leases "
+"that have started on or after it"
+msgstr ""
+"Näyttää tilastoraportin kaikista vuokrauksista tai jos alkupvm on annettu, "
+"niistä vuokrauksista jotka ovat alkaneet alkupäivämääränä tai sen jälkeen"
+
+msgid "Contract signing date"
+msgstr "Sopimuksen allekirjoituspvm"
+
+msgid "Lease state"
+msgstr "Vuokrauksen tila"
+
+msgid "Latest decision maker"
+msgstr "Viimeisin päätöksentekijä"
+
+msgid "Latest decision date"
+msgstr "Viimeisin päätöksen pvm"
+
+msgid "Latest decision type"
+msgstr "Viimeisin päätöksen tyyppi"
+
+#, python-brace-format
+msgid "Permitted building volume {unit} (Residential)"
+msgstr "Rakennus-oikeus {unit} (asuminen)"
+
+msgid "Rent amount (Residential)"
+msgstr "Vuosivuokra (asuminen)"
+
+#, python-brace-format
+msgid "Permitted building volume {unit} (Business)"
+msgstr "Rakennusoikeus {unit} (yritystila)"
+
+msgid "Rent amount (Business)"
+msgstr "Vuosivuokra (yritystila)"
+
+#, python-brace-format
+msgid "Permitted building volume total {unit}"
+msgstr "Kokonaisrakennusoikeus {unit}"
+
+msgid "Total rent amount for year"
+msgstr "Vuosivuokra yhteensä"
+
+#, python-brace-format
+msgid "Average amount per area {unit} (Residential)"
+msgstr "Keskimääräinen yksikköhinta {unit} (asuminen)"
+
+#, python-brace-format
+msgid "Average amount per area {unit} (Business)"
+msgstr "Keskimääräinen yksikköhinta {unit} (yritystila)"
+
+#, python-brace-format
+msgid "Unit price {unit} (index)"
+msgstr "Yksikköhinta {unit} (ind)"
+
+msgid "Subsidy percent"
+msgstr "Subventio prosentteina"
+
+msgid "Form of management (Subvention)"
+msgstr "Hallintamuotosubventio"
+
+msgid "Re-lease"
+msgstr "Uudelleenvuokraus"
+
+msgid "Option to purchase"
+msgstr "Osto-oikeus"
+
+msgid "Matti report"
+msgstr "MATTI-raportti"
+
+msgid "Results will be sent by email to {}"
+msgstr "Raportti toimitetaan sähköpostilla osoitteeseen {}"
+
+msgid "Basis of rents"
+msgstr "Vuokrausperiaatteet"
+
+msgid "Rent adjustments"
+msgstr "Alennukset/Korotukset"
+
+msgid "Shows all of the rent adjustments"
+msgstr "Kaikkien voimassa olevien vuokrausten alennukset/korotukset"
+
+msgid "Management subventions"
+msgstr "Hallintamuotosubventiot"
+
+msgid "Temporary subventions"
+msgstr "Tilapäisalennukset"
+
+msgid "Rent compare"
+msgstr "Vuokrien vertailu"
+
+msgid "Show difference in rent between two years"
+msgstr "Ero kahden eri vuoden vuokrien määrissä"
+
+msgid "First year"
+msgstr "Ensimmäinen vuosi"
+
+msgid "Second year"
+msgstr "Toinen vuosi"
+
+msgid "Rent type"
+msgstr "Vuokralaji"
+
+msgid "First year rent"
+msgstr "Ensimmäisen vuoden vuokra"
+
+msgid "Second year rent"
+msgstr "Toisen vuoden vuokra"
+
+msgid "Rent forecast"
+msgstr "Vuokraennuste"
+
+msgid "Calculate total yearly rent by lease type"
+msgstr "Näyttää ennusteen vuokrien määristä per vuokrauslaji"
+
+msgid "Start year"
+msgstr "Alkuvuosiluku"
+
+msgid "End year"
+msgstr "Loppuvuosiluku"
+
+msgid "Internal"
+msgstr "Sisäiset"
+
+msgid "External"
+msgstr "Ulkoiset"
+
+#, python-brace-format
+msgid "Total {year} {internal_external_text}"
+msgstr "{internal_external_text} yhteensä vuonna {year}"
+
+msgid "Rent type leases"
+msgstr "Vuokraukset vuokralajin mukaan"
+
+msgid "Show leases with a certain rent type"
+msgstr "Kaikki vuokraukset joissa on valittu vuokralaji"
+
+msgid "Reservations"
+msgstr "Varaukset"
+
+msgid "Show reservations"
+msgstr "Näytä varaukset"
+
+msgid "Start date start"
+msgstr "Alkupvm alkaen"
+
+msgid "Start date end"
+msgstr "Alkupvm viimeistään"
+
+msgid "End date start"
+msgstr "Loppupvm alkaen"
+
+msgid "End date end"
+msgstr "Loppupvm viimeistään"
+
+msgid "Exclude ones that are related to a lease"
+msgstr "Rajaa pois varaukset jotka on liitetty vuokraukseen"
+
+msgid "Exclude sold"
+msgstr "Rajaa pois myydyt kohteet"
+
+msgid "Reservation id"
+msgstr "Varaustunnus"
+
+msgid "Reservee name"
+msgstr "Varauksensaaja"
+
+msgid "Plan number"
+msgstr "Asemakaavan nro"
+
+msgid "Main permitted build area (floor-m²)"
+msgstr "Pääkäyttötarkoituksellinen rakennusoikeus (k-m²)"
+
+msgid "Other permitted build area (floor-m²)"
+msgstr "Muu rakennusoikeus (k-m²)"
+
+msgid "Financing method"
+msgstr "Rahoitusmuoto"
+
+msgid "Management method"
+msgstr "Hallintamuoto"
+
+msgid "Message"
+msgstr "Viesti"
+
+msgid "Report \"{}\" successfully generated"
+msgstr "Raportti \"{}\" luotu onnistuneesti"
+
+msgid "Generated report attached"
+msgstr "Luotu raportti on liitteenä."
+
+msgid "Failed to generate report \"{}\""
+msgstr "Raportin \"{}\" luonti epäonnistui"
+
+msgid "Please try again"
+msgstr "Ole hyvä ja yritä uudelleen"
+
+msgid "Report type not found"
+msgstr "Raporttityyppiä ei löytynyt"
+
+msgid "No permission to generate report"
+msgstr "Ei oikeutta luoda raporttia"
+
+msgid "Can only add contacts to service units the user is a member of"
+msgstr "Asiakkaita voi lisätä vain omaan palvelukokonaisuuteen"
+
+msgid "Cannot change service unit"
+msgstr "Palvelukokonaisuutta ei voi vaihtaa"
+
+msgid ""
+"Can not add a court decision for an invoice belonging to another service unit"
+msgstr ""
+"Ei voi lisätä käräjäoikeuden päätöstä toiselle palvelukokonaisuudelle "
+"kuuluvalle laskulle"
+
+msgid ""
+"Can not add a collection letter for an invoice belonging to another service "
+"unit"
+msgstr ""
+"Ei voi lisätä perintäkirjettä toiselle palvelukokonaisuudelle kuuluvalle "
+"laskulle"
+
+msgid ""
+"Can not create a collection note for an invoice belonging to another service "
+"unit"
+msgstr ""
+"Ei voi luoda perintähuomautusta toiselle palvelukokonaisuudelle kuuluvalle "
+"laskulle"
+
+msgid "Invoices must be provided for this type of collection note"
+msgstr "Laskut täytyy määrittää tälle perintähuomautukselle"
+
+msgid "Payment deferrals must be targeted to a single invoice"
+msgstr "Maksulykkäyksen tulee kohdistaa yhteen laskuun"
+
+msgid "Missing postpone date for payment deferral"
+msgstr "Lykkäyspäivämäärä puuttuu maksulykkäykseltä"
+
+msgid "Postpone date can only be set for payment deferrals"
+msgstr "Lykkäyspäivämäärän voi asettaa vain maksulykkäyksille"
+
+msgid "'Entire lease' can only be set for contract changes"
+msgstr "'Koko vuokraus' voidaan asettaa vain sopimusmuutokseen"
+
+msgid "Inspection date can only be set for contract changes"
+msgstr "Valvontapäivämäärän voi asettaa vain sopimusmuutokseen"
+
+msgid "Cannot use an inactive receivable type"
+msgstr "Saamislaji ei ole käytettävissä"
+
+msgid ""
+"Can only use receivable types from service units the user is a member of"
+msgstr "Voi käyttää vain oman palvelukokonaisuuden saamislajia"
+
+msgid "Can only add invoices to service units the user is a member of"
+msgstr "Laskuja voi lisätä vain omaan palvelukokonaisuuteen"
+
+msgid "Either recipient or tenant is required."
+msgstr "Vastaanottaja tai vuokralainen on annettava."
+
+msgid "Tenant not found in lease"
+msgstr "Vuokrauksesta ei löytynyt vuokralaista"
+
+msgid "Billing contact not found for tenant"
+msgstr "Vuokralaisen laskutusyhteystietoa ei löytynyt"
+
+msgid "Tenant share"
+msgstr "Laskutusosuus"
+
+msgid "Rent share"
+msgstr "Hallintaosuus"
+
+msgid ""
+"Both Billing period start and end are required if one of them is provided"
+msgstr ""
+"Laskutusjakson alku- ja loppupäivämäärät ovat molemmat pakollisia jos "
+"jompikumpi valittu"
+
+msgid "Billing period end must be the same or after the start"
+msgstr ""
+"Laskutusjakson loppupäivämäärä pitää olla alkupäivämäärä tai sen jälkeen"
+
+msgid "No active tenants found for the lease during the billing period"
+msgstr "Ei aktiivisia vuokralaisia laskutuskaudella"
+
+msgid "No rent share found for invoice recipient"
+msgstr "Laskunsaajalle ei löytynyt laskutusosuutta"
+
+msgid "from_lease and to_lease cannot be the same Lease"
+msgstr "Ei voi olla sama vuokraus"
+
+msgid "Must be from the same service unit as the parent"
+msgstr "Palvelukokonaisuuden pitää olla sama kuin isäntätietueessa"
+
+msgid "'Application received at' is a mandatory field for this service unit"
+msgstr ""
+"'Hakemuksen saapumispäivämäärä' on pakollinen kenttä vuokrauksen "
+"palvelukokonaisuudella"
+
+msgid "Can only add leases to service units the user is a member of"
+msgstr "Vuokrauksia voi lisätä vain omaan palvelukokonaisuuteen"
+
+msgid "Fixed initial rent end date must match rent cycle end date"
+msgstr "Alkuvuosivuokran loppu pitää olla sama kuin vuokrakauden loppu"
+
+msgid "Index is mandatory if the rent type is Index"
+msgstr "Indeksi on valittava kun vuokralaji on Indeksi"
+
+msgid "Amount total adjustment type cannot have an end date"
+msgstr "Alennus-/korotustyypillä \"€ yhteensä\" ei voi olla loppupäivämäärää"
+
+msgid ""
+"This number of custom due dates per year is not allowed: {}. Must be one of "
+"{}"
+msgstr ""
+"Tämä lukumäärä erikseen määrättyjä eräpäiviä ei ole sallittu: {}. Oltava "
+"joko {}"
+
+msgid "Adjustment type is required when periodic rent adjustment is added"
+msgstr "Tarkistuksen tyyppi vaaditaan kun tasotarkistus lisätään"
+
+#, python-brace-format
+msgid ""
+"Override receivable type '{type_name}' was unexpected. Service unit "
+"'{unit_name}' does not use this feature. Please contact MVJ developers about "
+"this error."
+msgstr ""
+"Odottamaton automaattinen saamislaji '{type_name}'. Palvelukokonaisuus "
+"{unit_name} ei käytä tätä ominaisuutta. Ota yhteyttä MVJ:n kehittäjiin tästä "
+"virheestä."
+
+msgid ""
+"Override receivable type '{}' was unexpected. This rent type does not "
+"generate automatic invoices. Please contact MVJ developers about this error."
+msgstr ""
+"Odottamaton saamislaji '{}'. Tämä vuokratyyppi ei luo automaattisia laskuja. "
+"Ota yhteyttä MVJ:n kehittäjiin tästä virheestä."
+
+msgid ""
+"Override receivable type is required for this rent type in service unit {}"
+msgstr ""
+"Automaattinen saamislaji vaaditaan tälle vuokratyypille "
+"palvelukokonaisuudessa {}"
+
+msgid "Basis of rent item id {} not found"
+msgstr "Vuokrausperiaatetta tunnisteella {} ei löydy"
+
+msgid "Can't edit locked basis of rent item"
+msgstr "Lukittua vuokrausperiaatetta ei voi muokata"
+
+msgid "Enter a valid business id."
+msgstr "Anna kelvollinen Y-tunnus."
+
+msgid "Error in upstream service"
+msgstr "Virhe ulkoisessa järjestelmässä"
+
+msgid "Cloudia Proxy"
+msgstr ""
+
+msgid "file_id parameter is not valid"
+msgstr "fiel_id-parametri on viallinen"
+
+msgid "Virre Proxy"
+msgstr ""
+
+msgid "service parameter is not valid"
+msgstr "service-parametri on viallinen"
+
+msgid "business id is invalid"
+msgstr "Y-tunnus on viallinen"
+
+msgid "File not available"
+msgstr "Tiedostoa ei löydy"
+
+msgid "Ryyti API Proxy"
+msgstr ""
+
+#, python-brace-format
+msgid "Unknown API: {api_name}"
+msgstr ""
+
+#, python-brace-format
+msgid "Ryyti API error: {error_msg}"
+msgstr ""
+
+msgid "Data not available"
+msgstr ""
+
+msgid "Check if contact already exist"
+msgstr "Tarkista onko kontakti jo olemassa"
+
+msgid ""
+"Check if contact already exist by business id or national identification "
+"number"
+msgstr "Kontakti on jo olemassa samalla Y-tunnuksella tai henkilötunnuksella"
+
+msgid "Query parameter \"identifier\" is mandatory"
+msgstr "\"identifier\"-parametri on pakollinen"
+
+msgid "Copy decision to leases"
+msgstr "Kopioi päätökset vuokraukseen"
+
+msgid "Duplicates chosen decision to chosen leases"
+msgstr "Kopioi valitun päätöksen valittuihin vuokrauksiin"
+
+msgid "Send email"
+msgstr "Lähetä sähköposti"
+
+msgid "MVJ lease {} {}"
+msgstr "MVJ vuokraus {} {}"
+
+msgid "Reminder: {}"
+msgstr "Muistutus: {}"
+
+msgid "Can't create invoices if invoicing is not enabled."
+msgstr "Ei voi luoda laskuja jos laskutusta ei ole käynnistetty"
+
+msgid "Can't edit invoices that have been sent to SAP"
+msgstr "Ei voi muokata laskuja jotka on lähetetty SAP:iin"
+
+msgid "Can't edit fully refunded invoices"
+msgstr "Ei voi muokata kokonaan hyvitettyä laskua"
+
+msgid "Can't delete numbered invoices"
+msgstr "Numeroitua laskua ei voi poistaa"
+
+msgid "Can't delete invoices that have been sent to SAP"
+msgstr "Ei voi muokata laskuja jotka on lähetetty SAP:iin"
+
+msgid "Invalid amount"
+msgstr "Epäkelpo määrä"
+
+msgid "Amount must be bigger than zero"
+msgstr "Määrän tulee olla suurempi kuin nolla"
+
+msgid "Calculate penalty interest"
+msgstr "Laske viivästyskorko"
+
+msgid "Calculate penalty interest for the outstanding amount until today"
+msgstr "Laske viivästyskorko puuttuvalle summalle tähän päivään asti"
+
+msgid "Credit invoice"
+msgstr "Hyvitä lasku"
+
+msgid "Credit invoice or part of it"
+msgstr "Hyvitä lasku tai osa siitä"
+
+msgid "Cannot credit invoices belonging to a different service unit"
+msgstr "Ei voi hyvittää toiselle palvelukokonaisuudelle kuuluvaa laskua"
+
+msgid "Cannot credit invoices that have not been sent to SAP"
+msgstr "Ei voi hyvittää laskua jota ei ole lähetetty SAP:iin"
+
+msgid "Credit invoice row"
+msgstr "Hyvitä laskurivi"
+
+msgid "Credit invoice row or part of it"
+msgstr "Hyvitä laskurivi tai osa siitä"
+
+msgid "Export invoice to Laske"
+msgstr "Vie lasku Laskeen"
+
+msgid "Export chosen invoice to Laske SAP system"
+msgstr "Vie valitun laskun Laske SAP-järjestelmään"
+
+msgid "This invoice has already been sent to SAP"
+msgstr "Lasku on jo lähetetty SAP:iin"
+
+msgid "Can't send invoices that already have a number to SAP"
+msgstr "Numeroitua laskua ei voi lähettää SAP:iin"
+
+msgid "No permission. Can only delete own empty leases."
+msgstr "Ei oikeutta. Voit poistaa vain omia tyhjiä vuokrauksia."
+
+msgid "Create charge"
+msgstr "Luo lasku"
+
+msgid "Create charge shared to tenants by their shares"
+msgstr "Luo lasku joka jaetaan vuokralaisten kesken osuuksien mukaan"
+
+#, python-brace-format
+msgid "the penalty interest rate is {interest_percent} %"
+msgstr "viivästyskoron suuruus on {interest_percent} %"
+
+#, python-brace-format
+msgid ""
+"The penalty interest rate starting on {start_date} is {interest_percent} %"
+msgstr "Viivästyskoron suuruus {start_date} alkaen on {interest_percent} %"
+
+#, python-brace-format
+msgid ""
+"The penalty interest rate between {start_date} and {end_date} is "
+"{interest_percent} %"
+msgstr ""
+"Viivästyskoron suuruus ajalla {start_date} - {end_date} on "
+"{interest_percent} %"
+
+msgid "Create collection letter document"
+msgstr "Luo perintäkirje"
+
+msgid "No billing info or billing info does not have a contact address"
+msgstr "Ei laskutustietoa tai laskutustiedossa ei ole osoitetta"
+
+#, python-brace-format
+msgid ""
+"Penalty interest for the invoice with the due date of {due_date} is "
+"{interest_amount} euroa"
+msgstr ""
+"Korko laskulle, jonka eräpäivä on ollut {due_date}, on {interest_amount} "
+"euroa"
+
+#, python-brace-format
+msgid "{due_date}, {debt_amount} euro (between {start_date} and {end_date})"
+msgstr "{due_date}, {debt_amount} euroa (ajalta {start_date} - {end_date})"
+
+msgid "Error creating the document from the template"
+msgstr "Virhe luotaessa dokumenttia asiakirjapohjan avulla"
+
+msgid "Rent for period"
+msgstr "Vuokra ajalle"
+
+msgid "View rent amounts for a given period"
+msgstr "Näytä vuokra määritellylle aikavälille"
+
+msgid "Start date or end date is invalid"
+msgstr "Alku- tai loppupäivämäärä on virheellinen"
+
+msgid "Start date cannot be after end date"
+msgstr "Alkupäivämäärä ei voi olla loppupäivämäärän jälkeen"
+
+msgid "List billing periods for year"
+msgstr "Näytä vuoden laskutuskaudet"
+
+msgid "Year parameter is not valid"
+msgstr "Vuosi-parametri on viallinen"
+
+msgid "Preview invoices for year"
+msgstr "Esikatsele vuoden laskuja"
+
+msgid "Set invoicing state"
+msgstr "Käynnistä tai keskeytä laskutus"
+
+msgid "Sets invoicing state for lease to true or false"
+msgstr "Käynnistää tai keskeyttää laskutuksen"
+
+msgid "Cannot change invoicing state belonging to a different service unit"
+msgstr ""
+"Ei voi muuttaa laskun tilaa toiselle palvelukokonaisuudelle kuuluvalle "
+"laskulle"
+
+msgid "Cannot enable invoicing if rent info is not completed"
+msgstr "Laskutusta ei voi käynnistää jos vuokratiedot ovat keskeneräiset"
+
+msgid "Failed to set invoicing state: {}"
+msgstr "Laskutuksen tilan asettaminen epäonnistui: {}"
+
+msgid "Set rent info completion state"
+msgstr "Aseta vuokratiedot kunnossa-tieto"
+
+msgid "Cannot complete rent info: {}"
+msgstr "Vuokran tietoja ei pysty merkitsemään valmiiksi: {}"
+
+msgid "This query parameter is required."
+msgstr "Tämä tietue vaaditaan."
+
+msgid "Must be an integer."
+msgstr "Täytyy olla kokonaisluku."
+
+msgid "Can't create global ui data"
+msgstr "Ei oikeutta lisätä ui dataa"
+
+msgid "Can't create other users ui data"
+msgstr "Ei oikeutta lisätä muiden käyttäjien ui dataa"
+
+msgid "Data integrity error"
+msgstr "Tietoeheysvirhe"
+
+msgid "Finnish"
+msgstr "Suomi"
+
+msgid "Swedish"
+msgstr "Ruotsi"
+
+msgid "English"
+msgstr "Englanti"
+
+msgctxt "Area search lessor"
+msgid "Area use and control"
+msgstr "Alueiden käyttö ja valvonta"
+
+msgctxt "Area search lessor"
+msgid "Development of land assets"
+msgstr "Maaomaisuuden kehittäminen ja tontit"
+
+msgctxt "Area search lessor"
+msgid "Sports venue services"
+msgstr "Liikuntapaikkapalvelut"
+
+msgctxt "Area search lessor"
+msgid "Outdoor services"
+msgstr "Ulkoilupalvelut"
+
+msgctxt "Area search lessor"
+msgid "Youth services"
+msgstr "Nuorisopalvelut"
+
+msgctxt "Search class"
+msgid "Plot search"
+msgstr "Tonttihaku tai -kilpailu"
+
+msgctxt "Search class"
+msgid "Other"
+msgstr "Muu kilpailu tai haku"
+
+msgctxt "Search stage"
+msgid "In preparation"
+msgstr "Valmisteilla"
+
+msgctxt "Search stage"
+msgid "In action"
+msgstr "Käynnissä"
+
+msgctxt "Search stage"
+msgid "Processing"
+msgstr "Käsittelyssä"
+
+msgctxt "Search stage"
+msgid "Decision making"
+msgstr "Päätöksenteossa"
+
+msgctxt "Search stage"
+msgid "Settled"
+msgstr "Päätetty"
+
+msgctxt "Information state"
+msgid "Checked"
+msgstr "Tarkistettu"
+
+msgctxt "Information state"
+msgid "Not checked"
+msgstr "Ei tarkistettu"
+
+msgctxt "Information state"
+msgid "Not needed"
+msgstr "Ei tarvetta"
+
+msgctxt "Information state"
+msgid "Requires further action"
+msgstr "Tarvitsee lisätietoja"
+
+msgctxt "Information check name"
+msgid "Trade register extract"
+msgstr "Kaupparekisteriote"
+
+msgctxt "Information check name"
+msgid "Creditworthiness certificate"
+msgstr "Luottokelpoisuustodistus"
+
+msgctxt "Information check name"
+msgid "Statement of payment of earning-related pension contributions"
+msgstr "Selvitys työeläkemaksujen maksamisesta"
+
+msgctxt "Information check name"
+msgid "Certificate of entry in the VAT register"
+msgstr "Todistus arvonlisäverorekisteriin merkitsemisestä"
+
+msgctxt "Information check name"
+msgid "Certificate of entry in the advance payment register"
+msgstr "Todistus ennakkoperintärekisteriin merkitsemisestä"
+
+msgctxt "Information check name"
+msgid "Tax debt certificate"
+msgstr "Verovelkatodistus"
+
+msgctxt "Information check name"
+msgid "Certificate of entry in the register of employers"
+msgstr "Todistus työnantajarekisteriin merkitsemisestä"
+
+msgctxt "Decline reason"
+msgid "Application expired"
+msgstr "Hakemus rauennut"
+
+msgctxt "Decline reason"
+msgid "Application missed deadline"
+msgstr "Hakemus ei tullut määräajassa"
+
+msgctxt "Decline reason"
+msgid "Application missing details"
+msgstr "Hakemus on puutteellinen"
+
+msgctxt "Decline reason"
+msgid "Applicant not qualified"
+msgstr "Hakija ei täytä kelpoisuusehtoja"
+
+msgctxt "Decline reason"
+msgid "Applicant withdrew application"
+msgstr "Hakija on perunut hakemuksensa"
+
+msgctxt "Decline reason"
+msgid "Area not controlled by city"
+msgstr "Alue ei ole kaupungin hallinnoima"
+
+msgctxt "Decline reason"
+msgid "Area not available for lease"
+msgstr "Alue ei ole vuokrattavissa"
+
+msgctxt "Decline reason"
+msgid "Other reason"
+msgstr "Muu syy"
+
+msgctxt "Area search state"
+msgid "Received"
+msgstr "Vastaanotettu"
+
+msgctxt "Area search state"
+msgid "Pending additional information"
+msgstr "Odottaa lisätietoja"
+
+msgctxt "Area search state"
+msgid "In action"
+msgstr "Käynnissä"
+
+msgctxt "Area search state"
+msgid "Settled"
+msgstr "Päätetty"
+
+msgctxt "Area search state"
+msgid "Revoked"
+msgstr "Peruutettu"
+
+msgctxt "Area search state"
+msgid "Declined"
+msgstr "Hylätty"
+
+msgctxt "Model name"
+msgid "Plot search type"
+msgstr "Tonttihaun tyyppi"
+
+msgctxt "Model name"
+msgid "Plot search types"
+msgstr "Tonttihaun tyypit"
+
+msgctxt "Model name"
+msgid "Plot search subtype"
+msgstr "Tonttihaun alityyppi"
+
+msgctxt "Model name"
+msgid "Plot search subtypes"
+msgstr "Tonttihaun alityypit"
+
+msgctxt "Model name"
+msgid "Plot search stage"
+msgstr "Tonttihaun vaihe"
+
+msgctxt "Model name"
+msgid "Plot search stages"
+msgstr "Tonttihaun vaiheet"
+
+msgid "Subtype"
+msgstr "Alityyppi"
+
+msgid "Begin at"
+msgstr "Alkaa"
+
+msgid "End at"
+msgstr "Loppuu"
+
+msgid "Stage"
+msgstr "Vaihe"
+
+msgctxt "Model name"
+msgid "Plot search"
+msgstr "Tonttihaku"
+
+msgctxt "Model name"
+msgid "Plot searches"
+msgstr "Tonttihaut"
+
+msgid "Target type"
+msgstr "Kohde tyyppi"
+
+msgctxt "Model name"
+msgid "Area search intended use"
+msgstr "Aluehaun käyttötarkoitus"
+
+msgctxt "Model name"
+msgid "Area search intended uses"
+msgstr "Aluehaun käyttötarkoitukset"
+
+msgctxt "Model name"
+msgid "Area search status"
+msgstr "Aluehaun tila"
+
+msgctxt "Model name"
+msgid "Area search statuses"
+msgstr "Aluehaun tilat"
+
+msgid "Time received"
+msgstr "Arkistointiaika"
+
+msgid "Time settled"
+msgstr "Päätetty pvm"
+
+msgid "Area search state"
+msgstr "Tila"
+
+msgctxt "Model name"
+msgid "Area search"
+msgstr "Aluehaku"
+
+msgctxt "Model name"
+msgid "Area searches"
+msgstr "Aluehaut"
+
+msgid "User amr"
+msgstr "Käyttäjän AMR"
+
+msgid "Authentication method reference"
+msgstr "Todennusmenetelmän viite"
+
+msgid "The target has been removed from the system!"
+msgstr "Kohde on poistunut järjestelmästä!"
+
+msgid "The target information has changed!"
+msgstr "Kohteen tiedot ovat muuttuneet!"
+
+msgid "Area search application"
+msgstr ""
+
+msgid "Area search information"
+msgstr "Aluehaun tiedot"
+
+msgid "City of Helsinki"
+msgstr "Helsingin kaupunki"
+
+msgid "Information check"
+msgstr "Tietojen tarkistus"
+
+msgid "Time stamp"
+msgstr "Aikaleima"
+
+msgid ""
+"This is a copy of your area search application sent to the City of Helsinki."
+msgstr "Tämä on kopio Helsingin kaupungille lähetetystä aluehaun hakemuksesta."
+
+msgid ""
+"You can find a detailed copy of your application as an attachment in this "
+"email."
+msgstr "Kopio hakemuksesta löytyy tämän sähköpostin liitetiedostosta."
+
+msgid "Plot search information"
+msgstr "Tonttihaun tiedot"
+
+msgid ""
+"This is a confirmation that the following plot application sent to the City "
+"of Helsinki were received."
+msgstr ""
+"Helsingin kaupungille lähetetyt tonttihakemukset on vahvistetusti "
+"vastaanotettu seuraavilla tunnuksilla."
+
+msgctxt "list of identifiers in email"
+msgid "Application identifiers"
+msgstr "Hakemustunnukset"
+
+msgid "yes"
+msgstr "kyllä"
+
+msgid "no"
+msgstr "ei"
+
+msgid "You have received a link for a direct reservation plot search"
+msgstr "Olet vastaanottanut linkin suoravaraushakuun"
+
+# python-brace-format
+#, python-brace-format
+msgid ""
+"Hi {receiver}! Here is the link for the direct reservation plot search: "
+"{url} \n"
+"\n"
+"{covering_note}"
+msgstr ""
+"Hei {receiver}! Tässä linkki suoravaraustonttihakuun: {url} \n"
+"\n"
+"{covering_note}"
+
+msgid "The deadline for applications"
+msgstr "Haku päättyy"
+
+msgid "Plot"
+msgstr "Tontti"
+
+msgid "Detailed plan state"
+msgstr "Asemakaavan käsittelyvaihe"
+
+msgid "Permitted build floor area (floor-m²)"
+msgstr "Rakennusoikeus (k-m²)"
+
+msgid "Permitted build residential floor area (floor-m²)"
+msgstr "Asuinrakennusoikeus (k-m²)"
+
+msgid "Permitted build commercial floor area (floor-m²)"
+msgstr "Liikerakennusoikeus (k-m²)"
+
+msgid "Area (m²)"
+msgstr "Pinta-ala (m²)"
+
+msgid "First suitable construction year"
+msgstr "Rakennuskelpoinen"
+
+msgid "HITAS"
+msgstr "HITAS"
+
+msgid "Token exists"
+msgstr "Token olemassa"
+
+msgid "Users permissions"
+msgstr "Käyttäjän oikeudet"

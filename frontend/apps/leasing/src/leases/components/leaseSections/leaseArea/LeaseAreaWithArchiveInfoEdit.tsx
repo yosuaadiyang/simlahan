@@ -1,0 +1,320 @@
+import React, { ReactElement, useMemo } from "react";
+import { useAppDispatch, useAppSelector } from "@/root/hooks";
+import { Row, Column } from "@/components/grid/Grid";
+import Authorization from "@/components/authorization/Authorization";
+import Collapse from "@/components/collapse/Collapse";
+import CollapseHeaderSubtitle from "@/components/collapse/CollapseHeaderSubtitle";
+import Divider from "@/components/content/Divider";
+import FormField from "@/components/form/final-form/FormField";
+import FormText from "@/components/form/FormText";
+import FormTextTitle from "@/components/form/FormTextTitle";
+import LeaseArea from "./LeaseArea";
+import LeaseAreaEdit from "./LeaseAreaEdit";
+import { receiveCollapseStates } from "@/leases/slice";
+import { FormNames, ViewModes } from "@/enums";
+import {
+  LeaseAreasFieldPaths,
+  LeaseAreasFieldTitles,
+  LeaseAreaAddressesFieldPaths,
+} from "@/leases/enums";
+import { UsersPermissions } from "@/usersPermissions/enums";
+import {
+  getDecisionOptions,
+  getFullAddress,
+  getLeaseAreaById,
+} from "@/leases/helpers";
+import {
+  formatDate,
+  formatNumber,
+  getFieldAttributes,
+  getFieldOptions,
+  getLabelOfOption,
+  hasPermissions,
+  isFieldAllowedToEdit,
+  isFieldAllowedToRead,
+} from "@/util/helpers";
+import { get } from "lodash-es";
+import { getUiDataLeaseKey } from "@/uiData/helpers";
+import {
+  getAttributes,
+  getCollapseStateByKey,
+  getCurrentLease,
+  getErrorsByFormName,
+  getIsSaveClicked,
+} from "@/leases/selectors";
+import { getUsersPermissions } from "@/usersPermissions/selectors";
+import type { Attributes } from "types";
+import type { Lease } from "@/leases/types";
+import type { UsersPermissions as UsersPermissionsType } from "@/usersPermissions/types";
+import type { FormApi } from "final-form";
+import { useField } from "react-final-form";
+
+type Props = {
+  formApi: FormApi;
+  field: string;
+  index: number;
+  isActive: boolean;
+  onArchive: (...args: Array<any>) => any;
+  onRemove: (...args: Array<any>) => any;
+  onUnarchive: (...args: Array<any>) => any;
+};
+
+const LeaseAreaWithArchiveInfoEdit = ({
+  formApi,
+  field,
+  index,
+  isActive,
+  onArchive,
+  onRemove,
+  onUnarchive,
+}: Props): ReactElement => {
+  const dispatch = useAppDispatch();
+
+  const {
+    input: { value: areaId },
+  } = useField(`${field}.id`, { subscription: { value: true } });
+  const {
+    input: { value: archivedAt },
+  } = useField(`${field}.archived_at`, { subscription: { value: true } });
+
+  const areaCollapseState = useAppSelector((state) =>
+    getCollapseStateByKey(
+      state,
+      `${ViewModes.EDIT}.${FormNames.LEASE_AREAS}.${areaId}.area`,
+    ),
+  );
+
+  const attributes: Attributes = useAppSelector(getAttributes);
+  const currentLease: Lease = useAppSelector(getCurrentLease);
+  const errors = useAppSelector((state) =>
+    getErrorsByFormName(state, FormNames.LEASE_AREAS),
+  );
+  const isSaveClicked: boolean = useAppSelector(getIsSaveClicked);
+  const usersPermissions: UsersPermissionsType =
+    useAppSelector(getUsersPermissions);
+  const decisionOptions = getDecisionOptions(currentLease);
+
+  const handleArchive = () => {
+    const editedArea = get(formApi.getState().values, field);
+    onArchive(index, editedArea);
+  };
+
+  const handleUnarchive = () => {
+    const editedArea = get(formApi.getState().values, field);
+    onUnarchive(index, editedArea);
+  };
+
+  const handleAreaCollapseToggle = (val: boolean) => {
+    if (!areaId) {
+      return;
+    }
+    dispatch(
+      receiveCollapseStates({
+        [ViewModes.EDIT]: {
+          [FormNames.LEASE_AREAS]: {
+            [areaId]: {
+              area: val,
+            },
+          },
+        },
+      }),
+    );
+  };
+
+  const typeOptions = getFieldOptions(attributes, LeaseAreasFieldPaths.TYPE);
+  const locationOptions = getFieldOptions(
+    attributes,
+    LeaseAreasFieldPaths.LOCATION,
+  );
+
+  const { savedArea, archived } = useMemo(() => {
+    const area = getLeaseAreaById(currentLease, areaId);
+    return {
+      savedArea: area,
+      archived: Boolean(area && area.archived_at),
+    };
+  }, [areaId, currentLease]);
+
+  const areaErrors = errors?.["lease_areas_active"];
+
+  return (
+    <Collapse
+      archived={archived}
+      defaultOpen={
+        areaCollapseState !== undefined ? areaCollapseState : !archived
+      }
+      hasErrors={isSaveClicked && JSON.stringify(areaErrors) !== "{}"}
+      headerSubtitles={
+        savedArea && (
+          <>
+            <Column>
+              <Authorization
+                allow={isFieldAllowedToRead(
+                  attributes,
+                  LeaseAreasFieldPaths.TYPE,
+                )}
+              >
+                <CollapseHeaderSubtitle>
+                  {getLabelOfOption(typeOptions, savedArea.type) || "-"}
+                </CollapseHeaderSubtitle>
+              </Authorization>
+            </Column>
+            <Column>
+              <Authorization
+                allow={isFieldAllowedToRead(
+                  attributes,
+                  LeaseAreaAddressesFieldPaths.ADDRESSES,
+                )}
+              >
+                <CollapseHeaderSubtitle>
+                  {getFullAddress(savedArea?.addresses?.[0]) || "-"}
+                </CollapseHeaderSubtitle>
+              </Authorization>
+            </Column>
+            <Column>
+              <Authorization
+                allow={isFieldAllowedToRead(
+                  attributes,
+                  LeaseAreasFieldPaths.AREA,
+                )}
+              >
+                <CollapseHeaderSubtitle>
+                  {formatNumber(savedArea.area) || "-"} m<sup>2</sup>
+                </CollapseHeaderSubtitle>
+              </Authorization>
+            </Column>
+            <Column>
+              <Authorization
+                allow={isFieldAllowedToRead(
+                  attributes,
+                  LeaseAreasFieldPaths.LOCATION,
+                )}
+              >
+                <CollapseHeaderSubtitle>
+                  {getLabelOfOption(locationOptions, savedArea.location) || "-"}
+                </CollapseHeaderSubtitle>
+              </Authorization>
+            </Column>
+          </>
+        )
+      }
+      headerTitle={
+        <Authorization
+          allow={isFieldAllowedToRead(
+            attributes,
+            LeaseAreasFieldPaths.IDENTIFIER,
+          )}
+        >
+          {savedArea ? savedArea.identifier || "-" : "-"}
+        </Authorization>
+      }
+      onArchive={
+        isFieldAllowedToEdit(attributes, LeaseAreasFieldPaths.ARCHIVED_AT) &&
+        isActive &&
+        areaId
+          ? handleArchive
+          : null
+      }
+      onRemove={
+        hasPermissions(usersPermissions, UsersPermissions.DELETE_LEASEAREA)
+          ? onRemove
+          : null
+      }
+      onUnarchive={
+        isFieldAllowedToEdit(attributes, LeaseAreasFieldPaths.ARCHIVED_AT) &&
+        !isActive &&
+        areaId
+          ? handleUnarchive
+          : null
+      }
+      onToggle={handleAreaCollapseToggle}
+    >
+      {isActive && (
+        <LeaseAreaEdit
+          formApi={formApi}
+          field={field}
+          areaId={areaId}
+          savedArea={savedArea}
+          isActive={isActive}
+        />
+      )}
+
+      {!isActive && <LeaseArea area={savedArea} />}
+      {!isActive && <Divider className="lease-area-divider" />}
+      {!isActive && (
+        <Row>
+          <Column small={6} medium={4} large={2}>
+            <Authorization
+              allow={isFieldAllowedToRead(
+                attributes,
+                LeaseAreasFieldPaths.ARCHIVED_AT,
+              )}
+            >
+              <>
+                <FormTextTitle
+                  uiDataKey={getUiDataLeaseKey(
+                    LeaseAreasFieldPaths.ARCHIVED_AT,
+                  )}
+                >
+                  {LeaseAreasFieldTitles.ARCHIVED_AT}
+                </FormTextTitle>
+                <FormText>{formatDate(archivedAt) || "-"}</FormText>
+              </>
+            </Authorization>
+          </Column>
+          <Column small={6} medium={4} large={2}>
+            <Authorization
+              allow={isFieldAllowedToRead(
+                attributes,
+                LeaseAreasFieldPaths.ARCHIVED_DECISION,
+              )}
+            >
+              <FormField
+                disableTouched={isSaveClicked}
+                fieldAttributes={getFieldAttributes(
+                  attributes,
+                  LeaseAreasFieldPaths.ARCHIVED_DECISION,
+                )}
+                name={`${field}.archived_decision`}
+                overrideValues={{
+                  label: LeaseAreasFieldTitles.ARCHIVED_DECISION,
+                  options: decisionOptions,
+                }}
+                enableUiDataEdit
+                uiDataKey={getUiDataLeaseKey(
+                  LeaseAreasFieldPaths.ARCHIVED_DECISION,
+                )}
+              />
+            </Authorization>
+          </Column>
+          <Column small={12} medium={4} large={8}>
+            <Authorization
+              allow={isFieldAllowedToRead(
+                attributes,
+                LeaseAreasFieldPaths.ARCHIVED_NOTE,
+              )}
+            >
+              <FormField
+                disableTouched={isSaveClicked}
+                fieldAttributes={getFieldAttributes(
+                  attributes,
+                  LeaseAreasFieldPaths.ARCHIVED_NOTE,
+                )}
+                name={`${field}.archived_note`}
+                overrideValues={{
+                  label: LeaseAreasFieldTitles.ARCHIVED_NOTE,
+                }}
+                enableUiDataEdit
+                uiDataKey={getUiDataLeaseKey(
+                  LeaseAreasFieldPaths.ARCHIVED_NOTE,
+                )}
+              />
+            </Authorization>
+          </Column>
+        </Row>
+      )}
+    </Collapse>
+  );
+};
+
+export default LeaseAreaWithArchiveInfoEdit;

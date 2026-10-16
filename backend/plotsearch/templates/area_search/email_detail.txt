@@ -1,0 +1,9 @@
+{% load i18n %}{% load entry_filter %}{% trans "This is a copy of your area search application sent to the City of Helsinki." %}
+{% trans "You can find a detailed copy of your application as an attachment in this email." %}
+
+{% trans "Area search information" %}
+---
+{% trans "Identifier" %}: {{ object.identifier }}
+{% trans "Start date" %}: {{ object.start_date|date:"G:i j.n.Y" }}
+{% trans "End date" %}: {{ object.end_date|date:"G:i j.n.Y" }}
+{% trans "Received date" %}: {{ object.received_date|date:"G:i j.n.Y" }}

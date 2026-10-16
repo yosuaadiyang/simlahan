@@ -1,0 +1,25 @@
+# Use this file to define constraints for sub-dependencies, for example to avoid
+# package resolution conflicts or vulnerable versions.
+#
+# Packages mentioned in this file are not installed separately, but only used to
+# constrain versions of dependencies installed via requirements.in or other
+# requirement files.
+#
+# For constraining top-level dependencies, just edit the .in-files directly.
+
+# Vulnerability in versions below 6.0.0:
+# - CVE-2025-55197 https://security.snyk.io/vuln/SNYK-PYTHON-PYPDF-11798040
+pypdf>=6.0.0
+
+# Vulnerability in versions below 3.1.6
+# - CVE-2025-27516 https://security.snyk.io/vuln/SNYK-PYTHON-JINJA2-9292516
+# Vulnerabilities in versions below 3.1.5
+# - CVE-2024-56326 https://security.snyk.io/vuln/SNYK-PYTHON-JINJA2-8548181
+# - CVE-2024-56201 https://security.snyk.io/vuln/SNYK-PYTHON-JINJA2-8548987
+jinja2>=3.1.6
+
+# Vulnerabilities in versions below 2.5.0
+# - CVE-2024-37891 https://security.snyk.io/vuln/SNYK-PYTHON-URLLIB3-7267250
+# - CVE-2025-50182 https://security.snyk.io/vuln/SNYK-PYTHON-URLLIB3-10390193
+# - CVE-2025-50181 https://security.snyk.io/vuln/SNYK-PYTHON-URLLIB3-10390194
+urllib3>=2.5.0

@@ -1,0 +1,157 @@
+{% load static %}
+{% load i18n %}
+{% load entry_filter %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{% trans "Area search application" %} {{ object.identifier }}</title>
+    <link rel="stylesheet" href="https://makasiini.hel.ninja/delivery/HelsinkiGrotesk/HelsinkiGrotesk.css">
+    <style>
+@page {
+  size: letter portrait;
+  margin: 2cm;
+}
+
+body {
+  font-family: 'HelsinkiGrotesk', Arial, 'Liberation Sans';
+  font-size: small;
+}
+
+h1 {
+  font-size: xx-large;
+}
+
+hr {
+  border-top: 1px solid #cccccc;
+}
+
+table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+th {
+  text-align: left;
+  width: 40%;
+  padding-right: 5%;
+}
+
+.divider {
+  width: 100%;
+  border-bottom: 1px solid #cccccc;
+}
+
+.parent-section {
+  margin-left: 20px;
+}
+    </style>
+</head>
+
+<body>
+<div class="content">
+    <div>
+        <h1>{{ object.identifier }}</h1>
+    </div>
+    <div>
+        <h2>{% trans "Area search information" %}</h2>
+        <table>
+            <tr>
+                <th>{% trans "Lessor" %}</th>
+                <td>{% trans "City of Helsinki" %}</td>
+            </tr>
+            <tr>
+                <th>{% trans "Description area" %}</th>
+                <td>{{ object.description_area }}</td>
+            </tr>
+            <tr>
+                <th>{% trans "Address" %}</th>
+                <td>{{ object.address }}</td>
+            </tr>
+            <tr>
+                <th>{% trans "District" %}</th>
+                <td>{{ object.district }}</td>
+            </tr>
+            <tr>
+                <th>{% trans "Intended use" %}</th>
+                <td>{{ object.intended_use }}</td>
+            </tr>
+            <tr>
+                <th>{% trans "Description intended use" %}</th>
+                <td>{{ object.description_intended_use }}</td>
+            </tr>
+            <tr>
+                <th>{% trans "Start date" %}</th>
+                <td>{{ object.start_date|date:"G:i j.n.Y" }}</td>
+            </tr>
+            <tr>
+                <th>{% trans "End date" %}</th>
+                <td>{{ object.end_date|date:"G:i j.n.Y" }}</td>
+            </tr>
+            <tr>
+                <th>{% trans "Received date" %}</th>
+                <td>{{ object.received_date|date:"G:i j.n.Y" }}</td>
+            </tr>
+        </table>
+    </div>
+    <div class="divider">&nbsp;</div>
+
+
+    <!--APPLICANT SECTIONS-->
+    {% for applicant in applicants %}
+        {% if applicant.section.applicant_type.value == applicant.applicant_type.value or applicant.section.applicant_type.value == "both" or applicant.applicant_type.value == "both" %}
+            {% include "mixins/section.html" with section=applicant.section answer=object.answer applicant_identifier=applicant.identifier applicant_type=applicant.applicant_type %}
+        {% endif %}
+    {% endfor %}
+    <!--OTHER SECTIONS-->
+
+    {% for section in other_sections.all|filter_only_parent %}
+        {% include "mixins/section.html" with section=section answer=object.answer applicant_identifier=None applicant_type="both" %}
+    {% endfor %}
+
+    {% if show_information_check %}
+        <div>
+            {% for information_check in information_checks %}
+                {% if information_check.name == "trade_register" %}
+                <h2>{% trans "Information check" %}, {% get_applicant information_check.entry_section %}</h2>
+                {% endif %}
+                <table>
+                <tr>
+                    <th>{{ information_check.name }}</th>
+                    <td>{{ information_check.state.label }}</td>
+                </tr>
+            {% endfor %}
+            </table>
+            <table>
+                <tr>
+                    <th>{% trans "Lessor" %}</th>
+                    <td>{{ object.area_search_status.decline_reason.value }}</td>
+                </tr>
+                <tr>
+                    <th>{% trans "Description area" %}</th>
+                    <td>{{ object.area_search_status.preparer_note }}</td>
+                </tr>
+                {% for note in object.area_search_status.status_notes.all %}
+                    <tr>
+                        <th>{% trans "Note" %}</th>
+                        <td>{{ note.note }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% trans "Preparer" %}</th>
+                        <td>{{ note.preparer }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% trans "Time stamp" %}</th>
+                        <td>{{ note.time_stamp|date:"G:i j.n.Y" }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+            <div class="divider">&nbsp;</div>
+        </div>
+    {% endif %}
+</div>
+</body>
+
+</html>

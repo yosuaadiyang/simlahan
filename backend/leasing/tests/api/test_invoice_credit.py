@@ -1,0 +1,233 @@
+import json
+from decimal import Decimal
+
+import pytest
+from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models import Sum
+from django.urls import reverse
+from django.utils import timezone
+
+from leasing.enums import ContactType, InvoiceType
+from leasing.models import Invoice
+from leasing.models.invoice import InvoiceRow, InvoiceSet
+
+
+@pytest.mark.django_db
+def test_invoice_credit_rounding(
+    django_db_setup,
+    assert_count_equal,
+    admin_client,
+    lease_test_data,
+    contact_factory,
+    invoice_factory,
+    invoice_row_factory,
+    tenant_factory,
+):
+    lease = lease_test_data["lease"]
+
+    contact = contact_factory(
+        first_name="First name", last_name="Last name", type=ContactType.PERSON
+    )
+
+    invoice = invoice_factory(
+        lease=lease,
+        type=InvoiceType.CHARGE,
+        total_amount=Decimal(300),
+        billed_amount=Decimal(300),
+        outstanding_amount=Decimal(300),
+        recipient=contact,
+        sent_to_sap_at=timezone.now(),
+    )
+
+    for i in range(1, 4):
+        tenant = tenant_factory(lease=lease, share_numerator=1, share_denominator=3)
+        invoice_row_factory(
+            invoice=invoice, tenant=tenant, receivable_type_id=1, amount=Decimal(100)
+        )
+
+    data = {"receivable_type": 1, "amount": "100"}
+
+    url = reverse("v1:invoice-credit") + "?invoice={}".format(invoice.id)
+    response = admin_client.post(
+        url,
+        data=json.dumps(data, cls=DjangoJSONEncoder),
+        content_type="application/json",
+    )
+
+    assert response.status_code == 200, "%s %s" % (response.status_code, response.data)
+
+    credit_note = Invoice.objects.get(type=InvoiceType.CREDIT_NOTE)
+
+    assert credit_note.total_amount == Decimal(100)
+    assert InvoiceRow.objects.filter(invoice=credit_note).aggregate(sum=Sum("amount"))[
+        "sum"
+    ] == Decimal(100)
+    assert_count_equal(
+        list(
+            InvoiceRow.objects.filter(invoice=credit_note).values_list(
+                "amount", flat=True
+            )
+        ),
+        [Decimal("33.33"), Decimal("33.33"), Decimal("33.34")],
+    )
+
+
+@pytest.mark.django_db
+def test_invoice_set_credit_rounding(
+    django_db_setup,
+    assert_count_equal,
+    admin_client,
+    lease_test_data,
+    contact_factory,
+    invoice_factory,
+    invoice_row_factory,
+    invoice_set_factory,
+):
+    lease = lease_test_data["lease"]
+
+    invoiceset = invoice_set_factory(lease=lease)
+
+    for i in range(1, 4):
+        contact = contact_factory(
+            first_name="First name {}".format(i),
+            last_name="Last name {}".format(i),
+            type=ContactType.PERSON,
+        )
+
+        invoice = invoice_factory(
+            lease=lease,
+            invoiceset=invoiceset,
+            type=InvoiceType.CHARGE,
+            total_amount=Decimal(300),
+            billed_amount=Decimal(100),
+            outstanding_amount=Decimal(100),
+            recipient=contact,
+        )
+
+        invoice_row_factory(invoice=invoice, receivable_type_id=1, amount=Decimal(100))
+
+    data = {"receivable_type": 1, "amount": "100"}
+
+    url = reverse("v1:invoice-set-credit") + "?invoice_set={}".format(invoiceset.id)
+    response = admin_client.post(
+        url,
+        data=json.dumps(data, cls=DjangoJSONEncoder),
+        content_type="application/json",
+    )
+
+    assert response.status_code == 200, "%s %s" % (response.status_code, response.data)
+
+    credit_invoice_set = InvoiceSet.objects.exclude(id=invoiceset.id).first()
+
+    assert (
+        Invoice.objects.filter(
+            invoiceset=credit_invoice_set, type=InvoiceType.CREDIT_NOTE
+        ).count()
+        == 3
+    )
+    assert Invoice.objects.filter(
+        invoiceset=credit_invoice_set, type=InvoiceType.CREDIT_NOTE
+    ).aggregate(sum=Sum("total_amount"))["sum"] == Decimal(100)
+    assert InvoiceRow.objects.filter(invoice__invoiceset=credit_invoice_set).aggregate(
+        sum=Sum("amount")
+    )["sum"] == Decimal(100)
+    assert_count_equal(
+        list(
+            InvoiceRow.objects.filter(
+                invoice__invoiceset=credit_invoice_set
+            ).values_list("amount", flat=True)
+        ),
+        [Decimal("33.33"), Decimal("33.33"), Decimal("33.34")],
+    )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("url_name", "query_parameter"),
+    [
+        ("v1:invoice-credit", "invoice"),
+        ("v1:invoice-set-credit", "invoice_set"),
+    ],
+)
+def test_credit_validation_error_includes_domain_error_message(
+    admin_client,
+    invoice_factory,
+    invoice_set_factory,
+    lease_test_data,
+    query_parameter,
+    url_name,
+):
+    lease = lease_test_data["lease"]
+    invoiceset = invoice_set_factory(lease=lease)
+    invoice = invoice_factory(
+        lease=lease,
+        invoiceset=invoiceset,
+        type=InvoiceType.CREDIT_NOTE,
+        sent_to_sap_at=timezone.now(),
+        total_amount=Decimal(100),
+        billed_amount=Decimal(100),
+    )
+
+    credit_target = invoice if query_parameter == "invoice" else invoiceset
+    url = reverse(url_name) + "?{}={}".format(query_parameter, credit_target.id)
+    response = admin_client.post(url, data={}, content_type="application/json")
+
+    assert response.status_code == 400
+    assert response.data == [
+        (
+            'No refundable invoices found (no invoices with the type "charge" found)'
+            if query_parameter == "invoice_set"
+            else 'Can not credit invoice with the type "credit_note". Only type "charge" allowed.'
+        )
+    ]
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("user_has_correct_service_unit", [False, True])
+def test_invoice_credit_service_unit_access(
+    client,
+    service_unit_factory,
+    invoice_row_factory,
+    invoice_factory,
+    user_factory,
+    lease_test_data,
+    user_has_correct_service_unit,
+):
+    """
+    InvoiceCreditView should allow crediting only when the user belongs
+    to the same service unit as the invoice's lease.
+    """
+
+    lease = lease_test_data["lease"]
+    other_service_unit = service_unit_factory()
+    invoice = invoice_factory(
+        lease=lease,
+        total_amount=Decimal(100),
+        billed_amount=Decimal(100),
+        sent_to_sap_at=timezone.now(),
+    )
+    row = invoice_row_factory(
+        invoice=invoice, receivable_type_id=1, amount=Decimal(100)
+    )
+    invoice.rows.add(row)
+
+    user = user_factory(
+        service_units=[
+            lease.service_unit if user_has_correct_service_unit else other_service_unit
+        ],
+        permissions=["add_invoice"],
+    )
+    client.force_login(user)
+
+    url = reverse("v1:invoice-credit") + "?invoice={}".format(invoice.id)
+    response = client.post(
+        url,
+        data=json.dumps({"receivable_type": 1, "amount": "100"}, cls=DjangoJSONEncoder),
+        content_type="application/json",
+    )
+
+    expected_status = 200 if user_has_correct_service_unit else 403
+    assert response.status_code == expected_status, "%s %s" % (
+        response.status_code,
+        response.data,
+    )

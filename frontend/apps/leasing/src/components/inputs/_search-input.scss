@@ -1,0 +1,39 @@
+@use "foundation-sites/scss/foundation" as *;
+@use "../../styles/variables";
+@use "../../styles/mixins";
+
+.search-input {
+  &__component {
+    position: relative;
+
+    .search-input {
+      border: 1px solid variables.$medium-dark-gray;
+      width: rem-calc(250px);
+      margin: 0;
+      height: rem-calc(30px);
+      padding: 0 rem-calc(8px);
+
+      &::-webkit-input-placeholder {
+        line-height: normal;
+      }
+
+      @include mixins.focusInput();
+    }
+
+    .search-icon {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      height: 20px;
+      width: 20px;
+      background-size: cover;
+      background-image: url(/assets/icons/icon-search.svg);
+      cursor: pointer;
+    }
+  }
+
+  &__label {
+    position: absolute;
+    visibility: hidden;
+  }
+}

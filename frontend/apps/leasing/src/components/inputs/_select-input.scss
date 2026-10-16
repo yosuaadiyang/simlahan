@@ -1,0 +1,144 @@
+@use "foundation-sites/scss/foundation" as *;
+@use "../../styles/variables";
+
+.select-input {
+  margin-bottom: 0;
+
+  .select-input {
+    &__control {
+      min-height: rem-calc(20px);
+      border-radius: 0;
+      transition: none;
+
+      &--is-focused {
+        &:not(.select-input__control--menu-is-open) {
+          box-shadow: 0 0 0 1px variables.$medium-gray;
+          outline: 2px dotted variables.$blue !important;
+          outline-offset: 0px;
+          border-color: variables.$medium-gray;
+        }
+      }
+
+      &--menu-is-open {
+        outline: none !important;
+        border: 1px solid variables.$blue !important;
+        box-shadow: 0px 0px 0px 1px variables.$blue;
+      }
+    }
+
+    &__value-container {
+      padding: rem-calc(0 3px);
+      overflow: visible;
+      font-size: rem-calc(14px);
+      color: variables.$black;
+
+      &--is-multi {
+        padding-right: rem-calc(36px);
+      }
+
+      div:last-of-type {
+        height: rem-calc(18px);
+        margin: 0;
+        padding: 0;
+      }
+    }
+
+    &__single-value {
+      padding-right: rem-calc(15px);
+      height: 100%;
+      margin-top: 0;
+      line-height: 18px;
+      overflow: hidden;
+    }
+
+    &__input-container {
+      vertical-align: top;
+
+      & input.select-input__input {
+        height: rem-calc(14px);
+        padding: rem-calc(2px) !important;
+        margin-bottom: 0;
+        line-height: 1;
+        box-shadow: none;
+      }
+    }
+
+    &__indicators {
+      height: rem-calc(18px);
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
+
+    &__indicator {
+      padding: rem-calc(1px);
+
+      svg {
+        height: rem-calc(16px);
+        width: rem-calc(16px);
+      }
+    }
+
+    &__indicator-separator {
+      margin-top: rem-calc(2px);
+      margin-bottom: rem-calc(2px);
+    }
+
+    &__dropdown-indicator {
+      display: block;
+      background-image: url(/assets/icons/icon_arrow_down.svg);
+      height: rem-calc(14px);
+      width: rem-calc(14px);
+      margin: rem-calc(0 2px);
+
+      &.menu-is-open {
+        background-image: url(/assets/icons/icon_arrow_up.svg);
+      }
+    }
+
+    &__menu {
+      left: rem-calc(-1px);
+      margin-top: rem-calc(-1px);
+      margin-bottom: 0;
+      border-radius: 0;
+      width: auto;
+      min-width: calc(100% + 2px);
+      z-index: 1020;
+      border: 2px solid variables.$blue;
+      border-radius: 0;
+      border-top-width: 1px;
+    }
+
+    &__menu-list {
+      padding: 0;
+    }
+
+    &__menu-notice {
+      &--no-options,
+      &--loading {
+        font-size: rem-calc(14px);
+        padding: rem-calc(5px 0);
+      }
+    }
+
+    &__option {
+      font-size: rem-calc(14px);
+      padding: rem-calc(2px 5px);
+      min-height: rem-calc(20px);
+      white-space: nowrap;
+
+      &:hover {
+        cursor: pointer;
+      }
+
+      &--is-focused {
+        background: variables.$light-blue;
+      }
+
+      &--is-selected {
+        background: variables.$light-blue;
+        color: variables.$black;
+      }
+    }
+  }
+}

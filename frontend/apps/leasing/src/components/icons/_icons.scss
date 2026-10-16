@@ -1,0 +1,75 @@
+@use "foundation-sites/scss/foundation" as *;
+@use "../../styles/variables";
+
+.icons {
+  fill: variables.$black;
+  stroke: variables.$black;
+  vertical-align: sub;
+  height: rem-calc(25px);
+  width: rem-calc(25px);
+  overflow: visible !important;
+
+  &.icons__add {
+    fill: variables.$blue;
+    stroke: variables.$blue;
+  }
+
+  &__error {
+    fill: variables.$red;
+  }
+
+  &__success {
+    #Artboard {
+      fill: variables.$blue;
+    }
+  }
+
+  &.icons__trash {
+    #Artboard {
+      fill: variables.$blue;
+    }
+  }
+
+  &.icons__copy-to-clipboard {
+    #Artboard {
+      fill: variables.$blue;
+    }
+  }
+
+  &.icons__attach {
+    #Artboard {
+      fill: variables.$black;
+    }
+  }
+
+  &.icons__archive {
+    stroke: none !important;
+  }
+
+  &.icons__move-up,
+  &.icons__move-down {
+    width: rem-calc(16px);
+
+    &.icon-medium {
+      width: rem-calc(12px);
+    }
+    &.icon-small {
+      width: rem-calc(9px);
+    }
+  }
+
+  &.icon-medium {
+    height: rem-calc(20px);
+    width: rem-calc(20px);
+  }
+
+  &.icon-small {
+    height: rem-calc(15px);
+    width: rem-calc(15px);
+  }
+
+  &.icon-green {
+    fill: variables.$blue;
+    stroke: variables.$blue;
+  }
+}

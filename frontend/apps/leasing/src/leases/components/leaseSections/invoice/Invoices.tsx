@@ -1,0 +1,586 @@
+import React, { useEffect, useMemo, useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/root/hooks";
+import { ActionTypes, ModalConsumer } from "@/app/ModalContext";
+import Authorization from "@/components/authorization/Authorization";
+import AuthorizationError from "@/components/authorization/AuthorizationError";
+import Button from "@/components/button/Button";
+import Collapse from "@/components/collapse/Collapse";
+import CreateAndCreditInvoice from "./CreateAndCreditInvoice";
+import CreateCollectionLetter from "./CreateCollectionLetter";
+import DebtCollection from "./DebtCollection";
+import Divider from "@/components/content/Divider";
+import InvoiceNotes from "./InvoiceNotes";
+import InvoiceSimulator from "@/components/invoice-simulator/InvoiceSimulator";
+import InvoiceTableAndPanel from "./InvoiceTableAndPanel";
+import Loader from "@/components/loader/Loader";
+import LoaderWrapper from "@/components/loader/LoaderWrapper";
+import SuccessField from "@/components/form/SuccessField";
+import Title from "@/components/content/Title";
+import WarningContainer from "@/components/content/WarningContainer";
+import WarningField from "@/components/form/WarningField";
+import {
+  fetchCollectionCourtDecisionsByLease,
+  fetchAttributes as fetchCollectionCourtDecisionAttributes,
+} from "@/collectionCourtDecision/slice";
+import { fetchCollectionLettersByLease } from "@/collectionLetter/actions";
+import { fetchCollectionNotesByLease } from "@/collectionNote/actions";
+import { fetchInvoiceSetsByLease } from "@/invoiceSets/slice";
+import {
+  receiveInvoiceToCredit,
+  receiveIsCreateInvoicePanelOpen,
+  receiveIsCreditInvoicePanelOpen,
+} from "@/invoices/slice";
+import {
+  receiveCollapseStates,
+  startInvoicing as startInvoicingForLease,
+  stopInvoicing as stopInvoicingForLease,
+} from "@/leases/slice";
+import { fetchAttributes as fetchCollectionLetterAttributes } from "@/collectionLetter/actions";
+import { fetchAttributes as fetchCollectionNoteAttributes } from "@/collectionNote/actions";
+import { fetchAttributes as fetchCreateCollectionLetterAttributes } from "@/createCollectionLetter/actions";
+import { fetchAttributes as fetchInvoiceNoteAttributes } from "@/invoiceNote/actions";
+import { fetchAttributes as fetchLeaseCreateChargeAttributes } from "@/leaseCreateCharge/actions";
+import {
+  ConfirmationModalTexts,
+  PermissionMissingTexts,
+  ViewModes,
+} from "@/enums";
+import { ButtonColors } from "@/components/enums";
+import {
+  LeaseInvoiceNotesFieldPaths,
+  LeaseInvoiceNotesFieldTitles,
+  LeaseInvoicingFieldPaths,
+  LeaseInvoicingFieldTitles,
+  LeaseRentsFieldPaths,
+} from "@/leases/enums";
+import { UsersPermissions } from "@/usersPermissions/enums";
+import { getContentInvoiceNotes } from "@/leases/helpers";
+import { getUiDataLeaseKey } from "@/uiData/helpers";
+import { hasPermissions, isFieldAllowedToRead } from "@/util/helpers";
+import { getCollectionLettersByLease } from "@/collectionLetter/selectors";
+import { getCollectionNotesByLease } from "@/collectionNote/selectors";
+import { getInvoiceToCredit } from "@/invoices/selectors";
+import { getInvoiceSetsByLease } from "@/invoiceSets/selectors";
+import {
+  getAttributes as getLeaseAttributes,
+  getCollapseStateByKey,
+  getCurrentLease,
+} from "@/leases/selectors";
+import {
+  getUserActiveServiceUnit,
+  getUsersPermissions,
+} from "@/usersPermissions/selectors";
+import {
+  getAttributes as getCollectionCourtDecisionAttributes,
+  getIsFetchingAttributes as getIsFetchingCollectionCourtDecisionAttributes,
+  getCollectionCourtDecisionsByLease,
+} from "@/collectionCourtDecision/selectors";
+import {
+  getAttributes as getCollectionLetterAttributes,
+  getIsFetchingAttributes as getIsFetchingCollectionLetterAttributes,
+} from "@/collectionLetter/selectors";
+import {
+  getAttributes as getCollectionNoteAttributes,
+  getIsFetchingAttributes as getIsFetchingCollectionNoteAttributes,
+} from "@/collectionNote/selectors";
+import {
+  getAttributes as getCreateCollectionLetterAttributes,
+  getIsFetchingAttributes as getIsFetchingCreateCollectionLetterAttributes,
+} from "@/createCollectionLetter/selectors";
+import {
+  getAttributes as getInvoiceNoteAttributes,
+  getIsFetchingAttributes as getIsFetchingInvoiceNoteAttributes,
+} from "@/invoiceNote/selectors";
+import {
+  getAttributes as getLeaseCreateChargeAttributes,
+  getIsFetchingAttributes as getIsFetchingLeaseCreateChargeAttributes,
+} from "@/leaseCreateCharge/selectors";
+import type { Attributes } from "types";
+import type { Lease } from "@/leases/types";
+import type { ContentInvoice } from "@/invoices/types";
+
+const Invoices: React.FC = () => {
+  const currentLease: Lease = useAppSelector(getCurrentLease);
+  const collectionCourtDecisions = useAppSelector((state) =>
+    getCollectionCourtDecisionsByLease(state, currentLease.id),
+  );
+  const collectionLetters = useAppSelector((state) =>
+    getCollectionLettersByLease(state, currentLease.id),
+  );
+  const collectionNotes = useAppSelector((state) =>
+    getCollectionNotesByLease(state, currentLease.id),
+  );
+  const invoiceSets = useAppSelector((state) =>
+    getInvoiceSetsByLease(state, currentLease.id),
+  );
+  const invoicesCollapseState = useAppSelector((state) =>
+    getCollapseStateByKey(state, `${ViewModes.READONLY}.invoices.invoices`),
+  );
+  const invoiceNotesCollapseState = useAppSelector((state) =>
+    getCollapseStateByKey(
+      state,
+      `${ViewModes.READONLY}.invoices.invoice_notes`,
+    ),
+  );
+  const invoiceToCredit = useAppSelector(getInvoiceToCredit);
+
+  const leaseAttributes: Attributes = useAppSelector(getLeaseAttributes);
+  const previewInvoicesCollapseState = useAppSelector((state) =>
+    getCollapseStateByKey(
+      state,
+      `${ViewModes.READONLY}.invoices.preview_invoices`,
+    ),
+  );
+  const usersPermissions = useAppSelector(getUsersPermissions);
+  const activeServiceUnit = useAppSelector(getUserActiveServiceUnit);
+  const dispatch = useAppDispatch();
+
+  const isServiceUnitSameAsActiveServiceUnit = () => {
+    return activeServiceUnit?.id === currentLease?.service_unit?.id;
+  };
+
+  const isInvoicingEnabled = useMemo(() => {
+    return currentLease ? !!currentLease.invoicing_enabled_at : null;
+  }, [currentLease]);
+
+  const [invoiceNotes, setInvoiceNotes] = useState<Array<Record<string, any>>>(
+    [],
+  );
+
+  const [
+    isFetchingLeaseInvoiceTabAttributes,
+    setIsFetchingLeaseInvoiceTabAttributes,
+  ] = useState<boolean>(false);
+
+  const collectionCourtDecisionAttributes = useAppSelector(
+    getCollectionCourtDecisionAttributes,
+  );
+  const collectionLetterAttributes = useAppSelector(
+    getCollectionLetterAttributes,
+  );
+  const collectionNoteAttributes = useAppSelector(getCollectionNoteAttributes);
+  const createCollectionLetterAttributes = useAppSelector(
+    getCreateCollectionLetterAttributes,
+  );
+  const invoiceNoteAttributes = useAppSelector(getInvoiceNoteAttributes);
+  const isFetchingCollectionCourtDecisionAttributes = useAppSelector(
+    getIsFetchingCollectionCourtDecisionAttributes,
+  );
+  const isFetchingCollectionLetterAttributes = useAppSelector(
+    getIsFetchingCollectionLetterAttributes,
+  );
+  const isFetchingCollectionNoteAttributes = useAppSelector(
+    getIsFetchingCollectionNoteAttributes,
+  );
+  const isFetchingCreateCollectionLetterAttributes = useAppSelector(
+    getIsFetchingCreateCollectionLetterAttributes,
+  );
+  const isFetchingInvoiceNoteAttributes = useAppSelector(
+    getIsFetchingInvoiceNoteAttributes,
+  );
+  const isFetchingLeaseCreateChargeAttributes = useAppSelector(
+    getIsFetchingLeaseCreateChargeAttributes,
+  );
+
+  const leaseCreateChargeAttributes = useAppSelector(
+    getLeaseCreateChargeAttributes,
+  );
+
+  useEffect(() => {
+    const isFetching =
+      isFetchingCollectionCourtDecisionAttributes ||
+      isFetchingCollectionLetterAttributes ||
+      isFetchingCollectionNoteAttributes ||
+      isFetchingCreateCollectionLetterAttributes ||
+      isFetchingInvoiceNoteAttributes ||
+      isFetchingLeaseCreateChargeAttributes;
+    setIsFetchingLeaseInvoiceTabAttributes(isFetching);
+  }, [
+    isFetchingCollectionCourtDecisionAttributes,
+    isFetchingCollectionLetterAttributes,
+    isFetchingCollectionNoteAttributes,
+    isFetchingCreateCollectionLetterAttributes,
+    isFetchingInvoiceNoteAttributes,
+    isFetchingLeaseCreateChargeAttributes,
+  ]);
+
+  useEffect(() => {
+    if (
+      !isFetchingCollectionCourtDecisionAttributes &&
+      !collectionCourtDecisionAttributes
+    ) {
+      dispatch(fetchCollectionCourtDecisionAttributes());
+    }
+  }, [
+    dispatch,
+    isFetchingCollectionCourtDecisionAttributes,
+    collectionCourtDecisionAttributes,
+  ]);
+
+  useEffect(() => {
+    if (!isFetchingCollectionLetterAttributes && !collectionLetterAttributes) {
+      dispatch(fetchCollectionLetterAttributes());
+    }
+  }, [
+    dispatch,
+    isFetchingCollectionLetterAttributes,
+    collectionLetterAttributes,
+  ]);
+
+  useEffect(() => {
+    if (!isFetchingCollectionNoteAttributes && !collectionNoteAttributes) {
+      dispatch(fetchCollectionNoteAttributes());
+    }
+  }, [dispatch, isFetchingCollectionNoteAttributes, collectionNoteAttributes]);
+
+  useEffect(() => {
+    if (
+      !isFetchingCreateCollectionLetterAttributes &&
+      !createCollectionLetterAttributes
+    ) {
+      dispatch(fetchCreateCollectionLetterAttributes());
+    }
+  }, [
+    dispatch,
+    isFetchingCreateCollectionLetterAttributes,
+    createCollectionLetterAttributes,
+  ]);
+
+  useEffect(() => {
+    if (!isFetchingInvoiceNoteAttributes && !invoiceNoteAttributes) {
+      dispatch(fetchInvoiceNoteAttributes());
+    }
+  }, [dispatch, isFetchingInvoiceNoteAttributes, invoiceNoteAttributes]);
+
+  useEffect(() => {
+    if (
+      !isFetchingLeaseCreateChargeAttributes &&
+      !leaseCreateChargeAttributes
+    ) {
+      dispatch(fetchLeaseCreateChargeAttributes());
+    }
+  }, [
+    dispatch,
+    isFetchingLeaseCreateChargeAttributes,
+    leaseCreateChargeAttributes,
+  ]);
+
+  useEffect(() => {
+    if (
+      hasPermissions(usersPermissions, UsersPermissions.VIEW_INVOICESET) &&
+      !invoiceSets
+    ) {
+      dispatch(fetchInvoiceSetsByLease(currentLease.id));
+    }
+
+    if (
+      hasPermissions(
+        usersPermissions,
+        UsersPermissions.VIEW_COLLECTIONCOURTDECISION,
+      ) &&
+      !collectionCourtDecisions
+    ) {
+      dispatch(fetchCollectionCourtDecisionsByLease(currentLease.id));
+    }
+
+    if (
+      hasPermissions(
+        usersPermissions,
+        UsersPermissions.VIEW_COLLECTIONLETTER,
+      ) &&
+      !collectionLetters
+    ) {
+      dispatch(fetchCollectionLettersByLease(currentLease.id));
+    }
+
+    if (
+      hasPermissions(usersPermissions, UsersPermissions.VIEW_COLLECTIONNOTE) &&
+      !collectionNotes
+    ) {
+      dispatch(fetchCollectionNotesByLease(currentLease.id));
+    }
+  }, [
+    collectionCourtDecisions,
+    collectionLetters,
+    collectionNotes,
+    currentLease,
+    dispatch,
+    invoiceSets,
+    usersPermissions,
+  ]);
+
+  useEffect(() => {
+    dispatch(receiveIsCreateInvoicePanelOpen(false));
+    dispatch(receiveIsCreditInvoicePanelOpen(false));
+    dispatch(receiveInvoiceToCredit(null));
+    setInvoiceNotes(getContentInvoiceNotes(currentLease));
+  }, [currentLease, dispatch]);
+
+  const handleCollapseToggle = (key: string, val: boolean) => {
+    dispatch(
+      receiveCollapseStates({
+        [ViewModes.READONLY]: {
+          invoices: {
+            [key]: val,
+          },
+        },
+      }),
+    );
+  };
+
+  const handleInvoicesCollapseToggle = (val: boolean) => {
+    handleCollapseToggle("invoices", val);
+  };
+
+  const handleInvoiceNotesCollapseToggle = (val: boolean) => {
+    handleCollapseToggle("invoice_notes", val);
+  };
+
+  const handlePreviewInvoicesCollapseToggle = (val: boolean) => {
+    handleCollapseToggle("preview_invoices", val);
+  };
+
+  const handleInvoiceToCreditChange = (val: ContentInvoice | null) => {
+    dispatch(receiveInvoiceToCredit(val));
+  };
+
+  const startInvoicing = () => {
+    dispatch(startInvoicingForLease(currentLease.id));
+  };
+
+  const stopInvoicing = () => {
+    dispatch(stopInvoicingForLease(currentLease.id));
+  };
+
+  if (isFetchingLeaseInvoiceTabAttributes)
+    return (
+      <LoaderWrapper>
+        <Loader isLoading={true} />
+      </LoaderWrapper>
+    );
+  if (!hasPermissions(usersPermissions, UsersPermissions.VIEW_INVOICE))
+    return <AuthorizationError text={PermissionMissingTexts.GENERAL} />;
+  return (
+    <ModalConsumer>
+      {({ modalDispatch }) => {
+        const handleStartInvoicing = () => {
+          modalDispatch({
+            type: ActionTypes.SHOW_CONFIRMATION_MODAL,
+            confirmationFunction: () => {
+              startInvoicing();
+            },
+            confirmationModalButtonClassName: ButtonColors.SUCCESS,
+            confirmationModalButtonText:
+              ConfirmationModalTexts.START_INVOICING.BUTTON,
+            confirmationModalLabel:
+              ConfirmationModalTexts.START_INVOICING.LABEL,
+            confirmationModalTitle:
+              ConfirmationModalTexts.START_INVOICING.TITLE,
+          });
+        };
+
+        const handleStopInvoicing = () => {
+          modalDispatch({
+            type: ActionTypes.SHOW_CONFIRMATION_MODAL,
+            confirmationFunction: () => {
+              stopInvoicing();
+            },
+            confirmationModalButtonClassName: ButtonColors.ALERT,
+            confirmationModalButtonText:
+              ConfirmationModalTexts.STOP_INVOICING.BUTTON,
+            confirmationModalLabel: ConfirmationModalTexts.STOP_INVOICING.LABEL,
+            confirmationModalTitle: ConfirmationModalTexts.STOP_INVOICING.TITLE,
+          });
+        };
+
+        return (
+          <>
+            <Title
+              enableUiDataEdit
+              uiDataKey={getUiDataLeaseKey(LeaseInvoicingFieldPaths.INVOICING)}
+            >
+              {LeaseInvoicingFieldTitles.INVOICING}
+            </Title>
+            <WarningContainer
+              alignCenter
+              buttonComponent={
+                <Authorization
+                  allow={
+                    hasPermissions(
+                      usersPermissions,
+                      UsersPermissions.CHANGE_LEASE_INVOICING_ENABLED_AT,
+                    ) && isServiceUnitSameAsActiveServiceUnit()
+                  }
+                >
+                  {isInvoicingEnabled ? (
+                    <Button
+                      className={ButtonColors.NEUTRAL}
+                      onClick={handleStopInvoicing}
+                      text="Keskeytä laskutus"
+                    />
+                  ) : (
+                    <Button
+                      disabled={!currentLease.rent_info_completed_at}
+                      className={ButtonColors.NEUTRAL}
+                      onClick={handleStartInvoicing}
+                      text="Käynnistä laskutus"
+                    />
+                  )}
+                </Authorization>
+              }
+              success={isInvoicingEnabled}
+            >
+              <Authorization
+                allow={
+                  isFieldAllowedToRead(
+                    leaseAttributes,
+                    LeaseInvoicingFieldPaths.INVOICING_ENABLED_AT,
+                  ) &&
+                  isFieldAllowedToRead(
+                    leaseAttributes,
+                    LeaseRentsFieldPaths.RENT_INFO_COMPLETED_AT,
+                  )
+                }
+              >
+                {isInvoicingEnabled && currentLease.rent_info_completed_at ? (
+                  <SuccessField
+                    meta={{
+                      warning: LeaseInvoicingFieldTitles.INVOICING_ENABLED,
+                    }}
+                    showWarning={true}
+                  />
+                ) : currentLease.rent_info_completed_at ? (
+                  <WarningField
+                    meta={{
+                      warning: LeaseInvoicingFieldTitles.INVOICING_DISABLED,
+                    }}
+                    showWarning={true}
+                  />
+                ) : (
+                  <WarningField
+                    meta={{
+                      warning:
+                        LeaseInvoicingFieldTitles.INVOICING_INCOMPLETE_INFO,
+                    }}
+                    showWarning={true}
+                  />
+                )}
+              </Authorization>
+            </WarningContainer>
+            <Divider />
+
+            <Collapse
+              defaultOpen={
+                invoicesCollapseState !== undefined
+                  ? invoicesCollapseState
+                  : true
+              }
+              headerTitle={LeaseInvoicingFieldTitles.INVOICES}
+              onToggle={handleInvoicesCollapseToggle}
+              enableUiDataEdit
+              uiDataKey={getUiDataLeaseKey(LeaseInvoicingFieldPaths.INVOICES)}
+            >
+              <InvoiceTableAndPanel
+                invoiceToCredit={invoiceToCredit}
+                onInvoiceToCreditChange={handleInvoiceToCreditChange}
+              />
+              <Authorization
+                allow={hasPermissions(
+                  usersPermissions,
+                  UsersPermissions.ADD_INVOICE,
+                )}
+              >
+                <CreateAndCreditInvoice invoiceToCredit={invoiceToCredit} />
+              </Authorization>
+            </Collapse>
+
+            <Authorization
+              allow={hasPermissions(
+                usersPermissions,
+                UsersPermissions.VIEW_INVOICENOTE,
+              )}
+            >
+              <Collapse
+                defaultOpen={
+                  invoiceNotesCollapseState !== undefined
+                    ? invoiceNotesCollapseState
+                    : true
+                }
+                headerTitle={`${LeaseInvoiceNotesFieldTitles.INVOICE_NOTES} (${invoiceNotes.length})`}
+                onToggle={handleInvoiceNotesCollapseToggle}
+                enableUiDataEdit
+                uiDataKey={getUiDataLeaseKey(
+                  LeaseInvoiceNotesFieldPaths.INVOICE_NOTES,
+                )}
+              >
+                <InvoiceNotes invoiceNotes={invoiceNotes} />
+              </Collapse>
+            </Authorization>
+
+            <Authorization
+              allow={hasPermissions(
+                usersPermissions,
+                UsersPermissions.VIEW_INVOICE,
+              )}
+            >
+              <Collapse
+                defaultOpen={
+                  previewInvoicesCollapseState !== undefined
+                    ? previewInvoicesCollapseState
+                    : true
+                }
+                headerTitle={LeaseInvoicingFieldTitles.PREVIEW_INVOICES}
+                onToggle={handlePreviewInvoicesCollapseToggle}
+                enableUiDataEdit
+                uiDataKey={getUiDataLeaseKey(
+                  LeaseInvoicingFieldPaths.PREVIEW_INVOICES,
+                )}
+              >
+                <InvoiceSimulator />
+              </Collapse>
+            </Authorization>
+            <Authorization
+              allow={
+                hasPermissions(
+                  usersPermissions,
+                  UsersPermissions.VIEW_COLLECTIONCOURTDECISION,
+                ) ||
+                hasPermissions(
+                  usersPermissions,
+                  UsersPermissions.VIEW_COLLECTIONLETTER,
+                ) ||
+                hasPermissions(
+                  usersPermissions,
+                  UsersPermissions.VIEW_COLLECTIONNOTE,
+                )
+              }
+            >
+              <>
+                <Title
+                  enableUiDataEdit
+                  uiDataKey={getUiDataLeaseKey(
+                    LeaseInvoicingFieldPaths.DEBT_COLLECTION,
+                  )}
+                >
+                  {LeaseInvoicingFieldTitles.DEBT_COLLECTION}
+                </Title>
+                <Divider />
+                <DebtCollection />
+                <Authorization
+                  allow={hasPermissions(
+                    usersPermissions,
+                    UsersPermissions.ADD_COLLECTIONLETTER,
+                  )}
+                >
+                  <CreateCollectionLetter />
+                </Authorization>
+              </>
+            </Authorization>
+          </>
+        );
+      }}
+    </ModalConsumer>
+  );
+};
+
+export default Invoices;

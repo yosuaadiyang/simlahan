@@ -1,0 +1,85 @@
+@use "sass:math";
+@use "hds-design-tokens/lib/all" as hds;
+
+// HDS Recommendation for layout grid gutter
+$grid-gutter: hds.$spacing-m;
+
+.grid-row {
+  display: flex;
+  flex-flow: row wrap;
+  column-gap: $grid-gutter;
+  row-gap: $grid-gutter;
+}
+
+.grid-column {
+  flex: 1 1 0px;
+  min-width: 0;
+
+  @media screen and (min-width: 0em) {
+    @for $i from 1 through 12 {
+      &.small-#{$i} {
+        $percent: math.percentage(math.div($i, 12));
+        flex: 0
+          0
+          calc(#{$percent} - (#{$grid-gutter} * #{1 - math.div($i, 12)}));
+        max-width: calc(
+          #{$percent} - (#{$grid-gutter} * #{1 - math.div($i, 12)})
+        );
+      }
+    }
+    @for $i from 1 through 11 {
+      &.offset-small-#{$i} {
+        $percent: math.percentage(math.div($i, 12));
+        margin-left: calc(
+          #{$percent} + (#{$grid-gutter} * #{math.div($i, 12)})
+        );
+      }
+    }
+  }
+
+  @media screen and (min-width: hds.$breakpoint-m) {
+    // Migrated to HDS Medium breakpoint
+    @for $i from 1 through 12 {
+      &.medium-#{$i} {
+        $percent: math.percentage(math.div($i, 12));
+        flex: 0
+          0
+          calc(#{$percent} - (#{$grid-gutter} * #{1 - math.div($i, 12)}));
+        max-width: calc(
+          #{$percent} - (#{$grid-gutter} * #{1 - math.div($i, 12)})
+        );
+      }
+    }
+    @for $i from 1 through 11 {
+      &.offset-medium-#{$i} {
+        $percent: math.percentage(math.div($i, 12));
+        margin-left: calc(
+          #{$percent} + (#{$grid-gutter} * #{math.div($i, 12)})
+        );
+      }
+    }
+  }
+
+  @media screen and (min-width: hds.$breakpoint-l) {
+    // Migrated to HDS Large breakpoint
+    @for $i from 1 through 12 {
+      &.large-#{$i} {
+        $percent: math.percentage(math.div($i, 12));
+        flex: 0
+          0
+          calc(#{$percent} - (#{$grid-gutter} * #{1 - math.div($i, 12)}));
+        max-width: calc(
+          #{$percent} - (#{$grid-gutter} * #{1 - math.div($i, 12)})
+        );
+      }
+    }
+    @for $i from 1 through 11 {
+      &.offset-large-#{$i} {
+        $percent: math.percentage(math.div($i, 12));
+        margin-left: calc(
+          #{$percent} + (#{$grid-gutter} * #{math.div($i, 12)})
+        );
+      }
+    }
+  }
+}

@@ -1,0 +1,51 @@
+@use "foundation-sites/scss/foundation" as *;
+@use "../../styles/variables";
+
+.search {
+  &__row {
+    display: flex;
+
+    & > .grid-row {
+      flex: 1 1 0%;
+
+      & > :not(.grid-column) {
+        flex: 1 1 0%;
+        min-width: 0;
+      }
+    }
+  }
+
+  &__label-column {
+    width: rem-calc(140px);
+  }
+
+  &__input-column {
+    flex: 1 1 0%;
+  }
+
+  &__label {
+    line-height: rem-calc(20px);
+    margin: 0;
+    display: block;
+    font-size: rem-calc(14px);
+    color: variables.$dark-gray;
+  }
+
+  &__subtitle-label-column {
+    font-weight: bold;
+    line-height: rem-calc(20px);
+    margin: 0;
+    display: block;
+    font-size: rem-calc(14px);
+    margin-bottom: rem-calc(10px);
+  }
+
+  &__change-type-link {
+    font-weight: variables.$semibold !important;
+  }
+
+  &__clear-link {
+    font-weight: variables.$semibold !important;
+    float: right;
+  }
+}

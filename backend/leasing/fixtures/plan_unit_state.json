@@ -1,0 +1,30 @@
+[
+  {
+    "model": "leasing.PlanUnitState",
+    "pk": 1,
+    "fields": {
+      "name": "Numeronvaraus"
+    }
+  },
+  {
+    "model": "leasing.PlanUnitState",
+    "pk": 2,
+    "fields": {
+      "name": "Vireillä"
+    }
+  },
+  {
+    "model": "leasing.PlanUnitState",
+    "pk": 3,
+    "fields": {
+      "name": "Voimassa"
+    }
+  },
+  {
+    "model": "leasing.PlanUnitState",
+    "pk": 4,
+    "fields": {
+      "name": "Kumottu"
+    }
+  }
+]

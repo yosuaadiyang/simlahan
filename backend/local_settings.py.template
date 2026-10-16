@@ -1,0 +1,48 @@
+HOUR_IN_SECONDS = 60 * 60
+
+Q_CLUSTER = {
+    "name": "DjangORM",
+    "timeout": 90,
+    "retry": HOUR_IN_SECONDS,
+    "orm": "default",
+    "workers": 1,
+}
+
+# Disable automatic pushing of auditlogs to Elasticsearch
+ENABLE_AUDITLOG_ELASTICSEARCH_SYNC = False
+
+PRIVATE_FILES_LOCATION = "/code/private_files"
+
+# qcluster configs for generating email reports locally
+EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+EMAIL_FILE_PATH = "/tmp/emails"
+
+# Areasearch map layer for Helsinki owned areas
+MAP_SERVICE_WMS_URL = ""
+MAP_SERVICE_WMS_USERNAME = ""
+MAP_SERVICE_WMS_PASSWORD = ""
+MAP_SERVICE_WMS_HELSINKI_OWNED_AREAS_LAYER = ""
+
+# Invoice XML creation: temporary directory for output, and placeholders for connection variables
+LASKE_EXPORT_ROOT = "/tmp"
+LASKE_PAYMENTS_IMPORT_LOCATION = "/tmp/payments"
+LASKE_SERVERS = {
+    "export": {
+        "host": "placeholder",
+        "port": 1234,
+        "username": "placeholder",
+        "password": "placeholder",
+        "directory": "placeholder",
+        # "key_type": "placeholder",
+        # "key": b"",
+    },
+    "payments": {
+        "host": "placeholder",
+        "port": 1234,
+        "username": "placeholder",
+        "password": "placeholder",
+        "directory": "placeholder",
+        # "key_type": "placeholder",
+        # "key": b"",
+    },
+}

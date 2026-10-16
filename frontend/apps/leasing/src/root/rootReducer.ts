@@ -1,0 +1,96 @@
+import { combineReducers } from "redux";
+import { reducer as formReducer } from "redux-form";
+import apiReducer from "@/api/slice";
+import areaNoteReducer from "@/areaNote/slice";
+import areaSearchReducer from "@/areaSearch/reducer";
+import auditLogReducer from "@/auditLog/slice";
+import { authReducer } from "@/auth/reducer";
+import batchrunReducer from "@/batchrun/slice";
+import billingPeriodReducer from "@/billingPeriods/slice";
+import collectionCourtDecisionReducer from "@/collectionCourtDecision/slice";
+import collectionLetterReducer from "@/collectionLetter/reducer";
+import collectionNoteReducer from "@/collectionNote/reducer";
+import commentsReducer from "@/comments/reducer";
+import contactsReducer from "@/contacts/reducer";
+import contractFileReducer from "@/contractFile/reducer";
+import createCollectionLetterReducer from "@/createCollectionLetter/reducer";
+import creditDecisionReducer from "@/creditDecision/reducer";
+import leaseReportsReducer from "@/reports/reducer";
+import districtsReducer from "@/district/reducer";
+import indexReducer from "@/index/reducer";
+import infillDevelopmentReducer from "@/infillDevelopment/reducer";
+import infillDevelopmentAttachmentReducer from "@/infillDevelopmentAttachment/reducer";
+import invoiceReducer from "@/invoices/slice";
+import invoiceNoteReducer from "@/invoiceNote/reducer";
+import invoiceSetReducer from "@/invoiceSets/slice";
+import intendedUseReducer from "@/intendedUse/reducer";
+import leaseReducer from "@/leases/slice";
+import oldDwellingsInHousingCompaniesPriceIndexReducer from "@/oldDwellingsInHousingCompaniesPriceIndex/reducer";
+import plotSearchReducer from "@/plotSearch/reducer";
+import plotApplicationsReducer from "@/plotApplications/reducer";
+import applicationReducer from "@/application/slice";
+import leaseCreateChargeReducer from "@/leaseCreateCharge/reducer";
+import leaseholdTransferReducer from "@/leaseholdTransfer/reducer";
+import leaseTypeReducer from "@/leaseType/reducer";
+import lessorReducer from "@/lessor/reducer";
+import penaltyInterestReducer from "@/penaltyInterest/reducer";
+import previewInvoicesReducer from "@/previewInvoices/reducer";
+import rentBasisReducer from "@/rentbasis/slice";
+import rentForPeriodReducer from "@/rentForPeriod/reducer";
+import sapInvoiceReducer from "@/sapInvoice/reducer";
+import serviceUnitsReducer from "@/serviceUnits/reducer";
+import topNavigationReducer from "@/components/topNavigation/reducer";
+import tradeRegisterReducer from "@/tradeRegister/reducer";
+import uiDataReducer from "@/uiData/reducer";
+import usersReducer from "@/users/reducer";
+import usersPermissionsReducer from "@/usersPermissions/slice";
+import vatReducer from "@/vat/reducer";
+export default combineReducers({
+  api: apiReducer,
+  areaNote: areaNoteReducer,
+  areaSearch: areaSearchReducer,
+  auditLog: auditLogReducer,
+  auth: authReducer,
+  batchrun: batchrunReducer,
+  billingPeriod: billingPeriodReducer,
+  collectionCourtDecision: collectionCourtDecisionReducer,
+  collectionLetter: collectionLetterReducer,
+  collectionNote: collectionNoteReducer,
+  comment: commentsReducer,
+  contact: contactsReducer,
+  contractFile: contractFileReducer,
+  createCollectionLetter: createCollectionLetterReducer,
+  creditDecision: creditDecisionReducer,
+  district: districtsReducer,
+  form: formReducer,
+  index: indexReducer,
+  infillDevelopment: infillDevelopmentReducer,
+  infillDevelopmentAttachment: infillDevelopmentAttachmentReducer,
+  invoice: invoiceReducer,
+  invoiceNote: invoiceNoteReducer,
+  invoiceSet: invoiceSetReducer,
+  intendedUse: intendedUseReducer,
+  lease: leaseReducer,
+  plotSearch: plotSearchReducer,
+  plotApplications: plotApplicationsReducer,
+  application: applicationReducer,
+  leaseCreateCharge: leaseCreateChargeReducer,
+  leaseholdTransfer: leaseholdTransferReducer,
+  leaseReports: leaseReportsReducer,
+  leaseType: leaseTypeReducer,
+  lessor: lessorReducer,
+  oldDwellingsInHousingCompaniesPriceIndex:
+    oldDwellingsInHousingCompaniesPriceIndexReducer,
+  penaltyInterest: penaltyInterestReducer,
+  previewInvoices: previewInvoicesReducer,
+  rentBasis: rentBasisReducer,
+  rentForPeriod: rentForPeriodReducer,
+  serviceUnits: serviceUnitsReducer,
+  sapInvoice: sapInvoiceReducer,
+  topNavigation: topNavigationReducer,
+  tradeRegister: tradeRegisterReducer,
+  uiData: uiDataReducer,
+  user: usersReducer,
+  usersPermissions: usersPermissionsReducer,
+  vat: vatReducer,
+});
