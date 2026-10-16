@@ -9,7 +9,8 @@ SimLahan adalah aplikasi web untuk instansi pengelola lahan di Indonesia:
   kerugian + validasi Ketua Pelaksana + pembayaran, pelepasan hak, penyerahan
   hasil, rumah tangga terdampak, dan arsip dokumen.
 - **Pemantauan tenggat hukum** dalam hari kerja (libur nasional & cuti bersama
-  2025–2027 sudah dimuat), dasbor, dan surel pengingat harian.
+  2025–2027 sudah dimuat), dasbor, dan surel pengingat tiap hari kerja
+  pukul 07.00 WIB.
 - **Manajemen sewa/pemanfaatan lahan** warisan MVJ: kontrak, penyewa, tarif,
   tagihan, jaminan, penagihan, laporan, peta, catatan area.
 
