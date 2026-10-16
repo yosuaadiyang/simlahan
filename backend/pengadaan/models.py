@@ -1054,6 +1054,12 @@ class Compensation(TimeStampedModel):
         verbose_name = pgettext_lazy("Model name", "Compensation")
         verbose_name_plural = pgettext_lazy("Model name", "Compensations")
         ordering = ["parcel", "id"]
+        permissions = [
+            (
+                "validate_compensation",
+                _("Can validate compensation (Chair of the Implementing Team)"),
+            )
+        ]
 
     @property
     def paid_amount(self) -> Decimal:

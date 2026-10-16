@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, parsers, serializers, status
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -90,7 +90,10 @@ class ProjectScopedViewSet(BaseViewSet):
 class HolidayViewSet(BaseViewSet):
     queryset = Holiday.objects.all()
     serializer_class = HolidaySerializer
-    filterset_fields = ("is_collective_leave",)
+    filterset_fields = {
+        "is_collective_leave": ["exact"],
+        "date": ["exact", "year", "gte", "lte"],
+    }
     search_fields = ("name",)
 
 
@@ -374,6 +377,13 @@ class ConsignmentViewSet(ParcelChildViewSet):
     filterset_fields = ("parcel", "status", "reason")
 
 
+class CanValidateCompensation(BasePermission):
+    """Hanya Ketua Pelaksana (izin ``validate_compensation``) yang boleh memvalidasi."""
+
+    def has_permission(self, request, view):
+        return request.user.has_perm("pengadaan.validate_compensation")
+
+
 class CompensationViewSet(ParcelChildViewSet):
     queryset = Compensation.objects.select_related(
         "parcel", "party", "validated_by"
@@ -381,12 +391,14 @@ class CompensationViewSet(ParcelChildViewSet):
     serializer_class = CompensationSerializer
     filterset_fields = ("parcel", "party", "status", "form")
 
-    @action(methods=["post"], detail=True)
+    @action(
+        methods=["post"],
+        detail=True,
+        permission_classes=(IsAuthenticated, CanValidateCompensation),
+    )
     def validate(self, request, pk=None):
         """Validasi oleh Ketua Pelaksana sebelum ganti kerugian dibayarkan."""
         compensation = self.get_object()
-        if not request.user.has_perm("pengadaan.change_compensation"):
-            return Response(status=status.HTTP_403_FORBIDDEN)
         if compensation.status not in (enums.CompensationStatus.DETERMINED,):
             raise serializers.ValidationError(
                 _("Only determined compensation can be validated.")

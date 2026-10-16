@@ -1,60 +1,40 @@
-# ==============================
-FROM helsinki.azurecr.io/ubi9/python-312-gdal:latest AS appbase
-# ==============================
+# syntax=docker/dockerfile:1
+# ==============================================================
+# SimLahan backend (Django + GeoDjango) – image produksi
+# ==============================================================
+FROM python:3.12-slim-bookworm AS base
 
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        gdal-bin libgdal32 libgeos-c1v5 libproj25 \
+        gettext libpq5 \
+        build-essential libpcre3-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-COPY --chown=default:root requirements*.txt /app/
+COPY requirements.txt requirements-prod.txt /app/
+RUN pip install -r requirements.txt -r requirements-prod.txt \
+    && apt-get purge -y --auto-remove build-essential libpcre3-dev
 
-USER default
+COPY . /app
 
-RUN pip install --no-cache-dir -r /app/requirements.txt \
-    && pip install --no-cache-dir -r /app/requirements-prod.txt
+# Kompilasi terjemahan & kumpulkan berkas statis saat build.
+RUN DEBUG=1 SECRET_KEY=build-only DATABASE_URL=postgis://build@localhost/build \
+        python manage.py compilemessages -l id -v0 \
+    && DEBUG=1 SECRET_KEY=build-only DATABASE_URL=postgis://build@localhost/build \
+        python manage.py collectstatic --noinput -v0
 
-COPY --chown=default:root deploy/docker-entrypoint.sh /entrypoint/docker-entrypoint.sh
-ENTRYPOINT ["/entrypoint/docker-entrypoint.sh"]
+RUN useradd --system --uid 1000 --home /app simlahan \
+    && mkdir -p /app/private_files /app/media \
+    && chown -R simlahan /app/private_files /app/media
 
-# ==============================
-FROM appbase AS staticbuilder
-# ==============================
-
-COPY --chown=default:root . /app
-
-USER root
-# Create static directory if it doesn't exist and set permissions
-RUN mkdir -p /app/static && chown -R default:root /app/static
-
-USER default
-
-RUN python manage.py compilemessages
-RUN python manage.py collectstatic --noinput
-
-
-# ==============================
-FROM appbase AS development
-# ==============================
-
-COPY --chown=default:root requirements-dev.txt /app/requirements-dev.txt
-RUN pip install --no-cache-dir -r /app/requirements-dev.txt
-
-ENV DEV_SERVER=1
-
-COPY --chown=default:root . /app/
-
-USER default
-
-EXPOSE 8080/tcp
-
-# ==============================
-FROM appbase AS production
-# ==============================
-
-COPY --from=staticbuilder --chown=default:root /app/static /app/static
-COPY --from=staticbuilder --chown=default:root /app/locale /app/locale
-COPY --chown=default:root . /app/
-
-USER default
-
-EXPOSE 8080/tcp
+USER simlahan
+EXPOSE 8080
+ENTRYPOINT ["/app/deploy/docker-entrypoint.sh"]
+CMD ["api"]

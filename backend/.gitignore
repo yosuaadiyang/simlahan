@@ -1,6 +1,7 @@
 *.py[cod]
 *.mo
 *.sql
+!**/migrations/*.sql
 *.iml
 *.csv
 *.dump

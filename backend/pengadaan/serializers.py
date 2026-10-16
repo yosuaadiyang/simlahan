@@ -235,6 +235,23 @@ class AcquisitionParcelSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {"district": _("Sub-district must be in the project's regency/city.")}
             )
+        parcel_number = attrs.get(
+            "parcel_number", getattr(self.instance, "parcel_number", None)
+        )
+        if project is not None and parcel_number:
+            duplicates = AcquisitionParcel.objects.filter(
+                project=project, parcel_number=parcel_number
+            )
+            if self.instance is not None:
+                duplicates = duplicates.exclude(pk=self.instance.pk)
+            if duplicates.exists():
+                raise serializers.ValidationError(
+                    {
+                        "parcel_number": _(
+                            "This parcel number already exists in the project."
+                        )
+                    }
+                )
         return attrs
 
 

@@ -31,6 +31,7 @@ VA = ("view", "add")
 VAC = ("view", "add", "change")
 ALL = ("view", "add", "change", "delete")
 SENSITIVE = "view_sensitive_personal_data"
+VALIDATE = "validate_compensation"
 
 # Grup yang hanya membaca seluruh modul.
 READERS = (
@@ -83,7 +84,13 @@ PENGADAAN_GROUP_MODEL_PERMISSIONS: GroupModelPermissions = {
     DeliberationResult: _perms({UG.SATGAS_PENGADAAN: VAC}),
     Objection: _perms({UG.PERINTALAKIMIES: VAC}),
     Consignment: _perms({UG.PERINTALAKIMIES: VAC}),
-    Compensation: _perms({UG.LASKUTTAJA: ("view", "change")}),
+    Compensation: _perms(
+        {
+            UG.PAAKAYTTAJA: ALL + (VALIDATE,),
+            UG.PELAKSANA_PENGADAAN: ALL + (VALIDATE,),
+            UG.LASKUTTAJA: ("view", "change"),
+        }
+    ),
     CompensationPayment: _perms({UG.LASKUTTAJA: VAC}),
     RightsRelease: _perms({UG.SATGAS_PENGADAAN: VAC}),
     Handover: _perms({UG.INSTANSI_PEMOHON: V}),

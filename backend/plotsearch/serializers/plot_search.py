@@ -1252,7 +1252,7 @@ class DirectReservationLinkSerializer(serializers.ModelSerializer):
     targets = InstanceDictPrimaryKeyRelatedField(
         queryset=PlotSearchTarget.objects.all(), many=True
     )
-    lang_choices = ("FI", "SE", "EN")
+    lang_choices = ("ID", "EN")
     language = serializers.ChoiceField(lang_choices, allow_blank=True, required=False)
     first_name = serializers.CharField(allow_blank=True, required=False)
     last_name = serializers.CharField(allow_blank=True, required=False)
@@ -1282,7 +1282,9 @@ class DirectReservationLinkSerializer(serializers.ModelSerializer):
         return obj.get_external_url()
 
     def create(self, validated_data):
-        language = pop_default(validated_data, "language", "en")
+        language = (
+            pop_default(validated_data, "language", "") or settings.LANGUAGE_CODE
+        ).lower()
         first_name = pop_default(validated_data, "first_name", "")
         last_name = pop_default(validated_data, "last_name", "")
         email = pop_default(validated_data, "email", None)

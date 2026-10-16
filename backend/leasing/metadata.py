@@ -90,6 +90,14 @@ class FieldsMetadata(FieldPermissionsMetadataMixin, SimpleMetadata):
 
             field_info["choices"].sort(key=lambda x: x["display_name"])
 
+        if isinstance(field, PrimaryKeyRelatedField) and (
+            getattr(field, "queryset", None) is None or _is_pengadaan_serializer(field)
+        ):
+            # Field read-only (tanpa queryset) atau modul pengadaan: pilihan
+            # dimuat UI melalui endpoint daftar masing-masing (bisa ribuan
+            # entri, mis. 7.285 kecamatan).
+            return field_info
+
         if isinstance(field, PrimaryKeyRelatedField) or isinstance(field, EnumField):
             # TODO: Make configurable
             if hasattr(field, "queryset") and field.queryset.model in (
@@ -114,3 +122,8 @@ class FieldsMetadata(FieldPermissionsMetadataMixin, SimpleMetadata):
             ]
 
         return field_info
+
+
+def _is_pengadaan_serializer(field) -> bool:
+    model = getattr(getattr(field.parent, "Meta", None), "model", None)
+    return model is not None and model._meta.app_label == "pengadaan"

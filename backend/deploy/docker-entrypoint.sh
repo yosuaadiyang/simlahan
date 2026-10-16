@@ -1,53 +1,53 @@
 #!/bin/bash
+# Titik masuk kontainer backend SimLahan.
+#   api       : migrasi (opsional) + bootstrap + uWSGI
+#   qcluster  : pekerja tugas latar (laporan, email)
+#   batchrun  : penjadwal tugas berkala (mis. notifikasi tenggat pengadaan)
+#   manage    : jalankan perintah manage.py, mis. `manage createsuperuser`
 set -e
 
-echo "Entrypoint executing with args: $@"
-
-
-start_api() {
-    # Check if this is an initContainer
-    if [[ ! -z "$IS_KUBERNETES_INIT_CONTAINER" ]]; then
-        echo "Running in initialization container mode"
-        # Create required directories in init container
-        bash deploy/init-create-dirs.sh
-        # Run migrations in init container
-        bash deploy/init-migrate.sh
-        # Update django permissions
-        echo "Run: set_group_field_permissions"
-        ./manage.py set_group_field_permissions
-        echo "Run: set_group_model_permissions"
-        ./manage.py set_group_model_permissions
-        echo "Run: set_report_permissions"
-        ./manage.py set_report_permissions
-        echo "Finished setting permissions"
-        # Exit to allow main container to start, and in order to not start uwsgi in initContainer
-        exit 0
-    fi
-
-    echo "Starting uWSGI server"
-    exec uwsgi --ini deploy/uwsgi.ini
+wait_for_db() {
+    python - <<'PY'
+import os, sys, time
+import django
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mvj.settings")
+django.setup()
+from django.db import connection
+for attempt in range(60):
+    try:
+        connection.ensure_connection()
+        sys.exit(0)
+    except Exception as exc:  # noqa: BLE001
+        print(f"Menunggu basis data… ({exc.__class__.__name__})", flush=True)
+        time.sleep(2)
+sys.exit("Basis data tidak dapat dihubungi.")
+PY
 }
 
 case "$1" in
-    batchrun)
-        echo "Running batchrun scheduler"
-        exec python ./manage.py batchrun_scheduler
-        ;;
-
-    qcluster)
-        echo "Running qcluster"
-        exec python ./manage.py qcluster
-        ;;
-
     api)
-        echo "Running api"
-        start_api
+        wait_for_db
+        if [[ "${APPLY_MIGRATIONS:-1}" = "1" ]]; then
+            python manage.py migrate --noinput
+        fi
+        if [[ "${RUN_BOOTSTRAP:-1}" = "1" ]]; then
+            python manage.py simlahan_bootstrap
+        fi
+        exec uwsgi --ini deploy/uwsgi.ini
         ;;
-
+    qcluster)
+        wait_for_db
+        exec python manage.py qcluster
+        ;;
+    batchrun)
+        wait_for_db
+        exec python manage.py batchrun_scheduler
+        ;;
+    manage)
+        shift
+        exec python manage.py "$@"
+        ;;
     *)
-        echo "Unknown command: $1"
-        echo "Usage: $0 {batchrun|qcluster|api}"
-        echo "Running default command: api"
-        start_api
+        exec "$@"
         ;;
 esac

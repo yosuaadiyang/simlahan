@@ -334,3 +334,101 @@ def test_deadlines_endpoint(admin_client, project, parcel):
     )
     data = admin_client.get(reverse("v1:pengadaan-deadlines")).json()
     assert any(item["kind"] == "deliberation" for item in data)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "basename",
+    [
+        "acquisitionproject",
+        "acquisitionmilestone",
+        "acquisitionparcel",
+        "entitledparty",
+        "parcelsurvey",
+        "announcement",
+        "valuation",
+        "deliberation",
+        "deliberationresult",
+        "objection",
+        "consignment",
+        "compensation",
+        "compensationpayment",
+        "rightsrelease",
+        "handover",
+        "affectedhousehold",
+        "acquisitiondocument",
+        "holiday",
+        "deadlinerule",
+    ],
+)
+def test_options_metadata_for_all_endpoints(admin_client, basename):
+    response = admin_client.options(reverse(f"v1:{basename}-list"))
+    assert response.status_code == 200, response.content
+    fields = response.json()["fields"]
+    assert "id" in fields
+
+
+@pytest.mark.django_db
+def test_holiday_year_filter(admin_client, seeded_rules):
+    data = admin_client.get(
+        reverse("v1:holiday-list"), {"date__year": 2026, "limit": 500}
+    ).json()
+    dates = [item["date"] for item in data["results"]]
+    assert dates and all(d.startswith("2026-") for d in dates)
+
+
+@pytest.mark.django_db
+def test_document_upload_and_download(admin_client, project):
+    upload = SimpleUploadedFile(
+        "penlok.pdf", b"%PDF-1.4 uji", content_type="application/pdf"
+    )
+    response = admin_client.post(
+        reverse("v1:acquisitiondocument-list"),
+        {
+            "project": project.id,
+            "document_type": enums.DocumentType.LOCATION_DECREE,
+            "title": "SK Penlok",
+            "file": upload,
+        },
+    )
+    assert response.status_code == 201, response.content
+    document_id = response.json()["id"]
+    assert response.json()["uploaded_by_name"]
+    download = admin_client.get(
+        reverse("v1:acquisitiondocument-download", kwargs={"pk": document_id})
+    )
+    assert download.status_code == 200
+    assert b"".join(download.streaming_content).startswith(b"%PDF")
+
+
+@pytest.mark.django_db
+def test_duplicate_parcel_number_is_a_field_error(admin_client, parcel):
+    response = admin_client.post(
+        reverse("v1:acquisitionparcel-list"),
+        data={"project": parcel.project_id, "parcel_number": parcel.parcel_number},
+        content_type="application/json",
+    )
+    assert response.status_code == 400
+    assert "parcel_number" in response.json()
+
+
+@pytest.mark.django_db
+def test_compensation_validation_requires_validate_permission(make_user, parcel, party):
+    compensation = Compensation.objects.create(
+        parcel=parcel, party=party, amount=Decimal("1000000")
+    )
+    url = reverse("v1:compensation-validate", kwargs={"pk": compensation.pk})
+    billing = make_user(
+        "penagih",
+        perms=("pengadaan.view_compensation", "pengadaan.change_compensation"),
+    )
+    assert _client(billing).post(url).status_code == 403
+
+    chair = make_user(
+        "ketua",
+        perms=("pengadaan.view_compensation", "pengadaan.validate_compensation"),
+    )
+    response = _client(chair).post(url)
+    assert response.status_code == 200, response.content
+    compensation.refresh_from_db()
+    assert compensation.validated_by == chair

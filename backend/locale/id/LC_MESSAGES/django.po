@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SimLahan\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 09:02+0700\n"
+"POT-Creation-Date: 2026-10-16 16:07+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Indonesian\n"
@@ -4796,6 +4796,9 @@ msgctxt "Model name"
 msgid "Compensations"
 msgstr "Ganti kerugian"
 
+msgid "Can validate compensation (Chair of the Implementing Team)"
+msgstr "Dapat memvalidasi ganti kerugian (Ketua Pelaksana)"
+
 msgid "Compensation"
 msgstr "Ganti kerugian"
 
@@ -4910,6 +4913,9 @@ msgstr "Luas terkena tidak boleh melebihi luas ukur."
 
 msgid "Sub-district must be in the project's regency/city."
 msgstr "Kecamatan harus berada di kabupaten/kota proyek."
+
+msgid "This parcel number already exists in the project."
+msgstr "Nomor bidang ini sudah ada dalam proyek."
 
 msgid "Bank account number must be numeric."
 msgstr "Nomor rekening bank harus berupa angka."

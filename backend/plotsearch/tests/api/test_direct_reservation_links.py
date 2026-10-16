@@ -29,7 +29,7 @@ def test_direct_reservation_link_create(
 
     data = {
         "targets": [target.id],
-        "language": "FI",
+        "language": "ID",
         "first_name": "Pekka",
         "last_name": "Testaaja",
         "email": "pekkatestaaja@testimaili.org",

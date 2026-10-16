@@ -48,6 +48,7 @@ env = environ.Env(
     FIELD_ENCRYPTION_KEY=(str, ""),
     ALLOWED_HOSTS=(list, []),
     CSRF_TRUSTED_ORIGINS=(list, []),
+    TRUST_PROXY_HEADERS=(bool, False),
     CORS_ALLOWED_ORIGINS=(list, []),
     OFFICER_UI_URL=(str, ""),
     PUBLIC_UI_URL=(str, ""),
@@ -118,7 +119,9 @@ if env("SENTRY_DSN"):
 
 MEDIA_ROOT = env.str("MEDIA_ROOT", default=project_root("media"))
 STATIC_ROOT = env.str("STATIC_ROOT", default=project_root("static"))
-PRIVATE_FILES_LOCATION = env.str("PRIVATE_FILES_LOCATION")
+PRIVATE_FILES_LOCATION = env.str("PRIVATE_FILES_LOCATION") or project_root(
+    "private_files"
+)
 
 MEDIA_URL = "/media/"
 STATIC_URL = "/static/"
@@ -247,6 +250,15 @@ vars().update(env.email_url("EMAIL_URL"))
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS")
 CORS_ALLOW_ALL_ORIGINS = DEBUG and not CORS_ALLOWED_ORIGINS
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS")
+
+# Aktifkan bila Django berjalan di belakang reverse proxy (nginx) yang
+# meneruskan X-Forwarded-Proto/Host, mis. pada docker compose bawaan.
+if env.bool("TRUST_PROXY_HEADERS"):
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    USE_X_FORWARDED_HOST = True
+if not DEBUG:
+    SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", default=True)
+    CSRF_COOKIE_SECURE = env.bool("CSRF_COOKIE_SECURE", default=True)
 CORS_EXPOSE_HEADERS = ["Content-Disposition"]
 
 Q_CLUSTER = {

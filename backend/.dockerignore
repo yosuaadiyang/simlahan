@@ -16,6 +16,7 @@ local_settings.py
 # Python build artifacts
 *.py[cod]
 *.mo
+__pycache__/
 .mypy_cache/
 .cache/
 .pytest_cache/
@@ -32,13 +33,10 @@ coverage.xml
 
 # Data files that should not be in the image
 *.sql
+# ...kecuali SQL migrasi yang dibutuhkan saat `migrate`
+!**/migrations/*.sql
 *.dump
 *.csv
 *.xlsx
 *.log
-/laske_export_files/
-/nls_leasehold_transfers/
 /tmp_backups_for_db_restore/
-
-# Pipelines (not needed at runtime)
-pipelines/
