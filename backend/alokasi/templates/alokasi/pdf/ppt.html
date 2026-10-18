@@ -1,0 +1,52 @@
+{% extends "alokasi/pdf/_base.html" %}{% load alokasi_tags %}
+{% block title %}PPT {{ doc.number }}{% endblock %}
+{% block content %}
+<h1>PERJANJIAN PEMANFAATAN TANAH</h1>
+<p class="center">Nomor: {{ doc.number }}</p>
+
+<p>Pada tanggal {{ doc.issued_at|tanggal }} di {{ config.city }}, yang bertanda tangan di bawah ini:</p>
+<ol>
+  <li><b>{{ config.authority_name }}</b>, dalam hal ini diwakili oleh {{ config.signatory_title }}, selanjutnya disebut <b>PIHAK PERTAMA</b>;</li>
+  <li><b>{{ holder.name }}</b>{% if holder.nib %} (NIB {{ holder.nib }}){% endif %}, beralamat di {{ holder.address }}, dalam hal ini diwakili oleh
+      {{ holder.pic_name }}{% if holder.pic_position %} selaku {{ holder.pic_position }}{% endif %}, selanjutnya disebut <b>PIHAK KEDUA</b>.</li>
+</ol>
+<p>Berdasarkan Keputusan Pengalokasian Tanah Nomor {{ allocation.kpt_number }}, PARA PIHAK sepakat mengikatkan diri dalam perjanjian dengan ketentuan berikut.</p>
+
+<div class="pasal">Pasal 1 – Objek Perjanjian</div>
+<p>PIHAK PERTAMA memberikan hak pemanfaatan atas tanah kode {{ plot.code }} di {{ plot.name }}{% if plot.district %}, Kecamatan {{ plot.district }}{% endif %},
+seluas {{ allocation.area_m2|angka:2 }} m², untuk peruntukan {{ allocation.activity }}.</p>
+
+<div class="pasal">Pasal 2 – Jangka Waktu</div>
+<p>Perjanjian berlaku sejak {{ allocation.start_date|tanggal }} sampai dengan {{ allocation.end_date|tanggal }} dan dapat diperpanjang sesuai ketentuan yang berlaku.</p>
+
+<div class="pasal">Pasal 3 – Uang Wajib Tahunan</div>
+<p>PIHAK KEDUA telah membayar Uang Wajib Tahunan dan biaya administrasi sesuai tagihan
+{% for invoice in application.invoices.all %}{{ invoice.number }} ({{ invoice.amount|rupiah }}){% if not forloop.last %}, {% endif %}{% empty %}yang ditetapkan{% endfor %}.</p>
+
+<div class="pasal">Pasal 4 – Kewajiban PIHAK KEDUA</div>
+<ol>
+  <li>Memanfaatkan tanah sesuai peruntukan dan rencana usaha yang diajukan.</li>
+  <li>Memulai pembangunan paling lambat {{ config.idle_years }} tahun sejak tanggal perjanjian.</li>
+  <li>Mengurus seluruh perizinan yang dipersyaratkan peraturan perundang-undangan.</li>
+  <li>Melaporkan progres perizinan dan pembangunan melalui portal paling sedikit setiap {{ config.report_interval_months }} bulan.</li>
+  <li>Menjaga batas tanah dan tidak memanfaatkan tanah di luar batas yang dialokasikan.</li>
+</ol>
+
+<div class="pasal">Pasal 5 – Larangan</div>
+<p>PIHAK KEDUA dilarang mengalihkan hak atas tanah kepada pihak lain tanpa izin tertulis dari PIHAK PERTAMA.</p>
+
+<div class="pasal">Pasal 6 – Sanksi</div>
+<p>Apabila PIHAK KEDUA tidak memenuhi kewajiban dalam Pasal 4 atau melanggar Pasal 5, PIHAK PERTAMA dapat mencabut alokasi tanah
+dan membatalkan perjanjian ini tanpa kewajiban mengembalikan pembayaran yang telah diterima, sesuai ketentuan yang berlaku.</p>
+
+<div class="pasal">Pasal 7 – Penutup</div>
+<p>Perjanjian ini dibuat secara elektronik dan mempunyai kekuatan hukum yang sama dengan dokumen tertulis.</p>
+
+<table class="sign">
+  <tr>
+    <td style="width: 24%;"><img src="{{ qr }}" width="80" height="80"><br><span class="muted">Kode verifikasi:<br>{{ doc.token }}</span></td>
+    <td style="width: 38%;" class="center">PIHAK KEDUA,<br>{{ holder.name }}<br><br><span class="muted">Disetujui secara elektronik melalui portal</span><br><b>{{ holder.pic_name }}</b></td>
+    <td style="width: 38%;" class="center">PIHAK PERTAMA,<br>{{ config.signatory_title }}<br><br><span class="muted">Ditandatangani secara elektronik</span><br><b>{{ config.signatory_name|default:"" }}</b></td>
+  </tr>
+</table>
+{% endblock %}

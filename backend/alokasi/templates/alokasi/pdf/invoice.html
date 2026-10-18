@@ -1,0 +1,24 @@
+{% extends "alokasi/pdf/_base.html" %}{% load alokasi_tags %}
+{% block title %}Tagihan {{ invoice.number }}{% endblock %}
+{% block content %}
+<h1>TAGIHAN</h1>
+<p class="center">Nomor: {{ invoice.number }}</p>
+<table class="data">
+  <tr><td style="width: 32%;">Kepada</td><td>: {{ applicant.name }}</td></tr>
+  <tr><td>Alamat</td><td>: {{ applicant.address }}</td></tr>
+  <tr><td>Nomor permohonan</td><td>: {{ application.number }} ({{ application.get_service_type_display }})</td></tr>
+  <tr><td>Tanggal tagihan</td><td>: {{ invoice.created_at|tanggal }}</td></tr>
+  <tr><td>Jatuh tempo</td><td>: {{ invoice.due_date|tanggal }}</td></tr>
+  <tr><td>Status</td><td>: {{ invoice.get_status_display }}</td></tr>
+</table>
+<br>
+<table class="grid">
+  <tr><th style="width: 30%;">Jenis</th><th>Uraian</th><th style="width: 22%;">Jumlah</th></tr>
+  <tr><td>{{ invoice.get_kind_display }}</td><td>{{ invoice.description }}</td><td class="right">{{ invoice.amount|rupiah }}</td></tr>
+  <tr><td colspan="2" class="right"><b>Total</b></td><td class="right"><b>{{ invoice.amount|rupiah }}</b></td></tr>
+</table>
+<h2>Petunjuk pembayaran</h2>
+<p>{{ config.payment_instructions|linebreaksbr }}</p>
+<p>Cantumkan nomor tagihan {{ invoice.number }} pada berita pembayaran, lalu unggah bukti bayar melalui portal.</p>
+{% endblock %}
+{% block footer %}Tagihan {{ invoice.number }} – dicetak {{ today|tanggal }}{% endblock %}

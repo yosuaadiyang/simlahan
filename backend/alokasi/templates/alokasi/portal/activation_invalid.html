@@ -1,0 +1,8 @@
+{% extends "alokasi/portal/base.html" %}
+{% block title %}Tautan Aktivasi Tidak Berlaku{% endblock %}
+{% block content %}
+<div class="card" style="max-width:640px">
+  <h1>Tautan aktivasi tidak berlaku</h1>
+  <p>Tautan sudah dipakai, kedaluwarsa, atau tidak lengkap. Bila akun sudah aktif, silakan <a href="{% url 'portal:login' %}">masuk</a>. Bila belum, <a href="{% url 'portal:resend_activation' %}">minta tautan baru</a>.</p>
+</div>
+{% endblock %}

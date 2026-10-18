@@ -1,0 +1,23 @@
+{% extends "alokasi/portal/base.html" %}{% load alokasi_tags %}
+{% block title %}{{ category_label }}{% endblock %}
+{% block content %}
+<h1>{{ category_label }}</h1>
+<nav class="tabs" aria-label="Kategori informasi">
+  <a href="{% url 'portal:info_index' %}"{% if not category %} class="active"{% endif %}>Semua</a>
+  {% for value, label, n in categories %}<a href="{% url 'portal:info_category' value %}"{% if category == value %} class="active"{% endif %}>{{ label }} ({{ n }})</a>{% endfor %}
+</nav>
+<form class="filters" method="get" role="search" style="grid-template-columns: 1fr auto">
+  <div><input type="search" name="q" value="{{ q }}" placeholder="Cari informasi" aria-label="Cari informasi"></div>
+  <div><button class="btn" type="submit">Cari</button></div>
+</form>
+{% for item in page %}
+  <article class="card">
+    <h2 style="margin-top:0"><a href="{% url 'portal:info_detail' item.slug %}">{{ item.title }}</a></h2>
+    <p class="small muted">{{ item.get_category_display }} · {{ item.published_at|tanggal }}{% if item.attachment %} · ada lampiran{% endif %}{% if item.video_url %} · video{% endif %}</p>
+    {% if item.summary %}<p>{{ item.summary }}</p>{% endif %}
+  </article>
+{% empty %}
+  <p class="muted">Belum ada informasi.</p>
+{% endfor %}
+{% include "alokasi/portal/_pagination.html" %}
+{% endblock %}

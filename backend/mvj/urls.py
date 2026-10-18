@@ -7,6 +7,7 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions, routers
 
+from alokasi.admin_views import officer_file
 from audittrail.viewsets import AuditTrailView
 from forms.viewsets.form import (
     AnswerOpeningRecordViewset,
@@ -393,8 +394,14 @@ urlpatterns = [
             namespace="v1",
         ),
     ),
+    path(
+        "admin/alokasi/berkas/<str:kind>/<int:pk>/",
+        officer_file,
+        name="alokasi-officer-file",
+    ),
     path("admin/", admin.site.urls),
     path("auth/", include(rest_framework.urls)),
+    path("portal/", include("alokasi.urls")),
 ]
 
 # Generate a schema

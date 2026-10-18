@@ -1,0 +1,14 @@
+{% extends "alokasi/portal/base.html" %}
+{% block title %}Profil Pemohon{% endblock %}
+{% block content %}
+<h1>Profil pemohon</h1>
+<form method="post" class="card">{% csrf_token %}
+  <p class="muted small">Surel akun: {{ request.user.email }}</p>
+  {% include "alokasi/portal/_form.html" %}
+  <div class="actions-row">
+    <button class="btn" type="submit">Simpan</button>
+    <a class="btn btn-outline" href="{% url 'portal:dashboard' %}">Batal</a>
+    <a href="{% url 'portal:password_change' %}">Ubah kata sandi</a>
+  </div>
+</form>
+{% endblock %}

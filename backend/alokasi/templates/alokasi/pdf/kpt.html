@@ -1,0 +1,41 @@
+{% extends "alokasi/pdf/_base.html" %}{% load alokasi_tags %}
+{% block title %}KPT {{ doc.number }}{% endblock %}
+{% block content %}
+<h1>KEPUTUSAN PENGALOKASIAN TANAH</h1>
+<p class="center">Nomor: {{ doc.number }}</p>
+
+<p>Berdasarkan permohonan Nomor {{ application.number }} tanggal {{ application.submitted_at|tanggal }}
+dan hasil verifikasi teknis, {{ config.authority_short_name }} menetapkan pengalokasian tanah kepada:</p>
+
+<table class="data">
+  <tr><td style="width: 32%;">Nama pemohon</td><td>: {{ holder.name }}</td></tr>
+  <tr><td>Jenis pemohon</td><td>: {{ holder.get_applicant_type_display }}</td></tr>
+  {% if holder.nib %}<tr><td>NIB</td><td>: {{ holder.nib }}</td></tr>{% endif %}
+  {% if holder.npwp %}<tr><td>NPWP</td><td>: {{ holder.npwp }}</td></tr>{% endif %}
+  <tr><td>Penanggung jawab</td><td>: {{ holder.pic_name }}{% if holder.pic_position %} ({{ holder.pic_position }}){% endif %}</td></tr>
+  <tr><td>Alamat</td><td>: {{ holder.address }}</td></tr>
+</table>
+
+<h2>Objek alokasi</h2>
+<table class="data">
+  <tr><td style="width: 32%;">Kode lahan</td><td>: {{ plot.code }}</td></tr>
+  <tr><td>Lokasi</td><td>: {{ plot.name }}{% if plot.village %}, Kel. {{ plot.village }}{% endif %}{% if plot.district %}, Kec. {{ plot.district }}{% endif %}</td></tr>
+  <tr><td>Luas</td><td>: {{ allocation.area_m2|angka:2 }} m²</td></tr>
+  <tr><td>Jenis alokasi</td><td>: {{ plot.get_allocation_type_display }}</td></tr>
+  <tr><td>Peruntukan</td><td>: {{ allocation.activity }}</td></tr>
+  <tr><td>Jangka waktu</td><td>: {{ allocation.start_date|tanggal }} s.d. {{ allocation.end_date|tanggal }}</td></tr>
+</table>
+
+<h2>Ketentuan</h2>
+<ol>
+  <li>Pemegang alokasi wajib menandatangani dan mematuhi Perjanjian Pemanfaatan Tanah Nomor {{ allocation.ppt_number }}.</li>
+  <li>Pemegang alokasi wajib memulai pembangunan paling lambat {{ config.idle_years }} tahun sejak keputusan ini ditetapkan.
+      Lahan yang tidak dibangun atau tidak dimanfaatkan dalam jangka waktu tersebut dapat dicabut alokasinya.</li>
+  <li>Pemegang alokasi wajib mengurus perizinan yang dipersyaratkan (antara lain PKKPR/PKKPRL, Persetujuan Lingkungan, dan PBG)
+      dan melaporkan progres perizinan serta pembangunan melalui portal paling sedikit setiap {{ config.report_interval_months }} bulan.</li>
+  <li>Peralihan hak atas tanah hanya dapat dilakukan dengan izin tertulis dari {{ config.authority_short_name }}.</li>
+  <li>Keputusan ini berlaku sejak tanggal ditetapkan dan akan ditinjau kembali apabila terdapat kekeliruan.</li>
+</ol>
+
+{% include "alokasi/pdf/_signature.html" %}
+{% endblock %}

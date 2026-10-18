@@ -1,0 +1,11 @@
+{% extends "alokasi/portal/base.html" %}
+{% block title %}Kirim Ulang Aktivasi{% endblock %}
+{% block content %}
+<div class="card" style="max-width:520px">
+  <h1>Kirim ulang tautan aktivasi</h1>
+  <form method="post">{% csrf_token %}
+    {% include "alokasi/portal/_form.html" with grid_class="stack" %}
+    <button class="btn" type="submit">Kirim</button>
+  </form>
+</div>
+{% endblock %}

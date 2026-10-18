@@ -176,6 +176,7 @@ INSTALLED_APPS = [
     "django_q",
     "file_operations",
     "pengadaan",
+    "alokasi",
 ]
 
 MIDDLEWARE = [
@@ -186,6 +187,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "alokasi.middleware.ApplicantIsolationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "utils.middleware.CustomAuditlogMiddleware",
@@ -202,6 +204,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "alokasi.context_processors.portal",
             ]
         },
     }

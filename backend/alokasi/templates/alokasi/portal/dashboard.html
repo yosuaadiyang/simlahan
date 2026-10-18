@@ -1,0 +1,87 @@
+{% extends "alokasi/portal/base.html" %}{% load alokasi_tags %}
+{% block title %}Akun Saya{% endblock %}
+{% block content %}
+<div class="actions-row" style="justify-content:space-between">
+  <div>
+    <h1 style="margin-bottom:0">{{ applicant.name }}</h1>
+    <p class="muted">{{ applicant.get_applicant_type_display }}{% if applicant.nib %} · NIB {{ applicant.nib }}{% endif %} · {{ request.user.email }}</p>
+  </div>
+  <div class="actions-row">
+    <a class="btn btn-outline" href="{% url 'portal:profile' %}">Ubah profil</a>
+    <a class="btn btn-accent" href="{% url 'portal:plot_list' %}">Ajukan alokasi baru</a>
+  </div>
+</div>
+
+{% for a in allocations %}{% if a.report_due or a.is_idle %}
+<div class="alert {% if a.is_idle %}alert-danger{% else %}alert-warn{% endif %}">
+  {% if a.is_idle %}<strong>Peringatan lahan tidur:</strong> pembangunan di lahan {{ a.plot.code }} (KPT {{ a.kpt_number }}) belum dimulai melewati batas {{ a.idle_deadline|tanggal }}.
+  {% else %}<strong>Laporan jatuh tempo:</strong> kirim laporan progres untuk KPT {{ a.kpt_number }}.{% endif %}
+  <a href="{% url 'portal:allocation_detail' a.pk %}">Buka</a>
+</div>
+{% endif %}{% endfor %}
+
+{% if open_invoices %}
+<section class="card">
+  <h2>Tagihan belum lunas</h2>
+  <div class="table-wrap"><table class="data">
+    <thead><tr><th>Nomor</th><th>Permohonan</th><th>Jenis</th><th>Jumlah</th><th>Jatuh tempo</th><th>Status</th></tr></thead>
+    <tbody>{% for inv in open_invoices %}
+      <tr>
+        <td>{{ inv.number }}</td>
+        <td><a href="{% url 'portal:application_detail' inv.application.number %}#tagihan">{{ inv.application.number }}</a></td>
+        <td>{{ inv.get_kind_display }}</td>
+        <td>{{ inv.amount|rupiah }}</td>
+        <td>{{ inv.due_date|tanggal }}{% if inv.is_overdue %} <span class="badge badge-ditolak">Lewat</span>{% endif %}</td>
+        <td><span class="badge badge-{{ inv.status }}">{{ inv.get_status_display }}</span></td>
+      </tr>{% endfor %}
+    </tbody>
+  </table></div>
+</section>
+{% endif %}
+
+<section class="card">
+  <h2>Alokasi lahan saya</h2>
+  {% if allocations %}
+  <div class="table-wrap"><table class="data">
+    <thead><tr><th>KPT</th><th>Lahan</th><th>Luas</th><th>Berlaku s.d.</th><th>Progres</th><th>Status</th></tr></thead>
+    <tbody>{% for a in allocations %}
+      <tr>
+        <td><a href="{% url 'portal:allocation_detail' a.pk %}">{{ a.kpt_number }}</a></td>
+        <td>{{ a.plot.code }} {{ a.plot.name }}</td>
+        <td>{{ a.area_m2|angka:0 }} m²</td>
+        <td>{{ a.end_date|tanggal }}</td>
+        <td style="min-width:120px"><div class="progress" title="{{ a.latest_progress }}%"><span style="width:{{ a.latest_progress }}%"></span></div><span class="small">{{ a.latest_progress }}%</span></td>
+        <td><span class="badge badge-{{ a.status }}">{{ a.get_status_display }}</span></td>
+      </tr>{% endfor %}
+    </tbody>
+  </table></div>
+  {% else %}<p class="muted">Belum ada alokasi.</p>{% endif %}
+</section>
+
+<section class="card">
+  <h2>Permohonan saya</h2>
+  {% if applications %}
+  <div class="table-wrap"><table class="data">
+    <thead><tr><th>Nomor</th><th>Layanan</th><th>Objek</th><th>Diajukan</th><th>Status</th></tr></thead>
+    <tbody>{% for app in applications %}
+      <tr>
+        <td><a href="{% url 'portal:application_detail' app.number %}">{{ app.number }}</a></td>
+        <td>{{ app.get_service_type_display }}</td>
+        <td>{% if app.is_allocation %}{{ app.plot.code }} {{ app.plot.name }}{% else %}KPT {{ app.source_allocation.kpt_number }}{% endif %}</td>
+        <td>{{ app.submitted_at|tanggal }}</td>
+        <td><span class="badge badge-{{ app.status }}">{{ app.get_status_display }}</span></td>
+      </tr>{% endfor %}
+    </tbody>
+  </table></div>
+  {% else %}<p class="muted">Belum ada permohonan. <a href="{% url 'portal:plot_list' %}">Cari lahan</a> untuk memulai.</p>{% endif %}
+</section>
+
+{% if incoming_transfers %}
+<section class="card">
+  <h2>Peralihan hak kepada saya</h2>
+  <ul>{% for app in incoming_transfers %}
+    <li><a href="{% url 'portal:application_detail' app.number %}">{{ app.number }}</a> – KPT {{ app.source_allocation.kpt_number }} dari {{ app.applicant.name }} <span class="badge badge-{{ app.status }}">{{ app.get_status_display }}</span></li>
+  {% endfor %}</ul>
+</section>
+{% endif %}
+{% endblock %}

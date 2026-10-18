@@ -1,0 +1,14 @@
+{% extends "admin/change_form.html" %}
+{% block object-tools-items %}
+  {% if can_revoke %}<li><a href="{% url 'admin:alokasi_allocation_revoke' original.pk %}">Cabut alokasi</a></li>{% endif %}
+  {% if original %}<li><a href="{% url 'admin:alokasi_application_change' original.application_id %}">Permohonan asal</a></li>{% endif %}
+  {{ block.super }}
+{% endblock %}
+{% block field_sets %}
+{% if is_idle %}
+<div class="module" style="padding:10px 12px;margin-bottom:16px;border-left:4px solid #ba2121">
+  <strong>Lahan tidur:</strong> pembangunan belum dimulai hingga batas {{ original.idle_deadline|date:"d-m-Y" }}. Alokasi dapat dicabut sesuai ketentuan.
+</div>
+{% endif %}
+{{ block.super }}
+{% endblock %}

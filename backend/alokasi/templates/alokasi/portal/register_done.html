@@ -1,0 +1,9 @@
+{% extends "alokasi/portal/base.html" %}
+{% block title %}Periksa Surel Anda{% endblock %}
+{% block content %}
+<div class="card" style="max-width:640px">
+  <h1>Periksa surel Anda</h1>
+  <p>Bila <strong>{{ email }}</strong> terdaftar dan belum aktif, tautan aktivasi telah dikirim ke alamat tersebut. Tautan berlaku 3 hari.</p>
+  <p class="small muted">Tidak menerima surel? Periksa folder spam, atau <a href="{% url 'portal:resend_activation' %}">kirim ulang tautan aktivasi</a>.</p>
+</div>
+{% endblock %}

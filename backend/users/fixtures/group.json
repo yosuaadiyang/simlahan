@@ -9,5 +9,7 @@
 {"model": "auth.group", "pk": 8, "fields": {"name": "Pelaksana Pengadaan Tanah", "permissions": []}},
 {"model": "auth.group", "pk": 9, "fields": {"name": "Satgas Pengadaan Tanah", "permissions": []}},
 {"model": "auth.group", "pk": 10, "fields": {"name": "Penilai Pertanahan", "permissions": []}},
-{"model": "auth.group", "pk": 11, "fields": {"name": "Instansi Yang Memerlukan Tanah", "permissions": []}}
+{"model": "auth.group", "pk": 11, "fields": {"name": "Instansi Yang Memerlukan Tanah", "permissions": []}},
+{"model": "auth.group", "pk": 12, "fields": {"name": "Petugas Alokasi Lahan", "permissions": []}},
+{"model": "auth.group", "pk": 13, "fields": {"name": "Tim Verifikasi Teknis", "permissions": []}}
 ]

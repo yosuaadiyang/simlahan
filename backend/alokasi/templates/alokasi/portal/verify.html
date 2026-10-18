@@ -1,0 +1,29 @@
+{% extends "alokasi/portal/base.html" %}{% load alokasi_tags %}
+{% block title %}Cek Keaslian Dokumen{% endblock %}
+{% block content %}
+<h1>Cek keaslian dokumen</h1>
+<p>Pindai kode QR pada KPT, PPT, atau Surat Izin Peralihan Hak, atau masukkan kode verifikasinya.</p>
+<form method="get" action="{% url 'portal:verify' %}" class="card" style="max-width:640px">
+  {% include "alokasi/portal/_form.html" with grid_class="stack" %}
+  <button class="btn" type="submit">Periksa</button>
+</form>
+{% if searched %}
+  {% if document %}
+  <div class="card alert-ok" style="max-width:640px;margin-top:16px">
+    <h2>Dokumen terdaftar dan sah</h2>
+    <dl class="props">
+      <dt>Jenis</dt><dd>{{ document.get_kind_display }}</dd>
+      <dt>Nomor</dt><dd>{{ document.number }}</dd>
+      <dt>Atas nama</dt><dd>{{ document.holder_name }}</dd>
+      <dt>Diterbitkan</dt><dd>{{ document.issued_at|tanggal }}</dd>
+      <dt>Lahan</dt><dd>{{ document.allocation.plot.code }} – {{ document.allocation.plot.name }}</dd>
+      <dt>Luas</dt><dd>{{ document.allocation.area_m2|angka:2 }} m²</dd>
+      <dt>Status alokasi saat ini</dt><dd><span class="badge badge-{{ document.allocation.status }}">{{ document.allocation.get_status_display }}</span></dd>
+    </dl>
+    {% if document.allocation.status != 'aktif' %}<p class="small">Alokasi atas dokumen ini tidak lagi aktif.</p>{% endif %}
+  </div>
+  {% else %}
+  <div class="alert alert-danger" style="max-width:640px;margin-top:16px"><strong>Dokumen tidak ditemukan.</strong> Kode tidak terdaftar; dokumen mungkin tidak sah.</div>
+  {% endif %}
+{% endif %}
+{% endblock %}

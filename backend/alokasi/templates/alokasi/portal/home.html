@@ -1,0 +1,73 @@
+{% extends "alokasi/portal/base.html" %}{% load alokasi_tags %}
+{% block title %}Beranda{% endblock %}
+{% block hero %}
+<section class="hero">
+  <div class="container">
+    <h1>Layanan Alokasi Lahan Daring</h1>
+    <p>Cari lahan yang tersedia, ajukan permohonan alokasi tanah, pantau prosesnya, bayar tagihan, dan unduh Keputusan Pengalokasian Tanah (KPT) serta Perjanjian Pemanfaatan Tanah (PPT) dalam satu portal.</p>
+    <div class="actions">
+      <a class="btn btn-accent" href="{% url 'portal:plot_list' %}">Lihat ketersediaan lahan</a>
+      {% if portal_applicant %}<a class="btn btn-outline" href="{% url 'portal:dashboard' %}">Akun saya</a>{% else %}<a class="btn btn-outline" href="{% url 'portal:register' %}">Daftar akun pemohon</a>{% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block content %}
+<div class="grid grid-4">
+  <div class="card"><div class="stat">{{ stats.total|default:0 }}</div><div class="muted">Lahan tersedia</div></div>
+  <div class="card"><div class="stat">{{ stats.area|default:0|hektare }}</div><div class="muted">Total luas tersedia</div></div>
+  <div class="card"><div class="stat">{{ allocated_count }}</div><div class="muted">Lahan sudah dialokasikan</div></div>
+  <div class="card"><div class="stat">100%</div><div class="muted">Layanan daring</div></div>
+</div>
+
+<h2>Jenis alokasi tanah</h2>
+<div class="grid grid-3">
+  {% for value, label, count in allocation_types %}
+  <a class="card" style="text-decoration:none;color:inherit" href="{% url 'portal:plot_list' %}?jenis={{ value }}">
+    <h3>{{ label }}</h3>
+    <p class="muted small">{% if value == 'reguler' %}Lahan yang ditawarkan untuk dimohonkan dengan penilaian rencana usaha oleh Tim Verifikasi Teknis.{% elif value == 'langsung' %}Pengalokasian langsung untuk kegiatan tertentu sesuai ketentuan, tetap melalui verifikasi.{% else %}Lahan siap bangun: dokumen teknis tersedia dan pematangan lahan telah selesai.{% endif %}</p>
+    <strong>{{ count }} lahan tersedia</strong>
+  </a>
+  {% endfor %}
+</div>
+
+<h2>Tahapan permohonan</h2>
+<ol class="steps">
+  <li><strong>Daftar akun</strong><br><span class="small muted">Isi data pemohon dan aktifkan akun lewat surel.</span></li>
+  <li><strong>Pilih lahan</strong><br><span class="small muted">Telusuri peta dan informasi lahan yang tersedia.</span></li>
+  <li><strong>Ajukan & unggah dokumen</strong><br><span class="small muted">Lengkapi rencana usaha dan dokumen persyaratan.</span></li>
+  <li><strong>Verifikasi teknis</strong><br><span class="small muted">Tim lintas unit menilai permohonan secara terukur.</span></li>
+  <li><strong>Bayar tagihan</strong><br><span class="small muted">UWT dan biaya administrasi; unggah bukti bayar.</span></li>
+  <li><strong>KPT & PPT terbit</strong><br><span class="small muted">Dokumen elektronik ber-QR terbit otomatis.</span></li>
+  <li><strong>Lapor progres</strong><br><span class="small muted">Laporkan perizinan dan pembangunan secara berkala.</span></li>
+</ol>
+
+<div class="grid grid-2" style="margin-top:24px">
+  <section class="card">
+    <h2>Pengumuman</h2>
+    {% for item in announcements %}
+      <p><a href="{% url 'portal:info_detail' item.slug %}"><strong>{{ item.title }}</strong></a><br><span class="small muted">{{ item.published_at|tanggal }}</span>{% if item.summary %}<br>{{ item.summary }}{% endif %}</p>
+    {% empty %}<p class="muted">Belum ada pengumuman.</p>{% endfor %}
+    <a href="{% url 'portal:info_category' 'pengumuman' %}">Semua pengumuman ›</a>
+  </section>
+  <section class="card">
+    <h2>Lahan terbaru</h2>
+    {% for plot in latest_plots %}
+      <p><a href="{% url 'portal:plot_detail' plot.code %}"><strong>{{ plot.code }}</strong> {{ plot.name }}</a><br><span class="small muted">{{ plot.get_allocation_type_display }} · {{ plot.area_m2|angka:0 }} m²{% if plot.district %} · Kec. {{ plot.district }}{% endif %}</span></p>
+    {% empty %}<p class="muted">Belum ada lahan yang ditawarkan.</p>{% endfor %}
+    <a href="{% url 'portal:plot_list' %}">Peta & daftar lahan ›</a>
+  </section>
+</div>
+
+{% if tutorials %}
+<h2>Video tutorial</h2>
+<div class="grid grid-3">
+  {% for item in tutorials %}
+  <div class="card">
+    {% if item.youtube_embed_url %}<div class="video"><iframe src="{{ item.youtube_embed_url }}" title="{{ item.title }}" loading="lazy" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div>{% endif %}
+    <h3><a href="{% url 'portal:info_detail' item.slug %}">{{ item.title }}</a></h3>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "alokasi/portal/base.html" %}{% load alokasi_tags %}
+{% block title %}{{ plot.code }} {{ plot.name }}{% endblock %}
+{% block head %}{% include "alokasi/portal/_leaflet.html" %}{% endblock %}
+{% block content %}
+<p class="small"><a href="{% url 'portal:plot_list' %}">‹ Kembali ke peta lahan</a></p>
+<h1>{{ plot.name }} <span class="badge badge-{{ plot.status }}">{{ plot.get_status_display }}</span></h1>
+<p class="muted">{{ plot.code }} · {{ plot.get_allocation_type_display }}</p>
+<div class="split">
+  <div>
+    <div class="map" data-map="shape" data-status="{{ plot.status }}" data-geometry="{{ geometry }}" role="region" aria-label="Peta batas lahan"></div>
+    {% if plot.photo %}<p><img src="{% url 'portal:plot_photo' plot.code %}" alt="Foto lahan {{ plot.code }}" loading="lazy" style="border-radius:8px;margin-top:16px"></p>{% endif %}
+    {% if plot.description %}<h2>Keterangan</h2><p class="prose">{{ plot.description }}</p>{% endif %}
+    {% if plot.infrastructure %}<h2>Sarana & prasarana</h2><p class="prose">{{ plot.infrastructure }}</p>{% endif %}
+    <h2>Dokumen persyaratan permohonan</h2>
+    <ul>
+      {% for doc in requirements %}<li>{{ doc.name }}{% if not doc.is_required %} <span class="muted small">(opsional)</span>{% endif %}{% if doc.description %}<br><span class="small muted">{{ doc.description }}</span>{% endif %}</li>
+      {% empty %}<li class="muted">Belum ditetapkan.</li>{% endfor %}
+    </ul>
+  </div>
+  <aside>
+    <div class="card">
+      <h2>Data lahan</h2>
+      <dl class="props">
+        <dt>Luas</dt><dd>{{ plot.area_m2|angka:2 }} m² ({{ plot.area_m2|hektare }})</dd>
+        {% if plot.district %}<dt>Kecamatan</dt><dd>{{ plot.district }}</dd>{% endif %}
+        {% if plot.village %}<dt>Kelurahan</dt><dd>{{ plot.village }}</dd>{% endif %}
+        {% if plot.address %}<dt>Alamat/patokan</dt><dd>{{ plot.address }}</dd>{% endif %}
+        {% if plot.zoning %}<dt>Peruntukan ruang</dt><dd>{{ plot.zoning }}</dd>{% endif %}
+        {% if plot.intended_use %}<dt>Arahan pemanfaatan</dt><dd>{{ plot.intended_use }}</dd>{% endif %}
+        <dt>Dokumen teknis</dt><dd>{{ plot.has_technical_documents|yesno:"Tersedia,Belum tersedia" }}</dd>
+        <dt>Pematangan lahan</dt><dd>{{ plot.land_preparation_done|yesno:"Selesai,Belum" }}</dd>
+        <dt>Jangka waktu</dt><dd>{{ plot.effective_term_years }} tahun</dd>
+        {% if plot.uwt_rate_per_m2_year %}
+        <dt>Tarif UWT</dt><dd>{{ plot.uwt_rate_per_m2_year|rupiah }} /m²/tahun</dd>
+        <dt>Perkiraan UWT</dt><dd>{{ plot.uwt_total|rupiah }}</dd>
+        {% endif %}
+        {% if config.allocation_admin_fee %}<dt>Biaya administrasi</dt><dd>{{ config.allocation_admin_fee|rupiah }}</dd>{% endif %}
+      </dl>
+    </div>
+    <div class="card">
+      {% if own_application %}
+        <p>Anda sudah memiliki permohonan <strong>{{ own_application.number }}</strong> ({{ own_application.get_status_display }}) untuk lahan ini.</p>
+        <a class="btn" href="{% url 'portal:application_detail' own_application.number %}">Buka permohonan</a>
+      {% elif plot.is_open_for_application %}
+        {% if is_applicant %}
+          <form method="post" action="{% url 'portal:application_create' plot.code %}">{% csrf_token %}
+            <button class="btn btn-accent" type="submit">Ajukan permohonan alokasi</button>
+          </form>
+          <p class="small muted">Draf dibuat lebih dulu; lahan baru dipesan setelah permohonan diajukan.</p>
+        {% else %}
+          <p>Masuk atau daftar sebagai pemohon untuk mengajukan alokasi lahan ini.</p>
+          <div class="actions-row">
+            <a class="btn" href="{% url 'portal:login' %}?next={{ request.get_full_path|urlencode }}">Masuk</a>
+            <a class="btn btn-outline" href="{% url 'portal:register' %}">Daftar</a>
+          </div>
+        {% endif %}
+      {% else %}
+        <p class="muted">Lahan ini sedang tidak menerima permohonan.</p>
+      {% endif %}
+    </div>
+  </aside>
+</div>
+{% endblock %}

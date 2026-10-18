@@ -67,6 +67,12 @@ class LoginView(APIView):
                 {"detail": _("Username or password is incorrect.")},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
+        if hasattr(user, "pemohon"):
+            # Akun pemohon portal alokasi lahan tidak boleh memakai aplikasi petugas.
+            return Response(
+                {"detail": _("Applicant accounts can only sign in at /portal/.")},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         # Sinkronkan unit layanan dari pemetaan grup, sama seperti login sesi.
         user_logged_in.send(sender=user.__class__, request=request, user=user)

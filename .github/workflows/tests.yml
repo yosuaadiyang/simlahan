@@ -66,8 +66,8 @@ jobs:
       - name: Compile translations
         run: python manage.py compilemessages -l id -v0
 
-      - name: Run pengadaan tests
-        run: pytest pengadaan/tests -p no:cacheprovider
+      - name: Run pengadaan and alokasi tests
+        run: pytest pengadaan/tests alokasi/tests -p no:cacheprovider
 
   frontend:
     name: Frontend (vitest)

@@ -1,0 +1,42 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+  &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+  &rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+  &rsaquo; <a href="{{ back_url }}">{{ original }}</a>
+  &rsaquo; Penilaian
+</div>
+{% endblock %}
+{% block content %}
+<div id="content-main">
+  <p>Nilai 0–100 per kriteria. Nilai akhir = rata-rata nilai semua verifikator per kriteria, dibobot.</p>
+  <div class="module" style="padding:8px 12px">
+    <strong>{{ original.plot.code }} – {{ original.plot.name }}</strong><br>
+    Pemohon: {{ original.applicant.name }} · Kegiatan: {{ original.activity }} ·
+    Investasi: Rp{{ original.investment_value|floatformat:"0g" }} · Tenaga kerja: {{ original.workforce }} ·
+    Pembangunan: {{ original.development_months }} bulan
+    <p style="white-space:pre-line">{{ original.description }}</p>
+    Dokumen:
+    {% for d in documents %}<a href="{% url 'alokasi-officer-file' 'dokumen' d.pk %}" target="_blank" rel="noopener">{{ d.doc_type.name }}</a>{% if not forloop.last %} · {% endif %}{% empty %}–{% endfor %}
+  </div>
+  <form method="post">{% csrf_token %}
+    {{ form.non_field_errors }}
+    <fieldset class="module aligned">
+      {% for criterion, score, note in form.rows %}
+      <div class="form-row">
+        {{ score.errors }}
+        <div class="flex-container"><label for="{{ score.id_for_label }}" class="required">{{ score.label }}</label>{{ score }}</div>
+        {% if criterion.description %}<div class="help">{{ criterion.description }}</div>{% endif %}
+        <div class="flex-container"><label for="{{ note.id_for_label }}">Catatan</label>{{ note }}</div>
+      </div>
+      {% endfor %}
+    </fieldset>
+    <div class="submit-row">
+      <input type="submit" value="Simpan nilai" class="default">
+      <a href="{{ back_url }}" class="closelink">Batal</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -17,6 +17,9 @@ class UserGroup(IntEnum):
     SATGAS_PENGADAAN = 9
     PENILAI = 10
     INSTANSI_PEMOHON = 11
+    # Peran modul alokasi lahan
+    PETUGAS_ALOKASI = 12
+    TIM_VERIFIKASI = 13
 
 
 UG = UserGroup

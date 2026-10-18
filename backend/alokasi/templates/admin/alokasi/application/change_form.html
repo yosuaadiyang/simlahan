@@ -1,0 +1,34 @@
+{% extends "admin/change_form.html" %}
+{% load alokasi_tags %}
+{% block object-tools-items %}
+  {% if can_start %}<li><a href="{% url 'admin:alokasi_application_process' original.pk 'verifikasi' %}">Mulai verifikasi teknis</a></li>{% endif %}
+  {% if can_score %}<li><a href="{% url 'admin:alokasi_application_score' original.pk %}">Nilai verifikasi</a></li>{% endif %}
+  {% if can_approve %}<li><a href="{% url 'admin:alokasi_application_process' original.pk 'setujui' %}">Setujui</a></li>{% endif %}
+  {% if can_revise %}<li><a href="{% url 'admin:alokasi_application_process' original.pk 'perbaikan' %}">Minta perbaikan</a></li>{% endif %}
+  {% if can_reject %}<li><a href="{% url 'admin:alokasi_application_process' original.pk 'tolak' %}">Tolak</a></li>{% endif %}
+  {% if original.allocation %}<li><a href="{% url 'admin:alokasi_allocation_change' original.allocation.pk %}">Lihat alokasi</a></li>{% endif %}
+  {{ block.super }}
+{% endblock %}
+{% block field_sets %}
+{% if original %}
+<div class="module" style="padding:10px 12px;margin-bottom:16px;border-left:4px solid #417690">
+  <strong>Status: {{ original.get_status_display }}</strong>
+  {% if original.is_allocation %}
+    · Lahan {{ original.plot.code }} ({{ original.plot.get_allocation_type_display }}, {{ original.plot.area_m2|angka:2 }} m²)
+  {% else %}
+    · Peralihan {{ original.source_allocation.kpt_number }} kepada {{ original.recipient.name }}
+  {% endif %}
+  {% if missing_docs %}
+    <p style="color:#ba2121;margin:6px 0 0">Dokumen wajib belum lengkap: {% for d in missing_docs %}{{ d.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+  {% endif %}
+  {% if original.is_allocation and original.status == 'verifikasi' %}
+    <p style="margin:6px 0 0">
+      {% if computed_score is not None %}Nilai akhir sementara: <strong>{{ computed_score }}</strong> (minimum {{ passing_score }}).
+      {% else %}Nilai akhir belum lengkap: setiap dari {{ criteria_count }} kriteria aktif perlu dinilai minimal oleh satu verifikator.{% endif %}
+      {% if verifier_progress %}Verifikator: {% for v, n in verifier_progress %}{{ v.get_display_name }} ({{ n }}/{{ criteria_count }}){% if not forloop.last %}, {% endif %}{% endfor %}.{% endif %}
+    </p>
+  {% endif %}
+</div>
+{% endif %}
+{{ block.super }}
+{% endblock %}

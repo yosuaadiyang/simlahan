@@ -1,0 +1,15 @@
+{% load alokasi_tags %}<table class="sign">
+  <tr>
+    <td style="width: 55%;">
+      <img src="{{ qr }}" width="90" height="90"><br>
+      <span class="muted">Pindai untuk memeriksa keaslian.<br>Kode: {{ doc.token }}</span>
+    </td>
+    <td style="width: 45%;" class="center">
+      Ditetapkan di {{ config.city }}<br>
+      pada tanggal {{ doc.issued_at|tanggal }}<br>
+      {{ config.signatory_title }},<br><br>
+      <span class="muted">Ditandatangani secara elektronik</span><br><br>
+      <b>{{ config.signatory_name|default:"" }}</b>
+    </td>
+  </tr>
+</table>

@@ -1,0 +1,38 @@
+{% load alokasi_tags %}<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>{% block title %}{% endblock %}</title>
+<style>
+  @page { size: a4 portrait; margin: 2cm 2.2cm 2.2cm 2.2cm;
+    @frame footer { -pdf-frame-content: footer; bottom: 1cm; margin-left: 2.2cm; margin-right: 2.2cm; height: 1cm; } }
+  body { font-family: Helvetica; font-size: 10pt; line-height: 1.25; color: #111; }
+  h1 { font-size: 13pt; text-align: center; margin: 0; }
+  h2 { font-size: 10.5pt; margin: 8pt 0 2pt 0; }
+  .center { text-align: center; }
+  .right { text-align: right; }
+  .muted { color: #555; font-size: 9pt; }
+  .kop { border-bottom: 2px solid #111; padding-bottom: 6pt; margin-bottom: 12pt; text-align: center; }
+  .kop .org { font-size: 12pt; font-weight: bold; }
+  table.data { width: 100%; border-collapse: collapse; }
+  table.data td { padding: 0 4pt; vertical-align: top; }
+  table.grid { width: 100%; border-collapse: collapse; }
+  table.grid th, table.grid td { border: 0.5pt solid #444; padding: 4pt; vertical-align: top; }
+  table.grid th { background-color: #e8e8e8; }
+  .sign { width: 100%; margin-top: 10pt; }
+  p { margin: 4pt 0; }
+  ol { margin-top: 2pt; margin-bottom: 2pt; }
+  li { margin-bottom: 1pt; }
+  .pasal { font-weight: bold; text-align: center; margin-top: 6pt; }
+</style>
+</head>
+<body>
+<div class="kop">
+  <div class="org">{{ config.authority_name|upper }}</div>
+</div>
+{% block content %}{% endblock %}
+<div id="footer" class="muted">
+  {% block footer %}Dokumen elektronik {{ doc.number }}. Keaslian dapat diperiksa di {{ verification_url }}{% endblock %}
+</div>
+</body>
+</html>
