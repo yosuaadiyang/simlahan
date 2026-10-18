@@ -20,9 +20,23 @@ class UserGroup(IntEnum):
     # Peran modul alokasi lahan
     PETUGAS_ALOKASI = 12
     TIM_VERIFIKASI = 13
+    # Peran modul manajemen aset lahan
+    PETUGAS_ASET = 14
+    PETUGAS_HUKUM = 15
+    PETUGAS_LAPANGAN = 16
 
 
 UG = UserGroup
+
+# Grup yang bekerja di panel /admin/ (alokasi & aset lahan): anggotanya
+# otomatis berstatus staf.
+ADMIN_PANEL_GROUPS = {
+    UserGroup.PETUGAS_ALOKASI,
+    UserGroup.TIM_VERIFIKASI,
+    UserGroup.PETUGAS_ASET,
+    UserGroup.PETUGAS_HUKUM,
+    UserGroup.PETUGAS_LAPANGAN,
+}
 
 MANAGED_USER_GROUP_ID_RANGE = [
     group.value for group in UserGroup

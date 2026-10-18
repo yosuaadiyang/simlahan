@@ -6,7 +6,7 @@
 {"model": "leasing.DecisionMaker", "pk": 5, "fields": {"name": "Bupati/Wali Kota"}},
 {"model": "leasing.DecisionMaker", "pk": 6, "fields": {"name": "Kepala Kantor Wilayah BPN"}},
 {"model": "leasing.DecisionMaker", "pk": 7, "fields": {"name": "Kepala Kantor Pertanahan"}},
-{"model": "leasing.DecisionMaker", "pk": 8, "fields": {"name": "Kepala Badan Pengusahaan"}},
+{"model": "leasing.DecisionMaker", "pk": 8, "fields": {"name": "Kepala Badan Pengelola Kawasan"}},
 {"model": "leasing.DecisionMaker", "pk": 9, "fields": {"name": "Kepala Dinas"}},
 {"model": "leasing.DecisionMaker", "pk": 10, "fields": {"name": "Sekretaris Daerah"}},
 {"model": "leasing.DecisionMaker", "pk": 11, "fields": {"name": "DPRD"}},

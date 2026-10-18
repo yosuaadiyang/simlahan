@@ -1,6 +1,6 @@
 """Pilihan (choices) modul alokasi lahan.
 
-Modul ini meniru layanan Land Management System (LMS) BP Batam: informasi
+Modul ini menyediakan layanan alokasi lahan secara daring: informasi
 ketersediaan lahan, permohonan alokasi tanah (reguler, langsung, terbuka),
 verifikasi teknis, tagihan UWT, penerbitan Keputusan Pengalokasian Tanah (KPT)
 dan Perjanjian Pemanfaatan Tanah (PPT), pelaporan progres perizinan dan

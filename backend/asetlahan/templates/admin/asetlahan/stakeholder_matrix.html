@@ -1,0 +1,16 @@
+{% extends "admin/asetlahan/tool_base.html" %}
+{% block tool %}
+<p class="al-muted">{{ total }} pemangku kepentingan. Warna menunjukkan sikap:
+  {% for label, color in stances %}<span class="al-chip" style="background:{{ color }}">{{ label }}</span>{% endfor %}</p>
+<table class="al-matrix">
+  <thead><tr><th>Pengaruh ↓ / Kepentingan →</th>{% for label in interest_labels %}<th>{{ label }}</th>{% endfor %}</tr></thead>
+  <tbody>
+  {% for row in rows %}
+    <tr><th>{{ row.influence }}</th>
+      {% for cell in row.cells %}<td>{% if cell.advice %}<span class="al-advice">{{ cell.advice }}</span>{% endif %}
+        {% for p in cell.people %}<a class="al-chip" style="background:{{ p.color }}" href="{{ p.url }}" title="{{ p.obj.organization }}">{{ p.obj.name }}</a>{% endfor %}</td>{% endfor %}
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

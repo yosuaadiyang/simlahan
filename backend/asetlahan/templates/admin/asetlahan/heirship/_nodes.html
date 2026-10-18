@@ -1,0 +1,5 @@
+<ul>{% for node in nodes %}
+  <li><span class="{% if not node.is_alive %}dead{% endif %}">{{ node.name }}</span> — {{ node.get_relation_display }}{% if node.share_percentage is not None %} · bagian {{ node.share_percentage|floatformat:"-3" }}%{% endif %}{% if not node.is_alive %} (alm.){% endif %}
+    {% with nodes=node.children.all %}{% if nodes %}{% include "admin/asetlahan/heirship/_nodes.html" %}{% endif %}{% endwith %}
+  </li>
+{% endfor %}</ul>

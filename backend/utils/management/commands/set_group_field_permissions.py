@@ -7,6 +7,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Model
 
 from alokasi.permissions import ALOKASI_GROUP_MODEL_PERMISSIONS
+from asetlahan.permissions import ASETLAHAN_GROUP_MODEL_PERMISSIONS
 from batchrun.permissions import BATCHRUN_GROUP_MODEL_PERMISSIONS
 from forms.permissions import FORMS_GROUP_MODEL_PERMISSIONS
 from leasing.permissions import LEASING_GROUP_MODEL_PERMISSIONS
@@ -23,6 +24,7 @@ DEFAULT_FIELD_PERMISSIONS_KEY = "_default"
 
 FIELD_PERMISSION_CONFIGS: tuple[GroupModelPermissions, ...] = (
     ALOKASI_GROUP_MODEL_PERMISSIONS,
+    ASETLAHAN_GROUP_MODEL_PERMISSIONS,
     BATCHRUN_GROUP_MODEL_PERMISSIONS,
     FORMS_GROUP_MODEL_PERMISSIONS,
     LEASING_GROUP_MODEL_PERMISSIONS,

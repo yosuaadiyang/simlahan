@@ -1,0 +1,17 @@
+{% extends "admin/asetlahan/tool_base.html" %}
+{% block tool %}
+<form method="get" class="al-filters">
+  <label>Kata kunci <input type="search" name="q" value="{{ q }}" size="50" autofocus></label>
+  <button type="submit" class="button">Cari</button>
+</form>
+<p class="al-muted">Mencari kode, nama, nomor hak, NIB, pihak, dan isi teks dokumen hasil OCR di seluruh modul yang dapat Anda akses.</p>
+{% if searched %}
+  {% for group in groups %}
+  <h2>{{ group.label }}</h2>
+  <ul>
+    {% for item in group.items %}<li>{% if item.url %}<a href="{{ item.url }}">{{ item.text }}</a>{% else %}{{ item.text }}{% endif %}{% if item.snippet %}<br><span class="al-snippet">{{ item.snippet }}</span>{% endif %}</li>{% endfor %}
+  </ul>
+  {% if group.more %}<p class="al-muted">Hasil lain tersedia; persempit kata kunci.</p>{% endif %}
+  {% empty %}<p>Tidak ditemukan data untuk “{{ q }}”.</p>{% endfor %}
+{% endif %}
+{% endblock %}

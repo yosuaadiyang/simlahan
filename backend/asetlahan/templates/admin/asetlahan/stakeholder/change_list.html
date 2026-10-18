@@ -1,0 +1,5 @@
+{% extends "admin/change_list.html" %}
+{% block object-tools-items %}
+  <li><a href="{% url 'asetlahan-stakeholder-matrix' %}">Matriks pengaruh × kepentingan</a></li>
+  {{ block.super }}
+{% endblock %}

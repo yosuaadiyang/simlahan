@@ -1,0 +1,18 @@
+{% extends "admin/app_index.html" %}
+{% load static %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static 'asetlahan/admin.css' %}">{% endblock %}
+{% block content %}
+<div id="content-main">
+  {% load asetlahan_tags %}{% aset_tools as asetlahan_tools %}{% if asetlahan_tools %}
+  <div class="module">
+    <table>
+      <caption>Alat & analisis</caption>
+      {% for tool in asetlahan_tools %}
+      <tr><th scope="row"><a href="{{ tool.url }}">{{ tool.label }}</a></th><td>{{ tool.description }}</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% endif %}
+  {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
+</div>
+{% endblock %}

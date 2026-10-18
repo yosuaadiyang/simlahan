@@ -9,6 +9,9 @@ from utils.group_permissions import UserGroup
 GROUP_NAMES = {
     UserGroup.PETUGAS_ALOKASI: "Petugas Alokasi Lahan",
     UserGroup.TIM_VERIFIKASI: "Tim Verifikasi Teknis",
+    UserGroup.PETUGAS_ASET: "Petugas Aset Lahan",
+    UserGroup.PETUGAS_HUKUM: "Petugas Hukum",
+    UserGroup.PETUGAS_LAPANGAN: "Petugas Lapangan",
 }
 
 MONITORING_COMMAND = "alokasi_pemantauan"
@@ -16,7 +19,7 @@ MONITORING_JOB = "Pemantauan alokasi lahan"
 
 
 def ensure_groups(group_model=Group, using=DEFAULT_DB_ALIAS) -> list[int]:
-    """Buat grup alokasi yang belum ada (instalasi lama tidak memuat ulang fixture)."""
+    """Buat grup alokasi & aset lahan yang belum ada (instalasi lama tidak memuat ulang fixture)."""
     created = []
     for group_id, name in GROUP_NAMES.items():
         if not group_model.objects.using(using).filter(pk=group_id).exists():

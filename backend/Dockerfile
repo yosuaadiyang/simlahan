@@ -13,6 +13,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         gdal-bin libgdal32 libgeos-c1v5 libproj25 \
         gettext libpq5 libpcre3 \
+        tesseract-ocr tesseract-ocr-ind tesseract-ocr-eng \
         build-essential libpcre3-dev \
     && rm -rf /var/lib/apt/lists/*
 

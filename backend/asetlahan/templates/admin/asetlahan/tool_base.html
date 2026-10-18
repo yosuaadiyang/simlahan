@@ -1,0 +1,18 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static 'asetlahan/admin.css' %}">{% block tool_head %}{% endblock %}{% endblock %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">Beranda</a>
+  &rsaquo; <a href="{% url 'admin:app_list' app_label='asetlahan' %}">Manajemen aset lahan</a>
+  &rsaquo; {{ title }}
+</div>
+{% endblock %}
+{% block content %}
+<div id="content-main">
+  <ul class="al-tools">
+    {% for tool in tools %}<li><a href="{{ tool.url }}"{% if tool.name == current %} class="active" aria-current="page"{% endif %}>{{ tool.label }}</a></li>{% endfor %}
+  </ul>
+  {% block tool %}{% endblock %}
+</div>
+{% endblock %}

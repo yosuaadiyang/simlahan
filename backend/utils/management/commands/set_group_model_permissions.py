@@ -8,6 +8,7 @@ from django.core.management.base import BaseCommand
 from django.db.models import Model
 
 from alokasi.permissions import ALOKASI_GROUP_MODEL_PERMISSIONS
+from asetlahan.permissions import ASETLAHAN_GROUP_MODEL_PERMISSIONS
 from batchrun.permissions import BATCHRUN_GROUP_MODEL_PERMISSIONS
 from forms.permissions import FORMS_GROUP_MODEL_PERMISSIONS
 from leasing.permissions import LEASING_GROUP_MODEL_PERMISSIONS
@@ -26,6 +27,7 @@ APP_PERMISSION_CONFIGS = {
     "forms": FORMS_GROUP_MODEL_PERMISSIONS,
     "pengadaan": PENGADAAN_GROUP_MODEL_PERMISSIONS,
     "alokasi": ALOKASI_GROUP_MODEL_PERMISSIONS,
+    "asetlahan": ASETLAHAN_GROUP_MODEL_PERMISSIONS,
 }
 
 APP_LABELS = tuple(APP_PERMISSION_CONFIGS.keys())

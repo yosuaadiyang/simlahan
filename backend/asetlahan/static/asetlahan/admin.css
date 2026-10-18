@@ -1,0 +1,53 @@
+/* Halaman alat modul Manajemen Aset Lahan (panel petugas). */
+.al-tools { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 16px; padding: 0; list-style: none; }
+.al-tools a { display: inline-block; padding: 5px 10px; border: 1px solid var(--hairline-color, #ddd); border-radius: 4px; text-decoration: none; }
+.al-tools a.active { background: var(--primary, #417690); color: #fff; border-color: transparent; }
+.al-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin-bottom: 16px; }
+.al-kpis { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); margin-bottom: 16px; }
+.al-card { border: 1px solid var(--hairline-color, #ddd); border-radius: 6px; padding: 14px; background: var(--body-bg, #fff); }
+.al-card h2 { margin: 0 0 10px; font-size: 1rem; background: none; color: inherit; padding: 0; }
+.al-kpi { font-size: 1.6rem; font-weight: 700; line-height: 1.2; }
+.al-kpi-label { color: var(--body-quiet-color, #666); font-size: .85rem; }
+.al-bar { display: grid; grid-template-columns: minmax(110px, 40%) 1fr auto; gap: 8px; align-items: center; margin: 4px 0; font-size: .85rem; }
+.al-bar-track { background: var(--darkened-bg, #f0f0f0); border-radius: 3px; height: 14px; overflow: hidden; }
+.al-bar-fill { height: 100%; border-radius: 3px; }
+.al-alert { display: flex; justify-content: space-between; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--hairline-color, #eee); }
+.al-alert .count { font-weight: 700; min-width: 2em; text-align: right; }
+.al-alert.warn .count { color: #cf222e; }
+.al-map { height: 640px; border: 1px solid var(--hairline-color, #ddd); border-radius: 6px; }
+.al-map-small { height: 420px; }
+.al-legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: .85rem; margin: 8px 0; }
+.al-swatch { display: inline-block; width: 12px; height: 12px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+.al-filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; margin-bottom: 12px; }
+.al-filters label { display: flex; flex-direction: column; font-size: .8rem; gap: 2px; }
+.al-swipe { width: 100%; margin: 8px 0; }
+.al-gantt { position: relative; border: 1px solid var(--hairline-color, #ddd); border-radius: 6px; overflow-x: auto; }
+.al-gantt-row { display: grid; grid-template-columns: 320px 1fr; min-width: 900px; border-bottom: 1px solid var(--hairline-color, #eee); }
+.al-gantt-label { padding: 4px 8px; font-size: .82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.al-gantt-track { position: relative; height: 26px; }
+.al-gantt-bar { position: absolute; top: 5px; height: 16px; border-radius: 3px; background: #0969da; color: #fff; font-size: .7rem; overflow: hidden; white-space: nowrap; }
+.al-gantt-bar .done { background: rgba(255,255,255,.35); height: 100%; }
+.al-gantt-bar.overdue { background: #cf222e; }
+.al-gantt-bar.closed { background: #57606a; }
+.al-gantt-diamond { position: absolute; top: 6px; width: 12px; height: 12px; background: #8250df; transform: rotate(45deg); margin-left: -6px; }
+.al-gantt-diamond.done { background: #1a7f37; }
+.al-gantt-today { position: absolute; top: 0; bottom: 0; width: 2px; background: #cf222e; opacity: .6; z-index: 2; }
+.al-gantt-month { position: absolute; top: 0; font-size: .75rem; padding: 4px; border-left: 1px solid var(--hairline-color, #ddd); height: 100%; box-sizing: border-box; }
+.al-matrix { border-collapse: collapse; width: 100%; }
+.al-matrix th, .al-matrix td { border: 1px solid var(--hairline-color, #ddd); vertical-align: top; padding: 8px; }
+.al-matrix td { height: 110px; width: 30%; }
+.al-chip { display: inline-block; margin: 2px; padding: 2px 8px; border-radius: 999px; color: #fff; font-size: .8rem; text-decoration: none; }
+.al-chip:link, .al-chip:visited { color: #fff; }
+.al-advice { display: block; color: var(--body-quiet-color, #666); font-size: .75rem; margin-bottom: 4px; }
+.al-chat { max-width: 1100px; }
+.al-q { font-weight: 600; margin-top: 18px; }
+.al-a { white-space: pre-line; margin: 6px 0 8px; }
+.al-table { width: 100%; margin: 6px 0 12px; }
+.al-num { text-align: right; white-space: nowrap; }
+.al-muted { color: var(--body-quiet-color, #666); font-size: .85rem; }
+.al-snippet { color: var(--body-quiet-color, #666); font-size: .8rem; }
+.al-tree ul { list-style: none; margin: 0 0 0 18px; padding-left: 12px; border-left: 1px dashed #bbb; }
+.al-tree > ul { margin-left: 0; border-left: 0; padding-left: 0; }
+.al-tree li { margin: 4px 0; }
+.al-tree .dead { color: #888; text-decoration: line-through; }
+@media (max-width: 767px) { .al-map { height: 420px; } .al-bar { grid-template-columns: 1fr 1fr auto; } }

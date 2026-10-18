@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
                 (
                     "authority_name",
                     models.CharField(
-                        default="Badan Pengusahaan Kawasan Perdagangan Bebas dan Pelabuhan Bebas Batam",
+                        default="Instansi Pengelola Lahan",
                         max_length=255,
                         verbose_name="Nama otoritas",
                     ),
@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
                 (
                     "authority_short_name",
                     models.CharField(
-                        default="BP Batam",
+                        default="Pengelola Lahan",
                         max_length=64,
                         verbose_name="Singkatan otoritas",
                     ),
@@ -69,7 +69,7 @@ class Migration(migrations.Migration):
                 (
                     "signatory_title",
                     models.CharField(
-                        default="Kepala Badan Pengusahaan Batam",
+                        default="Kepala Instansi Pengelola Lahan",
                         max_length=255,
                         verbose_name="Jabatan pejabat penandatangan",
                     ),
@@ -130,7 +130,7 @@ class Migration(migrations.Migration):
                     "idle_years",
                     models.PositiveSmallIntegerField(
                         default=2,
-                        help_text="Lahan yang belum dibangun dalam jangka ini ditandai lahan tidur (Peraturan Kepala BP Batam No. 2 Tahun 2026).",
+                        help_text="Lahan yang belum dibangun dalam jangka ini ditandai lahan tidur.",
                         verbose_name="Batas lahan tidur (tahun sejak KPT)",
                     ),
                 ),
@@ -144,7 +144,7 @@ class Migration(migrations.Migration):
                     "payment_instructions",
                     models.TextField(
                         blank=True,
-                        default="Pembayaran melalui rekening resmi BP Batam sesuai nomor tagihan.",
+                        default="Pembayaran melalui rekening resmi instansi sesuai nomor tagihan.",
                         verbose_name="Petunjuk pembayaran",
                     ),
                 ),

@@ -145,7 +145,7 @@ INFO_PAGES = [
         "Satuan Rumah Susun, dan Pendaftaran Tanah.\n"
         "- Peraturan Pemerintah Nomor 41 Tahun 2021 tentang Penyelenggaraan Kawasan Perdagangan "
         "Bebas dan Pelabuhan Bebas.\n"
-        "- Peraturan Badan Pengusahaan Batam tentang penyelenggaraan pengelolaan lahan yang berlaku.\n\n"
+        "- Peraturan instansi pengelola lahan tentang penyelenggaraan pengelolaan lahan yang berlaku.\n\n"
         "Petugas dapat memperbarui daftar ini dan melampirkan salinan peraturan.",
     ),
     (

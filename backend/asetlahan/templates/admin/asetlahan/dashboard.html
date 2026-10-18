@@ -1,0 +1,51 @@
+{% extends "admin/asetlahan/tool_base.html" %}
+{% load alokasi_tags %}
+{% block tool %}
+{% with a=s.assets %}
+<div class="al-kpis">
+  {% if a %}
+  <div class="al-card"><div class="al-kpi">{{ a.count|angka }}</div><div class="al-kpi-label">Aset lahan</div></div>
+  <div class="al-card"><div class="al-kpi">{{ a.area|angka:2 }}</div><div class="al-kpi-label">Total luas (m²)</div></div>
+  <div class="al-card"><div class="al-kpi">{{ a.portfolio|rupiah }}</div><div class="al-kpi-label">Nilai portofolio (penilaian terakhir)</div></div>
+  <div class="al-card"><div class="al-kpi">{{ a.cost|rupiah }}</div><div class="al-kpi-label">Nilai perolehan</div></div>
+  {% endif %}
+  {% if s.legal %}<div class="al-card"><div class="al-kpi">{{ s.legal.open }}</div><div class="al-kpi-label">Perkara aktif · gugatan {{ s.legal.claims|rupiah }}</div></div>{% endif %}
+  {% if s.encroachment %}<div class="al-card"><div class="al-kpi">{{ s.encroachment.open }}</div><div class="al-kpi-label">Okupasi terbuka · {{ s.encroachment.area|angka:2 }} m²</div></div>{% endif %}
+  {% if s.tasks %}<div class="al-card"><div class="al-kpi">{{ s.tasks.open }}</div><div class="al-kpi-label">Tugas terbuka · {{ s.tasks.overdue }} terlambat · {{ s.tasks.mine }} milik saya</div></div>{% endif %}
+  {% if s.grievances %}<div class="al-card"><div class="al-kpi">{{ s.grievances.open }}</div><div class="al-kpi-label">Pengaduan terbuka · {{ s.grievances.overdue }} lewat batas</div></div>{% endif %}
+  {% if s.tenders %}<div class="al-card"><div class="al-kpi">{{ s.tenders.active }}</div><div class="al-kpi-label">Lelang menerima penawaran</div></div>{% endif %}
+  {% for item in others %}<div class="al-card"><div class="al-kpi">{{ item.value|angka }}</div><div class="al-kpi-label">{{ item.label }}</div></div>{% endfor %}
+</div>
+
+<div class="al-grid">
+  <div class="al-card">
+    <h2>Peringatan & tenggat</h2>
+    {% for alert in alerts %}
+    <div class="al-alert{% if alert.count %} warn{% endif %}">
+      <span><a href="{% url alert.url_name %}">{{ alert.label }}</a>
+        {% if alert.items %}<br><span class="al-muted">{% for item in alert.items %}{{ item }}{% if not forloop.last %}; {% endif %}{% endfor %}{% if alert.count > 5 %} …{% endif %}</span>{% endif %}
+      </span>
+      <span class="count">{{ alert.count }}</span>
+    </div>
+    {% empty %}<p class="al-muted">Tidak ada peringatan.</p>{% endfor %}
+  </div>
+  {% if a %}
+  <div class="al-card"><h2>Aset per status (jumlah)</h2>{% include "admin/asetlahan/_bars.html" with bars=a.status_bars %}</div>
+  <div class="al-card"><h2>Aset per status (luas)</h2>{% include "admin/asetlahan/_bars.html" with bars=a.area_bars fmt="luas" %}</div>
+  <div class="al-card"><h2>Aset per kategori</h2>{% include "admin/asetlahan/_bars.html" with bars=a.category_bars %}</div>
+  {% endif %}
+  {% if s.finance %}
+  <div class="al-card"><h2>Keuangan lahan {{ s.finance.year }}</h2>
+    <p>Penerimaan <strong>{{ s.finance.income|rupiah }}</strong> · Pengeluaran <strong>{{ s.finance.expense|rupiah }}</strong> · Bersih <strong>{{ s.finance.net|rupiah }}</strong></p>
+    {% include "admin/asetlahan/_bars.html" with bars=s.finance.bars fmt="rupiah" %}
+  </div>
+  {% endif %}
+  {% if s.legal %}<div class="al-card"><h2>Perkara per status</h2>{% include "admin/asetlahan/_bars.html" with bars=s.legal.bars %}{% if s.legal.outcomes %}<h2 style="margin-top:12px">Hasil putusan</h2>{% include "admin/asetlahan/_bars.html" with bars=s.legal.outcomes %}{% endif %}</div>{% endif %}
+  {% if s.encroachment %}<div class="al-card"><h2>Okupasi per status</h2><p class="al-muted">{{ s.encroachment.resolved_year }} kasus selesai tahun ini.</p>{% include "admin/asetlahan/_bars.html" with bars=s.encroachment.bars %}</div>{% endif %}
+  {% if s.tasks %}<div class="al-card"><h2>Tugas per status</h2>{% include "admin/asetlahan/_bars.html" with bars=s.tasks.bars %}</div>{% endif %}
+  {% if s.grievances %}<div class="al-card"><h2>Pengaduan per status</h2>{% include "admin/asetlahan/_bars.html" with bars=s.grievances.bars %}</div>{% endif %}
+  {% if s.resettlement %}<div class="al-card"><h2>Hunian permukiman kembali ({{ s.resettlement.total }} unit)</h2>{% include "admin/asetlahan/_bars.html" with bars=s.resettlement.bars %}</div>{% endif %}
+  {% if s.tenders %}<div class="al-card"><h2>Lelang per status</h2>{% include "admin/asetlahan/_bars.html" with bars=s.tenders.bars %}</div>{% endif %}
+</div>
+{% endwith %}
+{% endblock %}

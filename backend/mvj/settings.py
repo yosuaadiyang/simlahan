@@ -76,6 +76,20 @@ env = environ.Env(
     FLAG_FILE_SCAN=(bool, False),
     FLAG_PLOTSEARCH=(bool, False),
     FLAG_SKIP_FILE_UPLOAD_PERMISSIONS=(bool, False),
+    OFFICER_OTP_REQUIRED=(bool, False),
+    MAP_CENTER_LAT=(float, 0.87),
+    MAP_CENTER_LNG=(float, 104.15),
+    MAP_DEFAULT_ZOOM=(int, 12),
+    MAP_WMS_URL=(str, ""),
+    MAP_WMS_LAYERS=(str, ""),
+    MAP_WMS_NAME=(str, "Peta instansi"),
+    MAP_EXTRA_BASEMAPS=(str, ""),
+    WHATSAPP_TOKEN=(str, ""),
+    WHATSAPP_PHONE_NUMBER_ID=(str, ""),
+    WHATSAPP_API_VERSION=(str, "v21.0"),
+    ANTHROPIC_API_KEY=(str, ""),
+    ANTHROPIC_MODEL=(str, ""),
+    OCR_LANGUAGES=(str, "ind+eng"),
 )
 
 env_file = project_root(".env")
@@ -177,6 +191,7 @@ INSTALLED_APPS = [
     "file_operations",
     "pengadaan",
     "alokasi",
+    "asetlahan",
 ]
 
 MIDDLEWARE = [
@@ -304,6 +319,30 @@ MAP_SERVICE_WMS_URL = env.str("MAP_SERVICE_WMS_URL")
 MAP_SERVICE_WMS_USERNAME = env.str("MAP_SERVICE_WMS_USERNAME")
 MAP_SERVICE_WMS_PASSWORD = env.str("MAP_SERVICE_WMS_PASSWORD")
 MAP_SERVICE_WMS_OWNED_AREAS_LAYER = env.str("MAP_SERVICE_WMS_OWNED_AREAS_LAYER")
+
+# Peta modul aset lahan (peta tematik, peta berbagi, aplikasi lapangan).
+MAP_CENTER_LAT = env.float("MAP_CENTER_LAT")
+MAP_CENTER_LNG = env.float("MAP_CENTER_LNG")
+MAP_DEFAULT_ZOOM = env.int("MAP_DEFAULT_ZOOM")
+MAP_WMS_URL = env.str("MAP_WMS_URL")
+MAP_WMS_LAYERS = env.str("MAP_WMS_LAYERS")
+MAP_WMS_NAME = env.str("MAP_WMS_NAME")
+# JSON daftar peta latar tambahan, mis. Google/Bing dengan kunci API instansi:
+# [{"name": "Google Satelit", "url": "https://.../{z}/{x}/{y}?key=...", "attribution": "Google"}]
+MAP_EXTRA_BASEMAPS = env.str("MAP_EXTRA_BASEMAPS")
+
+# OTP surel saat petugas masuk (aplikasi petugas & /admin/).
+OFFICER_OTP_REQUIRED = env.bool("OFFICER_OTP_REQUIRED")
+
+# Notifikasi WhatsApp Cloud API (opsional).
+WHATSAPP_TOKEN = env.str("WHATSAPP_TOKEN")
+WHATSAPP_PHONE_NUMBER_ID = env.str("WHATSAPP_PHONE_NUMBER_ID")
+WHATSAPP_API_VERSION = env.str("WHATSAPP_API_VERSION")
+
+# Asisten AI & ekstraksi dokumen (opsional, Claude API).
+ANTHROPIC_API_KEY = env.str("ANTHROPIC_API_KEY")
+ANTHROPIC_MODEL = env.str("ANTHROPIC_MODEL")
+OCR_LANGUAGES = env.str("OCR_LANGUAGES")
 
 # Minimum offset in days from invoice date to due date for generated invoices.
 # Ensures that the due date is always in the future.
