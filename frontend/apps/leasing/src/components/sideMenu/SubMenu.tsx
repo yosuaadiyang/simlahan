@@ -87,9 +87,14 @@ class SubMenu extends PureComponent<Props> {
             return (
               <Authorization allow={item.allow} key={index}>
                 <li>
-                  <Link onClick={item.onClick} to={item.to}>
-                    {item.text}
-                  </Link>
+                  {item.href ? (
+                    // Halaman di luar SPA (mis. panel petugas Django, portal publik).
+                    <a href={item.href}>{item.text}</a>
+                  ) : (
+                    <Link onClick={item.onClick} to={item.to}>
+                      {item.text}
+                    </Link>
+                  )}
                 </li>
               </Authorization>
             );

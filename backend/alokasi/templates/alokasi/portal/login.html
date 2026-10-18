@@ -1,0 +1,13 @@
+{% extends "alokasi/portal/base.html" %}
+{% block title %}Masuk{% endblock %}
+{% block content %}
+<div class="card" style="max-width:520px">
+  <h1>Masuk</h1>
+  <form method="post">{% csrf_token %}
+    {% include "alokasi/portal/_form.html" with grid_class="stack" %}
+    <input type="hidden" name="next" value="{{ next }}">
+    <button class="btn" type="submit">Masuk</button>
+  </form>
+  <p class="small"><a href="{% url 'portal:password_reset' %}">Lupa kata sandi?</a> · <a href="{% url 'portal:register' %}">Daftar akun baru</a> · <a href="{% url 'portal:resend_activation' %}">Kirim ulang aktivasi</a></p>
+</div>
+{% endblock %}

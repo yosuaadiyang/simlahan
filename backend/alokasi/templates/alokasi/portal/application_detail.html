@@ -1,0 +1,142 @@
+{% extends "alokasi/portal/base.html" %}{% load alokasi_tags %}
+{% block title %}Permohonan {{ application.number }}{% endblock %}
+{% block content %}
+<p class="small"><a href="{% url 'portal:dashboard' %}">‹ Akun saya</a></p>
+<h1>Permohonan {{ application.number }} <span class="badge badge-{{ application.status }}">{{ application.get_status_display }}</span></h1>
+<p class="muted">{{ application.get_service_type_display }}{% if application.submitted_at %} · diajukan {{ application.submitted_at|tanggal }}{% endif %}</p>
+
+{% if application.status == 'perbaikan' and application.officer_note %}
+<div class="alert alert-warn"><strong>Perlu perbaikan:</strong><div class="prose">{{ application.officer_note }}</div></div>
+{% elif application.status == 'ditolak' %}
+<div class="alert alert-danger"><strong>Permohonan ditolak.</strong><div class="prose">{{ application.officer_note }}</div></div>
+{% elif application.status == 'disetujui' %}
+<div class="alert alert-info"><strong>Permohonan disetujui.</strong> Bayar tagihan di bawah ini lalu unggah bukti bayar. Dokumen terbit otomatis setelah semua tagihan diverifikasi lunas.</div>
+{% elif application.status == 'terbit' %}
+<div class="alert alert-ok"><strong>Dokumen sudah terbit.</strong> {% if application.is_allocation and application.allocation %}<a href="{% url 'portal:allocation_detail' application.allocation.pk %}">Buka alokasi & pelaporan</a>{% endif %}</div>
+{% endif %}
+
+<div class="split">
+  <div>
+    <section class="card">
+      <div class="actions-row" style="justify-content:space-between">
+        <h2 style="margin:0">Data permohonan</h2>
+        {% if is_owner and application.is_editable %}<a class="btn btn-outline btn-small" href="{% url 'portal:application_edit' application.number %}">Ubah data</a>{% endif %}
+      </div>
+      {% if application.is_allocation %}
+      <dl class="props" style="margin-top:12px">
+        <dt>Lahan</dt><dd><a href="{% url 'portal:plot_detail' application.plot.code %}">{{ application.plot.code }} – {{ application.plot.name }}</a></dd>
+        <dt>Jenis alokasi</dt><dd>{{ application.plot.get_allocation_type_display }}</dd>
+        <dt>Luas</dt><dd>{{ application.plot.area_m2|angka:2 }} m²</dd>
+        <dt>Rencana kegiatan</dt><dd>{{ application.activity|default:"-" }}</dd>
+        <dt>Nilai investasi</dt><dd>{{ application.investment_value|rupiah }}</dd>
+        <dt>Tenaga kerja</dt><dd>{% if application.workforce is not None %}{{ application.workforce|angka }} orang{% else %}-{% endif %}</dd>
+        <dt>Jangka pembangunan</dt><dd>{{ application.development_months|bulan_ke_tahun }}</dd>
+      </dl>
+      {% if application.description %}<h3>Uraian rencana usaha</h3><p class="prose">{{ application.description }}</p>{% endif %}
+      {% else %}
+      <dl class="props" style="margin-top:12px">
+        <dt>Alokasi</dt><dd>KPT {{ application.source_allocation.kpt_number }} · lahan {{ application.source_allocation.plot.code }}</dd>
+        <dt>Luas</dt><dd>{{ application.source_allocation.area_m2|angka:2 }} m²</dd>
+        <dt>Pemohon (pemegang)</dt><dd>{{ application.applicant.name }}</dd>
+        <dt>Penerima hak</dt><dd>{{ application.recipient.name|default:"-" }}</dd>
+        <dt>Alasan peralihan</dt><dd class="prose">{{ application.transfer_reason|default:"-" }}</dd>
+      </dl>
+      {% endif %}
+    </section>
+
+    <section class="card" id="dokumen">
+      <h2>Dokumen persyaratan</h2>
+      <div class="table-wrap"><table class="data">
+        <thead><tr><th>Jenis dokumen</th><th>Berkas</th><th></th></tr></thead>
+        <tbody>
+        {% for doc in documents %}
+          <tr>
+            <td>{{ doc.doc_type.name }}</td>
+            <td>{% if is_owner %}<a href="{% url 'portal:document_download' application.number doc.pk %}">{{ doc.original_name|default:"berkas" }}</a>{% else %}{{ doc.original_name }}{% endif %}<br><span class="small muted">{{ doc.created_at|tanggal }}</span></td>
+            <td>{% if is_owner and application.is_editable %}
+              <form method="post" action="{% url 'portal:document_delete' application.number doc.pk %}" data-confirm="Hapus dokumen ini?">{% csrf_token %}<button class="btn btn-danger btn-small" type="submit">Hapus</button></form>
+            {% endif %}</td>
+          </tr>
+        {% empty %}<tr><td colspan="3" class="muted">Belum ada dokumen.</td></tr>{% endfor %}
+        </tbody>
+      </table></div>
+      {% if missing %}<div class="alert alert-warn" style="margin-top:12px"><strong>Dokumen wajib belum diunggah:</strong> {% for d in missing %}{{ d.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</div>{% endif %}
+      {% if upload_form %}
+      <form method="post" enctype="multipart/form-data" action="{% url 'portal:document_upload' application.number %}" style="margin-top:12px">{% csrf_token %}
+        {% include "alokasi/portal/_form.html" with form=upload_form %}
+        <button class="btn" type="submit">Unggah</button>
+      </form>
+      {% endif %}
+    </section>
+
+    {% if invoices %}
+    <section class="card" id="tagihan">
+      <h2>Tagihan</h2>
+      {% for inv in invoices %}
+      <div class="card">
+        <div class="actions-row" style="justify-content:space-between">
+          <strong>{{ inv.number }} · {{ inv.get_kind_display }}</strong>
+          <span class="badge badge-{{ inv.status }}">{{ inv.get_status_display }}</span>
+        </div>
+        <p>{{ inv.description }}<br><strong>{{ inv.amount|rupiah }}</strong> · jatuh tempo {{ inv.due_date|tanggal }}{% if inv.is_overdue %} <span class="badge badge-ditolak">Lewat jatuh tempo</span>{% endif %}</p>
+        {% if inv.note and inv.status == 'belum_bayar' %}<div class="alert alert-warn small">Catatan petugas: {{ inv.note }}</div>{% endif %}
+        {% if is_owner %}
+        <div class="actions-row">
+          <a class="btn btn-outline btn-small" href="{% url 'portal:invoice_pdf' inv.number %}">Unduh tagihan (PDF)</a>
+          {% if inv.payment_proof %}<a class="btn btn-outline btn-small" href="{% url 'portal:invoice_proof' inv.number %}">Lihat bukti bayar</a>{% endif %}
+        </div>
+        {% for pk, pform in proof_forms.items %}{% if pk == inv.pk %}
+        <form method="post" enctype="multipart/form-data" action="{% url 'portal:invoice_proof_upload' inv.number %}" style="margin-top:10px">{% csrf_token %}
+          {% include "alokasi/portal/_form.html" with form=pform %}
+          <button class="btn" type="submit">{% if inv.payment_proof %}Unggah ulang bukti bayar{% else %}Unggah bukti bayar{% endif %}</button>
+        </form>
+        {% endif %}{% endfor %}
+        {% endif %}
+      </div>
+      {% endfor %}
+      {% if config.payment_instructions %}<p class="small muted prose">{{ config.payment_instructions }}</p>{% endif %}
+    </section>
+    {% endif %}
+
+    {% if issued %}
+    <section class="card">
+      <h2>Dokumen terbit</h2>
+      <ul>{% for d in issued %}
+        <li><a href="{% url 'portal:issued_download' d.token %}">{{ d.get_kind_display }} – {{ d.number }}</a> <span class="small muted">({{ d.issued_at|tanggal }})</span></li>
+      {% endfor %}</ul>
+    </section>
+    {% endif %}
+  </div>
+
+  <aside>
+    {% if is_owner and application.is_editable %}
+    <section class="card">
+      <h2>Ajukan permohonan</h2>
+      {% if submission_errors %}
+        <p>Lengkapi dulu:</p>
+        <ul class="small">{% for e in submission_errors %}<li>{{ e }}</li>{% endfor %}</ul>
+        <button class="btn" type="button" disabled>Ajukan</button>
+      {% else %}
+        <p class="small">Data dan dokumen sudah lengkap. Setelah diajukan, data tidak dapat diubah kecuali diminta perbaikan.</p>
+        <form method="post" action="{% url 'portal:application_submit' application.number %}" data-confirm="Ajukan permohonan sekarang?">{% csrf_token %}
+          <button class="btn btn-accent" type="submit">{% if application.status == 'perbaikan' %}Ajukan ulang{% else %}Ajukan{% endif %}</button>
+        </form>
+      {% endif %}
+    </section>
+    {% endif %}
+    {% if can_cancel %}
+    <section class="card">
+      <form method="post" action="{% url 'portal:application_cancel' application.number %}" data-confirm="Batalkan permohonan ini? Tindakan ini tidak dapat diurungkan.">{% csrf_token %}
+        <button class="btn btn-danger" type="submit">Batalkan permohonan</button>
+      </form>
+    </section>
+    {% endif %}
+    <section class="card">
+      <h2>Riwayat</h2>
+      <ol class="timeline">
+        {% for e in events %}<li><strong>{{ e.get_status_display }}</strong><br><span class="small muted">{{ e.created_at|date:"d-m-Y H:i" }}</span>{% if e.note %}<div class="small prose">{{ e.note }}</div>{% endif %}</li>{% endfor %}
+      </ol>
+    </section>
+  </aside>
+</div>
+{% endblock %}

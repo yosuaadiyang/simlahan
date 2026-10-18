@@ -5371,3 +5371,6 @@ msgstr "Token ada"
 
 msgid "Users permissions"
 msgstr "Izin pengguna"
+
+msgid "Applicant accounts can only sign in at /portal/."
+msgstr "Akun pemohon hanya dapat masuk melalui portal (/portal/)."

@@ -225,6 +225,69 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
                   </Authorization>
 
                   <Authorization
+                    allow={
+                      hasPermissions(
+                        usersPermissions,
+                        UsersPermissions.VIEW_APPLICATION,
+                      ) ||
+                      hasPermissions(
+                        usersPermissions,
+                        UsersPermissions.VERIFY_PAYMENT,
+                      ) ||
+                      hasPermissions(
+                        usersPermissions,
+                        UsersPermissions.VIEW_ALLOCATION,
+                      )
+                    }
+                  >
+                    <SubMenu
+                      header="Alokasi Lahan"
+                      isOpen={subMenuKey === "allocation"}
+                      items={[
+                        {
+                          allow: hasPermissions(
+                            usersPermissions,
+                            UsersPermissions.VIEW_APPLICATION,
+                          ),
+                          text: "Permohonan & verifikasi",
+                          href: "/admin/alokasi/application/",
+                        },
+                        {
+                          allow: hasPermissions(
+                            usersPermissions,
+                            UsersPermissions.VERIFY_PAYMENT,
+                          ),
+                          text: "Tagihan & pembayaran",
+                          href: "/admin/alokasi/invoice/",
+                        },
+                        {
+                          allow: hasPermissions(
+                            usersPermissions,
+                            UsersPermissions.VIEW_ALLOCATION,
+                          ),
+                          text: "Alokasi & lahan tidur",
+                          href: "/admin/alokasi/allocation/",
+                        },
+                        {
+                          allow: hasPermissions(
+                            usersPermissions,
+                            UsersPermissions.VIEW_LANDPLOT,
+                          ),
+                          text: "Data lahan",
+                          href: "/admin/alokasi/landplot/",
+                        },
+                        {
+                          allow: true,
+                          text: "Portal publik",
+                          href: "/portal/",
+                        },
+                      ]}
+                      menuKey="allocation"
+                      onHeaderClick={this.handleHeaderClick}
+                    />
+                  </Authorization>
+
+                  <Authorization
                     allow={hasPermissions(
                       usersPermissions,
                       UsersPermissions.VIEW_CONTACT,

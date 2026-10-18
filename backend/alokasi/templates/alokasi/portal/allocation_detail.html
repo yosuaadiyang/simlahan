@@ -1,0 +1,109 @@
+{% extends "alokasi/portal/base.html" %}{% load alokasi_tags %}
+{% block title %}Alokasi {{ allocation.kpt_number }}{% endblock %}
+{% block head %}{% include "alokasi/portal/_leaflet.html" %}{% endblock %}
+{% block content %}
+<p class="small"><a href="{% url 'portal:dashboard' %}">‹ Akun saya</a></p>
+<h1>Alokasi {{ allocation.kpt_number }} <span class="badge badge-{{ allocation.status }}">{{ allocation.get_status_display }}</span></h1>
+<p class="muted">Lahan {{ plot.code }} – {{ plot.name }}</p>
+
+{% if allocation.status == 'dicabut' %}
+<div class="alert alert-danger"><strong>Alokasi dicabut</strong> pada {{ allocation.revoked_at|tanggal }}.<div class="prose">{{ allocation.revoke_reason }}</div></div>
+{% elif is_idle %}
+<div class="alert alert-danger"><strong>Lahan tidur.</strong> Pembangunan belum dimulai hingga batas {{ allocation.idle_deadline|tanggal }}. Lahan yang tidak dibangun/dimanfaatkan dapat dicabut alokasinya. Segera mulai pembangunan dan laporkan progresnya.</div>
+{% elif is_active and not has_started %}
+<div class="alert alert-info">Batas memulai pembangunan: <strong>{{ allocation.idle_deadline|tanggal }}</strong> ({{ idle_days_left }} hari lagi). Laporkan tahap konstruksi setelah pembangunan dimulai.</div>
+{% endif %}
+{% if report_due and allocation.status == 'aktif' %}
+<div class="alert alert-warn"><strong>Laporan progres jatuh tempo.</strong> Kirim laporan pembangunan terbaru di bawah ini (wajib setiap {{ config.report_interval_months }} bulan).</div>
+{% endif %}
+
+<div class="split">
+  <div>
+    <div class="map map-small" data-map="shape" data-status="dialokasikan" data-geometry="{{ geometry }}" role="region" aria-label="Peta lahan"></div>
+
+    <section class="card" id="perizinan" style="margin-top:16px">
+      <h2>Progres perizinan</h2>
+      <div class="table-wrap"><table class="data">
+        <thead><tr><th>Izin</th><th>Status</th><th>Nomor / tanggal</th><th>Dokumen</th></tr></thead>
+        <tbody>{% for value, label, report in permit_rows %}
+          <tr>
+            <td>{{ label }}</td>
+            <td>{% if report %}<span class="badge badge-{{ report.status }}">{{ report.get_status_display }}</span>{% else %}<span class="badge">Belum dilaporkan</span>{% endif %}</td>
+            <td>{% if report.permit_number %}{{ report.permit_number }}<br><span class="small muted">{{ report.issued_date|tanggal }}</span>{% else %}-{% endif %}</td>
+            <td>{% if report and report.document %}<a href="{% url 'portal:permit_document' allocation.pk report.pk %}">Unduh</a>{% else %}-{% endif %}</td>
+          </tr>{% endfor %}
+        </tbody>
+      </table></div>
+      {% if permit_form %}
+      <details class="panel" style="margin-top:12px">
+        <summary>Perbarui status izin</summary>
+        <form method="post" enctype="multipart/form-data" action="{% url 'portal:permit_report_save' allocation.pk %}" style="margin-top:12px">{% csrf_token %}
+          {% include "alokasi/portal/_form.html" with form=permit_form %}
+          <p class="small muted">Laporan untuk jenis izin yang sama akan menggantikan laporan sebelumnya.</p>
+          <button class="btn" type="submit">Simpan laporan izin</button>
+        </form>
+      </details>
+      {% endif %}
+    </section>
+
+    <section class="card" id="pembangunan">
+      <h2>Progres pembangunan</h2>
+      <p>Progres terakhir: <strong>{{ allocation.latest_progress }}%</strong></p>
+      <div class="progress"><span style="width:{{ allocation.latest_progress }}%"></span></div>
+      {% if development_form %}
+      <details class="panel" style="margin-top:12px"{% if report_due %} open{% endif %}>
+        <summary>Kirim laporan pembangunan</summary>
+        <form method="post" enctype="multipart/form-data" action="{% url 'portal:development_report_create' allocation.pk %}" style="margin-top:12px">{% csrf_token %}
+          {% include "alokasi/portal/_form.html" with form=development_form %}
+          <button class="btn" type="submit">Kirim laporan</button>
+        </form>
+      </details>
+      {% endif %}
+      <div class="table-wrap" style="margin-top:12px"><table class="data">
+        <thead><tr><th>Tanggal</th><th>Tahap</th><th>Progres</th><th>Investasi</th><th>Tenaga kerja</th><th>Uraian</th></tr></thead>
+        <tbody>{% for r in development_reports %}
+          <tr>
+            <td>{{ r.report_date|tanggal }}</td>
+            <td>{{ r.get_stage_display }}</td>
+            <td>{{ r.progress_percent }}%</td>
+            <td>{{ r.realized_investment|rupiah }}</td>
+            <td>{{ r.workforce|default_if_none:"-" }}</td>
+            <td class="prose">{{ r.description }}{% if r.photo %}<br><a href="{% url 'portal:development_attachment' allocation.pk r.pk %}">Lampiran</a>{% endif %}</td>
+          </tr>
+        {% empty %}<tr><td colspan="6" class="muted">Belum ada laporan.</td></tr>{% endfor %}
+        </tbody>
+      </table></div>
+    </section>
+  </div>
+
+  <aside>
+    <section class="card">
+      <h2>Data alokasi</h2>
+      <dl class="props">
+        <dt>Nomor KPT</dt><dd>{{ allocation.kpt_number }}</dd>
+        <dt>Nomor PPT</dt><dd>{{ allocation.ppt_number }}</dd>
+        <dt>Luas</dt><dd>{{ allocation.area_m2|angka:2 }} m²</dd>
+        <dt>Peruntukan</dt><dd>{{ allocation.activity }}</dd>
+        <dt>Terbit</dt><dd>{{ allocation.issued_date|tanggal }}</dd>
+        <dt>Berlaku</dt><dd>{{ allocation.start_date|tanggal }} s.d. {{ allocation.end_date|tanggal }}</dd>
+        <dt>Laporan terakhir</dt><dd>{{ allocation.last_report_date|tanggal }}</dd>
+      </dl>
+    </section>
+    <section class="card">
+      <h2>Dokumen</h2>
+      <ul>{% for d in issued %}<li><a href="{% url 'portal:issued_download' d.token %}">{{ d.get_kind_display }}</a><br><span class="small muted">{{ d.number }}</span></li>{% empty %}<li class="muted">–</li>{% endfor %}</ul>
+    </section>
+    {% if is_active %}
+    <section class="card">
+      <h2>Peralihan hak</h2>
+      {% if open_transfer %}
+        <p>Permohonan <a href="{% url 'portal:application_detail' open_transfer.number %}">{{ open_transfer.number }}</a> sedang berjalan ({{ open_transfer.get_status_display }}).</p>
+      {% else %}
+        <p class="small">Alihkan hak atas lahan ini kepada pemohon lain dengan izin {{ config.authority_short_name }}.</p>
+        <a class="btn btn-outline" href="{% url 'portal:transfer_create' allocation.pk %}">Ajukan peralihan hak</a>
+      {% endif %}
+    </section>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

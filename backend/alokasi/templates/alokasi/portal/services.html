@@ -1,0 +1,69 @@
+{% extends "alokasi/portal/base.html" %}{% load alokasi_tags %}
+{% block title %}Layanan & Persyaratan{% endblock %}
+{% block content %}
+<h1>Layanan & persyaratan</h1>
+<div class="grid grid-2">
+  <section class="card">
+    <h2>Permohonan alokasi tanah</h2>
+    <p>Permohonan pengalokasian tanah untuk kegiatan usaha atau pembangunan. Tersedia tiga jenis:</p>
+    <ul>
+      {% for value, label in allocation_types %}<li><strong>{{ label }}</strong> – {% if value == 'reguler' %}lahan yang ditawarkan untuk dimohonkan dan dinilai berdasarkan rencana usaha.{% elif value == 'langsung' %}pengalokasian langsung untuk kegiatan tertentu sesuai ketentuan.{% else %}lahan siap bangun yang dokumen teknisnya tersedia dan pematangan lahannya selesai.{% endif %}</li>{% endfor %}
+    </ul>
+    <p>Biaya: Uang Wajib Tahunan (UWT) sesuai tarif lahan × luas × jangka waktu{% if config.allocation_admin_fee %}, ditambah biaya administrasi {{ config.allocation_admin_fee|rupiah }}{% endif %}. Jangka waktu bawaan {{ config.default_term_years }} tahun.</p>
+    <p>Hasil: Keputusan Pengalokasian Tanah (KPT) dan Perjanjian Pemanfaatan Tanah (PPT) elektronik ber-QR.</p>
+    <a class="btn" href="{% url 'portal:plot_list' %}">Cari lahan</a>
+  </section>
+  <section class="card">
+    <h2>Izin peralihan hak atas tanah</h2>
+    <p>Pemegang alokasi aktif dapat mengajukan persetujuan peralihan hak kepada pihak lain yang sudah memiliki akun pemohon.</p>
+    <p>Biaya administrasi: {% if config.transfer_admin_fee or config.transfer_fee_per_m2 %}{{ config.transfer_admin_fee|rupiah }}{% if config.transfer_fee_per_m2 %} + {{ config.transfer_fee_per_m2|rupiah }} per m²{% endif %}{% else %}sesuai ketentuan yang berlaku{% endif %}.</p>
+    <p>Hasil: Surat Izin Persetujuan Peralihan Hak Atas Tanah elektronik ber-QR; alokasi beralih ke penerima hak.</p>
+    <p class="small muted">Ajukan dari menu Akun Saya › Alokasi › Ajukan peralihan hak.</p>
+  </section>
+</div>
+
+<h2>Tahapan proses</h2>
+<ol class="steps">
+  <li><strong>Pendaftaran akun</strong><br><span class="small muted">Data pemohon/badan usaha, aktivasi surel.</span></li>
+  <li><strong>Permohonan & dokumen</strong><br><span class="small muted">Isi rencana usaha, unggah persyaratan, ajukan.</span></li>
+  <li><strong>Verifikasi teknis</strong><br><span class="small muted">Penilaian berbobot oleh tim lintas unit; nilai minimum {{ config.passing_score|floatformat:"-2" }}.</span></li>
+  <li><strong>Keputusan</strong><br><span class="small muted">Disetujui, diminta perbaikan, atau ditolak dengan alasan.</span></li>
+  <li><strong>Pembayaran</strong><br><span class="small muted">Tagihan terbit, jatuh tempo {{ config.invoice_due_days }} hari; unggah bukti bayar.</span></li>
+  <li><strong>Penerbitan dokumen</strong><br><span class="small muted">KPT & PPT (atau izin peralihan) terbit otomatis setelah lunas.</span></li>
+  <li><strong>Pelaporan</strong><br><span class="small muted">Lapor perizinan & pembangunan minimal tiap {{ config.report_interval_months }} bulan.</span></li>
+</ol>
+
+<h2>Dokumen persyaratan</h2>
+<div class="grid grid-2">
+  {% for value, label, docs in requirements %}
+  <section class="card">
+    <h3>{{ label }}</h3>
+    <ul>
+      {% for doc in docs %}<li>{{ doc.name }}{% if doc.allocation_type %} <span class="badge">{{ doc.get_allocation_type_display }}</span>{% endif %}{% if not doc.is_required %} <span class="muted small">(opsional)</span>{% endif %}{% if doc.description %}<br><span class="small muted">{{ doc.description }}</span>{% endif %}</li>
+      {% empty %}<li class="muted">Belum ditetapkan.</li>{% endfor %}
+    </ul>
+  </section>
+  {% endfor %}
+</div>
+
+{% if criteria %}
+<h2>Kriteria verifikasi teknis</h2>
+<div class="table-wrap"><table class="data">
+  <thead><tr><th>Kriteria</th><th>Bobot</th></tr></thead>
+  <tbody>{% for c in criteria %}<tr><td>{{ c.name }}{% if c.description %}<br><span class="small muted">{{ c.description }}</span>{% endif %}</td><td>{{ c.weight|floatformat:"-2" }}%</td></tr>{% endfor %}</tbody>
+</table></div>
+{% endif %}
+
+<h2>Kewajiban pemegang alokasi</h2>
+<ul>
+  <li>Mengurus perizinan: PKKPR/PKKPRL, Persetujuan Lingkungan, PBG, dan SLF sesuai kegiatan.</li>
+  <li>Melaporkan progres perizinan dan pembangunan melalui portal paling sedikit setiap {{ config.report_interval_months }} bulan.</li>
+  <li>Memulai pembangunan paling lambat {{ config.idle_years }} tahun sejak KPT terbit. Lahan yang tidak dibangun dapat ditetapkan sebagai lahan tidur dan dicabut alokasinya.</li>
+  <li>Tidak mengalihkan hak tanpa izin peralihan hak.</li>
+</ul>
+
+{% if procedures %}
+<h2>Panduan prosedur</h2>
+<ul>{% for p in procedures %}<li><a href="{% url 'portal:info_detail' p.slug %}">{{ p.title }}</a></li>{% endfor %}</ul>
+{% endif %}
+{% endblock %}

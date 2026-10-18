@@ -1,0 +1,66 @@
+{% load static %}<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Portal Alokasi Lahan{% endblock %} · {{ portal_config.authority_short_name }}</title>
+  <meta name="description" content="Layanan informasi ketersediaan lahan dan permohonan alokasi tanah secara daring.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="{% static 'alokasi/portal.css' %}">
+  {% block head %}{% endblock %}
+</head>
+<body data-leaflet-images="{% static 'alokasi/vendor/leaflet/images/' %}">
+<a class="skip" href="#konten">Lewati ke konten</a>
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="{% url 'portal:home' %}">Portal Alokasi Lahan<small>{{ portal_config.authority_short_name }}</small></a>
+    <button class="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false">Menu</button>
+    <nav class="site-nav" id="site-nav" aria-label="Navigasi utama">
+      {% with name=request.resolver_match.url_name %}
+      <a href="{% url 'portal:home' %}"{% if name == 'home' %} class="active"{% endif %}>Beranda</a>
+      <a href="{% url 'portal:plot_list' %}"{% if name == 'plot_list' or name == 'plot_detail' %} class="active"{% endif %}>Peta Lahan</a>
+      <a href="{% url 'portal:services' %}"{% if name == 'services' %} class="active"{% endif %}>Layanan</a>
+      <a href="{% url 'portal:info_index' %}"{% if name == 'info_index' or name == 'info_category' or name == 'info_detail' %} class="active"{% endif %}>Informasi</a>
+      <a href="{% url 'portal:verify' %}"{% if name == 'verify' or name == 'verify_token' %} class="active"{% endif %}>Cek Dokumen</a>
+      {% if portal_applicant %}
+        <a href="{% url 'portal:dashboard' %}"{% if name == 'dashboard' %} class="active"{% endif %}>Akun Saya</a>
+        <form method="post" action="{% url 'portal:logout' %}">{% csrf_token %}<button type="submit">Keluar</button></form>
+      {% else %}
+        <a href="{% url 'portal:login' %}"{% if name == 'login' %} class="active"{% endif %}>Masuk</a>
+        <a class="cta" href="{% url 'portal:register' %}">Daftar</a>
+      {% endif %}
+      {% endwith %}
+    </nav>
+  </div>
+</header>
+{% block hero %}{% endblock %}
+<main id="konten">
+  <div class="container">
+    {% if messages %}
+    <ul class="messages" role="status">
+      {% for message in messages %}<li class="{{ message.tags }}">{{ message }}</li>{% endfor %}
+    </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </div>
+</main>
+<footer class="site-footer">
+  <div class="container">
+    <div>
+      <strong>{{ portal_config.authority_name }}</strong>
+      {% if portal_config.contact_info %}<p class="prose">{{ portal_config.contact_info }}</p>{% endif %}
+    </div>
+    <div>
+      <strong>Tautan</strong><br>
+      <a href="{% url 'portal:services' %}">Layanan & persyaratan</a><br>
+      <a href="{% url 'portal:info_category' 'regulasi' %}">Regulasi</a><br>
+      <a href="{% url 'portal:info_category' 'tutorial' %}">Video tutorial</a><br>
+      <a href="{% url 'portal:info_category' 'faq' %}">Tanya jawab</a>
+    </div>
+    <div class="small">Seluruh layanan permohonan dilakukan secara daring melalui portal ini. Waspadai pihak yang mengatasnamakan petugas.</div>
+  </div>
+</footer>
+{% block scripts %}{% endblock %}
+<script src="{% static 'alokasi/portal.js' %}"></script>
+</body>
+</html>

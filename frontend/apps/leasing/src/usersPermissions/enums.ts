@@ -17,6 +17,11 @@ export const UsersPermissions = {
   VIEW_HOLIDAY: "view_holiday",
   CHANGE_COMPENSATION: "change_compensation",
   VALIDATE_COMPENSATION: "validate_compensation",
+  // Alokasi lahan (panel petugas di /admin/alokasi/)
+  VIEW_APPLICATION: "view_application",
+  VIEW_ALLOCATION: "view_allocation",
+  VIEW_LANDPLOT: "view_landplot",
+  VERIFY_PAYMENT: "verify_payment",
   ADD_ANSWEROPENINGRECORD: "add_answeropeningrecord",
   ADD_BASISOFRENTDECISION: "add_basisofrentdecision",
   ADD_BASISOFRENTPROPERTYIDENTIFIER: "add_basisofrentpropertyidentifier",

@@ -1,0 +1,8 @@
+{% extends "admin/change_form.html" %}
+{% block object-tools-items %}
+  {% if can_verify %}<li><a href="{% url 'admin:alokasi_invoice_verify' original.pk %}">Nyatakan lunas</a></li>{% endif %}
+  {% if can_reject %}<li><a href="{% url 'admin:alokasi_invoice_reject' original.pk %}">Tolak bukti bayar</a></li>{% endif %}
+  {% if original %}<li><a href="{% url 'admin:alokasi_invoice_pdf' original.pk %}">Unduh tagihan PDF</a></li>
+  <li><a href="{% url 'admin:alokasi_application_change' original.application_id %}">Lihat permohonan</a></li>{% endif %}
+  {{ block.super }}
+{% endblock %}

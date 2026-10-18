@@ -1,0 +1,8 @@
+{% extends "admin/change_list.html" %}
+{% block content_title %}{{ block.super }}
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px">
+  {% for value, label, n in status_counts %}
+  <a href="?status__exact={{ value }}" style="border:1px solid var(--hairline-color,#ddd);border-radius:4px;padding:4px 10px;text-decoration:none">{{ label }}: <strong>{{ n }}</strong></a>
+  {% endfor %}
+</div>
+{% endblock %}

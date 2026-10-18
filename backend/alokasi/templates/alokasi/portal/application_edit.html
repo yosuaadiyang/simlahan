@@ -1,0 +1,13 @@
+{% extends "alokasi/portal/base.html" %}
+{% block title %}Ubah Permohonan {{ application.number }}{% endblock %}
+{% block content %}
+<p class="small"><a href="{% url 'portal:application_detail' application.number %}">‹ Permohonan {{ application.number }}</a></p>
+<h1>Ubah data permohonan</h1>
+<form method="post" class="card">{% csrf_token %}
+  {% include "alokasi/portal/_form.html" %}
+  <div class="actions-row">
+    <button class="btn" type="submit">Simpan</button>
+    <a class="btn btn-outline" href="{% url 'portal:application_detail' application.number %}">Batal</a>
+  </div>
+</form>
+{% endblock %}

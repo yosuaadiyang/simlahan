@@ -1,0 +1,11 @@
+{% extends "alokasi/portal/base.html" %}
+{% block title %}Daftar Akun Pemohon{% endblock %}
+{% block content %}
+<h1>Daftar akun pemohon</h1>
+<p class="muted">Satu akun untuk satu pemohon (perorangan, badan usaha, atau instansi). Data dapat diubah kemudian di menu profil.</p>
+<form method="post" class="card" novalidate>{% csrf_token %}
+  {% include "alokasi/portal/_form.html" %}
+  <button class="btn btn-accent" type="submit">Daftar</button>
+  <p class="small">Sudah punya akun? <a href="{% url 'portal:login' %}">Masuk</a> · Belum menerima surel aktivasi? <a href="{% url 'portal:resend_activation' %}">Kirim ulang</a></p>
+</form>
+{% endblock %}
