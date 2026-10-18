@@ -32,8 +32,16 @@ DEFAULT_ACCOUNTS = {
 }
 
 JOURNAL_HEADERS = [
-    "Tanggal", "Nomor bukti", "Kode akun", "Pusat biaya", "Debit", "Kredit", "Uraian", "Referensi",
-    "Kode aset", "Pihak",
+    "Tanggal",
+    "Nomor bukti",
+    "Kode akun",
+    "Pusat biaya",
+    "Debit",
+    "Kredit",
+    "Uraian",
+    "Referensi",
+    "Kode aset",
+    "Pihak",
 ]
 
 
@@ -48,7 +56,12 @@ def journal_rows(queryset) -> list[list]:
         amount = float(trx.amount)
         description = trx.description or trx.get_transaction_type_display()
         common = [trx.date.isoformat(), trx.number]
-        tail = [description, trx.reference, trx.asset.code if trx.asset_id else "", trx.counterparty]
+        tail = [
+            description,
+            trx.reference,
+            trx.asset.code if trx.asset_id else "",
+            trx.counterparty,
+        ]
         if trx.is_income:
             rows.append(common + [cash, trx.cost_center, amount, 0] + tail)
             rows.append(common + [account, trx.cost_center, 0, amount] + tail)
@@ -98,9 +111,13 @@ def _land_transactions(user, start, end):
     for trx in queryset:
         amount = Decimal(trx.amount)
         yield LedgerEntry(
-            date=trx.date, source="Aset lahan", number=trx.number,
-            description=trx.description or trx.get_transaction_type_display(), party=trx.counterparty,
-            income=amount if trx.is_income else Decimal(0), expense=Decimal(0) if trx.is_income else amount,
+            date=trx.date,
+            source="Aset lahan",
+            number=trx.number,
+            description=trx.description or trx.get_transaction_type_display(),
+            party=trx.counterparty,
+            income=amount if trx.is_income else Decimal(0),
+            expense=Decimal(0) if trx.is_income else amount,
             url=_admin_url("admin:asetlahan_landtransaction_change", trx.pk),
         )
 
@@ -108,7 +125,9 @@ def _land_transactions(user, start, end):
 def _compensation_payments(start, end):
     from pengadaan.models import CompensationPayment
 
-    queryset = CompensationPayment.objects.select_related("compensation__parcel__project")
+    queryset = CompensationPayment.objects.select_related(
+        "compensation__parcel__project"
+    )
     if start:
         queryset = queryset.filter(paid_on__gte=start)
     if end:
@@ -116,9 +135,13 @@ def _compensation_payments(start, end):
     for payment in queryset:
         parcel = payment.compensation.parcel
         yield LedgerEntry(
-            date=payment.paid_on, source="Pengadaan tanah", number=payment.bank_reference or f"GK-{payment.pk}",
+            date=payment.paid_on,
+            source="Pengadaan tanah",
+            number=payment.bank_reference or f"GK-{payment.pk}",
             description=f"Ganti kerugian {parcel.project.identifier} bidang {parcel.parcel_number}",
-            party=payment.recipient_name, income=Decimal(0), expense=Decimal(payment.amount),
+            party=payment.recipient_name,
+            income=Decimal(0),
+            expense=Decimal(payment.amount),
             url=_admin_url("admin:pengadaan_compensationpayment_change", payment.pk),
         )
 
@@ -127,18 +150,22 @@ def _allocation_invoices(start, end):
     from alokasi.enums import InvoiceStatus
     from alokasi.models import Invoice
 
-    queryset = Invoice.objects.filter(status=InvoiceStatus.PAID, paid_at__isnull=False).select_related(
-        "application__applicant"
-    )
+    queryset = Invoice.objects.filter(
+        status=InvoiceStatus.PAID, paid_at__isnull=False
+    ).select_related("application__applicant")
     if start:
         queryset = queryset.filter(paid_at__date__gte=start)
     if end:
         queryset = queryset.filter(paid_at__date__lte=end)
     for invoice in queryset:
         yield LedgerEntry(
-            date=timezone.localtime(invoice.paid_at).date(), source="Alokasi lahan", number=invoice.number,
-            description=invoice.description, party=invoice.application.applicant.name,
-            income=Decimal(invoice.amount), expense=Decimal(0),
+            date=timezone.localtime(invoice.paid_at).date(),
+            source="Alokasi lahan",
+            number=invoice.number,
+            description=invoice.description,
+            party=invoice.application.applicant.name,
+            income=Decimal(invoice.amount),
+            expense=Decimal(0),
             url=_admin_url("admin:alokasi_invoice_change", invoice.pk),
         )
 
@@ -157,19 +184,42 @@ def ledger(user, start=None, end=None) -> dict:
     expense = sum((e.expense for e in entries), Decimal(0))
     by_source: dict[str, dict] = {}
     for entry in entries:
-        bucket = by_source.setdefault(entry.source, {"income": Decimal(0), "expense": Decimal(0), "count": 0})
+        bucket = by_source.setdefault(
+            entry.source, {"income": Decimal(0), "expense": Decimal(0), "count": 0}
+        )
         bucket["income"] += entry.income
         bucket["expense"] += entry.expense
         bucket["count"] += 1
-    return {"entries": entries, "income": income, "expense": expense, "net": income - expense,
-            "by_source": by_source}
+    return {
+        "entries": entries,
+        "income": income,
+        "expense": expense,
+        "net": income - expense,
+        "by_source": by_source,
+    }
 
 
-LEDGER_HEADERS = ["Tanggal", "Sumber", "Nomor", "Uraian", "Pihak", "Penerimaan", "Pengeluaran"]
+LEDGER_HEADERS = [
+    "Tanggal",
+    "Sumber",
+    "Nomor",
+    "Uraian",
+    "Pihak",
+    "Penerimaan",
+    "Pengeluaran",
+]
 
 
 def ledger_rows(entries) -> list[list]:
     return [
-        [e.date.isoformat(), e.source, e.number, e.description, e.party, float(e.income), float(e.expense)]
+        [
+            e.date.isoformat(),
+            e.source,
+            e.number,
+            e.description,
+            e.party,
+            float(e.income),
+            float(e.expense),
+        ]
         for e in entries
     ]

@@ -57,20 +57,21 @@ def _decimal(value: str):
         return None
 
 
-def _geojson_features(data: bytes):
+def _geojson_items(data: bytes) -> list:
     try:
         payload = json.loads(data)
     except (json.JSONDecodeError, UnicodeDecodeError) as error:
         raise AssetImportError(f"Berkas bukan GeoJSON yang valid: {error}")
-    if not isinstance(payload, dict):
-        raise AssetImportError("Berkas harus GeoJSON Feature atau FeatureCollection.")
-    if payload.get("type") == "Feature":
-        items = [payload]
-    elif payload.get("type") == "FeatureCollection":
-        items = payload.get("features") or []
-    else:
-        raise AssetImportError("Berkas harus GeoJSON Feature atau FeatureCollection.")
-    for index, item in enumerate(items, start=1):
+    kind = payload.get("type") if isinstance(payload, dict) else None
+    if kind == "Feature":
+        return [payload]
+    if kind == "FeatureCollection":
+        return payload.get("features") or []
+    raise AssetImportError("Berkas harus GeoJSON Feature atau FeatureCollection.")
+
+
+def _geojson_features(data: bytes):
+    for index, item in enumerate(_geojson_items(data), start=1):
         geometry = item.get("geometry") if isinstance(item, dict) else None
         if not geometry:
             raise AssetImportError(f"Fitur ke-{index} tidak memiliki geometri.")
@@ -104,7 +105,11 @@ def _extract_shapefile(data: bytes, directory: str) -> str:
         archive = zipfile.ZipFile(io.BytesIO(data))
     except zipfile.BadZipFile:
         raise AssetImportError("Berkas ZIP rusak.")
-    shapefiles = [n for n in archive.namelist() if n.lower().endswith(".shp") and not n.startswith("__MACOSX")]
+    shapefiles = [
+        n
+        for n in archive.namelist()
+        if n.lower().endswith(".shp") and not n.startswith("__MACOSX")
+    ]
     if not shapefiles:
         raise AssetImportError("ZIP tidak berisi berkas .shp.")
     for name in archive.namelist():
@@ -120,7 +125,9 @@ def _read_features(data: bytes, filename: str) -> list:
     if extension in ("", ".json", ".geojson"):
         return list(_geojson_features(data))
     if extension not in (".zip", ".kml", ".gpkg"):
-        raise AssetImportError("Format tidak didukung. Gunakan GeoJSON, KML, GeoPackage, atau Shapefile (ZIP).")
+        raise AssetImportError(
+            "Format tidak didukung. Gunakan GeoJSON, KML, GeoPackage, atau Shapefile (ZIP)."
+        )
     with tempfile.TemporaryDirectory() as directory:
         if extension == ".zip":
             path = _extract_shapefile(data, directory)
@@ -136,14 +143,22 @@ def _polygon(index: int, geom):
         geom = geom.transform(4326, clone=True)
     multi = geo.as_multipolygon(geom)
     if multi is None:
-        raise AssetImportError(f"Fitur ke-{index}: tipe geometri {geom.geom_type} harus poligon.")
+        raise AssetImportError(
+            f"Fitur ke-{index}: tipe geometri {geom.geom_type} harus poligon."
+        )
     if not multi.valid:
         multi = geo.as_multipolygon(multi.buffer(0))
     return multi
 
 
-def import_assets(data: bytes, *, filename: str = "impor.geojson", category=None, status=None,
-                  service_unit=None) -> tuple[int, int]:
+def import_assets(
+    data: bytes,
+    *,
+    filename: str = "impor.geojson",
+    category=None,
+    status=None,
+    service_unit=None,
+) -> tuple[int, int]:
     features = _read_features(data, filename)
     if not features:
         raise AssetImportError("Tidak ada fitur di dalam berkas.")
@@ -152,7 +167,9 @@ def import_assets(data: bytes, *, filename: str = "impor.geojson", category=None
     created = updated = 0
     with transaction.atomic():
         for index, (props, geom) in enumerate(features, start=1):
-            values = {field: _prop(props, names)[:255] for field, names in TEXT_FIELDS.items()}
+            values = {
+                field: _prop(props, names)[:255] for field, names in TEXT_FIELDS.items()
+            }
             values = {k: v for k, v in values.items() if v}
             values["geometry"] = _polygon(index, geom)
             values["area_m2"] = geo.area_m2(values["geometry"])
@@ -162,7 +179,11 @@ def import_assets(data: bytes, *, filename: str = "impor.geojson", category=None
             code = _prop(props, ("kode", "code", "kode_aset"))[:32]
             asset = LandAsset.objects.filter(code=code).first() if code else None
             if asset is None:
-                asset = LandAsset(code=code or next_number("AST"), category=category, service_unit=service_unit)
+                asset = LandAsset(
+                    code=code or next_number("AST"),
+                    category=category,
+                    service_unit=service_unit,
+                )
                 asset.status = status or asset.status
                 created += 1
             else:

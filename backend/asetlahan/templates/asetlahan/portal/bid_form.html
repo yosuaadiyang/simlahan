@@ -1,0 +1,13 @@
+{% extends "alokasi/portal/base.html" %}{% load alokasi_tags %}
+{% block title %}Penawaran {{ tender.number }}{% endblock %}
+{% block content %}
+<p class="small"><a href="{% url 'aset_portal:tender_detail' tender.number %}">&larr; {{ tender.number }} {{ tender.title }}</a></p>
+<h1>{% if bid %}Ubah penawaran{% else %}Ajukan penawaran{% endif %}</h1>
+<p>Penawaran dapat diubah sampai {{ tender.close_at|date:"d-m-Y H:i" }}.{% if tender.reserve_price %} Nilai limit {{ tender.reserve_price|rupiah }}.{% endif %}</p>
+<form method="post" enctype="multipart/form-data" class="card">
+  {% csrf_token %}
+  {% include "alokasi/portal/_form.html" %}
+  {% if bid.proposal %}<p class="small muted">Dokumen penawaran sudah diunggah; unggah lagi hanya bila ingin menggantinya.</p>{% endif %}
+  <button class="btn" type="submit">Simpan penawaran</button>
+</form>
+{% endblock %}

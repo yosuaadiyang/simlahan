@@ -2,6 +2,9 @@
 
 Alur:
   POST /v1/auth/login/     {username, password}       -> {access, refresh, user}
+                                                         atau {otp_required, otp_token, email}
+                                                         bila OFFICER_OTP_REQUIRED aktif
+  POST /v1/auth/login/otp/ {otp_token, code}          -> {access, refresh, user}
   POST /v1/auth/refresh/   {refresh}                  -> {access, refresh}
   POST /v1/auth/logout/    {refresh}                  -> 204 (refresh token di-blacklist)
   GET  /v1/auth/me/                                   -> profil pengguna aktif
@@ -20,6 +23,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenRefreshView as BaseTokenRefreshView
 
 from leasing.serializers.service_unit import ServiceUnitSerializer
+from users import otp
+from users.models import LoginOTP
 
 
 def serialize_user(user) -> dict:
@@ -74,17 +79,73 @@ class LoginView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        # Sinkronkan unit layanan dari pemetaan grup, sama seperti login sesi.
-        user_logged_in.send(sender=user.__class__, request=request, user=user)
+        if otp.required_for(user):
+            try:
+                challenge = otp.issue(user, LoginOTP.PURPOSE_API)
+            except otp.OTPError as error:
+                return Response(
+                    {"detail": str(error)}, status=status.HTTP_403_FORBIDDEN
+                )
+            return Response(
+                {
+                    "otp_required": True,
+                    "otp_token": str(challenge.token),
+                    "email": otp.mask_email(user.email),
+                }
+            )
+        return token_response(request, user)
 
-        refresh = RefreshToken.for_user(user)
-        return Response(
-            {
-                "access": str(refresh.access_token),
-                "refresh": str(refresh),
-                "user": serialize_user(user),
-            }
+
+def token_response(request, user) -> Response:
+    # Sinkronkan unit layanan dari pemetaan grup, sama seperti login sesi.
+    user_logged_in.send(sender=user.__class__, request=request, user=user)
+
+    refresh = RefreshToken.for_user(user)
+    return Response(
+        {
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+            "user": serialize_user(user),
+        }
+    )
+
+
+class LoginOTPSerializer(serializers.Serializer):
+    otp_token = serializers.UUIDField()
+    code = serializers.CharField(max_length=12)
+
+
+class LoginOTPView(APIView):
+    permission_classes = (AllowAny,)
+    authentication_classes = ()
+    throttle_classes = (ScopedRateThrottle,)
+    throttle_scope = "login"
+
+    def get_view_name(self):
+        return _("Login OTP")
+
+    def post(self, request, format=None):
+        serializer = LoginOTPSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        challenge = (
+            LoginOTP.objects.select_related("user")
+            .filter(
+                token=serializer.validated_data["otp_token"],
+                purpose=LoginOTP.PURPOSE_API,
+            )
+            .first()
         )
+        if not otp.verify(challenge, serializer.validated_data["code"]):
+            return Response(
+                {"detail": _("OTP code is invalid or has expired.")},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+        if not challenge.user.is_active:
+            return Response(
+                {"detail": _("Username or password is incorrect.")},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+        return token_response(request, challenge.user)
 
 
 class TokenRefreshView(BaseTokenRefreshView):

@@ -127,9 +127,7 @@ class AllocationSettings(models.Model):
     idle_years = models.PositiveSmallIntegerField(
         verbose_name=_("Batas lahan tidur (tahun sejak KPT)"),
         default=2,
-        help_text=_(
-            "Lahan yang belum dibangun dalam jangka ini ditandai lahan tidur."
-        ),
+        help_text=_("Lahan yang belum dibangun dalam jangka ini ditandai lahan tidur."),
     )
     report_interval_months = models.PositiveSmallIntegerField(
         verbose_name=_("Interval wajib lapor progres (bulan)"), default=6

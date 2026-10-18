@@ -8,6 +8,8 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions, routers
 
 from alokasi.admin_views import officer_file
+from asetlahan import urls as asetlahan_urls
+from asetlahan.api import urlpatterns as asetlahan_api_urls
 from audittrail.viewsets import AuditTrailView
 from forms.viewsets.form import (
     AnswerOpeningRecordViewset,
@@ -131,12 +133,14 @@ from plotsearch.views.plot_search import (
     TargetStatusGeneratePDF,
 )
 from users.auth_views import (
+    LoginOTPView,
     LoginView,
     LogoutView,
     MeView,
     PasswordChangeView,
     TokenRefreshView,
 )
+from users.otp_views import officer_otp
 from users.views import UsersPermissions
 from users.viewsets import OfficerViewSet, UserViewSet
 
@@ -378,13 +382,14 @@ pub_api_urls = [
 ]
 auth_api_urls = [
     path("auth/login/", LoginView.as_view(), name="auth-login"),
+    path("auth/login/otp/", LoginOTPView.as_view(), name="auth-login-otp"),
     path("auth/refresh/", TokenRefreshView.as_view(), name="auth-refresh"),
     path("auth/logout/", LogoutView.as_view(), name="auth-logout"),
     path("auth/me/", MeView.as_view(), name="auth-me"),
     path("auth/password/", PasswordChangeView.as_view(), name="auth-password"),
 ]
 
-v1_urls = api_urls + auth_api_urls + pub_api_urls + pengadaan_urls
+v1_urls = api_urls + auth_api_urls + pub_api_urls + pengadaan_urls + asetlahan_api_urls
 
 urlpatterns = [
     path(
@@ -399,9 +404,13 @@ urlpatterns = [
         officer_file,
         name="alokasi-officer-file",
     ),
+    path("admin/otp/", officer_otp, name="officer-otp"),
+    path("admin/asetlahan/", include(asetlahan_urls.admin_urlpatterns)),
     path("admin/", admin.site.urls),
     path("auth/", include(rest_framework.urls)),
     path("portal/", include("alokasi.urls")),
+    path("portal/", include((asetlahan_urls.portal_urlpatterns, "aset_portal"))),
+    path("aset/", include(asetlahan_urls.public_urlpatterns)),
 ]
 
 # Generate a schema

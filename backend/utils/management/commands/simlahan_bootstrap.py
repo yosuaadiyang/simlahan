@@ -1,7 +1,7 @@
 """Inisialisasi instalasi SimLahan (idempoten, aman dijalankan setiap start).
 
 1. Memuat data master (fixture) bila basis data masih kosong.
-2. Memastikan grup & jadwal pemantauan modul alokasi lahan ada.
+2. Memastikan grup, jadwal pemantauan alokasi lahan, dan pengingat aset lahan ada.
 3. Menyetel ulang izin grup (model, kolom, laporan).
 4. Membuat akun admin awal dari variabel lingkungan bila belum ada.
 """
@@ -16,6 +16,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from alokasi.setup import ensure_groups, ensure_monitoring_job
+from asetlahan.setup import ensure_reminder_job
 from leasing.models import Municipality, ServiceUnit
 from utils.group_permissions import UserGroup
 
@@ -49,6 +50,8 @@ class Command(BaseCommand):
             self.stdout.write("Grup alokasi lahan dibuat.")
         if ensure_monitoring_job():
             self.stdout.write("Jadwal pemantauan alokasi lahan dibuat.")
+        if ensure_reminder_job():
+            self.stdout.write("Jadwal pengingat aset lahan dibuat.")
 
         for command in (
             "set_group_model_permissions",

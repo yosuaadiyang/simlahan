@@ -35,13 +35,33 @@ FIELD_LABELS = {
 }
 
 MONTHS = {
-    "januari": 1, "februari": 2, "pebruari": 2, "maret": 3, "april": 4, "mei": 5, "juni": 6, "juli": 7,
-    "agustus": 8, "september": 9, "oktober": 10, "november": 11, "nopember": 11, "desember": 12,
+    "januari": 1,
+    "februari": 2,
+    "pebruari": 2,
+    "maret": 3,
+    "april": 4,
+    "mei": 5,
+    "juni": 6,
+    "juli": 7,
+    "agustus": 8,
+    "september": 9,
+    "oktober": 10,
+    "november": 11,
+    "nopember": 11,
+    "desember": 12,
 }
 DATE = r"(\d{1,2}[-/.]\d{1,2}[-/.]\d{4}|\d{1,2}\s+[A-Za-z]+\s+\d{4})"
 TITLE_TYPES = {
-    "hak milik": "shm", "shm": "shm", "hak guna bangunan": "hgb", "hgb": "hgb", "hak guna usaha": "hgu",
-    "hgu": "hgu", "hak pakai": "hp", "hp": "hp", "hak pengelolaan": "hpl", "hpl": "hpl",
+    "hak milik": "shm",
+    "shm": "shm",
+    "hak guna bangunan": "hgb",
+    "hgb": "hgb",
+    "hak guna usaha": "hgu",
+    "hgu": "hgu",
+    "hak pakai": "hp",
+    "hp": "hp",
+    "hak pengelolaan": "hpl",
+    "hpl": "hpl",
 }
 PATTERNS = {
     "hak": re.compile(
@@ -50,19 +70,39 @@ PATTERNS = {
         re.IGNORECASE,
     ),
     "nib": re.compile(r"\bNIB\s*[:.]?\s*(\d[\d.\s]{6,22}\d)", re.IGNORECASE),
-    "luas": re.compile(r"\bluas(?:\s+tanah)?\s*[:=]?\s*(?:±\s*)?([\d.,]+)\s*(m2|m²|meter\s+persegi|ha|hektar)",
-                       re.IGNORECASE),
-    "pemegang": re.compile(r"\bpemegang\s+hak\s*[:.]?\s*([^\n\r]{3,120})", re.IGNORECASE),
-    "kelurahan": re.compile(r"\b(?:desa|kelurahan)\s*[:/]?\s*([A-Za-z][A-Za-z .'\-]{1,60})", re.IGNORECASE),
-    "kecamatan": re.compile(r"\bkecamatan\s*[:/]?\s*([A-Za-z][A-Za-z .'\-]{1,60})", re.IGNORECASE),
-    "berakhir": re.compile(r"\bberakhir(?:nya)?(?:\s+hak)?(?:\s+(?:pada|tanggal|tgl\.?))?\s*[:.]?\s*" + DATE,
-                           re.IGNORECASE),
-    "terbit": re.compile(r"\b(?:diterbitkan|tanggal\s+terbit|tgl\.?\s+terbit)(?:\s+tanggal)?\s*[:.]?\s*" + DATE,
-                         re.IGNORECASE),
-    "perkara": re.compile(r"\b(\d{1,5}/(?:Pdt|Pid)\.[A-Za-z.]+/\d{4}/[A-Za-z]+(?:\.[A-Za-z]+)?(?:\s[A-Z][a-z]+)?"
-                          r"|\d{1,5}/G/\d{4}/PTUN\.[A-Za-z]+)"),
-    "nop": re.compile(r"\bNOP\s*[:.]?\s*(\d{2}[.\s]?\d{2}[.\s]?\d{3}[.\s]?\d{3}[.\s]?\d{3}[\-.\s]?\d{4}[.\s]?\d)",
-                      re.IGNORECASE),
+    "luas": re.compile(
+        r"\bluas(?:\s+tanah)?\s*[:=]?\s*(?:±\s*)?([\d.,]+)\s*(m2|m²|meter\s+persegi|ha|hektar)",
+        re.IGNORECASE,
+    ),
+    "pemegang": re.compile(
+        r"\bpemegang\s+hak\s*[:.]?\s*([^\n\r]{3,120})", re.IGNORECASE
+    ),
+    "kelurahan": re.compile(
+        r"\b(?:desa\s*/\s*kelurahan|kelurahan\s*/\s*desa|desa|kelurahan)\s*:?\s*"
+        r"([A-Za-z][A-Za-z .'\-]{1,60})",
+        re.IGNORECASE,
+    ),
+    "kecamatan": re.compile(
+        r"\bkecamatan\s*[:/]?\s*([A-Za-z][A-Za-z .'\-]{1,60})", re.IGNORECASE
+    ),
+    "berakhir": re.compile(
+        r"\bberakhir(?:nya)?(?:\s+hak)?(?:\s+(?:pada|tanggal|tgl\.?))?\s*[:.]?\s*"
+        + DATE,
+        re.IGNORECASE,
+    ),
+    "terbit": re.compile(
+        r"\b(?:diterbitkan|tanggal\s+terbit|tgl\.?\s+terbit)(?:\s+tanggal)?\s*[:.]?\s*"
+        + DATE,
+        re.IGNORECASE,
+    ),
+    "perkara": re.compile(
+        r"\b(\d{1,5}/(?:Pdt|Pid)\.[A-Za-z.]+/\d{4}/[A-Za-z]+(?:\.[A-Za-z]+)?(?:\s[A-Z][a-z]+)?"
+        r"|\d{1,5}/G/\d{4}/PTUN\.[A-Za-z]+)"
+    ),
+    "nop": re.compile(
+        r"\bNOP\s*[:.]?\s*(\d{2}[.\s]?\d{2}[.\s]?\d{3}[.\s]?\d{3}[.\s]?\d{3}[\-.\s]?\d{4}[.\s]?\d)",
+        re.IGNORECASE,
+    ),
 }
 
 
@@ -71,10 +111,14 @@ def parse_date(value: str) -> str:
     match = re.match(r"(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$", value)
     try:
         if match:
-            return datetime.date(int(match[3]), int(match[2]), int(match[1])).isoformat()
+            return datetime.date(
+                int(match[3]), int(match[2]), int(match[1])
+            ).isoformat()
         match = re.match(r"(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})$", value)
         if match and match[2].lower() in MONTHS:
-            return datetime.date(int(match[3]), MONTHS[match[2].lower()], int(match[1])).isoformat()
+            return datetime.date(
+                int(match[3]), MONTHS[match[2].lower()], int(match[1])
+            ).isoformat()
     except ValueError:
         return ""
     return ""
@@ -168,7 +212,12 @@ def read_text(name: str, data: bytes) -> str:
     return ""
 
 
-MEDIA_TYPES = {"pdf": "application/pdf", "jpg": "image/jpeg", "jpeg": "image/jpeg", "png": "image/png"}
+MEDIA_TYPES = {
+    "pdf": "application/pdf",
+    "jpg": "image/jpeg",
+    "jpeg": "image/jpeg",
+    "png": "image/png",
+}
 
 
 def _ai_fields(name: str, data: bytes, text: str) -> dict:
@@ -185,7 +234,11 @@ def _ai_fields(name: str, data: bytes, text: str) -> dict:
     except ai.AIError as error:
         LOG.warning("Ekstraksi AI dokumen gagal: %s", error)
         return {}
-    return {k: str(v).strip() for k, v in result.items() if k in FIELD_LABELS and str(v).strip()}
+    return {
+        k: str(v).strip()
+        for k, v in result.items()
+        if k in FIELD_LABELS and str(v).strip()
+    }
 
 
 def process_document(document) -> bool:
@@ -212,8 +265,17 @@ def process_document(document) -> bool:
     fields = {k: v for k, v in fields.items() if v}
     document.extracted_text = text.strip()[:500000]
     document.extracted_fields = fields
-    document.ocr_status = enums.OcrStatus.DONE if (text.strip() or fields) else enums.OcrStatus.EMPTY
-    document.save(update_fields=["extracted_text", "extracted_fields", "ocr_status", "modified_at"])
+    document.ocr_status = (
+        enums.OcrStatus.DONE if (text.strip() or fields) else enums.OcrStatus.EMPTY
+    )
+    document.save(
+        update_fields=[
+            "extracted_text",
+            "extracted_fields",
+            "ocr_status",
+            "modified_at",
+        ]
+    )
     return document.ocr_status == enums.OcrStatus.DONE
 
 
@@ -227,10 +289,17 @@ ASSET_FIELD_MAP = {
 
 
 def _asset_values(fields: dict) -> dict:
-    values = {target: str(fields[key])[:128] for key, target in ASSET_FIELD_MAP.items() if fields.get(key)}
+    values = {
+        target: str(fields[key])[:128]
+        for key, target in ASSET_FIELD_MAP.items()
+        if fields.get(key)
+    }
     if fields.get("jenis_hak") in enums.TitleType.values:
         values["title_type"] = fields["jenis_hak"]
-    for key, target in (("tanggal_terbit", "title_date"), ("tanggal_berakhir", "title_expiry")):
+    for key, target in (
+        ("tanggal_terbit", "title_date"),
+        ("tanggal_berakhir", "title_expiry"),
+    ):
         if fields.get(key):
             try:
                 values[target] = datetime.date.fromisoformat(fields[key])
@@ -250,7 +319,9 @@ def apply_to_asset(document) -> list:
     changed = []
     for field, value in _asset_values(document.extracted_fields or {}).items():
         current = getattr(asset, field)
-        empty = current in (None, "") or (field == "title_type" and current == enums.TitleType.UNREGISTERED)
+        empty = current in (None, "") or (
+            field == "title_type" and current == enums.TitleType.UNREGISTERED
+        )
         if empty:
             setattr(asset, field, value)
             changed.append(asset._meta.get_field(field).verbose_name)

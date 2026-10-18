@@ -82,12 +82,16 @@ def send_whatsapp(phone: str, text: str) -> bool:
         LOG.exception("Gagal mengirim WhatsApp ke %s", number)
         return False
     if response.status_code >= 400:
-        LOG.warning("WhatsApp ditolak (%s): %s", response.status_code, response.text[:300])
+        LOG.warning(
+            "WhatsApp ditolak (%s): %s", response.status_code, response.text[:300]
+        )
         return False
     return True
 
 
-def notify_contact(*, email: str = "", phone: str = "", subject: str, body: str) -> bool:
+def notify_contact(
+    *, email: str = "", phone: str = "", subject: str, body: str
+) -> bool:
     sent_email = send_email([email], subject, body) if email else False
     sent_wa = send_whatsapp(phone, f"{subject}\n\n{body}") if phone else False
     return sent_email or sent_wa

@@ -8,7 +8,11 @@ from django.contrib.gis.geos import GEOSGeometry, MultiPolygon, Polygon
 
 def utm_srid(geom) -> int:
     """EPSG zona UTM WGS84 dari titik tengah geometri (Indonesia: zona 46–54)."""
-    point = geom.centroid if geom.srid == 4326 else geom.transform(4326, clone=True).centroid
+    point = (
+        geom.centroid
+        if geom.srid == 4326
+        else geom.transform(4326, clone=True).centroid
+    )
     zone = int((point.x + 180) // 6) + 1
     return (32600 if point.y >= 0 else 32700) + zone
 
@@ -17,7 +21,9 @@ def area_m2(geom) -> Decimal | None:
     if geom is None or geom.empty:
         return None
     projected = geom.transform(utm_srid(geom), clone=True)
-    return Decimal(str(projected.area)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    return Decimal(str(projected.area)).quantize(
+        Decimal("0.01"), rounding=ROUND_HALF_UP
+    )
 
 
 def as_multipolygon(geom) -> MultiPolygon | None:
@@ -27,7 +33,9 @@ def as_multipolygon(geom) -> MultiPolygon | None:
         return MultiPolygon(geom, srid=geom.srid)
     if isinstance(geom, MultiPolygon):
         return geom
-    polygons = [g for g in geom if isinstance(g, Polygon)] if hasattr(geom, "__iter__") else []
+    polygons = (
+        [g for g in geom if isinstance(g, Polygon)] if hasattr(geom, "__iter__") else []
+    )
     return MultiPolygon(*polygons, srid=geom.srid) if polygons else None
 
 
@@ -36,7 +44,9 @@ def asset_at(point):
 
     if point is None:
         return None
-    return LandAsset.objects.filter(geometry__intersects=point).order_by("area_m2").first()
+    return (
+        LandAsset.objects.filter(geometry__intersects=point).order_by("area_m2").first()
+    )
 
 
 def encroached_area(case) -> Decimal | None:
@@ -53,13 +63,17 @@ def encroached_area(case) -> Decimal | None:
     return area_m2(geom)
 
 
-def asset_overlaps(queryset=None, min_area_m2: Decimal = Decimal("1"), limit: int = 500):
+def asset_overlaps(
+    queryset=None, min_area_m2: Decimal = Decimal("1"), limit: int = 500
+):
     """Pasangan aset yang batasnya tumpang tindih (indikasi klaim ganda / salah ukur)."""
     from asetlahan.models import LandAsset
 
     results = []
     queryset = LandAsset.objects.all() if queryset is None else queryset
-    assets = queryset.exclude(geometry__isnull=True).only("id", "code", "name", "geometry")
+    assets = queryset.exclude(geometry__isnull=True).only(
+        "id", "code", "name", "geometry"
+    )
     for asset in assets:
         if len(results) >= limit:
             break
@@ -72,7 +86,9 @@ def asset_overlaps(queryset=None, min_area_m2: Decimal = Decimal("1"), limit: in
             overlap = asset.geometry.intersection(other.geometry)
             size = area_m2(overlap) if not overlap.empty and overlap.dims == 2 else None
             if size is not None and size >= min_area_m2:
-                results.append({"a": asset, "b": other, "area_m2": size, "geometry": overlap})
+                results.append(
+                    {"a": asset, "b": other, "area_m2": size, "geometry": overlap}
+                )
     return results
 
 
@@ -83,7 +99,9 @@ def external_overlaps(asset):
 
     if asset.geometry is None:
         return {"parcels": [], "plots": []}
-    parcels = AcquisitionParcel.objects.filter(geometry__intersects=asset.geometry).select_related("project")
+    parcels = AcquisitionParcel.objects.filter(
+        geometry__intersects=asset.geometry
+    ).select_related("project")
     plots = LandPlot.objects.filter(geometry__intersects=asset.geometry)
     if asset.pengadaan_parcel_id:
         parcels = parcels.exclude(pk=asset.pengadaan_parcel_id)
@@ -95,7 +113,11 @@ def external_overlaps(asset):
 def feature(geom, properties: dict) -> dict | None:
     if geom is None:
         return None
-    return {"type": "Feature", "geometry": json.loads(geom.geojson), "properties": properties}
+    return {
+        "type": "Feature",
+        "geometry": json.loads(geom.geojson),
+        "properties": properties,
+    }
 
 
 def collection(features) -> dict:
@@ -106,7 +128,11 @@ def parse_geojson_geometry(text: str):
     """GeoJSON (Feature/FeatureCollection/geometri) → MultiPolygon EPSG:4326."""
     data = json.loads(text)
     if data.get("type") == "FeatureCollection":
-        geoms = [GEOSGeometry(json.dumps(f["geometry"])) for f in data.get("features", []) if f.get("geometry")]
+        geoms = [
+            GEOSGeometry(json.dumps(f["geometry"]))
+            for f in data.get("features", [])
+            if f.get("geometry")
+        ]
     elif data.get("type") == "Feature":
         geoms = [GEOSGeometry(json.dumps(data["geometry"]))]
     else:
@@ -126,4 +152,3 @@ def parse_geojson_geometry(text: str):
     if not result.valid:
         result = as_multipolygon(result.buffer(0))
     return result
-

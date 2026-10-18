@@ -67,7 +67,7 @@ jobs:
         run: python manage.py compilemessages -l id -v0
 
       - name: Run pengadaan, alokasi and asetlahan tests
-        run: pytest pengadaan/tests alokasi/tests asetlahan/tests -p no:cacheprovider
+        run: pytest pengadaan/tests alokasi/tests asetlahan/tests users/tests -p no:cacheprovider
 
   frontend:
     name: Frontend (vitest)

@@ -46,8 +46,15 @@ def leases_ending(days: int, user=None):
 
 def titles_expiring(days: int, user=None):
     today = _today()
-    queryset = LandAsset.objects.filter(title_expiry__isnull=False, title_expiry__lte=today + datetime.timedelta(days=days))
-    return _scoped(queryset, user).exclude(status=enums.AssetStatus.RELEASED).order_by("title_expiry")
+    queryset = LandAsset.objects.filter(
+        title_expiry__isnull=False,
+        title_expiry__lte=today + datetime.timedelta(days=days),
+    )
+    return (
+        _scoped(queryset, user)
+        .exclude(status=enums.AssetStatus.RELEASED)
+        .order_by("title_expiry")
+    )
 
 
 def taxes_due(days: int, user=None):
@@ -66,14 +73,16 @@ def hearings_upcoming(days: int, user=None):
 
 
 def tasks_overdue(user=None):
-    queryset = Task.objects.filter(status__in=enums.OPEN_TASK_STATUSES, due_date__lt=_today()).select_related(
-        "assignee", "team"
-    )
+    queryset = Task.objects.filter(
+        status__in=enums.OPEN_TASK_STATUSES, due_date__lt=_today()
+    ).select_related("assignee", "team")
     return _scoped(queryset, user).order_by("due_date")
 
 
 def grievances_overdue(user=None):
-    queryset = Grievance.objects.filter(status__in=enums.OPEN_GRIEVANCE_STATUSES, due_date__lt=_today())
+    queryset = Grievance.objects.filter(
+        status__in=enums.OPEN_GRIEVANCE_STATUSES, due_date__lt=_today()
+    )
     return _scoped(queryset, user).order_by("due_date")
 
 
@@ -81,7 +90,11 @@ def stale_encroachments(days: int, user=None):
     cutoff = _today() - datetime.timedelta(days=days)
     queryset = (
         EncroachmentCase.objects.filter(status__in=enums.OPEN_ENCROACHMENT_STATUSES)
-        .annotate(last_action=Greatest("detected_on", Coalesce(Max("actions__date"), "detected_on")))
+        .annotate(
+            last_action=Greatest(
+                "detected_on", Coalesce(Max("actions__date"), "detected_on")
+            )
+        )
         .filter(last_action__lt=cutoff)
         .select_related("asset", "responsible")
     )
@@ -91,7 +104,11 @@ def stale_encroachments(days: int, user=None):
 def liaison_followups(user=None):
     queryset = LiaisonActivity.objects.filter(
         next_follow_up__lte=_today(),
-        status__in=[enums.LiaisonStatus.PREPARING, enums.LiaisonStatus.SUBMITTED, enums.LiaisonStatus.PROCESSING],
+        status__in=[
+            enums.LiaisonStatus.PREPARING,
+            enums.LiaisonStatus.SUBMITTED,
+            enums.LiaisonStatus.PROCESSING,
+        ],
     )
     return _scoped(queryset, user).order_by("next_follow_up")
 
@@ -100,25 +117,63 @@ def alerts(user) -> list[dict]:
     """Ringkasan peringatan yang terlihat oleh pengguna, untuk dasbor."""
     config = ModuleSettings.load()
     checks = [
-        ("leasing.view_lease", "", _("Sewa berakhir ≤ %d hari") % config.lease_alert_days,
-         lambda: leases_ending(config.lease_alert_days, user), "admin:leasing_lease_changelist"),
-        ("asetlahan.view_landasset", "", _("Hak atas tanah berakhir ≤ %d hari") % config.title_alert_days,
-         lambda: titles_expiring(config.title_alert_days, user), "admin:asetlahan_landasset_changelist"),
-        ("asetlahan.view_taxobligation", "enable_valuation", _("Pajak jatuh tempo ≤ %d hari / terlambat")
-         % config.tax_alert_days, lambda: taxes_due(config.tax_alert_days, user),
-         "admin:asetlahan_taxobligation_changelist"),
-        ("asetlahan.view_casehearing", "enable_litigation", _("Sidang ≤ %d hari") % config.hearing_alert_days,
-         lambda: hearings_upcoming(config.hearing_alert_days, user), "admin:asetlahan_legalcase_changelist"),
-        ("asetlahan.view_task", "enable_tasks", _("Tugas lewat tenggat"), lambda: tasks_overdue(user),
-         "admin:asetlahan_task_changelist"),
-        ("asetlahan.view_grievance", "enable_grievance", _("Pengaduan lewat batas"), lambda: grievances_overdue(user),
-         "admin:asetlahan_grievance_changelist"),
-        ("asetlahan.view_encroachmentcase", "enable_encroachment",
-         _("Okupasi tanpa tindak lanjut > %d hari") % config.encroachment_followup_days,
-         lambda: stale_encroachments(config.encroachment_followup_days, user),
-         "admin:asetlahan_encroachmentcase_changelist"),
-        ("asetlahan.view_liaisonactivity", "enable_survey", _("Urusan instansi perlu ditindaklanjuti"),
-         lambda: liaison_followups(user), "admin:asetlahan_liaisonactivity_changelist"),
+        (
+            "leasing.view_lease",
+            "",
+            _("Sewa berakhir ≤ %d hari") % config.lease_alert_days,
+            lambda: leases_ending(config.lease_alert_days, user),
+            "admin:leasing_lease_changelist",
+        ),
+        (
+            "asetlahan.view_landasset",
+            "",
+            _("Hak atas tanah berakhir ≤ %d hari") % config.title_alert_days,
+            lambda: titles_expiring(config.title_alert_days, user),
+            "admin:asetlahan_landasset_changelist",
+        ),
+        (
+            "asetlahan.view_taxobligation",
+            "enable_valuation",
+            _("Pajak jatuh tempo ≤ %d hari / terlambat") % config.tax_alert_days,
+            lambda: taxes_due(config.tax_alert_days, user),
+            "admin:asetlahan_taxobligation_changelist",
+        ),
+        (
+            "asetlahan.view_casehearing",
+            "enable_litigation",
+            _("Sidang ≤ %d hari") % config.hearing_alert_days,
+            lambda: hearings_upcoming(config.hearing_alert_days, user),
+            "admin:asetlahan_legalcase_changelist",
+        ),
+        (
+            "asetlahan.view_task",
+            "enable_tasks",
+            _("Tugas lewat tenggat"),
+            lambda: tasks_overdue(user),
+            "admin:asetlahan_task_changelist",
+        ),
+        (
+            "asetlahan.view_grievance",
+            "enable_grievance",
+            _("Pengaduan lewat batas"),
+            lambda: grievances_overdue(user),
+            "admin:asetlahan_grievance_changelist",
+        ),
+        (
+            "asetlahan.view_encroachmentcase",
+            "enable_encroachment",
+            _("Okupasi tanpa tindak lanjut > %d hari")
+            % config.encroachment_followup_days,
+            lambda: stale_encroachments(config.encroachment_followup_days, user),
+            "admin:asetlahan_encroachmentcase_changelist",
+        ),
+        (
+            "asetlahan.view_liaisonactivity",
+            "enable_survey",
+            _("Urusan instansi perlu ditindaklanjuti"),
+            lambda: liaison_followups(user),
+            "admin:asetlahan_liaisonactivity_changelist",
+        ),
     ]
     results = []
     for permission, flag, label, query, url_name in checks:
@@ -126,5 +181,7 @@ def alerts(user) -> list[dict]:
             continue
         items = list(query()[:5])
         count = query().count() if len(items) == 5 else len(items)
-        results.append({"label": label, "count": count, "items": items, "url_name": url_name})
+        results.append(
+            {"label": label, "count": count, "items": items, "url_name": url_name}
+        )
     return results

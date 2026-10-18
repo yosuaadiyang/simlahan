@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { LoginError } from "@/auth/session";
+import { LoginError, OtpRequiredError, verifyOtp } from "@/auth/session";
 
 type Props = {
   onLogin: (username: string, password: string) => Promise<unknown>;
@@ -14,6 +14,17 @@ const LoginPage: React.FC<Props> = ({ onLogin }) => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [otp, setOtp] = useState<{ token: string; email: string } | null>(null);
+  const [code, setCode] = useState("");
+
+  const showError = (e: unknown) => {
+    setError(
+      e instanceof LoginError
+        ? e.message
+        : "Tidak dapat terhubung ke server. Periksa koneksi Anda.",
+    );
+    setIsSubmitting(false);
+  };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -26,14 +37,93 @@ const LoginPage: React.FC<Props> = ({ onLogin }) => {
     try {
       await onLogin(username.trim(), password);
     } catch (e) {
-      setError(
-        e instanceof LoginError
-          ? e.message
-          : "Tidak dapat terhubung ke server. Periksa koneksi Anda.",
-      );
-      setIsSubmitting(false);
+      if (e instanceof OtpRequiredError) {
+        setOtp({ token: e.otpToken, email: e.email });
+        setCode("");
+        setIsSubmitting(false);
+        return;
+      }
+      showError(e);
     }
   };
+
+  const handleOtpSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!otp) return;
+    if (!/^\d{6}$/.test(code.trim())) {
+      setError("Masukkan 6 digit kode OTP.");
+      return;
+    }
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      await verifyOtp(otp.token, code.trim());
+    } catch (e) {
+      showError(e);
+    }
+  };
+
+  const restart = () => {
+    setOtp(null);
+    setCode("");
+    setPassword("");
+    setError(null);
+  };
+
+  if (otp) {
+    return (
+      <div className="login-page">
+        <form
+          className="login-page__content"
+          onSubmit={handleOtpSubmit}
+          noValidate
+        >
+          <div className="app-logo" aria-hidden="true" />
+          <h3>Verifikasi masuk</h3>
+          <p>
+            Kode 6 digit telah dikirim ke surel{" "}
+            <strong>{otp.email || "akun Anda"}</strong>. Kode berlaku 10 menit.
+          </p>
+          <label className="login-page__label" htmlFor="login-otp">
+            Kode OTP
+          </label>
+          <input
+            id="login-otp"
+            name="otp"
+            type="text"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            maxLength={6}
+            autoFocus
+            value={code}
+            onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+            disabled={isSubmitting}
+          />
+          {error && (
+            <p className="login-page__error" role="alert">
+              {error}
+            </p>
+          )}
+          <button
+            className="btn btn-default"
+            type="submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Memproses…" : "Verifikasi"}
+          </button>
+          <button
+            className="btn btn-link"
+            type="button"
+            onClick={restart}
+            disabled={isSubmitting}
+          >
+            Kembali / kirim ulang kode
+          </button>
+        </form>
+        <div className="login-footer" />
+      </div>
+    );
+  }
 
   return (
     <div className="login-page">
