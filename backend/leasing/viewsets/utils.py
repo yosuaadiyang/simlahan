@@ -3,6 +3,7 @@ import json
 from django.db import IntegrityError, transaction
 from django.utils.translation import gettext_lazy as _
 from rest_framework import parsers, status, viewsets
+from rest_framework.exceptions import ParseError
 from rest_framework.response import Response
 from rest_framework.views import exception_handler
 
@@ -23,7 +24,12 @@ class MultiPartJsonParser(parsers.MultiPartParser):
             stream, media_type=media_type, parser_context=parser_context
         )
 
-        data = json.loads(result.data["data"])
+        try:
+            data = json.loads(result.data["data"])
+        except (KeyError, TypeError, ValueError):
+            raise ParseError(
+                _("The multipart request must contain a JSON 'data' field.")
+            )
 
         # Flatten the result.files MultiValueDict.
         # If the "files" is not flatten, the serializer would receive the data like this:

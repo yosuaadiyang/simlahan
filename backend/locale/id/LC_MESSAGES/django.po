@@ -3600,6 +3600,9 @@ msgstr "Data UI pengguna lain tidak dapat dibuat"
 msgid "Data integrity error"
 msgstr "Galat integritas data"
 
+msgid "The multipart request must contain a JSON 'data' field."
+msgstr "Permintaan multipart wajib berisi kolom 'data' berformat JSON."
+
 msgid "Indonesian"
 msgstr "Bahasa Indonesia"
 

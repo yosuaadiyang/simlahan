@@ -1,6 +1,7 @@
 import pytest
 from django.core.management import call_command
 
+from leasing.models import District, Municipality
 from pengadaan.management.commands.pengadaan_contoh_rempang import (
     PARCELS,
     SAMPLE_PROJECT_NAME,
@@ -15,10 +16,16 @@ from pengadaan.models import (
 
 @pytest.mark.django_db
 def test_sample_rempang_create_is_idempotent_and_delete_removes_everything(
-    seeded_rules, municipality_factory, district_factory
+    seeded_rules,
 ):
-    batam = municipality_factory(name="Kota Batam", identifier="2171")
-    galang = district_factory(municipality=batam, name="Galang", identifier="8")
+    # Fixture leasing (dimuat sekali per sesi oleh modul lain) sudah berisi
+    # Kota Batam dan Galang; jangan membuat duplikatnya.
+    batam, _created = Municipality.objects.get_or_create(
+        identifier="2171", defaults={"name": "Kota Batam"}
+    )
+    galang, _created = District.objects.get_or_create(
+        municipality=batam, identifier="8", defaults={"name": "Galang"}
+    )
 
     call_command("pengadaan_contoh_rempang")
     call_command("pengadaan_contoh_rempang")
