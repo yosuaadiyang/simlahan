@@ -587,6 +587,69 @@ class ParcelSurvey(TimeStampedModel):
         ordering = ["parcel", "-survey_date", "-id"]
 
 
+class InventoryItem(TimeStampedModel):
+    """Rincian objek inventarisasi (bangunan, tanaman, kolam, sumur, jalan akses, dll.)."""
+
+    parcel = models.ForeignKey(
+        AcquisitionParcel,
+        verbose_name=_("Parcel"),
+        related_name="inventory_items",
+        on_delete=models.CASCADE,
+    )
+    party = models.ForeignKey(
+        EntitledParty,
+        verbose_name=_("Object owner"),
+        related_name="inventory_items",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    item_type = models.CharField(
+        verbose_name=_("Object type"),
+        max_length=32,
+        choices=enums.InventoryItemType.choices,
+    )
+    description = models.CharField(verbose_name=_("Description"), max_length=255)
+    quantity = models.DecimalField(
+        verbose_name=_("Quantity"),
+        max_digits=14,
+        decimal_places=2,
+        default=1,
+        validators=[MinValueValidator(0)],
+    )
+    unit = models.CharField(
+        verbose_name=_("Unit"),
+        max_length=32,
+        blank=True,
+        default="",
+        help_text=_("For example m², trees, units, m."),
+    )
+    condition = models.CharField(
+        verbose_name=_("Condition"), max_length=128, blank=True, default=""
+    )
+    unit_value = models.DecimalField(
+        verbose_name=_("Estimated value per unit (Rp)"),
+        null=True,
+        blank=True,
+        **MONEY,
+    )
+    note = models.TextField(verbose_name=_("Note"), blank=True, default="")
+
+    class Meta:
+        verbose_name = pgettext_lazy("Model name", "Inventory item")
+        verbose_name_plural = pgettext_lazy("Model name", "Inventory items")
+        ordering = ["parcel", "item_type", "id"]
+
+    def __str__(self):
+        return f"{self.get_item_type_display()}: {self.description}"
+
+    @property
+    def total_value(self) -> Decimal | None:
+        if self.unit_value is None:
+            return None
+        return (self.quantity or 0) * self.unit_value
+
+
 class Announcement(TimeStampedModel):
     """Pengumuman (rencana pembangunan, penlok, hasil inventarisasi, dll.)."""
 
@@ -1312,6 +1375,7 @@ for _model in (
     AcquisitionMilestone,
     AcquisitionParcel,
     ParcelSurvey,
+    InventoryItem,
     Announcement,
     Valuation,
     Deliberation,

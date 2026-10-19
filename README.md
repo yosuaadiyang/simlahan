@@ -4,7 +4,8 @@ SimLahan adalah aplikasi web untuk instansi pengelola lahan di Indonesia:
 
 - **Pengadaan tanah untuk kepentingan umum** (UU 2/2012 jo. UU 6/2023, PP 19/2021
   jo. PP 39/2023, Perma 3/2016 jo. Perma 2/2021): proyek, tahapan & tonggak,
-  bidang tanah + peta, pihak yang berhak, inventarisasi Satgas A/B, pengumuman,
+  bidang tanah + peta, pihak yang berhak, inventarisasi Satgas A/B beserta
+  rincian objek (bangunan, tanaman, kolam, dll.) dan pemiliknya, pengumuman,
   penilaian KJPP, musyawarah, keberatan/PTUN/kasasi, konsinyasi, ganti
   kerugian + validasi Ketua Pelaksana + pembayaran, pelepasan hak, penyerahan
   hasil, rumah tangga terdampak, dan arsip dokumen.
@@ -20,10 +21,12 @@ SimLahan adalah aplikasi web untuk instansi pengelola lahan di Indonesia:
 - **Manajemen aset lahan**: inventaris aset + batas bidang, rantai kepemilikan,
   silsilah ahli waris, pemangku kepentingan, penilaian, pajak, transaksi &
   ekspor jurnal ERP, perkara & jadwal sidang, okupasi/perambahan + citra
-  satelit, permukiman kembali, survei, fasilitator & urusan instansi, tugas &
-  Gantt, pengaduan masyarakat, lelang/seleksi lahan, dokumen ber-OCR, peta
-  tematik, peta berbagi, pembuat laporan, asisten AI, aplikasi lapangan luring
-  (PWA), OTP surel, dan pengingat otomatis surel/WhatsApp.
+  satelit/drone/LiDAR, jadwal pemantauan lapangan, permukiman kembali, survei,
+  fasilitator & urusan instansi, tugas & Gantt, pengaduan masyarakat,
+  lelang/seleksi lahan, dokumen ber-OCR, peta tematik + lapisan referensi,
+  peta berbagi, pembuat laporan, asisten AI dengan unduhan laporan, aplikasi
+  lapangan luring (PWA), OTP surel, OAuth2 untuk integrasi, dan pengingat
+  otomatis surel/WhatsApp.
 - **Manajemen sewa/pemanfaatan lahan** warisan MVJ: kontrak, penyewa, tarif,
   tagihan, jaminan, penagihan, laporan, peta, catatan area.
 
@@ -199,29 +202,32 @@ di **Pengaturan modul**.
 | Kepemilikan, silsilah ahli waris (pohon), pemangku kepentingan & matriks pengaruh | Aset lahan, Silsilah ahli waris, Pemangku kepentingan |
 | Penilaian, pajak (PBB/BPHTB/UWT), transaksi, jurnal ERP (CSV/Excel), buku besar gabungan | Penilaian aset, Pajak & retribusi, Transaksi, **Buku besar** |
 | Perkara, advokat, jadwal sidang + pengingat | Perkara & advokat |
-| Okupasi/perambahan, tindakan teguran, citra satelit & pembanding sebelum–sesudah | Okupasi & perambahan, Citra satelit, **Pembanding citra** |
+| Okupasi/perambahan, tindakan teguran, citra & data udara (satelit, drone, pesawat; optik, multispektral, inframerah, radar, ortofoto, DEM, LiDAR) & pembanding sebelum–sesudah | Okupasi & perambahan, Citra satelit, **Pembanding citra** |
+| Jadwal pemantauan lapangan berkala per aset (bawaan di Pengaturan modul, 0 = nonaktif); laporan lapangan memperbarui tanggal pantau terakhir | Aset lahan → Pemantauan lapangan |
 | Tumpang tindih batas antar-aset dan dengan bidang pengadaan/alokasi | **Tumpang tindih** |
 | Permukiman kembali (kawasan, kavling, penghuni) | Kawasan & unit permukiman kembali |
-| Survei & pengukuran, fasilitator, urusan instansi (BPN, pemda) | Survei & pemetaan, Fasilitator, Urusan instansi |
+| Survei & pengukuran, fasilitator, urusan instansi (balik nama, cek sertipikat, pengukuran, penlok, KKPR, PBG, lingkungan, penilaian, pajak, dll.) | Survei & pemetaan, Fasilitator, Urusan instansi |
 | Tugas, tim, ketergantungan, Gantt | Tugas, **Jadwal (Gantt)** |
 | Dokumen + OCR (PDF, foto, DOCX) dan pengisian otomatis data aset | Dokumen & arsip |
 | Peta tematik semua modul, peta berbagi baca-saja bertautan | **Peta tematik**, Peta berbagi |
+| Lapisan referensi (batas administrasi, kadaster, sungai, jalan, hutan, tata ruang, utilitas) dari GeoJSON/KML/SHP/GPKG | Lapisan peta referensi → tampil di **Peta tematik** |
 | Pembuat laporan (pilih data/kolom/filter → Excel, CSV, PDF) | **Pembuat laporan** |
 | Pencarian lintas modul termasuk isi dokumen | **Pencarian** |
-| Asisten AI (tanya data dengan bahasa sehari-hari) | **Asisten AI** |
+| Asisten AI (tanya data dengan bahasa sehari-hari; tiap tabel jawaban dapat diunduh Excel/PDF/CSV) | **Asisten AI** |
 | Pengaduan masyarakat (nomor + kode akses, cek status) | Portal `/portal/pengaduan/` |
 | Lelang/seleksi pemanfaatan lahan dan penawaran daring | Portal `/portal/lelang/` |
 | Aplikasi petugas lapangan (GPS, foto, luring, dapat dipasang di ponsel) | `/aset/lapangan/` |
-| API baca-saja untuk sistem lain | `/v1/aset/asset/`, `tax/`, `transaction/`, `legal_case/`, `encroachment/`, `task/`, `grievance/`, `tender/` |
+| API baca-saja untuk sistem lain (JWT atau OAuth2) | `/v1/aset/asset/`, `tax/`, `transaction/`, `legal_case/`, `encroachment/`, `task/`, `grievance/`, `tender/` |
 
 Pengingat harian 06.30 WIB (`asetlahan_pengingat --email`): sewa dan hak atas
 tanah yang segera berakhir, pajak jatuh tempo, sidang mendatang (juga ke kuasa
 hukum, surel/WhatsApp), tugas dan pengaduan lewat tenggat, okupasi tanpa tindak
-lanjut, dan urusan instansi. Jalankan manual tanpa mengirim:
+lanjut, aset yang belum dipantau sesuai jadwal, dan urusan instansi. Jalankan manual tanpa mengirim:
 `docker compose exec backend python manage.py asetlahan_pengingat`.
 
-Asisten AI tetap menjawab pertanyaan umum (sewa berakhir, okupasi, sidang,
-pajak, tugas, pengaduan, ringkasan, keuangan, pencarian) tanpa
+Asisten AI tetap menjawab pertanyaan umum (sewa berakhir, okupasi per zona,
+alokasi per bulan/tahun, pemantauan, sidang, pajak, tugas, pengaduan,
+ringkasan, keuangan, pencarian) tanpa
 `ANTHROPIC_API_KEY`; dengan kunci, pertanyaan bebas dijawab Claude memakai
 data yang boleh dilihat penanya. Peta dasar Google/Bing memerlukan lisensi;
 tambahkan lewat `MAP_EXTRA_BASEMAPS`.
@@ -233,6 +239,28 @@ permukiman kembali, pengaduan, dan lelang:
 docker compose exec backend python manage.py asetlahan_contoh_rempang          # buat
 docker compose exec backend python manage.py asetlahan_contoh_rempang --hapus  # hapus
 ```
+
+## Integrasi OAuth2
+
+Sistem lain (ERP, GIS, dasbor) dapat memakai API `/v1/` dengan OAuth2:
+
+1. Buat akun layanan (pengguna biasa) dengan grup dan unit layanan sesuai data
+   yang boleh diakses.
+2. Di `/admin/oauth2_provider/application/` tambahkan aplikasi: *Client type*
+   `Confidential`, *Authorization grant type* `Client credentials`, *User*
+   akun layanan tadi. **Salin *Client secret* sebelum menyimpan**; setelah
+   disimpan hanya hash-nya yang tersimpan.
+3. Minta token lalu panggil API:
+
+   ```sh
+   curl -X POST https://domain-anda/oauth/token/ -u "CLIENT_ID:CLIENT_SECRET" \
+     -d grant_type=client_credentials -d scope=read
+   curl https://domain-anda/v1/aset/asset/ -H "Authorization: Bearer TOKEN"
+   ```
+
+Scope `read` hanya membaca; perubahan data memerlukan `write`. Token berlaku
+1 jam. Grant *Authorization code* (dengan PKCE, redirect `https`) juga tersedia
+lewat `/oauth/authorize/` memakai login panel petugas.
 
 ## Pengembangan
 

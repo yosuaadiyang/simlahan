@@ -345,6 +345,7 @@ def test_deadlines_endpoint(admin_client, project, parcel):
         "acquisitionparcel",
         "entitledparty",
         "parcelsurvey",
+        "inventoryitem",
         "announcement",
         "valuation",
         "deliberation",

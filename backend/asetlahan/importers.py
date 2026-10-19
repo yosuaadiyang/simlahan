@@ -18,9 +18,12 @@ from django.contrib.gis.geos import GEOSException, GEOSGeometry
 from django.db import transaction
 
 from asetlahan import geo
-from asetlahan.models import LandAsset, next_number
+from asetlahan.models import LandAsset, MapOverlayFeature, next_number
+from utils.geometry import force_2d
 
 MAX_FEATURES = 5000
+MAX_OVERLAY_FEATURES = 20000
+NAME_FIELDS = ("nama", "name", "namobj", "remark", "keterangan", "label", "wadmkd")
 
 TEXT_FIELDS = {
     "name": ("nama", "name", "nama_aset", "lokasi"),
@@ -81,7 +84,7 @@ def _geojson_features(data: bytes):
             raise AssetImportError(f"Fitur ke-{index}: geometri tidak valid ({error}).")
         if geom.srid is None:
             geom.srid = 4326
-        yield item.get("properties") or {}, geom
+        yield item.get("properties") or {}, force_2d(geom)
 
 
 def _ogr_features(path: str):
@@ -97,7 +100,7 @@ def _ogr_features(path: str):
             geom = feature.geom.geos
             if geom.srid is None:
                 geom.srid = 4326
-            yield props, geom
+            yield props, force_2d(geom)
 
 
 def _extract_shapefile(data: bytes, directory: str) -> str:
@@ -149,6 +152,45 @@ def _polygon(index: int, geom):
     if not multi.valid:
         multi = geo.as_multipolygon(multi.buffer(0))
     return multi
+
+
+def read_overlay_features(data: bytes, filename: str) -> list:
+    """Baca berkas lapisan referensi; semua tipe geometri (titik, garis, poligon) diterima."""
+    features = _read_features(data, filename)
+    if not features:
+        raise AssetImportError("Tidak ada fitur di dalam berkas.")
+    if len(features) > MAX_OVERLAY_FEATURES:
+        raise AssetImportError(
+            f"Maksimal {MAX_OVERLAY_FEATURES} fitur per lapisan; pecah berkasnya."
+        )
+    result = []
+    for props, geom in features:
+        if geom.srid != 4326:
+            geom = geom.transform(4326, clone=True)
+        if not geom.valid and geom.dims == 2:
+            geom = geom.buffer(0)
+        clean = {
+            str(k)[:64]: (v if isinstance(v, (int, float, bool)) else str(v)[:255])
+            for k, v in props.items()
+            if v not in (None, "")
+        }
+        result.append((_prop(props, NAME_FIELDS)[:255], geom, clean))
+    return result
+
+
+def replace_overlay_features(overlay, features) -> int:
+    with transaction.atomic():
+        overlay.features.all().delete()
+        MapOverlayFeature.objects.bulk_create(
+            [
+                MapOverlayFeature(
+                    overlay=overlay, name=name, geometry=geom, properties=props
+                )
+                for name, geom, props in features
+            ],
+            batch_size=1000,
+        )
+    return len(features)
 
 
 def import_assets(

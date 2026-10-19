@@ -8,7 +8,15 @@ Login JWT pemohon ditolak di users.auth_views.LoginView.
 from django.http import JsonResponse
 from django.shortcuts import redirect
 
-OFFICER_PREFIXES = ("/v1/", "/admin/", "/auth/", "/docs", "/redoc", "/swagger")
+OFFICER_PREFIXES = (
+    "/v1/",
+    "/admin/",
+    "/auth/",
+    "/oauth/",
+    "/docs",
+    "/redoc",
+    "/swagger",
+)
 
 
 class ApplicantIsolationMiddleware:

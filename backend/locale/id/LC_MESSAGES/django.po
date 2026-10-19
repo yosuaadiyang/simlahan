@@ -5383,3 +5383,74 @@ msgstr "Izin pengguna"
 
 msgid "Applicant accounts can only sign in at /portal/."
 msgstr "Akun pemohon hanya dapat masuk melalui portal (/portal/)."
+
+msgid "Building / house"
+msgstr "Bangunan / rumah"
+
+msgid "Plants / trees"
+msgstr "Tanaman / pohon"
+
+msgid "Pond / fishpond"
+msgstr "Kolam / tambak"
+
+msgid "Well"
+msgstr "Sumur"
+
+msgid "Fence / wall"
+msgstr "Pagar / tembok"
+
+msgid "Access road / easement"
+msgstr "Jalan akses / hak lintas"
+
+msgid "Utility (electricity, water, telecom)"
+msgstr "Utilitas (listrik, air, telekomunikasi)"
+
+msgid "Grave"
+msgstr "Makam"
+
+msgid "Public / social facility"
+msgstr "Fasilitas umum / sosial"
+
+msgid "Water body / river"
+msgstr "Badan air / sungai"
+
+msgid "Forest / natural vegetation"
+msgstr "Hutan / vegetasi alami"
+
+msgid "Other object"
+msgstr "Benda lain"
+
+msgid "Object owner"
+msgstr "Pemilik objek"
+
+msgid "Object type"
+msgstr "Jenis objek"
+
+msgid "Quantity"
+msgstr "Jumlah"
+
+msgid "For example m², trees, units, m."
+msgstr "Misalnya m², pohon, unit, m."
+
+msgid "Condition"
+msgstr "Kondisi"
+
+msgid "Estimated value per unit (Rp)"
+msgstr "Perkiraan nilai per satuan (Rp)"
+
+msgctxt "Model name"
+msgid "Inventory item"
+msgstr "Objek inventarisasi"
+
+msgctxt "Model name"
+msgid "Inventory items"
+msgstr "Objek inventarisasi"
+
+msgid "The owner must be an entitled party of this parcel."
+msgstr "Pemilik harus pihak yang berhak atas bidang ini."
+
+msgid "OAuth application has no active service account."
+msgstr "Aplikasi OAuth tidak memiliki akun layanan yang aktif."
+
+msgid "This token is read-only (scope 'write' is required)."
+msgstr "Token ini hanya untuk membaca (perlu scope 'write')."

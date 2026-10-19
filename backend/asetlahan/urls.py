@@ -30,6 +30,11 @@ admin_urlpatterns = [
     ),
     path("cari/", admin_views.search, name="asetlahan-search"),
     path("asisten/", admin_views.assistant, name="asetlahan-assistant"),
+    path(
+        "asisten/unduh/<int:turn>/<int:index>/",
+        admin_views.assistant_export,
+        name="asetlahan-assistant-export",
+    ),
 ]
 
 portal_urlpatterns = [

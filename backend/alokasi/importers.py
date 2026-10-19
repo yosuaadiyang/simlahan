@@ -9,6 +9,7 @@ from django.db import transaction
 
 from alokasi import enums
 from alokasi.models import LandPlot
+from utils.geometry import force_2d
 
 # UTM zona 48N mencakup Batam–Rempang–Galang; dipakai untuk menghitung luas m².
 AREA_SRID = 32648
@@ -41,6 +42,7 @@ def _geometry(raw) -> MultiPolygon:
         geom = GEOSGeometry(json.dumps(raw))
     except (GEOSException, GDALException, ValueError, TypeError) as error:
         raise PlotImportError(f"Geometri tidak valid: {error}")
+    geom = force_2d(geom)
     if geom.srid is None:
         geom.srid = 4326
     elif geom.srid != 4326:

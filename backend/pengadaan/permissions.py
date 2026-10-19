@@ -19,6 +19,7 @@ from pengadaan.models import (
     EntitledParty,
     Handover,
     Holiday,
+    InventoryItem,
     Objection,
     ParcelSurvey,
     RightsRelease,
@@ -78,6 +79,7 @@ PENGADAAN_GROUP_MODEL_PERMISSIONS: GroupModelPermissions = {
         }
     ),
     ParcelSurvey: _perms({UG.SATGAS_PENGADAAN: ALL}),
+    InventoryItem: _perms({UG.SATGAS_PENGADAAN: ALL, UG.PENILAI: V}),
     Announcement: _perms({UG.SATGAS_PENGADAAN: VA, UG.INSTANSI_PEMOHON: V}),
     Valuation: _perms({UG.PENILAI: VAC}),
     Deliberation: _perms({UG.SATGAS_PENGADAAN: VA, UG.INSTANSI_PEMOHON: V}),

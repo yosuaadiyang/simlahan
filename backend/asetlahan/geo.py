@@ -5,6 +5,8 @@ from decimal import ROUND_HALF_UP, Decimal
 
 from django.contrib.gis.geos import GEOSGeometry, MultiPolygon, Polygon
 
+from utils.geometry import force_2d
+
 
 def utm_srid(geom) -> int:
     """EPSG zona UTM WGS84 dari titik tengah geometri (Indonesia: zona 46–54)."""
@@ -139,6 +141,7 @@ def parse_geojson_geometry(text: str):
         geoms = [GEOSGeometry(json.dumps(data))]
     polygons = []
     for geom in geoms:
+        geom = force_2d(geom)
         if geom.srid is None:
             geom.srid = 4326
         elif geom.srid != 4326:

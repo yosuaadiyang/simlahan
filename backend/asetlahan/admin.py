@@ -38,6 +38,7 @@ from asetlahan.models import (
     LandTransaction,
     LegalCase,
     LiaisonActivity,
+    MapOverlay,
     MapShare,
     ModuleSettings,
     OwnershipRecord,
@@ -249,6 +250,7 @@ class ModuleSettingsAdmin(admin.ModelAdmin):
                     "hearing_alert_days",
                     "grievance_sla_days",
                     "encroachment_followup_days",
+                    "monitoring_interval_days",
                 )
             },
         ),
@@ -394,7 +396,12 @@ class LandAssetAdmin(AsetGISAdmin):
     )
     autocomplete_fields = ("pengadaan_parcel", "lease")
     raw_id_fields = ("alokasi_plot",)
-    readonly_fields = ("valuation_summary", "related_records", "overlap_summary")
+    readonly_fields = (
+        "valuation_summary",
+        "related_records",
+        "overlap_summary",
+        "monitoring_due",
+    )
     inlines = (OwnershipInline, TaxInline, DocumentInline)
     actions = ("export_xlsx",)
     change_list_template = "admin/asetlahan/landasset/change_list.html"
@@ -410,6 +417,16 @@ class LandAssetAdmin(AsetGISAdmin):
                     "status",
                     "service_unit",
                     "responsible",
+                )
+            },
+        ),
+        (
+            _("Pemantauan lapangan"),
+            {
+                "fields": (
+                    "monitoring_interval_days",
+                    "last_monitored_on",
+                    "monitoring_due",
                 )
             },
         ),
@@ -474,6 +491,21 @@ class LandAssetAdmin(AsetGISAdmin):
     @admin.display(boolean=True, description=_("Peta"))
     def has_map(self, obj):
         return obj.geometry is not None
+
+    @admin.display(description=_("Jadwal pemantauan berikutnya"))
+    def monitoring_due(self, obj):
+        if not obj.pk:
+            return "–"
+        due = obj.monitoring_due_on()
+        if due is None:
+            return _("Tidak dijadwalkan")
+        if due < timezone.localdate():
+            return format_html(
+                '<strong style="color:#cf222e">{} ({})</strong>',
+                due.strftime("%d-%m-%Y"),
+                _("terlambat"),
+            )
+        return due.strftime("%d-%m-%Y")
 
     @admin.display(description=_("Penilaian terakhir"))
     def valuation_summary(self, obj):
@@ -1075,6 +1107,8 @@ class SatelliteImageAdmin(AsetGISAdmin):
     list_display = (
         "title",
         "provider",
+        "platform",
+        "data_type",
         "acquired_on",
         "resolution_m",
         "cloud_cover",
@@ -1082,7 +1116,7 @@ class SatelliteImageAdmin(AsetGISAdmin):
         "cost_fmt",
         "viewable",
     )
-    list_filter = ("status", "provider")
+    list_filter = ("status", "platform", "data_type", "provider")
     search_fields = ("title", "provider", "sensor")
     date_hierarchy = "requested_on"
 
@@ -1298,6 +1332,7 @@ class LiaisonActivityAdmin(AsetModelAdmin):
     module_flag = "enable_survey"
     list_display = (
         "subject",
+        "activity_type",
         "agency",
         "status",
         "submitted_on",
@@ -1305,7 +1340,7 @@ class LiaisonActivityAdmin(AsetModelAdmin):
         "officer",
         "asset",
     )
-    list_filter = ("status", "agency", "service_unit")
+    list_filter = ("activity_type", "status", "agency", "service_unit")
     search_fields = ("subject", "agency", "reference_number", "asset__code")
     autocomplete_fields = ("asset", "pengadaan_project", "facilitator")
     inlines = (DocumentInline,)
@@ -1823,6 +1858,100 @@ class MapShareAdmin(AsetModelAdmin):
             return _("Tersedia setelah disimpan.")
         url = services.app_url(reverse("asetlahan-share", args=[obj.token]))
         return format_html('<a href="{0}" target="_blank" rel="noopener">{0}</a>', url)
+
+
+class MapOverlayForm(forms.ModelForm):
+    import_file = forms.FileField(
+        label=_("Impor objek dari berkas"),
+        required=False,
+        help_text=_(
+            "GeoJSON, KML, GeoPackage, atau Shapefile (ZIP). Titik, garis, dan poligon "
+            "diterima. Objek lama di lapisan ini diganti isi berkas."
+        ),
+    )
+
+    class Meta:
+        model = MapOverlay
+        fields = "__all__"
+
+    def clean_import_file(self):
+        upload = self.cleaned_data.get("import_file")
+        if not upload:
+            return None
+        if upload.size > 50 * 1024 * 1024:
+            raise forms.ValidationError(_("Berkas maksimal 50 MB."))
+        from asetlahan.importers import AssetImportError, read_overlay_features
+
+        try:
+            return read_overlay_features(upload.read(), upload.name)
+        except AssetImportError as error:
+            raise forms.ValidationError(str(error))
+
+    def clean(self):
+        cleaned = super().clean()
+        if (
+            not self.instance.pk
+            and not cleaned.get("import_file")
+            and "import_file" not in self.errors
+        ):
+            self.add_error("import_file", _("Unggah berkas peta untuk lapisan baru."))
+        return cleaned
+
+
+@admin.register(MapOverlay)
+class MapOverlayAdmin(AsetModelAdmin):
+    scope_lookup = ""
+    form = MapOverlayForm
+    list_display = (
+        "name",
+        "kind",
+        "color_swatch",
+        "feature_count",
+        "is_active",
+        "show_by_default",
+        "modified_at",
+    )
+    list_filter = ("kind", "is_active")
+    search_fields = ("name", "source", "note")
+    readonly_fields = ("feature_count",)
+    fields = (
+        "name",
+        "kind",
+        "color",
+        "source",
+        "is_active",
+        "show_by_default",
+        "import_file",
+        "feature_count",
+        "note",
+    )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).annotate(_features=Count("features"))
+
+    @admin.display(description=_("Jumlah objek"), ordering="_features")
+    def feature_count(self, obj):
+        if not obj.pk:
+            return "–"
+        from alokasi.templatetags.alokasi_tags import angka
+
+        count = getattr(obj, "_features", None)
+        return angka(obj.features.count() if count is None else count)
+
+    @admin.display(description=_("Warna"))
+    def color_swatch(self, obj):
+        return badge(obj.display_color, obj.display_color)
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        features = form.cleaned_data.get("import_file")
+        if features:
+            from asetlahan.importers import replace_overlay_features
+
+            count = replace_overlay_features(obj, features)
+            self.message_user(
+                request, _("%(count)s objek diimpor ke lapisan.") % {"count": count}
+            )
 
 
 @admin.register(FieldReport)

@@ -547,10 +547,14 @@ def rows(columns, queryset, limit=None):
 def export_response(ds: Dataset, queryset, fmt: str, columns=None, title: str = ""):
     columns = columns or ds.columns
     title = title or ds.label
-    stamp = timezone.localtime().strftime("%Y%m%d-%H%M")
-    filename = f"{slugify(title)}-{stamp}"
     headers = [c.label for c in columns]
     data = list(rows(columns, queryset, limit=50000))
+    return table_response(title, headers, data, fmt)
+
+
+def table_response(title: str, headers, data, fmt: str):
+    stamp = timezone.localtime().strftime("%Y%m%d-%H%M")
+    filename = f"{slugify(title) or 'laporan'}-{stamp}"
     if fmt == "csv":
         return _csv(filename, headers, data)
     if fmt == "pdf":
@@ -628,5 +632,6 @@ __all__ = [
     "select_columns",
     "rows",
     "export_response",
+    "table_response",
     "enums",
 ]

@@ -47,6 +47,32 @@ class PartyInline(admin.StackedInline):
     exclude = ("deleted", "deleted_by_cascade")
 
 
+class InventoryItemInline(admin.TabularInline):
+    model = m.InventoryItem
+    extra = 0
+    fields = (
+        "item_type",
+        "description",
+        "quantity",
+        "unit",
+        "condition",
+        "unit_value",
+        "party",
+        "note",
+    )
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        # Pemilik objek hanya dari pihak yang berhak pada bidang ini.
+        if db_field.name == "party":
+            parcel_id = request.resolver_match.kwargs.get("object_id")
+            kwargs["queryset"] = (
+                m.EntitledParty.objects.filter(parcel_id=parcel_id)
+                if parcel_id and str(parcel_id).isdigit()
+                else m.EntitledParty.objects.none()
+            )
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+
 @admin.register(m.AcquisitionParcel)
 class AcquisitionParcelAdmin(admin.ModelAdmin):
     list_display = ("parcel_number", "project", "right_type", "status", "is_disputed")
@@ -54,11 +80,12 @@ class AcquisitionParcelAdmin(admin.ModelAdmin):
     search_fields = ("parcel_number", "nib", "village", "certificate_number")
     readonly_fields = ("status",)
     raw_id_fields = ("project", "district")
-    inlines = [PartyInline]
+    inlines = [PartyInline, InventoryItemInline]
 
 
 for model in (
     m.ParcelSurvey,
+    m.InventoryItem,
     m.Announcement,
     m.Valuation,
     m.Deliberation,

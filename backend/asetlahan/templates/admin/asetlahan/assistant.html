@@ -1,12 +1,17 @@
 {% extends "admin/asetlahan/tool_base.html" %}
 {% block tool %}
 <div class="al-chat">
-  {% if not ai_enabled %}<p class="help">Mode tanpa AI: pertanyaan dicocokkan dengan pola umum (sewa, okupasi, sidang, pajak, tugas, pengaduan, perkara, keuangan, lokasi). Isi <code>ANTHROPIC_API_KEY</code> untuk jawaban bahasa alami dari Claude.</p>{% endif %}
+  {% if not ai_enabled %}<p class="help">Mode tanpa AI: pertanyaan dicocokkan dengan pola umum (sewa, okupasi, alokasi, pemantauan, sidang, pajak, tugas, pengaduan, perkara, keuangan, lokasi). Isi <code>ANTHROPIC_API_KEY</code> untuk jawaban bahasa alami dari Claude.</p>{% endif %}
   {% for turn in history %}
     <p class="al-q">❓ {{ turn.q }}</p>
     <div class="al-a">{{ turn.answer }}</div>
     {% for table in turn.tables %}
-      <p><strong>{{ table.title }}</strong>{% if table.note %} — <span class="al-muted">{{ table.note }}</span>{% endif %}</p>
+      <p><strong>{{ table.title }}</strong>{% if table.note %} — <span class="al-muted">{{ table.note }}</span>{% endif %}
+      {% if table.rows %}<br><span class="al-muted">Unduh laporan:</span>
+        {% url "asetlahan-assistant-export" forloop.parentloop.counter0 forloop.counter0 as export_url %}
+        <a href="{{ export_url }}?format=xlsx">Excel</a> ·
+        <a href="{{ export_url }}?format=pdf">PDF</a> ·
+        <a href="{{ export_url }}?format=csv">CSV</a>{% endif %}</p>
       {% if table.rows %}
       <table class="al-table">
         <thead><tr>{% for h in table.headers %}<th>{{ h }}</th>{% endfor %}<th></th></tr></thead>

@@ -24,6 +24,7 @@ from pengadaan.models import (
     EntitledParty,
     Handover,
     Holiday,
+    InventoryItem,
     Objection,
     ParcelSurvey,
     RightsRelease,
@@ -363,6 +364,45 @@ class ParcelSurveySerializer(serializers.ModelSerializer):
             "longitude",
             "findings",
         )
+
+
+class InventoryItemSerializer(serializers.ModelSerializer):
+    parcel_number = serializers.CharField(source="parcel.parcel_number", read_only=True)
+    # Pemilik boleh kosong; field metode agar tetap ada juga pada respons PATCH.
+    party_name = serializers.SerializerMethodField()
+    total_value = serializers.DecimalField(
+        max_digits=24, decimal_places=2, read_only=True
+    )
+
+    class Meta:
+        model = InventoryItem
+        fields = (
+            "id",
+            "parcel",
+            "parcel_number",
+            "party",
+            "party_name",
+            "item_type",
+            "description",
+            "quantity",
+            "unit",
+            "condition",
+            "unit_value",
+            "total_value",
+            "note",
+        )
+
+    def get_party_name(self, obj) -> str | None:
+        return obj.party.name if obj.party_id else None
+
+    def validate(self, attrs):
+        parcel = attrs.get("parcel") or getattr(self.instance, "parcel", None)
+        party = attrs.get("party", getattr(self.instance, "party", None))
+        if party is not None and parcel is not None and party.parcel_id != parcel.pk:
+            raise serializers.ValidationError(
+                {"party": _("The owner must be an entitled party of this parcel.")}
+            )
+        return attrs
 
 
 class AnnouncementSerializer(serializers.ModelSerializer):

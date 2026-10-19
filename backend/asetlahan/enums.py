@@ -293,6 +293,51 @@ class ImageryStatus(models.TextChoices):
     REJECTED = "ditolak", _("Ditolak / batal")
 
 
+class ImageryPlatform(models.TextChoices):
+    SATELLITE = "satelit", _("Satelit")
+    DRONE = "drone", _("Drone / UAV")
+    AIRCRAFT = "pesawat", _("Pesawat (foto udara)")
+
+
+class ImageryType(models.TextChoices):
+    OPTICAL = "optik", _("Optik resolusi tinggi")
+    MULTISPECTRAL = "multispektral", _("Multispektral")
+    INFRARED = "inframerah", _("Inframerah")
+    RADAR = "radar", _("Radar / SAR")
+    STEREO = "stereo", _("Stereo (3D)")
+    ORTHOPHOTO = "ortofoto", _("Ortofoto")
+    ELEVATION = "dem", _("Model elevasi (DEM/DSM/DTM)")
+    LIDAR = "lidar", _("LiDAR / point cloud")
+    THERMAL = "termal", _("Termal")
+
+
+class OverlayKind(models.TextChoices):
+    ADMINISTRATIVE = "administrasi", _("Batas administrasi")
+    CADASTRE = "kadaster", _("Peta bidang / kadaster")
+    WATER = "perairan", _("Badan air / sungai")
+    SETTLEMENT = "permukiman", _("Permukiman")
+    ROAD = "jalan", _("Jalan")
+    RAILWAY = "rel", _("Jalur kereta api")
+    FOREST = "hutan", _("Kawasan hutan")
+    SPATIAL_PLAN = "tata_ruang", _("Rencana tata ruang (RTRW/RDTR)")
+    UTILITY = "utilitas", _("Jaringan utilitas")
+    OTHER = "lainnya", _("Lainnya")
+
+
+OVERLAY_COLORS = {
+    OverlayKind.ADMINISTRATIVE: "#6e40c9",
+    OverlayKind.CADASTRE: "#57606a",
+    OverlayKind.WATER: "#0969da",
+    OverlayKind.SETTLEMENT: "#bc4c00",
+    OverlayKind.ROAD: "#cf222e",
+    OverlayKind.RAILWAY: "#24292f",
+    OverlayKind.FOREST: "#1a7f37",
+    OverlayKind.SPATIAL_PLAN: "#bf8700",
+    OverlayKind.UTILITY: "#8250df",
+    OverlayKind.OTHER: "#6e7781",
+}
+
+
 class SurveyType(models.TextChoices):
     BOUNDARY = "batas", _("Pengukuran batas / rekonstruksi")
     TOPOGRAPHIC = "topografi", _("Survei topografi")
@@ -318,6 +363,22 @@ class FacilitatorType(models.TextChoices):
     LIAISON = "penghubung", _("Penghubung instansi")
     APPRAISER = "penilai", _("Penilai")
     SURVEYOR = "surveyor", _("Surveyor berlisensi")
+
+
+class LiaisonType(models.TextChoices):
+    MUTATION = "balik_nama", _("Mutasi / balik nama hak")
+    TITLE_CHECK = "cek_sertipikat", _("Pengecekan & verifikasi sertipikat")
+    MEASUREMENT = "pengukuran", _("Permohonan pengukuran / pemetaan BPN")
+    REGISTRATION = "pendaftaran", _("Pendaftaran / pembaruan hak")
+    LOCATION = "penlok", _("Penetapan lokasi / persetujuan pengadaan")
+    SPATIAL_PERMIT = "kkpr", _("KKPR / izin pemanfaatan ruang")
+    BUILDING_PERMIT = "pbg", _("PBG / izin bangunan & infrastruktur")
+    ENVIRONMENT = "lingkungan", _("Persetujuan lingkungan")
+    CLEARANCE = "rekomendasi", _("Rekomendasi / clearance instansi")
+    APPRAISAL = "penilaian", _("Koordinasi penilai / KJPP")
+    TAX = "pajak", _("Urusan pajak (PBB/BPHTB)")
+    COMPLIANCE = "kepatuhan", _("Kepatuhan regulasi")
+    OTHER = "lainnya", _("Lainnya")
 
 
 class LiaisonStatus(models.TextChoices):
