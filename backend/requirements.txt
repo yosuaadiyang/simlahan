@@ -92,6 +92,8 @@ django-modeltranslation==0.19.19
     # via -r requirements.in
 django-nested-inline==0.4.6
     # via -r requirements.in
+django-oauth-toolkit==3.1.0
+    # via -r requirements.in
 django-picklefield==3.2
     # via django-q2
 django-q-sentry==0.1.6
