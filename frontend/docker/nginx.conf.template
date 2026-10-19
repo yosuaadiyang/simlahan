@@ -21,8 +21,8 @@ server {
     add_header X-Frame-Options SAMEORIGIN always;
     add_header Referrer-Policy strict-origin-when-cross-origin always;
 
-    # API, antarmuka admin Django, dan portal pemohon
-    location ~ ^/(v1|admin|auth|static|docs|redoc|swagger|portal)(/|\.|$) {
+    # API, antarmuka admin Django, portal pemohon, dan aplikasi lapangan / peta berbagi (/aset)
+    location ~ ^/(v1|admin|auth|static|docs|redoc|swagger|portal|aset)(/|\.|$) {
         proxy_pass ${BACKEND_URL};
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-Host $host;

@@ -110,3 +110,30 @@ class User(AbstractUser):
         service_units_to_add = new_service_units.difference(old_service_units)
         if service_units_to_add:
             self.service_units.add(*service_units_to_add)
+
+
+class LoginOTP(models.Model):
+    """Kode sekali pakai (OTP) yang dikirim lewat surel saat petugas masuk.
+
+    Aktif bila ``OFFICER_OTP_REQUIRED`` diisi. Kode hanya disimpan dalam bentuk
+    hash; ``token`` mengikat kode ke satu percobaan masuk.
+    """
+
+    PURPOSE_API = "api"
+    PURPOSE_SESSION = "sesi"
+
+    user = models.ForeignKey(
+        "users.User", related_name="login_otps", on_delete=models.CASCADE
+    )
+    token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    purpose = models.CharField(max_length=8)
+    code_hash = models.CharField(max_length=64)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    attempts = models.PositiveSmallIntegerField(default=0)
+    used_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = _("Login OTP")
+        verbose_name_plural = _("Login OTPs")
+        ordering = ["-created_at"]

@@ -50,7 +50,7 @@ jobs:
       - name: Install GDAL, GEOS, PROJ and gettext
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends gdal-bin libgdal-dev gettext
+          sudo apt-get install -y --no-install-recommends gdal-bin libgdal-dev gettext tesseract-ocr
 
       - uses: actions/setup-python@v7
         with:
@@ -66,8 +66,8 @@ jobs:
       - name: Compile translations
         run: python manage.py compilemessages -l id -v0
 
-      - name: Run pengadaan and alokasi tests
-        run: pytest pengadaan/tests alokasi/tests -p no:cacheprovider
+      - name: Run pengadaan, alokasi and asetlahan tests
+        run: pytest pengadaan/tests alokasi/tests asetlahan/tests users/tests -p no:cacheprovider
 
   frontend:
     name: Frontend (vitest)

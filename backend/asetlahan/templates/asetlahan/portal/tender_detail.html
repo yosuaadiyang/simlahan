@@ -1,0 +1,45 @@
+{% extends "alokasi/portal/base.html" %}{% load alokasi_tags %}
+{% block title %}{{ tender.number }} {{ tender.title }}{% endblock %}
+{% block content %}
+<p class="small"><a href="{% url 'aset_portal:tender_list' %}">&larr; Semua lelang</a></p>
+<h1>{{ tender.title }}</h1>
+<div class="grid grid-2">
+  <div class="card">
+    <dl class="props">
+      <dt>Nomor</dt><dd>{{ tender.number }}</dd>
+      <dt>Metode</dt><dd>{{ tender.get_method_display }}</dd>
+      <dt>Lokasi</dt><dd>{{ tender.location_name|default:"-" }}</dd>
+      {% if tender.reserve_price %}<dt>Nilai limit</dt><dd>{{ tender.reserve_price|rupiah }}</dd>{% endif %}
+      {% if tender.deposit %}<dt>Jaminan penawaran</dt><dd>{{ tender.deposit|rupiah }}</dd>{% endif %}
+      <dt>Penawaran dibuka</dt><dd>{{ tender.open_at|date:"d-m-Y H:i" }}</dd>
+      <dt>Penawaran ditutup</dt><dd>{{ tender.close_at|date:"d-m-Y H:i" }}</dd>
+      <dt>Status</dt><dd><span class="badge">{% if tender.is_accepting_bids %}Menerima penawaran{% else %}{{ tender.get_status_display }}{% endif %}</span></dd>
+      <dt>Jumlah peserta</dt><dd>{{ bid_count }}</dd>
+    </dl>
+  </div>
+  <div class="card">
+    {% if tender.status == 'ditetapkan' and tender.winner %}
+      <h2>Pemenang</h2>
+      <p><strong>{{ tender.winner.bidder_name }}</strong>{% if tender.method == 'lelang' %} dengan penawaran {{ tender.winner.amount|rupiah }}{% endif %}.</p>
+      <p class="small muted">Ditetapkan {{ tender.awarded_on|tanggal }}.</p>
+    {% elif tender.status == 'batal' %}
+      <div class="alert alert-warn">Lelang ini dibatalkan.</div>
+    {% elif tender.is_accepting_bids %}
+      <h2>Ajukan penawaran</h2>
+      {% if own_bid %}<p>Penawaran Anda: <strong>{{ own_bid.amount|rupiah }}</strong> ({{ own_bid.modified_at|date:"d-m-Y H:i" }}).</p>{% endif %}
+      {% if portal_applicant %}
+        <a class="btn" href="{% url 'aset_portal:bid_submit' tender.number %}">{% if own_bid %}Ubah penawaran{% else %}Ajukan penawaran{% endif %}</a>
+      {% else %}
+        <p>Masuk dengan akun pemohon untuk mengajukan penawaran.</p>
+        <a class="btn" href="{% url 'portal:login' %}?next={{ request.path|urlencode }}">Masuk</a>
+        <a class="btn btn-outline" href="{% url 'portal:register' %}">Daftar</a>
+      {% endif %}
+    {% else %}
+      <p class="muted">{% if own_bid %}Penawaran Anda: {{ own_bid.amount|rupiah }} ({{ own_bid.get_status_display }}).{% else %}Penawaran tidak sedang dibuka.{% endif %}</p>
+    {% endif %}
+  </div>
+</div>
+<h2>Uraian & peruntukan</h2>
+<div class="prose">{{ tender.description|linebreaks }}</div>
+{% if tender.requirements %}<h2>Persyaratan peserta</h2><div class="prose">{{ tender.requirements|linebreaks }}</div>{% endif %}
+{% endblock %}

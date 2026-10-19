@@ -1,0 +1,27 @@
+{% extends "admin/asetlahan/tool_base.html" %}
+{% load alokasi_tags %}
+{% block tool %}
+<h2>Aset dengan batas saling tumpang tindih</h2>
+<p class="al-muted">Irisan ≥ 1 m² antar aset menandakan klaim ganda atau kesalahan ukur. Periksa dan perbaiki batas, atau ajukan survei pengukuran ulang.</p>
+<table class="al-table">
+  <thead><tr><th>Aset A</th><th>Aset B</th><th class="al-num">Luas irisan (m²)</th></tr></thead>
+  <tbody>
+  {% for p in pairs %}
+    <tr><td><a href="{% url 'admin:asetlahan_landasset_change' p.a.pk %}">{{ p.a }}</a></td>
+        <td><a href="{% url 'admin:asetlahan_landasset_change' p.b.pk %}">{{ p.b }}</a></td>
+        <td class="al-num">{{ p.area_m2|angka:2 }}</td></tr>
+  {% empty %}<tr><td colspan="3">Tidak ada aset yang tumpang tindih.</td></tr>{% endfor %}
+  </tbody>
+</table>
+<h2>Aset yang beririsan dengan bidang pengadaan atau lahan alokasi lain</h2>
+<table class="al-table">
+  <thead><tr><th>Aset</th><th>Bidang pengadaan tanah</th><th>Lahan alokasi</th></tr></thead>
+  <tbody>
+  {% for row in external %}
+    <tr><td><a href="{% url 'admin:asetlahan_landasset_change' row.asset.pk %}">{{ row.asset }}</a></td>
+        <td>{% for p in row.parcels %}{{ p.project.identifier }} / {{ p.parcel_number }}{% if not forloop.last %}, {% endif %}{% empty %}–{% endfor %}</td>
+        <td>{% for p in row.plots %}{{ p.code }}{% if not forloop.last %}, {% endif %}{% empty %}–{% endfor %}</td></tr>
+  {% empty %}<tr><td colspan="3">Tidak ada irisan.</td></tr>{% endfor %}
+  </tbody>
+</table>
+{% endblock %}

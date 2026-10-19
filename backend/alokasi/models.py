@@ -1,4 +1,4 @@
-"""Model modul alokasi lahan (setara layanan LMS BP Batam).
+"""Model modul alokasi lahan: portal pemohon dan panel petugas.
 
 Alur utama:
 Lahan tersedia → pemohon mendaftar → permohonan + dokumen → verifikasi teknis
@@ -79,10 +79,10 @@ class AllocationSettings(models.Model):
     authority_name = models.CharField(
         verbose_name=_("Nama otoritas"),
         max_length=255,
-        default="Badan Pengusahaan Kawasan Perdagangan Bebas dan Pelabuhan Bebas Batam",
+        default="Instansi Pengelola Lahan",
     )
     authority_short_name = models.CharField(
-        verbose_name=_("Singkatan otoritas"), max_length=64, default="BP Batam"
+        verbose_name=_("Singkatan otoritas"), max_length=64, default="Pengelola Lahan"
     )
     city = models.CharField(
         verbose_name=_("Kota penerbitan"), max_length=64, default="Batam"
@@ -96,7 +96,7 @@ class AllocationSettings(models.Model):
     signatory_title = models.CharField(
         verbose_name=_("Jabatan pejabat penandatangan"),
         max_length=255,
-        default="Kepala Badan Pengusahaan Batam",
+        default="Kepala Instansi Pengelola Lahan",
     )
     allocation_admin_fee = models.DecimalField(
         verbose_name=_("Biaya administrasi alokasi (Rp)"), default=Decimal("0"), **MONEY
@@ -127,10 +127,7 @@ class AllocationSettings(models.Model):
     idle_years = models.PositiveSmallIntegerField(
         verbose_name=_("Batas lahan tidur (tahun sejak KPT)"),
         default=2,
-        help_text=_(
-            "Lahan yang belum dibangun dalam jangka ini ditandai lahan tidur "
-            "(Peraturan Kepala BP Batam No. 2 Tahun 2026)."
-        ),
+        help_text=_("Lahan yang belum dibangun dalam jangka ini ditandai lahan tidur."),
     )
     report_interval_months = models.PositiveSmallIntegerField(
         verbose_name=_("Interval wajib lapor progres (bulan)"), default=6
@@ -138,7 +135,7 @@ class AllocationSettings(models.Model):
     payment_instructions = models.TextField(
         verbose_name=_("Petunjuk pembayaran"),
         blank=True,
-        default="Pembayaran melalui rekening resmi BP Batam sesuai nomor tagihan.",
+        default="Pembayaran melalui rekening resmi instansi sesuai nomor tagihan.",
     )
     contact_info = models.TextField(
         verbose_name=_("Kontak layanan"), blank=True, default=""

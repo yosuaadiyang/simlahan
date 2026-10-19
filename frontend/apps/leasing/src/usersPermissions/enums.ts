@@ -22,6 +22,13 @@ export const UsersPermissions = {
   VIEW_ALLOCATION: "view_allocation",
   VIEW_LANDPLOT: "view_landplot",
   VERIFY_PAYMENT: "verify_payment",
+  // Manajemen aset lahan (panel petugas di /admin/asetlahan/)
+  VIEW_LANDASSET: "view_landasset",
+  VIEW_LEGALCASE: "view_legalcase",
+  VIEW_ENCROACHMENTCASE: "view_encroachmentcase",
+  VIEW_GRIEVANCE: "view_grievance",
+  VIEW_TENDER: "view_tender",
+  ADD_FIELDREPORT: "add_fieldreport",
   ADD_ANSWEROPENINGRECORD: "add_answeropeningrecord",
   ADD_BASISOFRENTDECISION: "add_basisofrentdecision",
   ADD_BASISOFRENTPROPERTYIDENTIFIER: "add_basisofrentpropertyidentifier",

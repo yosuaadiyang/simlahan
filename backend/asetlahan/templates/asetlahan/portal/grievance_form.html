@@ -1,0 +1,32 @@
+{% extends "alokasi/portal/base.html" %}
+{% block title %}Pengaduan Masyarakat{% endblock %}
+{% block head %}{% include "alokasi/portal/_leaflet.html" %}{% endblock %}
+{% block content %}
+<h1>Pengaduan masyarakat</h1>
+<p>Sampaikan keluhan, laporan penyerobotan lahan, atau masukan terkait pengelolaan tanah. Anda akan menerima nomor pengaduan dan kode akses untuk memantau tindak lanjutnya. Sudah pernah mengadu? <a href="{% url 'aset_portal:grievance_check' %}">Cek status pengaduan</a>.</p>
+<form method="post" enctype="multipart/form-data" class="card" novalidate>
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="alert alert-danger">{% for e in form.non_field_errors %}{{ e }}<br>{% endfor %}</div>{% endif %}
+  {{ form.latitude }}{{ form.longitude }}
+  <div class="form-grid">
+    {% for field in form.visible_fields %}{% if field.name != "website" %}
+    <div class="field{% if field.field.required %} required{% endif %}"{% if field.widget_type == 'textarea' %} style="grid-column: 1 / -1"{% endif %}>
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {{ field }}
+      {% if field.help_text %}<span class="helptext">{{ field.help_text }}</span>{% endif %}
+      {{ field.errors }}
+    </div>
+    {% endif %}{% endfor %}
+  </div>
+  <div aria-hidden="true" style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden">
+    <label for="{{ form.website.id_for_label }}">{{ form.website.label }}</label>{{ form.website }}
+  </div>
+  <h2>Titik lokasi (opsional)</h2>
+  <p class="small muted">Klik peta untuk menandai lokasi kejadian, atau gunakan lokasi perangkat Anda.</p>
+  <p><button type="button" class="btn btn-outline btn-small" data-locate>Gunakan lokasi saya</button>
+     <button type="button" class="btn btn-outline btn-small" data-clear-location>Hapus titik</button></p>
+  <div id="peta" class="map map-small" data-map="pick" data-lat="{{ map_center.0 }}" data-lng="{{ map_center.1 }}" data-zoom="{{ map_zoom }}" role="region" aria-label="Pilih titik lokasi"></div>
+  <p class="small muted">Data pribadi Anda hanya digunakan untuk menindaklanjuti pengaduan ini.</p>
+  <button class="btn" type="submit">Kirim pengaduan</button>
+</form>
+{% endblock %}

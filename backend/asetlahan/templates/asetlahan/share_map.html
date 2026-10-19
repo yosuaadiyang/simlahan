@@ -1,0 +1,14 @@
+{% extends "alokasi/portal/base.html" %}{% load static %}
+{% block title %}{{ share.title }}{% endblock %}
+{% block head %}<meta name="robots" content="noindex, nofollow">{% include "alokasi/portal/_leaflet.html" %}{% endblock %}
+{% block content %}
+<h1>{{ share.title }}</h1>
+<p class="small muted">Peta baca-saja. Tautan berlaku sampai {{ share.expires_at|date:"d-m-Y H:i" }}.</p>
+{{ map_config|json_script:"share-map-config" }}
+<div id="peta-berbagi" class="map" role="region" aria-label="{{ share.title }}"></div>
+<div class="legend">
+  {% for item in legend %}<span style="--c:{{ item.color }}">{{ item.label }}</span>{% endfor %}
+</div>
+<p class="small muted">Batas bidang bersifat informatif dan bukan pengganti dokumen resmi pertanahan.</p>
+{% endblock %}
+{% block scripts %}<script src="{% static 'asetlahan/share-map.js' %}"></script>{% endblock %}

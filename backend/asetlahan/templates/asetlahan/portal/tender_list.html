@@ -1,0 +1,26 @@
+{% extends "alokasi/portal/base.html" %}{% load alokasi_tags %}
+{% block title %}Lelang & Seleksi Lahan{% endblock %}
+{% block content %}
+<h1>Lelang & seleksi pemanfaatan lahan</h1>
+<p>Pengumuman lelang dan seleksi proposal pemanfaatan lahan. Masuk dengan akun pemohon untuk mengajukan penawaran secara daring.</p>
+<div class="table-wrap">
+<table class="data">
+  <thead><tr><th>Nomor</th><th>Judul</th><th>Metode</th><th>Lokasi</th><th>Nilai limit</th><th>Batas penawaran</th><th>Status</th></tr></thead>
+  <tbody>
+  {% for tender in tenders %}
+    <tr>
+      <td><a href="{% url 'aset_portal:tender_detail' tender.number %}">{{ tender.number }}</a></td>
+      <td>{{ tender.title }}</td>
+      <td>{{ tender.get_method_display }}</td>
+      <td>{{ tender.location_name|default:"-" }}</td>
+      <td style="white-space:nowrap">{% if tender.reserve_price %}{{ tender.reserve_price|rupiah }}{% else %}-{% endif %}</td>
+      <td style="white-space:nowrap">{{ tender.close_at|date:"d-m-Y H:i" }}</td>
+      <td><span class="badge">{% if tender.is_accepting_bids %}Menerima penawaran{% else %}{{ tender.get_status_display }}{% endif %}</span></td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="7" class="muted">Belum ada lelang yang diumumkan.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

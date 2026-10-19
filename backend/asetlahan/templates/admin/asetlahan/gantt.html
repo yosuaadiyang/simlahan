@@ -1,0 +1,46 @@
+{% extends "admin/asetlahan/tool_base.html" %}
+{% block tool %}
+<form method="get" class="al-filters">
+  <label>Dari <input type="date" name="dari" value="{{ window_start|date:'Y-m-d' }}"></label>
+  <label>Sampai <input type="date" name="sampai" value="{{ window_end|date:'Y-m-d' }}"></label>
+  <label>Tim
+    <select name="tim"><option value="">Semua</option>
+      {% for team in teams %}<option value="{{ team.pk }}"{% if params.tim == team.pk|stringformat:'s' %} selected{% endif %}>{{ team }}</option>{% endfor %}
+    </select>
+  </label>
+  <label><span><input type="checkbox" name="petugas" value="saya"{% if params.petugas == 'saya' %} checked{% endif %}> Tugas saya saja</span></label>
+  <button type="submit" class="button">Terapkan</button>
+</form>
+<div class="al-legend">
+  <span><span class="al-swatch" style="background:#0969da"></span>Tugas berjalan (bagian terang = progres)</span>
+  <span><span class="al-swatch" style="background:#cf222e"></span>Lewat tenggat</span>
+  <span><span class="al-swatch" style="background:#57606a"></span>Selesai</span>
+  <span><span class="al-swatch" style="background:#8250df;transform:rotate(45deg)"></span>Tonggak pengadaan</span>
+</div>
+<div class="al-gantt">
+  <div class="al-gantt-row"><div class="al-gantt-label"><strong>Pekerjaan</strong></div>
+    <div class="al-gantt-track">{% for m in months %}<span class="al-gantt-month" style="left:{{ m.left }}%;width:{{ m.width }}%">{{ m.label }}</span>{% endfor %}</div>
+  </div>
+  {% for row in rows %}
+  <div class="al-gantt-row">
+    <div class="al-gantt-label" title="{{ row.obj.title }}"><a href="{{ row.url }}">{{ row.obj.number }}</a> {{ row.obj.title }}
+      <span class="al-muted">· {{ row.obj.assignee|default:"-" }}{% if row.obj.depends_on %} · setelah {{ row.obj.depends_on.number }}{% endif %}</span></div>
+    <div class="al-gantt-track">
+      {% if today_left is not None %}<span class="al-gantt-today" style="left:{{ today_left }}%"></span>{% endif %}
+      <span class="al-gantt-bar{% if row.overdue %} overdue{% elif row.obj.status == 'selesai' %} closed{% endif %}" style="left:{{ row.left }}%;width:{{ row.width }}%" title="{{ row.start|date:'d-m-Y' }} – {{ row.end|date:'d-m-Y' }} · {{ row.obj.progress }}%"><span class="done" style="display:block;width:{{ row.obj.progress }}%"></span></span>
+    </div>
+  </div>
+  {% endfor %}
+  {% for m in milestones %}
+  <div class="al-gantt-row">
+    <div class="al-gantt-label" title="{{ m.obj.title }}"><strong>{{ m.obj.project.identifier }}</strong> {{ m.obj.title }}
+      <span class="al-muted">· {{ m.obj.responsible|default:"-" }}</span></div>
+    <div class="al-gantt-track">
+      {% if today_left is not None %}<span class="al-gantt-today" style="left:{{ today_left }}%"></span>{% endif %}
+      <span class="al-gantt-diamond{% if m.done %} done{% endif %}" style="left:{{ m.left }}%" title="Rencana {{ m.start|date:'d-m-Y' }}{% if m.obj.actual_date %} · realisasi {{ m.obj.actual_date|date:'d-m-Y' }}{% endif %}"></span>
+    </div>
+  </div>
+  {% endfor %}
+  {% if not rows and not milestones %}<p class="al-muted" style="padding:12px">Tidak ada tugas atau tonggak pada rentang ini.</p>{% endif %}
+</div>
+{% endblock %}

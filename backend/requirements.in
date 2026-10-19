@@ -21,10 +21,12 @@ django-stubs[compatible-mypy]==4.2.7 # Newer versions will not work - typechecks
 djangorestframework==3.18.1
 djangorestframework-gis==1.3.0
 djangorestframework-simplejwt==5.5.1
+anthropic==1.15.0 # Asisten AI & ekstraksi dokumen (aktif bila ANTHROPIC_API_KEY diisi)
 cryptography==46.0.0 # Enkripsi data pribadi (UU PDP) di modul pengadaan
 drf-yasg[validation]==1.21.15
 docxtpl==0.20.2
 psycopg[binary]==3.3.4
+pytesseract==0.3.13 # OCR dokumen aset (butuh paket tesseract-ocr)
 python-daemon~=3.1.2
 python-dateutil==2.9.0.post0
 sentry-sdk==2.63.0

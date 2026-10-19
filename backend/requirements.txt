@@ -4,6 +4,14 @@
 #
 #    pip-compile requirements.in
 #
+annotated-types==0.8.0
+    # via pydantic
+anthropic==1.15.0
+    # via -r requirements.in
+anyio==4.14.2
+    # via
+    #   anthropic
+    #   httpx2
 arabic-reshaper==3.0.0
     # via xhtml2pdf
 asgiref==3.8.1
@@ -106,20 +114,33 @@ djangorestframework-gis==1.3.0
     # via -r requirements.in
 djangorestframework-simplejwt==5.5.1
     # via -r requirements.in
+docstring-parser==0.18.0
+    # via anthropic
 docxtpl==0.20.2
     # via -r requirements.in
 drf-yasg[validation]==1.21.15
     # via -r requirements.in
+h11==0.16.0
+    # via httpcore2
 html5lib==1.1
     # via xhtml2pdf
-idna==3.7
-    # via requests
+httpcore2==2.13.1
+    # via httpx2
+httpx2==2.13.1
+    # via anthropic
+idna==3.20
+    # via
+    #   anyio
+    #   httpx2
+    #   requests
 inflection==0.5.1
     # via drf-yasg
 jinja2==3.1.6
     # via
     #   -c constraints.txt
     #   docxtpl
+jiter==0.17.0
+    # via anthropic
 jsonschema==4.22.0
     # via swagger-spec-validator
 jsonschema-specifications==2023.12.1
@@ -137,14 +158,18 @@ mypy==1.7.1
     # via django-stubs
 mypy-extensions==1.0.0
     # via mypy
+opentelemetry-api==1.45.1
+    # via anthropic
 oscrypto==1.3.0
     # via pyhanko-certvalidator
 packaging==24.0
     # via
     #   django-safedelete
     #   drf-yasg
+    #   pytesseract
 pillow==10.3.0
     # via
+    #   pytesseract
     #   reportlab
     #   xhtml2pdf
 psycopg[binary]==3.3.4
@@ -153,6 +178,10 @@ psycopg-binary==3.3.4
     # via psycopg
 pycparser==2.22
     # via cffi
+pydantic==2.13.5
+    # via anthropic
+pydantic-core==2.46.5
+    # via pydantic
 pyhanko==0.25.0
     # via xhtml2pdf
 pyhanko-certvalidator==0.26.3
@@ -167,6 +196,8 @@ pypdf==6.1.3
     #   xhtml2pdf
 pypng==0.20220715.0
     # via qrcode
+pytesseract==0.3.13
+    # via -r requirements.in
 python-bidi==0.6.6
     # via xhtml2pdf
 python-daemon==3.1.2
@@ -211,6 +242,8 @@ six==1.16.0
     # via
     #   html5lib
     #   python-dateutil
+sniffio==1.3.1
+    # via anthropic
 sqlparse==0.5.0
     # via django
 svglib==1.5.1
@@ -221,21 +254,34 @@ tinycss2==1.3.0
     # via
     #   cssselect2
     #   svglib
+truststore==0.10.5
+    # via
+    #   httpcore2
+    #   httpx2
 types-pytz==2026.1.1.20260304
     # via django-stubs
 types-pyyaml==6.0.12.20240311
     # via django-stubs
 typing-extensions==4.15.0
     # via
+    #   anthropic
+    #   anyio
     #   django-countries
     #   django-modeltranslation
     #   django-stubs
     #   django-stubs-ext
+    #   httpx2
     #   mypy
+    #   opentelemetry-api
     #   psycopg
+    #   pydantic
+    #   pydantic-core
     #   python-docx
     #   qrcode
     #   swagger-spec-validator
+    #   typing-inspection
+typing-inspection==0.4.4
+    # via pydantic
 tzdata==2026.2
     # via -r requirements.in
 tzlocal==5.2

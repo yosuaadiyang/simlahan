@@ -1,0 +1,27 @@
+{% extends "admin/asetlahan/tool_base.html" %}
+{% load static %}
+{% block tool_head %}<link rel="stylesheet" href="{% static 'alokasi/vendor/leaflet/leaflet.css' %}">{% endblock %}
+{% block tool %}
+{% if case %}<p>Kasus: <a href="{% url 'admin:asetlahan_encroachmentcase_change' case.pk %}">{{ case }}</a> — area kasus & batas aset ditandai kuning.</p>{% endif %}
+<form method="get" class="al-filters">
+  {% if case %}<input type="hidden" name="okupasi" value="{{ case.pk }}">{% endif %}
+  <label>Kiri (sebelum)
+    <select name="kiri"><option value="">Citra satelit Esri</option>
+      {% for image in images %}<option value="{{ image.pk }}"{% if left and left.pk == image.pk %} selected{% endif %}>{{ image }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Kanan (sesudah)
+    <select name="kanan"><option value="">OpenStreetMap</option>
+      {% for image in images %}<option value="{{ image.pk }}"{% if right and right.pk == image.pk %} selected{% endif %}>{{ image }}</option>{% endfor %}
+    </select>
+  </label>
+  <button type="submit" class="button">Bandingkan</button>
+</form>
+{% if not images %}<p class="al-muted">Belum ada citra dengan URL ubin/WMS. Tambahkan di <a href="{% url 'admin:asetlahan_satelliteimage_changelist' %}">Citra satelit & foto udara</a>.</p>{% endif %}
+<label for="swipe" class="al-muted">Geser untuk membandingkan</label>
+<input id="swipe" class="al-swipe" type="range" min="0" max="100" value="50">
+<div id="peta" class="al-map" data-mode="compare" data-leaflet-images="{% static 'alokasi/vendor/leaflet/images/' %}" role="region" aria-label="Pembanding citra"></div>
+{{ map_config|json_script:"map-config" }}
+<script src="{% static 'alokasi/vendor/leaflet/leaflet.js' %}"></script>
+<script src="{% static 'asetlahan/admin-map.js' %}"></script>
+{% endblock %}

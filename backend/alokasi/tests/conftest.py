@@ -128,7 +128,7 @@ def applicant(make_applicant):
 def make_officer(seeded, django_user_model):
     def _make(username, group):
         user = django_user_model.objects.create_user(
-            username=username, email=f"{username}@bpbatam.go.id", password=PASSWORD
+            username=username, email=f"{username}@instansi.go.id", password=PASSWORD
         )
         user.groups.add(Group.objects.get(pk=group))
         user.refresh_from_db()

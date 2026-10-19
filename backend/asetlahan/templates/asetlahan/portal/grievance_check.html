@@ -1,0 +1,27 @@
+{% extends "alokasi/portal/base.html" %}{% load alokasi_tags %}
+{% block title %}Cek Status Pengaduan{% endblock %}
+{% block content %}
+<h1>Cek status pengaduan</h1>
+<form method="get" action="{% url 'aset_portal:grievance_check' %}" class="card" style="max-width:640px">
+  {% include "alokasi/portal/_form.html" with grid_class="stack" %}
+  <button class="btn" type="submit">Periksa</button>
+</form>
+{% if searched %}
+  {% if grievance %}
+  <div class="card" style="max-width:640px;margin-top:16px">
+    <h2>{{ grievance.number }} · {{ grievance.subject }}</h2>
+    <dl class="props">
+      <dt>Status</dt><dd><span class="badge">{{ grievance.get_status_display }}</span></dd>
+      <dt>Diterima</dt><dd>{{ grievance.created_at|tanggal }}</dd>
+      <dt>Batas penyelesaian</dt><dd>{{ grievance.due_date|tanggal }}</dd>
+      {% if grievance.resolved_on %}<dt>Selesai</dt><dd>{{ grievance.resolved_on|tanggal }}</dd>{% endif %}
+    </dl>
+    {% if grievance.response %}<h3>Tanggapan petugas</h3><p class="prose">{{ grievance.response|linebreaksbr }}</p>
+    {% else %}<p class="muted">Belum ada tanggapan. Pengaduan Anda sedang diproses.</p>{% endif %}
+  </div>
+  {% else %}
+  <div class="alert alert-danger" style="max-width:640px;margin-top:16px">Pengaduan tidak ditemukan. Periksa kembali nomor dan kode akses.</div>
+  {% endif %}
+{% endif %}
+<p><a href="{% url 'aset_portal:grievance_create' %}">Buat pengaduan baru</a></p>
+{% endblock %}

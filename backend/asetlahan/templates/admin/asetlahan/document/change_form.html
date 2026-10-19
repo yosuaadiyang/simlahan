@@ -1,0 +1,8 @@
+{% extends "admin/change_form.html" %}
+{% block object-tools-items %}
+  {% if original.pk and original.file %}<li><a href="{% url 'asetlahan-file' 'dokumen' original.pk %}?lihat=1" target="_blank" rel="noopener">Lihat berkas</a></li>{% endif %}
+  {% if original.pk and original.asset_id and original.extracted_fields %}
+  <li><form method="post" action="{% url 'admin:asetlahan_document_apply' original.pk %}" style="display:inline">{% csrf_token %}<button type="submit" class="historylink" style="border:0;cursor:pointer" title="Isi kolom aset yang masih kosong dari data terbaca">Terapkan data ke aset</button></form></li>
+  {% endif %}
+  {{ block.super }}
+{% endblock %}

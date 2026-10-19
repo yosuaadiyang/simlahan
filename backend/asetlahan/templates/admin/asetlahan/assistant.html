@@ -1,0 +1,27 @@
+{% extends "admin/asetlahan/tool_base.html" %}
+{% block tool %}
+<div class="al-chat">
+  {% if not ai_enabled %}<p class="help">Mode tanpa AI: pertanyaan dicocokkan dengan pola umum (sewa, okupasi, sidang, pajak, tugas, pengaduan, perkara, keuangan, lokasi). Isi <code>ANTHROPIC_API_KEY</code> untuk jawaban bahasa alami dari Claude.</p>{% endif %}
+  {% for turn in history %}
+    <p class="al-q">❓ {{ turn.q }}</p>
+    <div class="al-a">{{ turn.answer }}</div>
+    {% for table in turn.tables %}
+      <p><strong>{{ table.title }}</strong>{% if table.note %} — <span class="al-muted">{{ table.note }}</span>{% endif %}</p>
+      {% if table.rows %}
+      <table class="al-table">
+        <thead><tr>{% for h in table.headers %}<th>{{ h }}</th>{% endfor %}<th></th></tr></thead>
+        <tbody>{% for row in table.rows %}<tr>{% for cell in row %}<td>{{ cell }}</td>{% endfor %}<td>{% with link=table.links|slice:forloop.counter|last %}{% if link %}<a href="{{ link }}">Buka</a>{% endif %}{% endwith %}</td></tr>{% endfor %}</tbody>
+      </table>
+      {% endif %}
+    {% endfor %}
+  {% empty %}
+    <p>Contoh pertanyaan:</p>
+    <ul>{% for example in examples %}<li>{{ example }}</li>{% endfor %}</ul>
+  {% endfor %}
+  <form method="post" style="margin-top:16px">{% csrf_token %}
+    <textarea name="q" rows="3" style="width:100%" maxlength="2000" placeholder="Tulis pertanyaan Anda…" required></textarea>
+    <p><button type="submit" class="button default">Tanya</button></p>
+  </form>
+  {% if history %}<form method="post">{% csrf_token %}<button type="submit" name="reset" value="1" class="button">Mulai percakapan baru</button></form>{% endif %}
+</div>
+{% endblock %}

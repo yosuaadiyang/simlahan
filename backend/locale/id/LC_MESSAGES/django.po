@@ -5348,6 +5348,15 @@ msgstr "Masuk"
 msgid "Username or password is incorrect."
 msgstr "Nama pengguna atau kata sandi salah."
 
+msgid "Login OTP"
+msgstr "OTP masuk"
+
+msgid "Login OTPs"
+msgstr "OTP masuk"
+
+msgid "OTP code is invalid or has expired."
+msgstr "Kode OTP salah atau sudah kedaluwarsa."
+
 msgid "Logout"
 msgstr "Keluar"
 

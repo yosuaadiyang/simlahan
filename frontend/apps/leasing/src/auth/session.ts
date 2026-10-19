@@ -25,6 +25,18 @@ let refreshInFlight: Promise<string | null> | null = null;
 
 export class LoginError extends Error {}
 
+/** Login perlu langkah kedua: kode OTP yang dikirim ke surel petugas. */
+export class OtpRequiredError extends Error {
+  otpToken: string;
+  email: string;
+
+  constructor(otpToken: string, email: string) {
+    super("Masukkan kode OTP yang dikirim ke surel Anda.");
+    this.otpToken = otpToken;
+    this.email = email;
+  }
+}
+
 const readRefreshToken = (): string | null => {
   try {
     return localStorage.getItem(REFRESH_TOKEN_STORAGE_KEY);
@@ -151,6 +163,16 @@ const fetchCurrentUser = async (accessToken: string): Promise<AuthUser> => {
   return normalizeUser(await response.json());
 };
 
+const TOO_MANY_ATTEMPTS =
+  "Terlalu banyak percobaan masuk. Coba lagi dalam satu menit.";
+
+const completeLogin = (data: Record<string, any>): AuthUser => {
+  applyTokens({ access: data.access, refresh: data.refresh });
+  const user = normalizeUser(data.user);
+  store.dispatch(userFound(user));
+  return user;
+};
+
 export const login = async (
   username: string,
   password: string,
@@ -161,16 +183,34 @@ export const login = async (
   });
   if (!response.ok) {
     if (response.status === 429) {
-      throw new LoginError(
-        "Terlalu banyak percobaan masuk. Coba lagi dalam satu menit.",
-      );
+      throw new LoginError(TOO_MANY_ATTEMPTS);
     }
     throw new LoginError(data.detail || "Nama pengguna atau kata sandi salah.");
   }
-  applyTokens({ access: data.access, refresh: data.refresh });
-  const user = normalizeUser(data.user);
-  store.dispatch(userFound(user));
-  return user;
+  if (data.otp_required) {
+    throw new OtpRequiredError(data.otp_token, data.email || "");
+  }
+  return completeLogin(data);
+};
+
+/** Langkah kedua login: tukar kode OTP dengan token sesi. */
+export const verifyOtp = async (
+  otpToken: string,
+  code: string,
+): Promise<AuthUser> => {
+  const { response, data } = await postJson("auth/login/otp/", {
+    otp_token: otpToken,
+    code,
+  });
+  if (!response.ok) {
+    if (response.status === 429) {
+      throw new LoginError(TOO_MANY_ATTEMPTS);
+    }
+    throw new LoginError(
+      data.detail || "Kode OTP salah atau sudah kedaluwarsa.",
+    );
+  }
+  return completeLogin(data);
 };
 
 /** Pulihkan sesi dari refresh token tersimpan (saat aplikasi dimuat). */

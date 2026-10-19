@@ -1,0 +1,27 @@
+/* Aplikasi petugas lapangan (PWA). */
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #1f2328; background: #fff; }
+body { display: flex; flex-direction: column; }
+.bar { display: flex; align-items: center; gap: 10px; padding: 10px 14px; padding-top: max(10px, env(safe-area-inset-top)); background: #0b4f8a; color: #fff; }
+.bar strong { flex: 1; }
+.pill { font-size: 12px; padding: 2px 10px; border-radius: 999px; background: #57606a; }
+.pill.online { background: #1a7f37; }
+.pill.offline { background: #cf222e; }
+.link { background: none; border: 1px solid #fff; color: #fff; border-radius: 6px; padding: 4px 10px; font-size: 13px; }
+#peta { height: 42vh; min-height: 240px; flex: none; }
+.panel { padding: 12px 14px 24px; padding-bottom: max(24px, env(safe-area-inset-bottom)); overflow-y: auto; flex: 1; }
+.panel label { display: block; font-weight: 600; margin: 10px 0 4px; font-size: 14px; }
+.panel label.check { font-weight: normal; display: flex; gap: 8px; align-items: center; }
+.panel select, .panel textarea, .panel input[type=file] { width: 100%; font-size: 16px; padding: 8px; border: 1px solid #d0d7de; border-radius: 6px; }
+button { font-size: 15px; padding: 10px 14px; border-radius: 6px; border: 1px solid #d0d7de; background: #f6f8fa; }
+button.primary { width: 100%; margin-top: 12px; background: #0b4f8a; color: #fff; border-color: #0b4f8a; font-weight: 600; }
+button:disabled { opacity: .6; }
+.row { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; gap: 10px; }
+.small { font-size: 13px; }
+.muted { color: #57606a; }
+.error { color: #cf222e; }
+.ok { color: #1a7f37; }
+#antrean { list-style: none; padding: 0; margin: 8px 0; }
+#antrean li { border: 1px solid #d0d7de; border-radius: 6px; padding: 8px 10px; margin-bottom: 6px; font-size: 14px; }
+#antrean li .error { display: block; }
+#antrean button { padding: 4px 8px; font-size: 13px; margin-top: 6px; }

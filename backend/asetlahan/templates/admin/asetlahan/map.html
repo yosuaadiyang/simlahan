@@ -1,0 +1,35 @@
+{% extends "admin/asetlahan/tool_base.html" %}
+{% load static %}
+{% block tool_head %}<link rel="stylesheet" href="{% static 'alokasi/vendor/leaflet/leaflet.css' %}">{% endblock %}
+{% block tool %}
+<form method="get" class="al-filters">
+  <label>Warna aset
+    <select name="warna">
+      <option value="status"{% if params.warna != 'kategori' %} selected{% endif %}>Status penguasaan</option>
+      <option value="kategori"{% if params.warna == 'kategori' %} selected{% endif %}>Kategori</option>
+    </select>
+  </label>
+  <label>Status
+    <select name="status"><option value="">Semua</option>
+      {% for value, label in statuses %}<option value="{{ value }}"{% if params.status == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Kategori
+    <select name="kategori"><option value="">Semua</option>
+      {% for id, name in categories %}<option value="{{ id }}"{% if params.kategori == id|stringformat:'s' %} selected{% endif %}>{{ name }}</option>{% endfor %}
+    </select>
+  </label>
+  <label><span><input type="checkbox" name="semua_okupasi" value="1"{% if params.semua_okupasi %} checked{% endif %}> Termasuk okupasi selesai</span></label>
+  <button type="submit" class="button">Terapkan</button>
+</form>
+<div class="al-legend">
+  {% for item in map_config.legend %}<span><span class="al-swatch" style="background:{{ item.color }}"></span>{{ item.label }}</span>{% endfor %}
+  <span><span class="al-swatch" style="background:#cf222e;border-radius:50%"></span>Okupasi</span>
+  <span><span class="al-swatch" style="background:#8250df"></span>Bidang pengadaan</span>
+</div>
+<div id="peta" class="al-map" data-leaflet-images="{% static 'alokasi/vendor/leaflet/images/' %}" role="region" aria-label="Peta tematik"></div>
+<p class="al-muted">Pilih peta dasar, citra, dan lapisan di kotak kanan atas peta. Klik bidang untuk melihat rincian.</p>
+{{ map_config|json_script:"map-config" }}
+<script src="{% static 'alokasi/vendor/leaflet/leaflet.js' %}"></script>
+<script src="{% static 'asetlahan/admin-map.js' %}"></script>
+{% endblock %}

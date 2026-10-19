@@ -288,6 +288,96 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
                   </Authorization>
 
                   <Authorization
+                    allow={
+                      hasPermissions(
+                        usersPermissions,
+                        UsersPermissions.VIEW_LANDASSET,
+                      ) ||
+                      hasPermissions(
+                        usersPermissions,
+                        UsersPermissions.VIEW_LEGALCASE,
+                      ) ||
+                      hasPermissions(
+                        usersPermissions,
+                        UsersPermissions.ADD_FIELDREPORT,
+                      )
+                    }
+                  >
+                    <SubMenu
+                      header="Manajemen Aset Lahan"
+                      isOpen={subMenuKey === "landAssets"}
+                      items={[
+                        {
+                          allow: hasPermissions(
+                            usersPermissions,
+                            UsersPermissions.VIEW_LANDASSET,
+                          ),
+                          text: "Dasbor aset",
+                          href: "/admin/asetlahan/dasbor/",
+                        },
+                        {
+                          allow: hasPermissions(
+                            usersPermissions,
+                            UsersPermissions.VIEW_LANDASSET,
+                          ),
+                          text: "Data aset & peta",
+                          href: "/admin/asetlahan/landasset/",
+                        },
+                        {
+                          allow: hasPermissions(
+                            usersPermissions,
+                            UsersPermissions.VIEW_LEGALCASE,
+                          ),
+                          text: "Perkara & sidang",
+                          href: "/admin/asetlahan/legalcase/",
+                        },
+                        {
+                          allow: hasPermissions(
+                            usersPermissions,
+                            UsersPermissions.VIEW_ENCROACHMENTCASE,
+                          ),
+                          text: "Okupasi & perambahan",
+                          href: "/admin/asetlahan/encroachmentcase/",
+                        },
+                        {
+                          allow: hasPermissions(
+                            usersPermissions,
+                            UsersPermissions.VIEW_GRIEVANCE,
+                          ),
+                          text: "Pengaduan masyarakat",
+                          href: "/admin/asetlahan/grievance/",
+                        },
+                        {
+                          allow: hasPermissions(
+                            usersPermissions,
+                            UsersPermissions.VIEW_TENDER,
+                          ),
+                          text: "Lelang & seleksi lahan",
+                          href: "/admin/asetlahan/tender/",
+                        },
+                        {
+                          allow: hasPermissions(
+                            usersPermissions,
+                            UsersPermissions.VIEW_LANDASSET,
+                          ),
+                          text: "Laporan & asisten AI",
+                          href: "/admin/asetlahan/",
+                        },
+                        {
+                          allow: hasPermissions(
+                            usersPermissions,
+                            UsersPermissions.ADD_FIELDREPORT,
+                          ),
+                          text: "Aplikasi lapangan",
+                          href: "/aset/lapangan/",
+                        },
+                      ]}
+                      menuKey="landAssets"
+                      onHeaderClick={this.handleHeaderClick}
+                    />
+                  </Authorization>
+
+                  <Authorization
                     allow={hasPermissions(
                       usersPermissions,
                       UsersPermissions.VIEW_CONTACT,

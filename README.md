@@ -17,6 +17,13 @@ SimLahan adalah aplikasi web untuk instansi pengelola lahan di Indonesia:
   administrasi, penerbitan KPT/PPT/izin peralihan ber-QR, cek keaslian
   dokumen, pelaporan izin & progres pembangunan, pemantauan lahan tidur, dan
   pencabutan alokasi.
+- **Manajemen aset lahan**: inventaris aset + batas bidang, rantai kepemilikan,
+  silsilah ahli waris, pemangku kepentingan, penilaian, pajak, transaksi &
+  ekspor jurnal ERP, perkara & jadwal sidang, okupasi/perambahan + citra
+  satelit, permukiman kembali, survei, fasilitator & urusan instansi, tugas &
+  Gantt, pengaduan masyarakat, lelang/seleksi lahan, dokumen ber-OCR, peta
+  tematik, peta berbagi, pembuat laporan, asisten AI, aplikasi lapangan luring
+  (PWA), OTP surel, dan pengingat otomatis surel/WhatsApp.
 - **Manajemen sewa/pemanfaatan lahan** warisan MVJ: kontrak, penyewa, tarif,
   tagihan, jaminan, penagihan, laporan, peta, catatan area.
 
@@ -88,6 +95,17 @@ Grup alokasi lahan (anggotanya otomatis diberi akses `/admin/`):
 | Petugas Alokasi Lahan | data lahan & konten portal, pemeriksaan kelengkapan, perbaikan, persetujuan/penolakan, verifikasi pembayaran, pencabutan alokasi; menerima ringkasan pemantauan mingguan |
 | Tim Verifikasi Teknis | baca permohonan, tagihan & alokasi, penilaian teknis per kriteria |
 
+Grup manajemen aset lahan (anggotanya otomatis diberi akses `/admin/`):
+
+| Grup | Manajemen aset lahan |
+|---|---|
+| Petugas Aset Lahan | seluruh data aset, keuangan, okupasi, permukiman kembali, pengaduan, lelang, dokumen; baca perkara |
+| Petugas Hukum | perkara, advokat & jadwal sidang, dokumen; baca aset, kepemilikan & pemangku kepentingan |
+| Petugas Lapangan | aplikasi lapangan, laporan & foto lapangan, okupasi & tindakan teguran, survei, pembaruan tugas |
+
+Petugas hanya melihat data unit layanannya (data tanpa unit layanan terlihat
+semua); grup Administrator melihat seluruh lokasi.
+
 Pemohon mendaftar sendiri di `/portal/daftar/` dan tidak bisa masuk ke
 aplikasi petugas atau API. Akun petugas tidak bisa masuk ke portal.
 
@@ -108,6 +126,11 @@ pelepasan hak hanya bisa dicatat setelah ganti kerugian lunas atau dititipkan.
 | `EMAIL_URL`, `DEFAULT_FROM_EMAIL` | Surel keluar (wajib untuk aktivasi akun pemohon) |
 | `OFFICER_UI_URL` | Alamat publik, mis. `https://domain-anda`; dipakai untuk tautan surel portal dan kode QR KPT/PPT |
 | `JWT_ACCESS_TOKEN_MINUTES`, `JWT_REFRESH_TOKEN_HOURS` | Masa berlaku sesi |
+| `OFFICER_OTP_REQUIRED` | `1` = petugas wajib memasukkan kode OTP surel setiap masuk |
+| `MAP_EXTRA_BASEMAPS` | Peta dasar tambahan (JSON), mis. citra berlisensi milik instansi |
+| `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL` | Asisten AI & pembacaan dokumen pindaian (opsional) |
+| `OCR_LANGUAGES` | Bahasa Tesseract, bawaan `ind+eng` |
+| `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID` | Notifikasi WhatsApp Cloud API (opsional) |
 
 Variabel peta/aplikasi dibaca saat build frontend; setelah mengubahnya jalankan
 `docker compose up -d --build frontend`.
@@ -162,6 +185,53 @@ Data contoh 6 lahan fiktif di Pulau Rempang:
 ```sh
 docker compose exec backend python manage.py alokasi_contoh_rempang          # buat
 docker compose exec backend python manage.py alokasi_contoh_rempang --hapus  # hapus
+```
+
+## Manajemen aset lahan
+
+Panel petugas di `/admin/asetlahan/` (juga dari menu **Manajemen Aset Lahan**
+di aplikasi petugas). Aktifkan/nonaktifkan submodul dan atur batas pengingat
+di **Pengaturan modul**.
+
+| Kebutuhan | Tempat |
+|---|---|
+| Inventaris aset, batas bidang, impor SHP/KML/GPKG/GeoJSON, ekspor Excel | Aset lahan → **Impor peta** / aksi ekspor |
+| Kepemilikan, silsilah ahli waris (pohon), pemangku kepentingan & matriks pengaruh | Aset lahan, Silsilah ahli waris, Pemangku kepentingan |
+| Penilaian, pajak (PBB/BPHTB/UWT), transaksi, jurnal ERP (CSV/Excel), buku besar gabungan | Penilaian aset, Pajak & retribusi, Transaksi, **Buku besar** |
+| Perkara, advokat, jadwal sidang + pengingat | Perkara & advokat |
+| Okupasi/perambahan, tindakan teguran, citra satelit & pembanding sebelum–sesudah | Okupasi & perambahan, Citra satelit, **Pembanding citra** |
+| Tumpang tindih batas antar-aset dan dengan bidang pengadaan/alokasi | **Tumpang tindih** |
+| Permukiman kembali (kawasan, kavling, penghuni) | Kawasan & unit permukiman kembali |
+| Survei & pengukuran, fasilitator, urusan instansi (BPN, pemda) | Survei & pemetaan, Fasilitator, Urusan instansi |
+| Tugas, tim, ketergantungan, Gantt | Tugas, **Jadwal (Gantt)** |
+| Dokumen + OCR (PDF, foto, DOCX) dan pengisian otomatis data aset | Dokumen & arsip |
+| Peta tematik semua modul, peta berbagi baca-saja bertautan | **Peta tematik**, Peta berbagi |
+| Pembuat laporan (pilih data/kolom/filter → Excel, CSV, PDF) | **Pembuat laporan** |
+| Pencarian lintas modul termasuk isi dokumen | **Pencarian** |
+| Asisten AI (tanya data dengan bahasa sehari-hari) | **Asisten AI** |
+| Pengaduan masyarakat (nomor + kode akses, cek status) | Portal `/portal/pengaduan/` |
+| Lelang/seleksi pemanfaatan lahan dan penawaran daring | Portal `/portal/lelang/` |
+| Aplikasi petugas lapangan (GPS, foto, luring, dapat dipasang di ponsel) | `/aset/lapangan/` |
+| API baca-saja untuk sistem lain | `/v1/aset/asset/`, `tax/`, `transaction/`, `legal_case/`, `encroachment/`, `task/`, `grievance/`, `tender/` |
+
+Pengingat harian 06.30 WIB (`asetlahan_pengingat --email`): sewa dan hak atas
+tanah yang segera berakhir, pajak jatuh tempo, sidang mendatang (juga ke kuasa
+hukum, surel/WhatsApp), tugas dan pengaduan lewat tenggat, okupasi tanpa tindak
+lanjut, dan urusan instansi. Jalankan manual tanpa mengirim:
+`docker compose exec backend python manage.py asetlahan_pengingat`.
+
+Asisten AI tetap menjawab pertanyaan umum (sewa berakhir, okupasi, sidang,
+pajak, tugas, pengaduan, ringkasan, keuangan, pencarian) tanpa
+`ANTHROPIC_API_KEY`; dengan kunci, pertanyaan bebas dijawab Claude memakai
+data yang boleh dilihat penanya. Peta dasar Google/Bing memerlukan lisensi;
+tambahkan lewat `MAP_EXTRA_BASEMAPS`.
+
+Data contoh 5 aset fiktif di Pulau Rempang beserta perkara, okupasi,
+permukiman kembali, pengaduan, dan lelang:
+
+```sh
+docker compose exec backend python manage.py asetlahan_contoh_rempang          # buat
+docker compose exec backend python manage.py asetlahan_contoh_rempang --hapus  # hapus
 ```
 
 ## Pengembangan

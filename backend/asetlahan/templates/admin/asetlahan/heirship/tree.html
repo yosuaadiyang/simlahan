@@ -1,0 +1,3 @@
+<div class="al-tree"><ul><li><strong>{{ heirship.decedent_name }}</strong> (pewaris{% if heirship.date_of_death %}, wafat {{ heirship.date_of_death|date:"d-m-Y" }}{% endif %})
+  {% with nodes=heirship.roots %}{% if nodes %}{% include "admin/asetlahan/heirship/_nodes.html" %}{% endif %}{% endwith %}
+</li></ul></div>

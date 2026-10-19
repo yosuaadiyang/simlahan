@@ -1,0 +1,6 @@
+{% extends "admin/change_list.html" %}
+{% block object-tools-items %}
+  <li><a href="{% url 'asetlahan-map' %}">Peta tematik</a></li>
+  {% if has_add_permission %}<li><a href="{% url 'admin:asetlahan_landasset_import' %}">Impor SHP/KML/GeoJSON</a></li>{% endif %}
+  {{ block.super }}
+{% endblock %}

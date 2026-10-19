@@ -1,0 +1,49 @@
+{% load static %}<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b4f8a">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Lapangan">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <title>SimLahan Lapangan</title>
+  <link rel="manifest" href="{% url 'asetlahan-field-manifest' %}">
+  <link rel="icon" href="{% static 'asetlahan/field-icon.svg' %}" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{% static 'asetlahan/field-icon-192.png' %}">
+  <link rel="stylesheet" href="{% static 'alokasi/vendor/leaflet/leaflet.css' %}">
+  <link rel="stylesheet" href="{% static 'asetlahan/field.css' %}">
+</head>
+<body data-leaflet-images="{% static 'alokasi/vendor/leaflet/images/' %}">
+{{ field_config|json_script:"field-config" }}
+<header class="bar">
+  <strong>SimLahan Lapangan</strong>
+  <span id="net" class="pill">…</span>
+  <button id="install" type="button" class="link" hidden>Pasang</button>
+</header>
+<div id="peta" role="region" aria-label="Peta lapangan"></div>
+<main class="panel">
+  <div id="gps" class="small muted">Mencari sinyal GPS…</div>
+  <form id="lapor" autocomplete="off">
+    <label for="jenis">Jenis laporan</label>
+    <select id="jenis" name="report_type"></select>
+    <label for="catatan">Catatan</label>
+    <textarea id="catatan" name="note" rows="3" placeholder="Uraian temuan, kondisi patok, pihak yang ditemui…"></textarea>
+    <label for="foto">Foto (opsional)</label>
+    <input id="foto" name="photo" type="file" accept="image/*" capture="environment">
+    <label class="check"><input id="titik-manual" type="checkbox"> Pakai titik yang saya ketuk di peta</label>
+    <button type="submit" class="primary">Simpan laporan</button>
+  </form>
+  <div class="row">
+    <strong>Antrean kirim: <span id="jumlah">0</span></strong>
+    <button id="sinkron" type="button">Kirim sekarang</button>
+  </div>
+  <p id="pesan" class="small" role="status"></p>
+  <ul id="antrean"></ul>
+  <p class="small muted">Masuk sebagai {{ field_config.user }} · <a href="{% url 'admin:index' %}">Panel petugas</a></p>
+</main>
+<script src="{% static 'alokasi/vendor/leaflet/leaflet.js' %}"></script>
+<script src="{% static 'asetlahan/field.js' %}"></script>
+</body>
+</html>

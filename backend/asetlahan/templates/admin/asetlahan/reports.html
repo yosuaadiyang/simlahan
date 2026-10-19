@@ -1,0 +1,45 @@
+{% extends "admin/asetlahan/tool_base.html" %}
+{% block tool %}
+<form method="get">
+  <div class="al-filters">
+    <label>Data
+      <select name="data" onchange="this.form.submit()">
+        {% for d in datasets %}<option value="{{ d.key }}"{% if ds and ds.key == d.key %} selected{% endif %}>{{ d.label }}</option>{% endfor %}
+      </select>
+    </label>
+    {% if ds %}
+    <label>Kata kunci <input type="search" name="q" value="{{ params.q }}"></label>
+    {% if ds.status_choices %}<label>{{ ds.status_label|capfirst }}
+      <select name="status"><option value="">Semua</option>
+        {% for value, label in ds.status_choices %}<option value="{{ value }}"{% if params.status == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select></label>{% endif %}
+    {% if ds.date_field %}
+    <label>Dari <input type="date" name="dari" value="{{ params.dari }}"></label>
+    <label>Sampai <input type="date" name="sampai" value="{{ params.sampai }}"></label>
+    {% endif %}
+    {% if ds.scope_lookup %}<label>Unit layanan
+      <select name="unit"><option value="">Semua</option>
+        {% for unit in units %}<option value="{{ unit.pk }}"{% if params.unit == unit.pk|stringformat:'s' %} selected{% endif %}>{{ unit }}</option>{% endfor %}
+      </select></label>{% endif %}
+    {% endif %}
+  </div>
+  {% if ds %}
+  <fieldset class="module"><legend class="al-muted">Kolom</legend>
+    {% for c in ds.columns %}<label style="display:inline-block;margin:2px 10px 2px 0"><input type="checkbox" name="kolom" value="{{ c.key }}"{% if c.key in chosen %} checked{% endif %}> {{ c.label }}</label>{% endfor %}
+  </fieldset>
+  <p>
+    <button type="submit" class="button">Tampilkan</button>
+    <button type="submit" name="format" value="xlsx" class="button">Ekspor Excel</button>
+    <button type="submit" name="format" value="csv" class="button">Ekspor CSV</button>
+    <button type="submit" name="format" value="pdf" class="button">Ekspor PDF</button>
+  </p>
+  {% endif %}
+</form>
+{% if ds %}
+<p class="al-muted">{{ total }} baris{% if total > 100 %}; pratinjau 100 baris pertama, ekspor memuat semua (maks. 50.000){% endif %}.</p>
+<div class="results"><table class="al-table">
+  <thead><tr>{% for c in columns %}<th>{{ c.label }}</th>{% endfor %}</tr></thead>
+  <tbody>{% for row in preview %}<tr>{% for cell in row %}<td>{{ cell }}</td>{% endfor %}</tr>{% empty %}<tr><td colspan="{{ columns|length }}">Tidak ada data.</td></tr>{% endfor %}</tbody>
+</table></div>
+{% else %}<p>Anda tidak memiliki akses ke data laporan mana pun.</p>{% endif %}
+{% endblock %}

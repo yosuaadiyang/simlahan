@@ -11,5 +11,8 @@
 {"model": "auth.group", "pk": 10, "fields": {"name": "Penilai Pertanahan", "permissions": []}},
 {"model": "auth.group", "pk": 11, "fields": {"name": "Instansi Yang Memerlukan Tanah", "permissions": []}},
 {"model": "auth.group", "pk": 12, "fields": {"name": "Petugas Alokasi Lahan", "permissions": []}},
-{"model": "auth.group", "pk": 13, "fields": {"name": "Tim Verifikasi Teknis", "permissions": []}}
+{"model": "auth.group", "pk": 13, "fields": {"name": "Tim Verifikasi Teknis", "permissions": []}},
+{"model": "auth.group", "pk": 14, "fields": {"name": "Petugas Aset Lahan", "permissions": []}},
+{"model": "auth.group", "pk": 15, "fields": {"name": "Petugas Hukum", "permissions": []}},
+{"model": "auth.group", "pk": 16, "fields": {"name": "Petugas Lapangan", "permissions": []}}
 ]

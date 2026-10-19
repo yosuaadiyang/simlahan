@@ -1,0 +1,16 @@
+{% extends "alokasi/portal/base.html" %}{% load alokasi_tags %}
+{% block title %}Pengaduan Terkirim{% endblock %}
+{% block content %}
+<h1>Pengaduan terkirim</h1>
+<div class="card alert-ok" style="max-width:640px">
+  <p>Terima kasih, {{ grievance.complainant_name }}. Simpan nomor dan kode akses berikut untuk memantau tindak lanjut pengaduan Anda.</p>
+  <dl class="props">
+    <dt>Nomor pengaduan</dt><dd><strong>{{ grievance.number }}</strong></dd>
+    <dt>Kode akses</dt><dd><strong>{{ grievance.access_code }}</strong></dd>
+    <dt>Perihal</dt><dd>{{ grievance.subject }}</dd>
+    <dt>Batas penyelesaian</dt><dd>{{ grievance.due_date|tanggal }}</dd>
+  </dl>
+  {% if grievance.email or grievance.phone %}<p class="small">Salinan nomor dan kode akses juga dikirim ke {% if grievance.email %}surel {{ grievance.email }}{% endif %}{% if grievance.email and grievance.phone %} dan {% endif %}{% if grievance.phone %}WhatsApp {{ grievance.phone }}{% endif %} bila layanan pesan aktif.</p>{% endif %}
+</div>
+<p><a class="btn" href="{% url 'aset_portal:grievance_check' %}?number={{ grievance.number|urlencode }}&amp;access_code={{ grievance.access_code|urlencode }}">Cek status</a></p>
+{% endblock %}

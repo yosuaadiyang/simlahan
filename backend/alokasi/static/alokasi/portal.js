@@ -92,6 +92,42 @@
     map.fitBounds(layer.getBounds(), { padding: [20, 20], maxZoom: 17 });
   }
 
+  function initPickMap(el) {
+    var map = createMap(el);
+    var lat = document.getElementById("id_latitude");
+    var lng = document.getElementById("id_longitude");
+    var marker = null;
+    function place(latlng, zoom) {
+      if (marker) { marker.setLatLng(latlng); } else { marker = L.marker(latlng).addTo(map); }
+      lat.value = latlng.lat.toFixed(7);
+      lng.value = latlng.lng.toFixed(7);
+      if (zoom) { map.setView(latlng, zoom); }
+    }
+    if (lat && lng && lat.value && lng.value) {
+      place(L.latLng(parseFloat(lat.value), parseFloat(lng.value)), 16);
+    }
+    map.on("click", function (event) { place(event.latlng); });
+    var locate = document.querySelector("[data-locate]");
+    if (locate && navigator.geolocation) {
+      locate.addEventListener("click", function () {
+        navigator.geolocation.getCurrentPosition(function (pos) {
+          place(L.latLng(pos.coords.latitude, pos.coords.longitude), 17);
+        }, function () { locate.insertAdjacentHTML("afterend", ' <span class="small muted">Lokasi tidak tersedia.</span>'); },
+        { enableHighAccuracy: true, timeout: 15000 });
+      });
+    } else if (locate) {
+      locate.hidden = true;
+    }
+    var clear = document.querySelector("[data-clear-location]");
+    if (clear) {
+      clear.addEventListener("click", function () {
+        if (marker) { map.removeLayer(marker); marker = null; }
+        lat.value = "";
+        lng.value = "";
+      });
+    }
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     var toggle = document.querySelector(".nav-toggle");
     var nav = document.getElementById("site-nav");
@@ -114,5 +150,6 @@
     L.Icon.Default.imagePath = (document.body.dataset.leafletImages || "");
     document.querySelectorAll("[data-map=list]").forEach(initListMap);
     document.querySelectorAll("[data-map=shape]").forEach(initShapeMap);
+    document.querySelectorAll("[data-map=pick]").forEach(initPickMap);
   });
 })();
