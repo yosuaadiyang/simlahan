@@ -14,5 +14,6 @@
 {"model": "auth.group", "pk": 13, "fields": {"name": "Tim Verifikasi Teknis", "permissions": []}},
 {"model": "auth.group", "pk": 14, "fields": {"name": "Petugas Aset Lahan", "permissions": []}},
 {"model": "auth.group", "pk": 15, "fields": {"name": "Petugas Hukum", "permissions": []}},
-{"model": "auth.group", "pk": 16, "fields": {"name": "Petugas Lapangan", "permissions": []}}
+{"model": "auth.group", "pk": 16, "fields": {"name": "Petugas Lapangan", "permissions": []}},
+{"model": "auth.group", "pk": 17, "fields": {"name": "Koordinator Wilayah", "permissions": []}}
 ]

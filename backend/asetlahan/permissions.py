@@ -50,12 +50,14 @@ VAC = ("view", "add", "change")
 ALL = ("view", "add", "change", "delete")
 
 
-def _perms(admin, asset, legal=None, field=None):
+def _perms(admin, asset, legal=None, field=None, korwil=None):
     groups = {UG.PAAKAYTTAJA: admin, UG.PETUGAS_ASET: asset}
     if legal:
         groups[UG.PETUGAS_HUKUM] = legal
     if field:
         groups[UG.PETUGAS_LAPANGAN] = field
+    if korwil:
+        groups[UG.KOORDINATOR_WILAYAH] = korwil
     return {"model": groups, "fields": {}}
 
 
@@ -63,8 +65,8 @@ ASETLAHAN_GROUP_MODEL_PERMISSIONS: GroupModelPermissions = {
     ModuleSettings: _perms(VC, V),
     AssetCategory: _perms(ALL, ALL, V, V),
     GrievanceCategory: _perms(ALL, ALL),
-    Team: _perms(ALL, ALL, V, V),
-    LandAsset: _perms(ALL, ALL, V, V),
+    Team: _perms(ALL, ALL, V, V, V),
+    LandAsset: _perms(ALL, ALL, V, V, V),
     OwnershipRecord: _perms(ALL, ALL, V),
     Heirship: _perms(ALL, ALL, V),
     HeirMember: _perms(ALL, ALL, V),
@@ -85,7 +87,7 @@ ASETLAHAN_GROUP_MODEL_PERMISSIONS: GroupModelPermissions = {
     SurveyRequest: _perms(ALL, ALL, V, VC),
     Facilitator: _perms(ALL, ALL, V),
     LiaisonActivity: _perms(ALL, ALL, VAC),
-    Task: _perms(ALL, ALL, VAC, VC),
+    Task: _perms(ALL, ALL, VAC, VC, VAC),
     Grievance: _perms(ALL, ALL, VC, VC),
     Tender: _perms(ALL, ALL),
     Bid: _perms(VC, VC),

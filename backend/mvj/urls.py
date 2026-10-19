@@ -412,6 +412,7 @@ urlpatterns = [
     path("portal/", include("alokasi.urls")),
     path("portal/", include((asetlahan_urls.portal_urlpatterns, "aset_portal"))),
     path("aset/", include(asetlahan_urls.public_urlpatterns)),
+    path("komando/", include("operasi.urls")),
 ]
 
 # Generate a schema

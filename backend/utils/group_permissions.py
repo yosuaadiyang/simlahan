@@ -24,6 +24,8 @@ class UserGroup(IntEnum):
     PETUGAS_ASET = 14
     PETUGAS_HUKUM = 15
     PETUGAS_LAPANGAN = 16
+    # Peran pusat komando operasi lapangan
+    KOORDINATOR_WILAYAH = 17
 
 
 UG = UserGroup
@@ -36,6 +38,7 @@ ADMIN_PANEL_GROUPS = {
     UserGroup.PETUGAS_ASET,
     UserGroup.PETUGAS_HUKUM,
     UserGroup.PETUGAS_LAPANGAN,
+    UserGroup.KOORDINATOR_WILAYAH,
 }
 
 MANAGED_USER_GROUP_ID_RANGE = [

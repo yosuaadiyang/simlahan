@@ -12,6 +12,7 @@ from asetlahan.permissions import ASETLAHAN_GROUP_MODEL_PERMISSIONS
 from batchrun.permissions import BATCHRUN_GROUP_MODEL_PERMISSIONS
 from forms.permissions import FORMS_GROUP_MODEL_PERMISSIONS
 from leasing.permissions import LEASING_GROUP_MODEL_PERMISSIONS
+from operasi.permissions import OPERASI_GROUP_MODEL_PERMISSIONS
 from pengadaan.permissions import PENGADAAN_GROUP_MODEL_PERMISSIONS
 from plotsearch.permissions import PLOTSEARCH_GROUP_MODEL_PERMISSIONS
 from users.permissions import USERS_GROUP_MODEL_PERMISSIONS
@@ -28,6 +29,7 @@ APP_PERMISSION_CONFIGS = {
     "pengadaan": PENGADAAN_GROUP_MODEL_PERMISSIONS,
     "alokasi": ALOKASI_GROUP_MODEL_PERMISSIONS,
     "asetlahan": ASETLAHAN_GROUP_MODEL_PERMISSIONS,
+    "operasi": OPERASI_GROUP_MODEL_PERMISSIONS,
 }
 
 APP_LABELS = tuple(APP_PERMISSION_CONFIGS.keys())

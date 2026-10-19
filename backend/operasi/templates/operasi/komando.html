@@ -1,0 +1,358 @@
+{% load static %}<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0f1a">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Komando">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <title>{{ komando_config.appName }} Pusat Komando v{{ komando_config.version }}</title>
+  <link rel="manifest" href="{% url 'operasi-manifest' %}">
+  <link rel="icon" href="{% static 'operasi/komando-icon.svg' %}" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{% static 'operasi/komando-icon-192.png' %}">
+  <link rel="stylesheet" href="{% static 'alokasi/vendor/leaflet/leaflet.css' %}">
+  <link rel="stylesheet" href="{% static 'operasi/komando.css' %}">
+</head>
+<body data-leaflet-images="{% static 'alokasi/vendor/leaflet/images/' %}">
+{{ komando_config|json_script:"komando-config" }}
+
+<div id="kunci-banner" class="lock-banner" hidden>
+  <span>💣 ⚠ KUNCI SISTEM AKTIF — SISTEM AKAN DIMATIKAN PADA <strong id="kunci-waktu"></strong></span>
+  <span class="countdown" id="kunci-hitung">--:--:--:--</span>
+  <button type="button" id="kunci-buka" class="btn-small" hidden>🛡 Nonaktifkan</button>
+</div>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="logo" aria-hidden="true">{{ komando_config.appName|first|upper }}</span>
+    <div>
+      <strong>PUSAT KOMANDO</strong>
+      <small>Operasi lapangan &amp; pendataan warga</small>
+    </div>
+  </div>
+  <div class="stats" id="statistik" aria-live="polite">
+    <button type="button" class="stat" data-goto="korwil"><b id="st-kegiatan">–</b><span>Kegiatan</span></button>
+    <button type="button" class="stat" data-mode="stance"><b id="st-pro">–</b><span>Pro</span></button>
+    <button type="button" class="stat" data-mode="rtrw"><b id="st-rtrw">–</b><span>RTRW</span></button>
+    <button type="button" class="stat" data-goto="peta"><b id="st-korwil">–</b><span>Korwil</span></button>
+    <button type="button" class="stat" data-layer="tanah"><b id="st-tanah">–</b><span>Soil</span></button>
+  </div>
+  <div class="status">
+    <span id="net" class="pill">…</span>
+    <span id="antrean-pill" class="pill warn" hidden title="Laporan menunggu dikirim">⏳ <span id="antrean-jumlah">0</span></span>
+    <button id="pasang" type="button" class="btn-small" hidden>Pasang</button>
+  </div>
+</header>
+<p class="meta">v{{ komando_config.version }} · {{ komando_config.appName }} · Operasi lapangan · <span id="diperbarui">memuat…</span></p>
+
+<main class="workspace">
+  <section id="tab-peta" class="tab-view active" aria-label="Peta">
+    <div id="peta" role="region" aria-label="Peta wilayah kerja"></div>
+
+    <div class="map-tools" role="toolbar" aria-label="Alat peta">
+      <button type="button" data-tool="zoom-in" title="Perbesar">+</button>
+      <button type="button" data-tool="zoom-out" title="Perkecil">−</button>
+      <button type="button" data-tool="fullscreen" title="Layar penuh">⛶</button>
+      <button type="button" data-tool="locate" title="Lokasi saya">📍</button>
+      <button type="button" data-tool="measure" title="Ukur jarak">📏</button>
+      <button type="button" data-tool="satellite" title="Citra satelit">🛰️</button>
+      <button type="button" data-tool="ai" title="AI Satelit: analisis area">🤖</button>
+      <button type="button" data-tool="print" title="Cetak / export peta">🖨️</button>
+      <button type="button" data-tool="voice" title="Perintah suara">🎙️</button>
+      <button type="button" data-tool="chat" title="Chat internal">💬<span class="dot" id="chat-dot" hidden></span></button>
+      <button type="button" data-tool="legend" title="Legenda & lapisan">📜</button>
+      <button type="button" data-tool="search" title="Cari (Ctrl+K)">🔍</button>
+    </div>
+
+    <div class="compass" id="kompas" title="Kompas">
+      <div class="ring" id="kompas-cincin"><span class="n">N</span><span class="e">E</span><span class="s">S</span><span class="w">W</span><i class="needle"></i></div>
+      <button type="button" id="live" class="live" aria-pressed="false">🧭 Live</button>
+      <small id="kompas-derajat">—</small>
+    </div>
+
+    <button type="button" class="sos-button" id="sos-tombol" title="Tanda darurat">🆘</button>
+
+    <div class="panel legend" id="legenda" hidden>
+      <div class="panel-head"><strong>📜 LEGENDA</strong><button type="button" class="close" data-close="legenda">✕</button></div>
+      <label class="field">Warna titik warga
+        <select id="mode-warga">
+          <option value="stance">Sikap (Pro / Kontra)</option>
+          <option value="land">Status lahan (sudah / belum)</option>
+          <option value="rtrw">Kesesuaian RTRW</option>
+        </select>
+      </label>
+      <label class="field">Warna wilayah Korwil
+        <select id="mode-korwil">
+          <option value="color">Warna Korwil</option>
+          <option value="pro_pct">Persentase Pro</option>
+          <option value="rtrw_pct">Persentase RTRW sesuai</option>
+          <option value="released_pct">Persentase lahan sudah</option>
+        </select>
+      </label>
+      <ul class="legend-items" id="legenda-isi"></ul>
+      <h4>Lapisan</h4>
+      <ul class="layer-list" id="daftar-lapisan"></ul>
+    </div>
+
+    <div class="panel info" id="info-korwil" hidden>
+      <div class="panel-head"><strong id="info-judul">Pulau Rempang</strong><button type="button" class="close" data-close="info-korwil">✕</button></div>
+      <div class="info-grid">
+        <div><b id="in-warga">–</b><span>Warga</span></div>
+        <div><b id="in-pro">–</b><span>Pro %</span></div>
+        <div><b id="in-rtrw">–</b><span>RTRW sesuai</span></div>
+        <div><b id="in-belum">–</b><span>Lahan belum</span></div>
+        <div><b id="in-sudah">–</b><span>Lahan sudah</span></div>
+        <div><b id="in-kegiatan">–</b><span>Kegiatan</span></div>
+      </div>
+      <div class="row">
+        <button type="button" class="btn-small" id="info-fokus">🔎 Fokus</button>
+        <button type="button" class="btn-small" id="info-cetak">🖨️ Cetak</button>
+        <button type="button" class="btn-small" id="info-warga">👥 Warga</button>
+      </div>
+    </div>
+
+    <div class="measure" id="ukur" hidden>
+      <strong id="ukur-jarak">0 m</strong>
+      <span>Klik titik awal di peta, lalu klik titik berikutnya.</span>
+      <button type="button" class="btn-small" id="ukur-ulang">Ulang</button>
+      <button type="button" class="close" id="ukur-tutup">✕</button>
+    </div>
+
+    <div class="hint" id="ai-petunjuk" hidden>
+      AI Satelit: tahan lalu seret untuk menggambar kotak area
+      <button type="button" class="btn-small" id="ai-batal">Batal</button>
+    </div>
+
+    <div class="voice" id="suara" hidden>🎙 Mendengarkan… <span id="suara-teks"></span></div>
+  </section>
+
+  <section id="tab-absen" class="tab-view sheet" aria-label="Absen" hidden>
+    <h2>Absen</h2>
+    <div class="card" id="absen-hari-ini">Memuat…</div>
+    <div class="row wrap">
+      <button type="button" class="btn primary" id="absen-masuk">Absen masuk</button>
+      <button type="button" class="btn" id="absen-pulang">Absen pulang</button>
+    </div>
+    <label class="field">Swafoto <span id="foto-wajib" class="muted">(opsional)</span>
+      <input type="file" id="absen-foto" accept="image/*" capture="user">
+    </label>
+    <details class="card">
+      <summary>Ajukan izin / sakit / cuti / dinas luar</summary>
+      <form id="form-izin" class="stack">
+        <label class="field">Jenis <select name="jenis" id="izin-jenis"></select></label>
+        <label class="field">Tanggal <input type="date" name="tanggal" required></label>
+        <label class="field">Keterangan <textarea name="note" rows="2" required></textarea></label>
+        <label class="field">Lampiran (surat, foto) <input type="file" name="lampiran" accept="image/*,application/pdf"></label>
+        <button type="submit" class="btn">Kirim pengajuan</button>
+      </form>
+    </details>
+    <h3>Riwayat 30 hari</h3>
+    <ul class="list" id="absen-riwayat"></ul>
+  </section>
+
+  <section id="tab-korwil" class="tab-view sheet" aria-label="Lapor kegiatan" hidden>
+    <div class="segmented" role="tablist">
+      <button type="button" class="active" data-sub="kegiatan">Lapor kegiatan</button>
+      <button type="button" data-sub="tanah">Uji tanah</button>
+      <button type="button" data-sub="riwayat">Laporan saya</button>
+    </div>
+    <form id="form-kegiatan" class="stack sub-view" data-sub-view="kegiatan" autocomplete="off">
+      <label class="field">Jenis kegiatan <select name="jenis" id="kg-jenis"></select></label>
+      <label class="field">Judul <input name="judul" required maxlength="255" placeholder="Mis. Sosialisasi RT 02 Kampung Pasir Panjang"></label>
+      <label class="field">Uraian <textarea name="uraian" rows="3"></textarea></label>
+      <div class="grid2">
+        <label class="field">Waktu <input type="datetime-local" name="waktu" id="kg-waktu"></label>
+        <label class="field">Durasi (menit) <input type="number" name="durasi" min="0" inputmode="numeric"></label>
+        <label class="field">Warga hadir / ditemui <input type="number" name="peserta" min="0" inputmode="numeric"></label>
+        <label class="field">Korwil <select name="korwil" id="kg-korwil"></select></label>
+      </div>
+      <label class="field">Hasil & tindak lanjut <textarea name="hasil" rows="2"></textarea></label>
+      <label class="field">Tugas terkait <select name="tugas" id="kg-tugas"><option value="">—</option></select></label>
+      <div class="field">Warga terkait
+        <input type="search" id="kg-cari-warga" placeholder="Ketik nama warga…" autocomplete="off">
+        <ul class="suggest" id="kg-saran"></ul>
+        <ul class="chips" id="kg-warga"></ul>
+      </div>
+      <label class="field">Foto (maks. 5) <input type="file" name="foto" accept="image/*" capture="environment" multiple></label>
+      <label class="check"><input type="checkbox" id="kg-titik"> Pakai titik yang saya ketuk di peta</label>
+      <p class="muted small" id="kg-gps">Mencari sinyal GPS…</p>
+      <button type="submit" class="btn primary">Simpan laporan</button>
+    </form>
+    <form id="form-tanah" class="stack sub-view" data-sub-view="tanah" hidden autocomplete="off">
+      <div class="grid2">
+        <label class="field">Kedalaman (cm) <input type="number" name="kedalaman" min="0" inputmode="numeric"></label>
+        <label class="field">Tekstur <select name="tekstur" id="tn-tekstur"><option value="">—</option></select></label>
+        <label class="field">Warna tanah <input name="warna" maxlength="64"></label>
+        <label class="field">pH <input type="number" name="ph" step="0.01" min="0" max="14" inputmode="decimal"></label>
+        <label class="field">Kadar air (%) <input type="number" name="kadar_air" step="0.01" min="0" max="100" inputmode="decimal"></label>
+        <label class="field">C-organik (%) <input type="number" name="c_organik" step="0.01" min="0" max="100" inputmode="decimal"></label>
+        <label class="field">Daya dukung (kPa) <input type="number" name="daya_dukung" step="0.01" min="0" inputmode="decimal"></label>
+        <label class="field">CBR (%) <input type="number" name="cbr" step="0.01" min="0" max="100" inputmode="decimal"></label>
+      </div>
+      <label class="field">Kelayakan <select name="kelayakan" id="tn-kelayakan"></select></label>
+      <label class="field">Laboratorium <input name="lab" maxlength="255"></label>
+      <label class="field">Catatan <textarea name="catatan" rows="2"></textarea></label>
+      <label class="field">Foto sampel <input type="file" name="foto" accept="image/*" capture="environment"></label>
+      <label class="field">Laporan lab (PDF) <input type="file" name="laporan" accept="application/pdf,image/*"></label>
+      <label class="check"><input type="checkbox" id="tn-titik"> Pakai titik yang saya ketuk di peta</label>
+      <button type="submit" class="btn primary">Simpan uji tanah</button>
+    </form>
+    <div class="sub-view" data-sub-view="riwayat" hidden>
+      <h3>Antrean kirim <span class="muted" id="riwayat-antrean-n"></span></h3>
+      <div class="row"><button type="button" class="btn-small" id="kirim-sekarang">Kirim sekarang</button></div>
+      <ul class="list" id="daftar-antrean"></ul>
+      <h3>Terkirim</h3>
+      <div class="row">
+        <select id="riwayat-lingkup"><option value="">Laporan saya</option><option value="korwil">Korwil saya</option><option value="semua">Semua</option></select>
+      </div>
+      <ul class="list" id="daftar-kegiatan"></ul>
+    </div>
+  </section>
+
+  <section id="tab-warga" class="tab-view sheet" aria-label="Warga" hidden>
+    <h2>Warga terdata</h2>
+    <div class="row wrap">
+      <input type="search" id="warga-cari" placeholder="Cari nama / nomor / kampung" autocomplete="off">
+      <select id="warga-korwil"><option value="">Semua Korwil</option></select>
+      <select id="warga-sikap"><option value="">Semua sikap</option></select>
+      <button type="button" class="btn-small" id="warga-tambah-buka">＋ Warga</button>
+    </div>
+    <form id="form-warga" class="stack card" hidden autocomplete="off">
+      <h3>Tambah warga</h3>
+      <label class="field">Nama kepala keluarga <input name="nama" required maxlength="255"></label>
+      <div class="grid2">
+        <label class="field">NIK <input name="nik" inputmode="numeric" maxlength="16" pattern="[0-9]{16}"></label>
+        <label class="field">Jumlah jiwa <input type="number" name="jiwa" min="0" inputmode="numeric"></label>
+        <label class="field">Telepon / WA <input name="telepon" inputmode="tel" maxlength="32"></label>
+        <label class="field">Kampung <input name="kampung" maxlength="128"></label>
+      </div>
+      <label class="field">Alamat <input name="alamat" maxlength="255"></label>
+      <div class="grid2">
+        <label class="field">Sikap <select name="sikap" class="pilih-sikap"></select></label>
+        <label class="field">Status lahan <select name="lahan" class="pilih-lahan"></select></label>
+        <label class="field">RTRW <select name="rtrw" class="pilih-rtrw"></select></label>
+        <label class="field">Pilihan <select name="pilihan" class="pilih-relokasi"></select></label>
+      </div>
+      <label class="check"><input type="checkbox" name="pakai_gps" checked> Simpan lokasi GPS saat ini sebagai lokasi rumah</label>
+      <div class="row"><button type="submit" class="btn primary">Simpan warga</button><button type="button" class="btn" id="warga-tambah-batal">Batal</button></div>
+    </form>
+    <ul class="list" id="warga-daftar"></ul>
+  </section>
+
+  <section id="tab-tasks" class="tab-view sheet" aria-label="Tugas" hidden>
+    <h2>Tugas</h2>
+    <div class="row"><select id="tugas-filter"><option value="">Belum selesai</option><option value="semua">Semua</option></select></div>
+    <ul class="list" id="tugas-daftar"></ul>
+  </section>
+
+  <section id="tab-perf" class="tab-view sheet" aria-label="Kinerja" hidden>
+    <h2>Kinerja (KPI)</h2>
+    <div class="row wrap">
+      <select id="kinerja-periode"><option value="minggu">Minggu ini</option><option value="bulan" selected>Bulan ini</option><option value="bulan-lalu">Bulan lalu</option></select>
+      <select id="kinerja-petugas" hidden></select>
+    </div>
+    <div id="kinerja-isi" class="stack">Memuat…</div>
+    <div id="kinerja-tim" hidden>
+      <h3>Peringkat tim</h3>
+      <table class="table"><thead><tr><th>#</th><th>Petugas</th><th>Skor</th><th>Hadir</th><th>Kegiatan</th><th>Tugas</th></tr></thead><tbody id="kinerja-tim-isi"></tbody></table>
+    </div>
+  </section>
+
+  <section id="tab-chat" class="tab-view sheet chat" aria-label="Chat internal" hidden>
+    <div class="panel-head"><strong>💬 Chat internal</strong>
+      <select id="chat-kanal"><option value="umum">Kanal umum</option></select>
+    </div>
+    <ul class="messages" id="chat-pesan" aria-live="polite"></ul>
+    <form id="form-chat" class="chat-form" autocomplete="off">
+      <label class="check small"><input type="checkbox" id="chat-lokasi"> 📍</label>
+      <input id="chat-teks" name="pesan" maxlength="2000" placeholder="Tulis pesan…" aria-label="Pesan">
+      <button type="submit" class="btn primary">Kirim</button>
+    </form>
+  </section>
+</main>
+
+<nav class="tabbar" aria-label="Menu">
+  <button type="button" data-tab="peta" class="active">🗺️<span>Peta</span></button>
+  <button type="button" data-tab="absen">🕘<span>Absen</span></button>
+  <button type="button" data-tab="korwil">📝<span>Lapor</span></button>
+  <button type="button" data-tab="warga">👥<span>Warga</span></button>
+  <button type="button" data-tab="tasks">✅<span>Tugas</span></button>
+  <button type="button" data-tab="perf">📈<span>Kinerja</span></button>
+  <button type="button" data-tab="chat">💬<span>Chat</span><i class="dot" id="tab-chat-dot" hidden></i></button>
+</nav>
+
+<div class="sos-feed" id="sos-daftar" hidden></div>
+
+<!-- Dialog -->
+<dialog id="dlg-cari" class="palette">
+  <form method="dialog" class="palette-head">
+    <input type="search" id="cari-teks" placeholder="Cari warga, Korwil, kegiatan, bidang… (awali > untuk perintah)" autocomplete="off" aria-label="Cari">
+    <span class="kbd">ESC</span>
+  </form>
+  <ul id="cari-hasil" class="palette-list" role="listbox"></ul>
+  <div class="palette-foot">
+    <span>↑↓ navigasi</span><span>↵ pilih</span>
+    <label class="check"><input type="checkbox" id="power-mode"> Power Mode</label>
+  </div>
+</dialog>
+
+<dialog id="dlg-cetak">
+  <form method="dialog" class="stack">
+    <h3>🖨️ Cetak / Export Peta</h3>
+    <label class="field">Korwil <select id="cetak-korwil"><option value="">Semua Korwil (wilayah kerja)</option></select></label>
+    <label class="field">Ukuran kertas
+      <select id="cetak-kertas"><option value="A3">A3</option><option value="A2">A2</option><option value="A1">A1</option><option value="A0">A0</option></select>
+    </label>
+    <label class="field">Orientasi
+      <select id="cetak-orientasi"><option value="landscape">Lanskap</option><option value="portrait">Potret</option></select>
+    </label>
+    <p class="muted small">Lapisan aktif saat ini yang akan dicetak. Export PNG resolusi tinggi siap cetak.</p>
+    <p class="small" id="cetak-status" role="status"></p>
+    <div class="row"><button value="batal" class="btn">Batal</button><button type="button" id="cetak-mulai" class="btn primary">⬇ Export PNG</button></div>
+  </form>
+</dialog>
+
+<dialog id="dlg-sos">
+  <form method="dialog" class="stack">
+    <h3>🆘 Kirim tanda darurat?</h3>
+    <p>Lokasi Anda dikirim ke koordinator, Administrator, dan seluruh petugas di chat.</p>
+    <label class="field">Pesan (opsional) <input id="sos-pesan" maxlength="500" placeholder="Mis. dihadang massa, kecelakaan, butuh evakuasi"></label>
+    <div class="row"><button value="batal" class="btn">Batal</button><button type="button" id="sos-kirim" class="btn danger">KIRIM SOS</button></div>
+  </form>
+</dialog>
+
+<dialog id="dlg-ai" class="wide">
+  <form method="dialog" class="stack">
+    <div class="panel-head"><h3>🤖 Hasil AI Satelit</h3><button value="tutup" class="close">✕</button></div>
+    <div id="ai-isi">Menganalisis…</div>
+  </form>
+</dialog>
+
+<dialog id="dlg-warga" class="wide">
+  <form method="dialog" class="stack">
+    <div class="panel-head"><h3 id="wd-judul">Warga</h3><button value="tutup" class="close">✕</button></div>
+    <div id="wd-isi"></div>
+  </form>
+</dialog>
+
+<dialog id="dlg-kunci">
+  <form method="dialog" class="stack" id="form-kunci">
+    <h3>💣 NONAKTIFKAN KUNCI SISTEM</h3>
+    <p class="small">Masukkan kode rahasia untuk menghentikan hitung mundur. Hanya superuser yang dapat melakukannya.</p>
+    <input type="password" id="kunci-kode" autocomplete="off" aria-label="Kode rahasia">
+    <p class="small danger-text" id="kunci-pesan" role="status"></p>
+    <div class="row"><button value="batal" class="btn">Batal</button><button type="button" id="kunci-kirim" class="btn primary">🛡 Nonaktifkan</button></div>
+    <p class="small muted">🔐 KUNCI HIDUP SISTEM</p>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="{% static 'alokasi/vendor/leaflet/leaflet.js' %}"></script>
+<script src="{% static 'operasi/komando.js' %}"></script>
+</body>
+</html>

@@ -1395,10 +1395,12 @@ class TaskAdmin(AsetModelAdmin):
         "priority",
         "task_type",
         "team",
+        "korwil",
         "service_unit",
     )
     search_fields = ("number", "title", "description")
     autocomplete_fields = (
+        "korwil",
         "asset",
         "legal_case",
         "encroachment",
@@ -1425,7 +1427,7 @@ class TaskAdmin(AsetModelAdmin):
         ),
         (
             _("Penugasan"),
-            {"fields": ("assignee", "team", "service_unit", "created_by")},
+            {"fields": ("assignee", "team", "korwil", "service_unit", "created_by")},
         ),
         (
             _("Jadwal"),
