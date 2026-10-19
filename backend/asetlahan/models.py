@@ -1680,6 +1680,15 @@ class Task(TimeStampedModel):
         blank=True,
         on_delete=models.SET_NULL,
     )
+    korwil = models.ForeignKey(
+        "operasi.Korwil",
+        verbose_name=_("Korwil"),
+        related_name="tasks",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        help_text=_("Tugas wilayah tampil bagi koordinator Korwil di pusat komando."),
+    )
     created_by = _user_field(_("Dibuat oleh"))
     service_unit = _service_unit_field()
 

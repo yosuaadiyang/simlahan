@@ -27,6 +27,12 @@ SimLahan adalah aplikasi web untuk instansi pengelola lahan di Indonesia:
   peta berbagi, pembuat laporan, asisten AI dengan unduhan laporan, aplikasi
   lapangan luring (PWA), OTP surel, OAuth2 untuk integrasi, dan pengingat
   otomatis surel/WhatsApp.
+- **Pusat komando operasi lapangan** (`/komando/`, PWA): peta operasi per
+  Korwil dengan statistik warga/sikap/RTRW/status lahan/uji tanah, ukur jarak &
+  luas, cetak peta PNG A3–A0, perintah suara, pencarian & Power Mode, AI Satelit
+  (analisis kotak area), kompas & posisi Live tim, SOS, chat internal, absensi
+  GPS + izin/sakit/cuti, laporan kegiatan & uji tanah, pendataan sikap warga,
+  tugas wilayah, KPI petugas, antrean luring, dan kunci hidup sistem.
 - **Manajemen sewa/pemanfaatan lahan** warisan MVJ: kontrak, penyewa, tarif,
   tagihan, jaminan, penagihan, laporan, peta, catatan area.
 
@@ -104,7 +110,8 @@ Grup manajemen aset lahan (anggotanya otomatis diberi akses `/admin/`):
 |---|---|
 | Petugas Aset Lahan | seluruh data aset, keuangan, okupasi, permukiman kembali, pengaduan, lelang, dokumen; baca perkara |
 | Petugas Hukum | perkara, advokat & jadwal sidang, dokumen; baca aset, kepemilikan & pemangku kepentingan |
-| Petugas Lapangan | aplikasi lapangan, laporan & foto lapangan, okupasi & tindakan teguran, survei, pembaruan tugas |
+| Petugas Lapangan | aplikasi lapangan, laporan & foto lapangan, okupasi & tindakan teguran, survei, pembaruan tugas; di pusat komando: absen, lapor kegiatan & uji tanah, data warga, chat, SOS |
+| Koordinator Wilayah | semua hak petugas lapangan di pusat komando untuk Korwil yang dipimpin, ditambah verifikasi laporan, penanganan SOS, KPI anggota, dan tugas wilayah |
 
 Petugas hanya melihat data unit layanannya (data tanpa unit layanan terlihat
 semua); grup Administrator melihat seluruh lokasi.
@@ -238,6 +245,51 @@ permukiman kembali, pengaduan, dan lelang:
 ```sh
 docker compose exec backend python manage.py asetlahan_contoh_rempang          # buat
 docker compose exec backend python manage.py asetlahan_contoh_rempang --hapus  # hapus
+```
+
+## Pusat komando operasi lapangan
+
+Buka `/komando/` (juga menu **Pusat Komando** di aplikasi petugas); dapat
+dipasang di ponsel dan tetap bisa mencatat saat luring (data dikirim otomatis
+ketika sinyal kembali). Pintasan: `/komando/?tab=absen`, `?tab=korwil` (lapor),
+`?tab=perf` (kinerja), `?tab=tasks` (tugas). Tekan `Ctrl+K` atau `/` untuk
+pencarian & Power Mode.
+
+| Kebutuhan | Tempat |
+|---|---|
+| Korwil (kode, nama, warna, batas wilayah, koordinator, anggota), impor batas dari GeoJSON/KML/SHP/GPKG | `/admin/operasi/` → Korwil (koordinator wilayah) → **Impor batas SHP/KML/GeoJSON** |
+| Data warga (KK, NIK terenkripsi, sikap, status lahan, kesesuaian RTRW, pilihan penyelesaian, riwayat sikap), impor CSV/GeoJSON, ekspor CSV tanpa NIK | Warga terdata → **Impor CSV / SHP** |
+| Laporan kegiatan + foto, verifikasi koordinator, ekspor CSV | Laporan kegiatan |
+| Uji tanah (pH, kadar air, C-organik, daya dukung, CBR, kelayakan, laporan lab) | Uji tanah |
+| Absensi (jam kerja, toleransi terlambat, swafoto & geofence opsional), koreksi oleh Administrator | Absensi, **Pengaturan pusat komando** |
+| Bobot KPI (kehadiran, kegiatan, tugas), target kegiatan mingguan, penerima surel SOS, server citra AI Satelit | **Pengaturan pusat komando** |
+| SOS (ditangani / selesai / alarm palsu), chat, posisi Live, riwayat AI Satelit | Tanda darurat (SOS), Chat internal, Posisi petugas (Live), Analisis AI Satelit |
+| Tugas per Korwil | Manajemen aset lahan → Tugas (kolom Korwil) |
+
+Kolom impor warga (CSV, pemisah `,` `;` atau tab; atau GeoJSON/KML/SHP/GPKG):
+`nama` (wajib), `nik`, `kk`, `jiwa`, `telepon`, `kampung`, `alamat`, `korwil`
+(kode), `lat`, `lng`, `sikap` (pro/netral/kontra), `status_lahan`
+(sudah/belum), `rtrw` (sesuai/tidak), `pilihan` (relokasi/kompensasi/geser/lainnya),
+`catatan`. NIK yang sama memperbarui warga yang ada. Atribut impor batas Korwil:
+`kode` (wajib), `nama`, `warna`.
+
+AI Satelit menganalisis citra kotak area dengan Claude bila `ANTHROPIC_API_KEY`
+diisi; tanpa kunci tetap menampilkan mosaik citra dan ringkasan data SimLahan di
+area itu. Rekap harian 00.30 WIB (`operasi_harian`) menandai absen tanpa
+pulang dan menghapus posisi Live yang lebih dari 24 jam.
+
+**Kunci hidup sistem** (`/admin/operasi/systemlock/`, hanya superuser, mati
+secara bawaan): tetapkan kode rahasia dan waktu kunci. Selama hitung mundur
+semua pengguna melihat peringatan; bila waktu habis, seluruh aplikasi (kecuali
+superuser, halaman masuk, dan pemeriksaan kesehatan) terkunci sampai superuser
+memasukkan kode rahasia di pusat komando atau panel admin.
+
+Data contoh 11 Korwil (A–K) fiktif di Pulau Rempang beserta warga, kegiatan,
+uji tanah, dan tugas:
+
+```sh
+docker compose exec backend python manage.py operasi_contoh_rempang          # buat
+docker compose exec backend python manage.py operasi_contoh_rempang --hapus  # hapus
 ```
 
 ## Integrasi OAuth2

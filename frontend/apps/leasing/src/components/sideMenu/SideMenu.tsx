@@ -380,6 +380,52 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
                   <Authorization
                     allow={hasPermissions(
                       usersPermissions,
+                      UsersPermissions.VIEW_KORWIL,
+                    )}
+                  >
+                    <SubMenu
+                      header="Pusat Komando"
+                      isOpen={subMenuKey === "command"}
+                      items={[
+                        {
+                          allow: true,
+                          text: "Peta operasi & PWA",
+                          href: "/komando/",
+                        },
+                        {
+                          allow: true,
+                          text: "Absen",
+                          href: "/komando/?tab=absen",
+                        },
+                        {
+                          allow: true,
+                          text: "Lapor kegiatan",
+                          href: "/komando/?tab=korwil",
+                        },
+                        {
+                          allow: true,
+                          text: "Tugas",
+                          href: "/komando/?tab=tasks",
+                        },
+                        {
+                          allow: true,
+                          text: "Kinerja (KPI)",
+                          href: "/komando/?tab=perf",
+                        },
+                        {
+                          allow: true,
+                          text: "Korwil, warga & laporan",
+                          href: "/admin/operasi/",
+                        },
+                      ]}
+                      menuKey="command"
+                      onHeaderClick={this.handleHeaderClick}
+                    />
+                  </Authorization>
+
+                  <Authorization
+                    allow={hasPermissions(
+                      usersPermissions,
                       UsersPermissions.VIEW_CONTACT,
                     )}
                   >

@@ -196,6 +196,7 @@ INSTALLED_APPS = [
     "pengadaan",
     "alokasi",
     "asetlahan",
+    "operasi",
 ]
 
 MIDDLEWARE = [
@@ -208,6 +209,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "alokasi.middleware.ApplicantIsolationMiddleware",
     "users.middleware.OfficerOTPMiddleware",
+    "operasi.lock.SystemLockMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "utils.middleware.CustomAuditlogMiddleware",
@@ -227,6 +229,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "alokasi.context_processors.portal",
                 "users.context_processors.branding",
+                "operasi.lock.system_lock",
             ]
         },
     }

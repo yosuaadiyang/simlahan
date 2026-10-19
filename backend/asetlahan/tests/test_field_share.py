@@ -26,7 +26,7 @@ def _report(asset, **extra):
         "report_type": "okupasi",
         "lat": str(point.y),
         "lng": str(point.x),
-        "accuracy": "4.5",
+        "accuracy": "14.23",
         "captured_at": timezone.now().isoformat(),
         "note": "Pagar baru",
     }
@@ -70,7 +70,7 @@ def test_sync_is_idempotent_and_links_asset(client, field_officer, make_asset, u
     report = FieldReport.objects.get()
     assert report.asset == asset and report.service_unit == units[0]
     assert report.reported_by == field_officer
-    assert report.photo and str(report.accuracy_m) == "4.5"
+    assert report.photo and str(report.accuracy_m) == "14.2"
 
 
 def test_sync_validates_payload(client, field_officer, make_asset):

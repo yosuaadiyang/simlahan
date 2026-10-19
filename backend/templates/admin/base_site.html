@@ -11,3 +11,10 @@
 {% endblock %}
 
 {% block nav-global %}{% endblock %}
+
+{% block messages %}
+{% if system_lock %}
+<ul class="messagelist"><li class="error">⚠ Kunci sistem aktif: {% if system_lock.passed %}sistem sedang dihentikan bagi pengguna selain superuser{% else %}sistem akan dihentikan pada {{ system_lock.shutdown_label }} WIB{% endif %}.{% if user.is_superuser %} <a href="{% url 'admin:operasi_systemlock_changelist' %}">Kelola kunci sistem</a>{% endif %}</li></ul>
+{% endif %}
+{{ block.super }}
+{% endblock %}

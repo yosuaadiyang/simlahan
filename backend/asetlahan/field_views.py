@@ -9,6 +9,7 @@ menyinkronkan laporan saat sinyal kembali. Sinkronisasi idempoten lewat
 import datetime
 import json
 import uuid
+from decimal import Decimal, InvalidOperation
 
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
@@ -336,11 +337,14 @@ def _parse_captured_at(value):
 
 
 def _parse_accuracy(value):
+    # Decimal, bukan float: float 14.2 gagal validasi DecimalField(decimal_places=1).
     try:
-        accuracy = round(float(value), 1) if value else None
-    except ValueError:
+        accuracy = Decimal(str(value)).quantize(Decimal("0.1")) if value else None
+    except (InvalidOperation, ValueError):
         return None
-    return accuracy if accuracy is not None and 0 <= accuracy < 10_000_000 else None
+    if accuracy is None or not accuracy.is_finite():
+        return None
+    return accuracy if 0 <= accuracy < 10_000_000 else None
 
 
 def _parse_report(request):

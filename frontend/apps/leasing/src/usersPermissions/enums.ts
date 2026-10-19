@@ -29,6 +29,8 @@ export const UsersPermissions = {
   VIEW_GRIEVANCE: "view_grievance",
   VIEW_TENDER: "view_tender",
   ADD_FIELDREPORT: "add_fieldreport",
+  // Pusat komando operasi lapangan (/komando/)
+  VIEW_KORWIL: "view_korwil",
   ADD_ANSWEROPENINGRECORD: "add_answeropeningrecord",
   ADD_BASISOFRENTDECISION: "add_basisofrentdecision",
   ADD_BASISOFRENTPROPERTYIDENTIFIER: "add_basisofrentpropertyidentifier",

@@ -12,6 +12,7 @@ GROUP_NAMES = {
     UserGroup.PETUGAS_ASET: "Petugas Aset Lahan",
     UserGroup.PETUGAS_HUKUM: "Petugas Hukum",
     UserGroup.PETUGAS_LAPANGAN: "Petugas Lapangan",
+    UserGroup.KOORDINATOR_WILAYAH: "Koordinator Wilayah",
 }
 
 MONITORING_COMMAND = "alokasi_pemantauan"

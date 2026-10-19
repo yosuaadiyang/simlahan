@@ -1,0 +1,6 @@
+{% extends "admin/change_list.html" %}
+{% block object-tools-items %}
+  <li><a href="{% url 'operasi-command' %}">Buka pusat komando</a></li>
+  {% if has_add_permission %}<li><a href="{% url 'admin:operasi_korwil_import' %}">Impor batas SHP/KML/GeoJSON</a></li>{% endif %}
+  {{ block.super }}
+{% endblock %}
