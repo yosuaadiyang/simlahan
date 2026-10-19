@@ -2,8 +2,8 @@
 
 import datetime
 
-from django.db.models import Max
-from django.db.models.functions import Coalesce, Greatest
+from django.db.models import DateField, ExpressionWrapper, F, Max, Q
+from django.db.models.functions import Cast, Coalesce, Greatest, TruncDate
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
@@ -101,6 +101,35 @@ def stale_encroachments(days: int, user=None):
     return _scoped(queryset, user).order_by("last_action")
 
 
+def monitoring_overdue(user=None, default_days: int | None = None):
+    """Aset yang belum dipantau di lapangan melewati jadwal pemantauannya."""
+    if default_days is None:
+        default_days = ModuleSettings.load().monitoring_interval_days
+    today = _today()
+    queryset = (
+        LandAsset.objects.exclude(status=enums.AssetStatus.RELEASED)
+        .annotate(
+            monitored_base=Coalesce(
+                "last_monitored_on", "acquisition_date", TruncDate("created_at")
+            ),
+            interval=Coalesce("monitoring_interval_days", default_days),
+        )
+        .filter(interval__gt=0)
+        .annotate(
+            monitoring_due=ExpressionWrapper(
+                Cast(
+                    F("monitored_base") + F("interval") * datetime.timedelta(days=1),
+                    DateField(),
+                ),
+                output_field=DateField(),
+            )
+        )
+        .filter(Q(monitoring_due__lt=today))
+        .select_related("responsible")
+    )
+    return _scoped(queryset, user).order_by("monitoring_due")
+
+
 def liaison_followups(user=None):
     queryset = LiaisonActivity.objects.filter(
         next_follow_up__lte=_today(),
@@ -166,6 +195,13 @@ def alerts(user) -> list[dict]:
             % config.encroachment_followup_days,
             lambda: stale_encroachments(config.encroachment_followup_days, user),
             "admin:asetlahan_encroachmentcase_changelist",
+        ),
+        (
+            "asetlahan.view_landasset",
+            "",
+            _("Aset belum dipantau sesuai jadwal"),
+            lambda: monitoring_overdue(user, config.monitoring_interval_days),
+            "admin:asetlahan_landasset_changelist",
         ),
         (
             "asetlahan.view_liaisonactivity",

@@ -165,6 +165,21 @@ class PartyRole(models.TextChoices):
     PROXY = "proxy", _("Proxy / attorney")
 
 
+class InventoryItemType(models.TextChoices):
+    BUILDING = "building", _("Building / house")
+    PLANT = "plant", _("Plants / trees")
+    POND = "pond", _("Pond / fishpond")
+    WELL = "well", _("Well")
+    FENCE = "fence", _("Fence / wall")
+    ACCESS_ROAD = "access_road", _("Access road / easement")
+    UTILITY = "utility", _("Utility (electricity, water, telecom)")
+    GRAVE = "grave", _("Grave")
+    PUBLIC_FACILITY = "public_facility", _("Public / social facility")
+    WATER_BODY = "water_body", _("Water body / river")
+    FOREST = "forest", _("Forest / natural vegetation")
+    OTHER = "other", _("Other object")
+
+
 class SurveyType(models.TextChoices):
     PHYSICAL = "physical", _("Physical inventory (task force A)")
     JURIDICAL = "juridical", _("Juridical identification (task force B)")

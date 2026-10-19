@@ -1,0 +1,23 @@
+{% extends "admin/base_site.html" %}
+{% block breadcrumbs %}{% endblock %}
+{% block nav-sidebar %}{% endblock %}
+{% block content %}
+<div id="content-main" style="max-width:480px">
+  {% if not error %}
+  <form id="authorizationForm" method="post">
+    {% csrf_token %}
+    {% for field in form %}{% if field.is_hidden %}{{ field }}{% endif %}{% endfor %}
+    <p>Aplikasi <strong>{{ application.name }}</strong> meminta izin mengakses SimLahan atas nama <strong>{{ request.user.get_full_name|default:request.user.username }}</strong>:</p>
+    <ul>{% for scope in scopes_descriptions %}<li>{{ scope }}</li>{% endfor %}</ul>
+    {% if form.errors %}<p class="errornote">{{ form.errors }}</p>{% endif %}
+    <div class="submit-row" style="margin-top:12px">
+      <input type="submit" name="allow" value="Izinkan" class="default">
+      <input type="submit" value="Tolak">
+    </div>
+  </form>
+  {% else %}
+  <p class="errornote">Permintaan otorisasi tidak valid: {{ error.error }}</p>
+  {% if error.description %}<p>{{ error.description }}</p>{% endif %}
+  {% endif %}
+</div>
+{% endblock %}

@@ -408,6 +408,7 @@ urlpatterns = [
     path("admin/asetlahan/", include(asetlahan_urls.admin_urlpatterns)),
     path("admin/", admin.site.urls),
     path("auth/", include(rest_framework.urls)),
+    path("oauth/", include("users.oauth_views")),
     path("portal/", include("alokasi.urls")),
     path("portal/", include((asetlahan_urls.portal_urlpatterns, "aset_portal"))),
     path("aset/", include(asetlahan_urls.public_urlpatterns)),

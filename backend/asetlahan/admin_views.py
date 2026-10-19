@@ -35,6 +35,7 @@ from asetlahan.models import (
     LandAsset,
     LandTransaction,
     LegalCase,
+    MapOverlay,
     ModuleSettings,
     ResettlementSite,
     ResettlementUnit,
@@ -514,6 +515,7 @@ def dashboard(request):
 # --------------------------------------------------------------------------
 
 MAX_FEATURES = 5000
+MAX_OVERLAY_FEATURES = 20000
 
 
 def _basemaps() -> list[dict]:
@@ -647,6 +649,17 @@ def _map_layers(request) -> list[dict]:
     if request.GET.get("permukiman"):
         for layer in layers:
             layer["visible"] = layer["key"] in ("aset", "hunian")
+    if request.user.has_perm("asetlahan.view_mapoverlay"):
+        for overlay in MapOverlay.objects.filter(is_active=True):
+            key = f"ref-{overlay.pk}"
+            layers.append(
+                {
+                    "key": key,
+                    "name": f"{overlay.name} ({overlay.get_kind_display()})",
+                    "url": reverse("asetlahan-map-layer", args=[key]),
+                    "visible": overlay.show_by_default or key in request.GET,
+                }
+            )
     return layers
 
 
@@ -882,9 +895,28 @@ LAYER_BUILDERS = {
 }
 
 
+def _overlay_features(request, pk: int):
+    if not request.user.has_perm("asetlahan.view_mapoverlay"):
+        raise PermissionDenied
+    overlay = get_object_or_404(MapOverlay, pk=pk, is_active=True)
+    color = overlay.display_color
+    for item in overlay.features.all()[:MAX_OVERLAY_FEATURES]:
+        rows = [[str(k), str(v)] for k, v in list(item.properties.items())[:12]]
+        yield geo.feature(
+            item.geometry,
+            {
+                "title": item.name or overlay.name,
+                "color": color,
+                "rows": rows,
+            },
+        )
+
+
 @require_GET
 @staff_member_required
 def map_layer(request, layer):
+    if layer.startswith("ref-") and layer[4:].isdigit():
+        return JsonResponse(geo.collection(_overlay_features(request, int(layer[4:]))))
     spec = next((item for item in MAP_LAYERS if item[0] == layer), None)
     if spec is None:
         raise Http404
@@ -1437,3 +1469,24 @@ def assistant(request):
         "examples": engine.EXAMPLES,
     }
     return render(request, "admin/asetlahan/assistant.html", _("Asisten AI"), context)
+
+
+@tool_view("asetlahan.view_landasset")
+def assistant_export(request, turn, index):
+    """Unduh tabel jawaban asisten sebagai laporan Excel, PDF, atau CSV."""
+    from asetlahan import reports
+
+    history = request.session.get(SESSION_KEY, [])
+    try:
+        table = history[turn]["tables"][index]
+    except (IndexError, KeyError, TypeError):
+        raise Http404
+    fmt = request.GET.get("format", "xlsx")
+    if fmt not in ("xlsx", "pdf", "csv"):
+        fmt = "xlsx"
+    return reports.table_response(
+        table.get("title") or "Laporan asisten",
+        table.get("headers") or [],
+        table.get("rows") or [],
+        fmt,
+    )

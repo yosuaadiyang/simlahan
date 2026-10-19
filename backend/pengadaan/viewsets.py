@@ -35,6 +35,7 @@ from pengadaan.models import (
     EntitledParty,
     Handover,
     Holiday,
+    InventoryItem,
     Objection,
     ParcelSurvey,
     RightsRelease,
@@ -56,6 +57,7 @@ from pengadaan.serializers import (
     EntitledPartySerializer,
     HandoverSerializer,
     HolidaySerializer,
+    InventoryItemSerializer,
     ObjectionSerializer,
     ParcelSurveySerializer,
     RightsReleaseSerializer,
@@ -335,6 +337,13 @@ class ParcelSurveyViewSet(ParcelChildViewSet):
     queryset = ParcelSurvey.objects.select_related("parcel", "surveyor")
     serializer_class = ParcelSurveySerializer
     filterset_fields = ("parcel", "survey_type", "status")
+
+
+class InventoryItemViewSet(ParcelChildViewSet):
+    queryset = InventoryItem.objects.select_related("parcel", "party")
+    serializer_class = InventoryItemSerializer
+    filterset_fields = ("parcel", "party", "item_type")
+    search_fields = ("description", "parcel__parcel_number")
 
 
 class AnnouncementViewSet(ProjectScopedViewSet):

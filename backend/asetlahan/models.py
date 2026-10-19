@@ -17,6 +17,7 @@ from django.core.validators import (
     FileExtensionValidator,
     MaxValueValidator,
     MinValueValidator,
+    RegexValidator,
 )
 from django.db import models
 from django.utils import timezone
@@ -162,6 +163,14 @@ class ModuleSettings(models.Model):
     )
     encroachment_followup_days = models.PositiveSmallIntegerField(
         _("Okupasi tanpa tindak lanjut ditandai setelah (hari)"), default=30
+    )
+    monitoring_interval_days = models.PositiveSmallIntegerField(
+        _("Pemantauan lapangan aset tiap (hari)"),
+        default=90,
+        help_text=_(
+            "Aset yang belum dipantau selama ini masuk pengingat. 0 = nonaktif. "
+            "Bisa diubah per aset."
+        ),
     )
     cash_account_code = models.CharField(
         _("Kode akun kas/bank (jurnal ERP)"),
@@ -351,6 +360,20 @@ class LandAsset(TimeStampedModel):
         on_delete=models.SET_NULL,
     )
     responsible = _user_field(_("Penanggung jawab"))
+    monitoring_interval_days = models.PositiveSmallIntegerField(
+        _("Pemantauan tiap (hari)"),
+        null=True,
+        blank=True,
+        help_text=_(
+            "Kosongkan untuk memakai jadwal bawaan modul; 0 = tidak perlu dipantau."
+        ),
+    )
+    last_monitored_on = models.DateField(
+        _("Terakhir dipantau"),
+        null=True,
+        blank=True,
+        help_text=_("Diperbarui otomatis dari laporan lapangan."),
+    )
     note = models.TextField(_("Catatan"), blank=True, default="")
 
     class Meta:
@@ -375,6 +398,23 @@ class LandAsset(TimeStampedModel):
     @property
     def status_color(self) -> str:
         return enums.ASSET_STATUS_COLORS.get(self.status, "#57606a")
+
+    def monitoring_interval(self, default: int | None = None) -> int:
+        if self.monitoring_interval_days is not None:
+            return self.monitoring_interval_days
+        if default is None:
+            default = ModuleSettings.load().monitoring_interval_days
+        return default
+
+    def monitoring_due_on(self, default: int | None = None) -> datetime.date | None:
+        """Tanggal pemantauan berikutnya; None bila aset tidak perlu dipantau."""
+        interval = self.monitoring_interval(default)
+        if not interval or self.status == enums.AssetStatus.RELEASED:
+            return None
+        start = self.last_monitored_on or self.acquisition_date
+        if start is None:
+            start = timezone.localtime(self.created_at).date()
+        return start + datetime.timedelta(days=interval)
 
 
 class OwnershipRecord(TimeStampedModel):
@@ -1153,6 +1193,18 @@ class SatelliteImage(TimeStampedModel):
         max_length=128,
         help_text=_("Mis. BRIN, Maxar, Airbus, Planet, drone internal."),
     )
+    platform = models.CharField(
+        _("Wahana"),
+        max_length=16,
+        choices=enums.ImageryPlatform.choices,
+        default=enums.ImageryPlatform.SATELLITE,
+    )
+    data_type = models.CharField(
+        _("Jenis data"),
+        max_length=16,
+        choices=enums.ImageryType.choices,
+        default=enums.ImageryType.OPTICAL,
+    )
     sensor = models.CharField(
         _("Sensor / satelit"), max_length=128, blank=True, default=""
     )
@@ -1177,6 +1229,11 @@ class SatelliteImage(TimeStampedModel):
         _("Tanggal permintaan"), default=datetime.date.today
     )
     cost = models.DecimalField(_("Biaya (Rp)"), null=True, blank=True, **MONEY)
+    georeferenced = models.BooleanField(_("Tergeoreferensi"), default=True)
+    orthorectified = models.BooleanField(_("Terortorektifikasi"), default=False)
+    gcp_count = models.PositiveSmallIntegerField(
+        _("Jumlah titik kontrol tanah (GCP)"), null=True, blank=True
+    )
     tile_url = models.CharField(
         _("URL ubin XYZ"),
         max_length=500,
@@ -1191,12 +1248,14 @@ class SatelliteImage(TimeStampedModel):
         _("Layer WMS"), max_length=255, blank=True, default=""
     )
     file = PrivateFileField(
-        verbose_name=_("Berkas citra (GeoTIFF/JPG)"),
+        verbose_name=_("Berkas data (GeoTIFF, JPG, LAS/LAZ, ZIP)"),
         upload_to=upload_imagery,
         max_length=255,
         blank=True,
         validators=[
-            FileExtensionValidator(["tif", "tiff", "jpg", "jpeg", "png", "zip"])
+            FileExtensionValidator(
+                ["tif", "tiff", "jpg", "jpeg", "png", "zip", "las", "laz"]
+            )
         ],
     )
     note = models.TextField(_("Catatan"), blank=True, default="")
@@ -1477,6 +1536,12 @@ class LiaisonActivity(TimeStampedModel):
     """Urusan dengan instansi pemerintah (BPN, pemda, dinas, kementerian)."""
 
     subject = models.CharField(_("Perihal"), max_length=255)
+    activity_type = models.CharField(
+        _("Jenis urusan"),
+        max_length=16,
+        choices=enums.LiaisonType.choices,
+        default=enums.LiaisonType.OTHER,
+    )
     agency = models.CharField(
         _("Instansi tujuan"),
         max_length=255,
@@ -2114,6 +2179,62 @@ class MapShare(TimeStampedModel):
         return self.is_active and self.expires_at > timezone.now()
 
 
+class MapOverlay(TimeStampedModel):
+    """Lapisan peta referensi: batas administrasi, sungai, jalan, rel, permukiman, dsb."""
+
+    name = models.CharField(_("Nama lapisan"), max_length=255)
+    kind = models.CharField(
+        _("Jenis"),
+        max_length=16,
+        choices=enums.OverlayKind.choices,
+        default=enums.OverlayKind.OTHER,
+    )
+    color = models.CharField(
+        _("Warna"),
+        max_length=7,
+        blank=True,
+        default="",
+        validators=[RegexValidator(r"^#[0-9A-Fa-f]{6}$", _("Gunakan format #RRGGBB."))],
+        help_text=_("Kosongkan untuk warna bawaan jenis lapisan."),
+    )
+    source = models.CharField(_("Sumber data"), max_length=255, blank=True, default="")
+    is_active = models.BooleanField(_("Aktif"), default=True)
+    show_by_default = models.BooleanField(_("Tampil saat peta dibuka"), default=False)
+    note = models.TextField(_("Catatan"), blank=True, default="")
+
+    class Meta:
+        verbose_name = _("Lapisan peta referensi")
+        verbose_name_plural = _("Lapisan peta referensi")
+        ordering = ["kind", "name"]
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def display_color(self) -> str:
+        return self.color or enums.OVERLAY_COLORS.get(self.kind, "#6e7781")
+
+
+class MapOverlayFeature(models.Model):
+    overlay = models.ForeignKey(
+        MapOverlay,
+        verbose_name=_("Lapisan"),
+        related_name="features",
+        on_delete=models.CASCADE,
+    )
+    name = models.CharField(_("Nama"), max_length=255, blank=True, default="")
+    geometry = gmodels.GeometryField(_("Geometri"), srid=4326)
+    properties = models.JSONField(_("Atribut"), default=dict, blank=True)
+
+    class Meta:
+        verbose_name = _("Objek lapisan")
+        verbose_name_plural = _("Objek lapisan")
+        ordering = ["pk"]
+
+    def __str__(self):
+        return self.name or f"#{self.pk}"
+
+
 class FieldReport(TimeStampedModel):
     """Catatan petugas lapangan dari aplikasi seluler (bisa direkam luring)."""
 
@@ -2176,6 +2297,13 @@ class FieldReport(TimeStampedModel):
         if self.service_unit_id is None and self.asset_id:
             self.service_unit_id = self.asset.service_unit_id
         super().save(*args, **kwargs)
+        if self.asset_id and self.captured_at:
+            # Laporan lapangan = bukti aset sudah dipantau.
+            captured_on = timezone.localtime(self.captured_at).date()
+            LandAsset.objects.filter(pk=self.asset_id).filter(
+                models.Q(last_monitored_on__isnull=True)
+                | models.Q(last_monitored_on__lt=captured_on)
+            ).update(last_monitored_on=captured_on)
 
 
 for _model in (
@@ -2210,6 +2338,7 @@ for _model in (
     Bid,
     Document,
     MapShare,
+    MapOverlay,
     FieldReport,
 ):
     auditlog.register(_model)

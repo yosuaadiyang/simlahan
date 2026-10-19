@@ -29,7 +29,10 @@ def _date(value) -> str:
 
 
 class Command(BaseCommand):
-    help = "Pengingat tenggat aset lahan: sewa, hak, pajak, sidang, tugas, pengaduan, okupasi, urusan instansi"
+    help = (
+        "Pengingat tenggat aset lahan: sewa, hak, pajak, sidang, tugas, pengaduan, "
+        "okupasi, pemantauan lapangan, urusan instansi"
+    )
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -50,6 +53,7 @@ class Command(BaseCommand):
             self._tasks(),
             self._grievances(),
             self._encroachments(),
+            self._monitoring(),
             self._liaisons(),
         ]
         lines = [line for section in sections for line in section]
@@ -192,6 +196,22 @@ class Command(BaseCommand):
             }
             lines.append(line)
             self._remind(case.responsible, line)
+        return lines
+
+    def _monitoring(self):
+        lines = []
+        for asset in monitoring.monitoring_overdue(
+            default_days=self.config.monitoring_interval_days
+        ):
+            line = _(
+                "[PEMANTAUAN] %(code)s %(name)s – jadwal pemantauan lapangan %(date)s"
+            ) % {
+                "code": asset.code,
+                "name": asset.name,
+                "date": _date(asset.monitoring_due),
+            }
+            lines.append(line)
+            self._remind(asset.responsible, line)
         return lines
 
     def _liaisons(self):

@@ -171,6 +171,7 @@ INSTALLED_APPS = [
     "django_filters",
     "rest_framework",
     "rest_framework.authtoken",
+    "oauth2_provider",
     "rest_framework_simplejwt.token_blacklist",
     "rest_framework_gis",
     "drf_yasg",
@@ -237,6 +238,9 @@ REST_FRAMEWORK = {
     "ALLOWED_VERSIONS": ("v1",),
     "DEFAULT_VERSION": "v1",
     "DEFAULT_AUTHENTICATION_CLASSES": [
+        # OAuth2 dulu: token OAuth bukan JWT, sedangkan JWTAuthentication menolak
+        # token yang tidak dikenalnya (bukan melewatkannya).
+        "users.oauth.OAuth2ServiceAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.TokenAuthentication",
@@ -301,6 +305,17 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
     "UPDATE_LAST_LOGIN": True,
     "AUTH_HEADER_TYPES": ("Bearer",),
+}
+
+# OAuth2 untuk integrasi aplikasi lain (lihat users/oauth.py).
+OAUTH2_PROVIDER = {
+    "SCOPES": {"read": "Membaca data", "write": "Mengubah data"},
+    "DEFAULT_SCOPES": ["read"],
+    "ACCESS_TOKEN_EXPIRE_SECONDS": 3600,
+    "REFRESH_TOKEN_EXPIRE_SECONDS": 30 * 24 * 3600,
+    "ROTATE_REFRESH_TOKEN": True,
+    "PKCE_REQUIRED": True,
+    "ALLOWED_REDIRECT_URI_SCHEMES": ["https", "http"] if DEBUG else ["https"],
 }
 
 AUTH_PASSWORD_VALIDATORS = [

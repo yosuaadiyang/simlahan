@@ -24,6 +24,8 @@ from asetlahan.models import (
     LandTransaction,
     LegalCase,
     LiaisonActivity,
+    MapOverlay,
+    MapOverlayFeature,
     MapShare,
     ModuleSettings,
     OwnershipRecord,
@@ -89,5 +91,7 @@ ASETLAHAN_GROUP_MODEL_PERMISSIONS: GroupModelPermissions = {
     Bid: _perms(VC, VC),
     Document: _perms(ALL, ALL, ALL, VA),
     MapShare: _perms(ALL, ALL, VA),
+    MapOverlay: _perms(ALL, ALL, V, V),
+    MapOverlayFeature: _perms(ALL, ALL, V, V),
     FieldReport: _perms(ALL, VAC, V, VA),
 }

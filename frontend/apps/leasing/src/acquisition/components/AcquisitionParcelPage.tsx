@@ -5,9 +5,14 @@ import PageContainerHDS from "@/components/content/PageContainerHDS";
 import { receiveTopNavigationSettings } from "@/components/topNavigation/actions";
 import { getRouteById, Routes } from "@/root/routes";
 import { displayUIMessage, setPageTitle } from "@/util/helpers";
-import { apiGet } from "../api";
+import { apiGet, apiGetAll } from "../api";
 import { useApi, useChoices, useDistricts } from "../hooks";
-import { formatArea, formatDateId, formatRupiah } from "../format";
+import {
+  formatArea,
+  formatDateId,
+  formatNumberId,
+  formatRupiah,
+} from "../format";
 import AcquisitionMap from "./AcquisitionMap";
 import ResourceForm from "./ResourceForm";
 import ResourceSection from "./ResourceSection";
@@ -52,6 +57,18 @@ const AcquisitionParcelPage: React.FC = () => {
   const geojson = useApi(
     () => apiGet(`pengadaan/project/${projectId}/geojson/`),
     [projectId, version],
+  );
+  const parties = useApi(
+    () => apiGetAll("pengadaan/party/", { parcel: parcelId }),
+    [parcelId, version],
+  );
+  const partyOptions = useMemo(
+    () =>
+      (parties.data || []).map((r: Record<string, any>) => ({
+        value: r.id,
+        label: r.name,
+      })),
+    [parties.data],
   );
   const { data: districts } = useDistricts(project.data?.municipality);
   const districtOptions = useMemo(
@@ -259,6 +276,52 @@ const AcquisitionParcelPage: React.FC = () => {
                 {labelOf(choices, "SurveyStatus", r.status)}
               </Tag>
             ),
+          },
+        ]}
+      />
+      <ResourceSection
+        {...common}
+        title="Objek inventarisasi"
+        itemName="Objek"
+        endpoint="pengadaan/inventory_item/"
+        params={parcelParams}
+        defaults={{ parcel: Number(parcelId) }}
+        fkOptions={{ party: partyOptions }}
+        emptyText="Belum ada objek. Catat bangunan, tanaman, dan benda lain di atas bidang ini."
+        formFields={[
+          "item_type",
+          "party",
+          { name: "description", wide: true },
+          "quantity",
+          "unit",
+          "condition",
+          "unit_value",
+          { name: "note", wide: true },
+        ]}
+        columns={[
+          {
+            key: "item_type",
+            header: "Jenis",
+            render: (r) => labelOf(choices, "InventoryItemType", r.item_type),
+          },
+          { key: "description", header: "Uraian" },
+          {
+            key: "quantity",
+            header: "Jumlah",
+            className: "acq-num",
+            render: (r) =>
+              `${formatNumberId(r.quantity)} ${r.unit || ""}`.trim(),
+          },
+          {
+            key: "party_name",
+            header: "Pemilik",
+            render: (r) => r.party_name || "–",
+          },
+          {
+            key: "total_value",
+            header: "Perkiraan nilai",
+            className: "acq-num",
+            render: (r) => formatRupiah(r.total_value),
           },
         ]}
       />

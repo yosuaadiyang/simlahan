@@ -20,6 +20,7 @@ from django.db import transaction
 from django.utils.translation import gettext as _
 
 from pengadaan.models import AcquisitionParcel
+from utils.geometry import force_2d
 
 MAX_FEATURES = 20000
 MAX_UNCOMPRESSED_BYTES = 200 * 1024 * 1024
@@ -46,6 +47,7 @@ class ImportResult:
 
 
 def _to_multipolygon(geom: GEOSGeometry) -> MultiPolygon | None:
+    geom = force_2d(geom)
     if geom.srid is None:
         geom.srid = 4326
     if geom.srid != 4326:

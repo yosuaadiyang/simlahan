@@ -34,6 +34,9 @@ MAX_TURNS = 6
 EXAMPLES = [
     "Sewa mana saja yang berakhir dalam 6 bulan ke depan?",
     "Tampilkan kasus okupasi yang belum ditindaklanjuti 30 hari",
+    "Kasus okupasi terbuka di kawasan industri",
+    "Laporan alokasi lahan bulan ini",
+    "Aset yang belum dipantau sesuai jadwal",
     "Jadwal sidang minggu ini",
     "Pajak yang jatuh tempo 30 hari lagi",
     "Tugas saya yang terlambat",
@@ -103,10 +106,12 @@ def leases_ending(user, days=180):
     )
 
 
-def encroachments(user, stale_days=0):
+def encroachments(user, stale_days=0, zone=""):
     title = "Okupasi terbuka" + (
         f" tanpa tindak lanjut > {stale_days} hari" if stale_days else ""
     )
+    if zone:
+        title += f" di zona/kawasan “{zone}”"
     if not user.has_perm("asetlahan.view_encroachmentcase") or not _flag(
         "enable_encroachment"
     ):
@@ -120,6 +125,13 @@ def encroachments(user, stale_days=0):
             ),
             user,
         ).select_related("asset")
+    if zone:
+        queryset = queryset.filter(
+            Q(asset__zoning__icontains=zone)
+            | Q(asset__land_use__icontains=zone)
+            | Q(asset__category__name__icontains=zone)
+            | Q(description__icontains=zone)
+        )
     return _table(
         title,
         ["Nomor", "Temuan", "Aset", "Status", "Ditemukan", "Luas (m²)"],
@@ -309,6 +321,65 @@ def assets(user, title_expiring_days=0, **filters):
     return table
 
 
+def monitoring_due(user):
+    title = "Aset belum dipantau sesuai jadwal"
+    if not user.has_perm("asetlahan.view_landasset"):
+        return _denied(title)
+    return _table(
+        title,
+        ["Kode", "Nama", "Terakhir dipantau", "Jadwal", "Penanggung jawab"],
+        monitoring.monitoring_overdue(user),
+        lambda o: [
+            o.code,
+            o.name,
+            o.last_monitored_on,
+            o.monitoring_due,
+            (
+                (o.responsible.get_full_name() or o.responsible.username)
+                if o.responsible_id
+                else ""
+            ),
+        ],
+        "admin:asetlahan_landasset_change",
+    )
+
+
+def allocations(user, year=None, month=None):
+    from alokasi.models import Allocation
+
+    today = timezone.localdate()
+    year = year or today.year
+    period = f"{month:02d}/{year}" if month else str(year)
+    title = f"Alokasi lahan terbit {period}"
+    if not user.has_perm("alokasi.view_allocation"):
+        return _denied(title)
+    queryset = Allocation.objects.filter(issued_date__year=year).select_related(
+        "holder", "plot"
+    )
+    if month:
+        queryset = queryset.filter(issued_date__month=month)
+    summary = queryset.aggregate(n=Count("id"), area=Sum("area_m2"))
+    table = _table(
+        title,
+        ["Nomor KPT", "Pemegang", "Lahan", "Luas (m²)", "Kegiatan", "Terbit", "Status"],
+        queryset.order_by("issued_date", "pk"),
+        lambda o: [
+            o.kpt_number,
+            o.holder,
+            o.plot,
+            o.area_m2,
+            o.activity,
+            o.issued_date,
+            o.get_status_display(),
+        ],
+        "admin:alokasi_allocation_change",
+    )
+    table["note"] = (
+        f"{summary['n']} alokasi, total luas {angka(summary['area'] or 0, 2)} m²."
+    )
+    return table
+
+
 def portfolio(user):
     title = "Ringkasan portofolio"
     if not user.has_perm("asetlahan.view_landasset"):
@@ -409,7 +480,22 @@ TOOLS = [
         "name": "okupasi",
         "description": "Kasus okupasi/perambahan terbuka; isi tanpa_tindak_lanjut_hari untuk yang "
         "tidak ada tindakan selama N hari.",
-        "input_schema": _schema({"tanpa_tindak_lanjut_hari": INT}),
+        "input_schema": _schema({"tanpa_tindak_lanjut_hari": INT, "zona": STR}),
+    },
+    {
+        "name": "pemantauan_aset",
+        "description": "Aset yang belum dipantau petugas lapangan sesuai jadwal pemantauan.",
+        "input_schema": _schema(),
+    },
+    {
+        "name": "alokasi_lahan",
+        "description": "Alokasi lahan (KPT) yang terbit pada satu tahun atau bulan tertentu.",
+        "input_schema": _schema(
+            {
+                "tahun": {"type": "integer", "minimum": 2000, "maximum": 2100},
+                "bulan": {"type": "integer", "minimum": 1, "maximum": 12},
+            }
+        ),
     },
     {
         "name": "jadwal_sidang",
@@ -488,7 +574,15 @@ def run_tool(user, name: str, args: dict) -> dict:
     handlers = {
         "sewa_berakhir": lambda: leases_ending(user, _int(args.get("hari"), 180)),
         "okupasi": lambda: encroachments(
-            user, _int(args.get("tanpa_tindak_lanjut_hari"), 0, 0)
+            user,
+            _int(args.get("tanpa_tindak_lanjut_hari"), 0, 0),
+            str(args.get("zona") or "")[:100],
+        ),
+        "pemantauan_aset": lambda: monitoring_due(user),
+        "alokasi_lahan": lambda: allocations(
+            user,
+            _int(args.get("tahun"), None, 2000, 2100),
+            _int(args.get("bulan"), None, 1, 12),
         ),
         "jadwal_sidang": lambda: hearings(user, _int(args.get("hari"), 7)),
         "pajak_jatuh_tempo": lambda: taxes(user, _int(args.get("hari"), 30)),
@@ -546,8 +640,9 @@ pengelola lahan. Jawab dalam bahasa Indonesia yang ringkas dan jelas.
 
 Gunakan fungsi yang tersedia untuk mengambil data; jangan mengarang angka, nama, atau tanggal. Jika data tidak \
 ditemukan atau pengguna tidak memiliki akses, katakan apa adanya. Tabel hasil fungsi sudah ditampilkan kepada \
-pengguna di bawah jawaban Anda, jadi cukup rangkum temuan utama dan tindak lanjut yang disarankan. \
-Tanggal hari ini: {today}."""
+pengguna di bawah jawaban Anda (bisa diunduh sebagai Excel, PDF, atau CSV), jadi cukup rangkum temuan utama \
+dan tindak lanjut yang disarankan. Untuk analisis sebaran lokasi, sarankan Peta tematik di /admin/asetlahan/peta/ \
+dan Dasbor di /admin/asetlahan/dasbor/. Tanggal hari ini: {today}."""
 
 
 def _history_messages(history) -> list:
@@ -606,13 +701,70 @@ def _days(text: str, default: int) -> int:
     return default
 
 
+MONTHS = {
+    "januari": 1,
+    "februari": 2,
+    "maret": 3,
+    "april": 4,
+    "mei": 5,
+    "juni": 6,
+    "juli": 7,
+    "agustus": 8,
+    "september": 9,
+    "oktober": 10,
+    "november": 11,
+    "desember": 12,
+}
+
+ZONE_STOPWORDS = {
+    "yang", "dan", "atau", "di", "pada", "untuk", "dengan", "selama", "sejak",
+    "belum", "tanpa", "sudah", "masih", "lebih", "lewat", "tindak", "lama", "ada",
+    "apa", "saja", "mana", "berapa", "ini", "itu", "lalu", "depan", "terakhir",
+    "hari", "minggu", "bulan", "tahun",
+}  # fmt: skip
+
+
+def _zone(text: str) -> str:
+    match = re.search(r"\b(?:zona|kawasan)\s+(.+)", text)
+    if not match:
+        return ""
+    words = []
+    for word in re.findall(r"[a-z][a-z'-]*", match[1]):
+        if word in ZONE_STOPWORDS or word in MONTHS or len(words) == 3:
+            break
+        words.append(word)
+    return " ".join(words)
+
+
+def _allocation_period(text: str):
+    today = timezone.localdate()
+    year = re.search(r"\b(20\d\d)\b", text)
+    month = next(
+        (number for name, number in MONTHS.items() if re.search(rf"\b{name}\b", text)),
+        None,
+    )
+    if month is None and re.search(r"bulan ini|bulanan", text):
+        month = today.month
+    return (int(year[1]) if year else today.year), month
+
+
 RULES = (
     (r"\bsewa\b", lambda u, t: leases_ending(u, _days(t, 180))),
     (
         r"okupasi|perambahan|penyerobotan|diserobot",
         lambda u, t: encroachments(
-            u, _days(t, 30) if re.search(r"tindak\s*lanjut|lama|belum", t) else 0
+            u,
+            _days(t, 30) if re.search(r"tindak\s*lanjut|lama|belum", t) else 0,
+            _zone(t),
         ),
+    ),
+    (
+        r"alokasi|allotment|\bkpt\b",
+        lambda u, t: allocations(u, *_allocation_period(t)),
+    ),
+    (
+        r"pemantauan|belum dipantau|patroli",
+        lambda u, t: monitoring_due(u),
     ),
     (r"sidang", lambda u, t: hearings(u, _days(t, 7))),
     (r"pajak|pbb|retribusi|bphtb", lambda u, t: taxes(u, _days(t, 30))),
