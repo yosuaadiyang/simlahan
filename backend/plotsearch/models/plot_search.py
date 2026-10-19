@@ -42,7 +42,9 @@ class PlotSearchType(NameModel):
     In Finnish: Hakutyyppi
     """
 
-    ordering = models.PositiveSmallIntegerField(default=0, db_index=True)
+    ordering = models.PositiveSmallIntegerField(
+        default=0, db_index=True, verbose_name=_("Ordering")
+    )
 
     class Meta(NameModel.Meta):
         verbose_name = pgettext_lazy("Model name", "Plot search type")
@@ -59,11 +61,19 @@ class PlotSearchSubtype(NameModel):
     In Finnish: Haun alatyyppi
     """
 
-    plot_search_type = models.ForeignKey(PlotSearchType, on_delete=models.CASCADE)
-    show_district = models.BooleanField(default=False)
-    target_selection = models.BooleanField(default=False)
-    require_opening_record = models.BooleanField(default=False)
-    ordering = models.PositiveSmallIntegerField(default=0, db_index=True)
+    plot_search_type = models.ForeignKey(
+        PlotSearchType, on_delete=models.CASCADE, verbose_name=_("Plot search type")
+    )
+    show_district = models.BooleanField(default=False, verbose_name=_("Show district"))
+    target_selection = models.BooleanField(
+        default=False, verbose_name=_("Target selection")
+    )
+    require_opening_record = models.BooleanField(
+        default=False, verbose_name=_("Require opening record")
+    )
+    ordering = models.PositiveSmallIntegerField(
+        default=0, db_index=True, verbose_name=_("Ordering")
+    )
 
     class Meta(NameModel.Meta):
         verbose_name = pgettext_lazy("Model name", "Plot search subtype")
@@ -90,6 +100,7 @@ class PlotSearchStage(NameModel):
         max_length=30,
         null=True,
         blank=True,
+        verbose_name=_("Stage"),
     )
 
     class Meta(NameModel.Meta):
@@ -131,7 +142,13 @@ class PlotSearch(TimeStampedSafeDeleteModel, NameModel):
     end_at = models.DateTimeField(verbose_name=_("End at"), null=True, blank=True)
 
     # In Finnish: Haun luokittelu
-    search_class = EnumField(enum=SearchClass, max_length=30, null=True, blank=True)
+    search_class = EnumField(
+        enum=SearchClass,
+        max_length=30,
+        null=True,
+        blank=True,
+        verbose_name=_("Search class"),
+    )
 
     # In Finnish: Haun vaihe
     stage = models.ForeignKey(
@@ -144,10 +161,15 @@ class PlotSearch(TimeStampedSafeDeleteModel, NameModel):
     )
 
     # In Finnish: Lomake
-    form = models.OneToOneField(Form, on_delete=models.SET_NULL, null=True)
+    form = models.OneToOneField(
+        Form, on_delete=models.SET_NULL, null=True, verbose_name=_("Form")
+    )
 
     decisions = models.ManyToManyField(
-        "leasing.Decision", related_name="plot_searches", blank=True
+        "leasing.Decision",
+        related_name="plot_searches",
+        blank=True,
+        verbose_name=_("Decisions"),
     )
 
     recursive_get_related_skip_relations = [
@@ -429,24 +451,41 @@ class MeetingMemo(FileScanMixin, models.Model):
 
 
 class Favourite(models.Model):
-    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User, null=True, on_delete=models.CASCADE, verbose_name=_("User")
+    )
 
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    modified_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True, db_index=True, verbose_name=_("Time created")
+    )
+    modified_at = models.DateTimeField(auto_now=True, verbose_name=_("Time modified"))
 
     recursive_get_related_skip_relations = [
         "favouritetarget",
         "user",
     ]
 
+    class Meta:
+        verbose_name = _("favourite")
+        verbose_name_plural = _("favourites")
+
 
 class FavouriteTarget(models.Model):
     favourite = models.ForeignKey(
-        Favourite, on_delete=models.CASCADE, related_name="targets"
+        Favourite,
+        on_delete=models.CASCADE,
+        related_name="targets",
+        verbose_name=_("favourite"),
     )
-    plot_search_target = models.ForeignKey(PlotSearchTarget, on_delete=models.CASCADE)
+    plot_search_target = models.ForeignKey(
+        PlotSearchTarget, on_delete=models.CASCADE, verbose_name=_("Plot search target")
+    )
 
     recursive_get_related_skip_relations = []
+
+    class Meta:
+        verbose_name = _("favourite target")
+        verbose_name_plural = _("favourite targets")
 
 
 class AreaSearchIntendedUse(SafeDeleteModel, NameModel):
@@ -698,8 +737,8 @@ class DirectReservationLink(models.Model):
 
 
 class FAQ(models.Model):
-    question = models.TextField(unique=True)
-    answer = models.TextField()
+    question = models.TextField(unique=True, verbose_name=_("Question"))
+    answer = models.TextField(verbose_name=_("Answer"))
 
     @property
     def question_truncate(self):
@@ -710,6 +749,10 @@ class FAQ(models.Model):
         return self.answer if len(self.answer) < 50 else (self.answer[:50] + "..")
 
     recursive_get_related_skip_relations = []
+
+    class Meta:
+        verbose_name = _("FAQ")
+        verbose_name_plural = _("FAQs")
 
 
 class RelatedPlotApplication(TimeStampedSafeDeleteModel):

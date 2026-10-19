@@ -14,8 +14,9 @@ import zipfile
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
 
-from django.contrib.gis.gdal import DataSource
-from django.contrib.gis.geos import GEOSGeometry, MultiPolygon, Polygon
+from django.contrib.gis.gdal import DataSource, GDALException
+from django.contrib.gis.geos import GEOSException, GEOSGeometry, MultiPolygon, Polygon
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 from django.utils.translation import gettext as _
 
@@ -28,6 +29,10 @@ MAX_UNCOMPRESSED_BYTES = 200 * 1024 * 1024
 
 class ImportError_(Exception):
     pass
+
+
+class InvalidGeometry:
+    """Penanda geometri yang tidak dapat dibaca pada satu baris impor."""
 
 
 @dataclass
@@ -59,6 +64,10 @@ def _to_multipolygon(geom: GEOSGeometry) -> MultiPolygon | None:
     return None
 
 
+def _max_length(field_name: str) -> int:
+    return AcquisitionParcel._meta.get_field(field_name).max_length
+
+
 def _decimal(value) -> Decimal | None:
     if value in (None, ""):
         return None
@@ -68,47 +77,107 @@ def _decimal(value) -> Decimal | None:
         return None
 
 
-def _iter_geojson(raw: bytes):
+def _load_geojson(raw: bytes) -> dict:
     try:
         data = json.loads(raw.decode("utf-8-sig"))
-    except (UnicodeDecodeError, json.JSONDecodeError) as e:
-        raise ImportError_(_("Invalid GeoJSON file: %(error)s") % {"error": e})
-    srid = 4326
-    crs_name = (data.get("crs") or {}).get("properties", {}).get("name", "")
-    if "EPSG" in crs_name.upper():
+    except UnicodeDecodeError:
+        raise ImportError_(
+            _("Invalid GeoJSON file: %(error)s")
+            % {"error": _("the file is not UTF-8 encoded text")}
+        )
+    except json.JSONDecodeError as e:
+        raise ImportError_(
+            _("Invalid GeoJSON file: %(error)s")
+            % {
+                "error": _("syntax error at line %(line)s, column %(column)s")
+                % {"line": e.lineno, "column": e.colno}
+            }
+        )
+    if not isinstance(data, dict):
+        raise ImportError_(_("The file is not a GeoJSON Feature or FeatureCollection."))
+    return data
+
+
+def _geojson_srid(data: dict) -> int:
+    crs = data.get("crs")
+    properties = crs.get("properties") if isinstance(crs, dict) else None
+    crs_name = properties.get("name") if isinstance(properties, dict) else None
+    if isinstance(crs_name, str) and "EPSG" in crs_name.upper():
         try:
-            srid = int(crs_name.upper().rsplit(":", 1)[-1].replace("EPSG", ""))
+            return int(crs_name.upper().rsplit(":", 1)[-1].replace("EPSG", ""))
         except ValueError:
-            srid = 4326
-    features = (
-        data.get("features") if data.get("type") == "FeatureCollection" else [data]
-    )
-    for feature in features or []:
+            pass
+    return 4326
+
+
+def _geojson_features(data: dict) -> list:
+    if data.get("type") == "FeatureCollection":
+        features = data.get("features") or []
+    else:
+        features = [data]
+    if not isinstance(features, list) or not all(
+        isinstance(feature, dict) for feature in features
+    ):
+        raise ImportError_(_("The file is not a GeoJSON Feature or FeatureCollection."))
+    return features
+
+
+def _iter_geojson(raw: bytes):
+    data = _load_geojson(raw)
+    srid = _geojson_srid(data)
+    for feature in _geojson_features(data):
+        properties = feature.get("properties")
+        if not isinstance(properties, dict):
+            properties = {}
         geometry = feature.get("geometry")
         if not geometry:
-            yield feature.get("properties") or {}, None
+            yield properties, None
             continue
-        geom = GEOSGeometry(json.dumps(geometry), srid=srid)
-        yield feature.get("properties") or {}, geom
+        try:
+            geom = GEOSGeometry(json.dumps(geometry), srid=srid)
+        except (GEOSException, GDALException, ValueError, TypeError):
+            # Dilaporkan per baris oleh _import_rows, tidak menggagalkan impor.
+            yield properties, InvalidGeometry()
+            continue
+        yield properties, geom
+
+
+def _extract_zip(path: str, target_dir: str) -> list[str]:
+    try:
+        archive = zipfile.ZipFile(path)
+    except zipfile.BadZipFile:
+        raise ImportError_(_("The archive is not a valid ZIP file."))
+    with archive:
+        total = sum(info.file_size for info in archive.infolist())
+        if total > MAX_UNCOMPRESSED_BYTES:
+            raise ImportError_(_("Archive is too large."))
+        for info in archive.infolist():
+            name = os.path.basename(info.filename)
+            if not name or info.is_dir():
+                continue
+            # Cegah path traversal: hanya nama berkas yang diekstrak.
+            with archive.open(info) as src, open(
+                os.path.join(target_dir, name), "wb"
+            ) as dst:
+                shutil.copyfileobj(src, dst)
+    return os.listdir(target_dir)
+
+
+def _ogr_to_geos(ogr_geometry):
+    try:
+        ogr = ogr_geometry.clone()
+        ogr.transform(4326)
+        geom = ogr.geos
+    except (GDALException, GEOSException):
+        return InvalidGeometry()
+    geom.srid = 4326
+    return geom
 
 
 def _iter_shapefile_zip(path: str):
     tmpdir = tempfile.mkdtemp(prefix="pengadaan-shp-")
     try:
-        with zipfile.ZipFile(path) as archive:
-            total = sum(info.file_size for info in archive.infolist())
-            if total > MAX_UNCOMPRESSED_BYTES:
-                raise ImportError_(_("Archive is too large."))
-            for info in archive.infolist():
-                name = os.path.basename(info.filename)
-                if not name or info.is_dir():
-                    continue
-                # Cegah path traversal: hanya nama berkas yang diekstrak.
-                with archive.open(info) as src, open(
-                    os.path.join(tmpdir, name), "wb"
-                ) as dst:
-                    shutil.copyfileobj(src, dst)
-        files = os.listdir(tmpdir)
+        files = _extract_zip(path, tmpdir)
         shp_files = [f for f in files if f.lower().endswith(".shp")]
         if not shp_files:
             raise ImportError_(_("No .shp file found in the archive."))
@@ -116,16 +185,16 @@ def _iter_shapefile_zip(path: str):
             raise ImportError_(
                 _("The .prj file (coordinate system) is required for shapefiles.")
             )
-        source = DataSource(os.path.join(tmpdir, shp_files[0]))
-        layer = source[0]
+        try:
+            source = DataSource(os.path.join(tmpdir, shp_files[0]))
+            layer = source[0]
+        except (GDALException, IndexError):
+            raise ImportError_(_("The shapefile could not be read."))
         for feature in layer:
             props = {name: feature.get(name) for name in layer.fields}
             geom = None
             if feature.geom is not None:
-                ogr = feature.geom.clone()
-                ogr.transform(4326)
-                geom = ogr.geos
-                geom.srid = 4326
+                geom = _ogr_to_geos(feature.geom)
             yield props, geom
     finally:
         shutil.rmtree(tmpdir, ignore_errors=True)
@@ -188,7 +257,20 @@ def _import_rows(  # noqa: C901
                 )
                 continue
             number = str(number).strip()
+            if len(number) > _max_length("parcel_number"):
+                result.skipped += 1
+                result.errors.append(
+                    _("Row %(row)s: parcel number is longer than %(max)s characters.")
+                    % {"row": index, "max": _max_length("parcel_number")}
+                )
+                continue
             multipolygon = None
+            if isinstance(geom, InvalidGeometry):
+                result.skipped += 1
+                result.errors.append(
+                    _("Row %(row)s: the geometry could not be read.") % {"row": index}
+                )
+                continue
             if geom is not None:
                 try:
                     multipolygon = _to_multipolygon(geom)
@@ -197,6 +279,12 @@ def _import_rows(  # noqa: C901
                         _("Row %(row)s: invalid geometry (%(error)s).")
                         % {"row": index, "error": e}
                     )
+                else:
+                    if multipolygon is None:
+                        result.errors.append(
+                            _("Row %(row)s: the geometry is not a polygon.")
+                            % {"row": index}
+                        )
                 if multipolygon is None:
                     result.skipped += 1
                     continue
@@ -206,6 +294,17 @@ def _import_rows(  # noqa: C901
                         multipolygon = MultiPolygon(multipolygon, srid=4326)
 
             area = _decimal(props.get(area_field)) if area_field else None
+            if area is not None:
+                try:
+                    AcquisitionParcel._meta.get_field(
+                        "measured_area_m2"
+                    ).run_validators(area)
+                except DjangoValidationError:
+                    result.errors.append(
+                        _("Row %(row)s: the area value is out of range.")
+                        % {"row": index}
+                    )
+                    area = None
             parcel = AcquisitionParcel.objects.filter(
                 project=project, parcel_number=number
             ).first()
@@ -228,7 +327,7 @@ def _import_rows(  # noqa: C901
             }.items():
                 for key in keys:
                     if props.get(key) not in (None, ""):
-                        setattr(parcel, attr, str(props[key])[:255])
+                        setattr(parcel, attr, str(props[key])[: _max_length(attr)])
                         break
             parcel.save()
     return result

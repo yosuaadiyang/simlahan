@@ -859,7 +859,7 @@ const DebtCollectionForm: React.FC = () => {
                   </SubTitle>
 
                   {!debtCollectionDecisions.length && (
-                    <FormText>Tidak ada keputusan pembongkaran</FormText>
+                    <FormText>Tidak ada keputusan pembatalan sewa</FormText>
                   )}
                   {!!debtCollectionDecisions.length &&
                     debtCollectionDecisions.map((decision, index) => (

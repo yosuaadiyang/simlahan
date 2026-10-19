@@ -37,7 +37,9 @@ class FieldModelAdmin(admin.ModelAdmin):
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "section":
-            return SectionChoiceField(queryset=Section.objects.all())
+            return db_field.formfield(
+                form_class=SectionChoiceField, queryset=Section.objects.all()
+            )
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
@@ -51,9 +53,13 @@ class SectionModelAdmin(admin.ModelAdmin):
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "parent":
-            return SectionChoiceField(queryset=Section.objects.all())
+            return db_field.formfield(
+                form_class=SectionChoiceField, queryset=Section.objects.all()
+            )
         elif db_field.name == "form":
-            return FormChoiceField(queryset=Form.objects.all())
+            return db_field.formfield(
+                form_class=FormChoiceField, queryset=Form.objects.all()
+            )
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def get_queryset(self, request):
@@ -68,7 +74,9 @@ class ChoiceModelAdmin(admin.ModelAdmin):
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "field":
-            return FieldChoiceField(queryset=Field.objects.all())
+            return db_field.formfield(
+                form_class=FieldChoiceField, queryset=Field.objects.all()
+            )
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 

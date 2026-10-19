@@ -64,8 +64,14 @@ class SubMenu extends PureComponent<Props> {
       }
     };
 
-  render(): JSX.Element {
+  render(): JSX.Element | null {
     const { header, isOpen, items } = this.props;
+
+    // Jangan tampilkan judul submenu yang tidak berisi tautan apa pun.
+    if (!items.some((item) => item.allow)) {
+      return null;
+    }
+
     return (
       <li
         ref={this.rootRef}

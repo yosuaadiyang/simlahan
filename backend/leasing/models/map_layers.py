@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import get_language
+from django.utils.translation import gettext_lazy as _
 
 from leasing.models.land_area import LeaseArea
 from leasing.validators import HexColorValidator
@@ -12,11 +13,13 @@ class VipunenMapLayer(models.Model):
         "leasing.LeaseType",
         related_name="map_layers",
         blank=True,
+        verbose_name=_("Filter by lease type"),
     )
     filter_by_intended_use = models.ManyToManyField(
         "leasing.IntendedUse",
         related_name="map_layers",
         blank=True,
+        verbose_name=_("Filter by intended use"),
     )
     filter_by_service_unit = models.ForeignKey(
         "leasing.ServiceUnit",
@@ -24,6 +27,7 @@ class VipunenMapLayer(models.Model):
         related_name="map_layers",
         null=True,
         blank=True,
+        verbose_name=_("Filter by service unit"),
     )
     parent = models.ForeignKey(
         "self",
@@ -31,16 +35,24 @@ class VipunenMapLayer(models.Model):
         null=True,
         blank=True,
         related_name="children",
+        verbose_name=_("Parent layer"),
     )
-    order_in_parent = models.IntegerField(blank=True, null=True)
-    name_ind = models.CharField(max_length=255)
-    name_en = models.CharField(max_length=255, blank=True, null=True)
-    keywords = models.CharField(max_length=255, blank=True, null=True)
+    order_in_parent = models.IntegerField(
+        blank=True, null=True, verbose_name=_("Order in parent")
+    )
+    name_ind = models.CharField(max_length=255, verbose_name=_("Name (Indonesian)"))
+    name_en = models.CharField(
+        max_length=255, blank=True, null=True, verbose_name=_("Name (English)")
+    )
+    keywords = models.CharField(
+        max_length=255, blank=True, null=True, verbose_name=_("Keywords")
+    )
     hex_color = models.CharField(
         max_length=7,
         blank=True,
         null=True,
         validators=[HexColorValidator()],
+        verbose_name=_("Hex color"),
     )
 
     recursive_get_related_skip_relations = [
@@ -50,6 +62,10 @@ class VipunenMapLayer(models.Model):
         "filter_by_service_unit",
         "children",
     ]
+
+    class Meta:
+        verbose_name = _("map layer")
+        verbose_name_plural = _("map layers")
 
     def __str__(self):
         name = self.get_name()

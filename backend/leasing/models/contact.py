@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
 from auditlog.registry import auditlog
-from django.conf.global_settings import LANGUAGES
+from django.conf.global_settings import LANGUAGES as DJANGO_LANGUAGES
 from django.db import models
 from django.db.models import QuerySet
 from django.utils import timezone
@@ -19,6 +19,9 @@ from leasing.validators import (
 )
 
 from .mixins import TimeStampedSafeDeleteModel
+
+# Nama bahasa bawaan Django hanya ditandai gettext_noop; terjemahkan saat ditampilkan.
+LANGUAGES = [(code, _(name)) for code, name in DJANGO_LANGUAGES]
 
 if TYPE_CHECKING:
     from leasing.models.tenant import Tenant

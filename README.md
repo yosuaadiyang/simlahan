@@ -71,8 +71,9 @@ latar), `batchrun` (penjadwal), `frontend` (nginx + SPA, sekaligus reverse proxy
 ### Produksi
 
 1. Pasang di belakang HTTPS (mis. Caddy/Traefik/nginx di depan port `HTTP_PORT`),
-   lalu set `SESSION_COOKIE_SECURE=1`, `CSRF_COOKIE_SECURE=1`, dan
-   `CSRF_TRUSTED_ORIGINS=https://domain-anda`.
+   lalu set `SESSION_COOKIE_SECURE=1`, `CSRF_COOKIE_SECURE=1`,
+   `CSRF_TRUSTED_ORIGINS=https://domain-anda`, `OFFICER_UI_URL=https://domain-anda`,
+   dan `TRUSTED_PROXY_COUNT=2`.
 2. **Cadangkan `FIELD_ENCRYPTION_KEY`** di tempat aman. NIK, nomor rekening,
    dan nomor KK dienkripsi di basis data; tanpa kunci ini data tersebut tidak
    dapat dibaca kembali.
@@ -131,6 +132,7 @@ pelepasan hak hanya bisa dicatat setelah ganti kerugian lunas atau dititipkan.
 | `SECRET_KEY`, `FIELD_ENCRYPTION_KEY`, `POSTGRES_PASSWORD` | Rahasia (dibuat `setup-env.sh`) |
 | `ORGANIZATION_NAME`, `APP_NAME` | Nama instansi/aplikasi di layar & surel |
 | `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS` | Domain akses |
+| `TRUST_PROXY_HEADERS`, `TRUSTED_PROXY_COUNT` | Backend di belakang reverse proxy (aktif di compose). `TRUSTED_PROXY_COUNT` = jumlah proxy yang menambah `X-Forwarded-For`: `1` untuk compose saja, `2` bila ada nginx/Caddy HTTPS di depan `HTTP_PORT`; dipakai untuk pembatasan percobaan per pengunjung di portal |
 | `MAP_CENTER_LAT/LNG`, `MAP_DEFAULT_ZOOM`, `PRIMARY_MUNICIPALITY` | Tampilan peta & pencarian (bawaan Pulau Rempang: `0.87`, `104.15`, `12`, `Kota Batam`; seluruh Indonesia: `-2.5`, `118`, `5`) |
 | `MAP_WMS_URL`, `MAP_WMS_LAYERS` | Layer WMS instansi (peta bidang, RDTR) |
 | `EMAIL_URL`, `DEFAULT_FROM_EMAIL` | Surel keluar (wajib untuk aktivasi akun pemohon) |

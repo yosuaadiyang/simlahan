@@ -17,9 +17,7 @@ class OAuth2ServiceAuthentication(OAuth2Authentication):
         # Hanya token di header Authorization yang diterima. Tanpa itu jangan
         # memeriksa apa pun: oauthlib membaca isi permintaan, sehingga unggahan
         # tanpa autentikasi akan diurai (dan bisa gagal) sebelum ditolak 401.
-        if not request.META.get("HTTP_AUTHORIZATION", "").lower().startswith(
-            "bearer "
-        ):
+        if not request.META.get("HTTP_AUTHORIZATION", "").lower().startswith("bearer "):
             return None
         result = super().authenticate(request)
         if result is None:

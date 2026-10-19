@@ -43,6 +43,12 @@ class CommaSeparatedChoiceField(forms.ChoiceField):
                 )
 
 
+# Format tanggal pencarian dari SPA: ISO (pemilih tanggal formulir) dan
+# "d.m.yyyy" (kolom tanggal pencarian sewa). Format bawaan lokal "id" tidak
+# menerima titik, sehingga filter tanggal sebelumnya diabaikan tanpa pesan.
+SEARCH_DATE_INPUT_FORMATS = ["%Y-%m-%d", "%d.%m.%Y", "%d-%m-%Y", "%d/%m/%Y"]
+
+
 class LeaseSearchForm(forms.Form):
     succinct = forms.BooleanField(label="Succinct", required=False)
     identifier = forms.CharField(
@@ -64,10 +70,18 @@ class LeaseSearchForm(forms.Form):
             ("active", "Only active tenants"),
         ),
     )
-    lease_start_date_start = forms.DateField(required=False)
-    lease_start_date_end = forms.DateField(required=False)
-    lease_end_date_start = forms.DateField(required=False)
-    lease_end_date_end = forms.DateField(required=False)
+    lease_start_date_start = forms.DateField(
+        required=False, input_formats=SEARCH_DATE_INPUT_FORMATS
+    )
+    lease_start_date_end = forms.DateField(
+        required=False, input_formats=SEARCH_DATE_INPUT_FORMATS
+    )
+    lease_end_date_start = forms.DateField(
+        required=False, input_formats=SEARCH_DATE_INPUT_FORMATS
+    )
+    lease_end_date_end = forms.DateField(
+        required=False, input_formats=SEARCH_DATE_INPUT_FORMATS
+    )
     only_active_leases = forms.BooleanField(label="Active", required=False)
     only_expired_leases = forms.BooleanField(label="Expired", required=False)
     has_geometry = forms.NullBooleanField(label="Has geometry", required=False)
@@ -122,7 +136,9 @@ class LeaseSearchForm(forms.Form):
     decision_maker = forms.ModelChoiceField(
         label="Decision maker", queryset=DecisionMaker.objects.all(), required=False
     )
-    decision_date = forms.DateField(required=False)
+    decision_date = forms.DateField(
+        required=False, input_formats=SEARCH_DATE_INPUT_FORMATS
+    )
     decision_section = forms.CharField(
         label="Decision section", max_length=255, required=False, empty_value=None
     )
@@ -164,7 +180,9 @@ class BasisOfRentSearchForm(forms.Form):
     decision_maker = forms.ModelChoiceField(
         label="Decision maker", queryset=DecisionMaker.objects.all(), required=False
     )
-    decision_date = forms.DateField(required=False)
+    decision_date = forms.DateField(
+        required=False, input_formats=SEARCH_DATE_INPUT_FORMATS
+    )
     decision_section = forms.CharField(
         label="Decision section", max_length=255, required=False, empty_value=None
     )
@@ -186,7 +204,9 @@ class InfillDevelopmentCompensationSearchForm(forms.Form):
     decision_maker = forms.ModelChoiceField(
         label="Decision maker", queryset=DecisionMaker.objects.all(), required=False
     )
-    decision_date = forms.DateField(required=False)
+    decision_date = forms.DateField(
+        required=False, input_formats=SEARCH_DATE_INPUT_FORMATS
+    )
     decision_section = forms.CharField(
         label="Decision section", max_length=255, required=False, empty_value=None
     )

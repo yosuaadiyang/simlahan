@@ -35,7 +35,7 @@
         </tbody>
       </table></div>
       {% if permit_form %}
-      <details class="panel" style="margin-top:12px">
+      <details class="panel" style="margin-top:12px"{% if permit_form.errors %} open{% endif %}>
         <summary>Perbarui status izin</summary>
         <form method="post" enctype="multipart/form-data" action="{% url 'portal:permit_report_save' allocation.pk %}" style="margin-top:12px">{% csrf_token %}
           {% include "alokasi/portal/_form.html" with form=permit_form %}
@@ -51,7 +51,7 @@
       <p>Progres terakhir: <strong>{{ allocation.latest_progress }}%</strong></p>
       <div class="progress"><span style="width:{{ allocation.latest_progress }}%"></span></div>
       {% if development_form %}
-      <details class="panel" style="margin-top:12px"{% if report_due %} open{% endif %}>
+      <details class="panel" style="margin-top:12px"{% if report_due or development_form.errors %} open{% endif %}>
         <summary>Kirim laporan pembangunan</summary>
         <form method="post" enctype="multipart/form-data" action="{% url 'portal:development_report_create' allocation.pk %}" style="margin-top:12px">{% csrf_token %}
           {% include "alokasi/portal/_form.html" with form=development_form %}

@@ -49,6 +49,7 @@ env = environ.Env(
     ALLOWED_HOSTS=(list, []),
     CSRF_TRUSTED_ORIGINS=(list, []),
     TRUST_PROXY_HEADERS=(bool, False),
+    TRUSTED_PROXY_COUNT=(int, 1),
     CORS_ALLOWED_ORIGINS=(list, []),
     OFFICER_UI_URL=(str, ""),
     PUBLIC_UI_URL=(str, ""),
@@ -284,7 +285,11 @@ CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS")
 
 # Aktifkan bila Django berjalan di belakang reverse proxy (nginx) yang
 # meneruskan X-Forwarded-Proto/Host, mis. pada docker compose bawaan.
-if env.bool("TRUST_PROXY_HEADERS"):
+TRUST_PROXY_HEADERS = env.bool("TRUST_PROXY_HEADERS")
+# Jumlah reverse proxy tepercaya di depan Django yang masing-masing menambahkan
+# alamat ke X-Forwarded-For (compose bawaan: 1; nginx host + nginx kontainer: 2).
+TRUSTED_PROXY_COUNT = env.int("TRUSTED_PROXY_COUNT")
+if TRUST_PROXY_HEADERS:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     USE_X_FORWARDED_HOST = True
 if not DEBUG:

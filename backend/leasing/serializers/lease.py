@@ -132,31 +132,31 @@ class NoticePeriodSerializer(EnumSupportSerializerMixin, serializers.ModelSerial
         fields = "__all__"
 
 
-class RegulationSerializer(NameModelSerializer):
+class RegulationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Regulation
         fields = "__all__"
 
 
-class StatisticalUseSerializer(NameModelSerializer):
+class StatisticalUseSerializer(serializers.ModelSerializer):
     class Meta:
         model = StatisticalUse
         fields = "__all__"
 
 
-class SupportiveHousingSerializer(NameModelSerializer):
+class SupportiveHousingSerializer(serializers.ModelSerializer):
     class Meta:
         model = SupportiveHousing
         fields = "__all__"
 
 
-class SpecialProjectSerializer(NameModelSerializer):
+class SpecialProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = SpecialProject
         fields = "__all__"
 
 
-class ReservationProcedureSerializer(NameModelSerializer):
+class ReservationProcedureSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReservationProcedure
         fields = "__all__"

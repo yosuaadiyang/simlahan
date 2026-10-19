@@ -11,7 +11,11 @@ Alur:
   POST /v1/auth/password/  {old_password, new_password} -> 204
 """
 
-from django.contrib.auth import authenticate, password_validation, user_logged_in
+from django.conf import settings
+from django.contrib.auth import authenticate
+from django.contrib.auth import login as session_login
+from django.contrib.auth import logout as session_logout
+from django.contrib.auth import password_validation, user_logged_in
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -96,9 +100,30 @@ class LoginView(APIView):
         return token_response(request, user)
 
 
+def _is_same_origin_json(request) -> bool:
+    # Formulir HTML lintas situs tidak bisa mengirim JSON tanpa preflight CORS,
+    # jadi sesi hanya dibuat untuk permintaan aplikasi petugas sendiri.
+    return request.content_type.startswith("application/json")
+
+
 def token_response(request, user) -> Response:
-    # Sinkronkan unit layanan dari pemetaan grup, sama seperti login sesi.
-    user_logged_in.send(sender=user.__class__, request=request, user=user)
+    if _is_same_origin_json(request):
+        # Buat juga sesi peramban agar tautan menu ke /admin/, /aset/lapangan/
+        # dan /komando/ tidak meminta login kedua kalinya. login() mengirim
+        # sinyal user_logged_in (sinkron unit layanan, reset tanda OTP).
+        session_login(
+            request._request,
+            user,
+            backend="django.contrib.auth.backends.ModelBackend",
+        )
+        # Titik ini hanya tercapai bila OTP sudah lolos atau tidak diwajibkan.
+        request.session[otp.SESSION_KEY] = user.pk
+        request.session.set_expiry(
+            int(settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"].total_seconds())
+        )
+    else:
+        # Sinkronkan unit layanan dari pemetaan grup, sama seperti login sesi.
+        user_logged_in.send(sender=user.__class__, request=request, user=user)
 
     refresh = RefreshToken.for_user(user)
     return Response(
@@ -154,7 +179,7 @@ class TokenRefreshView(BaseTokenRefreshView):
 
 
 class LogoutSerializer(serializers.Serializer):
-    refresh = serializers.CharField()
+    refresh = serializers.CharField(required=False)
 
 
 class LogoutView(APIView):
@@ -168,10 +193,13 @@ class LogoutView(APIView):
         serializer = LogoutSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         try:
-            RefreshToken(serializer.validated_data["refresh"]).blacklist()
+            if serializer.validated_data.get("refresh"):
+                RefreshToken(serializer.validated_data["refresh"]).blacklist()
         except TokenError:
             # Token sudah kedaluwarsa/tidak valid: tetap anggap logout berhasil.
             pass
+        if _is_same_origin_json(request):
+            session_logout(request._request)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

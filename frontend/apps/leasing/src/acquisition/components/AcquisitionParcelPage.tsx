@@ -7,6 +7,7 @@ import { getRouteById, Routes } from "@/root/routes";
 import { displayUIMessage, setPageTitle } from "@/util/helpers";
 import { apiGet, apiGetAll } from "../api";
 import { useApi, useChoices, useDistricts } from "../hooks";
+import { useResourcePermissions } from "../permissions";
 import {
   formatArea,
   formatDateId,
@@ -46,6 +47,8 @@ const AcquisitionParcelPage: React.FC = () => {
   const bump = useCallback(() => setVersion((v) => v + 1), []);
   const [isEditing, setIsEditing] = useState(false);
   const { data: choices } = useChoices();
+  const parcelPermissions = useResourcePermissions("pengadaan/parcel/");
+  const canViewParties = useResourcePermissions("pengadaan/party/").canView;
   const project = useApi(
     () => apiGet(`pengadaan/project/${projectId}/`),
     [projectId],
@@ -59,8 +62,10 @@ const AcquisitionParcelPage: React.FC = () => {
     [projectId, version],
   );
   const parties = useApi(
-    () => apiGetAll("pengadaan/party/", { parcel: parcelId }),
-    [parcelId, version],
+    canViewParties
+      ? () => apiGetAll("pengadaan/party/", { parcel: parcelId })
+      : null,
+    [parcelId, version, canViewParties],
   );
   const partyOptions = useMemo(
     () =>
@@ -135,11 +140,13 @@ const AcquisitionParcelPage: React.FC = () => {
             </span>
           </p>
         </div>
-        <div className="acq-page__actions">
-          <Button variant="secondary" onClick={() => setIsEditing((v) => !v)}>
-            {isEditing ? "Tutup" : "Ubah data bidang"}
-          </Button>
-        </div>
+        {parcelPermissions.canChange && (
+          <div className="acq-page__actions">
+            <Button variant="secondary" onClick={() => setIsEditing((v) => !v)}>
+              {isEditing ? "Tutup" : "Ubah data bidang"}
+            </Button>
+          </div>
+        )}
       </header>
 
       <div className="acq-columns">
@@ -236,6 +243,7 @@ const AcquisitionParcelPage: React.FC = () => {
             key: "share_percentage",
             header: "Porsi (%)",
             className: "acq-num",
+            render: (r) => formatNumberId(r.share_percentage),
           },
           { key: "phone", header: "Telepon" },
         ]}

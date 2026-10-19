@@ -1,4 +1,7 @@
+import datetime
+
 import pytest
+from django.utils import translation
 
 from leasing.enums import LeaseState, TenantContactType
 
@@ -111,3 +114,18 @@ def test_lease_search_form_lease_state_choices(lease_state, expected):
     form = LeaseSearchForm({"lease_state": lease_state})
 
     assert expected == form.is_valid()
+
+
+@pytest.mark.parametrize("value", ["1.2.2026", "01.02.2026", "2026-02-01"])
+def test_lease_search_form_accepts_spa_date_formats(value):
+    """Tanggal pencarian dari SPA ("d.m.yyyy") harus terbaca di lokal Indonesia."""
+    from leasing.forms import LeaseSearchForm
+
+    with translation.override("id"):
+        form = LeaseSearchForm(
+            {"lease_start_date_start": value, "decision_date": value}
+        )
+        assert form.is_valid(), form.errors
+
+    assert form.cleaned_data["lease_start_date_start"] == datetime.date(2026, 2, 1)
+    assert form.cleaned_data["decision_date"] == datetime.date(2026, 2, 1)

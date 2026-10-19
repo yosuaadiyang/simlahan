@@ -164,7 +164,10 @@ class LeaseArea(Land, ArchivableModel, SafeDeleteModel):
     """
 
     lease = models.ForeignKey(
-        Lease, on_delete=models.PROTECT, related_name="lease_areas"
+        Lease,
+        on_delete=models.PROTECT,
+        related_name="lease_areas",
+        verbose_name=_("Lease"),
     )
     type = EnumField(LeaseAreaType, verbose_name=_("Type"), max_length=30)
     # In Finnish: Sijainti (maanpäällinen, maanalainen)
@@ -403,7 +406,10 @@ class Plot(Land, MasterLandItemMixin):
     # In Finnish: Kumoamispäivä
     repeal_date = models.DateField(verbose_name=_("Repeal date"), null=True, blank=True)
     lease_area = models.ForeignKey(
-        LeaseArea, related_name="plots", on_delete=models.CASCADE
+        LeaseArea,
+        related_name="plots",
+        on_delete=models.CASCADE,
+        verbose_name=_("Lease area"),
     )
     # In Finnish: Sopimushetkellä
     in_contract = models.BooleanField(
@@ -484,7 +490,10 @@ class PlanUnit(Land, MasterLandItemMixin):
 
     # In Finnish: Vuokra-alue
     lease_area = models.ForeignKey(
-        LeaseArea, related_name="plan_units", on_delete=models.CASCADE
+        LeaseArea,
+        related_name="plan_units",
+        on_delete=models.CASCADE,
+        verbose_name=_("Lease area"),
     )
 
     # In Finnish: Sopimushetkellä

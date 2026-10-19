@@ -33,7 +33,7 @@ else:
 
 
 class Command(SafeDeleteModel):
-    type = EnumField(CommandType, max_length=30)
+    type = EnumField(CommandType, max_length=30, verbose_name=_("type"))
 
     name = models.CharField(
         max_length=1000,
@@ -604,6 +604,8 @@ class JobRunQueueItem(models.Model):
     objects = JobRunQueueItemQuerySet.as_manager()
 
     class Meta:
+        verbose_name = _("job run queue item")
+        verbose_name_plural = _("job run queue items")
         ordering = ["run_at"]
 
     def __str__(self) -> str:

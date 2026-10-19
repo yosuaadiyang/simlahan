@@ -73,6 +73,15 @@ def test_grievance_submit_and_check(
     assert "tidak ditemukan" in wrong.content.decode()
 
 
+def test_grievance_map_center_not_localized(client, seeded, settings):
+    # data-lat="0,87" dibaca parseFloat sebagai 0 sehingga peta pemilih lokasi
+    # terbuka jauh dari wilayah kerja.
+    settings.MAP_CENTER_LAT = 0.87
+    settings.MAP_CENTER_LNG = 104.15
+    html = client.get(reverse("aset_portal:grievance_create")).content.decode()
+    assert 'data-lat="0.87"' in html and 'data-lng="104.15"' in html
+
+
 def test_grievance_rejects_bots_and_missing_contact(client, seeded):
     response = client.post(
         reverse("aset_portal:grievance_create"),

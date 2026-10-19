@@ -35,7 +35,7 @@ class AbstractUser(DjangoAbstractUser):
         null=True, blank=True, verbose_name=_("Latest API token usage date")
     )
 
-    class Meta:
+    class Meta(DjangoAbstractUser.Meta):
         abstract = True
 
     def save(self, *args, **kwargs):
@@ -60,7 +60,9 @@ class User(AbstractUser):
     # Manager for users that are officers (internal staff)
     officers = OfficerUserManager()
 
-    service_units = models.ManyToManyField("leasing.ServiceUnit", related_name="users")
+    service_units = models.ManyToManyField(
+        "leasing.ServiceUnit", related_name="users", verbose_name=_("Service units")
+    )
 
     recursive_get_related_skip_relations = [
         "auth_token",

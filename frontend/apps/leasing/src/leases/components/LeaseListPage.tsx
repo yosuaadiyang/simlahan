@@ -91,11 +91,11 @@ import {
   IconMap,
   IconScrollContent,
   Link,
-  Pagination,
   Table,
   type TableProps,
   Tabs,
 } from "hds-react";
+import Pagination from "@/components/table/Pagination";
 import { useLocation, useNavigate } from "react-router";
 import type { Attributes } from "types";
 import CreateLeaseModal from "./createLease/CreateLeaseModal";
@@ -989,16 +989,9 @@ const LeaseListPage: React.FC = () => {
                     dense
                   />
                   <Pagination
-                    language="en"
-                    onChange={(event, index) => {
-                      event.preventDefault();
-                      handlePageClick(index + 1);
-                    }}
-                    pageCount={maxPage || 1}
-                    pageHref={() => "#"}
-                    pageIndex={activePage - 1}
-                    paginationAriaLabel={`Pemilih halaman, ${activePage} / ${maxPage}`}
-                    siblingCount={5}
+                    activePage={activePage}
+                    maxPage={maxPage}
+                    onPageClick={handlePageClick}
                   />
                 </>
               </Tabs.TabPanel>

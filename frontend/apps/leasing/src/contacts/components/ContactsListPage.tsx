@@ -7,11 +7,11 @@ import {
   ButtonVariant,
   IconAngleDown,
   IconAngleUp,
-  Pagination,
   Table,
   type TableProps,
 } from "hds-react";
 import AuthorizationError from "@/components/authorization/AuthorizationError";
+import Pagination from "@/components/table/Pagination";
 import Loader from "@/components/loader/Loader";
 import LoaderWrapper from "@/components/loader/LoaderWrapper";
 import PageContainerHDS from "@/components/content/PageContainerHDS";
@@ -396,16 +396,9 @@ const ContactListPage: React.FC = () => {
           dense
         />
         <Pagination
-          language="en"
-          onChange={(event, index) => {
-            event.preventDefault();
-            handlePageClick(index + 1);
-          }}
-          pageCount={maxPage || 1}
-          pageHref={() => "#"}
-          pageIndex={activePage - 1}
-          paginationAriaLabel={`Pemilih halaman, ${activePage} / ${maxPage}`}
-          siblingCount={5}
+          activePage={activePage}
+          maxPage={maxPage}
+          onPageClick={handlePageClick}
         />
       </ContentContainerHds>
     </PageContainerHDS>

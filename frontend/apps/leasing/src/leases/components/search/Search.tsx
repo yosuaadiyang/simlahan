@@ -3,7 +3,6 @@ import {
   ButtonSize,
   ButtonVariant,
   Checkbox,
-  DateInput,
   IconEye,
   IconEyeCrossed,
   IconMinus,
@@ -27,6 +26,8 @@ import { ButtonLabels } from "@/components/enums";
 import { Column, Row } from "@/components/grid/Grid";
 import SearchContainer from "@/components/search/SearchContainer";
 import SearchRow from "@/components/search/SearchRow";
+import { HDS_SELECT_TEXTS } from "@/components/hdsSelectTexts";
+import SearchDateInput from "./SearchDateInput";
 import { getContactOptions } from "@/contacts/helpers";
 import type { Contact } from "@/contacts/types";
 import { fetchDistrictsByMunicipality } from "@/district/actions";
@@ -413,7 +414,7 @@ const Search: React.FC<Props> = ({
                   texts={{
                     label: "Pemberi sewa",
                     placeholder: "Pilih pemberi sewa",
-                    language: "en",
+                    ...HDS_SELECT_TEXTS,
                   }}
                   value={filterSelectedOptions(value, lessorOptions)}
                   options={lessorOptions}
@@ -440,7 +441,7 @@ const Search: React.FC<Props> = ({
                   texts={{
                     label: "Peruntukan sewa",
                     placeholder: "Pilih peruntukan",
-                    language: "en",
+                    ...HDS_SELECT_TEXTS,
                   }}
                   disabled={isFetchingIntendedUses}
                   value={filterSelectedGroupedOptions(
@@ -528,7 +529,7 @@ const Search: React.FC<Props> = ({
                   texts={{
                     label: "Jenis pengenal sewa",
                     placeholder: "Pilih jenis",
-                    language: "en",
+                    ...HDS_SELECT_TEXTS,
                   }}
                   value={selectedOption}
                   options={typeOptions}
@@ -558,7 +559,7 @@ const Search: React.FC<Props> = ({
                   texts={{
                     label: "Kabupaten/Kota",
                     placeholder: "Pilih kabupaten/kota",
-                    language: "en",
+                    ...HDS_SELECT_TEXTS,
                   }}
                   value={filterSelectedGroupedOptions(
                     value,
@@ -593,7 +594,7 @@ const Search: React.FC<Props> = ({
                   texts={{
                     label: "Kecamatan",
                     placeholder: "Pilih kecamatan",
-                    language: "en",
+                    ...HDS_SELECT_TEXTS,
                   }}
                   value={selectedOption}
                   options={districtOptions}
@@ -662,17 +663,14 @@ const Search: React.FC<Props> = ({
               meta: { error, invalid },
             }) => {
               return (
-                <DateInput
+                <SearchDateInput
                   id="lease_start_date_start"
-                  initialMonth={new Date()}
                   label="Tgl mulai sewa dari"
-                  language="en"
                   value={value || ""}
                   onBlur={onBlur}
                   onFocus={onFocus}
                   onChange={(nextValue) => onChange(nextValue)}
                   style={{ width: "100%" }}
-                  disableConfirmation
                   className={
                     hasInputValue(value) ? "hds-input-with-value" : undefined
                   }
@@ -686,17 +684,14 @@ const Search: React.FC<Props> = ({
               meta: { error, invalid },
             }) => {
               return (
-                <DateInput
+                <SearchDateInput
                   id="lease_start_date_end"
-                  initialMonth={new Date()}
                   label="Tgl mulai sewa sampai"
-                  language="en"
                   value={value || ""}
                   onBlur={onBlur}
                   onFocus={onFocus}
                   onChange={(nextValue) => onChange(nextValue)}
                   style={{ width: "100%" }}
-                  disableConfirmation
                   className={
                     hasInputValue(value) ? "hds-input-with-value" : undefined
                   }
@@ -710,17 +705,14 @@ const Search: React.FC<Props> = ({
               meta: { error, invalid },
             }) => {
               return (
-                <DateInput
+                <SearchDateInput
                   id="lease_end_date_start"
-                  initialMonth={new Date()}
                   label="Tgl akhir sewa dari"
-                  language="en"
                   value={value || ""}
                   onBlur={onBlur}
                   onFocus={onFocus}
                   onChange={(nextValue) => onChange(nextValue)}
                   style={{ width: "100%" }}
-                  disableConfirmation
                   className={
                     hasInputValue(value) ? "hds-input-with-value" : undefined
                   }
@@ -734,17 +726,14 @@ const Search: React.FC<Props> = ({
               meta: { error, invalid },
             }) => {
               return (
-                <DateInput
+                <SearchDateInput
                   id="lease_end_date_end"
-                  initialMonth={new Date()}
                   label="Tgl akhir sewa sampai"
-                  language="en"
                   value={value || ""}
                   onBlur={onBlur}
                   onFocus={onFocus}
                   onChange={(nextValue) => onChange(nextValue)}
                   style={{ width: "100%" }}
-                  disableConfirmation
                   className={
                     hasInputValue(value) ? "hds-input-with-value" : undefined
                   }
@@ -822,7 +811,7 @@ const Search: React.FC<Props> = ({
                   texts={{
                     label: "Pengambil keputusan",
                     placeholder: "Pilih pengambil keputusan",
-                    language: "en",
+                    ...HDS_SELECT_TEXTS,
                   }}
                   value={selectedOption}
                   options={decisionMakerOptions}
@@ -847,17 +836,14 @@ const Search: React.FC<Props> = ({
               meta: { error, invalid },
             }) => {
               return (
-                <DateInput
+                <SearchDateInput
                   id="decision_date"
-                  initialMonth={new Date()}
                   label="Tgl keputusan"
-                  language="en"
                   value={value || ""}
                   onBlur={onBlur}
                   onFocus={onFocus}
                   onChange={(nextValue) => onChange(nextValue)}
                   style={{ width: "100%" }}
-                  disableConfirmation
                   className={
                     hasInputValue(value) ? "hds-input-with-value" : undefined
                   }
@@ -1021,7 +1007,7 @@ const Search: React.FC<Props> = ({
                   texts={{
                     label: "Peran kontak",
                     placeholder: "Pilih peran",
-                    language: "en",
+                    ...HDS_SELECT_TEXTS,
                   }}
                   value={filterSelectedOptions(value, tenantTypeOptions)}
                   options={tenantTypeOptions}
@@ -1250,7 +1236,7 @@ const Search: React.FC<Props> = ({
                 texts={{
                   label: LeaseFieldTitles.SERVICE_UNIT,
                   placeholder: "Pilih unit layanan",
-                  language: "en",
+                  ...HDS_SELECT_TEXTS,
                 }}
                 value={filterSelectedOptions(value, serviceUnitOptions)}
                 options={serviceUnitOptions}
@@ -1284,7 +1270,7 @@ const Search: React.FC<Props> = ({
                   texts={{
                     label: "Jenis",
                     placeholder: "Pilih tipe",
-                    language: "en",
+                    ...HDS_SELECT_TEXTS,
                   }}
                   value={selected}
                   options={leaseStateOptions}
@@ -1323,7 +1309,7 @@ const Search: React.FC<Props> = ({
                   texts={{
                     label: "Penyiap",
                     placeholder: "Pilih penyiap",
-                    language: "en",
+                    ...HDS_SELECT_TEXTS,
                   }}
                   value={selected}
                   options={allPreparers}
@@ -1365,7 +1351,7 @@ const Search: React.FC<Props> = ({
                   texts={{
                     label: "Persiapan belum selesai",
                     placeholder: "Pilih tahap",
-                    language: "en",
+                    ...HDS_SELECT_TEXTS,
                   }}
                   value={selectedOptions}
                   options={preparationStateFilterOptions}

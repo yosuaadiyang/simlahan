@@ -3,7 +3,7 @@ import json
 import pytest
 
 from alokasi import services
-from alokasi.importers import import_plots
+from alokasi.importers import PlotImportError, import_plots
 from alokasi.models import LandPlot
 from asetlahan import assistant
 
@@ -57,3 +57,9 @@ def test_plot_import_drops_z_coordinates(seeded):
     data = json.dumps({"type": "FeatureCollection", "features": [feature]})
     assert import_plots(data) == (1, 0)
     assert not LandPlot.objects.get(code="Z-01").geometry.hasz
+
+
+def test_plot_import_json_error_message_is_indonesian(seeded):
+    with pytest.raises(PlotImportError) as excinfo:
+        import_plots(b"bukan json")
+    assert str(excinfo.value) == "Berkas bukan JSON yang valid (baris 1, kolom 1)."

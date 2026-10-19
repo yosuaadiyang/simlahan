@@ -49,7 +49,7 @@ from operasi.models import (
 )
 
 APP_VERSION = "1.0.0"
-SW_VERSION = "1"
+SW_VERSION = "2"  # naikkan setiap kali berkas cangkang (JS/CSS) berubah
 MAX_FEATURES = 5000
 MAX_PHOTOS = 5
 MAX_STANCE_UPDATES = 50

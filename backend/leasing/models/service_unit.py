@@ -83,6 +83,7 @@ class ServiceUnit(TimeStampedSafeDeleteModel):
         blank=True,
         null=True,
         validators=[HexColorValidator()],
+        verbose_name=_("Hex color"),
     )
 
     recursive_get_related_skip_relations = [
@@ -106,10 +107,16 @@ class ServiceUnit(TimeStampedSafeDeleteModel):
 
 class ServiceUnitGroupMapping(models.Model):
     group = models.ForeignKey(
-        Group, on_delete=models.CASCADE, related_name="service_units"
+        Group,
+        on_delete=models.CASCADE,
+        related_name="service_units",
+        verbose_name=_("Group"),
     )
     service_unit = models.ForeignKey(
-        ServiceUnit, on_delete=models.CASCADE, related_name="groups"
+        ServiceUnit,
+        on_delete=models.CASCADE,
+        related_name="groups",
+        verbose_name=_("Service unit"),
     )
 
     def __str__(self):

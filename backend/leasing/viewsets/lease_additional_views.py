@@ -25,7 +25,12 @@ from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import status, viewsets
-from rest_framework.exceptions import APIException, PermissionDenied
+from rest_framework.exceptions import (
+    APIException,
+    NotFound,
+    ParseError,
+    PermissionDenied,
+)
 from rest_framework.exceptions import ValidationError as DrfValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -148,7 +153,7 @@ class LeaseCreateCollectionLetterDocumentViewSet(
             ).first()
 
             if not billing_tenantcontact or not billing_tenantcontact.contact:
-                raise APIException(
+                raise ParseError(
                     _("No billing info or billing info does not have a contact address")
                 )
 
@@ -262,14 +267,14 @@ class LeaseCreateCollectionLetterDocumentViewSet(
 
 def get_lease_from_query_params(query_params):
     if not query_params.get("lease"):
-        raise APIException("lease parameter is mandatory")
+        raise ParseError(_("lease parameter is mandatory"))
 
     try:
         return Lease.objects.get(pk=int(query_params.get("lease")))
     except Lease.DoesNotExist:
-        raise APIException("Lease does not exist")
-    except ValueError:
-        raise APIException("Invalid lease id")
+        raise NotFound(_("Lease does not exist"))
+    except (TypeError, ValueError, OverflowError):
+        raise ParseError(_("Invalid lease id"))
 
 
 class LeaseRentForPeriodView(APIView):
@@ -289,16 +294,16 @@ class LeaseRentForPeriodView(APIView):
             "start_date" not in request.query_params
             or "end_date" not in request.query_params
         ):
-            raise APIException("Both start_date and end_data parameters are mandatory")
+            raise ParseError(_("Both start_date and end_date parameters are mandatory"))
 
         try:
             start_date = parser.parse(request.query_params["start_date"]).date()
             end_date = parser.parse(request.query_params["end_date"]).date()
-        except ValueError:
-            raise APIException(_("Start date or end date is invalid"))
+        except (ValueError, OverflowError):
+            raise ParseError(_("Start date or end date is invalid"))
 
         if start_date > end_date:
-            raise APIException(_("Start date cannot be after end date"))
+            raise ParseError(_("Start date cannot be after end date"))
 
         result = {"start_date": start_date, "end_date": end_date, "rents": []}
 
@@ -341,15 +346,15 @@ class LeaseBillingPeriodsView(APIView):
             try:
                 year = int(request.query_params["year"])
             except (ValueError, OverflowError):
-                raise APIException(_("Year parameter is not valid"))
+                raise ParseError(_("Year parameter is not valid"))
         else:
             year = timezone.now().year
 
         try:
             start_date = datetime.date(year=year, month=1, day=1)
             end_date = datetime.date(year=year, month=12, day=31)
-        except (ValueError, OverflowError) as e:
-            raise APIException(e)
+        except (ValueError, OverflowError):
+            raise ParseError(_("Year parameter is not valid"))
 
         billing_periods = []
         for rent in lease.rents.all():
@@ -375,14 +380,14 @@ class LeasePreviewInvoicesForYearView(APIView):
             try:
                 year = int(request.query_params["year"])
             except (ValueError, OverflowError):
-                raise APIException(_("Year parameter is not valid"))
+                raise ParseError(_("Year parameter is not valid"))
         else:
             year = timezone.now().year
 
         try:
             first_day_of_year = datetime.date(year=year, month=1, day=1)
-        except (ValueError, OverflowError) as e:
-            raise APIException(e)
+        except (ValueError, OverflowError):
+            raise ParseError(_("Year parameter is not valid"))
 
         first_day_of_every_month = [
             dt.date() for dt in rrule(freq=MONTHLY, count=12, dtstart=first_day_of_year)
@@ -430,19 +435,17 @@ class LeaseSetInvoicingStateView(APIView):
             )
 
         if "invoicing_enabled" not in request.data:
-            raise APIException('"invoicing_enabled" key is required')
+            raise ParseError(_('"invoicing_enabled" key is required'))
 
         invoicing_enabled_new_status = request.data["invoicing_enabled"]
         if (
             invoicing_enabled_new_status is not True
             and invoicing_enabled_new_status is not False
         ):
-            raise APIException('"invoicing_enabled" value has to be true or false')
+            raise ParseError(_('"invoicing_enabled" value has to be true or false'))
 
         if invoicing_enabled_new_status and lease.rent_info_completed_at is None:
-            raise APIException(
-                _("Cannot enable invoicing if rent info is not completed")
-            )
+            raise ParseError(_("Cannot enable invoicing if rent info is not completed"))
 
         try:
             lease.set_invoicing_enabled(invoicing_enabled_new_status)
@@ -473,11 +476,11 @@ class LeaseSetRentInfoCompletionStateView(APIView):
         lease = get_lease_from_query_params(request.query_params)
 
         if "rent_info_complete" not in request.data:
-            raise APIException('"rent_info_complete" key is required')
+            raise ParseError(_('"rent_info_complete" key is required'))
 
         rent_info_new_status = request.data["rent_info_complete"]
         if rent_info_new_status is not True and rent_info_new_status is not False:
-            raise APIException('"rent_info_complete" value has to be true or false')
+            raise ParseError(_('"rent_info_complete" value has to be true or false'))
 
         if rent_info_new_status is True:
             # We don't want to validate when setting the completion to false,

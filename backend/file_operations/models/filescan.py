@@ -36,21 +36,25 @@ class FileScanStatus(TimeStampedModel):
     content_type = models.ForeignKey(
         ContentType,
         on_delete=models.PROTECT,
+        verbose_name=_("Content type"),
     )
-    object_id = models.PositiveBigIntegerField()
+    object_id = models.PositiveBigIntegerField(verbose_name=_("Object id"))
 
     filefield_name = models.CharField(
         null=False,
         blank=False,
-        help_text="Name of the column of the content object's FileField",
+        help_text=_("Name of the column of the content object's FileField"),
+        verbose_name=_("File field name"),
     )
 
     # Details of the file and its scanning status
     filepath = models.CharField(
         max_length=255,
         verbose_name=_("filepath"),
-        help_text="Filepath for preservation even after the original row has "
-        "been deleted from a table referenced by the generic foreign key.",
+        help_text=_(
+            "Filepath for preservation even after the original row has "
+            "been deleted from a table referenced by the generic foreign key."
+        ),
     )
     scanned_at = models.DateTimeField(
         null=True, blank=True, verbose_name=_("scan time")

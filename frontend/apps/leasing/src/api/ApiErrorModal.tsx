@@ -17,6 +17,56 @@ interface ApiErrorData {
   trace?: TraceItem[];
 }
 
+/** Pesan bawaan redux-form untuk SubmissionError (bahasa Inggris). */
+const SUBMISSION_ERROR_MESSAGE = "Submit Validation Failed";
+
+/**
+ * Saga lama membungkus setiap jawaban galat API dalam SubmissionError. Pesan
+ * umum DRF (mis. 403/404) ada di "detail"; selebihnya galat per bidang.
+ */
+const getSubmissionErrors = (
+  data: ApiErrorData | null | undefined,
+): Record<string, any> | null =>
+  data?.errors && data.message === SUBMISSION_ERROR_MESSAGE
+    ? data.errors
+    : null;
+
+const getFieldErrors = (
+  data: ApiErrorData | null | undefined,
+): Record<string, any> | null | undefined => {
+  const errors = getSubmissionErrors(data);
+  if (!errors) return data?.errors;
+  // "detail" tampil sebagai pesan; "get" hanya menandai permintaan asal.
+  const fieldErrors = Object.fromEntries(
+    Object.entries(errors).filter(([key]) => !["detail", "get"].includes(key)),
+  );
+  return Object.keys(fieldErrors).length ? fieldErrors : null;
+};
+
+export const getApiErrorTitle = (
+  data: ApiErrorData | null | undefined,
+): string => {
+  const errors = getSubmissionErrors(data);
+  if (errors) {
+    return errors.detail && !getFieldErrors(data)
+      ? "Permintaan gagal"
+      : "Data tidak valid";
+  }
+  return `Galat server ${data?.exception || ""}`;
+};
+
+export const getApiErrorMessage = (
+  data: ApiErrorData | null | undefined,
+): string | undefined => {
+  const errors = getSubmissionErrors(data);
+  if (errors) {
+    return errors.detail
+      ? String(errors.detail)
+      : "Validasi data gagal. Periksa isian berikut.";
+  }
+  return data?.message;
+};
+
 const ApiErrorModal = ({
   data,
   handleDismiss,
@@ -33,10 +83,7 @@ const ApiErrorModal = ({
     close={handleDismiss}
     closeButtonLabelText="Tutup"
   >
-    <Dialog.Header
-      id="api-error-modal-title"
-      title={`Galat server ${data?.exception || ""}`}
-    />
+    <Dialog.Header id="api-error-modal-title" title={getApiErrorTitle(data)} />
     <Dialog.Content>
       {data ? <ApiErrorContent data={data} /> : null}
     </Dialog.Content>
@@ -104,9 +151,11 @@ const ApiErrorStackTrace = ({ trace }: ApiErrorData) => (
 const ApiErrorContent = ({ data }: { data: ApiErrorData }) => {
   return (
     <div className="api-error-modal">
-      <div className="api-error-modal__message">{data.message}</div>
+      <div className="api-error-modal__message">{getApiErrorMessage(data)}</div>
       <div className="api-error-modal__source">{data.source}</div>
-      {data.errors ? <ApiErrorList errors={data.errors} /> : null}
+      {getFieldErrors(data) ? (
+        <ApiErrorList errors={getFieldErrors(data)} />
+      ) : null}
       {data.trace ? <ApiErrorStackTrace trace={data.trace} /> : null}
     </div>
   );

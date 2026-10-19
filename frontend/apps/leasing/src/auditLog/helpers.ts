@@ -49,6 +49,9 @@ export const getAuditLogActionTypeInFinnish = (action: string) => {
     case "update":
       return "Pengubahan";
 
+    case "access":
+      return "Akses";
+
     default:
       return action;
   }

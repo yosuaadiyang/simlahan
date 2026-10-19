@@ -3,6 +3,7 @@ import Modal from "@/components/modal/Modal";
 import { displayUIMessage } from "@/util/helpers";
 import { apiGetAll, apiSend } from "../api";
 import { useApi } from "../hooks";
+import { useResourcePermissions } from "../permissions";
 import ResourceForm from "./ResourceForm";
 import type { FormFieldSpec } from "./ResourceForm";
 import { Button, DataTable, ErrorText, Section } from "./ui";
@@ -42,9 +43,9 @@ const ResourceSection: React.FC<Props> = ({
   formFields,
   defaults,
   fkOptions,
-  canAdd = true,
-  canEdit = true,
-  canDelete = true,
+  canAdd: canAddProp = true,
+  canEdit: canEditProp = true,
+  canDelete: canDeleteProp = true,
   itemName,
   rowActions,
   headerActions,
@@ -53,10 +54,15 @@ const ResourceSection: React.FC<Props> = ({
   onRowClick,
   refreshKey = 0,
 }) => {
+  const permissions = useResourcePermissions(endpoint);
+  const canView = permissions.isLoaded && permissions.canView;
+  const canAdd = canAddProp && permissions.canAdd;
+  const canEdit = canEditProp && permissions.canChange;
+  const canDelete = canDeleteProp && permissions.canDelete;
   const paramsKey = JSON.stringify(params);
   const { data, error, isLoading, reload } = useApi(
-    () => apiGetAll(endpoint, params),
-    [endpoint, paramsKey, refreshKey],
+    canView ? () => apiGetAll(endpoint, params) : null,
+    [endpoint, paramsKey, refreshKey, canView],
   );
   const [editing, setEditing] = useState<Record<string, any> | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -109,7 +115,13 @@ const ResourceSection: React.FC<Props> = ({
       }
     >
       {error && <ErrorText>{error}</ErrorText>}
-      {isLoading && !data ? (
+      {!canView ? (
+        <p className="acq-muted">
+          {permissions.isLoaded
+            ? "Anda tidak berwenang melihat data ini."
+            : "Memuat…"}
+        </p>
+      ) : isLoading && !data ? (
         <p className="acq-muted">Memuat…</p>
       ) : (
         <DataTable

@@ -114,3 +114,10 @@ def test_geojson_import_creates_then_updates(seeded):
 def test_import_rejects_bad_files(seeded, payload, filename):
     with pytest.raises(importers.AssetImportError):
         importers.import_assets(payload, filename=filename)
+
+
+def test_import_json_error_message_is_indonesian(seeded):
+    # Pesan json.JSONDecodeError ("Expecting value ...") tidak boleh tampil.
+    with pytest.raises(importers.AssetImportError) as excinfo:
+        importers.import_assets(b"bukan json", filename="a.geojson")
+    assert str(excinfo.value) == "Berkas bukan GeoJSON yang valid (baris 1, kolom 1)."

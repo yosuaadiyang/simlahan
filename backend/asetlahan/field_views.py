@@ -32,7 +32,7 @@ from asetlahan import enums, geo, scope
 from asetlahan.models import EncroachmentCase, FieldReport, LandAsset, MapShare
 
 MAX_FEATURES = 5000
-SW_VERSION = "1"
+SW_VERSION = "2"  # naikkan setiap kali berkas cangkang (JS/CSS) berubah
 
 # --------------------------------------------------------------------------
 # Peta berbagi (tautan publik baca-saja)

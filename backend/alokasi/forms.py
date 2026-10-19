@@ -132,6 +132,24 @@ class PortalLoginForm(AuthenticationForm):
     def clean_username(self):
         return _normalize_email(self.cleaned_data["username"])
 
+    def clean(self):
+        try:
+            return super().clean()
+        except forms.ValidationError as error:
+            # ModelBackend menolak akun nonaktif seperti sandi salah. Bila sandinya
+            # benar, beri tahu bahwa akun belum diaktifkan (bukan "sandi salah").
+            if error.code == "invalid_login":
+                user = User.objects.filter(
+                    username__iexact=self.cleaned_data.get("username") or "",
+                    is_active=False,
+                    pemohon__isnull=False,
+                ).first()
+                if user and user.check_password(self.cleaned_data.get("password")):
+                    raise forms.ValidationError(
+                        self.error_messages["inactive"], code="inactive"
+                    )
+            raise
+
     def confirm_login_allowed(self, user):
         super().confirm_login_allowed(user)
         if not hasattr(user, "pemohon"):

@@ -1,4 +1,5 @@
 {% extends "alokasi/portal/base.html" %}
+{% load l10n %}
 {% block title %}Pengaduan Masyarakat{% endblock %}
 {% block head %}{% include "alokasi/portal/_leaflet.html" %}{% endblock %}
 {% block content %}
@@ -25,7 +26,7 @@
   <p class="small muted">Klik peta untuk menandai lokasi kejadian, atau gunakan lokasi perangkat Anda.</p>
   <p><button type="button" class="btn btn-outline btn-small" data-locate>Gunakan lokasi saya</button>
      <button type="button" class="btn btn-outline btn-small" data-clear-location>Hapus titik</button></p>
-  <div id="peta" class="map map-small" data-map="pick" data-lat="{{ map_center.0 }}" data-lng="{{ map_center.1 }}" data-zoom="{{ map_zoom }}" role="region" aria-label="Pilih titik lokasi"></div>
+  <div id="peta" class="map map-small" data-map="pick" data-lat="{{ map_center.0|unlocalize }}" data-lng="{{ map_center.1|unlocalize }}" data-zoom="{{ map_zoom|unlocalize }}" role="region" aria-label="Pilih titik lokasi"></div>
   <p class="small muted">Data pribadi Anda hanya digunakan untuk menindaklanjuti pengaduan ini.</p>
   <button class="btn" type="submit">Kirim pengaduan</button>
 </form>

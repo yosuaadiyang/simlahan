@@ -230,12 +230,11 @@ export const restoreSession = async (): Promise<AuthUser | null> => {
 export const logout = async () => {
   const refresh = readRefreshToken();
   clearSession();
-  if (refresh) {
-    try {
-      await postJson("auth/logout/", { refresh });
-    } catch {
-      // Abaikan: token tetap akan kedaluwarsa.
-    }
+  try {
+    // Selalu dipanggil: juga mengakhiri sesi peramban panel /admin/ & /komando/.
+    await postJson("auth/logout/", refresh ? { refresh } : {});
+  } catch {
+    // Abaikan: token tetap akan kedaluwarsa.
   }
 };
 

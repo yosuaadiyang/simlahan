@@ -24,10 +24,16 @@
     display: flex;
     flex: 1 1 0%;
     align-items: center;
+    // Izinkan judul menyusut agar tidak menimpa menu kanan pada layar sempit.
+    min-width: 0;
 
     .page-title {
       font-size: rem-calc(20px);
       margin: 0;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
       padding: 0 rem-calc(20px);
       line-height: rem-calc(60px);
       background-color: variables.$white;
@@ -171,6 +177,32 @@
       .service-unit-name {
         font-size: 0.85rem;
         font-weight: 500;
+      }
+    }
+  }
+
+  // Layar sempit (tablet): persempit pilihan unit layanan agar judul halaman
+  // tetap terbaca dan tidak menimpa bagian kanan.
+  @include breakpoint(medium down) {
+    &__left-wrapper .page-title {
+      padding: 0 rem-calc(12px);
+    }
+
+    &__right-wrapper {
+      min-width: 0;
+
+      .user-service-unit {
+        min-width: 0;
+        padding-right: rem-calc(10px);
+
+        form {
+          min-width: 0;
+          width: rem-calc(150px);
+        }
+      }
+
+      .username-wrapper {
+        margin-left: rem-calc(10px);
       }
     }
   }

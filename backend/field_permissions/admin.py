@@ -1,4 +1,4 @@
-from django.db.models import ManyToOneRel
+from django.db.models import ForeignObjectRel
 
 
 class FieldPermissionsAdminMixin:
@@ -15,8 +15,9 @@ class FieldPermissionsAdminMixin:
         for field in field_permissions.get_model_fields(self.model):
             field_name = field.name
 
-            # if field_name == 'conditions':
-            if isinstance(field, ManyToOneRel):
+            # Relasi balik (termasuk ManyToManyRel) bukan kolom formulir; menjadikannya
+            # readonly membuat admin gagal (500) saat menampilkan nilainya.
+            if isinstance(field, ForeignObjectRel):
                 continue
 
             if not request.user.has_perm(

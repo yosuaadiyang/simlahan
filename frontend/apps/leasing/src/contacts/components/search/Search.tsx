@@ -16,6 +16,7 @@ import {
 import { Row, Column } from "@/components/grid/Grid";
 import Authorization from "@/components/authorization/Authorization";
 import SearchRow from "@/components/search/SearchRow";
+import { HDS_SELECT_TEXTS } from "@/components/hdsSelectTexts";
 import { fetchServiceUnits } from "@/serviceUnits/actions";
 import {
   getServiceUnits,
@@ -136,7 +137,7 @@ const SearchFormFields: React.FC<{
                   texts={{
                     label: ContactFieldTitles.SERVICE_UNIT,
                     placeholder: "Pilih unit layanan",
-                    language: "en",
+                    ...HDS_SELECT_TEXTS,
                   }}
                   value={filterSelectedOptions(value, serviceUnitOptions)}
                   options={serviceUnitOptions}

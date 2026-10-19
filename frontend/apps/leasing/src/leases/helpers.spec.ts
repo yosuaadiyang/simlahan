@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { getContentLeaseListLeaseAddresses } from "./helpers";
+import {
+  getContentLeaseAddress,
+  getContentLeaseAreaIdentifier,
+  getContentLeaseListLeaseAddresses,
+} from "./helpers";
 import type { Lease } from "./types";
 
 describe("leases/helpers", () => {
@@ -132,6 +136,23 @@ describe("leases/helpers", () => {
 
       const results = getContentLeaseListLeaseAddresses(lease);
       expect(results).to.deep.equal([]);
+    });
+  });
+  describe("getContentLeaseAddress", () => {
+    it("should not return the text 'undefined' without lease areas", () => {
+      const lease = { id: 1, lease_areas: [] } as unknown as Lease;
+      expect(getContentLeaseAddress(lease)).toBeNull();
+      expect(getContentLeaseAreaIdentifier(lease)).toBeNull();
+    });
+    it("should return the first area address and identifier", () => {
+      const lease = {
+        id: 1,
+        lease_areas: [
+          { identifier: "A-1", addresses: [{ address: "Jl. Uji 1" }] },
+        ],
+      } as unknown as Lease;
+      expect(getContentLeaseAddress(lease)).toBe("Jl. Uji 1");
+      expect(getContentLeaseAreaIdentifier(lease)).toBe("A-1");
     });
   });
 });

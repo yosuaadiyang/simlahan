@@ -6,6 +6,7 @@ import os
 from functools import wraps
 from urllib.parse import urlencode
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth import views as auth_views
@@ -79,7 +80,26 @@ activation_token = ActivationTokenGenerator()
 
 
 def _client_ip(request) -> str:
+    # Di belakang reverse proxy, REMOTE_ADDR selalu alamat proxy sehingga semua
+    # pengunjung berbagi satu kuota. Setiap proxy tepercaya menambahkan satu
+    # alamat di ujung X-Forwarded-For, jadi alamat klien ada di posisi ke-N dari
+    # belakang (N = TRUSTED_PROXY_COUNT). Entri di depannya bisa dipalsukan.
+    if getattr(settings, "TRUST_PROXY_HEADERS", False):
+        hops = max(getattr(settings, "TRUSTED_PROXY_COUNT", 1), 1)
+        forwarded = [
+            part.strip()
+            for part in request.META.get("HTTP_X_FORWARDED_FOR", "").split(",")
+            if part.strip()
+        ]
+        if forwarded:
+            return forwarded[-min(hops, len(forwarded))]
     return request.META.get("REMOTE_ADDR", "")
+
+
+def _absolute_url(request, path: str) -> str:
+    """Tautan untuk surel: pakai OFFICER_UI_URL bila diisi (alamat publik)."""
+    base = (getattr(settings, "OFFICER_UI_URL", "") or "").rstrip("/")
+    return f"{base}{path}" if base else request.build_absolute_uri(path)
 
 
 def _throttled(request, scope: str, limit: int = 10, window: int = 60) -> bool:
@@ -381,8 +401,9 @@ def verify_document(request, token=None):
 
 def _send_activation(request, user) -> None:
     uid = urlsafe_base64_encode(force_bytes(user.pk))
-    url = request.build_absolute_uri(
-        reverse("portal:activate", args=[uid, activation_token.make_token(user)])
+    url = _absolute_url(
+        request,
+        reverse("portal:activate", args=[uid, activation_token.make_token(user)]),
     )
     services.send_email(
         [user.email],
@@ -476,10 +497,13 @@ class PortalLoginView(auth_views.LoginView):
         return reverse("portal:dashboard")
 
 
-@require_POST
 def logout_view(request):
     from django.contrib.auth import logout
 
+    if request.method != "POST":
+        # Keluar hanya lewat formulir (CSRF). Alamat yang diketik langsung
+        # diarahkan kembali, bukan halaman 405 kosong.
+        return redirect("portal:home")
     logout(request)
     messages.info(request, _("Anda sudah keluar."))
     return redirect("portal:home")
@@ -496,6 +520,12 @@ class PortalPasswordResetView(auth_views.PasswordResetView):
     email_template_name = "alokasi/portal/email/password_reset.txt"
     subject_template_name = "alokasi/portal/email/password_reset_subject.txt"
     success_url = reverse_lazy("portal:password_reset_done")
+
+    def form_valid(self, form):
+        self.extra_email_context = {
+            "site_base": (getattr(settings, "OFFICER_UI_URL", "") or "").rstrip("/")
+        }
+        return super().form_valid(form)
 
     def post(self, request, *args, **kwargs):
         if _throttled(request, "reset", limit=5, window=300):
@@ -853,7 +883,10 @@ def _own_allocation(request, pk) -> Allocation:
 
 @applicant_required
 def allocation_detail(request, pk):
-    allocation = _own_allocation(request, pk)
+    return _render_allocation(request, _own_allocation(request, pk))
+
+
+def _render_allocation(request, allocation, *, permit_form=None, development_form=None):
     config = AllocationSettings.load()
     reports = {r.permit_type: r for r in allocation.permit_reports.all()}
     permit_rows = [
@@ -874,9 +907,16 @@ def allocation_detail(request, pk):
         "issued": allocation.issued_documents.all(),
         "permit_rows": permit_rows,
         "development_reports": allocation.development_reports.all(),
-        "permit_form": PermitReportForm(prefix="izin") if is_active else None,
+        "permit_form": (
+            (permit_form or PermitReportForm(prefix="izin")) if is_active else None
+        ),
         "development_form": (
-            DevelopmentReportForm(prefix="progres", initial={"report_date": today})
+            (
+                development_form
+                or DevelopmentReportForm(
+                    prefix="progres", initial={"report_date": today}
+                )
+            )
             if is_active
             else None
         ),
@@ -911,9 +951,8 @@ def permit_report_save(request, pk):
             report.document.storage.delete(old_document)
         messages.success(request, _("Laporan perizinan disimpan."))
     else:
-        for field_errors in form.errors.values():
-            for error in field_errors:
-                messages.error(request, error)
+        # Tampilkan ulang formulir beserta isian dan pesan galat per kolom.
+        return _render_allocation(request, allocation, permit_form=form)
     return redirect(f"{reverse('portal:allocation_detail', args=[pk])}#perizinan")
 
 
@@ -938,9 +977,7 @@ def development_report_create(request, pk):
         report.save()
         messages.success(request, _("Laporan progres pembangunan disimpan."))
     else:
-        for field_errors in form.errors.values():
-            for error in field_errors:
-                messages.error(request, error)
+        return _render_allocation(request, allocation, development_form=form)
     return redirect(f"{reverse('portal:allocation_detail', args=[pk])}#pembangunan")
 
 

@@ -37,6 +37,17 @@
   min-width: 0;
 }
 
+// Kolom tanggal pencarian (react-datepicker): isi lebar kolom dan tampilkan
+// kalender di atas tab/tabel di bawahnya.
+.lease-search-fieldset-group .lease-search__date-input {
+  width: 100%;
+  min-width: 0;
+}
+
+.lease-search__date-popper {
+  z-index: 10;
+}
+
 // Emphasize active lease search HDS inputs.
 // The parent selector helps this rule win over HDS component defaults
 // regardless of production stylesheet order.

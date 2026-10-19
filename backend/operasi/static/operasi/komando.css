@@ -75,6 +75,10 @@ a { color: var(--accent-2); }
 }
 @media (min-width: 900px) {
   .sheet { left: auto; width: 440px; border-left: 1px solid var(--line); box-shadow: -8px 0 24px rgba(0,0,0,.4); }
+  /* Panel samping desktop menutup tepi kanan peta: geser alat peta agar tetap terjangkau. */
+  .workspace:has(> .sheet:not([hidden])) .map-tools { right: 450px; }
+  .workspace:has(> .sheet:not([hidden])) .legend { right: 500px; }
+  .workspace:has(> .sheet:not([hidden])) .leaflet-right { right: 440px; }
 }
 .sheet h2 { margin: 4px 0 10px; font-size: 18px; }
 .sheet h3 { margin: 16px 0 8px; font-size: 15px; }

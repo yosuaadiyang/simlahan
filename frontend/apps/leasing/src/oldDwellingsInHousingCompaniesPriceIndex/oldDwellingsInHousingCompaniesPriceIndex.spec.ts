@@ -5,6 +5,7 @@ import {
   notFound,
 } from "./actions";
 import oldDwellingsInHousingCompaniesPriceIndexReducer from "./reducer";
+import { fetchOldDwellingsInHousingCompaniesPriceIndexSaga } from "./saga";
 import type {
   OldDwellingsInHousingCompaniesPriceIndex,
   OldDwellingsInHousingCompaniesPriceIndexState,
@@ -83,6 +84,22 @@ describe("oldDwellingsInHousingCompaniesPriceIndex", () => {
         );
         expect(state).to.deep.equal(newState);
       });
+    });
+  });
+  describe("Saga", () => {
+    const runWith = (bodyAsJson: Record<string, any>) => {
+      const saga = fetchOldDwellingsInHousingCompaniesPriceIndexSaga();
+      saga.next();
+      return saga.next({ response: { status: 200 }, bodyAsJson }).value;
+    };
+    it("should receive the first index of the list", () => {
+      const index = { point_figures: [], source: "uji" };
+      expect(runWith({ results: [index] }).payload.action).to.deep.equal(
+        receiveOldDwellingsInHousingCompaniesPriceIndex(index as any),
+      );
+    });
+    it("should mark not found when there is no index", () => {
+      expect(runWith({ results: [] }).payload.action).to.deep.equal(notFound());
     });
   });
 });

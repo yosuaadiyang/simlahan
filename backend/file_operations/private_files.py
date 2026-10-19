@@ -6,6 +6,7 @@ from django.db import models
 from django.db.models.fields.files import FieldFile
 
 from file_operations.errors import FileScanError, FileScanPendingError, FileUnsafeError
+from file_operations.validators import validate_file_signature
 
 
 class PrivateFileSystemStorage(FileSystemStorage):
@@ -50,6 +51,8 @@ class PrivateFieldFile(FieldFile):
 
 class PrivateFileField(models.FileField):
     attr_class = PrivateFieldFile
+    # Bukan bagian dari deconstruct(), jadi tidak memunculkan migrasi.
+    default_validators = [validate_file_signature]
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)

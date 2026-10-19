@@ -71,7 +71,13 @@ def _load_features(data: bytes | str) -> list:
     try:
         payload = json.loads(data)
     except (json.JSONDecodeError, UnicodeDecodeError) as error:
-        raise PlotImportError(f"Berkas bukan JSON yang valid: {error}")
+        # Pesan bawaan Python berbahasa Inggris; sebutkan posisinya saja.
+        where = (
+            f"baris {error.lineno}, kolom {error.colno}"
+            if isinstance(error, json.JSONDecodeError)
+            else "teks bukan UTF-8"
+        )
+        raise PlotImportError(f"Berkas bukan JSON yang valid ({where}).")
     if isinstance(payload, dict) and payload.get("type") == "Feature":
         features = [payload]
     elif isinstance(payload, dict) and payload.get("type") == "FeatureCollection":
