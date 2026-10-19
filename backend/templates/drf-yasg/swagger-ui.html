@@ -1,0 +1,11 @@
+{% extends "drf-yasg/swagger-ui.html" %}
+{% block user_context_message %}
+  {% if request.user.is_authenticated %}
+    <div class="hello">
+      <span class="django-session">{{ app_name }}</span>
+      <span class="label label-primary">{{ request.user }}</span>
+    </div>
+  {% endif %}
+{% endblock %}
+{% block django_logout_message %}Keluar dari {{ app_name }}{% endblock %}
+{% block django_login_message %}Masuk ke {{ app_name }}{% endblock %}

@@ -55,7 +55,7 @@ tenggat, hari libur, dsb.), menyetel izin grup, dan membuat admin awal.
 | `/` | Aplikasi petugas |
 | `/portal/` | Portal publik & pemohon alokasi lahan |
 | `/admin/alokasi/` | Panel petugas alokasi lahan |
-| `/admin/` | Admin Django (pengguna, grup, unit layanan, data master) |
+| `/admin/` | Panel admin SimLahan (pengguna, grup, unit layanan, data master) |
 | `/docs/` | Dokumentasi API (Swagger) |
 | `/healthz`, `/readiness` | Pemeriksaan kesehatan |
 

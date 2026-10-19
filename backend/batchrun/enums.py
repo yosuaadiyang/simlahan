@@ -11,7 +11,7 @@ class CommandType(Enum):
     @member
     class Labels:
         EXECUTABLE = _("executable or script")
-        DJANGO_MANAGE = _("Django management command")
+        DJANGO_MANAGE = _("SimLahan management command")
 
 
 class LogEntryKind(IntEnum):
