@@ -27,8 +27,8 @@ msgstr "Lihat log audit sewa atau kontak"
 msgid "executable or script"
 msgstr "berkas eksekusi atau skrip"
 
-msgid "Django management command"
-msgstr "perintah manajemen Django"
+msgid "SimLahan management command"
+msgstr "perintah manajemen SimLahan"
 
 msgid "Invalid integer set specifier"
 msgstr "Penentu himpunan bilangan bulat tidak valid"
@@ -5454,3 +5454,35 @@ msgstr "Aplikasi OAuth tidak memiliki akun layanan yang aktif."
 
 msgid "This token is read-only (scope 'write' is required)."
 msgstr "Token ini hanya untuk membaca (perlu scope 'write')."
+
+msgid "{app} administration"
+msgstr "Administrasi {app}"
+
+msgid "{app} site admin"
+msgstr "Admin situs {app}"
+
+msgid "OAuth2 integration"
+msgstr "Integrasi OAuth2"
+
+msgid "Background tasks"
+msgstr "Tugas latar belakang"
+
+msgid "REST API"
+msgstr "API REST"
+
+msgid "Data filters"
+msgstr "Penyaring data"
+
+msgid "Countries"
+msgstr "Negara"
+
+msgid "CORS"
+msgstr "CORS"
+
+#, python-format
+msgid "%(app)s administration"
+msgstr "Administrasi %(app)s"
+
+#, python-format
+msgid "%(app)s site admin"
+msgstr "Admin situs %(app)s"

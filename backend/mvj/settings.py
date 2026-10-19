@@ -61,6 +61,7 @@ env = environ.Env(
     EMAIL_URL=(str, "consolemail://"),
     DEFAULT_FROM_EMAIL=(str, "noreply@simlahan.local"),
     ORGANIZATION_NAME=(str, "Instansi Pengelola Lahan"),
+    APP_NAME=(str, "SimLahan"),
     FROM_EMAIL_PLOT_SEARCH=(str, ""),
     FROM_EMAIL_AREA_SEARCH=(str, ""),
     JWT_ACCESS_TOKEN_MINUTES=(int, 30),
@@ -153,6 +154,8 @@ TIME_ZONE = "Asia/Jakarta"
 CURRENCY_CODE = "IDR"
 # Nama instansi pengelola yang ditampilkan di dokumen/surel keluar.
 ORGANIZATION_NAME = env.str("ORGANIZATION_NAME")
+# Nama aplikasi di judul panel admin, API, dan halaman login.
+APP_NAME = env.str("APP_NAME")
 USE_I18N = True
 
 LOCALE_PATHS = [project_root("locale")]
@@ -213,7 +216,8 @@ MIDDLEWARE = [
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        # Templat proyek menimpa templat bawaan pustaka (judul & merek SimLahan).
+        "DIRS": [project_root("templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -222,6 +226,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "alokasi.context_processors.portal",
+                "users.context_processors.branding",
             ]
         },
     }

@@ -1,0 +1,5 @@
+{% extends "rest_framework/base.html" %}
+{% block title %}{% if name %}{{ name }} – {% endif %}{{ app_name }} API{% endblock %}
+{% block branding %}
+  <a class="navbar-brand" rel="nofollow" href="/">{{ app_name }} API</a>
+{% endblock %}

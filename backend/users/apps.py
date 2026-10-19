@@ -6,7 +6,9 @@ class UsersConfig(AppConfig):
     name = "users"
 
     def ready(self):
-        from . import signals
+        from . import branding, signals
+
+        branding.apply()
 
         user_logged_in.connect(
             signals.user_logged_in, dispatch_uid="users_signals_user_logged_in"

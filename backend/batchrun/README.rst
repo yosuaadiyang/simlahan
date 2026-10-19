@@ -9,7 +9,7 @@ Scheduled Jobs
 Scheduled jobs and the run logs are stored into database via Django
 models.
 
-The scheduled jobs can be managed via Django Admin.
+The scheduled jobs can be managed via the SimLahan admin panel.
 
 Run logs
 --------------
@@ -30,7 +30,7 @@ you don't see last two weeks' runlogs in the table.
 
 See JobHistoryRetentionPolicy for more information about cleaning schedules.
 
-The run logs are visible in the Django Admin, and in addition there is
+The run logs are visible in the SimLahan admin panel, and in addition there is
 an API end point for listing them.
 
 How It Works
