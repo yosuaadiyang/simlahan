@@ -93,6 +93,8 @@
         var data = null;
         try { data = text ? JSON.parse(text) : null; } catch (e) { data = null; }
         if (response.status === 401) {
+          // Data peta pengguna ini tidak boleh tertinggal di perangkat setelah sesi berakhir.
+          purgeOfflineData(true);
           sessionExpired();
           throw new ApiError("Sesi berakhir. Silakan masuk kembali.", 401, data);
         }
@@ -159,6 +161,29 @@
     el.hidden = false;
   }
 
+  // ================================================================ Data di perangkat
+
+  // Hapus lapisan peta tersimpan (dan halaman utama berisi konfigurasi pengguna).
+  function purgeOfflineData(includePage) {
+    if (!window.caches) { return Promise.resolve(); }
+    return caches.keys().then(function (keys) {
+      return Promise.all(keys.map(function (key) {
+        if (key.indexOf("komando-data-") === 0) { return caches.delete(key); }
+        if (includePage && key.indexOf("komando-shell-") === 0) {
+          return caches.open(key).then(function (cache) { return cache.delete(urls.scope, { ignoreSearch: true }); });
+        }
+        return null;
+      }));
+    }).catch(function () { /* Cache Storage tidak tersedia */ });
+  }
+
+  // Pengguna berganti di perangkat ini: buang data peta pengguna sebelumnya.
+  (function checkUser() {
+    var previous = store("pengguna");
+    if (previous !== null && previous !== undefined && previous !== config.user.id) { purgeOfflineData(false); }
+    store("pengguna", config.user.id);
+  }());
+
   // ================================================================ Antrean luring (IndexedDB)
 
   function openDb() {
@@ -185,6 +210,18 @@
   function queueAll() { return tx("readonly", function (s) { return s.getAll(); }); }
   function queuePut(item) { return tx("readwrite", function (s) { s.put(item); }); }
   function queueDelete(id) { return tx("readwrite", function (s) { s.delete(id); }); }
+  function queueClear() { return tx("readwrite", function (s) { s.clear(); }).catch(function () { /* mode privat */ }); }
+
+  // Antrean milik pengguna yang sedang masuk; laporan pengguna lain (atau tanpa
+  // penanda pengguna) dibuang agar tidak terkirim atas nama orang lain.
+  function myQueue() {
+    return queueAll().then(function (items) {
+      var mine = [];
+      var others = [];
+      items.forEach(function (item) { (item.user_id === config.user.id ? mine : others).push(item); });
+      return Promise.all(others.map(function (item) { return queueDelete(item.client_id); })).then(function () { return mine; });
+    });
+  }
 
   function enqueue(url, label, fields, files) {
     var item = {
@@ -194,6 +231,7 @@
       fields: fields,
       files: files || [],
       created_at: new Date().toISOString(),
+      user_id: config.user.id,
       error: ""
     };
     item.fields.client_id = item.client_id;
@@ -205,7 +243,7 @@
     if (syncing || !navigator.onLine) { return Promise.resolve(); }
     syncing = true;
     var sent = 0;
-    return queueAll().then(function (items) {
+    return myQueue().then(function (items) {
       items.sort(function (a, b) { return a.created_at < b.created_at ? -1 : 1; });
       return items.reduce(function (chain, item) {
         return chain.then(function (stop) {
@@ -235,7 +273,7 @@
   }
 
   function refreshQueue() {
-    return queueAll().then(function (items) {
+    return myQueue().then(function (items) {
       $("antrean-jumlah").textContent = items.length;
       $("antrean-pill").hidden = !items.length;
       $("riwayat-antrean-n").textContent = items.length ? "(" + items.length + ")" : "";
@@ -1282,6 +1320,7 @@
           " · Pulang " + fmtTime(a.check_out_at) + (a.missing_checkout ? " · lupa absen pulang" : "") + "</div></li>";
       }).join("") || "<li class='muted'>Belum ada riwayat.</li>";
     }).catch(function (error) { $("absen-hari-ini").textContent = error.message || "Absen butuh koneksi internet."; });
+    loadLeaveRequests();
   }
 
   function doAttendance(action) {
@@ -1315,9 +1354,32 @@
     var data = new FormData(this);
     data.append("aksi", "izin");
     request(urls.attendance, { method: "POST", body: data }).then(function () {
-      toast("Pengajuan tersimpan.", "ok");
+      toast("Pengajuan terkirim, menunggu persetujuan koordinator.", "ok");
       event.target.reset();
       loadAttendance();
+    }).catch(function (error) { toast(error.message, "error"); });
+  });
+
+  function loadLeaveRequests() {
+    if (!perms.setujuiIzin) { return; }
+    $("izin-tim").hidden = false;
+    request(urls.leaveRequests).then(function (data) {
+      $("izin-tim-daftar").innerHTML = data.results.map(function (a) {
+        return "<li><div class='title'>" + escapeHtml(a.user) + " · " + fmtDate(a.date) + " · " + escapeHtml(a.status_label) + "</div>" +
+          "<div class='sub'>" + escapeHtml(a.note || "") + (a.attachment ? " · <a href='" + escapeHtml(a.attachment) + "' target='_blank' rel='noopener'>lampiran</a>" : "") + "</div>" +
+          "<div class='row'><button type='button' class='btn-small' data-izin='" + a.id + "' data-keputusan='setuju'>Setujui</button>" +
+          "<button type='button' class='btn-small' data-izin='" + a.id + "' data-keputusan='tolak'>Tolak</button></div></li>";
+      }).join("") || "<li class='muted'>Tidak ada pengajuan menunggu.</li>";
+    }).catch(function (error) { $("izin-tim-daftar").innerHTML = "<li class='muted'>" + escapeHtml(error.message) + "</li>"; });
+  }
+
+  $("izin-tim-daftar").addEventListener("click", function (event) {
+    var id = event.target.getAttribute("data-izin");
+    if (!id) { return; }
+    var decision = event.target.getAttribute("data-keputusan");
+    request(urls.leaveDecision.replace("/0/", "/" + id + "/"), { method: "POST", body: form({ keputusan: decision }) }).then(function () {
+      toast(decision === "setuju" ? "Pengajuan disetujui." : "Pengajuan ditolak.", "ok");
+      loadLeaveRequests();
     }).catch(function (error) { toast(error.message, "error"); });
   });
 
@@ -1643,7 +1705,8 @@
     if (!perms.tugas) { $("tugas-daftar").innerHTML = "<li class='muted'>Anda tidak berhak melihat tugas.</li>"; return; }
     request(urls.tasks + ($("tugas-filter").value ? "?status=semua" : "")).then(function (data) {
       $("tugas-daftar").innerHTML = data.results.map(function (t) {
-        var statusSelect = perms.ubahTugas ? '<select data-status="' + t.id + '">' + config.choices.taskStatus.map(function (c) {
+        var statusChoices = config.choices.taskStatus.filter(function (c) { return c.value !== "batal" || t.can_cancel || t.status === "batal"; });
+        var statusSelect = perms.ubahTugas ? '<select data-status="' + t.id + '">' + statusChoices.map(function (c) {
           return '<option value="' + escapeHtml(c.value) + '"' + (c.value === t.status ? " selected" : "") + ">" + escapeHtml(c.label) + "</option>";
         }).join("") + "</select>" : "<span class='badge'>" + escapeHtml(t.status_label) + "</span>";
         return "<li><div class='title'>" + escapeHtml(t.title) + (t.overdue ? " <span class='badge' style='background:#cf222e'>terlambat</span>" : "") + "</div>" +
@@ -1696,8 +1759,9 @@
       var today = new Date().toISOString().slice(0, 10);
       me.days.forEach(function (d) {
         var cls = DAY_CLASS[d.status] || (d.workday && d.date < today ? "alpa" : "");
+        if (d.approval === "menunggu" || d.approval === "ditolak") { cls += " " + d.approval; }
         if (!d.workday) { cls += " libur"; }
-        calendar += "<div class='" + cls + "' title='" + escapeHtml(d.date + (d.status ? " · " + d.status : "") + " · " + d.activities + " kegiatan") + "'>" +
+        calendar += "<div class='" + cls + "' title='" + escapeHtml(d.date + (d.status ? " · " + d.status : "") + (d.approval === "menunggu" ? " (menunggu persetujuan)" : d.approval === "ditolak" ? " (ditolak)" : "") + " · " + d.activities + " kegiatan") + "'>" +
           parseInt(d.date.slice(8), 10) + (d.activities ? "•" : "") + "</div>";
       });
     }
@@ -2056,6 +2120,25 @@
     if (!installPrompt) { return; }
     installPrompt.prompt();
     installPrompt.userChoice.finally(function () { installPrompt = null; $("pasang").hidden = true; });
+  });
+
+  $("keluar").addEventListener("click", function () {
+    myQueue().catch(function () { return []; }).then(function (items) {
+      if (items.length && !window.confirm(items.length + " laporan di antrean belum terkirim dan akan dihapus dari perangkat. Tetap keluar?")) { return; }
+      Promise.all([purgeOfflineData(true), queueClear()]).then(function () {
+        try { localStorage.removeItem(STORAGE_PREFIX + "pengguna"); } catch (e) { /* abaikan */ }
+        var logout = document.createElement("form");
+        logout.method = "post";
+        logout.action = urls.logout;
+        var token = document.createElement("input");
+        token.type = "hidden";
+        token.name = "csrfmiddlewaretoken";
+        token.value = csrf();
+        logout.appendChild(token);
+        document.body.appendChild(logout);
+        logout.submit();
+      });
+    });
   });
 
   if ("serviceWorker" in navigator) {

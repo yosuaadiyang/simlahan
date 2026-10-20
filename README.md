@@ -264,6 +264,20 @@ ketika sinyal kembali). Pintasan: `/komando/?tab=absen`, `?tab=korwil` (lapor),
 `?tab=perf` (kinerja), `?tab=tasks` (tugas). Tekan `Ctrl+K` atau `/` untuk
 pencarian & Power Mode.
 
+Pemisahan data: Administrator, superuser, dan Petugas Aset Lahan melihat data
+per unit layanan. Petugas Lapangan dan Koordinator Wilayah hanya melihat Korwil
+tempat mereka menjadi anggota atau koordinator (warga, kegiatan, uji tanah,
+SOS, chat, berkas, lapisan peta, posisi Live, ringkasan, dan panel); data tanpa
+Korwil hanya terlihat oleh pembuatnya. Data baru yang lokasinya di Korwil lain
+masuk ke satu-satunya Korwil petugas, atau ditolak bila petugas memegang lebih
+dari satu Korwil (SOS tidak pernah ditolak). NIK & nomor KK warga hanya tampil
+bagi pemegang izin "Dapat melihat NIK dan nomor KK warga" (Administrator).
+Izin, sakit, cuti, dan dinas luar baru dihitung pada KPI setelah disetujui
+koordinator Korwil (tab Absen → Persetujuan izin tim) atau Administrator
+(panel Absensi → tindakan Setujui/Tolak); penerima tugas tidak dapat
+membatalkan tugasnya sendiri. Tombol **Keluar** di pusat komando menghapus
+lapisan peta tersimpan dan antrean luring dari perangkat.
+
 | Kebutuhan | Tempat |
 |---|---|
 | Korwil (kode, nama, warna, batas wilayah, koordinator, anggota), impor batas dari GeoJSON/KML/SHP/GPKG | `/admin/operasi/` → Korwil (koordinator wilayah) → **Impor batas SHP/KML/GeoJSON** |
@@ -279,7 +293,9 @@ Kolom impor warga (CSV, pemisah `,` `;` atau tab; atau GeoJSON/KML/SHP/GPKG):
 `nama` (wajib), `nik`, `kk`, `jiwa`, `telepon`, `kampung`, `alamat`, `korwil`
 (kode), `lat`, `lng`, `sikap` (pro/netral/kontra), `status_lahan`
 (sudah/belum), `rtrw` (sesuai/tidak), `pilihan` (relokasi/kompensasi/geser/lainnya),
-`catatan`. NIK yang sama memperbarui warga yang ada. Atribut impor batas Korwil:
+`catatan`. NIK yang sama memperbarui warga di wilayah kerja pengimpor (perlu hak
+ubah warga; catatan ditambahkan, tidak ditimpa); baris dengan NIK yang tidak
+dapat dipakai dilewati. Atribut impor batas Korwil:
 `kode` (wajib), `nama`, `warna`.
 
 AI Satelit menganalisis citra kotak area dengan Claude bila `ANTHROPIC_API_KEY`

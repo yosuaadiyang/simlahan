@@ -86,6 +86,9 @@ def test_leave_request_rules(field, korwil):
         services.request_leave(field, status="sakit", date=today, note=" ")
     leave = services.request_leave(field, status="sakit", date=today, note="Demam")
     assert leave.status == enums.AttendanceStatus.SICK and leave.korwil == korwil
+    assert leave.approval == enums.LeaveApproval.PENDING
+    # Izin yang sudah disetujui menghalangi absen masuk.
+    services.decide_leave(leave, korwil.coordinator, True)
     with pytest.raises(ValidationError):
         services.check_in(field, location=inside(korwil))
 

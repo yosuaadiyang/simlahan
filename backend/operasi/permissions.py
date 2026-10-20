@@ -29,6 +29,8 @@ VAC = ("view", "add", "change")
 VD = ("view", "delete")
 VAD = ("view", "add", "delete")
 ALL = ("view", "add", "change", "delete")
+# NIK & nomor KK warga hanya untuk Administrator.
+NIK = "view_resident_nik"
 
 
 def _perms(admin, coordinator=None, field=None, asset=None):
@@ -45,7 +47,7 @@ OPERASI_GROUP_MODEL_PERMISSIONS: GroupModelPermissions = {
     CommandSettings: _perms(VC),
     SystemLock: _perms(None),
     Korwil: _perms(ALL, V, V, V),
-    Resident: _perms(ALL, VAC, VAC, V),
+    Resident: _perms(ALL + (NIK,), VAC, VAC, V),
     StanceChange: _perms(V, V, V, V),
     Activity: _perms(ALL, VAC, VA, V),
     ActivityPhoto: _perms(ALL, VAC, VA, V),

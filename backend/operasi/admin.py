@@ -100,6 +100,19 @@ class OperasiAdminMixin:
 
     scope_prefix: str | None = "korwil"
     file_kinds: dict[str, str] = {}
+    # Bila diisi, baris hanya dapat diubah oleh pembuatnya (field ini),
+    # koordinator Korwil-nya, atau pengawas (Administrator / Petugas Aset Lahan).
+    owner_field: str | None = None
+
+    def has_change_permission(self, request, obj=None):
+        if not super().has_change_permission(request, obj):
+            return False
+        if obj is None or self.owner_field is None or geo.is_supervisor(request.user):
+            return True
+        user = request.user
+        if getattr(obj, f"{self.owner_field}_id") == user.pk:
+            return True
+        return bool(obj.korwil_id and obj.korwil.coordinator_id == user.pk)
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
@@ -492,6 +505,13 @@ class StanceChangeInline(admin.TabularInline):
         return False
 
 
+NIK_FIELDS = ("nik", "family_card_number")
+
+
+def sees_nik(request) -> bool:
+    return request.user.has_perm("operasi.view_resident_nik")
+
+
 @admin.register(Resident)
 class ResidentAdmin(OperasiGISAdmin):
     list_display = (
@@ -575,10 +595,28 @@ class ResidentAdmin(OperasiGISAdmin):
             ),
         )
 
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = super().get_fieldsets(request, obj)
+        if sees_nik(request):
+            return fieldsets
+        # Tanpa izin NIK, kolom NIK & KK tidak tampil (dan tidak ikut formulir).
+        return [
+            (
+                name,
+                {
+                    **options,
+                    "fields": tuple(
+                        f for f in options["fields"] if f not in NIK_FIELDS
+                    ),
+                },
+            )
+            for name, options in fieldsets
+        ]
+
     def get_search_results(self, request, queryset, search_term):
         results, distinct = super().get_search_results(request, queryset, search_term)
         digits = "".join(ch for ch in search_term if ch.isdigit())
-        if len(digits) == 16:
+        if len(digits) == 16 and sees_nik(request):
             from pengadaan.crypto import fingerprint
 
             results = results | queryset.filter(nik_fingerprint=fingerprint(digits))
@@ -588,6 +626,7 @@ class ResidentAdmin(OperasiGISAdmin):
         if not change and obj.created_by_id is None:
             obj.created_by = request.user
         obj._changed_by = request.user
+        geo.assign_korwil(obj, request.user, strict=False)
         super().save_model(request, obj, form, change)
 
     @admin.action(description=_("Ekspor CSV"), permissions=["view"])
@@ -665,8 +704,12 @@ class ResidentAdmin(OperasiGISAdmin):
             else:
                 messages.success(
                     request,
-                    _("%(c)d warga dibuat, %(u)d diperbarui.")
-                    % {"c": result["created"], "u": result["updated"]},
+                    _("%(c)d warga dibuat, %(u)d diperbarui, %(s)d dilewati.")
+                    % {
+                        "c": result["created"],
+                        "u": result["updated"],
+                        "s": result.get("skipped", 0),
+                    },
                 )
                 for error in result.get("errors", [])[:20]:
                     messages.warning(request, error)
@@ -685,8 +728,9 @@ class ResidentAdmin(OperasiGISAdmin):
                 "<code>kampung</code>, <code>alamat</code>, <code>korwil</code>, <code>lat</code>, "
                 "<code>lng</code>, <code>sikap</code> (pro/netral/kontra), <code>status_lahan</code> "
                 "(sudah/belum), <code>rtrw</code> (sesuai/tidak), <code>pilihan</code> "
-                "(relokasi/uang/geser), <code>catatan</code>. Warga dengan NIK yang sudah ada "
-                "diperbarui."
+                "(relokasi/uang/geser), <code>catatan</code>. Warga di wilayah kerja Anda "
+                "dengan NIK yang sudah ada diperbarui (catatan ditambahkan); baris lain "
+                "dengan NIK yang tidak dapat dipakai dilewati."
             ),
         )
 
@@ -710,6 +754,7 @@ class ActivityPhotoInline(admin.TabularInline):
 
 @admin.register(Activity)
 class ActivityAdmin(OperasiGISAdmin):
+    owner_field = "reported_by"
     list_display = (
         "number",
         "title",
@@ -781,11 +826,19 @@ class ActivityAdmin(OperasiGISAdmin):
     def photo_count(self, obj):
         return obj._photos
 
+    def get_readonly_fields(self, request, obj=None):
+        fields = super().get_readonly_fields(request, obj)
+        if aset_scope.sees_all(request.user):
+            return fields
+        # Verifikasi oleh koordinator lewat tindakan/pusat komando, bukan kotak centang.
+        return (*fields, "verified")
+
     def save_model(self, request, obj, form, change):
         if not change and obj.reported_by_id is None:
             obj.reported_by = request.user
         if "verified" in form.changed_data:
             obj.verified_by = request.user if obj.verified else None
+        geo.assign_korwil(obj, request.user, strict=False)
         super().save_model(request, obj, form, change)
 
     def save_related(self, request, form, formsets, change):
@@ -794,6 +847,9 @@ class ActivityAdmin(OperasiGISAdmin):
 
     @admin.action(description=_("Tandai sudah diverifikasi"), permissions=["change"])
     def mark_verified(self, request, queryset):
+        if not aset_scope.sees_all(request.user):
+            # Koordinator hanya memverifikasi laporan Korwil yang dipimpinnya.
+            queryset = queryset.filter(korwil__coordinator=request.user)
         count = 0
         for activity in queryset.filter(verified=False):
             activity.verified = True
@@ -844,6 +900,7 @@ class ActivityAdmin(OperasiGISAdmin):
 
 @admin.register(SoilTest)
 class SoilTestAdmin(OperasiGISAdmin):
+    owner_field = "sampled_by"
     file_kinds = {"photo": "tanah-foto", "lab_report": "tanah-lab"}
     list_display = (
         "number",
@@ -897,6 +954,7 @@ class SoilTestAdmin(OperasiGISAdmin):
     def save_model(self, request, obj, form, change):
         if not change and obj.sampled_by_id is None:
             obj.sampled_by = request.user
+        geo.assign_korwil(obj, request.user, strict=False)
         super().save_model(request, obj, form, change)
 
     @admin.action(description=_("Ekspor CSV"), permissions=["view"])
@@ -965,13 +1023,26 @@ class AttendanceAdmin(OperasiGISAdmin):
         "check_out_in_area",
         "worked",
         "missing_checkout",
+        "approval",
     )
-    list_filter = ("status", "korwil", "missing_checkout", "check_in_in_area", "date")
+    list_filter = (
+        "status",
+        "approval",
+        "korwil",
+        "missing_checkout",
+        "check_in_in_area",
+        "date",
+    )
     date_hierarchy = "date"
     search_fields = ("user__username", "user__first_name", "user__last_name", "note")
-    actions = ("export_csv",)
+    actions = ("approve_leave", "reject_leave", "export_csv")
+    readonly_fields = ("approved_by", "approved_at")
     fieldsets = (
         (None, {"fields": ("user", "date", "status", "korwil", "note", "attachment")}),
+        (
+            _("Persetujuan izin"),
+            {"fields": ("approval", "approved_by", "approved_at")},
+        ),
         (
             _("Masuk"),
             {
@@ -1017,6 +1088,37 @@ class AttendanceAdmin(OperasiGISAdmin):
     def has_delete_permission(self, request, obj=None):
         return self._manages(request) and super().has_delete_permission(request, obj)
 
+    def save_model(self, request, obj, form, change):
+        if obj.status not in enums.ABSENCE_STATUSES:
+            obj.approval = ""
+            obj.approved_by, obj.approved_at = None, None
+        elif not obj.approval:
+            # Izin yang dicatat langsung oleh Administrator dianggap disetujui.
+            obj.approval = enums.LeaveApproval.APPROVED
+        if obj.approval and (
+            "approval" in form.changed_data or obj.approved_by_id is None
+        ):
+            obj.approved_by, obj.approved_at = request.user, timezone.now()
+        super().save_model(request, obj, form, change)
+
+    def _decide(self, request, queryset, approve: bool):
+        pending = services.leave_requests(request.user).filter(
+            pk__in=queryset.values("pk")
+        )
+        count = 0
+        for record in pending:
+            services.decide_leave(record, request.user, approve)
+            count += 1
+        messages.success(request, _("%d pengajuan izin diputuskan.") % count)
+
+    @admin.action(description=_("Setujui pengajuan izin"), permissions=["change"])
+    def approve_leave(self, request, queryset):
+        self._decide(request, queryset, True)
+
+    @admin.action(description=_("Tolak pengajuan izin"), permissions=["change"])
+    def reject_leave(self, request, queryset):
+        self._decide(request, queryset, False)
+
     @admin.display(description=_("Masuk"), ordering="check_in_at")
     def check_in_time(self, obj):
         return (
@@ -1044,7 +1146,7 @@ class AttendanceAdmin(OperasiGISAdmin):
             (
                 a.date,
                 a.user.get_full_name() or a.user.get_username(),
-                a.get_status_display(),
+                a.status_text,
                 a.korwil.code if a.korwil_id else "",
                 _local(a.check_in_at),
                 {True: _("Ya"), False: _("Tidak")}.get(a.check_in_in_area, ""),
@@ -1079,6 +1181,7 @@ class AttendanceAdmin(OperasiGISAdmin):
 
 @admin.register(ChatMessage)
 class ChatMessageAdmin(ReadOnlyAdminMixin, OperasiModelAdmin):
+    scope_prefix = None
     list_display = ("created_at", "channel", "sender", "short_body", "is_system")
     list_filter = ("is_system", "korwil", "created_at")
     date_hierarchy = "created_at"
@@ -1096,6 +1199,9 @@ class ChatMessageAdmin(ReadOnlyAdminMixin, OperasiModelAdmin):
         "is_system",
         "created_at",
     )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).filter(services.chat_q(request.user))
 
     @admin.display(description=_("Kanal"), ordering="korwil__code")
     def channel(self, obj):
@@ -1210,6 +1316,14 @@ class OfficerPositionAdmin(ReadOnlyAdminMixin, OperasiGISAdmin):
         "battery_pct",
         "updated_at",
     )
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .filter(user__in=services.visible_officers(request.user))
+            .select_related("user")
+        )
 
 
 @admin.register(AreaAnalysis)
