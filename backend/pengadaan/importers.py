@@ -1,9 +1,10 @@
-"""Impor peta bidang (GeoJSON atau Shapefile dalam ZIP) ke daftar bidang proyek.
+"""Impor peta bidang (GeoJSON, KML/KMZ, atau Shapefile dalam ZIP) ke daftar bidang proyek.
 
 Peta bidang dari BPN umumnya tersedia sebagai SHP/DXF dalam sistem koordinat
 TM-3 atau UTM. Shapefile wajib menyertakan berkas .prj agar dapat diproyeksikan
 ulang otomatis ke WGS 84 (EPSG:4326). GeoJSON diasumsikan WGS 84 sesuai RFC 7946
-kecuali menyertakan anggota "crs".
+kecuali menyertakan anggota "crs". KML/KMZ (Google Earth) selalu WGS 84; nomor
+bidang biasanya ada di atribut "Name".
 """
 
 import json
@@ -21,7 +22,13 @@ from django.db import transaction
 from django.utils.translation import gettext as _
 
 from pengadaan.models import AcquisitionParcel
-from utils.geometry import force_2d
+from utils.geometry import (
+    KML_EXTENSIONS,
+    SpatialFileError,
+    force_2d,
+    ogr_feature_geometry,
+    read_kml_features,
+)
 
 MAX_FEATURES = 20000
 MAX_UNCOMPRESSED_BYTES = 200 * 1024 * 1024
@@ -193,8 +200,9 @@ def _iter_shapefile_zip(path: str):
         for feature in layer:
             props = {name: feature.get(name) for name in layer.fields}
             geom = None
-            if feature.geom is not None:
-                geom = _ogr_to_geos(feature.geom)
+            ogr_geom = ogr_feature_geometry(feature)
+            if ogr_geom is not None:
+                geom = _ogr_to_geos(ogr_geom)
             yield props, geom
     finally:
         shutil.rmtree(tmpdir, ignore_errors=True)
@@ -224,6 +232,25 @@ def import_parcels(
             )
         finally:
             os.unlink(tmp_path)
+    if name.endswith(KML_EXTENSIONS):
+        try:
+            rows = read_kml_features(uploaded_file.read(), name)
+        except SpatialFileError as error:
+            raise ImportError_(str(error))
+        # Google Earth menyimpan label placemark di "Name"; pakai bila atribut
+        # nomor bidang yang diminta tidak ada.
+        rows = [
+            (
+                (
+                    {**props, number_field: props["Name"]}
+                    if props.get(number_field) in (None, "") and props.get("Name")
+                    else props
+                ),
+                geom,
+            )
+            for props, geom in rows
+        ]
+        return _import_rows(project, rows, number_field, area_field, update_existing)
     if name.endswith((".geojson", ".json")):
         return _import_rows(
             project,
@@ -233,7 +260,10 @@ def import_parcels(
             update_existing,
         )
     raise ImportError_(
-        _("Supported formats: GeoJSON (.geojson/.json) or zipped shapefile (.zip).")
+        _(
+            "Supported formats: GeoJSON (.geojson/.json), KML/KMZ (.kml/.kmz) or "
+            "zipped shapefile (.zip)."
+        )
     )
 
 

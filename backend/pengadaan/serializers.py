@@ -893,6 +893,7 @@ class AcquisitionDocumentSerializer(serializers.ModelSerializer):
             "geojson",
             "json",
             "kml",
+            "kmz",
             "dxf",
             "dwg",
             "shp",

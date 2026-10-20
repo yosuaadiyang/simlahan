@@ -470,7 +470,7 @@ class KorwilAdmin(OperasiGISAdmin):
             form,
             _("Impor batas Korwil"),
             _(
-                "GeoJSON, KML, GeoPackage (.gpkg), atau Shapefile dalam ZIP berisi poligon "
+                "GeoJSON, KML/KMZ (Google Earth), GeoPackage (.gpkg), atau Shapefile dalam ZIP berisi poligon "
                 "wilayah. Atribut yang dikenali: <code>kode</code> (wajib, mis. A), "
                 "<code>nama</code>, <code>warna</code> (#RRGGBB), <code>kampung</code>. "
                 "Korwil dengan kode yang sudah ada diperbarui batasnya."
@@ -679,7 +679,7 @@ class ResidentAdmin(OperasiGISAdmin):
             form,
             _("Impor data warga"),
             _(
-                "CSV (pemisah koma atau titik koma) atau berkas spasial titik (GeoJSON, KML, "
+                "CSV (pemisah koma atau titik koma) atau berkas spasial titik (GeoJSON, KML/KMZ, "
                 "GeoPackage, Shapefile ZIP). Kolom yang dikenali: <code>nama</code> (wajib), "
                 "<code>nik</code>, <code>kk</code>, <code>jiwa</code>, <code>telepon</code>, "
                 "<code>kampung</code>, <code>alamat</code>, <code>korwil</code>, <code>lat</code>, "

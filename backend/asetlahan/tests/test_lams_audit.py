@@ -372,3 +372,14 @@ def test_assistant_period_and_zone_parsing():
     assert assistant._allocation_period("alokasi maret 2025") == (2025, 3)
     assert assistant._allocation_period("alokasi tahun 2024") == (2024, None)
     assert assistant._allocation_period("alokasi bulan ini")[1] == TODAY().month
+
+
+def test_import_assets_and_overlays_from_kmz(seeded, make_kmz):
+    kmz = make_kmz([("Aset KMZ", {"kode": "KMZ-A"}), ("Tanpa kode", {})])
+    assert importers.import_assets(kmz, filename="aset.kmz") == (2, 0)
+    asset = LandAsset.objects.get(code="KMZ-A")
+    assert asset.name == "Aset KMZ" and not asset.geometry.hasz
+    features = importers.read_overlay_features(kmz, "lapisan.KMZ")
+    assert [name for name, _geom, _props in features] == ["Aset KMZ", "Tanpa kode"]
+    with pytest.raises(importers.AssetImportError, match="KMZ"):
+        importers.import_assets(b"bukan zip", filename="aset.kmz")

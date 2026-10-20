@@ -354,3 +354,14 @@ def test_sample_data_command(admin_user):
     call_command("operasi_contoh_rempang", "--hapus", stdout=io.StringIO())
     assert not Korwil.objects.exists() and not Resident.objects.exists()
     assert not Activity.objects.exists() and not SoilTest.objects.exists()
+
+
+def test_korwil_import_from_kmz(admin_user, make_kmz):
+    from django.core.files.uploadedfile import SimpleUploadedFile
+
+    kmz = make_kmz([("Rempang Cate", {"kode": "c", "warna": "#123456"})])
+    upload = SimpleUploadedFile("korwil.kmz", kmz)
+    response = login(admin_user).post("/admin/operasi/korwil/impor/", {"file": upload})
+    assert response.status_code == 302
+    korwil = Korwil.objects.get()
+    assert (korwil.code, korwil.name, korwil.color) == ("C", "Rempang Cate", "#123456")

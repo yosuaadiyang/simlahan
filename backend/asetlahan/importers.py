@@ -1,4 +1,4 @@
-"""Impor aset lahan dari berkas spasial: GeoJSON, KML, GeoPackage, atau Shapefile (ZIP).
+"""Impor aset lahan dari berkas spasial: GeoJSON, KML/KMZ, GeoPackage, atau Shapefile (ZIP).
 
 Atribut yang dikenali (huruf besar/kecil bebas): kode/code, nama/name,
 kecamatan, kelurahan/desa, alamat, nomor_hak, nib, pemegang_hak, peruntukan,
@@ -19,7 +19,12 @@ from django.db import transaction
 
 from asetlahan import geo
 from asetlahan.models import LandAsset, MapOverlayFeature, next_number
-from utils.geometry import force_2d
+from utils.geometry import (
+    SpatialFileError,
+    force_2d,
+    kml_from_kmz,
+    ogr_feature_geometry,
+)
 
 MAX_FEATURES = 5000
 MAX_OVERLAY_FEATURES = 20000
@@ -96,14 +101,18 @@ def _geojson_features(data: bytes):
 def _ogr_features(path: str):
     try:
         source = DataSource(path)
-    except GDALException as error:
-        raise AssetImportError(f"Berkas tidak dapat dibaca: {error}")
+    except GDALException:
+        # Pesan GDAL berbahasa Inggris dan teknis; jangan diteruskan ke pengguna.
+        raise AssetImportError(
+            "Berkas tidak dapat dibaca. Pastikan format dan isinya benar."
+        )
     for layer in source:
         for feature in layer:
-            if feature.geom is None:
+            ogr_geom = ogr_feature_geometry(feature)
+            if ogr_geom is None:
                 continue
             props = {name: feature.get(name) for name in feature.fields}
-            geom = feature.geom.geos
+            geom = ogr_geom.geos
             if geom.srid is None:
                 geom.srid = 4326
             yield props, force_2d(geom)
@@ -133,10 +142,17 @@ def _read_features(data: bytes, filename: str) -> list:
     extension = os.path.splitext(filename.lower())[1]
     if extension in ("", ".json", ".geojson"):
         return list(_geojson_features(data))
-    if extension not in (".zip", ".kml", ".gpkg"):
+    if extension not in (".zip", ".kml", ".kmz", ".gpkg"):
         raise AssetImportError(
-            "Format tidak didukung. Gunakan GeoJSON, KML, GeoPackage, atau Shapefile (ZIP)."
+            "Format tidak didukung. Gunakan GeoJSON, KML/KMZ, GeoPackage, atau "
+            "Shapefile (ZIP)."
         )
+    if extension == ".kmz":
+        try:
+            data = kml_from_kmz(data)
+        except SpatialFileError as error:
+            raise AssetImportError(str(error))
+        extension = ".kml"
     with tempfile.TemporaryDirectory() as directory:
         if extension == ".zip":
             path = _extract_shapefile(data, directory)

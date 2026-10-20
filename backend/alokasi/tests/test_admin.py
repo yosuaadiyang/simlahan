@@ -313,3 +313,21 @@ def test_superuser_sees_everything(client, django_user_model, password, seeded):
             ).status_code
             == 200
         )
+
+
+def test_kmz_import_uses_placemark_name_as_code(client, officer, make_kmz):
+    from django.core.files.uploadedfile import SimpleUploadedFile
+
+    client.force_login(officer)
+    kmz = make_kmz([("RMP-K1", {"kecamatan": "Galang"}), ("RMP-K2", {})])
+    for expected in (2, 2):
+        upload = SimpleUploadedFile("lahan.kmz", kmz)
+        response = client.post(
+            reverse("admin:alokasi_landplot_import"),
+            {"file": upload, "allocation_type": "reguler"},
+        )
+        assert response.status_code == 302
+        assert LandPlot.objects.filter(code__startswith="RMP-K").count() == expected
+    plot = LandPlot.objects.get(code="RMP-K1")
+    assert plot.name == "RMP-K1" and plot.district == "Galang"
+    assert not plot.geometry.hasz and plot.area_m2 > 0

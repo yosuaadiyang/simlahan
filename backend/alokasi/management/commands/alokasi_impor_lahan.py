@@ -1,4 +1,4 @@
-"""Impor lahan dari berkas GeoJSON.
+"""Impor lahan dari berkas GeoJSON atau KML/KMZ.
 
 python manage.py alokasi_impor_lahan lahan.geojson --jenis reguler --tampilkan
 """
@@ -11,12 +11,10 @@ from alokasi.importers import PlotImportError, import_plots
 
 
 class Command(BaseCommand):
-    help = (
-        "Impor/perbarui data lahan alokasi dari GeoJSON (Polygon/MultiPolygon, WGS84)"
-    )
+    help = "Impor/perbarui data lahan alokasi dari GeoJSON atau KML/KMZ (Polygon/MultiPolygon, WGS84)"
 
     def add_arguments(self, parser):
-        parser.add_argument("path", help="Berkas GeoJSON")
+        parser.add_argument("path", help="Berkas GeoJSON atau KML/KMZ")
         parser.add_argument(
             "--jenis",
             choices=enums.AllocationType.values,
@@ -39,6 +37,7 @@ class Command(BaseCommand):
             with transaction.atomic():
                 created, updated = import_plots(
                     data,
+                    filename=options["path"],
                     defaults={
                         "allocation_type": options["jenis"],
                         "is_published": options["tampilkan"],

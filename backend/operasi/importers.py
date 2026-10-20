@@ -1,6 +1,6 @@
 """Impor batas Korwil (berkas spasial) dan data warga (CSV atau titik spasial).
 
-Batas Korwil: GeoJSON, KML, GeoPackage, atau Shapefile (ZIP) berpoligon dengan
+Batas Korwil: GeoJSON, KML/KMZ, GeoPackage, atau Shapefile (ZIP) berpoligon dengan
 atribut ``kode`` (wajib) dan ``nama``/``warna`` (opsional). Korwil dengan kode
 yang sama diperbarui.
 
