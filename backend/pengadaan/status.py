@@ -74,3 +74,47 @@ def derive_parcel_status(parcel) -> str:  # noqa: C901
         return P.ANNOUNCED if announced else P.INVENTORIED
 
     return P.IDENTIFIED
+
+
+SETTLED_CONSIGNMENT_STATUSES = (
+    enums.ConsignmentStatus.DEPOSITED,
+    enums.ConsignmentStatus.COLLECTED,
+)
+
+
+def consignment_coverage(parcel_id) -> tuple[bool, set[int]]:
+    """Cakupan konsinyasi yang sudah dititipkan di pengadilan pada sebuah bidang.
+
+    Mengembalikan (seluruh bidang tercakup, id pihak yang tercakup). Konsinyasi
+    tanpa pihak mencakup semua pihak bidang tersebut.
+    """
+    from pengadaan.models import Consignment
+
+    party_ids = set(
+        Consignment.objects.filter(
+            parcel_id=parcel_id, status__in=SETTLED_CONSIGNMENT_STATUSES
+        ).values_list("party_id", flat=True)
+    )
+    covers_all = None in party_ids
+    party_ids.discard(None)
+    return covers_all, party_ids
+
+
+def is_parcel_settled(parcel) -> bool:
+    """Semua ganti kerugian bidang (yang tidak dibatalkan) sudah lunas/dititipkan.
+
+    Bidang tanpa ganti kerugian dianggap selesai hanya bila ada konsinyasi
+    yang sudah dititipkan.
+    """
+    compensations = list(
+        parcel.compensations.exclude(status=enums.CompensationStatus.CANCELLED)
+    )
+    covers_all, party_ids = consignment_coverage(parcel.pk)
+    if not compensations:
+        return covers_all or bool(party_ids)
+    return all(
+        c.status in (enums.CompensationStatus.PAID, enums.CompensationStatus.CONSIGNED)
+        or covers_all
+        or (c.party_id is not None and c.party_id in party_ids)
+        for c in compensations
+    )

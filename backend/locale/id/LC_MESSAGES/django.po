@@ -4955,11 +4955,11 @@ msgid "Monetary compensation must be greater than zero."
 msgstr "Ganti kerugian uang harus lebih besar dari nol."
 
 msgid ""
-"Rights can only be released after compensation has been paid or consigned to"
-" the court."
+"Rights can only be released after all compensation of the parcel has been "
+"paid or consigned to the court."
 msgstr ""
-"Hak hanya dapat dilepaskan setelah ganti kerugian dibayar atau dititipkan di"
-" pengadilan."
+"Hak hanya dapat dilepaskan setelah seluruh ganti kerugian bidang dibayar atau "
+"dititipkan di pengadilan."
 
 msgid "All parcels must belong to the selected project."
 msgstr "Semua bidang harus termasuk dalam proyek yang dipilih."
@@ -6939,3 +6939,63 @@ msgstr "Anda hanya dapat membuat tagihan untuk sewa di unit layanan Anda."
 
 msgid "You can only copy decisions of leases in your service unit."
 msgstr "Anda hanya dapat menyalin keputusan sewa di unit layanan Anda."
+
+msgid "Assigned users"
+msgstr "Pengguna yang ditugaskan"
+
+msgid "Land appraisers and users of the agency requiring the land only see the projects they are assigned to."
+msgstr "Penilai Pertanahan dan pengguna Instansi Yang Memerlukan Tanah hanya melihat proyek yang ditugaskan kepada mereka."
+
+msgid "This cannot be changed after the milestone has been created."
+msgstr "Tidak dapat diubah setelah tonggak dibuat."
+
+msgid "This milestone is managed by the implementing team."
+msgstr "Tonggak ini dikelola oleh Pelaksana Pengadaan Tanah."
+
+msgid "Only the status, actual date and note of this milestone can be changed."
+msgstr "Hanya status, tanggal realisasi dan catatan tonggak ini yang dapat diubah."
+
+msgid "The compensation was changed after validation and was returned to determined; it must be validated again by the executing chair."
+msgstr "Ganti kerugian diubah setelah divalidasi sehingga kembali berstatus ditetapkan; Ketua Pelaksana perlu memvalidasinya ulang."
+
+msgid "Bank details changed: %(count)d validated compensation(s) of this party were returned to determined and must be validated again by the executing chair."
+msgstr "Rekening bank berubah: %(count)d ganti kerugian tervalidasi milik pihak ini kembali berstatus ditetapkan dan perlu divalidasi ulang oleh Ketua Pelaksana."
+
+msgid "Paid, consigned or cancelled compensation cannot be changed; only the note can be edited."
+msgstr "Ganti kerugian yang sudah dibayar, dititipkan atau dibatalkan tidak dapat diubah; hanya catatan yang dapat disunting."
+
+msgid "Amount cannot be less than what has been paid."
+msgstr "Nilai tidak boleh lebih kecil dari jumlah yang sudah dibayar."
+
+msgid "Valuation does not belong to the selected parcel."
+msgstr "Penilaian tidak terkait dengan bidang yang dipilih."
+
+msgid "Deliberation result does not belong to the selected parcel."
+msgstr "Hasil musyawarah tidak terkait dengan bidang yang dipilih."
+
+msgid "Court decision does not concern the selected parcel."
+msgstr "Putusan pengadilan tidak menyangkut bidang yang dipilih."
+
+msgid "Only determined or validated compensation can be cancelled."
+msgstr "Hanya ganti kerugian berstatus ditetapkan atau tervalidasi yang dapat dibatalkan."
+
+msgid "Compensation that already has payments cannot be cancelled."
+msgstr "Ganti kerugian yang sudah memiliki pembayaran tidak dapat dibatalkan."
+
+msgid "Monetary compensation is settled by recording payments."
+msgstr "Ganti kerugian berupa uang diselesaikan dengan mencatat pembayaran."
+
+msgid "The parcel of a rights release cannot be changed."
+msgstr "Bidang pada pelepasan hak tidak dapat diubah."
+
+msgid "A final valuation cannot be changed. Record a new valuation to revise it."
+msgstr "Penilaian final tidak dapat diubah. Catat penilaian baru untuk merevisinya."
+
+msgid "Party does not belong to the selected project."
+msgstr "Pihak tidak terkait dengan proyek yang dipilih."
+
+msgid "Your role cannot upload this type of document."
+msgstr "Peran Anda tidak dapat mengunggah jenis dokumen ini."
+
+msgid "Your role cannot attach documents to a party."
+msgstr "Peran Anda tidak dapat melampirkan dokumen pada pihak yang berhak."

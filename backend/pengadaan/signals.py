@@ -89,6 +89,45 @@ def _handover_deleted(sender, instance, **kwargs):
         parcel.recompute_status()
 
 
+@receiver([post_save, post_delete], sender=Consignment)
+def _consignment_updates_compensation_status(sender, instance, **kwargs):
+    """Ganti kerugian yang dititipkan di pengadilan berstatus "dikonsinyasi".
+
+    Bila konsinyasi dibatalkan/dihapus, status kembali ke tervalidasi atau
+    ditetapkan sesuai ada-tidaknya validasi Ketua Pelaksana.
+    """
+    from pengadaan.enums import CompensationStatus
+    from pengadaan.status import consignment_coverage
+
+    parcel_id = instance.parcel_id
+    if not AcquisitionParcel.all_objects.filter(pk=parcel_id).exists():
+        return
+    covers_all, party_ids = consignment_coverage(parcel_id)
+    compensations = Compensation.objects.filter(parcel_id=parcel_id).exclude(
+        status__in=[CompensationStatus.PAID, CompensationStatus.CANCELLED]
+    )
+    changed = False
+    for compensation in compensations:
+        covered = covers_all or (
+            compensation.party_id is not None and compensation.party_id in party_ids
+        )
+        if covered:
+            new_status = CompensationStatus.CONSIGNED
+        elif compensation.status == CompensationStatus.CONSIGNED:
+            new_status = (
+                CompensationStatus.VALIDATED
+                if compensation.validated_on or compensation.validated_by_id
+                else CompensationStatus.DETERMINED
+            )
+        else:
+            continue
+        if new_status != compensation.status:
+            Compensation.objects.filter(pk=compensation.pk).update(status=new_status)
+            changed = True
+    if changed:
+        _refresh(parcel_id)
+
+
 @receiver([post_save, post_delete], sender=CompensationPayment)
 def _payment_updates_compensation_status(sender, instance, **kwargs):
     from pengadaan.enums import CompensationStatus

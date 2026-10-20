@@ -2,6 +2,20 @@ from django.contrib import admin
 
 from pengadaan import models as m
 
+SENSITIVE_PERMISSION = "pengadaan.view_sensitive_personal_data"
+
+
+class SensitiveFieldsAdminMixin:
+    """Sembunyikan NIK/rekening/KK dari staf tanpa izin data pribadi."""
+
+    sensitive_fields: tuple[str, ...] = ()
+
+    def get_exclude(self, request, obj=None):
+        exclude = list(super().get_exclude(request, obj) or ())
+        if not request.user.has_perm(SENSITIVE_PERMISSION):
+            exclude += [f for f in self.sensitive_fields if f not in exclude]
+        return exclude
+
 
 @admin.register(m.Holiday)
 class HolidayAdmin(admin.ModelAdmin):
@@ -38,13 +52,15 @@ class AcquisitionProjectAdmin(admin.ModelAdmin):
     search_fields = ("identifier", "name", "requiring_agency")
     readonly_fields = ("identifier",)
     raw_id_fields = ("executing_chair", "created_by", "municipality")
+    filter_horizontal = ("assigned_users",)
     inlines = [MilestoneInline]
 
 
-class PartyInline(admin.StackedInline):
+class PartyInline(SensitiveFieldsAdminMixin, admin.StackedInline):
     model = m.EntitledParty
     extra = 0
     exclude = ("deleted", "deleted_by_cascade")
+    sensitive_fields = ("nik", "bank_account_number")
 
 
 class InventoryItemInline(admin.TabularInline):
@@ -83,6 +99,30 @@ class AcquisitionParcelAdmin(admin.ModelAdmin):
     inlines = [PartyInline, InventoryItemInline]
 
 
+@admin.register(m.Compensation)
+class CompensationAdmin(admin.ModelAdmin):
+    list_display = ("parcel", "party", "form", "amount", "status")
+    list_filter = ("status", "form")
+    # Status hanya berubah lewat validasi, pembayaran dan konsinyasi.
+    readonly_fields = ("status", "validated_on", "validated_by")
+    raw_id_fields = (
+        "parcel",
+        "party",
+        "valuation",
+        "deliberation_result",
+        "court_decision",
+    )
+
+
+@admin.register(m.AffectedHousehold)
+class AffectedHouseholdAdmin(SensitiveFieldsAdminMixin, admin.ModelAdmin):
+    list_display = ("head_name", "project", "displacement", "stage")
+    list_filter = ("displacement", "stage")
+    search_fields = ("head_name",)
+    raw_id_fields = ("project", "parcel")
+    sensitive_fields = ("nik", "family_card_number")
+
+
 for model in (
     m.ParcelSurvey,
     m.InventoryItem,
@@ -92,11 +132,9 @@ for model in (
     m.DeliberationResult,
     m.Objection,
     m.Consignment,
-    m.Compensation,
     m.CompensationPayment,
     m.RightsRelease,
     m.Handover,
-    m.AffectedHousehold,
     m.AcquisitionDocument,
 ):
     admin.site.register(model)
