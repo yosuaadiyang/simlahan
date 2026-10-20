@@ -13,6 +13,7 @@ $acq-success: #1b6b3a;
   h1 {
     font-size: 1.75rem;
     margin: 0.25rem 0;
+    overflow-wrap: anywhere;
   }
 
   &__header {
@@ -22,6 +23,10 @@ $acq-success: #1b6b3a;
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 1.25rem;
+
+    > * {
+      min-width: 0;
+    }
   }
 
   &__actions {
@@ -52,6 +57,7 @@ $acq-success: #1b6b3a;
 }
 
 .acq-section {
+  min-width: 0;
   background: #fff;
   border: 1px solid $acq-border;
   border-radius: 4px;
@@ -69,6 +75,7 @@ $acq-success: #1b6b3a;
     h2 {
       font-size: 1.15rem;
       margin: 0;
+      overflow-wrap: anywhere;
     }
   }
 
@@ -87,7 +94,7 @@ $acq-success: #1b6b3a;
 
 .acq-columns {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr));
   gap: 1.25rem;
   align-items: start;
 
@@ -100,12 +107,16 @@ $acq-success: #1b6b3a;
 
 .acq-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
   gap: 0.75rem;
   margin-bottom: 1.25rem;
 }
 
+// Angka panjang (mis. Rp ratusan triliun) dipatahkan ke baris berikutnya,
+// tidak meluber keluar kartu.
 .acq-stat {
+  min-width: 0;
+  overflow-wrap: anywhere;
   background: #fff;
   border: 1px solid $acq-border;
   border-left: 4px solid $acq-green;
@@ -122,6 +133,7 @@ $acq-success: #1b6b3a;
 
   &__value {
     font-size: 1.35rem;
+    line-height: 1.25;
     font-variant-numeric: tabular-nums;
   }
 
@@ -160,8 +172,11 @@ $acq-success: #1b6b3a;
   &__text {
     position: absolute;
     inset: 0;
-    display: flex;
-    align-items: center;
+    display: block;
+    line-height: 1.4rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     padding: 0 0.5rem;
     font-size: 0.8rem;
     font-weight: 600;
@@ -179,7 +194,8 @@ $acq-success: #1b6b3a;
 
   li {
     display: grid;
-    grid-template-columns: minmax(140px, 40%) 1fr;
+    grid-template-columns: minmax(0, 40%) minmax(0, 1fr);
+    overflow-wrap: anywhere;
     gap: 0.75rem;
     align-items: center;
     margin-bottom: 0.4rem;
@@ -372,7 +388,8 @@ $acq-success: #1b6b3a;
   select {
     margin: 0;
     width: auto;
-    min-width: 180px;
+    min-width: min(180px, 100%);
+    max-width: 100%;
   }
 
   input[type="search"] {
@@ -383,7 +400,7 @@ $acq-success: #1b6b3a;
 .acq-form {
   &__grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
     gap: 0.75rem 1rem;
   }
 
@@ -391,6 +408,7 @@ $acq-success: #1b6b3a;
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
+    min-width: 0;
 
     label {
       font-weight: 600;
@@ -438,7 +456,8 @@ $acq-success: #1b6b3a;
 
 .acq-dl {
   display: grid;
-  grid-template-columns: minmax(160px, 35%) 1fr;
+  grid-template-columns: minmax(0, 35%) minmax(0, 1fr);
+  overflow-wrap: anywhere;
   gap: 0.35rem 1rem;
   margin: 0;
 

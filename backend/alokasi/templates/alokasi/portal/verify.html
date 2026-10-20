@@ -17,7 +17,7 @@
       <dt>Atas nama</dt><dd>{{ document.holder_name }}</dd>
       <dt>Diterbitkan</dt><dd>{{ document.issued_at|tanggal }}</dd>
       <dt>Lahan</dt><dd>{{ document.allocation.plot.code }} – {{ document.allocation.plot.name }}</dd>
-      <dt>Luas</dt><dd>{{ document.allocation.area_m2|angka:2 }} m²</dd>
+      <dt>Luas</dt><dd>{{ document.allocation.area_m2|angka:2|patah }} m²</dd>
       <dt>Status alokasi saat ini</dt><dd><span class="badge badge-{{ document.allocation.status }}">{{ document.allocation.get_status_display }}</span></dd>
     </dl>
     {% if document.allocation.status != 'aktif' %}<p class="small">Alokasi atas dokumen ini tidak lagi aktif.</p>{% endif %}

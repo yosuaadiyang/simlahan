@@ -66,7 +66,7 @@
             <td>{{ r.report_date|tanggal }}</td>
             <td>{{ r.get_stage_display }}</td>
             <td>{{ r.progress_percent }}%</td>
-            <td>{{ r.realized_investment|rupiah }}</td>
+            <td>{{ r.realized_investment|rupiah|patah }}</td>
             <td>{{ r.workforce|default_if_none:"-" }}</td>
             <td class="prose">{{ r.description }}{% if r.photo %}<br><a href="{% url 'portal:development_attachment' allocation.pk r.pk %}">Lampiran</a>{% endif %}</td>
           </tr>
@@ -82,7 +82,7 @@
       <dl class="props">
         <dt>Nomor KPT</dt><dd>{{ allocation.kpt_number }}</dd>
         <dt>Nomor PPT</dt><dd>{{ allocation.ppt_number }}</dd>
-        <dt>Luas</dt><dd>{{ allocation.area_m2|angka:2 }} m²</dd>
+        <dt>Luas</dt><dd>{{ allocation.area_m2|angka:2|patah }} m²</dd>
         <dt>Peruntukan</dt><dd>{{ allocation.activity }}</dd>
         <dt>Terbit</dt><dd>{{ allocation.issued_date|tanggal }}</dd>
         <dt>Berlaku</dt><dd>{{ allocation.start_date|tanggal }} s.d. {{ allocation.end_date|tanggal }}</dd>

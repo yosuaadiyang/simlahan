@@ -4,17 +4,17 @@
 {% with a=s.assets %}
 <div class="al-kpis">
   {% if a %}
-  <div class="al-card"><div class="al-kpi">{{ a.count|angka }}</div><div class="al-kpi-label">Aset lahan</div></div>
-  <div class="al-card"><div class="al-kpi">{{ a.area|angka:2 }}</div><div class="al-kpi-label">Total luas (m²)</div></div>
-  <div class="al-card"><div class="al-kpi">{{ a.portfolio|rupiah }}</div><div class="al-kpi-label">Nilai portofolio (penilaian terakhir)</div></div>
-  <div class="al-card"><div class="al-kpi">{{ a.cost|rupiah }}</div><div class="al-kpi-label">Nilai perolehan</div></div>
+  <div class="al-card"><div class="al-kpi">{{ a.count|angka|patah }}</div><div class="al-kpi-label">Aset lahan</div></div>
+  <div class="al-card"><div class="al-kpi">{{ a.area|angka:2|patah }}</div><div class="al-kpi-label">Total luas (m²)</div></div>
+  <div class="al-card"><div class="al-kpi">{{ a.portfolio|rupiah|patah }}</div><div class="al-kpi-label">Nilai portofolio (penilaian terakhir)</div></div>
+  <div class="al-card"><div class="al-kpi">{{ a.cost|rupiah|patah }}</div><div class="al-kpi-label">Nilai perolehan</div></div>
   {% endif %}
-  {% if s.legal %}<div class="al-card"><div class="al-kpi">{{ s.legal.open }}</div><div class="al-kpi-label">Perkara aktif · gugatan {{ s.legal.claims|rupiah }}</div></div>{% endif %}
-  {% if s.encroachment %}<div class="al-card"><div class="al-kpi">{{ s.encroachment.open }}</div><div class="al-kpi-label">Okupasi terbuka · {{ s.encroachment.area|angka:2 }} m²</div></div>{% endif %}
+  {% if s.legal %}<div class="al-card"><div class="al-kpi">{{ s.legal.open }}</div><div class="al-kpi-label">Perkara aktif · gugatan {{ s.legal.claims|rupiah|patah }}</div></div>{% endif %}
+  {% if s.encroachment %}<div class="al-card"><div class="al-kpi">{{ s.encroachment.open }}</div><div class="al-kpi-label">Okupasi terbuka · {{ s.encroachment.area|angka:2|patah }} m²</div></div>{% endif %}
   {% if s.tasks %}<div class="al-card"><div class="al-kpi">{{ s.tasks.open }}</div><div class="al-kpi-label">Tugas terbuka · {{ s.tasks.overdue }} terlambat · {{ s.tasks.mine }} milik saya</div></div>{% endif %}
   {% if s.grievances %}<div class="al-card"><div class="al-kpi">{{ s.grievances.open }}</div><div class="al-kpi-label">Pengaduan terbuka · {{ s.grievances.overdue }} lewat batas</div></div>{% endif %}
   {% if s.tenders %}<div class="al-card"><div class="al-kpi">{{ s.tenders.active }}</div><div class="al-kpi-label">Lelang menerima penawaran</div></div>{% endif %}
-  {% for item in others %}<div class="al-card"><div class="al-kpi">{{ item.value|angka }}</div><div class="al-kpi-label">{{ item.label }}</div></div>{% endfor %}
+  {% for item in others %}<div class="al-card"><div class="al-kpi">{{ item.value|angka|patah }}</div><div class="al-kpi-label">{{ item.label }}</div></div>{% endfor %}
 </div>
 
 <div class="al-grid">
@@ -36,7 +36,7 @@
   {% endif %}
   {% if s.finance %}
   <div class="al-card"><h2>Keuangan lahan {{ s.finance.year }}</h2>
-    <p>Penerimaan <strong>{{ s.finance.income|rupiah }}</strong> · Pengeluaran <strong>{{ s.finance.expense|rupiah }}</strong> · Bersih <strong>{{ s.finance.net|rupiah }}</strong></p>
+    <p>Penerimaan <strong>{{ s.finance.income|rupiah|patah }}</strong> · Pengeluaran <strong>{{ s.finance.expense|rupiah|patah }}</strong> · Bersih <strong>{{ s.finance.net|rupiah|patah }}</strong></p>
     {% include "admin/asetlahan/_bars.html" with bars=s.finance.bars fmt="rupiah" %}
   </div>
   {% endif %}

@@ -1,3 +1,4 @@
+import decimal
 import os
 import subprocess
 from datetime import timedelta
@@ -10,6 +11,12 @@ from django.utils.translation import gettext_lazy as _
 from sentry_sdk.integrations.django import DjangoIntegration
 
 django_stubs_ext.monkeypatch()
+
+# Presisi bawaan Python (28 digit) tidak cukup untuk perkalian nilai uang x
+# luas (masing-masing hingga 18 digit), sehingga quantize() gagal dan halaman
+# galat 500. Naikkan presisi untuk semua thread (DefaultContext) dan thread ini.
+decimal.DefaultContext.prec = 60
+decimal.getcontext().prec = 60
 project_root = environ.Path(__file__) - 2
 BASE_DIR = project_root
 

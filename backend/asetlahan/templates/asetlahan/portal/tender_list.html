@@ -13,7 +13,7 @@
       <td>{{ tender.title }}</td>
       <td>{{ tender.get_method_display }}</td>
       <td>{{ tender.location_name|default:"-" }}</td>
-      <td style="white-space:nowrap">{% if tender.reserve_price %}{{ tender.reserve_price|rupiah }}{% else %}-{% endif %}</td>
+      <td style="white-space:nowrap">{% if tender.reserve_price %}{{ tender.reserve_price|rupiah|patah }}{% else %}-{% endif %}</td>
       <td style="white-space:nowrap">{{ tender.close_at|date:"d-m-Y H:i" }}</td>
       <td><span class="badge">{% if tender.is_accepting_bids %}Menerima penawaran{% else %}{{ tender.get_status_display }}{% endif %}</span></td>
     </tr>

@@ -1249,6 +1249,7 @@
     if (name === "tasks") { loadTasks(); }
     if (name === "perf") { loadPerformance(); }
     if (name === "chat") { loadChat(true); }
+    syncSosSpace();
     setTimeout(function () { map.invalidateSize(); }, 50);
   }
 
@@ -1819,6 +1820,11 @@
     if (navigator.vibrate && activated) { navigator.vibrate([300, 150, 300, 150, 300]); }
   }
 
+  // Ruang kosong di bawah lembar menu HP agar isi terakhir tidak tertutup daftar SOS.
+  function syncSosSpace() {
+    document.documentElement.style.setProperty("--sos-h", $("sos-daftar").offsetHeight + "px");
+  }
+
   function loadSos() {
     if (!perms.lihatSos || !navigator.onLine) { return; }
     request(urls.sos).then(function (data) {
@@ -1839,6 +1845,7 @@
       $("sos-daftar").innerHTML = head + (sosCollapsed ? "" : html);
       $("sos-daftar").classList.toggle("collapsed", sosCollapsed);
       $("sos-daftar").hidden = !data.results.length;
+      syncSosSpace();
       if (fresh) { beep(); loadLayer("sos"); }
     }).catch(function () {});
   }

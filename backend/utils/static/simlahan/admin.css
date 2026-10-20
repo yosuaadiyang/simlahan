@@ -1,0 +1,78 @@
+/* Penyesuaian tampilan panel admin SimLahan (dimuat di semua halaman admin). */
+
+/* Tabel inline (TabularInline) yang lebar digulir di dalam kotaknya sendiri,
+   tidak melebarkan seluruh halaman ke kanan. */
+.inline-group .tabular {
+  overflow-x: auto;
+}
+
+.inline-group .tabular fieldset.module {
+  min-width: 0;
+}
+
+/* Isian baca-saja (mis. nominal hasil perhitungan) dipatahkan bila terlalu
+   panjang, tidak menimpa kolom di sebelahnya. */
+.form-row .readonly {
+  overflow-wrap: anywhere;
+}
+
+/* Di tabel inline nominal tetap satu baris (tabelnya bisa digulir ke samping)
+   agar baris tidak menjadi tinggi karena angka dipatahkan per digit. */
+.inline-group .tabular td p {
+  white-space: nowrap;
+}
+
+/* Nominal di daftar data tidak dipatahkan di tengah angka; tabel daftar
+   sudah bisa digulir ke samping. */
+#result_list td.field-amount,
+#result_list td[class*="_fmt"] {
+  white-space: nowrap;
+}
+
+/* Konten utama boleh menyempit di samping menu; tabel lebar di halaman alat
+   (laporan, buku besar, dll.) digulir di kotaknya sendiri. */
+.main > .content {
+  min-width: 0;
+}
+
+.results {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+/* Tabel alat di halaman modul: kolom nama alat 35%, keterangan panjang
+   dipatahkan per kata (gaya bawaan dasbor membuat th selebar 100% dan sel
+   tidak terpatahkan sehingga halaman melebar di HP). */
+.module table.simlahan-tools {
+  width: 100%;
+}
+
+.dashboard .module table.simlahan-tools th {
+  width: 35%;
+}
+
+.dashboard .module table.simlahan-tools td {
+  white-space: normal;
+}
+
+/* Tombol di kanan atas (Tambah, Impor, Riwayat, ...) diletakkan di barisnya
+   sendiri agar tidak menimpa judul halaman yang panjang. */
+.object-tools {
+  float: none;
+  margin-top: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.object-tools li {
+  margin-left: 0;
+}
+
+/* Kotak isian dengan atribut size besar tidak melebihi lebar layar HP. */
+#content input[type="search"],
+#content input[type="text"] {
+  max-width: 100%;
+  box-sizing: border-box;
+}

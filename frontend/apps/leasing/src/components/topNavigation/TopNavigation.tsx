@@ -233,7 +233,9 @@ class TopNavigation extends Component<Props & WithRouterProps, State> {
 
                 <div className="username-wrapper">
                   <p className="username">
-                    {username}{" "}
+                    <span className="username__text" title={username}>
+                      {username}
+                    </span>{" "}
                     <button
                       className={"user-group-button"}
                       onClick={toggleDisplayUserGroups}

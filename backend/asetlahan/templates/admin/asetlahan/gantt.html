@@ -20,7 +20,7 @@
 </div>
 <div class="al-gantt">
   <div class="al-gantt-row"><div class="al-gantt-label"><strong>Pekerjaan</strong></div>
-    <div class="al-gantt-track">{% for m in months %}<span class="al-gantt-month" style="left:{{ m.left|unlocalize }}%;width:{{ m.width|unlocalize }}%">{{ m.label }}</span>{% endfor %}</div>
+    <div class="al-gantt-track">{% for m in months %}<span class="al-gantt-month" title="{{ m.label }}" style="left:{{ m.left|unlocalize }}%;width:{{ m.width|unlocalize }}%">{{ m.label }}</span>{% endfor %}</div>
   </div>
   {% for row in rows %}
   <div class="al-gantt-row">

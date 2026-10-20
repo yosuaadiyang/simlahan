@@ -880,6 +880,9 @@
   display: block;
   height: auto;
   width: 400px;
+  // Peta sempit (HP): kotak cari tetap di tengah dan tidak menutupi tombol
+  // peta di sisi kanan.
+  max-width: calc(100% - 112px);
   margin: 10px auto 0;
   cursor: auto;
   z-index: 1000;

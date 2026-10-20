@@ -30,7 +30,7 @@
       <td><a href="{% url 'portal:plot_detail' plot.code %}">{{ plot.code }}</a></td>
       <td>{{ plot.name }}{% if plot.village or plot.district %}<br><span class="small muted">{% if plot.village %}Kel. {{ plot.village }}{% endif %}{% if plot.village and plot.district %}, {% endif %}{% if plot.district %}Kec. {{ plot.district }}{% endif %}</span>{% endif %}</td>
       <td>{{ plot.get_allocation_type_display }}</td>
-      <td style="white-space:nowrap">{{ plot.area_m2|angka:0 }} m²</td>
+      <td style="white-space:nowrap">{{ plot.area_m2|angka:0|patah }} m²</td>
       <td>{{ plot.intended_use|default:"-" }}</td>
       <td><span class="badge badge-{{ plot.status }}">{{ plot.get_status_display }}</span></td>
     </tr>

@@ -83,18 +83,33 @@
 
   &__right-wrapper {
     display: flex;
+    align-items: center;
+    // Bagian kanan boleh menyusut; nama pengguna panjang dipotong dengan "…"
+    // alih-alih menimpa judul halaman.
+    flex: 0 1 auto;
+    min-width: 0;
 
     .username-wrapper {
       line-height: 1;
       margin-left: 20px;
       text-align: right;
+      min-width: 0;
 
       .username {
         display: flex;
+        align-items: center;
         justify-content: flex-end;
         font-weight: 500;
         font-size: rem-calc(16px);
         margin-bottom: 0;
+        min-width: 0;
+
+        &__text {
+          min-width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
 
         .user-group-button {
           display: flex;
@@ -106,6 +121,7 @@
           border-radius: 50%;
           margin-left: rem-calc(5px);
           background-color: #0078c0;
+          flex: 0 0 auto;
         }
       }
       .logout-link {
@@ -203,6 +219,40 @@
 
       .username-wrapper {
         margin-left: rem-calc(10px);
+      }
+    }
+  }
+
+  // Ponsel: judul halaman sudah tampil sebagai judul di konten dan unit
+  // layanan bisa dilihat lewat tombol grup, jadi keduanya disembunyikan agar
+  // tombol menu, nama pengguna, dan "Keluar" muat tanpa saling menimpa.
+  @include breakpoint(small only) {
+    padding: 0 rem-calc(12px);
+
+    &__left-wrapper .page-title,
+    &__right-wrapper .user-service-unit {
+      display: none;
+    }
+
+    &__title_button {
+      margin-left: rem-calc(-12px);
+      padding: 0 rem-calc(12px);
+    }
+
+    &__right-wrapper {
+      .search {
+        margin: 0 rem-calc(8px) 0 0;
+        min-width: 0;
+        flex: 1 1 auto;
+      }
+
+      .username-wrapper {
+        margin-left: rem-calc(8px);
+        max-width: 55vw;
+
+        .username {
+          font-size: rem-calc(14px);
+        }
       }
     }
   }

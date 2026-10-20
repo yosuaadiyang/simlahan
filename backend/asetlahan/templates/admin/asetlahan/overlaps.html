@@ -3,7 +3,7 @@
 {% block tool %}
 <h2>Aset dengan batas saling tumpang tindih</h2>
 <p class="al-muted">Irisan ≥ 1 m² antar aset menandakan klaim ganda atau kesalahan ukur. Periksa dan perbaiki batas, atau ajukan survei pengukuran ulang.</p>
-<table class="al-table">
+<div class="results"><table class="al-table">
   <thead><tr><th>Aset A</th><th>Aset B</th><th class="al-num">Luas irisan (m²)</th></tr></thead>
   <tbody>
   {% for p in pairs %}
@@ -12,9 +12,9 @@
         <td class="al-num">{{ p.area_m2|angka:2 }}</td></tr>
   {% empty %}<tr><td colspan="3">Tidak ada aset yang tumpang tindih.</td></tr>{% endfor %}
   </tbody>
-</table>
+</table></div>
 <h2>Aset yang beririsan dengan bidang pengadaan atau lahan alokasi lain</h2>
-<table class="al-table">
+<div class="results"><table class="al-table">
   <thead><tr><th>Aset</th><th>Bidang pengadaan tanah</th><th>Lahan alokasi</th></tr></thead>
   <tbody>
   {% for row in external %}
@@ -23,5 +23,5 @@
         <td>{% for p in row.plots %}{{ p.code }}{% if not forloop.last %}, {% endif %}{% empty %}–{% endfor %}</td></tr>
   {% empty %}<tr><td colspan="3">Tidak ada irisan.</td></tr>{% endfor %}
   </tbody>
-</table>
+</table></div>
 {% endblock %}
