@@ -194,5 +194,8 @@ def test_ensure_groups_recreates_every_role_group():
 
     assert set(GROUP_NAMES) == set(UserGroup)
     Group.objects.filter(pk__in=[UserGroup.PAAKAYTTAJA, UserGroup.PENILAI]).delete()
-    assert sorted(ensure_groups()) == [UserGroup.PAAKAYTTAJA, UserGroup.PENILAI]
+    created = ensure_groups()
+    assert {UserGroup.PAAKAYTTAJA, UserGroup.PENILAI} <= set(created)
+    assert Group.objects.filter(pk__in=list(UserGroup)).count() == len(UserGroup)
     assert Group.objects.get(pk=UserGroup.PAAKAYTTAJA).name == "Administrator"
+    assert ensure_groups() == []
