@@ -57,7 +57,12 @@ def _notify_new_grievance(grievance: Grievance) -> None:
         subject=_("Pengaduan %s diterima") % grievance.number,
         body=body,
     )
-    officers = services.group_emails(UserGroup.PETUGAS_ASET, UserGroup.PAAKAYTTAJA)
+    officers = services.officer_emails(
+        "asetlahan.view_grievance",
+        grievance.service_unit_id,
+        UserGroup.PETUGAS_ASET,
+        UserGroup.PAAKAYTTAJA,
+    )
     services.send_email(
         officers,
         _("Pengaduan baru %s") % grievance.number,
@@ -210,6 +215,14 @@ def bid_submit(request, number):
         return redirect("aset_portal:tender_detail", number=number)
     applicant = request.applicant
     bid = Bid.objects.filter(tender=tender, applicant=applicant).first()
+    if bid is not None and bid.status != enums.BidStatus.SUBMITTED:
+        # Penawaran yang sudah dievaluasi (lolos/gugur) tidak dapat diubah lagi.
+        messages.error(
+            request,
+            _("Penawaran Anda sudah dievaluasi (%s) dan tidak dapat diubah lagi.")
+            % bid.get_status_display(),
+        )
+        return redirect("aset_portal:tender_detail", number=number)
     initial = (
         {}
         if bid

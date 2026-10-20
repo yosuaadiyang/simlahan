@@ -58,6 +58,7 @@ from asetlahan.models import (
     ValuationItem,
 )
 from file_operations.private_files import PrivateFileField
+from utils.group_permissions import UserGroup
 
 
 def badge(color: str, label) -> str:
@@ -103,7 +104,55 @@ class PrivateFileWidget(forms.ClearableFileInput):
         return None
 
 
-class AsetAdminMixin:
+# Data master lintas modul yang boleh tampil sebagai label bagi semua petugas.
+SHARED_MODELS = {"users.user", "leasing.serviceunit", "leasing.municipality"}
+
+
+class ForeignFieldsMixin:
+    """Tautan ke modul lain (pengadaan, alokasi, sewa, operasi) hanya tampil bila
+    pengguna boleh melihat model tujuannya.
+
+    Tanpa izin tersebut field disembunyikan dari formulir, daftar, filter, dan
+    pencarian: label tidak bocor dan ID tidak dapat diisi lewat raw-id. Nilai
+    yang sudah tersimpan tetap dipertahankan saat formulir disimpan.
+    """
+
+    def hidden_foreign_fields(self, request) -> set[str]:
+        hidden = set()
+        for field in self.model._meta.get_fields():
+            if not field.concrete or not (field.many_to_one or field.many_to_many):
+                continue
+            meta = field.related_model._meta
+            if meta.app_label == "asetlahan" or meta.label_lower in SHARED_MODELS:
+                continue
+            if not request.user.has_perm(f"{meta.app_label}.view_{meta.model_name}"):
+                hidden.add(field.name)
+        return hidden
+
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = super().get_fieldsets(request, obj)
+        hidden = self.hidden_foreign_fields(request)
+        if not hidden:
+            return fieldsets
+        result = []
+        for name, options in fieldsets:
+            fields = [f for f in options.get("fields", ()) if f not in hidden]
+            if fields:
+                result.append((name, {**options, "fields": fields}))
+        return result
+
+
+def _strip_hidden(names, hidden):
+    def visible(item):
+        name = item[0] if isinstance(item, (list, tuple)) else item
+        return not (
+            isinstance(name, str) and name.split("__", 1)[0].lstrip("^=@") in hidden
+        )
+
+    return [item for item in names if visible(item)]
+
+
+class AsetAdminMixin(ForeignFieldsMixin):
     """Pemisahan data per unit layanan, modul yang dapat dimatikan, berkas privat."""
 
     scope_lookup = "service_unit"
@@ -133,13 +182,42 @@ class AsetAdminMixin:
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         related = db_field.related_model
         field_names = {f.name for f in related._meta.get_fields()}
-        if related.__module__.startswith("asetlahan") and "service_unit" in field_names:
+        if (
+            related.__module__.startswith("asetlahan")
+            and "service_unit" in field_names
+            and "queryset" not in kwargs
+        ):
             kwargs["queryset"] = scope.scoped(
                 related._default_manager.all(), request.user
             )
         if db_field.name == "service_unit" and not scope.sees_all(request.user):
             kwargs["queryset"] = request.user.service_units.all()
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        related = db_field.related_model
+        field_names = {f.name for f in related._meta.get_fields()}
+        if related.__module__.startswith("asetlahan") and "service_unit" in field_names:
+            # Pilihan & validasi hanya data unit layanan pengguna.
+            kwargs["queryset"] = scope.scoped(
+                related._default_manager.all(), request.user
+            )
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
+
+    def get_list_display(self, request):
+        return _strip_hidden(
+            super().get_list_display(request), self.hidden_foreign_fields(request)
+        )
+
+    def get_list_filter(self, request):
+        return _strip_hidden(
+            super().get_list_filter(request), self.hidden_foreign_fields(request)
+        )
+
+    def get_search_fields(self, request):
+        return _strip_hidden(
+            super().get_search_fields(request), self.hidden_foreign_fields(request)
+        )
 
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         if isinstance(db_field, PrivateFileField) and self.file_kind:
@@ -162,6 +240,26 @@ class AsetAdminMixin:
                     setattr(obj, field, request.user)
         super().save_model(request, obj, form, change)
 
+    def save_related(self, request, form, formsets, change):
+        # Tautan M2M ke data unit lain tidak terlihat di formulir; pertahankan
+        # agar tidak ikut terhapus saat petugas unit lain menyimpan.
+        preserved = {}
+        if change:
+            for model_field in self.model._meta.many_to_many:
+                name = model_field.name
+                field = form.fields.get(name)
+                if field is None or name not in form.cleaned_data:
+                    continue
+                preserved[name] = list(
+                    getattr(form.instance, name)
+                    .exclude(pk__in=field.queryset.values("pk"))
+                    .values_list("pk", flat=True)
+                )
+        super().save_related(request, form, formsets, change)
+        for name, pks in preserved.items():
+            if pks:
+                getattr(form.instance, name).add(*pks)
+
 
 class AsetModelAdmin(AsetAdminMixin, admin.ModelAdmin):
     pass
@@ -171,11 +269,15 @@ class AsetGISAdmin(AsetAdminMixin, GISModelAdmin):
     pass
 
 
-class ScopedInlineMixin:
+class ScopedInlineMixin(ForeignFieldsMixin):
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         related = db_field.related_model
         field_names = {f.name for f in related._meta.get_fields()}
-        if related.__module__.startswith("asetlahan") and "service_unit" in field_names:
+        if (
+            related.__module__.startswith("asetlahan")
+            and "service_unit" in field_names
+            and "queryset" not in kwargs
+        ):
             kwargs["queryset"] = scope.scoped(
                 related._default_manager.all(), request.user
             )
@@ -196,6 +298,11 @@ class DocumentInline(ScopedInlineMixin, admin.TabularInline):
     )
     readonly_fields = ("ocr_status",)
     show_change_link = True
+
+    def get_queryset(self, request):
+        # Dokumen yang juga ditautkan ke perkara/lelang/dll. yang tidak boleh
+        # dilihat pengguna tidak ikut tampil di halaman objek lain.
+        return scope.documents(request.user, super().get_queryset(request))
 
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         if isinstance(db_field, PrivateFileField):
@@ -510,8 +617,35 @@ class LandAssetAdmin(AsetGISAdmin):
             )
         return due.strftime("%d-%m-%Y")
 
+    def get_object(self, request, object_id, from_field=None):
+        obj = super().get_object(request, object_id, from_field)
+        if obj is not None:
+            # Ringkasan baca-saja di bawah bergantung pada izin penampil.
+            obj._viewer = request.user
+        return obj
+
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = super().get_fieldsets(request, obj)
+        if request.user.has_perm("asetlahan.view_assetvaluation"):
+            return fieldsets
+        return [
+            (
+                name,
+                {
+                    **options,
+                    "fields": [
+                        f for f in options["fields"] if f != "valuation_summary"
+                    ],
+                },
+            )
+            for name, options in fieldsets
+        ]
+
     @admin.display(description=_("Penilaian terakhir"))
     def valuation_summary(self, obj):
+        viewer = getattr(obj, "_viewer", None)
+        if viewer is None or not viewer.has_perm("asetlahan.view_assetvaluation"):
+            return "–"
         valuation = obj.latest_valuation if obj.pk else None
         if not valuation:
             return "–"
@@ -525,27 +659,34 @@ class LandAssetAdmin(AsetGISAdmin):
 
     @admin.display(description=_("Perkara, okupasi, tugas, survei"))
     def related_records(self, obj):
-        if not obj.pk:
+        viewer = getattr(obj, "_viewer", None)
+        if not obj.pk or viewer is None:
             return "–"
         rows = [
-            (
-                _("Perkara"),
-                related_links(list(obj.legal_cases.all()[:10]), "legalcase"),
-            ),
-            (
-                _("Okupasi"),
-                related_links(list(obj.encroachments.all()[:10]), "encroachmentcase"),
-            ),
-            (_("Tugas"), related_links(list(obj.tasks.all()[:10]), "task")),
-            (_("Survei"), related_links(list(obj.surveys.all()[:10]), "surveyrequest")),
+            (label, related_links(list(scope.scoped(manager.all(), viewer)[:10]), name))
+            for label, manager, name in (
+                (_("Perkara"), obj.legal_cases, "legalcase"),
+                (_("Okupasi"), obj.encroachments, "encroachmentcase"),
+                (_("Tugas"), obj.tasks, "task"),
+                (_("Survei"), obj.surveys, "surveyrequest"),
+            )
+            if viewer.has_perm(f"asetlahan.view_{name}")
         ]
+        if not rows:
+            return "–"
         return format_html_join("", "<p><b>{}</b><br>{}</p>", rows)
 
     @admin.display(description=_("Irisan dengan bidang lain"))
     def overlap_summary(self, obj):
-        if not obj.pk or obj.geometry is None:
+        viewer = getattr(obj, "_viewer", None)
+        if not obj.pk or obj.geometry is None or viewer is None:
             return "–"
-        found = geo.external_overlaps(obj)
+        if not (
+            viewer.has_perm("pengadaan.view_acquisitionparcel")
+            or viewer.has_perm("alokasi.view_landplot")
+        ):
+            return "–"
+        found = geo.external_overlaps(obj, viewer)
         if not found["parcels"] and not found["plots"]:
             return _("Tidak ada irisan dengan bidang pengadaan atau lahan alokasi.")
         parcels = format_html_join(", ", "{}", ((str(p),) for p in found["parcels"]))
@@ -590,6 +731,7 @@ class LandAssetAdmin(AsetGISAdmin):
                     category=form.cleaned_data["category"],
                     status=form.cleaned_data["status"],
                     service_unit=scope.default_unit(request.user),
+                    user=request.user,
                 )
             except AssetImportError as error:
                 messages.error(request, str(error))
@@ -613,7 +755,7 @@ class LandAssetAdmin(AsetGISAdmin):
         )
 
 
-class HeirMemberInline(admin.TabularInline):
+class HeirMemberInline(ForeignFieldsMixin, admin.TabularInline):
     model = HeirMember
     extra = 1
     fields = (
@@ -900,7 +1042,7 @@ class LandTransactionAdmin(AsetModelAdmin):
 # --------------------------------------------------------------------------
 
 
-class ResettlementUnitInline(admin.TabularInline):
+class ResettlementUnitInline(ForeignFieldsMixin, admin.TabularInline):
     model = ResettlementUnit
     extra = 0
     fields = (
@@ -1256,7 +1398,14 @@ class EncroachmentCaseAdmin(AsetGISAdmin):
             obj.encroached_area_m2 = None
         super().save_model(request, obj, form, change)
 
-    @admin.action(description=_("Limpahkan ke perkara baru"), permissions=["change"])
+    def has_create_legal_case_permission(self, request):
+        return self.has_change_permission(request) and request.user.has_perm(
+            "asetlahan.add_legalcase"
+        )
+
+    @admin.action(
+        description=_("Limpahkan ke perkara baru"), permissions=["create_legal_case"]
+    )
     def create_legal_case(self, request, queryset):
         created = 0
         for case in queryset.filter(legal_case__isnull=True):
@@ -1304,15 +1453,23 @@ class SurveyRequestAdmin(AsetGISAdmin):
     inlines = (DocumentInline,)
     actions = ("apply_result",)
 
+    def has_apply_result_permission(self, request):
+        # Mengubah batas aset: perlu izin ubah aset, bukan hanya izin ubah survei.
+        return self.has_change_permission(request) and request.user.has_perm(
+            "asetlahan.change_landasset"
+        )
+
     @admin.action(
-        description=_("Terapkan batas hasil ukur ke aset"), permissions=["change"]
+        description=_("Terapkan batas hasil ukur ke aset"),
+        permissions=["apply_result"],
     )
     def apply_result(self, request, queryset):
         applied = 0
+        assets = scope.scoped(LandAsset.objects.all(), request.user)
         for survey in queryset.filter(
             status=enums.SurveyStatus.DONE,
             result_geometry__isnull=False,
-            asset__isnull=False,
+            asset__in=assets,
         ).select_related("asset"):
             asset = survey.asset
             asset.geometry = survey.result_geometry
@@ -1461,9 +1618,76 @@ class TaskAdmin(AsetModelAdmin):
         ),
     )
 
+    # Petugas lapangan hanya memperbarui kemajuan tugasnya sendiri.
+    FIELD_EDITABLE = ("status", "progress")
+
     @admin.display(boolean=True, description=_("Terlambat"))
     def overdue(self, obj):
         return obj.is_overdue
+
+    @staticmethod
+    def task_role(request) -> str:
+        """``full`` (Administrator, Petugas Aset/Hukum), ``korwil``, atau ``field``."""
+        role = getattr(request, "_asetlahan_task_role", None)
+        if role is None:
+            user = request.user
+            groups = set(user.groups.values_list("pk", flat=True))
+            full = {
+                UserGroup.PAAKAYTTAJA,
+                UserGroup.PETUGAS_ASET,
+                UserGroup.PETUGAS_HUKUM,
+            }
+            if user.is_superuser or groups & full:
+                role = "full"
+            elif UserGroup.KOORDINATOR_WILAYAH in groups:
+                role = "korwil"
+            elif UserGroup.PETUGAS_LAPANGAN in groups:
+                role = "field"
+            else:
+                role = "full"
+            request._asetlahan_task_role = role
+        return role
+
+    @staticmethod
+    def _user_korwils(user):
+        from operasi.geo import user_korwils
+
+        return user_korwils(user)
+
+    def editable_q(self, request) -> Q:
+        """Tugas yang boleh diubah pengguna (di dalam unit layanannya)."""
+        user = request.user
+        role = self.task_role(request)
+        if role == "full":
+            return Q()
+        mine = Q(assignee=user) | Q(assignee__isnull=True, team__members=user)
+        if role == "korwil":
+            mine |= Q(korwil__in=self._user_korwils(user))
+        return Q(pk__in=Task.objects.filter(mine).values("pk"))
+
+    def has_change_permission(self, request, obj=None):
+        allowed = super().has_change_permission(request, obj)
+        if not allowed or obj is None or self.task_role(request) == "full":
+            return allowed
+        return Task.objects.filter(pk=obj.pk).filter(self.editable_q(request)).exists()
+
+    def _get_list_editable_queryset(self, request, prefix):
+        queryset = super()._get_list_editable_queryset(request, prefix)
+        return queryset.filter(self.editable_q(request))
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly = list(super().get_readonly_fields(request, obj))
+        if obj is None or self.task_role(request) != "field":
+            return readonly
+        names = [f for _name, options in self.fieldsets for f in options["fields"]]
+        return readonly + [
+            f for f in names if f not in self.FIELD_EDITABLE and f not in readonly
+        ]
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "korwil" and self.task_role(request) == "korwil":
+            kwargs["queryset"] = self._user_korwils(request.user)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def save_model(self, request, obj, form, change):
         notify = obj.assignee_id and (not change or "assignee" in form.changed_data)
@@ -1559,7 +1783,14 @@ class GrievanceAdmin(AsetModelAdmin):
 
             notify_grievance_update(obj)
 
-    @admin.action(description=_("Jadikan kasus okupasi"), permissions=["change"])
+    def has_create_encroachment_permission(self, request):
+        return self.has_change_permission(request) and request.user.has_perm(
+            "asetlahan.add_encroachmentcase"
+        )
+
+    @admin.action(
+        description=_("Jadikan kasus okupasi"), permissions=["create_encroachment"]
+    )
     def create_encroachment(self, request, queryset):
         created = 0
         for grievance in queryset.filter(encroachment__isnull=True):
@@ -1785,6 +2016,31 @@ class DocumentAdmin(AsetModelAdmin):
         ),
     )
 
+    def get_queryset(self, request):
+        # Dokumen perkara, lelang, dsb. hanya untuk yang boleh melihat objeknya.
+        return scope.documents(request.user, super().get_queryset(request))
+
+    def has_change_permission(self, request, obj=None):
+        allowed = super().has_change_permission(request, obj)
+        if obj is None or not allowed:
+            return allowed
+        return scope.document_allows(request.user, obj, "change")
+
+    def has_delete_permission(self, request, obj=None):
+        allowed = super().has_delete_permission(request, obj)
+        if obj is None or not allowed:
+            return allowed
+        return scope.document_allows(request.user, obj, "delete")
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        links = dict(scope.DOCUMENT_LINKS)
+        if db_field.name in links and not request.user.has_perm(
+            f"asetlahan.change_{links[db_field.name]}"
+        ):
+            # Menautkan dokumen = mengubah berkas objek tersebut.
+            kwargs["queryset"] = db_field.related_model._default_manager.none()
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
     @admin.display(description=_("Terkait"))
     def linked_to(self, obj):
         for related in (
@@ -1817,7 +2073,12 @@ class DocumentAdmin(AsetModelAdmin):
     def run_ocr(self, request, queryset):
         from asetlahan.ocr import process_document
 
-        done = sum(1 for doc in queryset[:50] if process_document(doc))
+        done = sum(
+            1
+            for doc in queryset[:50]
+            if scope.document_allows(request.user, doc, "change")
+            and process_document(doc)
+        )
         self.message_user(request, _("%d dokumen berhasil dibaca.") % done)
 
     def get_urls(self):
@@ -1860,21 +2121,115 @@ class DocumentAdmin(AsetModelAdmin):
         )
 
 
+# Sumber data peta berbagi: (field, izin untuk membagikan, izin nama pemilik).
+SHARE_SOURCES = (
+    ("assets", (), ("asetlahan.view_ownershiprecord",)),
+    (
+        "pengadaan_project",
+        ("pengadaan.view_acquisitionproject", "pengadaan.view_acquisitionparcel"),
+        ("pengadaan.view_entitledparty",),
+    ),
+    (
+        "resettlement_site",
+        ("asetlahan.view_resettlementunit",),
+        ("pengadaan.view_affectedhousehold",),
+    ),
+)
+
+
+class MapShareForm(forms.ModelForm):
+    """Tautan publik hanya boleh memuat data yang boleh dilihat pembuatnya."""
+
+    user = None  # diisi MapShareAdmin.get_form
+
+    class Meta:
+        model = MapShare
+        fields = "__all__"
+
+    def _value(self, name):
+        if name in self.cleaned_data:
+            return self.cleaned_data[name]
+        if not self.instance.pk:
+            return None
+        value = getattr(self.instance, name)
+        return value.all() if name == "assets" else value
+
+    def _changed(self, name) -> bool:
+        return not self.instance.pk or name in self.changed_data
+
+    def clean(self):
+        cleaned = super().clean()
+        user = self.user
+        if user is None:
+            return cleaned
+        owners_changed = self._changed("show_owner_names")
+        show_owners = self._value("show_owner_names")
+        missing_owner_perm = []
+        for name, share_perms, owner_perms in SHARE_SOURCES:
+            value = self._value(name)
+            present = value.exists() if hasattr(value, "exists") else bool(value)
+            if not present or not (owners_changed or self._changed(name)):
+                continue
+            if self._changed(name) and not user.has_perms(share_perms):
+                self.add_error(
+                    name if name in self.fields else None,
+                    _("Anda tidak berhak membagikan data ini."),
+                )
+            if show_owners and not user.has_perms(owner_perms):
+                missing_owner_perm.append(
+                    str(MapShare._meta.get_field(name).verbose_name)
+                )
+        if missing_owner_perm and "show_owner_names" in self.fields:
+            self.add_error(
+                "show_owner_names",
+                _("Anda tidak berhak menampilkan nama pemegang hak untuk: %s.")
+                % ", ".join(missing_owner_perm),
+            )
+        elif missing_owner_perm:
+            raise forms.ValidationError(
+                _("Anda tidak berhak menampilkan nama pemegang hak untuk: %s.")
+                % ", ".join(missing_owner_perm)
+            )
+        return cleaned
+
+
 @admin.register(MapShare)
 class MapShareAdmin(AsetModelAdmin):
+    # Tanpa scope_lookup bawaan: tautan dibatasi per unit atau pembuat (get_queryset).
     scope_lookup = ""
+    form = MapShareForm
     list_display = (
         "title",
         "public_link",
         "expires_at",
         "is_active",
         "view_count",
+        "service_unit",
         "created_by",
     )
-    list_filter = ("is_active",)
+    list_filter = ("is_active", "service_unit")
     filter_horizontal = ("assets",)
     autocomplete_fields = ("pengadaan_project",)
     readonly_fields = ("public_link", "view_count", "created_by")
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        user = request.user
+        if scope.sees_all(user):
+            return queryset
+        # Tautan berisi token publik: tanpa unit hanya terlihat oleh pembuatnya.
+        return queryset.filter(
+            Q(created_by=user) | Q(service_unit__in=scope.unit_ids(user))
+        )
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        return type(form.__name__, (form,), {"user": request.user})
+
+    def save_model(self, request, obj, form, change):
+        if obj.service_unit_id is None and not scope.sees_all(request.user):
+            obj.service_unit = scope.default_unit(request.user)
+        super().save_model(request, obj, form, change)
 
     @admin.display(description=_("Tautan publik"))
     def public_link(self, obj):
@@ -2004,7 +2359,14 @@ class FieldReportAdmin(AsetGISAdmin):
     def has_photo(self, obj):
         return bool(obj.photo)
 
-    @admin.action(description=_("Jadikan kasus okupasi"), permissions=["change"])
+    def has_to_encroachment_permission(self, request):
+        return self.has_change_permission(request) and request.user.has_perm(
+            "asetlahan.add_encroachmentcase"
+        )
+
+    @admin.action(
+        description=_("Jadikan kasus okupasi"), permissions=["to_encroachment"]
+    )
     def to_encroachment(self, request, queryset):
         created = 0
         for report in queryset.filter(encroachment__isnull=True):

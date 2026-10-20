@@ -372,6 +372,20 @@ def _parse_report(request):
     return values, errors
 
 
+def _duplicate(request, client_id):
+    """Laporan dengan ID perangkat yang sama milik petugas ini (kirim ulang)."""
+    existing = FieldReport.objects.filter(client_id=client_id).first()
+    if existing is None:
+        return None
+    if existing.reported_by_id != request.user.pk:
+        # ID milik laporan petugas lain: jangan bocorkan ID laporannya.
+        return JsonResponse(
+            {"errors": {"client_id": [_("ID perangkat sudah dipakai laporan lain.")]}},
+            status=400,
+        )
+    return JsonResponse({"id": existing.pk, "duplicate": True})
+
+
 @require_POST
 @staff_member_required
 def field_sync(request):
@@ -382,9 +396,9 @@ def field_sync(request):
     values, errors = _parse_report(request)
     if errors:
         return JsonResponse({"errors": errors}, status=400)
-    existing = FieldReport.objects.filter(client_id=values["client_id"]).first()
-    if existing is not None:
-        return JsonResponse({"id": existing.pk, "duplicate": True})
+    duplicate = _duplicate(request, values["client_id"])
+    if duplicate is not None:
+        return duplicate
     report = FieldReport(**values, reported_by=request.user)
     if request.FILES.get("photo"):
         report.photo = request.FILES["photo"]
@@ -393,7 +407,8 @@ def field_sync(request):
             exclude=["asset", "service_unit", "encroachment", "reported_by"],
             validate_unique=False,
         )
-        report.asset = geo.asset_at(report.location)
+        # Hanya aset di unit layanan petugas (bukan aset unit lain di titik yang sama).
+        report.asset = geo.asset_at(report.location, request.user)
         if report.asset is None:
             report.service_unit = scope.default_unit(request.user)
         with transaction.atomic():
@@ -401,8 +416,9 @@ def field_sync(request):
     except ValidationError as error:
         return JsonResponse({"errors": error.message_dict}, status=400)
     except IntegrityError:
-        existing = FieldReport.objects.get(client_id=values["client_id"])
-        return JsonResponse({"id": existing.pk, "duplicate": True})
+        return _duplicate(request, values["client_id"]) or JsonResponse(
+            {"errors": {"client_id": [_("Laporan gagal disimpan.")]}}, status=400
+        )
     return JsonResponse(
         {"id": report.pk, "duplicate": False, "asset": str(report.asset or "")},
         status=201,

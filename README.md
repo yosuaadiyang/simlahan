@@ -109,13 +109,18 @@ Grup manajemen aset lahan (anggotanya otomatis diberi akses `/admin/`):
 
 | Grup | Manajemen aset lahan |
 |---|---|
-| Petugas Aset Lahan | seluruh data aset, keuangan, okupasi, permukiman kembali, pengaduan, lelang, dokumen; baca perkara |
-| Petugas Hukum | perkara, advokat & jadwal sidang, dokumen; baca aset, kepemilikan & pemangku kepentingan |
-| Petugas Lapangan | aplikasi lapangan, laporan & foto lapangan, okupasi & tindakan teguran, survei, pembaruan tugas; di pusat komando: absen, lapor kegiatan & uji tanah, data warga, chat, SOS |
-| Koordinator Wilayah | semua hak petugas lapangan di pusat komando untuk Korwil yang dipimpin, ditambah verifikasi laporan, penanganan SOS, KPI anggota, dan tugas wilayah |
+| Petugas Aset Lahan | seluruh data aset, keuangan, okupasi, permukiman kembali, pengaduan, lelang, dokumen, peta berbagi; baca perkara |
+| Petugas Hukum | perkara, advokat & jadwal sidang, dokumen perkara; tindak lanjut okupasi & pengaduan, urusan instansi, tugas; baca aset, kepemilikan, pemangku kepentingan & survei (tanpa penilaian, pajak, transaksi, dan peta berbagi) |
+| Petugas Lapangan | aplikasi lapangan, laporan & foto lapangan, okupasi & tindakan teguran, survei, tindak lanjut pengaduan, pembaruan status & progres tugas sendiri; di pusat komando: absen, lapor kegiatan & uji tanah, data warga, chat, SOS |
+| Koordinator Wilayah | semua hak petugas lapangan di pusat komando untuk Korwil yang dipimpin, ditambah verifikasi laporan, penanganan SOS, KPI anggota, dan tugas wilayah (hanya tugas Korwil yang dipimpin/diikuti) |
 
 Petugas hanya melihat data unit layanannya (data tanpa unit layanan terlihat
-semua); grup Administrator melihat seluruh lokasi.
+semua); grup Administrator melihat seluruh lokasi. Dokumen hanya terlihat bila
+objek yang ditautkan (perkara, lelang, okupasi, dll.) juga boleh dilihat, dan
+mengubah/menghapusnya memerlukan izin ubah/hapus atas objek tersebut. Tautan ke
+modul lain (bidang pengadaan, lahan alokasi, sewa, Korwil) hanya tampil bagi
+yang berhak melihat modul itu. Peta berbagi hanya boleh memuat data yang boleh
+dilihat pembuatnya dan terlihat oleh petugas unit layanannya.
 
 Pemohon mendaftar sendiri di `/portal/daftar/` dan tidak bisa masuk ke
 aplikasi petugas atau API. Akun petugas tidak bisa masuk ke portal.
@@ -231,7 +236,9 @@ di **Pengaturan modul**.
 Pengingat harian 06.30 WIB (`asetlahan_pengingat --email`): sewa dan hak atas
 tanah yang segera berakhir, pajak jatuh tempo, sidang mendatang (juga ke kuasa
 hukum, surel/WhatsApp), tugas dan pengaduan lewat tenggat, okupasi tanpa tindak
-lanjut, aset yang belum dipantau sesuai jadwal, dan urusan instansi. Jalankan manual tanpa mengirim:
+lanjut, aset yang belum dipantau sesuai jadwal, dan urusan instansi. Ringkasan
+dikirim per petugas, hanya berisi data unit layanan dan jenis data yang boleh
+ia lihat. Jalankan manual tanpa mengirim:
 `docker compose exec backend python manage.py asetlahan_pengingat`.
 
 Asisten AI tetap menjawab pertanyaan umum (sewa berakhir, okupasi per zona,
