@@ -49,7 +49,7 @@ class Command(BaseCommand):
             self.stdout.write("Data master sudah ada, fixture dilewati.")
 
         for ensure, message in (
-            (ensure_groups, "Grup alokasi lahan dibuat."),
+            (ensure_groups, "Grup peran yang belum ada dibuat."),
             (ensure_monitoring_job, "Jadwal pemantauan alokasi lahan dibuat."),
             (ensure_reminder_job, "Jadwal pengingat aset lahan dibuat."),
             (ensure_daily_job, "Jadwal rekap harian pusat komando dibuat."),
