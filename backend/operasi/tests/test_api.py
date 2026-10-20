@@ -209,6 +209,10 @@ def test_field_officer_cannot_change_stance_without_permission(field, korwil, un
     from django.contrib.auth.models import Permission
 
     field.groups.clear()
+    # Keluar dari grup panel mencabut status staf; uji ini hanya memeriksa
+    # izin model, jadi status staf dipulihkan.
+    field.is_staff = True
+    field.save(update_fields=["is_staff"])
     for codename in ("view_korwil", "view_activity", "add_activity", "view_resident"):
         field.user_permissions.add(
             Permission.objects.get(codename=codename, content_type__app_label="operasi")
