@@ -91,12 +91,26 @@ Grup bawaan (atur di `/admin/` → Pengguna):
 |---|---|---|
 | Administrator | penuh | ya |
 | Pelaksana Pengadaan Tanah | penuh, termasuk validasi ganti kerugian, kalender & aturan tenggat | ya |
-| Satgas Pengadaan Tanah | bidang, inventarisasi, pihak, pengumuman, musyawarah, pelepasan hak, rumah tangga terdampak | ya |
-| Penilai Pertanahan | penilaian & dokumen | tidak (tersamar) |
-| Instansi Yang Memerlukan Tanah | baca proyek, bidang, pengumuman, musyawarah, penyerahan; unggah dokumen | tidak (pihak tidak terlihat) |
+| Satgas Pengadaan Tanah | bidang, inventarisasi, pihak, pengumuman, musyawarah, pelepasan hak, rumah tangga terdampak; tonggak inventarisasi, musyawarah & pelepasan hak (status, tanggal realisasi, catatan) | ya |
+| Penilai Pertanahan | penilaian & dokumen, hanya pada proyek yang ditugaskan | tidak (tersamar) |
+| Instansi Yang Memerlukan Tanah | baca proyek, bidang, pengumuman, musyawarah, penyerahan; unggah dokumen perencanaan (DPPT, studi kelayakan), BAST, foto & lainnya; hanya proyek yang ditugaskan, tanpa nilai uang | tidak (pihak tidak terlihat) |
 | Ahli Hukum Penagihan | keberatan, konsinyasi, dokumen | tidak (tersamar) |
-| Petugas Penagihan | ganti kerugian & pembayaran | tidak (tersamar) |
+| Petugas Penagihan | pembayaran & penyerahan ganti kerugian yang sudah divalidasi | tidak (tersamar) |
 | Penelusur, Penyusun, Penyusun Kontrak, Operator Entri Data | baca | tidak (tersamar) |
+
+Catatan pengadaan tanah:
+
+- Penilai dan Instansi Pemohon hanya melihat proyek yang ditugaskan kepadanya
+  (isian **Pengguna yang ditugaskan** pada data proyek, di aplikasi atau
+  `/admin/`). Grup lain melihat semua proyek.
+- Status ganti kerugian tidak diisi manual: Ketua Pelaksana memvalidasi atau
+  membatalkan, pembayaran/penyerahan dan konsinyasi memperbaruinya otomatis.
+  Mengubah nilai, pihak, bentuk ganti kerugian atau rekening pihak setelah
+  validasi mengembalikannya ke status ditetapkan (perlu validasi ulang).
+- Penilaian berstatus final tidak dapat diubah; catat penilaian baru lalu
+  tandai yang lama sebagai direvisi.
+- Pindaian KTP, sertipikat, bukti bayar dan dokumen yang dikaitkan ke pihak
+  hanya terlihat oleh pemegang izin data pribadi.
 
 Grup alokasi lahan (anggotanya otomatis diberi akses `/admin/`):
 

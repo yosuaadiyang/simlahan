@@ -26,6 +26,8 @@ type Props = {
   highlightParcelId?: number | null;
   height?: number;
   statusLabels?: Record<string, string>;
+  /** Tampilkan nama pihak yang berhak pada keterangan bidang. */
+  showParties?: boolean;
 };
 
 const escapeHtml = (text: unknown) =>
@@ -41,6 +43,7 @@ const AcquisitionMap: React.FC<Props> = ({
   highlightParcelId,
   height = 480,
   statusLabels,
+  showParties = true,
 }) => {
   const hasFeatures = Boolean(featureCollection?.features?.length);
   const bounds = useMemo(() => {
@@ -80,7 +83,7 @@ const AcquisitionMap: React.FC<Props> = ({
       `<strong>Bidang ${escapeHtml(p.parcel_number)}</strong><br/>` +
         `${escapeHtml(p.status_display)}<br/>` +
         `${escapeHtml(p.right_type)}${p.affected_area_m2 ? ` · ${escapeHtml(p.affected_area_m2)} m²` : ""}` +
-        `${p.parties ? `<br/>${escapeHtml(p.parties)}` : ""}` +
+        `${showParties && p.parties ? `<br/>${escapeHtml(p.parties)}` : ""}` +
         `${p.is_disputed ? "<br/><em>Bersengketa</em>" : ""}`,
       { sticky: true },
     );

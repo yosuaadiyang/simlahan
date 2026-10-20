@@ -33,7 +33,7 @@ import type { Deadline, Option } from "../types";
 import AcquisitionMap from "./AcquisitionMap";
 import ResourceForm from "./ResourceForm";
 import ResourceSection from "./ResourceSection";
-import { useCanViewResource } from "../permissions";
+import { useCanViewResource, useProjectCapabilities } from "../permissions";
 import { PROJECT_FORM_FIELDS } from "./AcquisitionListPage";
 import {
   Button,
@@ -81,6 +81,14 @@ const PROJECT_DETAIL_FIELDS = [
   "location_decree_date",
   "location_announcement_date",
   "location_decree_extended",
+  {
+    name: "assigned_users",
+    multiple: true,
+    wide: true,
+    help:
+      "Penilai Pertanahan dan Instansi Yang Memerlukan Tanah hanya melihat " +
+      "proyek yang ditugaskan kepada mereka.",
+  },
 ];
 
 const ImportParcels: React.FC<{
@@ -210,6 +218,12 @@ const AcquisitionProjectPage: React.FC = () => {
     [projectId, version],
   );
   const canView = useCanViewResource();
+  const {
+    canViewParties,
+    canExportNominative,
+    canImportParcels,
+    canRecordPayment,
+  } = useProjectCapabilities();
   // Daftar pilihan hanya dimuat dari endpoint yang boleh dilihat pengguna.
   const listProjectRows = (endpoint: string) =>
     canView(endpoint)
@@ -329,15 +343,30 @@ const AcquisitionProjectPage: React.FC = () => {
     }
   };
 
-  const validateCompensation = async (
+  /** Aksi status ganti kerugian (validasi, batal, serahkan) di server. */
+  const compensationAction = async (
     row: Record<string, any>,
     reload: () => void,
+    action: "validate" | "cancel" | "deliver",
   ) => {
-    if (!window.confirm("Validasi ganti kerugian ini sebagai Ketua Pelaksana?"))
-      return;
+    const texts = {
+      validate: {
+        confirm: "Validasi ganti kerugian ini sebagai Ketua Pelaksana?",
+        done: "Ganti kerugian divalidasi",
+      },
+      cancel: {
+        confirm: "Batalkan ganti kerugian ini?",
+        done: "Ganti kerugian dibatalkan",
+      },
+      deliver: {
+        confirm: "Catat ganti kerugian bukan uang ini sudah diserahkan?",
+        done: "Penyerahan ganti kerugian dicatat",
+      },
+    }[action];
+    if (!window.confirm(texts.confirm)) return;
     try {
-      await apiSend("POST", `pengadaan/compensation/${row.id}/validate/`);
-      displayUIMessage({ title: "", body: "Ganti kerugian divalidasi" });
+      await apiSend("POST", `pengadaan/compensation/${row.id}/${action}/`);
+      displayUIMessage({ title: "", body: texts.done });
       reload();
       bump();
     } catch (e) {
@@ -397,11 +426,13 @@ const AcquisitionProjectPage: React.FC = () => {
             </span>
           </p>
         </div>
-        <div className="acq-page__actions">
-          <Button variant="secondary" onClick={exportNominative}>
-            Unduh daftar nominatif (.xlsx)
-          </Button>
-        </div>
+        {canExportNominative && (
+          <div className="acq-page__actions">
+            <Button variant="secondary" onClick={exportNominative}>
+              Unduh daftar nominatif (.xlsx)
+            </Button>
+          </div>
+        )}
       </header>
 
       <Tabs
@@ -419,7 +450,11 @@ const AcquisitionProjectPage: React.FC = () => {
               <Stat
                 label="Bidang"
                 value={s.parcel_count}
-                hint={`${s.party_count} pihak yang berhak`}
+                hint={
+                  s.party_count !== undefined
+                    ? `${s.party_count} pihak yang berhak`
+                    : undefined
+                }
               />
               <Stat
                 label="Luas terkena"
@@ -432,20 +467,31 @@ const AcquisitionProjectPage: React.FC = () => {
                 hint={formatArea(s.released_area_m2)}
                 tone="success"
               />
-              <Stat
-                label="Nilai penilaian (final)"
-                value={formatRupiah(s.valuation_total)}
-              />
-              <Stat
-                label="Ganti kerugian dibayar"
-                value={formatRupiah(s.paid_total)}
-                hint={`dari ${formatRupiah(s.compensation_total)} · dititipkan ${formatRupiah(s.consigned_total)}`}
-              />
-              <Stat
-                label="Keberatan berjalan"
-                value={s.open_objections}
-                tone={s.open_objections ? "warning" : "default"}
-              />
+              {s.valuation_total !== undefined && (
+                <Stat
+                  label="Nilai penilaian (final)"
+                  value={formatRupiah(s.valuation_total)}
+                />
+              )}
+              {s.compensation_total !== undefined && (
+                <Stat
+                  label="Ganti kerugian dibayar"
+                  value={formatRupiah(s.paid_total)}
+                  hint={
+                    `dari ${formatRupiah(s.compensation_total)}` +
+                    (s.consigned_total !== undefined
+                      ? ` · dititipkan ${formatRupiah(s.consigned_total)}`
+                      : "")
+                  }
+                />
+              )}
+              {s.open_objections !== undefined && (
+                <Stat
+                  label="Keberatan berjalan"
+                  value={s.open_objections}
+                  tone={s.open_objections ? "warning" : "default"}
+                />
+              )}
             </div>
           )}
           {s && (
@@ -477,6 +523,7 @@ const AcquisitionProjectPage: React.FC = () => {
                 fkOptions={{
                   municipality: options.municipality,
                   executing_chair: options.user,
+                  assigned_users: options.user,
                 }}
                 onCancel={() => setIsEditing(false)}
                 onSaved={() => {
@@ -599,6 +646,7 @@ const AcquisitionProjectPage: React.FC = () => {
             <AcquisitionMap
               featureCollection={geojson.data}
               statusLabels={statusLabels}
+              showParties={canViewParties}
               onParcelClick={(id) => navigate(parcelUrl(id))}
             />
           </Section>
@@ -612,7 +660,7 @@ const AcquisitionProjectPage: React.FC = () => {
             onRowClick={(row) => navigate(parcelUrl(row.id))}
             fkOptions={{ district: options.district }}
             headerActions={
-              can(UsersPermissions.ADD_ACQUISITIONPARCEL) && (
+              canImportParcels && (
                 <Button
                   variant="secondary"
                   onClick={() => setIsImportOpen(true)}
@@ -649,11 +697,15 @@ const AcquisitionProjectPage: React.FC = () => {
                 header: "Jenis hak",
                 render: (r) => labelOf(choices, "LandRightType", r.right_type),
               },
-              {
-                key: "party_names",
-                header: "Pihak yang berhak",
-                render: (r) => r.party_names || "–",
-              },
+              ...(canViewParties
+                ? [
+                    {
+                      key: "party_names",
+                      header: "Pihak yang berhak",
+                      render: (r: Record<string, any>) => r.party_names || "–",
+                    },
+                  ]
+                : []),
               {
                 key: "affected_area_m2",
                 header: "Luas terkena",
@@ -1114,24 +1166,51 @@ const AcquisitionProjectPage: React.FC = () => {
               "party",
               "form",
               "amount",
-              "status",
               "valuation",
               "deliberation_result",
               "court_decision",
               { name: "description", wide: true },
               { name: "note", wide: true },
             ]}
-            rowActions={(row, reload) =>
-              row.status === "determined" &&
-              can(UsersPermissions.VALIDATE_COMPENSATION) && (
-                <Button
-                  variant="link"
-                  onClick={() => validateCompensation(row, reload)}
-                >
-                  Validasi
-                </Button>
-              )
-            }
+            rowActions={(row, reload) => {
+              // Status hanya berubah lewat aksi berikut, bukan formulir.
+              const isOpen = ["determined", "validated"].includes(row.status);
+              const canValidate = can(UsersPermissions.VALIDATE_COMPENSATION);
+              return (
+                <>
+                  {row.status === "determined" && canValidate && (
+                    <Button
+                      variant="link"
+                      onClick={() =>
+                        compensationAction(row, reload, "validate")
+                      }
+                    >
+                      Validasi
+                    </Button>
+                  )}
+                  {row.status === "validated" &&
+                    row.form !== "money" &&
+                    canRecordPayment && (
+                      <Button
+                        variant="link"
+                        onClick={() =>
+                          compensationAction(row, reload, "deliver")
+                        }
+                      >
+                        Tandai diserahkan
+                      </Button>
+                    )}
+                  {isOpen && canValidate && !(row.payments || []).length && (
+                    <Button
+                      variant="link"
+                      onClick={() => compensationAction(row, reload, "cancel")}
+                    >
+                      Batalkan
+                    </Button>
+                  )}
+                </>
+              );
+            }}
             columns={[
               { key: "parcel_number", header: "Bidang" },
               { key: "party_name", header: "Pihak" },

@@ -201,6 +201,7 @@ const AcquisitionParcelPage: React.FC = () => {
             featureCollection={geojson.data}
             highlightParcelId={Number(parcelId)}
             statusLabels={statusLabels}
+            showParties={canViewParties}
             height={360}
             onParcelClick={(id) =>
               id !== Number(parcelId) && navigate(`${projectUrl}/bidang/${id}`)

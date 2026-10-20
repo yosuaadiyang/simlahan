@@ -66,6 +66,45 @@ export const getResourcePermissions = (
   };
 };
 
+export type ProjectCapabilities = {
+  /** Nama pihak (kolom, keterangan peta) boleh ditampilkan. */
+  canViewParties: boolean;
+  /** Daftar nominatif memuat pihak, nilai penilaian dan ganti kerugian. */
+  canExportNominative: boolean;
+  /** Impor peta lewat endpoint proyek: perlu tambah bidang dan tambah proyek. */
+  canImportParcels: boolean;
+  /** Mencatat pembayaran/penyerahan ganti kerugian. */
+  canRecordPayment: boolean;
+};
+
+/** Kemampuan halaman proyek yang bergantung pada beberapa izin sekaligus. */
+export const getProjectCapabilities = (
+  usersPermissions: UsersPermissions,
+): ProjectCapabilities => {
+  const resource = (endpoint: string) =>
+    getResourcePermissions(usersPermissions, endpoint);
+  const canViewParties = resource("pengadaan/party/").canView;
+  return {
+    canViewParties,
+    canExportNominative:
+      canViewParties &&
+      resource("pengadaan/valuation/").canView &&
+      resource("pengadaan/compensation/").canView,
+    canImportParcels:
+      resource("pengadaan/parcel/").canAdd &&
+      resource("pengadaan/project/").canAdd,
+    canRecordPayment: resource("pengadaan/payment/").canAdd,
+  };
+};
+
+export const useProjectCapabilities = (): ProjectCapabilities => {
+  const usersPermissions = useAppSelector(getUsersPermissions);
+  return useMemo(
+    () => getProjectCapabilities(usersPermissions),
+    [usersPermissions],
+  );
+};
+
 export const useResourcePermissions = (
   endpoint: string,
 ): ResourcePermissions => {

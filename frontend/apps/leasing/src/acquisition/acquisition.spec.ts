@@ -9,7 +9,7 @@ import {
   percent,
 } from "./format";
 import { labelOf } from "./components/ui";
-import { getResourcePermissions } from "./permissions";
+import { getProjectCapabilities, getResourcePermissions } from "./permissions";
 import {
   buildPayload,
   findMissingRequired,
@@ -105,6 +105,45 @@ describe("Acquisition helpers", () => {
     expect(getResourcePermissions([], "pengadaan/payment/").isLoaded).toBe(
       false,
     );
+  });
+  it("gates project page actions by combined permissions", () => {
+    const perms = (...codenames: Array<string>) =>
+      codenames.map((codename) => ({ codename }));
+    // Satgas: boleh menambah bidang tetapi tidak menambah proyek.
+    const satgas = getProjectCapabilities(
+      perms(
+        "view_acquisitionproject",
+        "add_acquisitionparcel",
+        "view_entitledparty",
+        "view_valuation",
+        "view_compensation",
+      ),
+    );
+    expect(satgas.canImportParcels).toBe(false);
+    expect(satgas.canExportNominative).toBe(true);
+    expect(satgas.canRecordPayment).toBe(false);
+    // Instansi pemohon: tanpa pihak dan nilai uang.
+    const agency = getProjectCapabilities(
+      perms("view_acquisitionproject", "view_acquisitionparcel"),
+    );
+    expect(agency.canViewParties).toBe(false);
+    expect(agency.canExportNominative).toBe(false);
+    const pelaksana = getProjectCapabilities(
+      perms(
+        "add_acquisitionproject",
+        "add_acquisitionparcel",
+        "view_entitledparty",
+        "view_valuation",
+        "view_compensation",
+        "add_compensationpayment",
+      ),
+    );
+    expect(pelaksana).toEqual({
+      canViewParties: true,
+      canExportNominative: true,
+      canImportParcels: true,
+      canRecordPayment: true,
+    });
   });
   it("flags empty required fields before saving", () => {
     const meta: any = {

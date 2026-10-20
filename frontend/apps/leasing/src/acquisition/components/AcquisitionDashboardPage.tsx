@@ -84,21 +84,25 @@ const AcquisitionDashboardPage: React.FC = () => {
               value={d.deadlines_due_soon}
               tone={d.deadlines_due_soon ? "warning" : "default"}
             />
-            <Stat
-              label="Keberatan/perkara berjalan"
-              value={d.open_objections}
-              tone={d.open_objections ? "warning" : "default"}
-            />
+            {d.open_objections !== undefined && (
+              <Stat
+                label="Keberatan/perkara berjalan"
+                value={d.open_objections}
+                tone={d.open_objections ? "warning" : "default"}
+              />
+            )}
             <Stat
               label="Luas terkena"
               value={formatArea(d.affected_area_m2)}
               hint={`Dilepaskan: ${formatArea(d.released_area_m2)}`}
             />
-            <Stat
-              label="Ganti kerugian ditetapkan"
-              value={formatRupiah(d.compensation_total)}
-              hint={`Dibayar: ${formatRupiah(d.paid_total)}`}
-            />
+            {d.compensation_total !== undefined && (
+              <Stat
+                label="Ganti kerugian ditetapkan"
+                value={formatRupiah(d.compensation_total)}
+                hint={`Dibayar: ${formatRupiah(d.paid_total)}`}
+              />
+            )}
           </div>
 
           <div className="acq-columns">

@@ -72,10 +72,14 @@ const ResourceSection: React.FC<Props> = ({
     onChanged?.();
   };
 
-  const handleSaved = () => {
+  const handleSaved = (record?: Record<string, any>) => {
     setIsFormOpen(false);
     setEditing(null);
     displayUIMessage({ title: "", body: `${itemName} disimpan` });
+    if (record?.notice) {
+      // Mis. validasi ganti kerugian dibatalkan karena data berubah.
+      displayUIMessage({ title: "", body: record.notice }, { type: "info" });
+    }
     refresh();
   };
 
