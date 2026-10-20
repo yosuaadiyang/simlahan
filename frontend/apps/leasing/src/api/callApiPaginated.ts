@@ -1,7 +1,12 @@
 import callApi from "./callApi";
+import { SERVER_ERROR_MESSAGE } from "./responseBody";
 
 function* callApiPaginated(request: Request): Generator<any, any, any> {
   let { response, bodyAsJson } = yield callApi(request);
+  if (response.status !== 200) {
+    // Galat halaman pertama diteruskan apa adanya ke pemanggil.
+    return { response, bodyAsJson };
+  }
   const allResults = [...bodyAsJson.results];
 
   if (bodyAsJson.next) {
@@ -26,7 +31,10 @@ function* callApiPaginated(request: Request): Generator<any, any, any> {
             response,
             bodyAsJson: {
               exception: response.status,
-              message: response.statusText,
+              message:
+                bodyAsJson?.detail ||
+                bodyAsJson?.message ||
+                SERVER_ERROR_MESSAGE,
             },
           };
       }

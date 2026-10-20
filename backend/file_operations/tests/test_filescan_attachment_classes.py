@@ -61,7 +61,9 @@ def test_attachment_classes(
     and verifying that downloads are allowed or denied when appropriate.
     """
     uploaded_file = SimpleUploadedFile(
-        name="test_attachment.pdf", content=b"test", content_type="application/pdf"
+        name="test_attachment.pdf",
+        content=b"%PDF-1.4\ntest",
+        content_type="application/pdf",
     )
 
     with pytest.raises(FileScanStatus.DoesNotExist):

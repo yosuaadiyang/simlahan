@@ -64,7 +64,13 @@ def _geojson_items(data: bytes) -> list:
     try:
         payload = json.loads(data)
     except (json.JSONDecodeError, UnicodeDecodeError) as error:
-        raise AssetImportError(f"Berkas bukan GeoJSON yang valid: {error}")
+        # Pesan bawaan Python berbahasa Inggris; sebutkan posisinya saja.
+        where = (
+            f"baris {error.lineno}, kolom {error.colno}"
+            if isinstance(error, json.JSONDecodeError)
+            else "teks bukan UTF-8"
+        )
+        raise AssetImportError(f"Berkas bukan GeoJSON yang valid ({where}).")
     kind = payload.get("type") if isinstance(payload, dict) else None
     if kind == "Feature":
         return [payload]

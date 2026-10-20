@@ -519,6 +519,7 @@ class AreaType(Enum):
             "Area type", "Infill development compensation"
         )
         DETAILED_PLAN = pgettext_lazy("Area type", "Detailed plan")
+        PRE_DETAILED_PLAN = pgettext_lazy("Area type", "Pending detailed plan")
         OTHER = pgettext_lazy("Area type", "Other")
 
 

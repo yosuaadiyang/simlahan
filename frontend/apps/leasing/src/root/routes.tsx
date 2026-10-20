@@ -1,5 +1,5 @@
 import React from "react";
-import { Navigate, Route, Routes as RouterRoutes } from "react-router";
+import { Route, Routes as RouterRoutes } from "react-router";
 import ErrorPage from "@/errorPage/ErrorPage";
 import App from "@/app/App";
 import AreaNoteListPage from "@/areaNote/components/AreaNoteListPage";
@@ -32,6 +32,7 @@ import AcquisitionListPage from "@/acquisition/components/AcquisitionListPage";
 import AcquisitionProjectPage from "@/acquisition/components/AcquisitionProjectPage";
 import AcquisitionParcelPage from "@/acquisition/components/AcquisitionParcelPage";
 import AcquisitionSettingsPage from "@/acquisition/components/AcquisitionSettingsPage";
+import HomeRedirect from "./HomeRedirect";
 
 /**
  * Routes enumerate
@@ -93,7 +94,7 @@ export const getRouteById = (id: string): string => {
 export default (
   <App>
     <RouterRoutes>
-      <Route path="/" element={<Navigate to={getRouteById(Routes.LEASES)} />} />
+      <Route path="/" element={<HomeRedirect getRoute={getRouteById} />} />
       <Route path={getRouteById(Routes.LEASES)} element={<LeaseListPage />} />
       <Route
         path={getRouteById(Routes.ACQUISITION_DASHBOARD)}

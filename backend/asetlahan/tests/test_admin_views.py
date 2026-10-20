@@ -75,6 +75,18 @@ def test_tool_pages_render_for_admin(client, admin, data, name):
     assert response.status_code == 200
 
 
+@pytest.mark.parametrize("name", ["asetlahan-dashboard", "asetlahan-gantt"])
+def test_chart_css_numbers_are_not_localized(client, admin, data, name):
+    # Locale id memakai koma desimal; "width:12,5%" adalah CSS tidak sah dan
+    # membuat batang grafik/Gantt salah posisi.
+    import re
+
+    client.force_login(admin)
+    html = client.get(reverse(name)).content.decode()
+    assert re.search(r"(?:width|left):\s*\d+(?:\.\d+)?%", html)
+    assert not re.search(r"(?:width|left):\s*\d+,\d+%", html)
+
+
 def test_tool_pages_require_staff(client, data):
     response = client.get(reverse("asetlahan-dashboard"))
     assert response.status_code == 302

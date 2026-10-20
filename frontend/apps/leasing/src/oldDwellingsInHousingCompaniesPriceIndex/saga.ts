@@ -7,7 +7,7 @@ import { fetchOldDwellingsInHousingCompaniesPriceIndex } from "./requests";
 import { receiveError } from "@/api/slice";
 import { FETCH_ACTION_STRING } from "./constants";
 
-function* fetchOldDwellingsInHousingCompaniesPriceIndexSaga(): Generator<
+export function* fetchOldDwellingsInHousingCompaniesPriceIndexSaga(): Generator<
   any,
   any,
   any
@@ -19,9 +19,15 @@ function* fetchOldDwellingsInHousingCompaniesPriceIndexSaga(): Generator<
     } = yield call(fetchOldDwellingsInHousingCompaniesPriceIndex);
 
     switch (statusCode) {
-      case 200:
-        yield put(receiveOldDwellingsInHousingCompaniesPriceIndex(bodyAsJson));
+      case 200: {
+        const index = bodyAsJson?.results?.[0];
+        yield put(
+          index
+            ? receiveOldDwellingsInHousingCompaniesPriceIndex(index)
+            : notFound(),
+        );
         break;
+      }
 
       default:
         yield put(notFound());

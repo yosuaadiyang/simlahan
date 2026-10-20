@@ -80,7 +80,7 @@ class LeaseholdTransferParty(NameModel):
     """
 
     # In Finnish: Tyyppi
-    type = EnumField(LeaseholdTransferPartyType)
+    type = EnumField(LeaseholdTransferPartyType, verbose_name=_("Type"))
 
     transfer = models.ForeignKey(
         LeaseholdTransfer,

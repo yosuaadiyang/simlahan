@@ -3600,6 +3600,9 @@ msgstr "Data UI pengguna lain tidak dapat dibuat"
 msgid "Data integrity error"
 msgstr "Galat integritas data"
 
+msgid "The multipart request must contain a JSON 'data' field."
+msgstr "Permintaan multipart wajib berisi kolom 'data' berformat JSON."
+
 msgid "Indonesian"
 msgstr "Bahasa Indonesia"
 
@@ -5486,3 +5489,1446 @@ msgstr "Administrasi %(app)s"
 #, python-format
 msgid "%(app)s site admin"
 msgstr "Admin situs %(app)s"
+
+msgid "lease parameter is mandatory"
+msgstr "Parameter lease wajib diisi"
+
+msgid "Lease does not exist"
+msgstr "Sewa tidak ditemukan"
+
+msgid "Invalid lease id"
+msgstr "ID sewa tidak valid"
+
+msgid "Both start_date and end_date parameters are mandatory"
+msgstr "Parameter start_date dan end_date wajib diisi"
+
+msgid "\"invoicing_enabled\" key is required"
+msgstr "Kunci \"invoicing_enabled\" wajib diisi"
+
+msgid "\"invoicing_enabled\" value has to be true or false"
+msgstr "Nilai \"invoicing_enabled\" harus true atau false"
+
+msgid "\"rent_info_complete\" key is required"
+msgstr "Kunci \"rent_info_complete\" wajib diisi"
+
+msgid "\"rent_info_complete\" value has to be true or false"
+msgstr "Nilai \"rent_info_complete\" harus true atau false"
+
+msgid "decision parameter is mandatory"
+msgstr "Parameter decision wajib diisi"
+
+msgid "Decision does not exist"
+msgstr "Keputusan tidak ditemukan"
+
+msgid "Invalid decision id"
+msgstr "ID keputusan tidak valid"
+
+msgid "Please provide target lease ids with \"leases\" parameter"
+msgstr "Isi ID sewa tujuan pada parameter \"leases\""
+
+msgid "Invalid type"
+msgstr "Jenis tidak valid"
+
+#, python-format
+msgid "%(model)s does not exist"
+msgstr "%(model)s tidak ditemukan"
+
+msgid "the file is not UTF-8 encoded text"
+msgstr "berkas bukan teks berenkode UTF-8"
+
+#, python-format
+msgid "syntax error at line %(line)s, column %(column)s"
+msgstr "kesalahan sintaks pada baris %(line)s, kolom %(column)s"
+
+msgid "The file is not a GeoJSON Feature or FeatureCollection."
+msgstr "Berkas bukan Feature atau FeatureCollection GeoJSON."
+
+msgid "The archive is not a valid ZIP file."
+msgstr "Arsip bukan berkas ZIP yang valid."
+
+msgid "The shapefile could not be read."
+msgstr "Shapefile tidak dapat dibaca."
+
+#, python-format
+msgid "Row %(row)s: the geometry is not a polygon."
+msgstr "Baris %(row)s: geometri bukan poligon."
+
+#, python-format
+msgid "Row %(row)s: parcel number is longer than %(max)s characters."
+msgstr "Baris %(row)s: nomor bidang lebih dari %(max)s karakter."
+
+#, python-format
+msgid "Row %(row)s: the area value is out of range."
+msgstr "Baris %(row)s: nilai luas di luar batas."
+
+#, python-format
+msgid "Row %(row)s: the geometry could not be read."
+msgstr "Baris %(row)s: geometri tidak dapat dibaca."
+
+msgid "Leasing"
+msgstr "Sewa lahan"
+
+msgid "Forms"
+msgstr "Formulir"
+
+msgid "Users"
+msgstr "Pengguna"
+
+msgid "File operations"
+msgstr "Operasi berkas"
+
+msgid "Batch jobs"
+msgstr "Tugas batch"
+
+msgid "map layer"
+msgstr "lapisan peta"
+
+msgid "map layers"
+msgstr "lapisan peta"
+
+msgid "favourite"
+msgstr "favorit"
+
+msgid "favourites"
+msgstr "favorit"
+
+msgid "FAQ"
+msgstr "tanya jawab (FAQ)"
+
+msgid "FAQs"
+msgstr "tanya jawab (FAQ)"
+
+msgid "job run queue item"
+msgstr "antrean eksekusi tugas"
+
+msgid "job run queue items"
+msgstr "antrean eksekusi tugas"
+
+msgid "form"
+msgstr "formulir"
+
+msgid "forms"
+msgstr "formulir"
+
+msgid "form section"
+msgstr "bagian formulir"
+
+msgid "form sections"
+msgstr "bagian formulir"
+
+msgid "form field"
+msgstr "isian formulir"
+
+msgid "form fields"
+msgstr "isian formulir"
+
+msgid "field choice"
+msgstr "pilihan isian"
+
+msgid "field choices"
+msgstr "pilihan isian"
+
+msgid "OAuth2 application"
+msgstr "aplikasi OAuth2"
+
+msgid "OAuth2 applications"
+msgstr "aplikasi OAuth2"
+
+msgid "access token"
+msgstr "token akses"
+
+msgid "access tokens"
+msgstr "token akses"
+
+msgid "refresh token"
+msgstr "token penyegar"
+
+msgid "refresh tokens"
+msgstr "token penyegar"
+
+msgid "ID token"
+msgstr "token ID"
+
+msgid "ID tokens"
+msgstr "token ID"
+
+msgid "authorization grant"
+msgstr "kode otorisasi"
+
+msgid "authorization grants"
+msgstr "kode otorisasi"
+
+msgid "Failed task"
+msgstr "Tugas gagal"
+
+msgid "Failed tasks"
+msgstr "Tugas gagal"
+
+msgid "Queued task"
+msgstr "Tugas dalam antrean"
+
+msgid "Queued tasks"
+msgstr "Tugas dalam antrean"
+
+msgid "Scheduled task"
+msgstr "Tugas terjadwal"
+
+msgid "Scheduled tasks"
+msgstr "Tugas terjadwal"
+
+msgid "Successful task"
+msgstr "Tugas berhasil"
+
+msgid "Successful tasks"
+msgstr "Tugas berhasil"
+
+msgid "Task"
+msgstr "Tugas"
+
+msgid "Tasks"
+msgstr "Tugas"
+
+msgid "Task id"
+msgstr "ID tugas"
+
+msgid "Function"
+msgstr "Fungsi"
+
+msgid "Hook"
+msgstr "Hook"
+
+msgid "Arguments"
+msgstr "Argumen"
+
+msgid "Keyword arguments"
+msgstr "Argumen kata kunci"
+
+msgid "Result"
+msgstr "Hasil"
+
+msgid "Short result"
+msgstr "Ringkasan hasil"
+
+msgid "Group"
+msgstr "Grup"
+
+msgid "Cluster"
+msgstr "Klaster"
+
+msgid "Cluster key"
+msgstr "Kunci klaster"
+
+msgid "Started at"
+msgstr "Mulai pada"
+
+msgid "Stopped at"
+msgstr "Selesai pada"
+
+msgid "Success"
+msgstr "Berhasil"
+
+msgid "Attempt count"
+msgstr "Jumlah percobaan"
+
+msgid "Time Taken"
+msgstr "Durasi"
+
+msgid "Schedule Type"
+msgstr "Jenis jadwal"
+
+msgid "Minutes"
+msgstr "Menit"
+
+msgid "Repeats"
+msgstr "Pengulangan"
+
+msgid "Next Run"
+msgstr "Jalan berikutnya"
+
+msgid "Cron"
+msgstr "Cron"
+
+msgid "Last task id"
+msgstr "ID tugas terakhir"
+
+msgid "Intended date kwarg"
+msgstr "Kwarg tanggal rencana"
+
+msgid "Payload"
+msgstr "Muatan"
+
+msgid "Lock until"
+msgstr "Dikunci hingga"
+
+msgid "Once"
+msgstr "Sekali"
+
+msgid "Hourly"
+msgstr "Tiap jam"
+
+msgid "Daily"
+msgstr "Harian"
+
+msgid "Weekly"
+msgstr "Mingguan"
+
+msgid "Biweekly"
+msgstr "Dua mingguan"
+
+msgid "Monthly"
+msgstr "Bulanan"
+
+msgid "Bimonthly"
+msgstr "Dua bulanan"
+
+msgid "Quarterly"
+msgstr "Triwulanan"
+
+msgid "Yearly"
+msgstr "Tahunan"
+
+msgid "Resubmit selected tasks to queue"
+msgstr "Kirim ulang tugas terpilih ke antrean"
+
+msgid "Queue options"
+msgstr "Opsi antrean"
+
+msgid "Cron expression"
+msgstr "Ekspresi cron"
+
+msgid "32-character task identifier."
+msgstr "Pengenal tugas 32 karakter."
+
+msgid "Dotted import path to the callable, e.g. myapp.tasks.job."
+msgstr "Jalur impor fungsi, mis. myapp.tasks.job."
+
+msgid "False if the task raised an exception or timed out."
+msgstr "Salah bila tugas memicu galat atau melewati batas waktu."
+
+msgid "How many times execution was attempted."
+msgstr "Berapa kali eksekusi dicoba."
+
+msgid "How often this task should be enqueued."
+msgstr "Seberapa sering tugas ini dimasukkan ke antrean."
+
+msgid "Id of the last task spawned from this schedule (read-only)."
+msgstr "ID tugas terakhir dari jadwal ini (hanya baca)."
+
+msgid "Name of kwarg to pass intended schedule date"
+msgstr "Nama kwarg untuk meneruskan tanggal jadwal"
+
+msgid "Name of the cluster that executed this task."
+msgstr "Nama klaster yang menjalankan tugas ini."
+
+msgid "Name of the target cluster"
+msgstr "Nama klaster tujuan"
+
+msgid "Number of minutes for the Minutes type"
+msgstr "Jumlah menit untuk jenis Menit"
+
+msgid "Optional group id to aggregate related tasks."
+msgstr "ID grup opsional untuk mengelompokkan tugas terkait."
+
+msgid "Optional human-readable name for lookup and display."
+msgstr "Nama opsional untuk pencarian dan tampilan."
+
+msgid "Optional label to identify this schedule in the admin."
+msgstr "Label opsional untuk mengenali jadwal ini di admin."
+
+msgid "Pickled keyword arguments (dict)."
+msgstr "Argumen kata kunci terserialisasi (dict)."
+
+msgid "Pickled positional arguments (tuple)."
+msgstr "Argumen posisi terserialisasi (tuple)."
+
+msgid "Pickled return value or error payload."
+msgstr "Nilai kembalian atau galat terserialisasi."
+
+msgid "Please install croniter to enable cron expressions"
+msgstr "Pasang croniter untuk mengaktifkan ekspresi cron"
+
+msgid "Prevent any cluster from pulling until"
+msgstr "Cegah klaster mengambil tugas hingga"
+
+msgid "Signed serialized task package (do not edit manually)."
+msgstr "Paket tugas terserialisasi bertanda tangan (jangan diubah manual)."
+
+msgid "When the worker finished (success or failure)."
+msgstr "Waktu pekerja selesai (berhasil atau gagal)."
+
+msgid "When the worker started executing the task."
+msgstr "Waktu pekerja mulai menjalankan tugas."
+
+msgid "When this schedule runs next (stored in UTC)."
+msgstr "Waktu jadwal ini berjalan berikutnya (disimpan dalam UTC)."
+
+msgid "n = n times, -1 = forever"
+msgstr "n = n kali, -1 = selamanya"
+
+msgid "e.g. module.tasks.function"
+msgstr "mis. module.tasks.function"
+
+msgid "e.g. module.tasks.result_function"
+msgstr "mis. module.tasks.result_function"
+
+msgid "e.g. 1, 2, 'John'"
+msgstr "mis. 1, 2, 'Budi'"
+
+msgid "e.g. x=1, y=2, name='John'"
+msgstr "mis. x=1, y=2, name='Budi'"
+
+msgid "last_run"
+msgstr "terakhir dijalankan"
+
+msgid "Token Blacklist"
+msgstr "Daftar hitam token"
+
+msgid "Blacklisted Token"
+msgstr "Token diblokir"
+
+msgid "Blacklisted Tokens"
+msgstr "Token diblokir"
+
+msgid "Outstanding Token"
+msgstr "Token beredar"
+
+msgid "Outstanding Tokens"
+msgstr "Token beredar"
+
+msgid "jti"
+msgstr "jti"
+
+msgid "created at"
+msgstr "dibuat pada"
+
+msgid "expires at"
+msgstr "kedaluwarsa pada"
+
+msgid "blacklisted at"
+msgstr "diblokir pada"
+
+msgid "Audit log"
+msgstr "Log audit"
+
+#, python-format
+msgid "Audit log: %s"
+msgstr "Log audit: %s"
+
+msgid "Correlation ID"
+msgstr "ID korelasi"
+
+msgid "Click to filter by records with this correlation id"
+msgstr "Klik untuk menyaring catatan dengan ID korelasi ini"
+
+msgid "object pk"
+msgstr "pk objek"
+
+msgid "object representation"
+msgstr "representasi objek"
+
+msgid "serialized data"
+msgstr "data terserialisasi"
+
+msgid "action"
+msgstr "tindakan"
+
+msgid "actor"
+msgstr "pelaku"
+
+msgid "remote address"
+msgstr "alamat jarak jauh"
+
+msgid "remote port"
+msgstr "port jarak jauh"
+
+msgid "timestamp"
+msgstr "waktu"
+
+msgid "additional data"
+msgstr "data tambahan"
+
+msgid "actor email"
+msgstr "surel pelaku"
+
+msgid "create"
+msgstr "buat"
+
+msgid "update"
+msgstr "ubah"
+
+msgid "delete"
+msgstr "hapus"
+
+msgid "access"
+msgstr "akses"
+
+msgid "Resource"
+msgstr "Sumber daya"
+
+msgid "Resource Type"
+msgstr "Jenis sumber daya"
+
+msgid "Changes"
+msgstr "Perubahan"
+
+msgid "Sequences"
+msgstr "Urutan nomor"
+
+msgid "sequence"
+msgstr "urutan nomor"
+
+msgid "sequences"
+msgstr "urutan nomor"
+
+msgid "last value"
+msgstr "nilai terakhir"
+
+msgid "Plot search"
+msgstr "Pencarian kavling"
+
+msgid "Add new allowed"
+msgstr "Boleh tambah baru"
+
+msgid "Add new text"
+msgstr "Teks tombol tambah"
+
+msgid "Answer"
+msgstr "Jawaban"
+
+msgid "Applicant type"
+msgstr "Jenis pemohon"
+
+msgid "Application metadata"
+msgstr "Metadata permohonan"
+
+msgid "Contacts"
+msgstr "Kontak"
+
+msgid "Content type"
+msgstr "Jenis konten"
+
+msgid "Decisions"
+msgstr "Keputusan"
+
+msgid "Default value"
+msgstr "Nilai bawaan"
+
+msgid "Enabled"
+msgstr "Aktif"
+
+msgid "File field name"
+msgstr "Nama kolom berkas"
+
+msgid "Filter by intended use"
+msgstr "Saring menurut peruntukan"
+
+msgid "Filter by lease type"
+msgstr "Saring menurut jenis sewa"
+
+msgid "Filter by service unit"
+msgstr "Saring menurut unit layanan"
+
+msgid "Form"
+msgstr "Formulir"
+
+msgid "Form field"
+msgstr "Isian formulir"
+
+msgid "Form section"
+msgstr "Bagian formulir"
+
+msgid "Has text input"
+msgstr "Dengan isian teks"
+
+msgid "Hex color"
+msgstr "Warna (hex)"
+
+msgid "Hint text"
+msgstr "Teks petunjuk"
+
+msgid "Is area form"
+msgstr "Formulir pencarian area"
+
+msgid "Is template"
+msgstr "Templat"
+
+msgid "Keywords"
+msgstr "Kata kunci"
+
+msgid "Label"
+msgstr "Label"
+
+msgid "Leases"
+msgstr "Sewa"
+
+msgid "Name (English)"
+msgstr "Nama (Inggris)"
+
+msgid "Name (Indonesian)"
+msgstr "Nama (Indonesia)"
+
+msgid "Object id"
+msgstr "ID objek"
+
+msgid "Order in parent"
+msgstr "Urutan dalam induk"
+
+msgid "Ordering"
+msgstr "Urutan"
+
+msgid "Parent layer"
+msgstr "Lapisan induk"
+
+msgid "Parent section"
+msgstr "Bagian induk"
+
+msgid "Plot search type"
+msgstr "Jenis pencarian kavling"
+
+msgid "Question"
+msgstr "Pertanyaan"
+
+msgid "Related leases"
+msgstr "Sewa terkait"
+
+msgid "Require opening record"
+msgstr "Wajib berita acara pembukaan"
+
+msgid "Required"
+msgstr "Wajib"
+
+msgid "Search class"
+msgstr "Kelas pencarian"
+
+msgid "Service units"
+msgstr "Unit layanan"
+
+msgid "Show district"
+msgstr "Tampilkan kecamatan"
+
+msgid "Show duplication check"
+msgstr "Tampilkan pemeriksaan duplikat"
+
+msgid "Sort order"
+msgstr "Urutan"
+
+msgid "Target selection"
+msgstr "Pemilihan target"
+
+msgid "Validation"
+msgstr "Validasi"
+
+msgid "Visible"
+msgstr "Tampil"
+
+msgid "type"
+msgstr "jenis"
+
+msgid "Optional dotted path to a callback that receives the task result."
+msgstr "Jalur opsional ke fungsi balik yang menerima hasil tugas."
+
+# Nama negara untuk django-countries (tanpa katalog bahasa Indonesia), dari data CLDR.
+
+msgid "Afghanistan"
+msgstr "Afganistan"
+
+msgid "Åland Islands"
+msgstr "Kepulauan Aland"
+
+msgid "Albania"
+msgstr "Albania"
+
+msgid "Algeria"
+msgstr "Aljazair"
+
+msgid "American Samoa"
+msgstr "Samoa Amerika"
+
+msgid "Andorra"
+msgstr "Andorra"
+
+msgid "Angola"
+msgstr "Angola"
+
+msgid "Anguilla"
+msgstr "Anguilla"
+
+msgid "Antarctica"
+msgstr "Antarktika"
+
+msgid "Antigua and Barbuda"
+msgstr "Antigua dan Barbuda"
+
+msgid "Argentina"
+msgstr "Argentina"
+
+msgid "Armenia"
+msgstr "Armenia"
+
+msgid "Aruba"
+msgstr "Aruba"
+
+msgid "Australia"
+msgstr "Australia"
+
+msgid "Austria"
+msgstr "Austria"
+
+msgid "Azerbaijan"
+msgstr "Azerbaijan"
+
+msgid "Bahamas (The)"
+msgstr "Bahama"
+
+msgid "Bahrain"
+msgstr "Bahrain"
+
+msgid "Bangladesh"
+msgstr "Bangladesh"
+
+msgid "Barbados"
+msgstr "Barbados"
+
+msgid "Belarus"
+msgstr "Belarus"
+
+msgid "Belgium"
+msgstr "Belgia"
+
+msgid "Belize"
+msgstr "Belize"
+
+msgid "Benin"
+msgstr "Benin"
+
+msgid "Bermuda"
+msgstr "Bermuda"
+
+msgid "Bhutan"
+msgstr "Bhutan"
+
+msgid "Bolivia (Plurinational State of)"
+msgstr "Bolivia"
+
+msgid "Bonaire, Sint Eustatius and Saba"
+msgstr "Belanda Karibia"
+
+msgid "Bosnia and Herzegovina"
+msgstr "Bosnia dan Herzegovina"
+
+msgid "Botswana"
+msgstr "Botswana"
+
+msgid "Bouvet Island"
+msgstr "Pulau Bouvet"
+
+msgid "Brazil"
+msgstr "Brasil"
+
+msgid "British Indian Ocean Territory"
+msgstr "Wilayah Inggris di Samudra Hindia"
+
+msgid "Brunei Darussalam"
+msgstr "Brunei"
+
+msgid "Bulgaria"
+msgstr "Bulgaria"
+
+msgid "Burkina Faso"
+msgstr "Burkina Faso"
+
+msgid "Burundi"
+msgstr "Burundi"
+
+msgid "Cabo Verde"
+msgstr "Tanjung Verde"
+
+msgid "Cambodia"
+msgstr "Kamboja"
+
+msgid "Cameroon"
+msgstr "Kamerun"
+
+msgid "Canada"
+msgstr "Kanada"
+
+msgid "Cayman Islands"
+msgstr "Kepulauan Cayman"
+
+msgid "Central African Republic"
+msgstr "Republik Afrika Tengah"
+
+msgid "Chad"
+msgstr "Chad"
+
+msgid "Chile"
+msgstr "Cile"
+
+msgid "China"
+msgstr "Tiongkok"
+
+msgid "Christmas Island"
+msgstr "Pulau Natal"
+
+msgid "Cocos (Keeling) Islands"
+msgstr "Kepulauan Cocos (Keeling)"
+
+msgid "Colombia"
+msgstr "Kolombia"
+
+msgid "Comoros"
+msgstr "Komoro"
+
+msgid "Congo"
+msgstr "Kongo - Brazzaville"
+
+msgid "Congo (the Democratic Republic of the)"
+msgstr "Kongo - Kinshasa"
+
+msgid "Cook Islands"
+msgstr "Kepulauan Cook"
+
+msgid "Costa Rica"
+msgstr "Kosta Rika"
+
+msgid "Côte d'Ivoire"
+msgstr "Côte d’Ivoire"
+
+msgid "Croatia"
+msgstr "Kroasia"
+
+msgid "Cuba"
+msgstr "Kuba"
+
+msgid "Curaçao"
+msgstr "Curaçao"
+
+msgid "Cyprus"
+msgstr "Siprus"
+
+msgid "Czechia"
+msgstr "Ceko"
+
+msgid "Denmark"
+msgstr "Denmark"
+
+msgid "Djibouti"
+msgstr "Jibuti"
+
+msgid "Dominica"
+msgstr "Dominika"
+
+msgid "Dominican Republic"
+msgstr "Republik Dominika"
+
+msgid "Ecuador"
+msgstr "Ekuador"
+
+msgid "Egypt"
+msgstr "Mesir"
+
+msgid "El Salvador"
+msgstr "El Salvador"
+
+msgid "Equatorial Guinea"
+msgstr "Guinea Ekuatorial"
+
+msgid "Eritrea"
+msgstr "Eritrea"
+
+msgid "Estonia"
+msgstr "Estonia"
+
+msgid "Eswatini"
+msgstr "eSwatini"
+
+msgid "Ethiopia"
+msgstr "Etiopia"
+
+msgid "Falkland Islands (Malvinas)"
+msgstr "Kepulauan Falkland"
+
+msgid "Faroe Islands"
+msgstr "Kepulauan Faroe"
+
+msgid "Fiji"
+msgstr "Fiji"
+
+msgid "Finland"
+msgstr "Finlandia"
+
+msgid "France"
+msgstr "Prancis"
+
+msgid "French Guiana"
+msgstr "Guyana Prancis"
+
+msgid "French Polynesia"
+msgstr "Polinesia Prancis"
+
+msgid "French Southern Territories"
+msgstr "Wilayah Selatan Prancis"
+
+msgid "Gabon"
+msgstr "Gabon"
+
+msgid "Gambia"
+msgstr "Gambia"
+
+msgid "Georgia"
+msgstr "Georgia"
+
+msgid "Germany"
+msgstr "Jerman"
+
+msgid "Ghana"
+msgstr "Ghana"
+
+msgid "Gibraltar"
+msgstr "Gibraltar"
+
+msgid "Greece"
+msgstr "Yunani"
+
+msgid "Greenland"
+msgstr "Greenland"
+
+msgid "Grenada"
+msgstr "Grenada"
+
+msgid "Guadeloupe"
+msgstr "Guadeloupe"
+
+msgid "Guam"
+msgstr "Guam"
+
+msgid "Guatemala"
+msgstr "Guatemala"
+
+msgid "Guernsey"
+msgstr "Guernsey"
+
+msgid "Guinea"
+msgstr "Guinea"
+
+msgid "Guinea-Bissau"
+msgstr "Guinea-Bissau"
+
+msgid "Guyana"
+msgstr "Guyana"
+
+msgid "Haiti"
+msgstr "Haiti"
+
+msgid "Heard Island and McDonald Islands"
+msgstr "Pulau Heard dan Kepulauan McDonald"
+
+msgid "Holy See"
+msgstr "Vatikan"
+
+msgid "Honduras"
+msgstr "Honduras"
+
+msgid "Hong Kong"
+msgstr "Hong Kong DAK Tiongkok"
+
+msgid "Hungary"
+msgstr "Hungaria"
+
+msgid "Iceland"
+msgstr "Islandia"
+
+msgid "India"
+msgstr "India"
+
+msgid "Indonesia"
+msgstr "Indonesia"
+
+msgid "Iran (Islamic Republic of)"
+msgstr "Iran"
+
+msgid "Iraq"
+msgstr "Irak"
+
+msgid "Ireland"
+msgstr "Irlandia"
+
+msgid "Isle of Man"
+msgstr "Pulau Man"
+
+msgid "Israel"
+msgstr "Israel"
+
+msgid "Italy"
+msgstr "Italia"
+
+msgid "Jamaica"
+msgstr "Jamaika"
+
+msgid "Japan"
+msgstr "Jepang"
+
+msgid "Jersey"
+msgstr "Jersey"
+
+msgid "Jordan"
+msgstr "Yordania"
+
+msgid "Kazakhstan"
+msgstr "Kazakhstan"
+
+msgid "Kenya"
+msgstr "Kenya"
+
+msgid "Kiribati"
+msgstr "Kiribati"
+
+msgid "Korea (the Democratic People's Republic of)"
+msgstr "Korea Utara"
+
+msgid "Korea (the Republic of)"
+msgstr "Korea Selatan"
+
+msgid "Kuwait"
+msgstr "Kuwait"
+
+msgid "Kyrgyzstan"
+msgstr "Kirgizstan"
+
+msgid "Lao People's Democratic Republic"
+msgstr "Laos"
+
+msgid "Latvia"
+msgstr "Latvia"
+
+msgid "Lebanon"
+msgstr "Lebanon"
+
+msgid "Lesotho"
+msgstr "Lesotho"
+
+msgid "Liberia"
+msgstr "Liberia"
+
+msgid "Libya"
+msgstr "Libya"
+
+msgid "Liechtenstein"
+msgstr "Liechtenstein"
+
+msgid "Lithuania"
+msgstr "Lituania"
+
+msgid "Luxembourg"
+msgstr "Luksemburg"
+
+msgid "Macao"
+msgstr "Makau DAK Tiongkok"
+
+msgid "Madagascar"
+msgstr "Madagaskar"
+
+msgid "Malawi"
+msgstr "Malawi"
+
+msgid "Malaysia"
+msgstr "Malaysia"
+
+msgid "Maldives"
+msgstr "Maladewa"
+
+msgid "Mali"
+msgstr "Mali"
+
+msgid "Malta"
+msgstr "Malta"
+
+msgid "Marshall Islands"
+msgstr "Kepulauan Marshall"
+
+msgid "Martinique"
+msgstr "Martinik"
+
+msgid "Mauritania"
+msgstr "Mauritania"
+
+msgid "Mauritius"
+msgstr "Mauritius"
+
+msgid "Mayotte"
+msgstr "Mayotte"
+
+msgid "Mexico"
+msgstr "Meksiko"
+
+msgid "Micronesia (Federated States of)"
+msgstr "Mikronesia"
+
+msgid "Moldova (the Republic of)"
+msgstr "Moldova"
+
+msgid "Monaco"
+msgstr "Monako"
+
+msgid "Mongolia"
+msgstr "Mongolia"
+
+msgid "Montenegro"
+msgstr "Montenegro"
+
+msgid "Montserrat"
+msgstr "Montserrat"
+
+msgid "Morocco"
+msgstr "Maroko"
+
+msgid "Mozambique"
+msgstr "Mozambik"
+
+msgid "Myanmar"
+msgstr "Myanmar (Burma)"
+
+msgid "Namibia"
+msgstr "Namibia"
+
+msgid "Naoero"
+msgstr "Nauru"
+
+msgid "Nepal"
+msgstr "Nepal"
+
+msgid "Netherlands (Kingdom of the)"
+msgstr "Belanda"
+
+msgid "New Caledonia"
+msgstr "Kaledonia Baru"
+
+msgid "New Zealand"
+msgstr "Selandia Baru"
+
+msgid "Nicaragua"
+msgstr "Nikaragua"
+
+msgid "Niger"
+msgstr "Niger"
+
+msgid "Nigeria"
+msgstr "Nigeria"
+
+msgid "Niue"
+msgstr "Niue"
+
+msgid "Norfolk Island"
+msgstr "Kepulauan Norfolk"
+
+msgid "North Macedonia"
+msgstr "Makedonia Utara"
+
+msgid "Northern Mariana Islands"
+msgstr "Kepulauan Mariana Utara"
+
+msgid "Norway"
+msgstr "Norwegia"
+
+msgid "Oman"
+msgstr "Oman"
+
+msgid "Pakistan"
+msgstr "Pakistan"
+
+msgid "Palau"
+msgstr "Palau"
+
+msgid "Palestine, State of"
+msgstr "Wilayah Palestina"
+
+msgid "Panama"
+msgstr "Panama"
+
+msgid "Papua New Guinea"
+msgstr "Papua Nugini"
+
+msgid "Paraguay"
+msgstr "Paraguay"
+
+msgid "Peru"
+msgstr "Peru"
+
+msgid "Philippines"
+msgstr "Filipina"
+
+msgid "Pitcairn"
+msgstr "Kepulauan Pitcairn"
+
+msgid "Poland"
+msgstr "Polandia"
+
+msgid "Portugal"
+msgstr "Portugal"
+
+msgid "Puerto Rico"
+msgstr "Puerto Riko"
+
+msgid "Qatar"
+msgstr "Qatar"
+
+msgid "Réunion"
+msgstr "Réunion"
+
+msgid "Romania"
+msgstr "Rumania"
+
+msgid "Russian Federation"
+msgstr "Rusia"
+
+msgid "Rwanda"
+msgstr "Rwanda"
+
+msgid "Saint Barthélemy"
+msgstr "Saint Barthélemy"
+
+msgid "Saint Helena, Ascension and Tristan da Cunha"
+msgstr "Saint Helena"
+
+msgid "Saint Kitts and Nevis"
+msgstr "Saint Kitts dan Nevis"
+
+msgid "Saint Lucia"
+msgstr "Saint Lucia"
+
+msgid "Saint Martin (French part)"
+msgstr "Saint Martin"
+
+msgid "Saint Pierre and Miquelon"
+msgstr "Saint Pierre dan Miquelon"
+
+msgid "Saint Vincent and the Grenadines"
+msgstr "Saint Vincent dan Grenadine"
+
+msgid "Samoa"
+msgstr "Samoa"
+
+msgid "San Marino"
+msgstr "San Marino"
+
+msgid "Sao Tome and Principe"
+msgstr "Sao Tome dan Principe"
+
+msgid "Saudi Arabia"
+msgstr "Arab Saudi"
+
+msgid "Senegal"
+msgstr "Senegal"
+
+msgid "Serbia"
+msgstr "Serbia"
+
+msgid "Seychelles"
+msgstr "Seychelles"
+
+msgid "Sierra Leone"
+msgstr "Sierra Leone"
+
+msgid "Singapore"
+msgstr "Singapura"
+
+msgid "Sint Maarten (Dutch part)"
+msgstr "Sint Maarten"
+
+msgid "Slovakia"
+msgstr "Slovakia"
+
+msgid "Slovenia"
+msgstr "Slovenia"
+
+msgid "Solomon Islands"
+msgstr "Kepulauan Solomon"
+
+msgid "Somalia"
+msgstr "Somalia"
+
+msgid "South Africa"
+msgstr "Afrika Selatan"
+
+msgid "South Georgia and the South Sandwich Islands"
+msgstr "Georgia Selatan & Kep. Sandwich Selatan"
+
+msgid "South Sudan"
+msgstr "Sudan Selatan"
+
+msgid "Spain"
+msgstr "Spanyol"
+
+msgid "Sri Lanka"
+msgstr "Sri Lanka"
+
+msgid "Sudan"
+msgstr "Sudan"
+
+msgid "Suriname"
+msgstr "Suriname"
+
+msgid "Svalbard and Jan Mayen"
+msgstr "Kepulauan Svalbard dan Jan Mayen"
+
+msgid "Sweden"
+msgstr "Swedia"
+
+msgid "Switzerland"
+msgstr "Swiss"
+
+msgid "Syrian Arab Republic"
+msgstr "Suriah"
+
+msgid "Taiwan (Province of China)"
+msgstr "Taiwan"
+
+msgid "Tajikistan"
+msgstr "Tajikistan"
+
+msgid "Tanzania, the United Republic of"
+msgstr "Tanzania"
+
+msgid "Thailand"
+msgstr "Thailand"
+
+msgid "Timor-Leste"
+msgstr "Timor Leste"
+
+msgid "Togo"
+msgstr "Togo"
+
+msgid "Tokelau"
+msgstr "Tokelau"
+
+msgid "Tonga"
+msgstr "Tonga"
+
+msgid "Trinidad and Tobago"
+msgstr "Trinidad dan Tobago"
+
+msgid "Tunisia"
+msgstr "Tunisia"
+
+msgid "Türkiye"
+msgstr "Turki"
+
+msgid "Turkmenistan"
+msgstr "Turkmenistan"
+
+msgid "Turks and Caicos Islands"
+msgstr "Kepulauan Turks dan Caicos"
+
+msgid "Tuvalu"
+msgstr "Tuvalu"
+
+msgid "Uganda"
+msgstr "Uganda"
+
+msgid "Ukraine"
+msgstr "Ukraina"
+
+msgid "United Arab Emirates"
+msgstr "Uni Emirat Arab"
+
+msgid "United Kingdom of Great Britain and Northern Ireland"
+msgstr "Inggris Raya"
+
+msgid "United States Minor Outlying Islands"
+msgstr "Kepulauan Terluar AS"
+
+msgid "United States of America"
+msgstr "Amerika Serikat"
+
+msgid "Uruguay"
+msgstr "Uruguay"
+
+msgid "Uzbekistan"
+msgstr "Uzbekistan"
+
+msgid "Vanuatu"
+msgstr "Vanuatu"
+
+msgid "Venezuela (Bolivarian Republic of)"
+msgstr "Venezuela"
+
+msgid "Viet Nam"
+msgstr "Vietnam"
+
+msgid "Virgin Islands (British)"
+msgstr "Kepulauan Virgin Britania Raya"
+
+msgid "Virgin Islands (U.S.)"
+msgstr "Kepulauan Virgin Amerika Serikat"
+
+msgid "Wallis and Futuna"
+msgstr "Kepulauan Wallis dan Futuna"
+
+msgid "Western Sahara"
+msgstr "Sahara Barat"
+
+msgid "Yemen"
+msgstr "Yaman"
+
+msgid "Zambia"
+msgstr "Zambia"
+
+msgid "Zimbabwe"
+msgstr "Zimbabwe"
+
+msgctxt "Area type"
+msgid "Pending detailed plan"
+msgstr "Rencana detail dalam proses"
+
+# Memperbaiki salah ketik pada katalog bawaan Django ("autentidikasi").
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"Apakah pengguna dapat masuk menggunakan kata sandi. Jika dinonaktifkan, "
+"pengguna mungkin masih dapat masuk melalui cara lain, seperti Single Sign-On "
+"atau LDAP."
+
+msgid "VAT {}% from {}"
+msgstr "PPN {}% mulai {}"
+
+msgid "Name of the column of the content object's FileField"
+msgstr "Nama kolom berkas (FileField) pada objek konten"
+
+msgid ""
+"Filepath for preservation even after the original row has been deleted from "
+"a table referenced by the generic foreign key."
+msgstr ""
+"Jalur berkas yang tetap disimpan meskipun baris asalnya telah dihapus dari "
+"tabel yang dirujuk."
+
+msgid "From date"
+msgstr "Dari tanggal"
+
+msgid "To date"
+msgstr "Sampai tanggal"
+
+msgid "Reset"
+msgstr "Atur ulang"
+
+msgid "From"
+msgstr "Dari"
+
+msgid "To"
+msgstr "Sampai"
+
+msgid "Field"
+msgstr "Kolom"
+
+msgid "Created"
+msgstr "Dibuat"
+
+msgid "Plot search target"
+msgstr "Target pencarian kavling"
+
+msgid "favourite target"
+msgstr "target favorit"
+
+msgid "favourite targets"
+msgstr "target favorit"

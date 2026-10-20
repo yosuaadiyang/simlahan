@@ -12,16 +12,25 @@ from ..utils import clone_object, generate_unique_identifier
 
 
 class Form(models.Model):
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
-    is_template = models.BooleanField(default=False)
-    is_area_form = models.BooleanField(default=False)
-    state = EnumField(FormState, max_length=30, default=FormState.WORK_IN_PROGRESS)
+    name = models.CharField(max_length=255, verbose_name=_("Name"))
+    description = models.TextField(blank=True, verbose_name=_("Description"))
+    is_template = models.BooleanField(default=False, verbose_name=_("Is template"))
+    is_area_form = models.BooleanField(default=False, verbose_name=_("Is area form"))
+    state = EnumField(
+        FormState,
+        max_length=30,
+        default=FormState.WORK_IN_PROGRESS,
+        verbose_name=_("State"),
+    )
 
-    title = models.CharField(max_length=255, blank=True)
+    title = models.CharField(max_length=255, blank=True, verbose_name=_("Title"))
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Time created"))
     modified_at = models.DateTimeField(auto_now=True, verbose_name=_("Time modified"))
+
+    class Meta:
+        verbose_name = _("form")
+        verbose_name_plural = _("forms")
 
     def clone(self):
         assert self.is_template  # Only templates can be clone
@@ -39,14 +48,20 @@ class Form(models.Model):
 
 
 class Section(models.Model):
-    title = models.CharField(max_length=255)
-    identifier = models.SlugField()
-    visible = models.BooleanField(default=True)
-    sort_order = models.PositiveIntegerField(default=0)
+    title = models.CharField(max_length=255, verbose_name=_("Title"))
+    identifier = models.SlugField(verbose_name=_("Identifier"))
+    visible = models.BooleanField(default=True, verbose_name=_("Visible"))
+    sort_order = models.PositiveIntegerField(default=0, verbose_name=_("Sort order"))
 
-    add_new_allowed = models.BooleanField(default=False)
-    add_new_text = models.CharField(max_length=255, null=True, blank=True)
-    show_duplication_check = models.BooleanField(default=True)
+    add_new_allowed = models.BooleanField(
+        default=False, verbose_name=_("Add new allowed")
+    )
+    add_new_text = models.CharField(
+        max_length=255, null=True, blank=True, verbose_name=_("Add new text")
+    )
+    show_duplication_check = models.BooleanField(
+        default=True, verbose_name=_("Show duplication check")
+    )
 
     parent = models.ForeignKey(
         "self",
@@ -54,12 +69,27 @@ class Section(models.Model):
         blank=True,
         null=True,
         related_name="subsections",
+        verbose_name=_("Parent section"),
     )
-    form = models.ForeignKey(Form, on_delete=models.CASCADE, related_name="sections")
-    type = EnumField(SectionType, max_length=30, default=SectionType.SHOW_ALWAYS)
-    applicant_type = EnumField(ApplicantType, max_length=30, default=ApplicantType.BOTH)
+    form = models.ForeignKey(
+        Form, on_delete=models.CASCADE, related_name="sections", verbose_name=_("Form")
+    )
+    type = EnumField(
+        SectionType,
+        max_length=30,
+        default=SectionType.SHOW_ALWAYS,
+        verbose_name=_("Type"),
+    )
+    applicant_type = EnumField(
+        ApplicantType,
+        max_length=30,
+        default=ApplicantType.BOTH,
+        verbose_name=_("Applicant type"),
+    )
 
     class Meta:
+        verbose_name = _("form section")
+        verbose_name_plural = _("form sections")
         ordering = ["sort_order"]
         unique_together = (
             "form",
@@ -104,21 +134,34 @@ class Field(models.Model):
         ("fractional", _("Fraction")),
         ("hidden", _("Hidden")),
     )
-    label = models.CharField(max_length=255)
-    hint_text = models.CharField(max_length=1024, null=True, blank=True)
-    identifier = models.SlugField()
-    enabled = models.BooleanField(default=True)
-    required = models.BooleanField(default=False)
-    validation = models.CharField(max_length=255, null=True, blank=True)
-    action = models.CharField(max_length=255, null=True, blank=True)
-    sort_order = models.PositiveIntegerField(default=0)
-    default_value = models.CharField(max_length=512, null=True, blank=True)
-    type = models.CharField(max_length=255, choices=FIELD_TYPES)
+    label = models.CharField(max_length=255, verbose_name=_("Label"))
+    hint_text = models.CharField(
+        max_length=1024, null=True, blank=True, verbose_name=_("Hint text")
+    )
+    identifier = models.SlugField(verbose_name=_("Identifier"))
+    enabled = models.BooleanField(default=True, verbose_name=_("Enabled"))
+    required = models.BooleanField(default=False, verbose_name=_("Required"))
+    validation = models.CharField(
+        max_length=255, null=True, blank=True, verbose_name=_("Validation")
+    )
+    action = models.CharField(
+        max_length=255, null=True, blank=True, verbose_name=_("Action")
+    )
+    sort_order = models.PositiveIntegerField(default=0, verbose_name=_("Sort order"))
+    default_value = models.CharField(
+        max_length=512, null=True, blank=True, verbose_name=_("Default value")
+    )
+    type = models.CharField(max_length=255, choices=FIELD_TYPES, verbose_name=_("Type"))
     section = models.ForeignKey(
-        Section, on_delete=models.CASCADE, related_name="fields"
+        Section,
+        on_delete=models.CASCADE,
+        related_name="fields",
+        verbose_name=_("Form section"),
     )
 
     class Meta:
+        verbose_name = _("form field")
+        verbose_name_plural = _("form fields")
         ordering = ["sort_order"]
         unique_together = (
             "section",
@@ -148,14 +191,27 @@ class Field(models.Model):
 
 
 class Choice(models.Model):
-    text = models.CharField(max_length=255)
-    value = models.CharField(max_length=50)
-    action = models.CharField(max_length=255, null=True, blank=True)
-    has_text_input = models.BooleanField(default=False)
+    text = models.CharField(max_length=255, verbose_name=_("Text"))
+    value = models.CharField(max_length=50, verbose_name=_("Value"))
+    action = models.CharField(
+        max_length=255, null=True, blank=True, verbose_name=_("Action")
+    )
+    has_text_input = models.BooleanField(
+        default=False, verbose_name=_("Has text input")
+    )
 
-    field = models.ForeignKey(Field, on_delete=models.CASCADE, related_name="choices")
+    field = models.ForeignKey(
+        Field,
+        on_delete=models.CASCADE,
+        related_name="choices",
+        verbose_name=_("Form field"),
+    )
 
     recursive_get_related_skip_relations = []
+
+    class Meta:
+        verbose_name = _("field choice")
+        verbose_name_plural = _("field choices")
 
 
 class Answer(models.Model):

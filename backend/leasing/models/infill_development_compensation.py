@@ -64,6 +64,7 @@ class InfillDevelopmentCompensation(TimeStampedSafeDeleteModel):
         "leasing.Lease",
         through="leasing.InfillDevelopmentCompensationLease",
         related_name="leases",
+        verbose_name=_("Leases"),
     )
 
     # In Finnish: Alue
@@ -302,7 +303,10 @@ class InfillDevelopmentCompensationAttachment(
 
     # In Finnish: Tiedosto
     file = PrivateFileField(
-        upload_to=get_attachment_file_upload_to, blank=False, null=False
+        upload_to=get_attachment_file_upload_to,
+        blank=False,
+        null=False,
+        verbose_name=_("File"),
     )
 
     # In Finnish: Lataaja

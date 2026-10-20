@@ -107,9 +107,13 @@ class InvoiceViewSet(FieldPermissionsViewsetMixin, AtomicTransactionModelViewSet
         return InvoiceSerializer
 
     def create(self, request, *args, **kwargs):
-        lease = Lease.objects.get(pk=request.data.get("lease"))
+        try:
+            lease = Lease.objects.filter(pk=int(request.data.get("lease"))).first()
+        except (TypeError, ValueError, OverflowError):
+            # Biarkan serializer melaporkan bidang "lease" yang kosong/tidak valid.
+            lease = None
 
-        if lease.invoicing_enabled_at is None:
+        if lease is not None and lease.invoicing_enabled_at is None:
             raise ValidationError(
                 _("Can't create invoices if invoicing is not enabled.")
             )

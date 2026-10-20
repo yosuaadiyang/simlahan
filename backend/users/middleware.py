@@ -12,7 +12,16 @@ from django.utils.http import urlencode
 
 from users import otp
 
-EXEMPT_PREFIXES = ("/admin/otp/", "/admin/logout/", "/healthz", "/readiness")
+EXEMPT_PREFIXES = (
+    "/admin/otp/",
+    "/admin/logout/",
+    # Login/logout aplikasi petugas tidak memakai sesi; jangan diblokir oleh
+    # sesi lama yang belum lolos OTP.
+    "/v1/auth/login/",
+    "/v1/auth/logout/",
+    "/healthz",
+    "/readiness",
+)
 
 
 class OfficerOTPMiddleware:

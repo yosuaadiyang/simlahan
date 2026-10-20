@@ -34,7 +34,7 @@ def test_upload_attachment(
 
     url = reverse("v1:infilldevelopmentcompensationattachment-list")
 
-    dummy_file = BytesIO(b"dummy data")
+    dummy_file = BytesIO(b"PK\x03\x04dummy data")
     dummy_file.name = "dummy_file.zip"
 
     response = admin_client.post(
@@ -70,7 +70,7 @@ def test_download_attachment(
 
     url = reverse("v1:infilldevelopmentcompensationattachment-list")
 
-    dummy_file = BytesIO(b"dummy data")
+    dummy_file = BytesIO(b"PK\x03\x04dummy data")
     dummy_file.name = "dummy_file.zip"
 
     response = admin_client.post(
@@ -106,4 +106,28 @@ def test_download_attachment(
         'attachment; filename="dummy_file'
     )
     # Get the content from the generator
-    assert b"".join(response.streaming_content) == b"dummy data"
+    assert b"".join(response.streaming_content) == b"PK\x03\x04dummy data"
+
+
+@pytest.mark.django_db
+def test_upload_attachment_rejects_disguised_file(
+    django_db_setup, admin_client, lease_test_data, user_factory
+):
+    lease = lease_test_data["lease"]
+    user = user_factory(username="test_user")
+    idc = InfillDevelopmentCompensation.objects.create(user=user)
+    idcl = InfillDevelopmentCompensationLease.objects.create(
+        lease=lease, infill_development_compensation=idc
+    )
+    data = {"infill_development_compensation_lease": idcl.id}
+    disguised = BytesIO(b"MZ\x90\x00 program, bukan PDF")
+    disguised.name = "surat.pdf"
+
+    response = admin_client.post(
+        reverse("v1:infilldevelopmentcompensationattachment-list"),
+        data={"data": json.dumps(data, cls=DjangoJSONEncoder), "file": disguised},
+    )
+
+    assert response.status_code == 400, response.data
+    assert "file" in response.data
+    assert idcl.attachments.count() == 0

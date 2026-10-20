@@ -65,6 +65,60 @@ const serialize = (meta: FieldMeta | undefined, value: any) => {
   return value;
 };
 
+export const REQUIRED_MESSAGE = "Bidang ini wajib diisi.";
+
+/** Bidang wajib yang masih kosong, sebelum data dikirim ke server. */
+export const findMissingRequired = (
+  meta: Record<string, FieldMeta>,
+  payload: Record<string, any>,
+): Record<string, string> => {
+  const missing: Record<string, string> = {};
+  Object.entries(payload).forEach(([name, value]) => {
+    const fieldMeta = meta[name];
+    if (!fieldMeta?.required || fieldMeta.read_only) return;
+    if (value === null || value === undefined || value === "") {
+      missing[name] = REQUIRED_MESSAGE;
+    }
+  });
+  return missing;
+};
+
+/** Data yang dikirim ke API dari isian formulir. */
+export const buildPayload = (
+  specs: Array<{ name: string; multiple?: boolean }>,
+  meta: Record<string, FieldMeta>,
+  values: Record<string, any>,
+  instance?: Record<string, any> | null,
+  defaults?: Record<string, any>,
+): Record<string, any> => {
+  const payload: Record<string, any> = { ...(instance ? {} : defaults) };
+  specs.forEach(({ name, multiple }) => {
+    const fieldMeta = meta[name];
+    if (!fieldMeta || fieldMeta.read_only || isFileType(fieldMeta)) return;
+    if (multiple) {
+      payload[name] = Array.isArray(values[name]) ? values[name] : [];
+      return;
+    }
+    const value = initialValue(fieldMeta, values[name]);
+    if (fieldMeta.type === "choice" && (value === "" || value === null)) {
+      // Biarkan nilai bawaan server untuk pilihan yang dikosongkan.
+      return;
+    }
+    const serialized = serialize(fieldMeta, value);
+    if (
+      serialized === null &&
+      !instance &&
+      (!fieldMeta.required || defaults?.[name] != null)
+    ) {
+      // Bidang kosong saat menambah data: pakai nilai bawaan (formulir atau
+      // server), bukan null; kolom berangka dengan nilai bawaan menolak null.
+      return;
+    }
+    payload[name] = serialized;
+  });
+  return payload;
+};
+
 const ResourceForm: React.FC<Props> = ({
   endpoint,
   fields,
@@ -108,21 +162,21 @@ const ResourceForm: React.FC<Props> = ({
     setIsSaving(true);
     setErrors({});
     setFormError(null);
-    const payload: Record<string, any> = { ...(instance ? {} : defaults) };
-    specs.forEach(({ name, multiple }) => {
-      const fieldMeta = meta[name];
-      if (!fieldMeta || fieldMeta.read_only || isFileType(fieldMeta)) return;
-      if (multiple) {
-        payload[name] = Array.isArray(values[name]) ? values[name] : [];
-        return;
-      }
-      const value = initialValue(fieldMeta, values[name]);
-      if (fieldMeta.type === "choice" && (value === "" || value === null)) {
-        // Biarkan nilai bawaan server untuk pilihan yang dikosongkan.
-        return;
-      }
-      payload[name] = serialize(fieldMeta, value);
-    });
+    const payload = buildPayload(specs, meta, values, instance, defaults);
+    const missing = findMissingRequired(
+      meta,
+      Object.fromEntries(
+        specs
+          .filter(({ name }) => name in payload)
+          .map(({ name }) => [name, payload[name]]),
+      ),
+    );
+    if (Object.keys(missing).length) {
+      setErrors(missing);
+      setFormError("Periksa kembali isian yang ditandai.");
+      setIsSaving(false);
+      return;
+    }
     const hasFiles = Object.values(files).some(Boolean);
     try {
       let record: Record<string, any>;

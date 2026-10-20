@@ -361,7 +361,7 @@ export const getContentLeaseAddress = (
   lease: Lease,
 ): string | null | undefined =>
   !isEmpty(lease)
-    ? `${get(lease, "lease_areas[0].addresses[0].address")}`
+    ? (get(lease, "lease_areas[0].addresses[0].address") ?? null)
     : null;
 
 /**
@@ -372,7 +372,7 @@ export const getContentLeaseAddress = (
 export const getContentLeaseAreaIdentifier = (
   lease: Lease,
 ): string | null | undefined =>
-  !isEmpty(lease) ? `${get(lease, "lease_areas[0].identifier")}` : null;
+  !isEmpty(lease) ? (get(lease, "lease_areas[0].identifier") ?? null) : null;
 
 /**
  * Get lease infill development compensations content

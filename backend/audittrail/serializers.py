@@ -3,6 +3,15 @@ from rest_framework import serializers
 
 from users.serializers import UserSerializer
 
+# Kunci tetap untuk aplikasi petugas; label pilihan auditlog ikut diterjemahkan
+# sehingga tidak bisa dipakai sebagai nilai API.
+ACTION_KEYS = {
+    LogEntry.Action.CREATE: "create",
+    LogEntry.Action.UPDATE: "update",
+    LogEntry.Action.DELETE: "delete",
+    LogEntry.Action.ACCESS: "access",
+}
+
 
 class LogEntrySerializer(serializers.ModelSerializer[LogEntry]):
     actor = UserSerializer()
@@ -22,7 +31,7 @@ class LogEntrySerializer(serializers.ModelSerializer[LogEntry]):
 
     def to_representation(self, instance):
         result = super().to_representation(instance)
-        result["action"] = LogEntry.Action.choices[instance.action][1]
+        result["action"] = ACTION_KEYS.get(instance.action, str(instance.action))
         result["changes"] = instance.changes_dict
         result["content_type"] = instance.content_type.model
         result["content_type_name"] = instance.content_type.name

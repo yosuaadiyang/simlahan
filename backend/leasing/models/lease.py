@@ -170,7 +170,10 @@ class IntendedUse(NameModel):
     """
 
     service_unit = models.ForeignKey(
-        "leasing.ServiceUnit", on_delete=models.SET_NULL, null=True
+        "leasing.ServiceUnit",
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name=_("Service unit"),
     )
     # Determines whether to show the intended use in the UI selection list
     # The list of unused IntendedUses grew too large and was cluttering the UI
@@ -630,6 +633,7 @@ class Lease(TimeStampedSafeDeleteModel):
         through="leasing.RelatedLease",
         symmetrical=False,
         related_name="related_to",
+        verbose_name=_("Related leases"),
     )
 
     # In Finnish: Vuokratiedot kunnossa
@@ -719,7 +723,11 @@ class Lease(TimeStampedSafeDeleteModel):
 
     # In Finnish: Hakemuksen tiedot (saapumispäivämäärä)
     application_metadata = models.OneToOneField(
-        "ApplicationMetadata", related_name="+", on_delete=models.PROTECT, null=True
+        "ApplicationMetadata",
+        related_name="+",
+        on_delete=models.PROTECT,
+        null=True,
+        verbose_name=_("Application metadata"),
     )
 
     objects = LeaseManager()

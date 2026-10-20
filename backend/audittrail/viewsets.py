@@ -5,7 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from rest_framework import status
-from rest_framework.exceptions import APIException, PermissionDenied
+from rest_framework.exceptions import NotFound, ParseError, PermissionDenied
 from rest_framework.metadata import SimpleMetadata
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
@@ -57,7 +57,7 @@ class AuditTrailView(APIView):
         type_value = search_form["type"].value()
 
         if type_value not in TYPE_MAP:
-            raise APIException("Invalid type")
+            raise ParseError(_("Invalid type"))
 
         if not request.user.has_perm(TYPE_MAP[type_value]["permission"]):
             raise PermissionDenied()
@@ -115,7 +115,10 @@ class AuditTrailView(APIView):
             else:
                 return model.objects.get(pk=id)
         except model.DoesNotExist:
-            raise APIException(f"{model.__name__} does not exist")
+            raise NotFound(
+                _("%(model)s does not exist")
+                % {"model": model._meta.verbose_name.capitalize()}
+            )
 
     def _build_queryset(self, obj, collected_items):
         obj_content_type = ContentType.objects.get_for_model(obj)

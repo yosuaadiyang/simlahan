@@ -471,14 +471,21 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
                     </li>
                   </Authorization>
 
-                  <li>
-                    <Link
-                      onClick={handleClick}
-                      to={getRouteById(Routes.LEASE_REPORTS)}
-                    >
-                      Statistik dan laporan
-                    </Link>
-                  </li>
+                  <Authorization
+                    allow={hasPermissions(
+                      usersPermissions,
+                      UsersPermissions.VIEW_INVOICE,
+                    )}
+                  >
+                    <li>
+                      <Link
+                        onClick={handleClick}
+                        to={getRouteById(Routes.LEASE_REPORTS)}
+                      >
+                        Statistik dan laporan
+                      </Link>
+                    </li>
+                  </Authorization>
 
                   <Authorization
                     allow={hasPermissions(
@@ -573,7 +580,7 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
                     }
                   >
                     <SubMenu
-                      header="Tambah"
+                      header="Lainnya"
                       isOpen={subMenuKey === "tools"}
                       items={[
                         {

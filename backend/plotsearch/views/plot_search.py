@@ -12,7 +12,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django_filters.views import FilterView
 from rest_framework import mixins, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.exceptions import MethodNotAllowed, NotFound
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -579,6 +579,8 @@ class TargetStatusGeneratePDF(PdfMixin, FilterView, APIView):
     def render_to_response(
         self, context: Dict[str, Any], **response_kwargs: Any
     ) -> http.HttpResponse:
+        if not self.object_list:
+            raise NotFound()
         response_kwargs.setdefault("content_type", self.content_type)
         response = HttpResponse(content_type="application/zip")
         with zipfile.PyZipFile(response, mode="w") as zip_file:
@@ -623,6 +625,8 @@ class AreaSearchGeneratePDF(PdfMixin, FilterView, APIView):
     def render_to_response(
         self, context: Dict[str, Any], **response_kwargs: Any
     ) -> http.HttpResponse:
+        if not self.object_list:
+            raise NotFound()
         response_kwargs.setdefault("content_type", self.content_type)
         response = HttpResponse(content_type="application/zip")
         with zipfile.PyZipFile(response, mode="w") as zip_file:

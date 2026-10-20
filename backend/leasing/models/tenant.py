@@ -38,7 +38,10 @@ class Tenant(TimeStampedSafeDeleteModel):
     )
 
     contacts = models.ManyToManyField(
-        Contact, through="leasing.TenantContact", related_name="tenants"
+        Contact,
+        through="leasing.TenantContact",
+        related_name="tenants",
+        verbose_name=_("Contacts"),
     )
 
     # TODO: Add start and end dates?
@@ -114,7 +117,7 @@ class Tenant(TimeStampedSafeDeleteModel):
 
 
 class TenantContact(TimeStampedSafeDeleteModel):
-    type = EnumField(TenantContactType, max_length=255)
+    type = EnumField(TenantContactType, max_length=255, verbose_name=_("Type"))
     tenant = models.ForeignKey(
         Tenant, verbose_name=_("Tenant"), on_delete=models.PROTECT
     )

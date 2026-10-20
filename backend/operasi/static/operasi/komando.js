@@ -85,7 +85,10 @@
     } else if (options.body) {
       init.body = options.body;
     }
-    return fetch(url, init).then(function (response) {
+    return fetch(url, init).catch(function () {
+      // TypeError bawaan peramban ("Failed to fetch") berbahasa Inggris.
+      throw new ApiError("Tidak dapat terhubung ke server. Periksa koneksi internet.", 0, null);
+    }).then(function (response) {
       return response.text().then(function (text) {
         var data = null;
         try { data = text ? JSON.parse(text) : null; } catch (e) { data = null; }
@@ -433,7 +436,7 @@
       renderLegend();
       return data;
     }).catch(function (error) {
-      if (error instanceof ApiError) { toast("Lapisan " + key + ": " + error.message, "error"); }
+      if (error instanceof ApiError && error.status) { toast("Lapisan " + key + ": " + error.message, "error"); }
     });
   }
 

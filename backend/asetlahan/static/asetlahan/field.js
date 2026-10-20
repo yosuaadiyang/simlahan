@@ -153,7 +153,8 @@
       }
       if (first) { map.setView(latlng, 17); }
     }, function (error) {
-      $("gps").textContent = "GPS tidak tersedia (" + error.message + "). Ketuk peta untuk menandai titik.";
+      var reason = { 1: "izin lokasi ditolak", 2: "posisi tidak ditemukan", 3: "waktu habis" }[error.code] || "galat perangkat";
+      $("gps").textContent = "GPS tidak tersedia (" + reason + "). Ketuk peta untuk menandai titik.";
     }, { enableHighAccuracy: true, maximumAge: 5000, timeout: 30000 });
   }
 

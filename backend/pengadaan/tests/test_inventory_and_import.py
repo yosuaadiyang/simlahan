@@ -118,3 +118,80 @@ def test_import_parcels_drops_z_coordinates(admin_client, project):
     assert response.json()["created"] == 1
     parcel = AcquisitionParcel.objects.get(project=project, parcel_number="Z-1")
     assert not parcel.geometry.hasz
+
+
+@pytest.mark.parametrize(
+    "filename, content",
+    [
+        ("bidang.geojson", b"[1, 2]"),
+        ("bidang.geojson", b'"teks"'),
+        ("bidang.geojson", b'{"type": "FeatureCollection", "features": "x"}'),
+        ("bidang.geojson", b'{"type": "FeatureCollection", "features": [1]}'),
+        ("bidang.geojson", b"bukan json"),
+        ("bidang.geojson", b"\xff\xfe\x00"),
+        ("bidang.zip", b"PK bukan zip"),
+    ],
+)
+def test_import_parcels_rejects_malformed_files_with_400(
+    admin_client, project, filename, content
+):
+    url = reverse("v1:acquisitionproject-import-parcels", kwargs={"pk": project.pk})
+    upload = SimpleUploadedFile(filename, content)
+
+    response = admin_client.post(url, {"file": upload}, HTTP_ACCEPT_LANGUAGE="id")
+
+    assert response.status_code == 400, response.content
+    detail = response.json()["detail"]
+    assert "Expecting value" not in detail
+
+
+def test_import_parcels_reports_bad_rows_without_failing(admin_client, project):
+    square = [[[104.0, 1.0], [104.001, 1.0], [104.001, 1.001], [104.0, 1.0]]]
+    collection = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": {"parcel_number": "OK-1", "luas": "12,5"},
+                "geometry": {"type": "Polygon", "coordinates": square},
+            },
+            {
+                "type": "Feature",
+                "properties": {"parcel_number": "TITIK"},
+                "geometry": {"type": "Point", "coordinates": [104.0, 1.0]},
+            },
+            {
+                "type": "Feature",
+                "properties": {"parcel_number": "RUSAK"},
+                "geometry": {"type": "Polygon", "coordinates": "x"},
+            },
+            {
+                "type": "Feature",
+                "properties": {"parcel_number": "P" * 100},
+                "geometry": None,
+            },
+            {
+                "type": "Feature",
+                "properties": {"parcel_number": "LUAS", "luas": "9" * 20},
+                "geometry": None,
+            },
+        ],
+    }
+    upload = SimpleUploadedFile("bidang.geojson", json.dumps(collection).encode())
+    url = reverse("v1:acquisitionproject-import-parcels", kwargs={"pk": project.pk})
+
+    response = admin_client.post(url, {"file": upload, "area_field": "luas"})
+
+    assert response.status_code == 200, response.content
+    result = response.json()
+    assert result["created"] == 2
+    assert result["skipped"] == 3
+    assert len(result["errors"]) == 4
+    parcel = AcquisitionParcel.objects.get(project=project, parcel_number="OK-1")
+    assert parcel.measured_area_m2 == Decimal("12.50")
+    assert (
+        AcquisitionParcel.objects.get(
+            project=project, parcel_number="LUAS"
+        ).measured_area_m2
+        is None
+    )

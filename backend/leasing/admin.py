@@ -300,7 +300,7 @@ class CollectionNoteAdmin(FieldPermissionsModelAdmin):
         "user__first_name",
         "user__last_name",
     ]
-    list_filter = ("collection_stage",)
+    list_filter = (("collection_stage", EnumFieldListFilter),)
     raw_id_fields = ("lease",)
     ordering = ("-created_at",)
 
@@ -687,7 +687,7 @@ class LeaseAreaAddressInline(FieldPermissionsAdminMixin, admin.TabularInline):
 class LeaseAreaAdmin(FieldPermissionsModelAdmin):
     list_display = ("lease", "identifier", "type")
     search_fields = ["lease__identifier__identifier", "identifier"]
-    list_filter = ("type",)
+    list_filter = (("type", EnumFieldListFilter),)
     inlines = [
         LeaseAreaAddressInline,
         ConstructabilityDescriptionInline,
@@ -714,7 +714,7 @@ class LeaseAreaAdmin(FieldPermissionsModelAdmin):
 class PlotAdmin(FieldPermissionsModelAdmin):
     list_display = ("get_lease_area_identifier", "type")
     search_fields = ["lease_area__identifier", "type"]
-    list_filter = ("type",)
+    list_filter = (("type", EnumFieldListFilter),)
     raw_id_fields = ("lease_area",)
 
     def get_lease_area_identifier(self, obj):

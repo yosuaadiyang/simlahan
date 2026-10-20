@@ -1,6 +1,6 @@
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import ParseError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -25,7 +25,7 @@ class ContactExistsView(APIView):
         # Optional, some integrations can use the endpoint with just identifier.
         service_unit_id = request.query_params.get("service_unit", None)
         if not identifier:
-            raise APIException(_('Query parameter "identifier" is mandatory'))
+            raise ParseError(_('Query parameter "identifier" is mandatory'))
 
         contacts_qs = Contact.objects.filter(
             Q(business_id__iexact=identifier)

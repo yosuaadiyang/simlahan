@@ -1,4 +1,5 @@
 import re
+from urllib.parse import urlparse
 
 import pytest
 from django.core import mail
@@ -142,10 +143,21 @@ def test_register_activate_login(client, seeded):
     assert user.groups.count() == 0
 
     assert not client.login(username="baru@contoh.id", password="SandiSangatKuat#2026")
+    # Akun belum aktif: pesan aktivasi, bukan "sandi salah" (sandi benar saja).
+    response = client.post(
+        reverse("portal:login"),
+        {"username": "baru@contoh.id", "password": "SandiSangatKuat#2026"},
+    )
+    assert "belum diaktifkan" in response.content.decode()
+    response = client.post(
+        reverse("portal:login"),
+        {"username": "baru@contoh.id", "password": "SandiSalah#2026"},
+    )
+    assert "Surel atau kata sandi salah" in response.content.decode()
     link = re.search(r"https?://\S+/portal/aktivasi/\S+/", mail.outbox[-1].body).group(
         0
     )
-    path = link.split("testserver", 1)[1]
+    path = urlparse(link).path
     assert client.get(path).status_code == 302
     user.refresh_from_db()
     assert user.is_active
@@ -201,6 +213,59 @@ def test_login_is_throttled(client, seeded):
         ).status_code
         == 429
     )
+
+
+@pytest.mark.parametrize(
+    "hops,chain",
+    [
+        # Compose saja: nginx kontainer menambahkan alamat klien.
+        (1, "{ip}"),
+        # nginx host (TLS) -> nginx kontainer: entri terakhir = gateway docker.
+        (2, "{ip}, 172.18.0.1"),
+    ],
+)
+def test_throttle_per_visitor_behind_proxy(client, seeded, settings, hops, chain):
+    # Di belakang proxy semua permintaan datang dari alamat proxy; kuota harus
+    # tetap per pengunjung.
+    settings.TRUST_PROXY_HEADERS = True
+    settings.TRUSTED_PROXY_COUNT = hops
+    data = {"username": "x@y.id", "password": "salah"}
+    url = reverse("portal:login")
+
+    def post(ip, prefix=""):
+        forwarded = prefix + chain.format(ip=ip)
+        return client.post(url, data, HTTP_X_FORWARDED_FOR=forwarded).status_code
+
+    for _ in range(10):
+        assert post("203.0.113.5") == 200
+    assert post("203.0.113.5") == 429
+    # Alamat palsu di depan rantai tidak bisa dipakai untuk mengelak.
+    assert post("203.0.113.5", prefix="198.51.100.1, ") == 429
+    # Pengunjung lain tidak ikut terblokir.
+    assert post("203.0.113.9") == 200
+
+
+def test_client_ip_hop_count_bounds(rf, settings):
+    from alokasi.views import _client_ip
+
+    request = rf.get("/", HTTP_X_FORWARDED_FOR="203.0.113.5", REMOTE_ADDR="10.0.0.2")
+    settings.TRUST_PROXY_HEADERS = True
+    settings.TRUSTED_PROXY_COUNT = 3
+    assert _client_ip(request) == "203.0.113.5"
+    settings.TRUSTED_PROXY_COUNT = 0
+    assert _client_ip(request) == "203.0.113.5"
+    assert _client_ip(rf.get("/", REMOTE_ADDR="10.0.0.2")) == "10.0.0.2"
+    settings.TRUST_PROXY_HEADERS = False
+    assert _client_ip(request) == "10.0.0.2"
+
+
+def test_email_links_use_public_url(client, seeded, applicant, settings):
+    # Tautan surel memakai alamat publik, bukan Host dari proxy (port hilang).
+    settings.OFFICER_UI_URL = "https://lahan.contoh.go.id"
+    client.post(reverse("portal:register"), registration_data())
+    assert "https://lahan.contoh.go.id/portal/aktivasi/" in mail.outbox[-1].body
+    client.post(reverse("portal:password_reset"), {"email": applicant.user.email})
+    assert "https://lahan.contoh.go.id/portal/atur-sandi/" in mail.outbox[-1].body
 
 
 def test_password_reset_only_for_applicants(client, applicant, officer):
@@ -430,11 +495,15 @@ def test_allocation_reporting_and_transfer(
     assert "Batas memulai pembangunan" in page.content.decode()
 
     # Laporan izin: status terbit wajib nomor & tanggal.
-    client.post(
+    response = client.post(
         reverse("portal:permit_report_save", args=[allocation.pk]),
         {"izin-permit_type": "pkkpr", "izin-status": "terbit"},
     )
     assert not allocation.permit_reports.exists()
+    # Galat ditampilkan pada formulir yang sama, isian tidak hilang.
+    assert response.status_code == 200
+    assert response.context["permit_form"].errors["permit_number"]
+    assert response.context["permit_form"]["status"].value() == "terbit"
     client.post(
         reverse("portal:permit_report_save", args=[allocation.pk]),
         {
@@ -471,7 +540,7 @@ def test_allocation_reporting_and_transfer(
     )
     assert allocation.development_reports.count() == 1
     assert allocation.has_started_development
-    client.post(
+    response = client.post(
         reverse("portal:development_report_create", args=[allocation.pk]),
         {
             "progres-report_date": "2026-10-10",
@@ -481,6 +550,9 @@ def test_allocation_reporting_and_transfer(
         },
     )
     assert allocation.development_reports.count() == 1
+    assert response.status_code == 200
+    form = response.context["development_form"]
+    assert form.errors["progress_percent"] and form["stage"].value() == "konstruksi"
 
     recipient = make_applicant(name="PT Penerima")
     response = client.post(
@@ -526,3 +598,15 @@ def test_application_detail_shows_missing_documents(client, applicant, plot):
         reverse("portal:application_detail", args=[application.number])
     ).content.decode()
     assert "Dokumen wajib belum diunggah" in page
+
+
+def test_logout_by_typed_address_redirects_without_logging_out(client, applicant):
+    login(client, applicant)
+    response = client.get(reverse("portal:logout"))
+    assert response.status_code == 302
+    assert response.url == reverse("portal:home")
+    assert client.get(reverse("portal:dashboard")).status_code == 200
+
+    response = client.post(reverse("portal:logout"))
+    assert response.status_code == 302
+    assert client.get(reverse("portal:dashboard")).status_code == 302

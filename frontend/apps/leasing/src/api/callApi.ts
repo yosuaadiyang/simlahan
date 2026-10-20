@@ -2,6 +2,7 @@ import { call, select } from "redux-saga/effects";
 import { getApiToken } from "@/auth/selectors";
 import { refreshAccessToken } from "@/auth/session";
 import { UI_ACCEPT_LANGUAGE_VALUE } from "@/api/constants";
+import { readResponseBody } from "./responseBody";
 
 function* callApi(
   request: Request,
@@ -35,23 +36,13 @@ function* callApi(
     }
   }
 
-  switch (status) {
-    case 204:
-      return {
-        response,
-      };
-
-    case 500:
-      return {
-        response,
-        bodyAsJson: {
-          exception: response.status,
-          message: response.statusText,
-        },
-      };
+  if (status === 204) {
+    return {
+      response,
+    };
   }
 
-  const bodyAsJson = yield call([response, response.json]);
+  const bodyAsJson = yield call(readResponseBody, response);
   return {
     response,
     bodyAsJson,

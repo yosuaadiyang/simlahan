@@ -6,6 +6,7 @@ from django.http import StreamingHttpResponse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 from requests.auth import HTTPBasicAuth
+from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
@@ -17,6 +18,18 @@ from rest_framework.status import (
 from plotsearch.serializers.map_service_proxy import WmsRequestSerializer
 
 logger = logging.getLogger(__name__)
+
+
+def _json_response(data, status) -> Response:
+    """Response DRF yang bisa dirender dari view fungsi biasa (bukan APIView).
+
+    Tanpa renderer, Django gagal merender Response DRF (AssertionError -> 500).
+    """
+    response = Response(data, status=status)
+    response.accepted_renderer = JSONRenderer()
+    response.accepted_media_type = "application/json"
+    response.renderer_context = {}
+    return response
 
 
 @require_http_methods(["GET", "OPTIONS"])
@@ -35,7 +48,7 @@ def owned_areas_wms_proxy(request):
 
     if not all([username, password, map_service_url, layer]):
         logger.error("Owned Areas WMS Proxy Public: Missing configuration settings.")
-        return Response(
+        return _json_response(
             "Service misconfigured.",
             status=HTTP_500_INTERNAL_SERVER_ERROR,
         )
@@ -43,7 +56,7 @@ def owned_areas_wms_proxy(request):
     serializer = WmsRequestSerializer(data=request.GET)
     if not serializer.is_valid():
         logger.warning(f"Invalid WMS parameters: {serializer.errors}")
-        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+        return _json_response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
     validated_data = serializer.validated_data
 
@@ -71,12 +84,12 @@ def owned_areas_wms_proxy(request):
         )
     except requests.exceptions.Timeout as e:
         logger.error(f"WMS request timed out after {timeout}s: {str(e)}")
-        return Response(
+        return _json_response(
             "Error connecting to map service, timeout", status=HTTP_504_GATEWAY_TIMEOUT
         )
     except requests.exceptions.RequestException as e:
         logger.error(f"WMS request failed: {type(e).__name__}")
-        return Response(
+        return _json_response(
             "Error connecting to map service", status=HTTP_500_INTERNAL_SERVER_ERROR
         )
 
@@ -85,7 +98,7 @@ def owned_areas_wms_proxy(request):
         if settings.DEBUG:
             content = r.content
 
-        return Response(status=r.status_code, data=content)
+        return _json_response(content, status=r.status_code)
 
     response_content_type = r.headers.get("Content-Type", "").lower()
     format_choices = serializer.fields.fields.get("format").choices.keys()
@@ -93,7 +106,7 @@ def owned_areas_wms_proxy(request):
         logger.warning(
             f"Unexpected content type from upstream: {response_content_type}"
         )
-        return Response(
+        return _json_response(
             "Invalid response from upstream service", status=HTTP_502_BAD_GATEWAY
         )
 

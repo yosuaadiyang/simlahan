@@ -27,6 +27,8 @@ export class ApiRequestError extends Error {
 export const extractErrorMessage = (body: ApiErrorBody): string => {
   if (!body) return "";
   if (typeof body === "string") return body;
+  // DRF mengirim daftar pesan untuk ValidationError tanpa nama bidang.
+  if (Array.isArray(body)) return body.map(String).join(" ");
   if (body.detail) return String(body.detail);
   if (Array.isArray(body.non_field_errors)) {
     return body.non_field_errors.join(" ");

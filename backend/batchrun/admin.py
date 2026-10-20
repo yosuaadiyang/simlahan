@@ -3,6 +3,7 @@ from django.db.models import QuerySet
 from django.http import HttpRequest
 from django.utils.html import escape as html_escape
 from django.utils.safestring import mark_safe
+from enumfields.admin import EnumFieldListFilter
 from rangefilter.filters import DateRangeFilter
 
 from .admin_utils import PreciseTimeFormatter, ReadOnlyAdmin, WithDownloadableContent
@@ -65,7 +66,7 @@ class JobRunAdmin(ReadOnlyAdmin[JobRun]):
 class JobRunLogEntryAdmin(ReadOnlyAdmin[JobRunLogEntry]):
     date_hierarchy = "time"
     list_display = ["time_p", "run", "kind", "line_number", "number", "text"]
-    list_filter = ["kind", "run__job"]
+    list_filter = [("kind", EnumFieldListFilter), "run__job"]
     readonly_fields = ("time_p", "run", "kind", "line_number", "number", "text")
 
     time_p = PreciseTimeFormatter(JobRunLogEntry, "time")

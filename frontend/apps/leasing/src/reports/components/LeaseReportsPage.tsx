@@ -71,7 +71,7 @@ const LeaseReportsPage: React.FC = () => {
   return (
     <PageContainer>
       <ContentContainer>
-        <h2>RAPORTIT</h2>
+        <h2>LAPORAN</h2>
         <Divider />
         <GreenBox>
           <LeaseReportsForm />

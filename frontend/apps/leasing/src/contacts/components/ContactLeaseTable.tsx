@@ -1,4 +1,5 @@
-import { Link, Pagination, Table } from "hds-react";
+import { Link, Table } from "hds-react";
+import Pagination from "@/components/table/Pagination";
 import React, { useEffect, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "@/root/hooks";
 import { useLocation, useNavigate } from "react-router";
@@ -109,6 +110,8 @@ const ContactLeaseTable: React.FC<Props> = ({ contact }: Props) => {
   }, [dispatch, attributes, isFetchingAttributes]);
 
   useEffect(() => {
+    // Kontak yang baru dibuat belum memiliki id; jangan minta sewa tanpa id.
+    if (!contact?.id) return;
     const offset = (activePage - 1) * LIST_TABLE_PAGE_SIZE;
     dispatch(
       fetchLeasesForContact(
@@ -121,7 +124,7 @@ const ContactLeaseTable: React.FC<Props> = ({ contact }: Props) => {
         }),
       ),
     );
-  }, [dispatch, contact.id, activePage, sortKey, sortOrder]);
+  }, [dispatch, contact?.id, activePage, sortKey, sortOrder]);
 
   const handleSortingChange = (
     order: "asc" | "desc",
@@ -259,16 +262,9 @@ const ContactLeaseTable: React.FC<Props> = ({ contact }: Props) => {
         dense
       />
       <Pagination
-        language="en"
-        onChange={(event, index) => {
-          event.preventDefault();
-          handlePageClick(index + 1);
-        }}
-        pageCount={maxPage || 1}
-        pageHref={() => "#"}
-        pageIndex={activePage - 1}
-        paginationAriaLabel={`Pemilih halaman, ${activePage} / ${maxPage}`}
-        siblingCount={5}
+        activePage={activePage}
+        maxPage={maxPage}
+        onPageClick={handlePageClick}
       />
     </GreenBox>
   );

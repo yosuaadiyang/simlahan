@@ -25,6 +25,7 @@ import {
   formatArea,
   formatDateId,
   formatHectare,
+  formatNumberId,
   formatRupiah,
   percent,
 } from "../format";
@@ -32,6 +33,7 @@ import type { Deadline, Option } from "../types";
 import AcquisitionMap from "./AcquisitionMap";
 import ResourceForm from "./ResourceForm";
 import ResourceSection from "./ResourceSection";
+import { useCanViewResource } from "../permissions";
 import { PROJECT_FORM_FIELDS } from "./AcquisitionListPage";
 import {
   Button,
@@ -205,25 +207,31 @@ const AcquisitionProjectPage: React.FC = () => {
     () => apiGet(`pengadaan/project/${projectId}/geojson/`),
     [projectId, version],
   );
+  const canView = useCanViewResource();
+  // Daftar pilihan hanya dimuat dari endpoint yang boleh dilihat pengguna.
+  const listProjectRows = (endpoint: string) =>
+    canView(endpoint)
+      ? apiGetAll(endpoint, { project: projectId })
+      : Promise.resolve([]);
   const parcels = useApi(
-    () => apiGetAll("pengadaan/parcel/", { project: projectId }),
-    [projectId, version],
+    () => listProjectRows("pengadaan/parcel/"),
+    [projectId, version, canView],
   );
   const parties = useApi(
-    () => apiGetAll("pengadaan/party/", { project: projectId }),
-    [projectId, version],
+    () => listProjectRows("pengadaan/party/"),
+    [projectId, version, canView],
   );
   const lookups = useApi(async () => {
     const [deliberations, valuations, results, objections, compensations] =
       await Promise.all([
-        apiGetAll("pengadaan/deliberation/", { project: projectId }),
-        apiGetAll("pengadaan/valuation/", { project: projectId }),
-        apiGetAll("pengadaan/deliberation_result/", { project: projectId }),
-        apiGetAll("pengadaan/objection/", { project: projectId }),
-        apiGetAll("pengadaan/compensation/", { project: projectId }),
+        listProjectRows("pengadaan/deliberation/"),
+        listProjectRows("pengadaan/valuation/"),
+        listProjectRows("pengadaan/deliberation_result/"),
+        listProjectRows("pengadaan/objection/"),
+        listProjectRows("pengadaan/compensation/"),
       ]);
     return { deliberations, valuations, results, objections, compensations };
-  }, [projectId, version]);
+  }, [projectId, version, canView]);
 
   const p = project.data;
   const { data: districts } = useDistricts(p?.municipality);
@@ -713,6 +721,7 @@ const AcquisitionProjectPage: React.FC = () => {
                 key: "share_percentage",
                 header: "Porsi (%)",
                 className: "acq-num",
+                render: (r) => formatNumberId(r.share_percentage),
               },
               {
                 key: "bank_account_number",

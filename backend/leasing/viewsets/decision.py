@@ -1,7 +1,7 @@
 from copy import deepcopy
 
 from django.utils.translation import gettext_lazy as _
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import NotFound, ParseError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -31,14 +31,14 @@ class DecisionViewSet(FieldPermissionsViewsetMixin, AtomicTransactionModelViewSe
 
 def get_decision_from_query_params(query_params):
     if not query_params.get("decision"):
-        raise APIException("decision parameter is mandatory")
+        raise ParseError(_("decision parameter is mandatory"))
 
     try:
         return Decision.objects.get(pk=int(query_params.get("decision")))
     except Decision.DoesNotExist:
-        raise APIException("Decision does not exist")
-    except ValueError:
-        raise APIException("Invalid decision id")
+        raise NotFound(_("Decision does not exist"))
+    except (TypeError, ValueError, OverflowError):
+        raise ParseError(_("Invalid decision id"))
 
 
 class DecisionCopyToLeasesView(APIView):
@@ -63,8 +63,8 @@ class DecisionCopyToLeasesView(APIView):
         target_leases = request.query_params.getlist("leases")
 
         if not target_leases:
-            raise APIException(
-                'Please provide target lease ids with "leases" parameter'
+            raise ParseError(
+                _('Please provide target lease ids with "leases" parameter')
             )
 
         for target_lease_id in target_leases:

@@ -53,6 +53,9 @@ class Vat(models.Model):
         ordering = ("-start_date",)
 
     def __str__(self):
+        if self.end_date is None:
+            # Tarif yang masih berlaku; jangan tampilkan "None" sebagai tanggal akhir.
+            return _("VAT {}% from {}").format(self.percent, self.start_date)
         return _("VAT {}% {} - {}").format(self.percent, self.start_date, self.end_date)
 
     def clean(self):

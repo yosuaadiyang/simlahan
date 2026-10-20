@@ -289,7 +289,7 @@ const InvoiceNotesEdit = ({ fields }: EditProps): ReactElement => {
                           <RemoveButton
                             className="third-level"
                             onClick={handleRemove}
-                            title="Hapus pengumuman"
+                            title="Hapus catatan"
                           />
                         </Authorization>
                       }
@@ -303,7 +303,7 @@ const InvoiceNotesEdit = ({ fields }: EditProps): ReactElement => {
             >
               <Row>
                 <Column>
-                  <AddButton label="Tambah pengumuman" onClick={handleAdd} />
+                  <AddButton label="Tambah catatan" onClick={handleAdd} />
                 </Column>
               </Row>
             </Authorization>
