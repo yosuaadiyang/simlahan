@@ -8,6 +8,7 @@ import {
 import { authReducer } from "./reducer";
 import {
   OtpRequiredError,
+  clearKomandoDeviceData,
   getTokenExpiry,
   login,
   normalizeUser,
@@ -136,5 +137,34 @@ describe("Auth", () => {
       );
       vi.unstubAllGlobals();
     });
+  });
+});
+
+describe("clearKomandoDeviceData", () => {
+  it("menghapus cache & antrean luring pusat komando saja", async () => {
+    const deleted: string[] = [];
+    vi.stubGlobal("caches", {
+      keys: async () => ["komando-shell-4", "komando-data-4", "lain-1"],
+      delete: async (key: string) => {
+        deleted.push(key);
+        return true;
+      },
+    });
+    const deleteDatabase = vi.fn();
+    vi.stubGlobal("indexedDB", { deleteDatabase });
+    await clearKomandoDeviceData();
+    expect(deleted.sort()).toEqual(["komando-data-4", "komando-shell-4"]);
+    expect(deleteDatabase).toHaveBeenCalledWith("simlahan-komando");
+    vi.unstubAllGlobals();
+  });
+
+  it("tidak gagal bila penyimpanan peramban tidak tersedia", async () => {
+    vi.stubGlobal("caches", {
+      keys: async () => {
+        throw new Error("diblokir");
+      },
+    });
+    await expect(clearKomandoDeviceData()).resolves.toBeUndefined();
+    vi.unstubAllGlobals();
   });
 });

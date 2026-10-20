@@ -227,9 +227,37 @@ export const restoreSession = async (): Promise<AuthUser | null> => {
   }
 };
 
+/**
+ * Hapus data pusat komando (/komando/) yang tersimpan di perangkat: cache
+ * halaman & lapisan peta serta antrean laporan luring. Tanpa ini data warga
+ * dan posisi petugas tetap tersedia luring bagi pengguna berikutnya.
+ */
+export const clearKomandoDeviceData = async () => {
+  try {
+    if (typeof caches !== "undefined") {
+      const keys = await caches.keys();
+      await Promise.all(
+        keys
+          .filter((key) => key.startsWith("komando-"))
+          .map((key) => caches.delete(key)),
+      );
+    }
+  } catch {
+    // Abaikan: penyimpanan cache tidak tersedia (mis. mode privat).
+  }
+  try {
+    if (typeof indexedDB !== "undefined") {
+      indexedDB.deleteDatabase("simlahan-komando");
+    }
+  } catch {
+    // Abaikan.
+  }
+};
+
 export const logout = async () => {
   const refresh = readRefreshToken();
   clearSession();
+  await clearKomandoDeviceData();
   try {
     // Selalu dipanggil: juga mengakhiri sesi peramban panel /admin/ & /komando/.
     await postJson("auth/logout/", refresh ? { refresh } : {});
