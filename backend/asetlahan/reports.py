@@ -530,12 +530,23 @@ def _cell(value):
     if isinstance(value, (datetime.date, datetime.datetime)):
         return value.isoformat()
     if isinstance(value, Decimal):
-        return float(value)
+        # Tetap Decimal agar digit tidak hilang (float hanya ±15 digit).
+        return value
     return (
         ""
         if value is None
         else value if isinstance(value, (int, float)) else str(value)
     )
+
+
+def display_cell(value):
+    """Nilai sel untuk tampilan (pratinjau/PDF): angka diberi pemisah ribuan."""
+    if isinstance(value, Decimal):
+        from alokasi.templatetags.alokasi_tags import angka
+
+        places = max(0, min(2, -value.as_tuple().exponent))
+        return angka(value, places)
+    return value
 
 
 def rows(columns, queryset, limit=None):
@@ -586,6 +597,10 @@ def xlsx_bytes(title, headers, data) -> bytes:
         sheet.set_column(col, col, max(12, min(40, len(header) + 4)))
     for row_index, row in enumerate(data, start=1):
         for col, value in enumerate(row):
+            if isinstance(value, Decimal):
+                # Excel menyimpan angka sebagai float (15 digit); nilai lebih
+                # besar ditulis sebagai teks agar tidak berubah.
+                value = float(value) if abs(value) < 10**15 else str(value)
             sheet.write(row_index, col, value)
     sheet.freeze_panes(1, 0)
     sheet.autofilter(0, 0, max(len(data), 1), max(len(headers) - 1, 0))
@@ -611,7 +626,7 @@ def _pdf(filename, title, headers, data):
         {
             "title": title,
             "headers": headers,
-            "rows": data[:5000],
+            "rows": [[display_cell(v) for v in row] for row in data[:5000]],
             "total": len(data),
             "organization": settings.ORGANIZATION_NAME,
             "printed_at": timezone.localtime(),

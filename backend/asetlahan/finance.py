@@ -14,6 +14,8 @@ from django.utils.text import slugify
 
 from asetlahan import enums, scope
 
+ZERO = Decimal(0)
+
 T = enums.TransactionType
 
 # Akun bawaan per jenis transaksi bila kode akun tidak diisi.
@@ -53,7 +55,7 @@ def journal_rows(queryset) -> list[list]:
     rows = []
     for trx in queryset.select_related("asset").order_by("date", "id"):
         account = trx.account_code or DEFAULT_ACCOUNTS.get(trx.transaction_type, "")
-        amount = float(trx.amount)
+        amount = trx.amount
         description = trx.description or trx.get_transaction_type_display()
         common = [trx.date.isoformat(), trx.number]
         tail = [
@@ -63,11 +65,11 @@ def journal_rows(queryset) -> list[list]:
             trx.counterparty,
         ]
         if trx.is_income:
-            rows.append(common + [cash, trx.cost_center, amount, 0] + tail)
-            rows.append(common + [account, trx.cost_center, 0, amount] + tail)
+            rows.append(common + [cash, trx.cost_center, amount, ZERO] + tail)
+            rows.append(common + [account, trx.cost_center, ZERO, amount] + tail)
         else:
-            rows.append(common + [account, trx.cost_center, amount, 0] + tail)
-            rows.append(common + [cash, trx.cost_center, 0, amount] + tail)
+            rows.append(common + [account, trx.cost_center, amount, ZERO] + tail)
+            rows.append(common + [cash, trx.cost_center, ZERO, amount] + tail)
     return rows
 
 
@@ -218,8 +220,8 @@ def ledger_rows(entries) -> list[list]:
             e.number,
             e.description,
             e.party,
-            float(e.income),
-            float(e.expense),
+            e.income,
+            e.expense,
         ]
         for e in entries
     ]

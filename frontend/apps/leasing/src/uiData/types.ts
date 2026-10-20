@@ -1,6 +1,7 @@
 import type { Action, Attributes, Methods } from "types";
 export type UiDataState = {
   attributes: Attributes;
+  isFetched: boolean;
   isFetching: boolean;
   isFetchingAttributes: boolean;
   list: UiDataList;

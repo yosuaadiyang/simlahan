@@ -21,7 +21,7 @@
     <div class="card">
       <h2>Data lahan</h2>
       <dl class="props">
-        <dt>Luas</dt><dd>{{ plot.area_m2|angka:2 }} m² ({{ plot.area_m2|hektare }})</dd>
+        <dt>Luas</dt><dd>{{ plot.area_m2|angka:2|patah }} m² ({{ plot.area_m2|hektare|patah }})</dd>
         {% if plot.district %}<dt>Kecamatan</dt><dd>{{ plot.district }}</dd>{% endif %}
         {% if plot.village %}<dt>Kelurahan</dt><dd>{{ plot.village }}</dd>{% endif %}
         {% if plot.address %}<dt>Alamat/patokan</dt><dd>{{ plot.address }}</dd>{% endif %}
@@ -31,10 +31,10 @@
         <dt>Pematangan lahan</dt><dd>{{ plot.land_preparation_done|yesno:"Selesai,Belum" }}</dd>
         <dt>Jangka waktu</dt><dd>{{ plot.effective_term_years }} tahun</dd>
         {% if plot.uwt_rate_per_m2_year %}
-        <dt>Tarif UWT</dt><dd>{{ plot.uwt_rate_per_m2_year|rupiah }} /m²/tahun</dd>
-        <dt>Perkiraan UWT</dt><dd>{{ plot.uwt_total|rupiah }}</dd>
+        <dt>Tarif UWT</dt><dd>{{ plot.uwt_rate_per_m2_year|rupiah|patah }} /m²/tahun</dd>
+        <dt>Perkiraan UWT</dt><dd>{{ plot.uwt_total|rupiah|patah }}</dd>
         {% endif %}
-        {% if config.allocation_admin_fee %}<dt>Biaya administrasi</dt><dd>{{ config.allocation_admin_fee|rupiah }}</dd>{% endif %}
+        {% if config.allocation_admin_fee %}<dt>Biaya administrasi</dt><dd>{{ config.allocation_admin_fee|rupiah|patah }}</dd>{% endif %}
       </dl>
     </div>
     <div class="card">

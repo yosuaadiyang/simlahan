@@ -1069,7 +1069,10 @@ def report_builder(request):
                 "columns": columns,
                 "chosen": {c.key for c in columns},
                 "total": queryset.count(),
-                "preview": list(reports.rows(columns, queryset, limit=100)),
+                "preview": [
+                    [reports.display_cell(v) for v in row]
+                    for row in reports.rows(columns, queryset, limit=100)
+                ],
                 "units": (
                     request.user.service_units.all()
                     if not scope.sees_all(request.user)

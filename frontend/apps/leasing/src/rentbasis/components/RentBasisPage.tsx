@@ -81,6 +81,7 @@ import {
   getIsFetching as getIsFetchingUiData,
   getIsFetchingAttributes as getIsFetchingUiDataAttributes,
   getMethods as getUiDataMethods,
+  getIsFetched as getIsUiDataListFetched,
   getUiDataList,
 } from "@/uiData/selectors";
 import {
@@ -122,6 +123,7 @@ const RentBasisPage: React.FC = () => {
   const uiDataMethods = useAppSelector(getUiDataMethods);
   const isFetchingUiDataList = useAppSelector(getIsFetchingUiData);
   const uiDataList = useAppSelector(getUiDataList);
+  const isUiDataListFetched = useAppSelector(getIsUiDataListFetched);
 
   const [activeTab, setActiveTab] = useState(0);
   const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
@@ -192,7 +194,7 @@ const RentBasisPage: React.FC = () => {
       dispatch(fetchUiDataAttributes());
     }
 
-    if (!isFetchingUiDataList && isEmpty(uiDataList)) {
+    if (!isFetchingUiDataList && !isUiDataListFetched) {
       dispatch(
         fetchUiDataList({
           limit: 100000,

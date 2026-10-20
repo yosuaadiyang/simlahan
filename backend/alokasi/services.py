@@ -27,6 +27,7 @@ from alokasi.models import (
     LandPlot,
     _next_number,
 )
+from utils.money import check_fits
 
 LOG = logging.getLogger(__name__)
 S = enums.ApplicationStatus
@@ -387,6 +388,8 @@ def _create_invoices(application: Application, config: AllocationSettings) -> No
                     amount,
                 )
             )
+    for kind, description, amount in items:
+        check_fits(Invoice, "amount", amount)
     for kind, description, amount in items:
         Invoice.objects.create(
             application=application,

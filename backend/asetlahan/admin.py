@@ -4,11 +4,14 @@ Halaman alat (dasbor, peta tematik, Gantt, laporan, asisten, pencarian)
 ada di asetlahan.admin_views dan ditautkan dari halaman indeks modul.
 """
 
+from decimal import Decimal
+
 from django import forms
 from django.contrib import admin, messages
 from django.contrib.gis.admin import GISModelAdmin
 from django.db import transaction
 from django.db.models import Count, Q
+from django.forms.models import BaseInlineFormSet
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
@@ -707,8 +710,27 @@ class StakeholderAdmin(AsetModelAdmin):
 # --------------------------------------------------------------------------
 
 
+class ValuationItemFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        from utils.money import check_fits
+
+        structures = Decimal(0)
+        for form in self.forms:
+            data = getattr(form, "cleaned_data", None) or {}
+            if not data or data.get("DELETE"):
+                continue
+            structures += Decimal(data.get("quantity") or 0) * Decimal(
+                data.get("unit_value") or 0
+            )
+        check_fits(AssetValuation, "structures_value", structures)
+        land = self.instance.compute_land_value()
+        check_fits(AssetValuation, "total_value", land + structures)
+
+
 class ValuationItemInline(admin.TabularInline):
     model = ValuationItem
+    formset = ValuationItemFormSet
     extra = 1
     fields = (
         "item_type",

@@ -30,7 +30,7 @@
         <td>{{ inv.number }}</td>
         <td><a href="{% url 'portal:application_detail' inv.application.number %}#tagihan">{{ inv.application.number }}</a></td>
         <td>{{ inv.get_kind_display }}</td>
-        <td>{{ inv.amount|rupiah }}</td>
+        <td>{{ inv.amount|rupiah|patah }}</td>
         <td>{{ inv.due_date|tanggal }}{% if inv.is_overdue %} <span class="badge badge-ditolak">Lewat</span>{% endif %}</td>
         <td><span class="badge badge-{{ inv.status }}">{{ inv.get_status_display }}</span></td>
       </tr>{% endfor %}
@@ -48,7 +48,7 @@
       <tr>
         <td><a href="{% url 'portal:allocation_detail' a.pk %}">{{ a.kpt_number }}</a></td>
         <td>{{ a.plot.code }} {{ a.plot.name }}</td>
-        <td>{{ a.area_m2|angka:0 }} m²</td>
+        <td>{{ a.area_m2|angka:0|patah }} m²</td>
         <td>{{ a.end_date|tanggal }}</td>
         <td style="min-width:120px"><div class="progress" title="{{ a.latest_progress }}%"><span style="width:{{ a.latest_progress }}%"></span></div><span class="small">{{ a.latest_progress }}%</span></td>
         <td><span class="badge badge-{{ a.status }}">{{ a.get_status_display }}</span></td>

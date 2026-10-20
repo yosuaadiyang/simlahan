@@ -48,6 +48,14 @@ const isFetchingReducer: Reducer<boolean> = handleActions(
   },
   false,
 );
+// Tabel kosong tetap dihitung sudah dimuat agar daftar kosong tidak diminta berulang tanpa henti.
+const isFetchedReducer: Reducer<boolean> = handleActions(
+  {
+    "mvj/uiData/RECEIVE_ALL": () => true,
+    "mvj/uiData/NOT_FOUND": () => true,
+  },
+  false,
+);
 const listReducer: Reducer<UiDataList> = handleActions(
   {
     "mvj/uiData/RECEIVE_ALL": (
@@ -61,6 +69,7 @@ const listReducer: Reducer<UiDataList> = handleActions(
 );
 export default combineReducers<Record<string, any>, any>({
   attributes: attributesReducer,
+  isFetched: isFetchedReducer,
   isFetching: isFetchingReducer,
   isFetchingAttributes: isFetchingAttributesReducer,
   list: listReducer,

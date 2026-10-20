@@ -1,6 +1,6 @@
 import React, { PureComponent } from "react";
 import { connect } from "react-redux";
-import { flowRight, isEmpty } from "lodash-es";
+import { flowRight } from "lodash-es";
 import {
   fetchAttributes as fetchUiDataAttributes,
   fetchUiDataList,
@@ -10,10 +10,12 @@ import {
   getIsFetching,
   getIsFetchingAttributes as getIsFetchingUiDataAttributes,
   getMethods as getUiDataMethods,
+  getIsFetched as getIsUiDataListFetched,
   getUiDataList,
 } from "@/uiData/selectors";
 import type { Attributes, Methods } from "types";
 import type { UiDataList } from "@/uiData/types";
+import type { RootState } from "@/root/types";
 
 function UiDataListHOC(WrappedComponent: any) {
   type Props = {
@@ -21,6 +23,7 @@ function UiDataListHOC(WrappedComponent: any) {
     fetchUiDataList: (...args: Array<any>) => any;
     isFetchingUiDataAttributes: boolean;
     isFetchingUiDataList: boolean;
+    isUiDataListFetched: boolean;
     uiDataAttributes: Attributes;
     uiDataList: UiDataList;
     uiDataMethods: Methods;
@@ -32,8 +35,8 @@ function UiDataListHOC(WrappedComponent: any) {
         fetchUiDataList,
         isFetchingUiDataAttributes,
         isFetchingUiDataList,
+        isUiDataListFetched,
         uiDataAttributes,
-        uiDataList,
         uiDataMethods,
       } = this.props;
 
@@ -41,7 +44,7 @@ function UiDataListHOC(WrappedComponent: any) {
         fetchUiDataAttributes();
       }
 
-      if (!isFetchingUiDataList && isEmpty(uiDataList)) {
+      if (!isFetchingUiDataList && !isUiDataListFetched) {
         fetchUiDataList({
           limit: 100000,
         });
@@ -56,10 +59,11 @@ function UiDataListHOC(WrappedComponent: any) {
 
 const withUiDataList = flowRight(
   connect(
-    (state) => {
+    (state: RootState) => {
       return {
         isFetchingUiDataAttributes: getIsFetchingUiDataAttributes(state),
         isFetchingUiDataList: getIsFetching(state),
+        isUiDataListFetched: getIsUiDataListFetched(state),
         uiDataAttributes: getUiDataAttributes(state),
         uiDataList: getUiDataList(state),
         uiDataMethods: getUiDataMethods(state),

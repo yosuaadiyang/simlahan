@@ -233,9 +233,17 @@ a { color: var(--accent-2); }
 .chat-form input[type="text"], #chat-teks { flex: 1; background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 10px; }
 
 /* ---------------------------------------------------------------- SOS */
-/* Di antara kompas (kiri) dan kolom alat peta (kanan) agar tidak menutupinya. */
-.sos-feed { position: fixed; top: 64px; left: 50%; transform: translateX(-50%); z-index: 900; width: min(520px, calc(100% - 220px)); display: flex; flex-direction: column; gap: 6px; max-height: 45vh; overflow-y: auto; }
-.sos-feed.collapsed { width: auto; }
+/* Di dalam area peta, di antara kompas (kiri) dan kolom alat peta (kanan) agar tidak menutupinya. */
+.sos-feed {
+  position: absolute; top: 10px; left: 104px; right: 60px; margin-inline: auto; max-width: 520px; z-index: 900;
+  display: flex; flex-direction: column; gap: 6px; max-height: 45%; overflow-y: auto; overflow-wrap: anywhere;
+}
+.sos-feed.collapsed { width: fit-content; }
+.sos-head b { min-width: 0; }
+@media (min-width: 641px) {
+  /* Panel samping desktop terbuka: tetap di bagian peta yang terlihat. */
+  .workspace:has(> .sheet:not([hidden])) > .sos-feed { right: 500px; }
+}
 .sos-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: #7f1d1d; border: 2px solid #fecaca; border-radius: 99px; padding: 4px 6px 4px 12px; }
 .sos-item { background: #7f1d1d; border: 2px solid #fecaca; border-radius: 12px; padding: 10px; animation: pulse 1.2s infinite; }
 .sos-item.ditangani { animation: none; background: #78350f; border-color: #fde68a; }
@@ -290,8 +298,10 @@ dialog h3 { margin: 0; }
   .stat span { font-size: 9px; letter-spacing: 0; }
   .map-tools { gap: 4px; top: 8px; right: 8px; max-height: calc(100% - 16px); overflow-y: auto; scrollbar-width: none; }
   .map-tools button { width: 36px; height: 36px; font-size: 16px; }
-  .sos-feed { top: 118px; left: 92px; right: 52px; transform: none; width: auto; }
-  .sos-feed.collapsed { right: auto; }
+  .sos-feed { left: 92px; right: 52px; }
+  /* Lembar menu menutupi peta: SOS pindah ke bawah, di atas bilah menu, agar isi lembar tetap terbaca. */
+  .workspace:has(> .sheet:not([hidden])) > .sos-feed { top: auto; bottom: 8px; left: 12px; right: 12px; }
+  .sheet { padding-bottom: calc(var(--tab-h) + var(--sos-h, 0px) + 24px); }
   .measure, .hint { left: 84px; right: 84px; transform: none; max-width: none; }
   .grid2 { grid-template-columns: 1fr; }
   .compass { width: 74px; }

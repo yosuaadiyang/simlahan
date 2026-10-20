@@ -8,7 +8,7 @@ from django.contrib.gis.geos import GEOSException, GEOSGeometry, MultiPolygon
 from django.db import transaction
 
 from alokasi import enums
-from alokasi.models import LandPlot
+from alokasi.models import MAX_TERM_YEARS, LandPlot
 from utils.geometry import (
     KML_EXTENSIONS,
     SpatialFileError,
@@ -153,13 +153,25 @@ def _feature_values(index: int, feature: dict) -> tuple[str, dict]:
     rate = _decimal(_prop(props, "tarif_uwt", "uwt_rate"), "tarif UWT")
     if rate is not None:
         values["uwt_rate_per_m2_year"] = rate
-    term = _prop(props, "jangka_tahun", "term_years")
-    if term not in ("", None):
-        try:
-            values["term_years"] = int(term)
-        except (TypeError, ValueError):
-            raise PlotImportError(f"Fitur ke-{index}: jangka_tahun tidak valid: {term}")
+    term = _term_years(index, _prop(props, "jangka_tahun", "term_years"))
+    if term is not None:
+        values["term_years"] = term
     return code, values
+
+
+def _term_years(index: int, term) -> int | None:
+    """Jangka waktu alokasi (tahun) dari atribut fitur; kosong berarti default."""
+    if term in ("", None):
+        return None
+    try:
+        years = int(term)
+    except (TypeError, ValueError):
+        raise PlotImportError(f"Fitur ke-{index}: jangka_tahun tidak valid: {term}")
+    if not 1 <= years <= MAX_TERM_YEARS:
+        raise PlotImportError(
+            f"Fitur ke-{index}: jangka_tahun harus 1–{MAX_TERM_YEARS}: {term}"
+        )
+    return years
 
 
 @transaction.atomic

@@ -48,6 +48,7 @@ import {
   getIsFetching,
   getIsFetchingAttributes as getIsFetchingUiDataAttributes,
   getMethods as getUiDataMethods,
+  getIsFetched as getIsUiDataListFetched,
   getUiDataList,
 } from "@/uiData/selectors";
 import type { Methods as MethodsType } from "types";
@@ -73,6 +74,7 @@ const NewRentBasisPage: React.FC = () => {
   const isFetchingUiDataList = useAppSelector(getIsFetching);
   const uiDataAttributes = useAppSelector(getUiDataAttributes);
   const uiDataList = useAppSelector(getUiDataList);
+  const isUiDataListFetched = useAppSelector(getIsUiDataListFetched);
   const uiDataMethods = useAppSelector(getUiDataMethods);
   const [editedRentBasis, setEditedRentBasis] = useState<RentBasis>();
 
@@ -145,7 +147,7 @@ const NewRentBasisPage: React.FC = () => {
       dispatch(fetchUiDataAttributes());
     }
 
-    if (!isFetchingUiDataList && isEmpty(uiDataList)) {
+    if (!isFetchingUiDataList && !isUiDataListFetched) {
       dispatch(
         fetchUiDataList({
           limit: 100000,
@@ -157,7 +159,7 @@ const NewRentBasisPage: React.FC = () => {
     isFetchingUiDataAttributes,
     isFetchingUiDataList,
     uiDataAttributes,
-    uiDataList,
+    isUiDataListFetched,
     uiDataMethods,
   ]);
 

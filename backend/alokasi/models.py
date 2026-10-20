@@ -73,6 +73,11 @@ def _next_number(prefix: str) -> str:
     return f"{prefix}-{year}-{value:05d}"
 
 
+# Jangka waktu dalam tahun; batas atas mencegah tanggal berakhir melewati
+# kalender (tahun 9999) yang membuat proses penerbitan gagal.
+MAX_TERM_YEARS = 99
+
+
 class AllocationSettings(models.Model):
     """Pengaturan layanan (satu baris), dapat diubah petugas di /admin/."""
 
@@ -112,7 +117,9 @@ class AllocationSettings(models.Model):
         **MONEY,
     )
     default_term_years = models.PositiveSmallIntegerField(
-        verbose_name=_("Jangka waktu alokasi bawaan (tahun)"), default=30
+        verbose_name=_("Jangka waktu alokasi bawaan (tahun)"),
+        default=30,
+        validators=[MinValueValidator(1), MaxValueValidator(MAX_TERM_YEARS)],
     )
     passing_score = models.DecimalField(
         verbose_name=_("Nilai minimum verifikasi teknis"),
@@ -127,6 +134,7 @@ class AllocationSettings(models.Model):
     idle_years = models.PositiveSmallIntegerField(
         verbose_name=_("Batas lahan tidur (tahun sejak KPT)"),
         default=2,
+        validators=[MaxValueValidator(MAX_TERM_YEARS)],
         help_text=_("Lahan yang belum dibangun dalam jangka ini ditandai lahan tidur."),
     )
     report_interval_months = models.PositiveSmallIntegerField(
@@ -204,6 +212,7 @@ class LandPlot(TimeStampedModel):
         verbose_name=_("Jangka waktu alokasi (tahun)"),
         null=True,
         blank=True,
+        validators=[MinValueValidator(1), MaxValueValidator(MAX_TERM_YEARS)],
         help_text=_("Kosongkan untuk memakai jangka waktu bawaan."),
     )
     has_technical_documents = models.BooleanField(
@@ -239,6 +248,14 @@ class LandPlot(TimeStampedModel):
 
     def __str__(self):
         return f"{self.code} {self.name}"
+
+    def clean(self):
+        super().clean()
+        if self.area_m2 is not None and self.uwt_rate_per_m2_year is not None:
+            from utils.money import check_fits
+
+            # Total UWT menjadi tagihan; harus muat di kolom jumlah tagihan.
+            check_fits(Invoice, "amount", self.uwt_total)
 
     def save(self, *args, **kwargs):
         if not self.code:

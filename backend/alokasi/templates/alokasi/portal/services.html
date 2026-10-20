@@ -9,14 +9,14 @@
     <ul>
       {% for value, label in allocation_types %}<li><strong>{{ label }}</strong> – {% if value == 'reguler' %}lahan yang ditawarkan untuk dimohonkan dan dinilai berdasarkan rencana usaha.{% elif value == 'langsung' %}pengalokasian langsung untuk kegiatan tertentu sesuai ketentuan.{% else %}lahan siap bangun yang dokumen teknisnya tersedia dan pematangan lahannya selesai.{% endif %}</li>{% endfor %}
     </ul>
-    <p>Biaya: Uang Wajib Tahunan (UWT) sesuai tarif lahan × luas × jangka waktu{% if config.allocation_admin_fee %}, ditambah biaya administrasi {{ config.allocation_admin_fee|rupiah }}{% endif %}. Jangka waktu bawaan {{ config.default_term_years }} tahun.</p>
+    <p>Biaya: Uang Wajib Tahunan (UWT) sesuai tarif lahan × luas × jangka waktu{% if config.allocation_admin_fee %}, ditambah biaya administrasi {{ config.allocation_admin_fee|rupiah|patah }}{% endif %}. Jangka waktu bawaan {{ config.default_term_years }} tahun.</p>
     <p>Hasil: Keputusan Pengalokasian Tanah (KPT) dan Perjanjian Pemanfaatan Tanah (PPT) elektronik ber-QR.</p>
     <a class="btn" href="{% url 'portal:plot_list' %}">Cari lahan</a>
   </section>
   <section class="card">
     <h2>Izin peralihan hak atas tanah</h2>
     <p>Pemegang alokasi aktif dapat mengajukan persetujuan peralihan hak kepada pihak lain yang sudah memiliki akun pemohon.</p>
-    <p>Biaya administrasi: {% if config.transfer_admin_fee or config.transfer_fee_per_m2 %}{{ config.transfer_admin_fee|rupiah }}{% if config.transfer_fee_per_m2 %} + {{ config.transfer_fee_per_m2|rupiah }} per m²{% endif %}{% else %}sesuai ketentuan yang berlaku{% endif %}.</p>
+    <p>Biaya administrasi: {% if config.transfer_admin_fee or config.transfer_fee_per_m2 %}{{ config.transfer_admin_fee|rupiah|patah }}{% if config.transfer_fee_per_m2 %} + {{ config.transfer_fee_per_m2|rupiah|patah }} per m²{% endif %}{% else %}sesuai ketentuan yang berlaku{% endif %}.</p>
     <p>Hasil: Surat Izin Persetujuan Peralihan Hak Atas Tanah elektronik ber-QR; alokasi beralih ke penerima hak.</p>
     <p class="small muted">Ajukan dari menu Akun Saya › Alokasi › Ajukan peralihan hak.</p>
   </section>

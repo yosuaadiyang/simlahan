@@ -5,6 +5,8 @@ from decimal import Decimal, InvalidOperation
 
 from django import template
 from django.utils import timezone
+from django.utils.html import conditional_escape
+from django.utils.safestring import mark_safe
 
 register = template.Library()
 
@@ -38,7 +40,8 @@ def rupiah(value) -> str:
         amount = Decimal(value)
     except (InvalidOperation, TypeError, ValueError):
         return str(value)
-    return "Rp" + _group(amount, 0)
+    sign = "-" if amount < 0 else ""
+    return sign + "Rp" + _group(abs(amount), 0)
 
 
 @register.filter
@@ -49,6 +52,14 @@ def angka(value, decimals=0) -> str:
         return _group(Decimal(value), int(decimals))
     except (InvalidOperation, TypeError, ValueError):
         return str(value)
+
+
+@register.filter(needs_autoescape=True)
+def patah(value, autoescape=True) -> str:
+    """Sisipkan titik patah baris (<wbr>) setelah pemisah ribuan sehingga
+    nominal panjang di kartu sempit pindah baris dengan rapi, tidak meluber."""
+    text = str(conditional_escape(value) if autoescape else value)
+    return mark_safe(text.replace(".", ".<wbr>"))
 
 
 @register.filter

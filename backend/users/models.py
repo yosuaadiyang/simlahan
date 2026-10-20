@@ -113,6 +113,16 @@ class User(AbstractUser):
         if service_units_to_add:
             self.service_units.add(*service_units_to_add)
 
+        # Petugas tanpa unit layanan tidak bisa memakai aplikasi petugas. Bila
+        # instalasi hanya punya satu unit, pasangkan otomatis (pemohon portal
+        # tidak memakai aplikasi petugas sehingga dilewati).
+        if not hasattr(self, "pemohon") and not self.service_units.exists():
+            from leasing.models.service_unit import ServiceUnit
+
+            units = list(ServiceUnit.objects.all()[:2])
+            if len(units) == 1:
+                self.service_units.add(units[0])
+
 
 class LoginOTP(models.Model):
     """Kode sekali pakai (OTP) yang dikirim lewat surel saat petugas masuk.

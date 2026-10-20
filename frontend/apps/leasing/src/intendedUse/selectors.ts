@@ -6,6 +6,10 @@ export const getIsFetching: Selector<boolean, void> = (
   state: RootState,
 ): boolean => state.intendedUse.isFetching;
 
+export const getIsFetched: Selector<boolean, void> = (
+  state: RootState,
+): boolean => state.intendedUse.isFetched;
+
 export const getIntendedUseList: Selector<IntendedUseList, void> = (
   state: RootState,
 ): IntendedUseList => state.intendedUse.list;

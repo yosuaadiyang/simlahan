@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/root/hooks";
-import { isEmpty } from "lodash-es";
 import {
   fetchUiDataList,
   fetchAttributes as fetchUiDataAttributes,
@@ -10,6 +9,7 @@ import {
   getIsFetching,
   getIsFetchingAttributes as getIsFetchingUiDataAttributes,
   getMethods as getUiDataMethods,
+  getIsFetched as getIsUiDataListFetched,
   getUiDataList,
 } from "@/uiData/selectors";
 
@@ -19,6 +19,7 @@ export function useUiDataList() {
   const uiDataAttributes = useAppSelector(getUiDataAttributes);
   const uiDataMethods = useAppSelector(getUiDataMethods);
   const uiDataList = useAppSelector(getUiDataList);
+  const isUiDataListFetched = useAppSelector(getIsUiDataListFetched);
   const isFetchingUiDataAttributes = useAppSelector(
     getIsFetchingUiDataAttributes,
   );
@@ -29,7 +30,7 @@ export function useUiDataList() {
       dispatch(fetchUiDataAttributes());
     }
 
-    if (!isFetchingUiDataList && isEmpty(uiDataList)) {
+    if (!isFetchingUiDataList && !isUiDataListFetched) {
       dispatch(
         fetchUiDataList({
           limit: 100000,
@@ -41,7 +42,7 @@ export function useUiDataList() {
     isFetchingUiDataAttributes,
     isFetchingUiDataList,
     uiDataAttributes,
-    uiDataList,
+    isUiDataListFetched,
     uiDataMethods,
   ]);
 

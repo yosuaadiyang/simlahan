@@ -13,6 +13,9 @@ export const getMethods: Selector<Methods, void> = (
 export const getIsFetching: Selector<boolean, void> = (
   state: RootState,
 ): boolean => state.uiData.isFetching;
+export const getIsFetched: Selector<boolean, void> = (
+  state: RootState,
+): boolean => state.uiData.isFetched;
 export const getUiDataList: Selector<UiDataList, void> = (
   state: RootState,
 ): UiDataList => {

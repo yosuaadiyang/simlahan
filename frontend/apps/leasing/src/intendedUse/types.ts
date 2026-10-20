@@ -1,6 +1,7 @@
 import type { Action } from "@/types";
 
 export type IntendedUseState = {
+  isFetched: boolean;
   isFetching: boolean;
   list: IntendedUseList;
 };

@@ -168,6 +168,7 @@ import {
 import {
   getAttributes as getUiDataAttributes,
   getIsFetching as getIsFetchingUiDataList,
+  getIsFetched as getIsUiDataListFetched,
   getIsFetchingAttributes as getIsFetchingUiDataAttributes,
   getMethods as getUiDataMethods,
   getUiDataList,
@@ -215,6 +216,7 @@ const LeasePage: React.FC = () => {
   const isFetchingUiDataList = useAppSelector(getIsFetchingUiDataList);
   const uiDataAttributes = useAppSelector(getUiDataAttributes);
   const uiDataList = useAppSelector(getUiDataList);
+  const isUiDataListFetched = useAppSelector(getIsUiDataListFetched);
   const uiDataMethods: MethodsType = useAppSelector(getUiDataMethods);
 
   const currentLease = useAppSelector(getCurrentLease);
@@ -310,7 +312,7 @@ const LeasePage: React.FC = () => {
       dispatch(fetchUiDataAttributes());
     }
 
-    if (!isFetchingUiDataList && isEmpty(uiDataList)) {
+    if (!isFetchingUiDataList && !isUiDataListFetched) {
       dispatch(
         fetchUiDataList({
           limit: 100000,
@@ -322,7 +324,7 @@ const LeasePage: React.FC = () => {
     uiDataAttributes,
     uiDataMethods,
     isFetchingUiDataList,
-    uiDataList,
+    isUiDataListFetched,
     dispatch,
   ]);
 

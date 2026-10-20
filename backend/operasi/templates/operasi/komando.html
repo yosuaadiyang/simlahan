@@ -137,7 +137,7 @@
       <button type="button" class="btn primary" id="absen-masuk">Absen masuk</button>
       <button type="button" class="btn" id="absen-pulang">Absen pulang</button>
     </div>
-    <label class="field">Swafoto <span id="foto-wajib" class="muted">(opsional)</span>
+    <label class="field"><span>Swafoto <span id="foto-wajib" class="muted">(opsional)</span></span>
       <input type="file" id="absen-foto" accept="image/*" capture="user">
     </label>
     <details class="card">
@@ -273,6 +273,7 @@
       <button type="submit" class="btn primary">Kirim</button>
     </form>
   </section>
+  <div class="sos-feed" id="sos-daftar" hidden></div>
 </main>
 
 <nav class="tabbar" aria-label="Menu">
@@ -284,8 +285,6 @@
   <button type="button" data-tab="perf">📈<span>Kinerja</span></button>
   <button type="button" data-tab="chat">💬<span>Chat</span><i class="dot" id="tab-chat-dot" hidden></i></button>
 </nav>
-
-<div class="sos-feed" id="sos-daftar" hidden></div>
 
 <!-- Dialog -->
 <dialog id="dlg-cari" class="palette">

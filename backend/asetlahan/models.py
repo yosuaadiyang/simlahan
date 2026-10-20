@@ -706,13 +706,23 @@ class AssetValuation(TimeStampedModel):
     def __str__(self):
         return f"{self.asset.code} {self.valuation_date}"
 
+    def _area(self) -> Decimal:
+        if self.area_m2 is not None:
+            return Decimal(self.area_m2)
+        asset = self.asset if self.asset_id else None
+        return Decimal(asset.area_m2 or 0) if asset else Decimal(0)
+
+    def compute_land_value(self) -> Decimal:
+        return _money(Decimal(self.land_value_per_m2 or 0) * self._area())
+
+    def clean(self):
+        super().clean()
+        from utils.money import check_fits
+
+        check_fits(AssetValuation, "land_value", self.compute_land_value())
+
     def recompute(self, save=True):
-        area = (
-            self.area_m2
-            if self.area_m2 is not None
-            else (self.asset.area_m2 or Decimal(0))
-        )
-        self.land_value = _money(Decimal(self.land_value_per_m2 or 0) * Decimal(area))
+        self.land_value = self.compute_land_value()
         self.structures_value = _money(
             sum((item.total for item in self.items.all()), Decimal(0)) if self.pk else 0
         )
@@ -759,6 +769,12 @@ class ValuationItem(models.Model):
     @property
     def total(self) -> Decimal:
         return _money(Decimal(self.quantity or 0) * Decimal(self.unit_value or 0))
+
+    def clean(self):
+        super().clean()
+        from utils.money import check_fits
+
+        check_fits(AssetValuation, "structures_value", self.total)
 
 
 class TaxObligation(TimeStampedModel):
@@ -826,6 +842,13 @@ class TaxObligation(TimeStampedModel):
             return None
         taxable = max(Decimal(base) - Decimal(self.deduction or 0), Decimal(0))
         return _money(taxable * Decimal(self.rate_percent) / Decimal(100))
+
+    def clean(self):
+        super().clean()
+        if self.amount is None:
+            from utils.money import check_fits
+
+            check_fits(TaxObligation, "amount", self.compute_amount())
 
     def save(self, *args, **kwargs):
         if self.amount is None:

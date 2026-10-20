@@ -33,8 +33,23 @@
 }
 
 .lease-search-fieldset-group > [class*="TextInput-module_textInput__"],
-.lease-search-fieldset-group > [class*="Select-module_select__"] {
+.lease-search-fieldset-group > [class*="Select-module_select__"],
+.lease-search-fieldset-group > [class*="Select-module_root__"] {
   min-width: 0;
+}
+
+// HP: dua kolom isian per baris agar label tidak terpotong dan kotak pilihan
+// tidak terlalu sempit.
+@media (max-width: 39.9375em) {
+  .lease-search-fieldset-group {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  // Lebih spesifik dari aturan umum `.search__row > .grid-row > *`.
+  .search__row > .grid-row.lease-search-fieldset-group > * {
+    min-width: calc(50% - 0.5rem);
+  }
 }
 
 // Kolom tanggal pencarian (react-datepicker): isi lebar kolom dan tampilkan

@@ -53,14 +53,34 @@ const initialValue = (meta: FieldMeta | undefined, value: any) => {
   return value;
 };
 
-const serialize = (meta: FieldMeta | undefined, value: any) => {
+/**
+ * Terima penulisan angka gaya Indonesia: "1.500.000,50" atau "1.500"
+ * (titik = pemisah ribuan, koma = desimal) selain "1500000.50".
+ */
+export const normalizeDecimalInput = (value: string): string => {
+  let text = value.replace(/[\s\u00a0]/g, "").replace(/^Rp\.?/i, "");
+  if (text.includes(",")) {
+    text = text.replace(/\./g, "").replace(",", ".");
+  } else if (/^-?\d{1,3}(\.\d{3})+$/.test(text)) {
+    text = text.replace(/\./g, "");
+  }
+  return text;
+};
+
+const serialize = (
+  meta: FieldMeta | undefined,
+  value: any,
+  unchanged = false,
+) => {
   if (!meta) return value;
   if (meta.type === "boolean") return Boolean(value);
   if (value === "" || value === undefined) {
     return ["string", "email", "url"].includes(meta.type) ? "" : null;
   }
   if (meta.type === "decimal" && typeof value === "string") {
-    return value.replace(/\s/g, "").replace(",", ".");
+    // Nilai dari server ("33.333") dikirim apa adanya; hanya ketikan pengguna
+    // yang dibaca dengan aturan penulisan Indonesia.
+    return unchanged ? value : normalizeDecimalInput(value);
   }
   return value;
 };
@@ -104,7 +124,11 @@ export const buildPayload = (
       // Biarkan nilai bawaan server untuk pilihan yang dikosongkan.
       return;
     }
-    const serialized = serialize(fieldMeta, value);
+    const serialized = serialize(
+      fieldMeta,
+      value,
+      !!instance && values[name] === instance[name],
+    );
     if (
       serialized === null &&
       !instance &&

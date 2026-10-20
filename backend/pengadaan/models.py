@@ -57,7 +57,10 @@ class DeadlineRule(models.Model):
 
     code = models.CharField(verbose_name=_("Code"), max_length=64, unique=True)
     name = models.CharField(verbose_name=_("Name"), max_length=255)
-    amount = models.PositiveIntegerField(verbose_name=_("Amount"))
+    # Batas atas mencegah tanggal tenggat melewati kalender (galat server).
+    amount = models.PositiveIntegerField(
+        verbose_name=_("Amount"), validators=[MaxValueValidator(3650)]
+    )
     unit = models.CharField(
         verbose_name=_("Unit"), max_length=16, choices=UNIT_CHOICES, default="workdays"
     )
@@ -770,17 +773,32 @@ class Valuation(TimeStampedModel):
         verbose_name_plural = pgettext_lazy("Model name", "Valuations")
         ordering = ["parcel", "-valuation_date", "-id"]
 
+    VALUE_FIELDS = (
+        "value_land",
+        "value_space",
+        "value_building",
+        "value_plants",
+        "value_other_objects",
+        "value_non_physical",
+    )
+
+    @classmethod
+    def compute_total(cls, values) -> Decimal:
+        return sum((values.get(name) or 0 for name in cls.VALUE_FIELDS), Decimal("0"))
+
+    def clean(self):
+        super().clean()
+        from utils.money import check_fits
+
+        check_fits(
+            Valuation,
+            "total_value",
+            self.compute_total({n: getattr(self, n) for n in self.VALUE_FIELDS}),
+        )
+
     def save(self, *args, **kwargs):
-        self.total_value = sum(
-            (
-                self.value_land or 0,
-                self.value_space or 0,
-                self.value_building or 0,
-                self.value_plants or 0,
-                self.value_other_objects or 0,
-                self.value_non_physical or 0,
-            ),
-            Decimal("0"),
+        self.total_value = self.compute_total(
+            {name: getattr(self, name) for name in self.VALUE_FIELDS}
         )
         super().save(*args, **kwargs)
 

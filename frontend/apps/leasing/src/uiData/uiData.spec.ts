@@ -15,6 +15,7 @@ import uiDataReducer from "./reducer";
 import type { UiDataState } from "./types";
 const defaultState: UiDataState = {
   attributes: null,
+  isFetched: false,
   isFetching: false,
   isFetchingAttributes: false,
   list: [],
@@ -60,7 +61,11 @@ describe("Ui data", () => {
             label: "Foo",
           },
         ];
-        const newState = { ...defaultState, list: dummyUiDataList };
+        const newState = {
+          ...defaultState,
+          isFetched: true,
+          list: dummyUiDataList,
+        };
         const state = uiDataReducer({}, receiveUiDataList(dummyUiDataList));
         expect(state).to.deep.equal(newState);
       });
@@ -94,10 +99,19 @@ describe("Ui data", () => {
         expect(state).to.deep.equal(newState);
       });
       it("should update isFetching flag to false by notFound", () => {
-        const newState = { ...defaultState, isFetching: false };
+        const newState = {
+          ...defaultState,
+          isFetched: true,
+          isFetching: false,
+        };
         let state = uiDataReducer({}, fetchUiDataList({}));
         state = uiDataReducer(state, notFound());
         expect(state).to.deep.equal(newState);
+      });
+      it("should mark an empty ui data list as fetched so it is not requested again", () => {
+        let state = uiDataReducer({}, fetchUiDataList({}));
+        state = uiDataReducer(state, receiveUiDataList([]));
+        expect(state).to.deep.equal({ ...defaultState, isFetched: true });
       });
     });
   });

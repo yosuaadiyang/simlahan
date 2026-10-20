@@ -30,6 +30,7 @@ from pengadaan.models import (
     RightsRelease,
     Valuation,
 )
+from utils.money import fits, too_large_message
 
 
 class UserNameField(serializers.Field):
@@ -169,7 +170,7 @@ class AcquisitionParcelSerializer(serializers.ModelSerializer):
         source="project.identifier", read_only=True
     )
     remaining_area_m2 = serializers.DecimalField(
-        max_digits=16, decimal_places=2, read_only=True
+        max_digits=None, decimal_places=2, read_only=True
     )
     party_names = serializers.SerializerMethodField()
     geometry = GeometryField(required=False, allow_null=True)
@@ -371,7 +372,7 @@ class InventoryItemSerializer(serializers.ModelSerializer):
     # Pemilik boleh kosong; field metode agar tetap ada juga pada respons PATCH.
     party_name = serializers.SerializerMethodField()
     total_value = serializers.DecimalField(
-        max_digits=24, decimal_places=2, read_only=True
+        max_digits=None, decimal_places=2, read_only=True
     )
 
     class Meta:
@@ -466,6 +467,14 @@ class ValuationSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     {field: _("Value cannot be negative.")}
                 )
+        values = {
+            name: attrs.get(name, getattr(self.instance, name, None))
+            for name in Valuation.VALUE_FIELDS
+        }
+        if not fits(Valuation, "total_value", Valuation.compute_total(values)):
+            raise serializers.ValidationError(
+                too_large_message(Valuation, "total_value")
+            )
         return attrs
 
 
@@ -669,10 +678,10 @@ class CompensationSerializer(serializers.ModelSerializer):
     )
     validated_by_name = UserNameField("validated_by")
     paid_amount = serializers.DecimalField(
-        max_digits=20, decimal_places=2, read_only=True
+        max_digits=None, decimal_places=2, read_only=True
     )
     outstanding_amount = serializers.DecimalField(
-        max_digits=20, decimal_places=2, read_only=True
+        max_digits=None, decimal_places=2, read_only=True
     )
     payments = CompensationPaymentSerializer(many=True, read_only=True)
 

@@ -1,11 +1,19 @@
 import { describe, expect, it, vi } from "vitest";
 import { extractErrorMessage } from "./api";
-import { formatArea, formatDateId, formatRupiah, percent } from "./format";
+import {
+  formatArea,
+  formatDateId,
+  formatHectare,
+  formatNumberId,
+  formatRupiah,
+  percent,
+} from "./format";
 import { labelOf } from "./components/ui";
 import { getResourcePermissions } from "./permissions";
 import {
   buildPayload,
   findMissingRequired,
+  normalizeDecimalInput,
   REQUIRED_MESSAGE,
 } from "./components/ResourceForm";
 
@@ -23,6 +31,33 @@ describe("Acquisition helpers", () => {
   it("formats area in square metres", () => {
     expect(formatArea("1234.5")).toBe("1.234,5 m²");
     expect(formatArea("")).toBe("–");
+  });
+  it("formats very large decimals exactly", () => {
+    // Di atas 2^53 Number kehilangan digit; string desimal dari API harus utuh.
+    expect(formatRupiah("987654321987654321.99").replace(/\s/g, " ")).toBe(
+      "Rp 987.654.321.987.654.322",
+    );
+    expect(formatRupiah("-1500000.40").replace(/\s/g, " ")).toBe(
+      "-Rp 1.500.000",
+    );
+    expect(formatRupiah(2500).replace(/\s/g, " ")).toMatch(/Rp.?2\.500/);
+    expect(formatArea("98765432198765.43")).toBe("98.765.432.198.765,43 m²");
+    expect(formatArea("10.005")).toBe("10,01 m²");
+    expect(formatArea("0.00")).toBe("0 m²");
+    expect(formatNumberId("100.000")).toBe("100");
+    expect(formatNumberId("abc")).toBe("–");
+    expect(formatHectare("98765432198765.43")).toBe("9.876.543.219,88 ha");
+    expect(formatHectare("2500")).toBe("0,25 ha");
+    expect(formatHectare(null)).toBe("–");
+  });
+  it("accepts Indonesian number notation in decimal inputs", () => {
+    expect(normalizeDecimalInput("1.500.000")).toBe("1500000");
+    expect(normalizeDecimalInput("1.500.000,50")).toBe("1500000.50");
+    expect(normalizeDecimalInput("Rp 2.000")).toBe("2000");
+    expect(normalizeDecimalInput("Rp. 2.000.000")).toBe("2000000");
+    expect(normalizeDecimalInput("12,5")).toBe("12.5");
+    expect(normalizeDecimalInput("12.5")).toBe("12.5");
+    expect(normalizeDecimalInput("1234.56")).toBe("1234.56");
   });
   it("formats ISO dates", () => {
     expect(formatDateId("2026-08-17")).toMatch(/17 Agu\w* 2026/);
@@ -103,6 +138,20 @@ describe("Acquisition helpers", () => {
     expect(
       buildPayload(specs, meta, { parcel: 7, land_value: "" }, { id: 1 }),
     ).toEqual({ parcel: 7, land_value: null, note: "" });
+  });
+  it("keeps unchanged server decimals and reads typed Indonesian numbers", () => {
+    const meta = {
+      share_percentage: { type: "decimal", required: false, read_only: false },
+      amount: { type: "decimal", required: false, read_only: false },
+    } as any;
+    const specs = [{ name: "share_percentage" }, { name: "amount" }];
+    const instance = { id: 1, share_percentage: "33.333", amount: "1500.00" };
+    expect(
+      buildPayload(specs, meta, { ...instance, amount: "2.500.000" }, instance),
+    ).toEqual({ share_percentage: "33.333", amount: "2500000" });
+    expect(
+      buildPayload(specs, meta, { share_percentage: "33.333" }, null),
+    ).toEqual({ share_percentage: "33333" });
   });
   it("resolves choice labels", () => {
     const choices = { ParcelStatus: [{ value: "paid", label: "Dibayar" }] };

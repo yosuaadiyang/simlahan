@@ -26,17 +26,17 @@
       <dl class="props" style="margin-top:12px">
         <dt>Lahan</dt><dd><a href="{% url 'portal:plot_detail' application.plot.code %}">{{ application.plot.code }} – {{ application.plot.name }}</a></dd>
         <dt>Jenis alokasi</dt><dd>{{ application.plot.get_allocation_type_display }}</dd>
-        <dt>Luas</dt><dd>{{ application.plot.area_m2|angka:2 }} m²</dd>
+        <dt>Luas</dt><dd>{{ application.plot.area_m2|angka:2|patah }} m²</dd>
         <dt>Rencana kegiatan</dt><dd>{{ application.activity|default:"-" }}</dd>
-        <dt>Nilai investasi</dt><dd>{{ application.investment_value|rupiah }}</dd>
-        <dt>Tenaga kerja</dt><dd>{% if application.workforce is not None %}{{ application.workforce|angka }} orang{% else %}-{% endif %}</dd>
+        <dt>Nilai investasi</dt><dd>{{ application.investment_value|rupiah|patah }}</dd>
+        <dt>Tenaga kerja</dt><dd>{% if application.workforce is not None %}{{ application.workforce|angka|patah }} orang{% else %}-{% endif %}</dd>
         <dt>Jangka pembangunan</dt><dd>{{ application.development_months|bulan_ke_tahun }}</dd>
       </dl>
       {% if application.description %}<h3>Uraian rencana usaha</h3><p class="prose">{{ application.description }}</p>{% endif %}
       {% else %}
       <dl class="props" style="margin-top:12px">
         <dt>Alokasi</dt><dd>KPT {{ application.source_allocation.kpt_number }} · lahan {{ application.source_allocation.plot.code }}</dd>
-        <dt>Luas</dt><dd>{{ application.source_allocation.area_m2|angka:2 }} m²</dd>
+        <dt>Luas</dt><dd>{{ application.source_allocation.area_m2|angka:2|patah }} m²</dd>
         <dt>Pemohon (pemegang)</dt><dd>{{ application.applicant.name }}</dd>
         <dt>Penerima hak</dt><dd>{{ application.recipient.name|default:"-" }}</dd>
         <dt>Alasan peralihan</dt><dd class="prose">{{ application.transfer_reason|default:"-" }}</dd>
@@ -78,7 +78,7 @@
           <strong>{{ inv.number }} · {{ inv.get_kind_display }}</strong>
           <span class="badge badge-{{ inv.status }}">{{ inv.get_status_display }}</span>
         </div>
-        <p>{{ inv.description }}<br><strong>{{ inv.amount|rupiah }}</strong> · jatuh tempo {{ inv.due_date|tanggal }}{% if inv.is_overdue %} <span class="badge badge-ditolak">Lewat jatuh tempo</span>{% endif %}</p>
+        <p>{{ inv.description }}<br><strong>{{ inv.amount|rupiah|patah }}</strong> · jatuh tempo {{ inv.due_date|tanggal }}{% if inv.is_overdue %} <span class="badge badge-ditolak">Lewat jatuh tempo</span>{% endif %}</p>
         {% if inv.note and inv.status == 'belum_bayar' %}<div class="alert alert-warn small">Catatan petugas: {{ inv.note }}</div>{% endif %}
         {% if is_owner %}
         <div class="actions-row">
