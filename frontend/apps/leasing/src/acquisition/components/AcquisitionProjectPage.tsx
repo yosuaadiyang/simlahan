@@ -97,7 +97,7 @@ const ImportParcels: React.FC<{
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!file) {
-      setError("Pilih berkas GeoJSON atau shapefile (.zip).");
+      setError("Pilih berkas GeoJSON, KML/KMZ, atau shapefile (.zip).");
       return;
     }
     setBusy(true);
@@ -123,9 +123,11 @@ const ImportParcels: React.FC<{
   return (
     <form className="acq-form" onSubmit={submit}>
       <p className="acq-muted">
-        Unggah peta bidang hasil ukur (GeoJSON atau shapefile ber-.prj dalam
-        .zip). Koordinat diubah otomatis ke WGS84. Bidang dengan nomor yang sama
-        diperbarui, bukan digandakan.
+        Unggah peta bidang hasil ukur (GeoJSON, KML/KMZ dari Google Earth, atau
+        shapefile ber-.prj dalam .zip). Koordinat diubah otomatis ke WGS84.
+        Untuk KML/KMZ, nama placemark dipakai sebagai nomor bidang bila atribut
+        nomor tidak ada. Bidang dengan nomor yang sama diperbarui, bukan
+        digandakan.
       </p>
       <div className="acq-form__grid">
         <div className="acq-form__field acq-form__field--wide">
@@ -133,7 +135,7 @@ const ImportParcels: React.FC<{
           <input
             id="acq-import-file"
             type="file"
-            accept=".geojson,.json,.zip"
+            accept=".geojson,.json,.kml,.kmz,.zip"
             onChange={(e) => setFile(e.target.files?.[0] || null)}
           />
         </div>

@@ -10,7 +10,7 @@
 {% endblock %}
 {% block content %}
 <div id="content-main">
-  <p>Ekspor dari QGIS/ArcGIS sebagai GeoJSON, KML, GeoPackage, atau Shapefile (semua berkas .shp/.shx/.dbf/.prj dalam satu ZIP). Atribut yang dikenali: <code>kode</code>, <code>nama</code>, <code>kecamatan</code>, <code>kelurahan</code>, <code>alamat</code>, <code>nomor_hak</code>, <code>nib</code>, <code>pemegang_hak</code>, <code>peruntukan</code>, <code>penggunaan</code>, <code>njop</code>. Aset dengan kode yang sudah ada diperbarui; tanpa kode dibuat baru dengan nomor otomatis.</p>
+  <p>Ekspor dari QGIS/ArcGIS sebagai GeoJSON, KML/KMZ (juga dari Google Earth), GeoPackage, atau Shapefile (semua berkas .shp/.shx/.dbf/.prj dalam satu ZIP). Atribut yang dikenali: <code>kode</code>, <code>nama</code>, <code>kecamatan</code>, <code>kelurahan</code>, <code>alamat</code>, <code>nomor_hak</code>, <code>nib</code>, <code>pemegang_hak</code>, <code>peruntukan</code>, <code>penggunaan</code>, <code>njop</code>. Aset dengan kode yang sudah ada diperbarui; tanpa kode dibuat baru dengan nomor otomatis.</p>
   <form method="post" enctype="multipart/form-data">{% csrf_token %}
     <fieldset class="module aligned">
       {% for field in form %}

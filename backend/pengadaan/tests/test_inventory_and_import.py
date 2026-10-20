@@ -195,3 +195,35 @@ def test_import_parcels_reports_bad_rows_without_failing(admin_client, project):
         ).measured_area_m2
         is None
     )
+
+
+def test_import_parcels_from_google_earth_kmz(admin_client, project, make_kmz):
+    kmz = make_kmz([("BID-01", {}), ("BID-02", {"parcel_number": "BID-99"})])
+    upload = SimpleUploadedFile("bidang.kmz", kmz)
+    url = reverse("v1:acquisitionproject-import-parcels", kwargs={"pk": project.pk})
+
+    response = admin_client.post(url, {"file": upload})
+
+    assert response.status_code == 200, response.content
+    assert response.json()["created"] == 2
+    numbers = set(
+        AcquisitionParcel.objects.filter(project=project).values_list(
+            "parcel_number", flat=True
+        )
+    )
+    # Nama placemark dipakai bila atribut nomor bidang tidak ada.
+    assert numbers == {"BID-01", "BID-99"}
+    parcel = AcquisitionParcel.objects.get(project=project, parcel_number="BID-01")
+    assert parcel.geometry is not None and not parcel.geometry.hasz
+
+    # Impor ulang memperbarui, tidak menggandakan.
+    upload = SimpleUploadedFile("bidang.kmz", kmz)
+    assert admin_client.post(url, {"file": upload}).json()["updated"] == 2
+
+
+def test_import_parcels_rejects_broken_kmz(admin_client, project):
+    url = reverse("v1:acquisitionproject-import-parcels", kwargs={"pk": project.pk})
+    upload = SimpleUploadedFile("bidang.kmz", b"PK\x03\x04 rusak")
+    response = admin_client.post(url, {"file": upload})
+    assert response.status_code == 400
+    assert "KMZ" in str(response.json())

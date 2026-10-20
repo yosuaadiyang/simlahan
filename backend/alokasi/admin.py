@@ -338,8 +338,10 @@ class LandPlotAdmin(PrivateFileAdminMixin, GISModelAdmin):
         if request.method == "POST" and form.is_valid():
             try:
                 with transaction.atomic():
+                    upload = form.cleaned_data["file"]
                     created, updated = import_plots(
-                        form.cleaned_data["file"].read(),
+                        upload.read(),
+                        filename=upload.name,
                         defaults={
                             "allocation_type": form.cleaned_data["allocation_type"],
                             "is_published": form.cleaned_data["is_published"],
@@ -359,7 +361,7 @@ class LandPlotAdmin(PrivateFileAdminMixin, GISModelAdmin):
         context = {
             **self.admin_site.each_context(request),
             "opts": self.model._meta,
-            "title": _("Impor lahan dari GeoJSON"),
+            "title": _("Impor lahan dari GeoJSON atau KML/KMZ"),
             "form": form,
         }
         return TemplateResponse(request, "admin/alokasi/landplot/import.html", context)
@@ -367,9 +369,11 @@ class LandPlotAdmin(PrivateFileAdminMixin, GISModelAdmin):
 
 class PlotImportForm(forms.Form):
     file = forms.FileField(
-        label=_("Berkas GeoJSON"),
+        label=_("Berkas GeoJSON atau KML/KMZ"),
         help_text=_(
-            "FeatureCollection Polygon/MultiPolygon (WGS84). Properti yang dikenali: kode/code, "
+            "GeoJSON FeatureCollection atau KML/KMZ dari Google Earth, berisi Polygon/MultiPolygon "
+            "(WGS84). Pada KML/KMZ, nama placemark dipakai sebagai kode bila tidak ada atribut "
+            "kode. Properti yang dikenali: kode/code, "
             "nama/name, luas_m2/area_m2 (dihitung dari geometri bila kosong), kecamatan, kelurahan, "
             "alamat, peruntukan, arahan, tarif_uwt, jangka_tahun, jenis_alokasi."
         ),

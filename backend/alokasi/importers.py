@@ -1,4 +1,4 @@
-"""Impor data lahan dari GeoJSON (admin "Impor lahan" dan perintah alokasi_impor_lahan)."""
+"""Impor data lahan dari GeoJSON atau KML/KMZ (admin "Impor lahan" dan perintah alokasi_impor_lahan)."""
 
 import json
 from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
@@ -9,7 +9,12 @@ from django.db import transaction
 
 from alokasi import enums
 from alokasi.models import LandPlot
-from utils.geometry import force_2d
+from utils.geometry import (
+    KML_EXTENSIONS,
+    SpatialFileError,
+    force_2d,
+    read_kml_features,
+)
 
 # UTM zona 48N mencakup Batam–Rempang–Galang; dipakai untuk menghitung luas m².
 AREA_SRID = 32648
@@ -89,6 +94,32 @@ def _load_features(data: bytes | str) -> list:
     return features
 
 
+def _kml_features(data: bytes, filename: str) -> list:
+    """Placemark KML/KMZ sebagai fitur GeoJSON agar diproses seperti GeoJSON."""
+    try:
+        rows = read_kml_features(data, filename)
+    except SpatialFileError as error:
+        raise PlotImportError(str(error))
+    if not rows:
+        raise PlotImportError("Tidak ada fitur di dalam berkas.")
+    features = []
+    for props, geom in rows:
+        props = dict(props)
+        name = str(props.get("Name") or "").strip()
+        if not _prop(props, "kode", "code", "kode_lahan") and 0 < len(name) <= 32:
+            # Google Earth: nama placemark menjadi kode lahan, sehingga impor
+            # ulang memperbarui lahan yang sama, bukan menggandakannya.
+            props["kode"] = name
+        features.append(
+            {
+                "type": "Feature",
+                "properties": props,
+                "geometry": json.loads(geom.geojson),
+            }
+        )
+    return features
+
+
 def _feature_values(index: int, feature: dict) -> tuple[str, dict]:
     """Kode lahan dan nilai field dari satu fitur GeoJSON."""
     props = feature.get("properties") or {}
@@ -132,11 +163,17 @@ def _feature_values(index: int, feature: dict) -> tuple[str, dict]:
 
 
 @transaction.atomic
-def import_plots(data: bytes | str, defaults: dict | None = None) -> tuple[int, int]:
+def import_plots(
+    data: bytes | str, defaults: dict | None = None, filename: str = ""
+) -> tuple[int, int]:
     """Buat atau perbarui lahan (dicocokkan dengan kode). Semua atau tidak sama sekali."""
     defaults = defaults or {}
     created = updated = 0
-    for index, feature in enumerate(_load_features(data), start=1):
+    if filename.lower().endswith(KML_EXTENSIONS):
+        features = _kml_features(data, filename)
+    else:
+        features = _load_features(data)
+    for index, feature in enumerate(features, start=1):
         code, values = _feature_values(index, feature)
         plot = LandPlot.objects.filter(code=code).first() if code else None
         if plot is None:

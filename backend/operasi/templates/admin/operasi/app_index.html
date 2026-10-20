@@ -5,7 +5,7 @@
     <table>
       <caption>Pusat komando</caption>
       <tr><th scope="row"><a href="{% url 'operasi-command' %}">Buka pusat komando</a></th><td>Peta operasi, absen, lapor kegiatan & uji tanah, warga, tugas, kinerja (KPI), chat, SOS, AI Satelit, cetak peta. Dapat dipasang di ponsel (PWA) dan bekerja tanpa sinyal.</td></tr>
-      {% if perms.operasi.add_korwil %}<tr><th scope="row"><a href="{% url 'admin:operasi_korwil_import' %}">Impor batas Korwil</a></th><td>Poligon wilayah dari SHP/KML/GeoJSON/GeoPackage.</td></tr>{% endif %}
+      {% if perms.operasi.add_korwil %}<tr><th scope="row"><a href="{% url 'admin:operasi_korwil_import' %}">Impor batas Korwil</a></th><td>Poligon wilayah dari SHP/KML/KMZ/GeoJSON/GeoPackage.</td></tr>{% endif %}
       {% if perms.operasi.add_resident %}<tr><th scope="row"><a href="{% url 'admin:operasi_resident_import' %}">Impor data warga</a></th><td>CSV atau titik spasial; NIK yang sama diperbarui.</td></tr>{% endif %}
     </table>
   </div>

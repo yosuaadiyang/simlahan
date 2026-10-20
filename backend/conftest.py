@@ -1389,3 +1389,40 @@ class InspectionFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Inspection
+
+
+@pytest.fixture
+def make_kmz():
+    """Bangun KMZ (seperti dari Google Earth) berisi placemark poligon."""
+    import io
+    import zipfile
+
+    def _make(placemarks: list[tuple[str, dict]]) -> bytes:
+        body = []
+        for index, (name, data) in enumerate(placemarks):
+            x = 104.10 + index * 0.01
+            extended = "".join(
+                f'<Data name="{key}"><value>{value}</value></Data>'
+                for key, value in data.items()
+            )
+            body.append(
+                f"<Placemark><name>{name}</name>"
+                f"<ExtendedData>{extended}</ExtendedData>"
+                "<Polygon><outerBoundaryIs><LinearRing><coordinates>"
+                f"{x},0.80,5 {x + 0.001},0.80,5 {x + 0.001},0.801,5 "
+                f"{x},0.801,5 {x},0.80,5"
+                "</coordinates></LinearRing></outerBoundaryIs></Polygon>"
+                "</Placemark>"
+            )
+        kml = (
+            '<?xml version="1.0" encoding="UTF-8"?>'
+            '<kml xmlns="http://www.opengis.net/kml/2.2"><Document>'
+            + "".join(body)
+            + "</Document></kml>"
+        )
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(buffer, "w") as archive:
+            archive.writestr("doc.kml", kml)
+        return buffer.getvalue()
+
+    return _make

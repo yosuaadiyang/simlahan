@@ -347,7 +347,7 @@ class AssetImportForm(forms.Form):
     file = forms.FileField(
         label=_("Berkas spasial"),
         help_text=_(
-            "GeoJSON, KML, GeoPackage (.gpkg), atau Shapefile dalam ZIP. Maksimal 5.000 poligon."
+            "GeoJSON, KML/KMZ (Google Earth), GeoPackage (.gpkg), atau Shapefile dalam ZIP. Maksimal 5.000 poligon."
         ),
     )
     category = forms.ModelChoiceField(
@@ -1867,7 +1867,7 @@ class MapOverlayForm(forms.ModelForm):
         label=_("Impor objek dari berkas"),
         required=False,
         help_text=_(
-            "GeoJSON, KML, GeoPackage, atau Shapefile (ZIP). Titik, garis, dan poligon "
+            "GeoJSON, KML/KMZ, GeoPackage, atau Shapefile (ZIP). Titik, garis, dan poligon "
             "diterima. Objek lama di lapisan ini diganti isi berkas."
         ),
     )
