@@ -33,7 +33,12 @@ import type { Deadline, Option } from "../types";
 import AcquisitionMap from "./AcquisitionMap";
 import ResourceForm from "./ResourceForm";
 import ResourceSection from "./ResourceSection";
-import { useCanViewResource, useProjectCapabilities } from "../permissions";
+import {
+  canEditMilestone,
+  useCanViewResource,
+  useProjectCapabilities,
+  useResourcePermissions,
+} from "../permissions";
 import { PROJECT_FORM_FIELDS } from "./AcquisitionListPage";
 import {
   Button,
@@ -224,6 +229,7 @@ const AcquisitionProjectPage: React.FC = () => {
     canImportParcels,
     canRecordPayment,
   } = useProjectCapabilities();
+  const milestonePermissions = useResourcePermissions("pengadaan/milestone/");
   // Daftar pilihan hanya dimuat dari endpoint yang boleh dilihat pengguna.
   const listProjectRows = (endpoint: string) =>
     canView(endpoint)
@@ -597,16 +603,21 @@ const AcquisitionProjectPage: React.FC = () => {
             params={{ ...projectParams, ordering: "sequence" }}
             defaults={{ project: Number(projectId) }}
             fkOptions={{ responsible: options.user }}
-            formFields={[
-              "stage",
-              "title",
-              "legal_basis",
-              "planned_date",
-              "actual_date",
-              "status",
-              "responsible",
-              { name: "note", wide: true },
-            ]}
+            isRowEditable={(row) => canEditMilestone(row, milestonePermissions)}
+            formFields={
+              milestonePermissions.canAdd
+                ? [
+                    "stage",
+                    "title",
+                    "legal_basis",
+                    "planned_date",
+                    "actual_date",
+                    "status",
+                    "responsible",
+                    { name: "note", wide: true },
+                  ]
+                : ["actual_date", "status", { name: "note", wide: true }]
+            }
             columns={[
               {
                 key: "stage",

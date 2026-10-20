@@ -9,7 +9,11 @@ import {
   percent,
 } from "./format";
 import { labelOf } from "./components/ui";
-import { getProjectCapabilities, getResourcePermissions } from "./permissions";
+import {
+  canEditMilestone,
+  getProjectCapabilities,
+  getResourcePermissions,
+} from "./permissions";
 import {
   buildPayload,
   findMissingRequired,
@@ -197,5 +201,26 @@ describe("Acquisition helpers", () => {
     expect(labelOf(choices, "ParcelStatus", "paid")).toBe("Dibayar");
     expect(labelOf(choices, "ParcelStatus", "x")).toBe("x");
     expect(labelOf(choices, "ParcelStatus", null)).toBe("–");
+  });
+});
+
+describe("canEditMilestone", () => {
+  it("Satgas hanya mengubah tonggak tanggung jawabnya", () => {
+    const satgas = { canAdd: false, canChange: true };
+    expect(canEditMilestone({ code: "inventory" }, satgas)).toBe(true);
+    expect(canEditMilestone({ code: "release" }, satgas)).toBe(true);
+    expect(canEditMilestone({ code: "location_decree" }, satgas)).toBe(false);
+    expect(canEditMilestone({ code: null }, satgas)).toBe(false);
+  });
+
+  it("Pelaksana mengubah semua tonggak; tanpa izin ubah tidak ada", () => {
+    const pelaksana = { canAdd: true, canChange: true };
+    expect(canEditMilestone({ code: "location_decree" }, pelaksana)).toBe(true);
+    expect(
+      canEditMilestone(
+        { code: "inventory" },
+        { canAdd: false, canChange: false },
+      ),
+    ).toBe(false);
   });
 });

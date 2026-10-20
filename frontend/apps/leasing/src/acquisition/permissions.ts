@@ -124,3 +124,24 @@ export const useCanViewResource = (): ((endpoint: string) => boolean) => {
     [usersPermissions],
   );
 };
+
+/**
+ * Tonggak yang menjadi tanggung jawab Satgas (sama dengan
+ * AcquisitionMilestoneSerializer.TASK_FORCE_CODES di backend). Pengguna yang
+ * boleh mengubah tetapi tidak menambah tonggak hanya memperbarui tonggak ini,
+ * dan hanya status, tanggal realisasi serta catatannya.
+ */
+export const TASK_FORCE_MILESTONE_CODES = new Set([
+  "inventory",
+  "inventory_announcement",
+  "inventory_verification",
+  "deliberation",
+  "release",
+]);
+
+export const canEditMilestone = (
+  milestone: { code?: string | null },
+  permissions: Pick<ResourcePermissions, "canAdd" | "canChange">,
+): boolean =>
+  permissions.canChange &&
+  (permissions.canAdd || TASK_FORCE_MILESTONE_CODES.has(milestone.code ?? ""));

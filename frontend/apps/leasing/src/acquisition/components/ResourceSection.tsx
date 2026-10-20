@@ -21,6 +21,8 @@ type Props = {
   canAdd?: boolean;
   canEdit?: boolean;
   canDelete?: boolean;
+  /** Batasi tombol Ubah per baris (mis. tonggak yang dikelola tim lain). */
+  isRowEditable?: (row: Record<string, any>) => boolean;
   itemName: string;
   rowActions?: (
     row: Record<string, any>,
@@ -46,6 +48,7 @@ const ResourceSection: React.FC<Props> = ({
   canAdd: canAddProp = true,
   canEdit: canEditProp = true,
   canDelete: canDeleteProp = true,
+  isRowEditable,
   itemName,
   rowActions,
   headerActions,
@@ -138,7 +141,7 @@ const ResourceSection: React.FC<Props> = ({
               ? (row) => (
                   <div className="acq-row-actions">
                     {rowActions?.(row, refresh)}
-                    {canEdit && (
+                    {canEdit && (isRowEditable?.(row) ?? true) && (
                       <Button
                         variant="link"
                         onClick={() => {

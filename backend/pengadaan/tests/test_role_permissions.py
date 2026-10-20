@@ -746,3 +746,35 @@ def test_admin_hides_personal_data_and_compensation_status(django_user_model):
     assert {"status", "validated_by", "validated_on"} <= set(
         compensation_admin.get_readonly_fields(request)
     )
+
+
+def test_admin_follows_document_and_project_scoping(user_in, project, parcel, party):
+    def _doc(document_type, **kwargs):
+        return AcquisitionDocument.objects.create(
+            project=project,
+            document_type=document_type,
+            title=document_type,
+            file=SimpleUploadedFile(f"{document_type}.pdf", b"%PDF-1.4 rahasia"),
+            **kwargs,
+        )
+
+    public = _doc(enums.DocumentType.LOCATION_DECREE)
+    _doc(enums.DocumentType.ID_CARD)
+    _doc(enums.DocumentType.OTHER, parcel=parcel, party=party)
+    document_admin = admin_site._registry[AcquisitionDocument]
+    request = RequestFactory().get("/admin/")
+
+    request.user = user_in(UserGroup.LASKUTTAJA)
+    assert list(document_admin.get_queryset(request)) == [public]
+    request.user = user_in(UserGroup.PAAKAYTTAJA)
+    assert document_admin.get_queryset(request).count() == 3
+
+    # Peran eksternal hanya melihat proyek yang ditugaskan, juga di admin.
+    request.user = user_in(UserGroup.PENILAI)
+    project_admin = admin_site._registry[AcquisitionProject]
+    parcel_admin = admin_site._registry[AcquisitionParcel]
+    assert not project_admin.get_queryset(request).exists()
+    assert not parcel_admin.get_queryset(request).exists()
+    request.user = user_in(UserGroup.PENILAI, projects=[project])
+    assert list(project_admin.get_queryset(request)) == [project]
+    assert list(parcel_admin.get_queryset(request)) == [parcel]

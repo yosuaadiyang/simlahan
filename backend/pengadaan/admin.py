@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from pengadaan import access
 from pengadaan import models as m
 
 SENSITIVE_PERMISSION = "pengadaan.view_sensitive_personal_data"
@@ -15,6 +16,13 @@ class SensitiveFieldsAdminMixin:
         if not request.user.has_perm(SENSITIVE_PERMISSION):
             exclude += [f for f in self.sensitive_fields if f not in exclude]
         return exclude
+
+
+class ProjectScopedAdmin(admin.ModelAdmin):
+    """Panel admin mengikuti pembatasan proyek yang sama dengan API."""
+
+    def get_queryset(self, request):
+        return access.scope_queryset(super().get_queryset(request), request.user)
 
 
 @admin.register(m.Holiday)
@@ -46,7 +54,7 @@ class MilestoneInline(admin.TabularInline):
 
 
 @admin.register(m.AcquisitionProject)
-class AcquisitionProjectAdmin(admin.ModelAdmin):
+class AcquisitionProjectAdmin(ProjectScopedAdmin):
     list_display = ("identifier", "name", "acquisition_type", "stage", "status")
     list_filter = ("acquisition_type", "stage", "status", "priority")
     search_fields = ("identifier", "name", "requiring_agency")
@@ -90,7 +98,7 @@ class InventoryItemInline(admin.TabularInline):
 
 
 @admin.register(m.AcquisitionParcel)
-class AcquisitionParcelAdmin(admin.ModelAdmin):
+class AcquisitionParcelAdmin(ProjectScopedAdmin):
     list_display = ("parcel_number", "project", "right_type", "status", "is_disputed")
     list_filter = ("status", "right_type", "is_disputed", "project")
     search_fields = ("parcel_number", "nib", "village", "certificate_number")
@@ -100,7 +108,7 @@ class AcquisitionParcelAdmin(admin.ModelAdmin):
 
 
 @admin.register(m.Compensation)
-class CompensationAdmin(admin.ModelAdmin):
+class CompensationAdmin(ProjectScopedAdmin):
     list_display = ("parcel", "party", "form", "amount", "status")
     list_filter = ("status", "form")
     # Status hanya berubah lewat validasi, pembayaran dan konsinyasi.
@@ -115,7 +123,7 @@ class CompensationAdmin(admin.ModelAdmin):
 
 
 @admin.register(m.AffectedHousehold)
-class AffectedHouseholdAdmin(SensitiveFieldsAdminMixin, admin.ModelAdmin):
+class AffectedHouseholdAdmin(SensitiveFieldsAdminMixin, ProjectScopedAdmin):
     list_display = ("head_name", "project", "displacement", "stage")
     list_filter = ("displacement", "stage")
     search_fields = ("head_name",)
@@ -135,6 +143,23 @@ for model in (
     m.CompensationPayment,
     m.RightsRelease,
     m.Handover,
-    m.AcquisitionDocument,
 ):
-    admin.site.register(model)
+    admin.site.register(model, ProjectScopedAdmin)
+
+
+@admin.register(m.AcquisitionDocument)
+class AcquisitionDocumentAdmin(ProjectScopedAdmin):
+    list_display = ("title", "document_type", "project", "parcel")
+    list_filter = ("document_type",)
+    search_fields = ("title", "number")
+    raw_id_fields = ("project", "parcel", "party")
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        # Sama seperti API: pindaian KTP, sertipikat, bukti bayar dan dokumen
+        # milik pihak tertentu hanya untuk pemegang izin data pribadi.
+        if not request.user.has_perm(SENSITIVE_PERMISSION):
+            qs = qs.exclude(document_type__in=access.SENSITIVE_DOCUMENT_TYPES).filter(
+                party__isnull=True
+            )
+        return qs
