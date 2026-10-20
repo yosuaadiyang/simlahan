@@ -5,7 +5,9 @@
 <h1>Permohonan {{ application.number }} <span class="badge badge-{{ application.status }}">{{ application.get_status_display }}</span></h1>
 <p class="muted">{{ application.get_service_type_display }}{% if application.submitted_at %} · diajukan {{ application.submitted_at|tanggal }}{% endif %}</p>
 
-{% if application.status == 'perbaikan' and application.officer_note %}
+{% if not is_owner %}
+<div class="alert alert-info">Anda adalah <strong>penerima hak</strong> dalam peralihan ini.{% if application.recipient_accepted_at %} Persetujuan Anda tercatat pada {{ application.recipient_accepted_at|date:"d-m-Y H:i" }}.{% endif %}</div>
+{% elif application.status == 'perbaikan' and application.officer_note %}
 <div class="alert alert-warn"><strong>Perlu perbaikan:</strong><div class="prose">{{ application.officer_note }}</div></div>
 {% elif application.status == 'ditolak' %}
 <div class="alert alert-danger"><strong>Permohonan ditolak.</strong><div class="prose">{{ application.officer_note }}</div></div>
@@ -44,6 +46,7 @@
       {% endif %}
     </section>
 
+    {% if is_owner %}
     <section class="card" id="dokumen">
       <h2>Dokumen persyaratan</h2>
       <div class="table-wrap"><table class="data">
@@ -68,6 +71,7 @@
       </form>
       {% endif %}
     </section>
+    {% endif %}
 
     {% if invoices %}
     <section class="card" id="tagihan">
@@ -124,6 +128,18 @@
       {% endif %}
     </section>
     {% endif %}
+    {% if can_accept %}
+    <section class="card">
+      <h2>Persetujuan penerima hak</h2>
+      <p class="small">{{ application.applicant.name }} mengajukan peralihan hak alokasi ini kepada Anda. Petugas baru dapat memproses peralihan setelah Anda menyetujuinya. Dengan menyetujui, Anda menerima seluruh kewajiban pemegang alokasi.</p>
+      <form method="post" action="{% url 'portal:application_accept_transfer' application.number %}" data-confirm="Setujui peralihan hak ini kepada Anda?">{% csrf_token %}
+        <button class="btn btn-accent" type="submit">Setujui peralihan</button>
+      </form>
+    </section>
+    {% endif %}
+    {% if is_owner and transfer_in_review %}
+    <section class="card small">{% if application.recipient_accepted_at %}Penerima hak sudah menyetujui peralihan.{% else %}Menunggu persetujuan penerima hak di portal.{% endif %}</section>
+    {% endif %}
     {% if can_cancel %}
     <section class="card">
       <form method="post" action="{% url 'portal:application_cancel' application.number %}" data-confirm="Batalkan permohonan ini? Tindakan ini tidak dapat diurungkan.">{% csrf_token %}
@@ -134,7 +150,7 @@
     <section class="card">
       <h2>Riwayat</h2>
       <ol class="timeline">
-        {% for e in events %}<li><strong>{{ e.get_status_display }}</strong><br><span class="small muted">{{ e.created_at|date:"d-m-Y H:i" }}</span>{% if e.note %}<div class="small prose">{{ e.note }}</div>{% endif %}</li>{% endfor %}
+        {% for e in events %}<li><strong>{{ e.get_status_display }}</strong><br><span class="small muted">{{ e.created_at|date:"d-m-Y H:i" }}</span>{% if e.note and is_owner %}<div class="small prose">{{ e.note }}</div>{% endif %}</li>{% endfor %}
       </ol>
     </section>
   </aside>

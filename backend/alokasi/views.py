@@ -386,10 +386,28 @@ def verify_document(request, token=None):
             .filter(token=token)
             .first()
         )
+    # Setelah peralihan hak, KPT/PPT (atau IPH) sebelumnya tetap terdaftar
+    # tetapi tidak lagi menunjukkan pemegang hak yang berlaku.
+    transfer = None
+    if document is not None:
+        transfer = (
+            IssuedDocument.objects.filter(
+                allocation=document.allocation,
+                kind="iph",
+                issued_at__gt=document.issued_at,
+            )
+            .order_by("-issued_at")
+            .first()
+        )
     return render(
         request,
         "alokasi/portal/verify.html",
-        {"form": form, "document": document, "searched": searched},
+        {
+            "form": form,
+            "document": document,
+            "searched": searched,
+            "transfer": transfer,
+        },
         status=404 if searched and document is None else 200,
     )
 
@@ -661,13 +679,22 @@ def application_detail(request, number):
     context = {
         "application": application,
         "is_owner": is_owner,
-        "documents": application.documents.select_related("doc_type"),
+        # Penerima hak hanya melihat ringkasan peralihan: dokumen persyaratan,
+        # tagihan, dan catatan petugas milik pemegang hak tidak ditampilkan.
+        "documents": (
+            application.documents.select_related("doc_type") if is_owner else []
+        ),
         "required_docs": RequirementDocType.for_application(application),
         "missing": (
             application.missing_required_documents() if application.is_editable else []
         ),
         "events": application.events.all(),
-        "invoices": invoices,
+        "invoices": invoices if is_owner else [],
+        "transfer_in_review": not application.is_allocation
+        and application.status in (S.SUBMITTED, S.VERIFYING),
+        "can_accept": not is_owner
+        and application.status in (S.SUBMITTED, S.VERIFYING)
+        and application.recipient_accepted_at is None,
         "proof_forms": {
             invoice.pk: PaymentProofForm()
             for invoice in invoices
@@ -768,6 +795,22 @@ def application_submit(request, number):
     else:
         messages.success(
             request, _("Permohonan diajukan. Status akan dikabarkan melalui surel.")
+        )
+    return redirect("portal:application_detail", number=number)
+
+
+@applicant_required
+@require_POST
+def application_accept_transfer(request, number):
+    application = _own_application(request, number, allow_recipient=True)
+    try:
+        services.accept_transfer(application, request.applicant, request.user)
+    except ValidationError as error:
+        for message in _form_errors(error):
+            messages.error(request, message)
+    else:
+        messages.success(
+            request, _("Terima kasih. Persetujuan Anda atas peralihan ini tercatat.")
         )
     return redirect("portal:application_detail", number=number)
 

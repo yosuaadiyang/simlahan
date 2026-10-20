@@ -460,7 +460,7 @@ def test_invoice_and_issued_documents(
     )
 
     for inv in application.invoices.all():
-        services.verify_payment(inv, officer)
+        services.verify_payment(inv, officer, "Rekening koran 20-10-2026")
     application.refresh_from_db()
     assert application.status == S.ISSUED
     kpt = application.issued_documents.get(kind="kpt")
@@ -580,15 +580,39 @@ def test_allocation_reporting_and_transfer(
         ).status_code
         == 404
     )
-    Application.objects.filter(pk=transfer.pk).update(status=S.SUBMITTED)
-    assert (
-        client.get(
-            reverse("portal:application_detail", args=[transfer.number])
-        ).status_code
-        == 200
+    Application.objects.filter(pk=transfer.pk).update(
+        status=S.SUBMITTED, officer_note="Catatan internal pemegang"
     )
+    detail = reverse("portal:application_detail", args=[transfer.number])
+    page = client.get(detail)
+    assert page.status_code == 200
+    html = page.content.decode()
+    # Penerima hak tidak melihat dokumen, tagihan, maupun catatan pemegang hak.
+    assert "Dokumen persyaratan" not in html
+    assert "Catatan internal pemegang" not in html
+    assert not page.context["documents"] and not page.context["invoices"]
+    assert "Setujui peralihan" in html
+    accept = reverse("portal:application_accept_transfer", args=[transfer.number])
+    assert client.get(accept).status_code == 405
+    client.post(accept)
+    transfer.refresh_from_db()
+    assert transfer.recipient_accepted_at is not None
+    assert "Setujui peralihan" not in client.get(detail).content.decode()
     # Bukan pemegang: tidak bisa membuka alokasi.
     assert client.get(url).status_code == 404
+
+    # Pemegang hak tidak dapat menyetujui atas nama penerima; pihak lain 404.
+    Application.objects.filter(pk=transfer.pk).update(recipient_accepted_at=None)
+    client.logout()
+    login(client, application.applicant)
+    assert "Menunggu persetujuan penerima hak" in client.get(detail).content.decode()
+    client.post(accept)
+    transfer.refresh_from_db()
+    assert transfer.recipient_accepted_at is None
+    client.logout()
+    login(client, make_applicant(name="Pihak Lain"))
+    assert client.post(accept).status_code == 404
+    assert client.get(detail).status_code == 404
 
 
 def test_application_detail_shows_missing_documents(client, applicant, plot):

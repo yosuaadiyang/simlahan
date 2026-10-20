@@ -666,7 +666,14 @@ class ApplicationAdmin(admin.ModelAdmin):
         ),
         (
             _("Peralihan hak"),
-            {"fields": ("source_allocation", "recipient", "transfer_reason")},
+            {
+                "fields": (
+                    "source_allocation",
+                    "recipient",
+                    "transfer_reason",
+                    "recipient_accepted_at",
+                )
+            },
         ),
         (_("Keputusan"), {"fields": ("score", "decided_at", "decided_by")}),
     )
@@ -961,11 +968,17 @@ class InvoiceAdmin(ReadOnlyAdmin):
         if not request.user.has_perm("alokasi.verify_payment"):
             raise PermissionDenied
         invoice = get_object_or_404(Invoice, pk=pk)
-        form = OfficerNoteForm(request.POST or None, required=False)
+        # Tanpa bukti bayar dari pemohon, dasar pelunasan wajib dicatat.
+        form = OfficerNoteForm(
+            request.POST or None,
+            required=invoice.status == enums.InvoiceStatus.UNPAID,
+        )
         if request.method == "POST" and form.is_valid():
             _run(
                 request,
-                lambda: services.verify_payment(invoice, request.user),
+                lambda: services.verify_payment(
+                    invoice, request.user, form.cleaned_data["note"]
+                ),
                 _("Tagihan %s dinyatakan lunas.") % invoice.number,
             )
             return HttpResponseRedirect(
