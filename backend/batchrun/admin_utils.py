@@ -3,7 +3,7 @@ from functools import update_wrapper
 from typing import Any, List, Optional, Type, TypeVar
 
 from django.contrib import admin
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db.models import Field, Model
 from django.http import Http404, HttpRequest, HttpResponse
 from django.urls import path, reverse
@@ -95,6 +95,8 @@ class WithDownloadableContent(admin.ModelAdmin[JobRunLog]):
             obj = self.model.objects.get(pk=object_id)
         except (ObjectDoesNotExist, ValueError):
             raise Http404
+        if not self.has_view_permission(request, obj):
+            raise PermissionDenied
         filename = self.get_downloadable_content_filename(obj)
         response = HttpResponse(content_type="application/text-plain")
         response["Content-Disposition"] = f'attachment; filename="{filename}"'

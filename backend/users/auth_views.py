@@ -12,10 +12,16 @@ Alur:
 """
 
 from django.conf import settings
-from django.contrib.auth import authenticate
+from django.contrib.auth import (
+    authenticate,
+)
 from django.contrib.auth import login as session_login
 from django.contrib.auth import logout as session_logout
-from django.contrib.auth import password_validation, user_logged_in
+from django.contrib.auth import (
+    password_validation,
+    update_session_auth_hash,
+    user_logged_in,
+)
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -23,6 +29,10 @@ from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework_simplejwt.token_blacklist.models import (
+    BlacklistedToken,
+    OutstandingToken,
+)
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenRefreshView as BaseTokenRefreshView
 
@@ -241,6 +251,16 @@ class PasswordChangeView(APIView):
             data=request.data, context={"request": request}
         )
         serializer.is_valid(raise_exception=True)
-        request.user.set_password(serializer.validated_data["new_password"])
-        request.user.save(update_fields=["password"])
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        user = request.user
+        user.set_password(serializer.validated_data["new_password"])
+        user.save(update_fields=["password"])
+        # Token lama (mis. yang dicuri) tidak berlaku lagi: access token ditolak
+        # lewat CHECK_REVOKE_TOKEN, refresh token masuk daftar hitam. Sesi
+        # peramban pemanggil dipertahankan dan ia menerima token baru.
+        for token in OutstandingToken.objects.filter(
+            user=user, blacklistedtoken__isnull=True
+        ):
+            BlacklistedToken.objects.get_or_create(token=token)
+        update_session_auth_hash(request._request, user)
+        refresh = RefreshToken.for_user(user)
+        return Response({"access": str(refresh.access_token), "refresh": str(refresh)})

@@ -1,14 +1,14 @@
 from copy import deepcopy
 
 from django.utils.translation import gettext_lazy as _
-from rest_framework.exceptions import NotFound, ParseError
+from rest_framework.exceptions import NotFound, ParseError, PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from field_permissions.viewsets import FieldPermissionsViewsetMixin
 from leasing.filters import DecisionFilter
 from leasing.models import Decision, Lease
-from leasing.permissions import PerMethodPermission
+from leasing.permissions import PerMethodPermission, user_in_service_unit
 from leasing.serializers.decision import (
     DecisionCreateUpdateSerializer,
     DecisionSerializer,
@@ -59,6 +59,10 @@ class DecisionCopyToLeasesView(APIView):
             ?copy_conditions=1 - if we want the conditions to be copied as well
         """
         decision = get_decision_from_query_params(request.query_params)
+        if not user_in_service_unit(request.user, decision.lease.service_unit):
+            raise PermissionDenied(
+                _("You can only copy decisions of leases in your service unit.")
+            )
 
         target_leases = request.query_params.getlist("leases")
 
@@ -74,6 +78,8 @@ class DecisionCopyToLeasesView(APIView):
                 # TODO: report failed ids
                 continue
             except ValueError:
+                continue
+            if not user_in_service_unit(request.user, lease.service_unit):
                 continue
 
             copied_decision = deepcopy(decision)

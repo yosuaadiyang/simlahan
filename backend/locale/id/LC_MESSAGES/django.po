@@ -6933,3 +6933,9 @@ msgstr "target favorit"
 
 msgid "favourite targets"
 msgstr "target favorit"
+
+msgid "You can only create charges for leases in your service unit."
+msgstr "Anda hanya dapat membuat tagihan untuk sewa di unit layanan Anda."
+
+msgid "You can only copy decisions of leases in your service unit."
+msgstr "Anda hanya dapat menyalin keputusan sewa di unit layanan Anda."

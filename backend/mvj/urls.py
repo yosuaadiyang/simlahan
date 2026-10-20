@@ -1,6 +1,7 @@
 import rest_framework.urls
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path, re_path
 from drf_yasg import openapi
@@ -430,19 +431,28 @@ schema_view = get_schema_view(
 )
 
 # Include schema URLs
+# Dokumentasi API memetakan seluruh titik akhir petugas, jadi hanya untuk
+# pengguna yang sudah masuk (halaman login API yang dapat dijelajah).
+_docs_login = "/auth/login/"
 urlpatterns += [
     re_path(
         r"^swagger(?P<format>\.json|\.yaml)$",
-        schema_view.without_ui(cache_timeout=0),
+        login_required(schema_view.without_ui(cache_timeout=0), login_url=_docs_login),
         name="schema-json",
     ),
     re_path(
         r"^docs/$",
-        schema_view.with_ui("swagger", cache_timeout=0),
+        login_required(
+            schema_view.with_ui("swagger", cache_timeout=0), login_url=_docs_login
+        ),
         name="schema-swagger-ui",
     ),
     re_path(
-        r"^redoc/$", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"
+        r"^redoc/$",
+        login_required(
+            schema_view.with_ui("redoc", cache_timeout=0), login_url=_docs_login
+        ),
+        name="schema-redoc",
     ),
 ]
 

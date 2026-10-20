@@ -280,7 +280,7 @@ class PlotSearchUIDataView(APIView):
 class PlotSearchTargetViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
     queryset = PlotSearchTarget.objects.all()
     serializer_class = PlotSearchTargetSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, MvjDjangoModelPermissions)
 
 
 class FavouriteViewSet(viewsets.ModelViewSet):
@@ -326,6 +326,7 @@ class AreaSearchViewSet(viewsets.ModelViewSet):
         "PUT": ["plotsearch.change_areasearch"],
         "PATCH": ["plotsearch.change_areasearch"],
         "DELETE": ["plotsearch.delete_areasearch"],
+        "POST": ["plotsearch.add_areasearch"],
     }
     filter_backends = (DjangoFilterBackend, OrderingFilter, InBBoxFilter)
     filterset_class = AreaSearchFilterSet
@@ -404,6 +405,7 @@ class AreaSearchAttachmentViewset(
         "PUT": ["plotsearch.change_areasearchattachment"],
         "PATCH": ["plotsearch.change_areasearchattachment"],
         "DELETE": ["plotsearch.delete_areasearchattachment"],
+        "POST": ["plotsearch.add_areasearchattachment"],
     }
 
     def get_queryset(self):
@@ -426,6 +428,8 @@ class AreaSearchAttachmentPublicViewset(
 
     serializer_class = AreaSearchAttachmentPublicSerializer
     permission_classes = (AreaSearchAttachmentPublicPermissions,)
+    # Pengguna publik mengunggah lampirannya sendiri tanpa izin model.
+    perms_map = {**AreaSearchAttachmentViewset.perms_map, "POST": []}
 
     def destroy(self, request, *args, **kwargs):
         raise MethodNotAllowed("DELETE")

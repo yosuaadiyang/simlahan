@@ -1967,6 +1967,15 @@ class PerMethodPermission(permissions.BasePermission):
         if not request.user or not request.user.is_authenticated:
             return False
 
+        return self.has_method_permissions(request, view)
+
+    def has_method_permissions(self, request, view):
+        """Izin model untuk metode ini; dipakai juga sebagai cek objek terakhir.
+
+        BasePermission.has_object_permission selalu True, jadi subkelas yang
+        meloloskan has_permission berdasarkan peran lain (mis. penyusun suatu
+        pencarian lahan) wajib memanggil ini agar objek lain tidak ikut terbuka.
+        """
         required_perms = self.get_required_permissions(request.method, view)
 
         return request.user.has_perms(required_perms)
@@ -1989,12 +1998,14 @@ class IsMemberOfSameServiceUnit(permissions.BasePermission):
         if request.user.is_superuser:
             return True
 
-        service_unit = obj.get_service_unit()
+        return user_in_service_unit(request.user, obj.get_service_unit())
 
-        if service_unit in request.user.service_units.all():
-            return True
 
-        return False
+def user_in_service_unit(user, service_unit) -> bool:
+    """Boleh mengubah data unit layanan ini (superuser: semua unit)."""
+    if user.is_superuser:
+        return True
+    return user.service_units.filter(pk=getattr(service_unit, "pk", None)).exists()
 
 
 # Peran modul pengadaan tanah perlu membaca data referensi wilayah & unit layanan.

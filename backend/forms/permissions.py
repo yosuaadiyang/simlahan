@@ -66,7 +66,7 @@ class AnswerPermissions(PerMethodPermission):
             )
         ).exists():
             return True
-        return super().has_object_permission(request, view, obj)
+        return self.has_method_permissions(request, view)
 
 
 class OpeningRecordPermissions(PerMethodPermission):
@@ -84,14 +84,14 @@ class OpeningRecordPermissions(PerMethodPermission):
             )
         ).exists():
             return True
-        return super().has_object_permission(request, view, obj)
+        return self.has_method_permissions(request, view)
 
 
 class AttachmentPermissions(PerMethodPermission):
     def has_object_permission(self, request, view, obj):
         if obj.user == request.user:
             return True
-        return super().has_object_permission(request, view, obj)
+        return self.has_method_permissions(request, view)
 
 
 class TargetStatusPermissions(MvjDjangoModelPermissions):

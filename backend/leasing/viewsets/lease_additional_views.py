@@ -41,7 +41,7 @@ from leasing.models import Lease
 from leasing.models.invoice import Invoice
 from leasing.models.tenant import TenantContact
 from leasing.models.utils import get_billing_periods_for_year
-from leasing.permissions import PerMethodPermission
+from leasing.permissions import PerMethodPermission, user_in_service_unit
 from leasing.serializers.debt_collection import CreateCollectionLetterDocumentSerializer
 from leasing.serializers.explanation import ExplanationSerializer
 from leasing.serializers.invoice import (
@@ -71,6 +71,13 @@ class LeaseCreateChargeViewSet(AtomicTransactionMixin, viewsets.GenericViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        lease = serializer.validated_data.get("lease")
+        if lease is not None and not user_in_service_unit(
+            request.user, lease.service_unit
+        ):
+            raise PermissionDenied(
+                _("You can only create charges for leases in your service unit.")
+            )
         serializer.save()
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)

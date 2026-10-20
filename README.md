@@ -62,7 +62,7 @@ tenggat, hari libur, dsb.), menyetel izin grup, dan membuat admin awal.
 | `/portal/` | Portal publik & pemohon alokasi lahan |
 | `/admin/alokasi/` | Panel petugas alokasi lahan |
 | `/admin/` | Panel admin SimLahan (pengguna, grup, unit layanan, data master) |
-| `/docs/` | Dokumentasi API (Swagger) |
+| `/docs/` | Dokumentasi API (Swagger), perlu masuk |
 | `/healthz`, `/readiness` | Pemeriksaan kesehatan |
 
 Layanan: `db` (PostGIS 16), `backend` (uWSGI), `qcluster` (laporan & surel
