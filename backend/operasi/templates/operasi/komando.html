@@ -45,6 +45,7 @@
     <span id="net" class="pill">…</span>
     <span id="antrean-pill" class="pill warn" hidden title="Laporan menunggu dikirim">⏳ <span id="antrean-jumlah">0</span></span>
     <button id="pasang" type="button" class="btn-small" hidden>Pasang</button>
+    <button id="keluar" type="button" class="btn-small" title="Keluar dan hapus data pusat komando di perangkat ini">Keluar</button>
   </div>
 </header>
 <p class="meta">v{{ komando_config.version }} · {{ komando_config.appName }} · Operasi lapangan · <span id="diperbarui">memuat…</span></p>
@@ -147,9 +148,14 @@
         <label class="field">Tanggal <input type="date" name="tanggal" required></label>
         <label class="field">Keterangan <textarea name="note" rows="2" required></textarea></label>
         <label class="field">Lampiran (surat, foto) <input type="file" name="lampiran" accept="image/*,application/pdf"></label>
+        <p class="muted small">Pengajuan dihitung pada kinerja setelah disetujui koordinator Korwil.</p>
         <button type="submit" class="btn">Kirim pengajuan</button>
       </form>
     </details>
+    <div id="izin-tim" hidden>
+      <h3>Persetujuan izin tim</h3>
+      <ul class="list" id="izin-tim-daftar"></ul>
+    </div>
     <h3>Riwayat 30 hari</h3>
     <ul class="list" id="absen-riwayat"></ul>
   </section>
@@ -318,7 +324,7 @@
 <dialog id="dlg-sos">
   <form method="dialog" class="stack">
     <h3>🆘 Kirim tanda darurat?</h3>
-    <p>Lokasi Anda dikirim ke koordinator, Administrator, dan seluruh petugas di chat.</p>
+    <p>Lokasi Anda dikirim ke koordinator, Administrator, dan petugas Korwil Anda di chat.</p>
     <label class="field">Pesan (opsional) <input id="sos-pesan" maxlength="500" placeholder="Mis. dihadang massa, kecelakaan, butuh evakuasi"></label>
     <div class="row"><button value="batal" class="btn">Batal</button><button type="button" id="sos-kirim" class="btn danger">KIRIM SOS</button></div>
   </form>

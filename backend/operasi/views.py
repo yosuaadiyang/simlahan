@@ -49,7 +49,7 @@ from operasi.models import (
 )
 
 APP_VERSION = "1.0.0"
-SW_VERSION = "3"  # naikkan setiap kali berkas cangkang (JS/CSS) berubah
+SW_VERSION = "4"  # naikkan setiap kali berkas cangkang (JS/CSS) berubah
 MAX_FEATURES = 5000
 MAX_PHOTOS = 5
 MAX_STANCE_UPDATES = 50
@@ -212,6 +212,7 @@ def _config(request) -> dict:
         "tugas": user.has_perm("asetlahan.view_task"),
         "ubahTugas": user.has_perm("asetlahan.change_task"),
         "tim": services.team_users(user).exclude(pk=user.pk).exists(),
+        "setujuiIzin": services.leave_deciders_q(user) is not None,
         "kunci": user.is_superuser,
         "admin": user.has_perm("operasi.change_korwil"),
     }
@@ -271,6 +272,8 @@ def _config(request) -> dict:
             "layer": reverse("operasi-layer", args=["__key__"]),
             "search": reverse("operasi-search"),
             "attendance": reverse("operasi-attendance"),
+            "leaveRequests": reverse("operasi-leave-requests"),
+            "leaveDecision": reverse("operasi-leave-decision", args=[0]),
             "activities": reverse("operasi-activities"),
             "verify": reverse("operasi-activity-verify", args=[0]),
             "soil": reverse("operasi-soil"),
@@ -290,6 +293,7 @@ def _config(request) -> dict:
             "admin": reverse("admin:index"),
             "adminKorwil": reverse("admin:app_list", args=["operasi"]),
             "login": reverse("admin:login") + "?next=" + reverse("operasi-command"),
+            "logout": reverse("admin:logout"),
         },
     }
 
@@ -610,7 +614,7 @@ def _officer_features(request):
     config = CommandSettings.load()
     since = timezone.now() - datetime.timedelta(minutes=config.online_minutes)
     for position in OfficerPosition.objects.filter(
-        updated_at__gte=since
+        updated_at__gte=since, user__in=services.visible_officers(request.user)
     ).select_related("user"):
         yield feature(
             position.location,
@@ -716,7 +720,8 @@ def _attendance_json(attendance) -> dict | None:
         "id": attendance.pk,
         "date": attendance.date.isoformat(),
         "status": attendance.status,
-        "status_label": attendance.get_status_display(),
+        "status_label": attendance.status_text,
+        "approval": attendance.approval,
         "korwil": str(attendance.korwil) if attendance.korwil_id else "",
         "check_in_at": _local(attendance.check_in_at),
         "check_out_at": _local(attendance.check_out_at),
@@ -787,6 +792,30 @@ def attendance(request):
             "history": [_attendance_json(a) for a in history],
         }
     )
+
+
+@api(permission="operasi.view_attendance")
+def leave_requests(request):
+    """Pengajuan izin anggota tim yang menunggu keputusan koordinator / Administrator."""
+    results = []
+    for record in services.leave_requests(request.user)[:200]:
+        item = _attendance_json(record)
+        item["user"] = _name(record.user)
+        item["attachment"] = (
+            file_url("absen-lampiran", record) + "?lihat=1" if record.attachment else ""
+        )
+        results.append(item)
+    return JsonResponse({"results": results})
+
+
+@api(permission="operasi.view_attendance", methods=("POST",))
+def leave_decision(request, pk):
+    record = get_object_or_404(services.leave_requests(request.user), pk=pk)
+    decision = request.POST.get("keputusan")
+    if decision not in ("setuju", "tolak"):
+        raise ValidationError({"keputusan": [_("Pilih setuju atau tolak.")]})
+    services.decide_leave(record, request.user, decision == "setuju")
+    return JsonResponse(_attendance_json(record))
 
 
 # --------------------------------------------------------------------------
@@ -928,6 +957,7 @@ def _create_activity(request):
         reported_by=user,
     )
     _activity_relations(activity, data, user)
+    geo.assign_korwil(activity, user)
     activity.full_clean(
         exclude=["number", "korwil", "task", "reported_by", "verified_by"],
         validate_unique=False,
@@ -1034,6 +1064,7 @@ def _create_soil_test(request):
     if request.FILES.get("laporan"):
         test.lab_report = request.FILES["laporan"]
     test.full_clean(exclude=["number", "korwil", "sampled_by"], validate_unique=False)
+    geo.assign_korwil(test, user)
     try:
         with transaction.atomic():
             test.save()
@@ -1117,6 +1148,32 @@ def _apply_resident(resident, data, user):
     resident._changed_by = user
 
 
+NIK_CONFLICT_LIMIT = 10
+
+
+def _check_new_nik(nik: str, user) -> None:
+    """Tolak NIK ganda tanpa membocorkan apakah NIK itu terdata di wilayah lain."""
+    from pengadaan.crypto import fingerprint
+
+    if not Resident.objects.filter(nik_fingerprint=fingerprint(nik)).exists():
+        return
+    if _throttled(f"operasi:nik:{user.pk}", NIK_CONFLICT_LIMIT, 3600):
+        raise ValidationError(
+            {"nik": [_("Terlalu banyak percobaan NIK. Coba lagi satu jam lagi.")]}
+        )
+    if user.has_perm("operasi.view_resident_nik") and aset_scope.sees_all(user):
+        raise ValidationError({"nik": [_("NIK ini sudah terdata.")]})
+    raise ValidationError(
+        {
+            "nik": [
+                _(
+                    "NIK tidak dapat dipakai. Periksa kembali atau hubungi Administrator."
+                )
+            ]
+        }
+    )
+
+
 @api(permission="operasi.view_resident", methods=("GET", "POST"))
 def residents(request):
     user = request.user
@@ -1129,11 +1186,9 @@ def residents(request):
         if nik:
             if len(nik) != 16:
                 raise ValidationError({"nik": [_("NIK harus 16 digit.")]})
-            from pengadaan.crypto import fingerprint
-
-            if Resident.objects.filter(nik_fingerprint=fingerprint(nik)).exists():
-                raise ValidationError({"nik": [_("NIK ini sudah terdata.")]})
+            _check_new_nik(nik, user)
             resident.nik = nik
+        geo.assign_korwil(resident, user)
         resident.save()
         return JsonResponse(_resident_json(resident), status=201)
     queryset = geo.scoped(Resident.objects.select_related("korwil"), user)
@@ -1199,7 +1254,24 @@ def _task_json(task) -> dict:
         "korwil": task.korwil.code if task.korwil_id else "",
         "assignee": _name(task.assignee) if task.assignee_id else "",
         "mine": task.assignee_id is not None,
+        "can_cancel": False,
     }
+
+
+def _can_cancel_task(user, task) -> bool:
+    """Batal hanya oleh pembuat tugas, koordinator Korwil terkait, atau Administrator."""
+    if aset_scope.sees_all(user):
+        return True
+    if task.created_by_id == user.pk and task.assignee_id != user.pk:
+        return True
+    led = Korwil.objects.filter(coordinator=user, is_active=True)
+    if task.korwil_id and led.filter(pk=task.korwil_id).exists():
+        return True
+    return bool(
+        task.assignee_id
+        and task.assignee_id != user.pk
+        and led.filter(members=task.assignee_id).exists()
+    )
 
 
 def _tasks_for(user):
@@ -1220,6 +1292,7 @@ def tasks(request):
     for task in queryset[:200]:
         item = _task_json(task)
         item["mine"] = task.assignee_id == request.user.pk
+        item["can_cancel"] = _can_cancel_task(request.user, task)
         results.append(item)
     return JsonResponse({"results": results})
 
@@ -1231,6 +1304,20 @@ def task_update(request, pk):
     if status:
         if status not in aset_enums.TaskStatus.values:
             raise ValidationError({"status": [_("Status tidak sah.")]})
+        cancelling = (
+            status == aset_enums.TaskStatus.CANCELLED
+            and task.status != aset_enums.TaskStatus.CANCELLED
+        )
+        if cancelling and not _can_cancel_task(request.user, task):
+            return JsonResponse(
+                {
+                    "error": _(
+                        "Tugas hanya dapat dibatalkan oleh pembuat tugas, koordinator "
+                        "Korwil, atau Administrator."
+                    )
+                },
+                status=403,
+            )
         task.status = status
     if "progress" in request.POST:
         progress = _int_or_none(request.POST.get("progress"), 0, 100)
@@ -1239,7 +1326,10 @@ def task_update(request, pk):
         task.progress = progress
     task.full_clean()
     task.save()
-    return JsonResponse(_task_json(task))
+    data = _task_json(task)
+    data["mine"] = task.assignee_id == request.user.pk
+    data["can_cancel"] = _can_cancel_task(request.user, task)
+    return JsonResponse(data)
 
 
 # --------------------------------------------------------------------------
@@ -1307,11 +1397,11 @@ def chat(request):
         )
         return JsonResponse(_message_json(message, user), status=201)
     channel = _channel(request, request.GET.get("kanal"))
-    queryset = ChatMessage.objects.filter(korwil=channel).select_related("sender")
+    queryset = ChatMessage.objects.filter(korwil=channel)
     if channel is None:
-        queryset = ChatMessage.objects.filter(
-            Q(korwil=None) | Q(is_system=True)
-        ).select_related("sender")
+        # Kanal umum: obrolan umum dan pesan sistem (SOS) dari Korwil yang terlihat.
+        queryset = ChatMessage.objects.filter(Q(korwil=None) | Q(is_system=True))
+    queryset = queryset.filter(services.chat_q(user)).select_related("sender")
     after = _int_or_none(request.GET.get("setelah"), 0, 2**62)
     if after:
         messages = list(queryset.filter(pk__gt=after).order_by("pk")[:100])
@@ -1362,6 +1452,7 @@ def sos(request):
             accuracy_m=_accuracy(data.get("accuracy")),
             message=(data.get("pesan") or "")[:2000],
         )
+        geo.assign_korwil(alert, user, strict=False)
         try:
             with transaction.atomic():
                 alert.save()

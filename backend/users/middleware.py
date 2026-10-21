@@ -5,10 +5,11 @@ ini menangani sesi Django. Aktif hanya bila ``OFFICER_OTP_REQUIRED=True``.
 """
 
 from django.conf import settings
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.http import urlencode
+from django.utils.translation import gettext as _
 
 from users import otp
 
@@ -53,3 +54,27 @@ class OfficerOTPMiddleware:
         ):
             return False
         return request.session.get(otp.SESSION_KEY) != user.pk
+
+
+# Halaman login sesi (panel admin & API yang dapat dijelajah). Login JWT
+# /v1/auth/login/ sudah dibatasi oleh ScopedRateThrottle DRF.
+SESSION_LOGIN_PATHS = ("/admin/login/", "/auth/login/")
+
+
+class LoginThrottleMiddleware:
+    """Batasi percobaan login sesi per alamat IP agar sandi tidak bisa ditebak."""
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if request.method == "POST" and request.path in SESSION_LOGIN_PATHS:
+            from alokasi.views import _throttled
+
+            if _throttled(request, "login-sesi", limit=10, window=60):
+                return HttpResponse(
+                    _("Terlalu banyak percobaan masuk. Coba lagi dalam satu menit."),
+                    status=429,
+                    content_type="text/plain; charset=utf-8",
+                )
+        return self.get_response(request)

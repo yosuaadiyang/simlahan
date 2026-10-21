@@ -46,7 +46,39 @@ def released_q(prefix: str = "") -> Q:
 
 
 def visible_korwils(user):
-    return geo.scoped(Korwil.objects.filter(is_active=True), user, prefix="")
+    return geo.visible_korwils(user)
+
+
+def visible_officers(user):
+    """Petugas yang posisi Live dan kehadirannya boleh dilihat.
+
+    Administrator melihat semua; pengawas unit (Petugas Aset Lahan) melihat
+    petugas Korwil di unitnya dan rekan satu unit; petugas lapangan dan
+    koordinator hanya rekan di Korwil mereka sendiri.
+    """
+    from django.contrib.auth import get_user_model
+
+    User = get_user_model()
+    if aset_scope.sees_all(user):
+        return User.objects.all()
+    korwils = visible_korwils(user)
+    allowed = (
+        Q(operasi_korwil__in=korwils)
+        | Q(operasi_korwil_led__in=korwils)
+        | Q(pk=user.pk)
+    )
+    if geo.is_supervisor(user):
+        allowed |= Q(service_units__in=aset_scope.unit_ids(user))
+    return User.objects.filter(allowed).distinct()
+
+
+def chat_q(user) -> Q:
+    """Pesan chat yang boleh dibaca: kanal umum dan kanal/pesan sistem Korwil yang terlihat."""
+    visible = geo.korwil_q(user)
+    if not visible:
+        # Q() kosong berarti semua data; jangan digabung (Q(a) | Q() == Q(a)).
+        return visible
+    return Q(korwil__isnull=True, is_system=False) | visible
 
 
 def resident_counts(queryset) -> dict:
@@ -94,10 +126,13 @@ def summary(user, korwil=None) -> dict:
             "korwil": visible_korwils(user).count(),
             "sos_open": sos.count(),
             "online": OfficerPosition.objects.filter(
-                updated_at__gte=now - datetime.timedelta(minutes=config.online_minutes)
+                updated_at__gte=now - datetime.timedelta(minutes=config.online_minutes),
+                user__in=visible_officers(user),
             ).count(),
             "present_today": Attendance.objects.filter(
-                date=timezone.localdate(), status__in=enums.PRESENT_STATUSES
+                date=timezone.localdate(),
+                status__in=enums.PRESENT_STATUSES,
+                user__in=visible_officers(user),
             ).count(),
             "updated_at": now.isoformat(),
         }
@@ -159,6 +194,7 @@ def _validate_check_in(attendance, location, photo, config):
         attendance is not None
         and attendance.status in enums.ABSENCE_STATUSES
         and attendance.status != enums.AttendanceStatus.DUTY
+        and attendance.is_approved
     ):
         raise ValidationError(
             _("Hari ini sudah tercatat %(status)s.")
@@ -172,7 +208,8 @@ def _validate_check_in(attendance, location, photo, config):
 
 def _check_in_area(user, location, config):
     """Korwil absen dan apakah lokasi di dalam wilayahnya (geofence)."""
-    korwil = geo.korwil_for(location, user)
+    # Geofence dibandingkan dengan wilayah kerja petugas, bukan Korwil lain di lokasi.
+    korwil = geo.korwil_for_write(user, location, strict=False)
     if korwil is None:
         korwil = next(iter(geo.user_korwils(user)[:1]), None)
     inside = geo.in_area(korwil, location, config.geofence_tolerance_m)
@@ -198,13 +235,23 @@ def check_in(user, *, location, accuracy=None, photo=None, note="", now=None):
     _validate_check_in(attendance, location, photo, config)
     korwil, inside, warnings = _check_in_area(user, location, config)
     attendance = attendance or Attendance(user=user, date=today)
-    if attendance.status != enums.AttendanceStatus.DUTY:
-        attendance.status = (
-            enums.AttendanceStatus.LATE
-            if _late(now, config)
-            else enums.AttendanceStatus.PRESENT
+    duty = attendance.status == enums.AttendanceStatus.DUTY
+    if attendance.status in enums.ABSENCE_STATUSES and not duty:
+        # Pengajuan izin yang belum disetujui gugur karena petugas hadir.
+        warnings.append(
+            _("Pengajuan izin untuk hari ini dibatalkan karena Anda hadir.")
         )
-        if attendance.status == enums.AttendanceStatus.LATE:
+        attendance.approval = ""
+        attendance.approved_by = None
+        attendance.approved_at = None
+    if not (duty and attendance.is_approved):
+        # Hanya dinas luar yang sudah disetujui yang membebaskan dari terlambat.
+        late = _late(now, config)
+        if not duty:
+            attendance.status = (
+                enums.AttendanceStatus.LATE if late else enums.AttendanceStatus.PRESENT
+            )
+        if late:
             warnings.append(_("Tercatat terlambat."))
     attendance.korwil = korwil
     attendance.check_in_at = now
@@ -278,12 +325,75 @@ def request_leave(user, *, status, date, note, attachment=None):
         raise ValidationError(_("Tanggal ini sudah ada absen masuk."))
     attendance = attendance or Attendance(user=user, date=date)
     attendance.status = status
+    # Setiap pengajuan (juga perubahan) menunggu keputusan koordinator.
+    attendance.approval = enums.LeaveApproval.PENDING
+    attendance.approved_by = None
+    attendance.approved_at = None
     attendance.note = note.strip()[:2000]
     if attendance.korwil_id is None:
         attendance.korwil = next(iter(geo.user_korwils(user)[:1]), None)
     if attachment:
         attendance.attachment = attachment
     attendance.full_clean(validate_unique=False)
+    attendance.save()
+    return attendance
+
+
+def leave_deciders_q(user) -> Q | None:
+    """Pengajuan izin yang boleh diputuskan pengguna (None = tidak ada).
+
+    Koordinator memutuskan pengajuan anggota Korwil yang dipimpinnya,
+    Administrator memutuskan semuanya; tidak ada yang memutuskan pengajuannya
+    sendiri (kecuali superuser).
+    """
+    if not user.has_perm("operasi.view_attendance"):
+        return None
+    if aset_scope.sees_all(user):
+        allowed = Q()
+    else:
+        led = Korwil.objects.filter(coordinator=user, is_active=True)
+        if not led.exists():
+            return None
+        allowed = Q(user__operasi_korwil__in=led) | Q(korwil__in=led)
+    if not user.is_superuser:
+        allowed &= ~Q(user=user)
+    return allowed
+
+
+def leave_requests(user):
+    """Pengajuan izin yang menunggu keputusan pengguna."""
+    allowed = leave_deciders_q(user)
+    if allowed is None:
+        return Attendance.objects.none()
+    pks = Attendance.objects.filter(
+        allowed,
+        status__in=enums.ABSENCE_STATUSES,
+        approval=enums.LeaveApproval.PENDING,
+    ).values("pk")
+    return (
+        Attendance.objects.filter(pk__in=pks)
+        .select_related("user", "korwil")
+        .order_by("date", "pk")
+    )
+
+
+def can_decide_leave(user, attendance) -> bool:
+    allowed = leave_deciders_q(user)
+    return (
+        allowed is not None
+        and Attendance.objects.filter(allowed, pk=attendance.pk).exists()
+    )
+
+
+def decide_leave(attendance, user, approve: bool):
+    """Setujui atau tolak pengajuan izin / sakit / cuti / dinas luar."""
+    if attendance.status not in enums.ABSENCE_STATUSES or not attendance.approval:
+        raise ValidationError(_("Catatan ini bukan pengajuan izin."))
+    attendance.approval = (
+        enums.LeaveApproval.APPROVED if approve else enums.LeaveApproval.REJECTED
+    )
+    attendance.approved_by = user
+    attendance.approved_at = timezone.now()
     attendance.save()
     return attendance
 
@@ -332,6 +442,26 @@ def grade(score: float) -> str:
     return "D"
 
 
+def _counts_present(attendance) -> bool:
+    """Hadir: absen masuk, atau dinas luar yang disetujui (pengajuan sendiri tidak cukup)."""
+    if attendance.status in enums.PRESENT_STATUSES:
+        return True
+    return attendance.status == enums.AttendanceStatus.DUTY and bool(
+        attendance.is_approved or attendance.check_in_at
+    )
+
+
+def _counts_late(attendance, config) -> bool:
+    if attendance.status == enums.AttendanceStatus.LATE:
+        return True
+    return bool(
+        attendance.status == enums.AttendanceStatus.DUTY
+        and not attendance.is_approved
+        and attendance.check_in_at
+        and _late(attendance.check_in_at, config)
+    )
+
+
 def performance(user, start: datetime.date, end: datetime.date, config=None) -> dict:
     from asetlahan.models import Task
 
@@ -348,17 +478,14 @@ def performance(user, start: datetime.date, end: datetime.date, config=None) -> 
         a.date: a
         for a in Attendance.objects.filter(user=user, date__gte=start, date__lte=end)
     }
-    present = [
-        a
-        for a in attendances.values()
-        if a.status in enums.PRESENT_STATUSES or a.status == enums.AttendanceStatus.DUTY
-    ]
+    present = [a for a in attendances.values() if _counts_present(a)]
     # Hari ini baru dihitung setelah ada catatan absen (pagi hari belum terlambat absen).
     attendance_days = [d for d in workdays if d < today or d in attendances]
     excused = sum(
         1
         for day, a in attendances.items()
         if day in attendance_days
+        and a.is_approved
         and a.status
         in (
             enums.AttendanceStatus.PERMIT,
@@ -366,7 +493,7 @@ def performance(user, start: datetime.date, end: datetime.date, config=None) -> 
             enums.AttendanceStatus.LEAVE,
         )
     )
-    late = sum(1 for a in present if a.status == enums.AttendanceStatus.LATE)
+    late = sum(1 for a in present if _counts_late(a, config))
     expected_days = max(len(attendance_days) - excused, 0)
     attendance_rate = (
         min(len([a for a in present if a.date in attendance_days]) / expected_days, 1.0)
@@ -423,6 +550,7 @@ def performance(user, start: datetime.date, end: datetime.date, config=None) -> 
                 "date": current.isoformat(),
                 "workday": current in workdays,
                 "status": record.status if record else "",
+                "approval": record.approval if record else "",
                 "activities": per_day.get(current, 0),
             }
         )
@@ -506,8 +634,13 @@ def raise_sos(alert: SosAlert) -> None:
         "korwil": f" ({alert.korwil})" if alert.korwil_id else "",
         "message": alert.message or _("Butuh bantuan segera."),
     }
+    # Pesan sistem ikut Korwil SOS agar hanya terbaca oleh yang boleh melihat SOS-nya.
     ChatMessage.objects.create(
-        korwil=None, sender=None, body=text, location=alert.location, is_system=True
+        korwil=alert.korwil,
+        sender=None,
+        body=text,
+        location=alert.location,
+        is_system=True,
     )
     recipients = set(CommandSettings.load().sos_recipients())
     recipients.update(aset_services.group_emails(UserGroup.PAAKAYTTAJA))
@@ -557,6 +690,7 @@ def update_sos(alert: SosAlert, action: str, user, note: str = "") -> SosAlert:
         raise ValidationError(_("Tindakan tidak dikenal."))
     alert.save()
     ChatMessage.objects.create(
+        korwil=alert.korwil,
         body=message
         % {"number": alert.number, "who": user.get_full_name() or user.get_username()},
         is_system=True,
@@ -611,7 +745,7 @@ def _search_residents(user, query, limit):
         | Q(village__icontains=query)
         | Q(address__icontains=query)
     )
-    if len(digits) >= 16:
+    if len(digits) >= 16 and user.has_perm("operasi.view_resident_nik"):
         match |= Q(nik_fingerprint=fingerprint(digits))
     residents = geo.scoped(Resident.objects.select_related("korwil"), user)
     return [

@@ -227,6 +227,10 @@ def submit(application: Application, user) -> Application:
         )
     resubmission = application.status == S.REVISION
     application.submitted_at = timezone.now()
+    if not application.is_allocation:
+        # Data peralihan bisa berubah saat perbaikan, jadi penerima hak
+        # menyetujui ulang setiap kali permohonan diajukan.
+        application.recipient_accepted_at = None
     _set_status(
         application,
         S.SUBMITTED,
@@ -234,6 +238,53 @@ def submit(application: Application, user) -> Application:
         note=_("Diajukan ulang setelah perbaikan.") if resubmission else "",
     )
     _notify_status(application)
+    if not application.is_allocation:
+        _notify_recipient_to_accept(application)
+    return application
+
+
+def _notify_recipient_to_accept(application: Application) -> None:
+    notify(
+        application.recipient,
+        _("Persetujuan peralihan hak %s") % application.number,
+        _(
+            "%(holder)s mengajukan peralihan hak alokasi KPT %(kpt)s kepada Anda. "
+            "Peralihan baru dapat diproses setelah Anda menyetujuinya di %(url)s"
+        )
+        % {
+            "holder": application.applicant.name,
+            "kpt": application.source_allocation.kpt_number,
+            "url": portal_url(f"permohonan/{application.number}/"),
+        },
+    )
+
+
+@transaction.atomic
+def accept_transfer(
+    application: Application, applicant: Applicant, user
+) -> Application:
+    """Penerima hak menyetujui peralihan yang diajukan kepadanya."""
+    application = Application.objects.select_for_update().get(pk=application.pk)
+    _require(
+        not application.is_allocation and application.recipient_id == applicant.pk,
+        _("Hanya penerima hak yang dapat menyetujui peralihan ini."),
+    )
+    _require(
+        application.status in (S.SUBMITTED, S.VERIFYING),
+        _("Peralihan pada tahap ini tidak dapat disetujui."),
+    )
+    _require(
+        application.recipient_accepted_at is None,
+        _("Peralihan ini sudah Anda setujui."),
+    )
+    application.recipient_accepted_at = timezone.now()
+    application.save(update_fields=["recipient_accepted_at", "modified_at"])
+    ApplicationEvent.objects.create(
+        application=application,
+        status=application.status,
+        note=_("Penerima hak %s menyetujui peralihan.") % applicant.name,
+        actor=user,
+    )
     return application
 
 
@@ -287,6 +338,10 @@ def request_revision(application: Application, officer, note: str) -> Applicatio
         _("Perbaikan hanya dapat diminta saat permohonan diajukan atau diverifikasi."),
     )
     _require(bool(note.strip()), _("Tuliskan apa yang harus diperbaiki."))
+    # Nilai verifikasi berlaku untuk data yang dinilai; setelah diperbaiki
+    # pemohon, verifikator wajib menilai ulang.
+    application.scores.all().delete()
+    application.score = None
     application.officer_note = note
     _set_status(application, S.REVISION, actor=officer, note=note)
     _notify_status(application, note)
@@ -317,6 +372,11 @@ def approve(application: Application, officer, note: str = "") -> Application:
             score >= config.passing_score,
             _("Nilai verifikasi %(score)s di bawah nilai minimum %(min)s.")
             % {"score": score, "min": config.passing_score},
+        )
+    else:
+        _require(
+            application.recipient_accepted_at is not None,
+            _("Penerima hak belum menyetujui peralihan ini di portal."),
         )
     application.decided_at = timezone.now()
     application.decided_by = officer
@@ -417,13 +477,22 @@ def upload_payment_proof(invoice: Invoice, file, user) -> Invoice:
 
 
 @transaction.atomic
-def verify_payment(invoice: Invoice, officer) -> Invoice:
+def verify_payment(invoice: Invoice, officer, note: str = "") -> Invoice:
     invoice = Invoice.objects.select_for_update().get(pk=invoice.pk)
     _require(
         invoice.status
         in (enums.InvoiceStatus.UNPAID, enums.InvoiceStatus.PROOF_UPLOADED),
         _("Tagihan ini sudah lunas atau dibatalkan."),
     )
+    if invoice.status == enums.InvoiceStatus.UNPAID:
+        # Tanpa bukti bayar dari pemohon, petugas wajib mencatat dasar
+        # pelunasan (mis. nomor rekening koran) sebagai jejak audit.
+        _require(
+            bool(note.strip()),
+            _("Belum ada bukti bayar: tuliskan dasar pelunasan tagihan ini."),
+        )
+    if note.strip():
+        invoice.note = note.strip()
     invoice.status = enums.InvoiceStatus.PAID
     invoice.paid_at = timezone.now()
     invoice.verified_by = officer

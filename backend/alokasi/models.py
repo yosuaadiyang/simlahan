@@ -540,6 +540,15 @@ class Application(TimeStampedModel):
     transfer_reason = models.TextField(
         verbose_name=_("Alasan / dasar peralihan"), blank=True, default=""
     )
+    recipient_accepted_at = models.DateTimeField(
+        verbose_name=_("Penerima hak menyetujui"),
+        null=True,
+        blank=True,
+        help_text=_(
+            "Peralihan hanya dapat disetujui petugas setelah penerima hak "
+            "menyetujuinya di portal."
+        ),
+    )
     # --- Proses ---
     submitted_at = models.DateTimeField(
         verbose_name=_("Tanggal diajukan"), null=True, blank=True

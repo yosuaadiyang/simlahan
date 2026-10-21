@@ -6,7 +6,7 @@
   {% if a %}
   <div class="al-card"><div class="al-kpi">{{ a.count|angka|patah }}</div><div class="al-kpi-label">Aset lahan</div></div>
   <div class="al-card"><div class="al-kpi">{{ a.area|angka:2|patah }}</div><div class="al-kpi-label">Total luas (m²)</div></div>
-  <div class="al-card"><div class="al-kpi">{{ a.portfolio|rupiah|patah }}</div><div class="al-kpi-label">Nilai portofolio (penilaian terakhir)</div></div>
+  {% if a.portfolio is not None %}<div class="al-card"><div class="al-kpi">{{ a.portfolio|rupiah|patah }}</div><div class="al-kpi-label">Nilai portofolio (penilaian terakhir)</div></div>{% endif %}
   <div class="al-card"><div class="al-kpi">{{ a.cost|rupiah|patah }}</div><div class="al-kpi-label">Nilai perolehan</div></div>
   {% endif %}
   {% if s.legal %}<div class="al-card"><div class="al-kpi">{{ s.legal.open }}</div><div class="al-kpi-label">Perkara aktif · gugatan {{ s.legal.claims|rupiah|patah }}</div></div>{% endif %}

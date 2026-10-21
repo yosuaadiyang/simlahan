@@ -105,3 +105,24 @@ def group_emails(*group_ids) -> list[str]:
         .values_list("email", flat=True)
         .distinct()
     )
+
+
+def officers(*group_ids):
+    """Petugas aktif bersurel di grup tertentu."""
+    User = get_user_model()
+    return (
+        User.objects.filter(is_active=True, groups__id__in=group_ids)
+        .exclude(email="")
+        .distinct()
+    )
+
+
+def officer_emails(permission: str, service_unit_id, *group_ids) -> list[str]:
+    """Surel petugas grup tertentu yang berhak melihat data di unit layanan itu."""
+    from asetlahan import scope
+
+    return [
+        user.email
+        for user in officers(*group_ids)
+        if user.has_perm(permission) and scope.in_scope(user, service_unit_id)
+    ]

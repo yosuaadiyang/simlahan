@@ -400,6 +400,9 @@ class Resident(TimeStampedModel):
         verbose_name = _("Warga terdata")
         verbose_name_plural = _("Warga terdata")
         ordering = ["korwil__code", "head_name"]
+        permissions = [
+            ("view_resident_nik", _("Dapat melihat NIK dan nomor KK warga")),
+        ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -415,7 +418,11 @@ class Resident(TimeStampedModel):
         if not self.number:
             self.number = next_number("WRG")
         self.nik_fingerprint = fingerprint(self.nik) or ""
-        if self.korwil_id is None and self.location is not None:
+        if (
+            self.korwil_id is None
+            and self.location is not None
+            and not getattr(self, "_korwil_resolved", False)
+        ):
             self.korwil = geo.korwil_at(self.location)
         if self.pengadaan_parcel_id and self.land_status != enums.LandStatus.RELEASED:
             from pengadaan.models import AcquisitionParcel
@@ -552,7 +559,7 @@ class Activity(TimeStampedModel):
 
         if not self.number:
             self.number = next_number("KGT")
-        if self.korwil_id is None:
+        if self.korwil_id is None and not getattr(self, "_korwil_resolved", False):
             self.korwil = geo.korwil_for(self.location, self.reported_by)
         if self.verified and self.verified_at is None:
             self.verified_at = timezone.now()
@@ -689,7 +696,7 @@ class SoilTest(TimeStampedModel):
 
         if not self.number:
             self.number = next_number("UJT")
-        if self.korwil_id is None:
+        if self.korwil_id is None and not getattr(self, "_korwil_resolved", False):
             self.korwil = geo.korwil_for(self.location, self.sampled_by)
         super().save(*args, **kwargs)
 
@@ -747,6 +754,19 @@ class Attendance(TimeStampedModel):
         validators=IMAGE_VALIDATORS,
     )
     missing_checkout = models.BooleanField(_("Lupa absen pulang"), default=False)
+    approval = models.CharField(
+        _("Persetujuan izin"),
+        max_length=16,
+        choices=enums.LeaveApproval.choices,
+        blank=True,
+        default="",
+        help_text=_(
+            "Izin, sakit, cuti, dan dinas luar baru dihitung pada kinerja setelah "
+            "disetujui koordinator Korwil atau Administrator."
+        ),
+    )
+    approved_by = _user_field(_("Diputuskan oleh"))
+    approved_at = models.DateTimeField(_("Diputuskan pada"), null=True, blank=True)
     note = models.TextField(_("Keterangan"), blank=True, default="")
     attachment = PrivateFileField(
         verbose_name=_("Lampiran (surat izin / sakit)"),
@@ -768,6 +788,21 @@ class Attendance(TimeStampedModel):
 
     def __str__(self):
         return f"{self.user} {self.date:%d-%m-%Y}"
+
+    @property
+    def is_approved(self) -> bool:
+        return self.approval == enums.LeaveApproval.APPROVED
+
+    @property
+    def status_text(self) -> str:
+        """Status beserta keadaan persetujuan izin (mis. "Cuti (menunggu persetujuan)")."""
+        label = str(self.get_status_display())
+        if self.status in enums.ABSENCE_STATUSES and self.approval in (
+            enums.LeaveApproval.PENDING,
+            enums.LeaveApproval.REJECTED,
+        ):
+            return f"{label} ({str(self.get_approval_display()).lower()})"
+        return label
 
     @property
     def worked_minutes(self) -> int | None:
@@ -854,7 +889,7 @@ class SosAlert(TimeStampedModel):
 
         if not self.number:
             self.number = next_number("SOS")
-        if self.korwil_id is None:
+        if self.korwil_id is None and not getattr(self, "_korwil_resolved", False):
             self.korwil = geo.korwil_for(self.location, self.raised_by)
         super().save(*args, **kwargs)
 

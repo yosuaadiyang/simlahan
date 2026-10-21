@@ -41,14 +41,17 @@ def as_multipolygon(geom) -> MultiPolygon | None:
     return MultiPolygon(*polygons, srid=geom.srid) if polygons else None
 
 
-def asset_at(point):
+def asset_at(point, user=None):
+    """Aset terkecil yang memuat titik; bila ``user`` diberikan, hanya aset di unitnya."""
+    from asetlahan import scope
     from asetlahan.models import LandAsset
 
     if point is None:
         return None
-    return (
-        LandAsset.objects.filter(geometry__intersects=point).order_by("area_m2").first()
-    )
+    queryset = LandAsset.objects.filter(geometry__intersects=point)
+    if user is not None:
+        queryset = scope.scoped(queryset, user)
+    return queryset.order_by("area_m2").first()
 
 
 def encroached_area(case) -> Decimal | None:
@@ -94,11 +97,17 @@ def asset_overlaps(
     return results
 
 
-def external_overlaps(asset):
-    """Bidang pengadaan & lahan alokasi yang beririsan dengan aset."""
+def external_overlaps(asset, user=None):
+    """Bidang pengadaan & lahan alokasi yang beririsan dengan aset.
+
+    Bila ``user`` diberikan, bidang/lahan hanya dicari di modul yang boleh
+    dilihat pengguna tersebut.
+    """
     from alokasi.models import LandPlot
     from pengadaan.models import AcquisitionParcel
 
+    show_parcels = user is None or user.has_perm("pengadaan.view_acquisitionparcel")
+    show_plots = user is None or user.has_perm("alokasi.view_landplot")
     if asset.geometry is None:
         return {"parcels": [], "plots": []}
     parcels = AcquisitionParcel.objects.filter(
@@ -109,7 +118,10 @@ def external_overlaps(asset):
         parcels = parcels.exclude(pk=asset.pengadaan_parcel_id)
     if asset.alokasi_plot_id:
         plots = plots.exclude(pk=asset.alokasi_plot_id)
-    return {"parcels": list(parcels[:50]), "plots": list(plots[:50])}
+    return {
+        "parcels": list(parcels[:50]) if show_parcels else [],
+        "plots": list(plots[:50]) if show_plots else [],
+    }
 
 
 def feature(geom, properties: dict) -> dict | None:

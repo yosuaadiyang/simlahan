@@ -396,13 +396,20 @@ class PlotSearchTargetCreateUpdateSerializer(
         prev_links = self.get_prev_links(instance)
         for info_link in validated_data.pop("info_links", []):
             try:
-                link = TargetInfoLink.objects.get(pk=info_link["id"])
+                # Hanya tautan milik target ini yang boleh diubah.
+                link = TargetInfoLink.objects.get(
+                    pk=info_link["id"], plot_search_target=instance
+                )
                 for k, v in info_link.items():
                     setattr(link, k, v)
                 link.save()
                 prev_links.pop(info_link["id"])
             except KeyError:
                 TargetInfoLink.objects.create(plot_search_target=instance, **info_link)
+            except TargetInfoLink.DoesNotExist:
+                raise serializers.ValidationError(
+                    {"info_links": _("Tautan informasi tidak ditemukan.")}
+                )
 
         # check if any info links are deleted (ie. not found in list) and delete corresponding object
         for k, link in prev_links.items():

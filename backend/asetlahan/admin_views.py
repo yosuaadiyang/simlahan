@@ -89,6 +89,8 @@ def officer_file(request, kind, pk):
         if lookup
         else model.objects.all()
     )
+    if model is Document:
+        queryset = scope.documents(request.user, queryset)
     obj = get_object_or_404(queryset, pk=pk)
     return serve_file(getattr(obj, field), inline=request.GET.get("lihat") == "1")
 
@@ -245,6 +247,22 @@ def _admin_link(name: str, *args) -> str:
 # --------------------------------------------------------------------------
 
 
+def _portfolio_value(user, assets):
+    """Nilai penilaian terakhir seluruh aset; ``None`` bila tidak berhak melihat penilaian."""
+    if not user.has_perm("asetlahan.view_assetvaluation") or not getattr(
+        ModuleSettings.load(), "enable_valuation"
+    ):
+        return None
+    portfolio = Decimal(0)
+    for asset in assets.prefetch_related("valuations"):
+        latest = max(
+            asset.valuations.all(), key=lambda v: (v.valuation_date, v.pk), default=None
+        )
+        if latest:
+            portfolio += latest.total_value
+    return portfolio
+
+
 def _asset_section(user):
     assets = scope.scoped(LandAsset.objects.all(), user)
     totals = assets.aggregate(
@@ -261,18 +279,11 @@ def _asset_section(user):
         .annotate(n=Count("id"))
         .order_by("-n")[:10]
     )
-    portfolio = Decimal(0)
-    for asset in assets.prefetch_related("valuations"):
-        latest = max(
-            asset.valuations.all(), key=lambda v: (v.valuation_date, v.pk), default=None
-        )
-        if latest:
-            portfolio += latest.total_value
     return {
         "count": totals["n"],
         "area": totals["area"] or 0,
         "cost": totals["cost"] or 0,
-        "portfolio": portfolio,
+        "portfolio": _portfolio_value(user, assets),
         "status_bars": bars(
             [
                 (r["status"], labels.get(r["status"], r["status"]), r["n"])
@@ -1102,7 +1113,7 @@ def overlaps(request):
     pairs = geo.asset_overlaps(assets)
     external = []
     for asset in assets.exclude(geometry__isnull=True)[:300]:
-        found = geo.external_overlaps(asset)
+        found = geo.external_overlaps(asset, request.user)
         if found["parcels"] or found["plots"]:
             external.append({"asset": asset, **found})
     context = {"pairs": pairs, "external": external}
@@ -1399,6 +1410,8 @@ def search_all(user, query: str, limit: int = 20) -> list[dict]:
         queryset = model._default_manager.filter(condition)
         if lookup:
             queryset = scope.scoped(queryset, user, lookup)
+        if model is Document:
+            queryset = scope.documents(user, queryset)
         items = list(queryset.distinct()[: limit + 1])
         if items:
             groups.append(

@@ -9,8 +9,13 @@
 </form>
 {% if searched %}
   {% if document %}
-  <div class="card alert-ok" style="max-width:640px;margin-top:16px">
+  <div class="card {% if transfer %}alert-warn{% else %}alert-ok{% endif %}" style="max-width:640px;margin-top:16px">
+    {% if transfer %}
+    <h2>Dokumen terdaftar, tetapi hak sudah dialihkan</h2>
+    <p>Hak atas alokasi ini telah dialihkan dengan {{ transfer.get_kind_display }} nomor {{ transfer.number }} tanggal {{ transfer.issued_at|tanggal }}. Dokumen ini atas nama pemegang hak sebelumnya dan tidak lagi menunjukkan pemegang hak yang berlaku.</p>
+    {% else %}
     <h2>Dokumen terdaftar dan sah</h2>
+    {% endif %}
     <dl class="props">
       <dt>Jenis</dt><dd>{{ document.get_kind_display }}</dd>
       <dt>Nomor</dt><dd>{{ document.number }}</dd>
@@ -18,6 +23,7 @@
       <dt>Diterbitkan</dt><dd>{{ document.issued_at|tanggal }}</dd>
       <dt>Lahan</dt><dd>{{ document.allocation.plot.code }} – {{ document.allocation.plot.name }}</dd>
       <dt>Luas</dt><dd>{{ document.allocation.area_m2|angka:2|patah }} m²</dd>
+      {% if transfer %}<dt>Pemegang hak saat ini</dt><dd>{{ document.allocation.holder.name }}</dd>{% endif %}
       <dt>Status alokasi saat ini</dt><dd><span class="badge badge-{{ document.allocation.status }}">{{ document.allocation.get_status_display }}</span></dd>
     </dl>
     {% if document.allocation.status != 'aktif' %}<p class="small">Alokasi atas dokumen ini tidak lagi aktif.</p>{% endif %}

@@ -24,8 +24,12 @@ EXEMPT_PREFIXES = (
     "/admin/logout/",
     "/admin/otp/",
     "/admin/jsi18n/",
-    # Masuk/keluar aplikasi petugas; superuser tetap dapat masuk dan bekerja.
-    "/v1/auth/",
+    # Masuk (termasuk OTP), perpanjang token, dan keluar aplikasi petugas agar
+    # superuser tetap dapat masuk. Profil (/me/) dan ganti sandi ikut terkunci;
+    # superuser melewatinya dengan token JWT-nya.
+    "/v1/auth/login/",
+    "/v1/auth/refresh/",
+    "/v1/auth/logout/",
 )
 
 

@@ -133,7 +133,7 @@ def test_summary_and_layers(field, korwil, korwil_b):
     assert client.get(api("lapisan/tidakada/")).status_code == 404
 
 
-def test_search(field, korwil):
+def test_search(field, manager, korwil):
     Resident.objects.create(
         head_name="Zulkifli",
         korwil=korwil,
@@ -143,7 +143,9 @@ def test_search(field, korwil):
     client = login(field)
     kinds = {r["kind"] for r in client.get(api("cari/?q=zulk")).json()["results"]}
     assert "warga" in kinds
-    by_nik = client.get(api("cari/?q=2171010101010009")).json()["results"]
+    # Cari dengan NIK hanya bagi pemegang izin NIK (Administrator).
+    assert client.get(api("cari/?q=2171010101010009")).json()["results"] == []
+    by_nik = login(manager).get(api("cari/?q=2171010101010009")).json()["results"]
     assert by_nik and by_nik[0]["label"] == "Zulkifli"
     assert any(
         r["kind"] == "korwil"
@@ -207,6 +209,10 @@ def test_field_officer_cannot_change_stance_without_permission(field, korwil, un
     from django.contrib.auth.models import Permission
 
     field.groups.clear()
+    # Keluar dari grup panel mencabut status staf; uji ini hanya memeriksa
+    # izin model, jadi status staf dipulihkan.
+    field.is_staff = True
+    field.save(update_fields=["is_staff"])
     for codename in ("view_korwil", "view_activity", "add_activity", "view_resident"):
         field.user_permissions.add(
             Permission.objects.get(codename=codename, content_type__app_label="operasi")

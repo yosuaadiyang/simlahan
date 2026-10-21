@@ -17,7 +17,7 @@ from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.geos import GEOSException, GEOSGeometry
 from django.db import transaction
 
-from asetlahan import geo
+from asetlahan import geo, scope
 from asetlahan.models import LandAsset, MapOverlayFeature, next_number
 from utils.geometry import (
     SpatialFileError,
@@ -215,6 +215,20 @@ def replace_overlay_features(overlay, features) -> int:
     return len(features)
 
 
+def _check_update(index: int, code: str, asset, user) -> None:
+    # Pesan sengaja tidak menyebut nama/unit aset yang sudah ada.
+    if not scope.scoped(LandAsset.objects.filter(pk=asset.pk), user).exists():
+        raise AssetImportError(
+            f"Fitur ke-{index}: kode aset {code} sudah dipakai di luar unit layanan "
+            "Anda. Ganti kode pada berkas."
+        )
+    if not user.has_perm("asetlahan.change_landasset"):
+        raise AssetImportError(
+            f"Fitur ke-{index}: aset berkode {code} sudah ada dan Anda tidak berhak "
+            "memperbaruinya."
+        )
+
+
 def import_assets(
     data: bytes,
     *,
@@ -222,7 +236,13 @@ def import_assets(
     category=None,
     status=None,
     service_unit=None,
+    user=None,
 ) -> tuple[int, int]:
+    """Buat/perbarui aset dari berkas spasial (kode sama = diperbarui).
+
+    Bila ``user`` diberikan, kode hanya dicocokkan dengan aset di unit layanan
+    pengguna; kode milik unit lain ditolak dan pembaruan memerlukan izin ubah.
+    """
     features = _read_features(data, filename)
     if not features:
         raise AssetImportError("Tidak ada fitur di dalam berkas.")
@@ -242,6 +262,8 @@ def import_assets(
                 values["njop_per_m2"] = njop
             code = _prop(props, ("kode", "code", "kode_aset"))[:32]
             asset = LandAsset.objects.filter(code=code).first() if code else None
+            if asset is not None and user is not None:
+                _check_update(index, code, asset, user)
             if asset is None:
                 asset = LandAsset(
                     code=code or next_number("AST"),

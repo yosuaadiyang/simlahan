@@ -251,6 +251,18 @@ class AcquisitionProject(TimeStampedSafeDeleteModel):
         blank=True,
         on_delete=models.SET_NULL,
     )
+    # Penilai dan Instansi Pemohon hanya melihat proyek yang ditugaskan
+    # kepadanya (lihat pengadaan.access).
+    assigned_users = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Assigned users"),
+        help_text=_(
+            "Land appraisers and users of the agency requiring the land only see "
+            "the projects they are assigned to."
+        ),
+        related_name="assigned_acquisition_projects",
+        blank=True,
+    )
 
     class Meta:
         verbose_name = pgettext_lazy("Model name", "Land acquisition project")

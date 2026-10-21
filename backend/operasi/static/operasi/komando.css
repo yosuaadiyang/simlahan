@@ -215,6 +215,8 @@ a { color: var(--accent-2); }
 .calendar .terlambat { background: #92400e; }
 .calendar .izin, .calendar .sakit, .calendar .cuti, .calendar .dinas { background: #1e3a8a; }
 .calendar .alpa { background: #7f1d1d; }
+.calendar .menunggu { background: var(--panel-2); outline: 1px dashed #60a5fa; }
+.calendar .ditolak { background: #7f1d1d; }
 .calendar .libur { opacity: .35; }
 .table { width: 100%; border-collapse: collapse; font-size: 12px; }
 .table th, .table td { border-bottom: 1px solid var(--line); padding: 6px 4px; text-align: left; }

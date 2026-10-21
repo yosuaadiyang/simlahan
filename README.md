@@ -62,7 +62,7 @@ tenggat, hari libur, dsb.), menyetel izin grup, dan membuat admin awal.
 | `/portal/` | Portal publik & pemohon alokasi lahan |
 | `/admin/alokasi/` | Panel petugas alokasi lahan |
 | `/admin/` | Panel admin SimLahan (pengguna, grup, unit layanan, data master) |
-| `/docs/` | Dokumentasi API (Swagger) |
+| `/docs/` | Dokumentasi API (Swagger), perlu masuk |
 | `/healthz`, `/readiness` | Pemeriksaan kesehatan |
 
 Layanan: `db` (PostGIS 16), `backend` (uWSGI), `qcluster` (laporan & surel
@@ -91,12 +91,26 @@ Grup bawaan (atur di `/admin/` → Pengguna):
 |---|---|---|
 | Administrator | penuh | ya |
 | Pelaksana Pengadaan Tanah | penuh, termasuk validasi ganti kerugian, kalender & aturan tenggat | ya |
-| Satgas Pengadaan Tanah | bidang, inventarisasi, pihak, pengumuman, musyawarah, pelepasan hak, rumah tangga terdampak | ya |
-| Penilai Pertanahan | penilaian & dokumen | tidak (tersamar) |
-| Instansi Yang Memerlukan Tanah | baca proyek, bidang, pengumuman, musyawarah, penyerahan; unggah dokumen | tidak (pihak tidak terlihat) |
+| Satgas Pengadaan Tanah | bidang, inventarisasi, pihak, pengumuman, musyawarah, pelepasan hak, rumah tangga terdampak; tonggak inventarisasi, musyawarah & pelepasan hak (status, tanggal realisasi, catatan) | ya |
+| Penilai Pertanahan | penilaian & dokumen, hanya pada proyek yang ditugaskan | tidak (tersamar) |
+| Instansi Yang Memerlukan Tanah | baca proyek, bidang, pengumuman, musyawarah, penyerahan; unggah dokumen perencanaan (DPPT, studi kelayakan), BAST, foto & lainnya; hanya proyek yang ditugaskan, tanpa nilai uang | tidak (pihak tidak terlihat) |
 | Ahli Hukum Penagihan | keberatan, konsinyasi, dokumen | tidak (tersamar) |
-| Petugas Penagihan | ganti kerugian & pembayaran | tidak (tersamar) |
+| Petugas Penagihan | pembayaran & penyerahan ganti kerugian yang sudah divalidasi | tidak (tersamar) |
 | Penelusur, Penyusun, Penyusun Kontrak, Operator Entri Data | baca | tidak (tersamar) |
+
+Catatan pengadaan tanah:
+
+- Penilai dan Instansi Pemohon hanya melihat proyek yang ditugaskan kepadanya
+  (isian **Pengguna yang ditugaskan** pada data proyek, di aplikasi atau
+  `/admin/`). Grup lain melihat semua proyek.
+- Status ganti kerugian tidak diisi manual: Ketua Pelaksana memvalidasi atau
+  membatalkan, pembayaran/penyerahan dan konsinyasi memperbaruinya otomatis.
+  Mengubah nilai, pihak, bentuk ganti kerugian atau rekening pihak setelah
+  validasi mengembalikannya ke status ditetapkan (perlu validasi ulang).
+- Penilaian berstatus final tidak dapat diubah; catat penilaian baru lalu
+  tandai yang lama sebagai direvisi.
+- Pindaian KTP, sertipikat, bukti bayar dan dokumen yang dikaitkan ke pihak
+  hanya terlihat oleh pemegang izin data pribadi.
 
 Grup alokasi lahan (anggotanya otomatis diberi akses `/admin/`):
 
@@ -109,13 +123,18 @@ Grup manajemen aset lahan (anggotanya otomatis diberi akses `/admin/`):
 
 | Grup | Manajemen aset lahan |
 |---|---|
-| Petugas Aset Lahan | seluruh data aset, keuangan, okupasi, permukiman kembali, pengaduan, lelang, dokumen; baca perkara |
-| Petugas Hukum | perkara, advokat & jadwal sidang, dokumen; baca aset, kepemilikan & pemangku kepentingan |
-| Petugas Lapangan | aplikasi lapangan, laporan & foto lapangan, okupasi & tindakan teguran, survei, pembaruan tugas; di pusat komando: absen, lapor kegiatan & uji tanah, data warga, chat, SOS |
-| Koordinator Wilayah | semua hak petugas lapangan di pusat komando untuk Korwil yang dipimpin, ditambah verifikasi laporan, penanganan SOS, KPI anggota, dan tugas wilayah |
+| Petugas Aset Lahan | seluruh data aset, keuangan, okupasi, permukiman kembali, pengaduan, lelang, dokumen, peta berbagi; baca perkara |
+| Petugas Hukum | perkara, advokat & jadwal sidang, dokumen perkara; tindak lanjut okupasi & pengaduan, urusan instansi, tugas; baca aset, kepemilikan, pemangku kepentingan & survei (tanpa penilaian, pajak, transaksi, dan peta berbagi) |
+| Petugas Lapangan | aplikasi lapangan, laporan & foto lapangan, okupasi & tindakan teguran, survei, tindak lanjut pengaduan, pembaruan status & progres tugas sendiri; di pusat komando: absen, lapor kegiatan & uji tanah, data warga, chat, SOS |
+| Koordinator Wilayah | semua hak petugas lapangan di pusat komando untuk Korwil yang dipimpin, ditambah verifikasi laporan, penanganan SOS, KPI anggota, dan tugas wilayah (hanya tugas Korwil yang dipimpin/diikuti) |
 
 Petugas hanya melihat data unit layanannya (data tanpa unit layanan terlihat
-semua); grup Administrator melihat seluruh lokasi.
+semua); grup Administrator melihat seluruh lokasi. Dokumen hanya terlihat bila
+objek yang ditautkan (perkara, lelang, okupasi, dll.) juga boleh dilihat, dan
+mengubah/menghapusnya memerlukan izin ubah/hapus atas objek tersebut. Tautan ke
+modul lain (bidang pengadaan, lahan alokasi, sewa, Korwil) hanya tampil bagi
+yang berhak melihat modul itu. Peta berbagi hanya boleh memuat data yang boleh
+dilihat pembuatnya dan terlihat oleh petugas unit layanannya.
 
 Pemohon mendaftar sendiri di `/portal/daftar/` dan tidak bisa masuk ke
 aplikasi petugas atau API. Akun petugas tidak bisa masuk ke portal.
@@ -231,7 +250,9 @@ di **Pengaturan modul**.
 Pengingat harian 06.30 WIB (`asetlahan_pengingat --email`): sewa dan hak atas
 tanah yang segera berakhir, pajak jatuh tempo, sidang mendatang (juga ke kuasa
 hukum, surel/WhatsApp), tugas dan pengaduan lewat tenggat, okupasi tanpa tindak
-lanjut, aset yang belum dipantau sesuai jadwal, dan urusan instansi. Jalankan manual tanpa mengirim:
+lanjut, aset yang belum dipantau sesuai jadwal, dan urusan instansi. Ringkasan
+dikirim per petugas, hanya berisi data unit layanan dan jenis data yang boleh
+ia lihat. Jalankan manual tanpa mengirim:
 `docker compose exec backend python manage.py asetlahan_pengingat`.
 
 Asisten AI tetap menjawab pertanyaan umum (sewa berakhir, okupasi per zona,
@@ -257,6 +278,20 @@ ketika sinyal kembali). Pintasan: `/komando/?tab=absen`, `?tab=korwil` (lapor),
 `?tab=perf` (kinerja), `?tab=tasks` (tugas). Tekan `Ctrl+K` atau `/` untuk
 pencarian & Power Mode.
 
+Pemisahan data: Administrator, superuser, dan Petugas Aset Lahan melihat data
+per unit layanan. Petugas Lapangan dan Koordinator Wilayah hanya melihat Korwil
+tempat mereka menjadi anggota atau koordinator (warga, kegiatan, uji tanah,
+SOS, chat, berkas, lapisan peta, posisi Live, ringkasan, dan panel); data tanpa
+Korwil hanya terlihat oleh pembuatnya. Data baru yang lokasinya di Korwil lain
+masuk ke satu-satunya Korwil petugas, atau ditolak bila petugas memegang lebih
+dari satu Korwil (SOS tidak pernah ditolak). NIK & nomor KK warga hanya tampil
+bagi pemegang izin "Dapat melihat NIK dan nomor KK warga" (Administrator).
+Izin, sakit, cuti, dan dinas luar baru dihitung pada KPI setelah disetujui
+koordinator Korwil (tab Absen → Persetujuan izin tim) atau Administrator
+(panel Absensi → tindakan Setujui/Tolak); penerima tugas tidak dapat
+membatalkan tugasnya sendiri. Tombol **Keluar** di pusat komando menghapus
+lapisan peta tersimpan dan antrean luring dari perangkat.
+
 | Kebutuhan | Tempat |
 |---|---|
 | Korwil (kode, nama, warna, batas wilayah, koordinator, anggota), impor batas dari GeoJSON/KML/SHP/GPKG | `/admin/operasi/` → Korwil (koordinator wilayah) → **Impor batas SHP/KML/GeoJSON** |
@@ -272,7 +307,9 @@ Kolom impor warga (CSV, pemisah `,` `;` atau tab; atau GeoJSON/KML/SHP/GPKG):
 `nama` (wajib), `nik`, `kk`, `jiwa`, `telepon`, `kampung`, `alamat`, `korwil`
 (kode), `lat`, `lng`, `sikap` (pro/netral/kontra), `status_lahan`
 (sudah/belum), `rtrw` (sesuai/tidak), `pilihan` (relokasi/kompensasi/geser/lainnya),
-`catatan`. NIK yang sama memperbarui warga yang ada. Atribut impor batas Korwil:
+`catatan`. NIK yang sama memperbarui warga di wilayah kerja pengimpor (perlu hak
+ubah warga; catatan ditambahkan, tidak ditimpa); baris dengan NIK yang tidak
+dapat dipakai dilewati. Atribut impor batas Korwil:
 `kode` (wajib), `nama`, `warna`.
 
 AI Satelit menganalisis citra kotak area dengan Claude bila `ANTHROPIC_API_KEY`

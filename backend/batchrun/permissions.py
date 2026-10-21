@@ -9,6 +9,9 @@ from batchrun.models import (
 )
 from utils.group_permissions import UG, GroupModelPermissions
 
+# Command, Job, dan ScheduledJob dapat menjalankan program apa pun di server
+# (tipe "executable"), jadi hanya superuser yang boleh membuat atau mengubahnya.
+# Administrator cukup melihat.
 BATCHRUN_GROUP_MODEL_PERMISSIONS: GroupModelPermissions = {
     Command: {
         "model": {
@@ -18,7 +21,7 @@ BATCHRUN_GROUP_MODEL_PERMISSIONS: GroupModelPermissions = {
             UG.SYOTTAJA: None,
             UG.PERINTALAKIMIES: None,
             UG.LASKUTTAJA: None,
-            UG.PAAKAYTTAJA: ("view", "add", "change", "delete"),
+            UG.PAAKAYTTAJA: ("view",),
         },
         "fields": {},
     },
@@ -30,7 +33,7 @@ BATCHRUN_GROUP_MODEL_PERMISSIONS: GroupModelPermissions = {
             UG.SYOTTAJA: ("view",),
             UG.PERINTALAKIMIES: ("view",),
             UG.LASKUTTAJA: ("view",),
-            UG.PAAKAYTTAJA: ("view", "add", "change", "delete"),
+            UG.PAAKAYTTAJA: ("view",),
         },
         "fields": {},
     },
@@ -78,7 +81,7 @@ BATCHRUN_GROUP_MODEL_PERMISSIONS: GroupModelPermissions = {
             UG.SYOTTAJA: ("view",),
             UG.PERINTALAKIMIES: ("view",),
             UG.LASKUTTAJA: ("view",),
-            UG.PAAKAYTTAJA: ("view", "add", "change", "delete"),
+            UG.PAAKAYTTAJA: ("view",),
         },
         "fields": {},
     },

@@ -13,6 +13,16 @@ urlpatterns = [
     path("api/lapisan/<str:key>/", views.layer, name="operasi-layer"),
     path("api/cari/", views.search, name="operasi-search"),
     path("api/absen/", views.attendance, name="operasi-attendance"),
+    path(
+        "api/absen/persetujuan/",
+        views.leave_requests,
+        name="operasi-leave-requests",
+    ),
+    path(
+        "api/absen/<int:pk>/persetujuan/",
+        views.leave_decision,
+        name="operasi-leave-decision",
+    ),
     path("api/kegiatan/", views.activities, name="operasi-activities"),
     path(
         "api/kegiatan/<int:pk>/verifikasi/",

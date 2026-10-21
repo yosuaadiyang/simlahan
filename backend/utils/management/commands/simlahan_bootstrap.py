@@ -1,5 +1,6 @@
 """Inisialisasi instalasi SimLahan (idempoten, aman dijalankan setiap start).
 
+0. Membuat tabel cache bersama bila belum ada.
 1. Memuat data master (fixture) bila basis data masih kosong.
 2. Memastikan grup, jadwal pemantauan alokasi lahan, pengingat aset lahan, dan
    rekap harian pusat komando ada.
@@ -37,6 +38,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         root = Path(__file__).resolve().parents[3]
+        # Cache basis data dipakai bersama oleh semua proses (idempoten).
+        call_command("createcachetable", verbosity=0)
 
         if options["force_fixtures"] or not Municipality.objects.exists():
             files = []
@@ -49,7 +52,7 @@ class Command(BaseCommand):
             self.stdout.write("Data master sudah ada, fixture dilewati.")
 
         for ensure, message in (
-            (ensure_groups, "Grup alokasi lahan dibuat."),
+            (ensure_groups, "Grup peran yang belum ada dibuat."),
             (ensure_monitoring_job, "Jadwal pemantauan alokasi lahan dibuat."),
             (ensure_reminder_job, "Jadwal pengingat aset lahan dibuat."),
             (ensure_daily_job, "Jadwal rekap harian pusat komando dibuat."),

@@ -61,6 +61,18 @@ from plotsearch.models import (
 from users.models import User
 
 
+@pytest.fixture(autouse=True)
+def _locmem_cache(settings):
+    """Tes memakai cache memori: produksi memakai cache basis data bersama,
+    yang akan membuat tes tanpa akses basis data gagal saat menyentuh cache."""
+    settings.CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "simlahan-tes",
+        }
+    }
+
+
 @pytest.fixture()
 def admin_client(db, admin_user):
     """A Django test client logged in as an admin user.

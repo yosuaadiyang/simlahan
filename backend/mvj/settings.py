@@ -63,7 +63,7 @@ env = environ.Env(
     ADMINS=(list, []),
     DATABASE_URL=(str, "postgis:///simlahan"),
     DATABASE_PASSWORD=(str, ""),
-    CACHE_URL=(str, "locmemcache://"),
+    CACHE_URL=(str, "dbcache://simlahan_cache"),
     SENTRY_DSN=(str, ""),
     SENTRY_ENVIRONMENT=(str, ""),
     EMAIL_URL=(str, "consolemail://"),
@@ -215,6 +215,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "users.middleware.LoginThrottleMiddleware",
     "alokasi.middleware.ApplicantIsolationMiddleware",
     "users.middleware.OfficerOTPMiddleware",
     "operasi.lock.SystemLockMiddleware",
@@ -296,6 +297,9 @@ TRUST_PROXY_HEADERS = env.bool("TRUST_PROXY_HEADERS")
 # Jumlah reverse proxy tepercaya di depan Django yang masing-masing menambahkan
 # alamat ke X-Forwarded-For (compose bawaan: 1; nginx host + nginx kontainer: 2).
 TRUSTED_PROXY_COUNT = env.int("TRUSTED_PROXY_COUNT")
+# Pembatas percobaan DRF mengambil alamat klien dari X-Forwarded-For hanya
+# sebanyak proxy tepercaya; entri lain bisa dipalsukan untuk lolos dari batas.
+REST_FRAMEWORK["NUM_PROXIES"] = TRUSTED_PROXY_COUNT if TRUST_PROXY_HEADERS else 0
 if TRUST_PROXY_HEADERS:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     USE_X_FORWARDED_HOST = True
@@ -325,6 +329,9 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
     "UPDATE_LAST_LOGIN": True,
     "AUTH_HEADER_TYPES": ("Bearer",),
+    # Token memuat sidik kata sandi: setelah sandi diganti (di API, admin, atau
+    # reset), semua token lama otomatis ditolak.
+    "CHECK_REVOKE_TOKEN": True,
 }
 
 # OAuth2 untuk integrasi aplikasi lain (lihat users/oauth.py).

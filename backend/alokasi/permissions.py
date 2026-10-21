@@ -43,12 +43,15 @@ def _staff(admin, officer, verifier):
 
 
 ALOKASI_GROUP_MODEL_PERMISSIONS: GroupModelPermissions = {
-    AllocationSettings: _staff(VC, VC, V),
+    # Bobot kriteria & nilai minimum menentukan hasil verifikasi teknis, jadi
+    # hanya Administrator yang boleh mengubahnya (petugas yang memutuskan
+    # permohonan tidak boleh mengubah aturan penilaiannya sendiri).
+    AllocationSettings: _staff(VC, V, V),
     LandPlot: _staff(ALL, ALL, V),
     InfoPage: _staff(ALL, ALL, None),
     Applicant: _staff(VC, VC, V),
     RequirementDocType: _staff(ALL, ALL, V),
-    VerificationCriterion: _staff(ALL, ALL, V),
+    VerificationCriterion: _staff(ALL, V, V),
     Application: _staff(
         VC + ("verify_application", "decide_application"),
         VC + ("decide_application",),

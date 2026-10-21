@@ -1,5 +1,8 @@
+from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.relations import ManyRelatedField, PrimaryKeyRelatedField
 from rest_framework_gis.fields import GeometryField
 
 from leasing.validators import (
@@ -7,6 +10,13 @@ from leasing.validators import (
     validate_national_identification_number,
 )
 from pengadaan import enums
+from pengadaan.access import (
+    REQUESTING_AGENCY_DOCUMENT_TYPES,
+    is_project_scoped,
+    is_requesting_agency_only,
+    project_lookup_for,
+    scope_queryset,
+)
 from pengadaan.crypto import mask
 from pengadaan.models import (
     AcquisitionDocument,
@@ -30,7 +40,72 @@ from pengadaan.models import (
     RightsRelease,
     Valuation,
 )
+from pengadaan.status import is_parcel_settled
 from utils.money import fits, too_large_message
+
+
+def _request_user(serializer):
+    request = serializer.context.get("request")
+    return getattr(request, "user", None)
+
+
+def _has_perm(serializer, perm: str) -> bool:
+    user = _request_user(serializer)
+    return bool(user and user.is_authenticated and user.has_perm(perm))
+
+
+def _changed_fields(instance, attrs, fields=None) -> list[str]:
+    """Nama bidang di ``attrs`` yang nilainya berbeda dari ``instance``."""
+    if instance is None:
+        return []
+    names = attrs.keys() if fields is None else [f for f in fields if f in attrs]
+    return [name for name in names if attrs[name] != getattr(instance, name)]
+
+
+def _reject_changes(instance, attrs, fields, message):
+    """Tolak perubahan bidang yang hanya boleh diisi saat data dibuat."""
+    changed = _changed_fields(instance, attrs, fields)
+    if changed:
+        raise serializers.ValidationError({name: message for name in changed})
+
+
+class PengadaanModelSerializer(serializers.ModelSerializer):
+    """Dasar serializer pengadaan.
+
+    Bagi peran eksternal yang dibatasi per proyek (pengadaan.access), pilihan
+    relasi (proyek, bidang, pihak, dst.) dibatasi ke proyek yang ditugaskan,
+    sehingga data proyek lain tidak dapat dirujuk.
+    """
+
+    def get_fields(self):
+        fields = super().get_fields()
+        user = _request_user(self)
+        if user is None or not is_project_scoped(user):
+            return fields
+        for field in fields.values():
+            relation = (
+                field.child_relation if isinstance(field, ManyRelatedField) else field
+            )
+            if (
+                isinstance(relation, PrimaryKeyRelatedField)
+                and not relation.read_only
+                and relation.queryset is not None
+                and project_lookup_for(relation.queryset.model)
+            ):
+                relation.queryset = scope_queryset(relation.queryset, user)
+        return fields
+
+
+class NoticeMixin:
+    """Sertakan pemberitahuan (``notice``) pada respons setelah penyimpanan."""
+
+    notice = None
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if self.notice:
+            data["notice"] = str(self.notice)
+        return data
 
 
 class UserNameField(serializers.Field):
@@ -47,20 +122,20 @@ class UserNameField(serializers.Field):
         return user.get_display_name() if user is not None else None
 
 
-class HolidaySerializer(serializers.ModelSerializer):
+class HolidaySerializer(PengadaanModelSerializer):
     class Meta:
         model = Holiday
         fields = ("id", "date", "name", "is_collective_leave")
 
 
-class DeadlineRuleSerializer(serializers.ModelSerializer):
+class DeadlineRuleSerializer(PengadaanModelSerializer):
     class Meta:
         model = DeadlineRule
         fields = ("id", "code", "name", "amount", "unit", "legal_basis", "description")
         read_only_fields = ("code",)
 
 
-class AcquisitionMilestoneSerializer(serializers.ModelSerializer):
+class AcquisitionMilestoneSerializer(PengadaanModelSerializer):
     responsible_name = UserNameField("responsible")
 
     class Meta:
@@ -81,8 +156,55 @@ class AcquisitionMilestoneSerializer(serializers.ModelSerializer):
             "note",
         )
 
+    # Tonggak yang menjadi tanggung jawab Satgas Pengadaan Tanah. Pengguna yang
+    # boleh mengubah tetapi tidak boleh menambah tonggak (grup Satgas) hanya
+    # dapat memperbarui status, tanggal realisasi dan catatan tonggak ini;
+    # rencana, penanggung jawab dan tonggak lain dikelola Pelaksana.
+    TASK_FORCE_CODES = frozenset(
+        {
+            "inventory",
+            "inventory_announcement",
+            "inventory_verification",
+            "deliberation",
+            "release",
+        }
+    )
+    TASK_FORCE_FIELDS = frozenset({"status", "actual_date", "note"})
 
-class AcquisitionProjectSerializer(serializers.ModelSerializer):
+    def validate(self, attrs):
+        instance = self.instance
+        _reject_changes(
+            instance,
+            attrs,
+            ("project", "stage", "code"),
+            _("This cannot be changed after the milestone has been created."),
+        )
+        if instance is not None and not _has_perm(
+            self, "pengadaan.add_acquisitionmilestone"
+        ):
+            if instance.code not in self.TASK_FORCE_CODES:
+                raise PermissionDenied(
+                    _("This milestone is managed by the implementing team.")
+                )
+            changed = [
+                name
+                for name in _changed_fields(instance, attrs)
+                if name not in self.TASK_FORCE_FIELDS
+            ]
+            if changed:
+                raise serializers.ValidationError(
+                    {
+                        name: _(
+                            "Only the status, actual date and note of this "
+                            "milestone can be changed."
+                        )
+                        for name in changed
+                    }
+                )
+        return attrs
+
+
+class AcquisitionProjectSerializer(PengadaanModelSerializer):
     executing_chair_name = UserNameField("executing_chair")
     municipality_name = serializers.CharField(
         source="municipality.name", read_only=True, default=None
@@ -91,6 +213,16 @@ class AcquisitionProjectSerializer(serializers.ModelSerializer):
     ptun_filing_deadline = serializers.DateField(read_only=True)
     parcel_count = serializers.IntegerField(read_only=True, required=False)
     geometry = GeometryField(required=False, allow_null=True)
+    assigned_users = serializers.PrimaryKeyRelatedField(
+        many=True,
+        required=False,
+        queryset=get_user_model().objects.all(),
+        label=_("Assigned users"),
+        help_text=_(
+            "Land appraisers and users of the agency requiring the land only see "
+            "the projects they are assigned to."
+        ),
+    )
 
     class Meta:
         model = AcquisitionProject
@@ -130,10 +262,19 @@ class AcquisitionProjectSerializer(serializers.ModelSerializer):
             "target_completion_date",
             "geometry",
             "parcel_count",
+            "assigned_users",
             "created_at",
             "modified_at",
         )
         read_only_fields = ("identifier", "created_at", "modified_at")
+
+    def get_fields(self):
+        fields = super().get_fields()
+        user = _request_user(self)
+        # Peran eksternal tidak perlu tahu siapa saja yang ditugaskan.
+        if user is not None and is_project_scoped(user):
+            fields.pop("assigned_users", None)
+        return fields
 
     def validate(self, attrs):
         start = attrs.get("start_date", getattr(self.instance, "start_date", None))
@@ -162,7 +303,7 @@ class AcquisitionProjectSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class AcquisitionParcelSerializer(serializers.ModelSerializer):
+class AcquisitionParcelSerializer(PengadaanModelSerializer):
     district_name = serializers.CharField(
         source="district.name", read_only=True, default=None
     )
@@ -207,6 +348,13 @@ class AcquisitionParcelSerializer(serializers.ModelSerializer):
             "modified_at",
         )
         read_only_fields = ("status", "created_at", "modified_at")
+
+    def get_fields(self):
+        fields = super().get_fields()
+        # Nama pihak hanya untuk peran yang boleh melihat pihak yang berhak.
+        if not _has_perm(self, "pengadaan.view_entitledparty"):
+            fields.pop("party_names", None)
+        return fields
 
     def get_party_names(self, obj):
         return ", ".join(p.name for p in obj.parties.all())
@@ -257,6 +405,23 @@ class AcquisitionParcelSerializer(serializers.ModelSerializer):
         return attrs
 
 
+def reset_validation(compensations) -> int:
+    """Kembalikan ganti kerugian tervalidasi ke status ditetapkan.
+
+    Disimpan satu per satu agar perubahan tercatat di log audit.
+    """
+    count = 0
+    for compensation in compensations:
+        compensation.status = enums.CompensationStatus.DETERMINED
+        compensation.validated_on = None
+        compensation.validated_by = None
+        compensation.save(
+            update_fields=["status", "validated_on", "validated_by", "modified_at"]
+        )
+        count += 1
+    return count
+
+
 class SensitiveDataMixin:
     """Menyamarkan NIK/rekening kecuali pengguna berhak melihat data pribadi."""
 
@@ -280,8 +445,11 @@ class SensitiveDataMixin:
         return data
 
 
-class EntitledPartySerializer(SensitiveDataMixin, serializers.ModelSerializer):
+class EntitledPartySerializer(
+    NoticeMixin, SensitiveDataMixin, PengadaanModelSerializer
+):
     sensitive_fields = ("nik", "bank_account_number")
+    BANK_FIELDS = ("bank_name", "bank_account_number", "bank_account_holder")
     parcel_number = serializers.CharField(source="parcel.parcel_number", read_only=True)
     project = serializers.IntegerField(source="parcel.project_id", read_only=True)
 
@@ -344,8 +512,25 @@ class EntitledPartySerializer(SensitiveDataMixin, serializers.ModelSerializer):
                 )
         return attrs
 
+    def update(self, instance, validated_data):
+        bank_changed = bool(_changed_fields(instance, validated_data, self.BANK_FIELDS))
+        instance = super().update(instance, validated_data)
+        if bank_changed:
+            # Validasi Ketua Pelaksana mencakup rekening tujuan pembayaran:
+            # rekening berubah berarti validasi harus diulang.
+            count = reset_validation(
+                instance.compensations.filter(status=enums.CompensationStatus.VALIDATED)
+            )
+            if count:
+                self.notice = _(
+                    "Bank details changed: %(count)d validated compensation(s) of "
+                    "this party were returned to determined and must be validated "
+                    "again by the executing chair."
+                ) % {"count": count}
+        return instance
 
-class ParcelSurveySerializer(serializers.ModelSerializer):
+
+class ParcelSurveySerializer(PengadaanModelSerializer):
     surveyor_name = UserNameField("surveyor")
     parcel_number = serializers.CharField(source="parcel.parcel_number", read_only=True)
 
@@ -367,7 +552,7 @@ class ParcelSurveySerializer(serializers.ModelSerializer):
         )
 
 
-class InventoryItemSerializer(serializers.ModelSerializer):
+class InventoryItemSerializer(PengadaanModelSerializer):
     parcel_number = serializers.CharField(source="parcel.parcel_number", read_only=True)
     # Pemilik boleh kosong; field metode agar tetap ada juga pada respons PATCH.
     party_name = serializers.SerializerMethodField()
@@ -406,7 +591,7 @@ class InventoryItemSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class AnnouncementSerializer(serializers.ModelSerializer):
+class AnnouncementSerializer(PengadaanModelSerializer):
     period_ends_on = serializers.DateField(read_only=True)
     objection_deadline = serializers.DateField(read_only=True)
 
@@ -425,7 +610,7 @@ class AnnouncementSerializer(serializers.ModelSerializer):
         )
 
 
-class ValuationSerializer(serializers.ModelSerializer):
+class ValuationSerializer(PengadaanModelSerializer):
     parcel_number = serializers.CharField(source="parcel.parcel_number", read_only=True)
     deliberation_deadline = serializers.DateField(read_only=True)
 
@@ -454,7 +639,34 @@ class ValuationSerializer(serializers.ModelSerializer):
         )
         read_only_fields = ("total_value",)
 
+    def _check_locked(self, attrs):
+        """Penilaian final tidak dapat diubah; revisi dicatat sebagai penilaian baru.
+
+        Satu-satunya perubahan yang diizinkan adalah menandai penilaian final
+        sebagai direvisi (beserta catatannya) setelah penilaian pengganti dibuat.
+        """
+        instance = self.instance
+        if instance is None or instance.status not in (
+            enums.ValuationStatus.FINAL,
+            enums.ValuationStatus.REVISED,
+        ):
+            return
+        changed = set(_changed_fields(instance, attrs))
+        marking_revised = (
+            instance.status == enums.ValuationStatus.FINAL
+            and attrs.get("status") == enums.ValuationStatus.REVISED
+        )
+        allowed = {"status", "note"} if marking_revised else set()
+        if changed - allowed:
+            raise serializers.ValidationError(
+                _(
+                    "A final valuation cannot be changed. Record a new valuation to "
+                    "revise it."
+                )
+            )
+
     def validate(self, attrs):
+        self._check_locked(attrs)
         for field in (
             "value_land",
             "value_space",
@@ -478,7 +690,7 @@ class ValuationSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class DeliberationResultSerializer(serializers.ModelSerializer):
+class DeliberationResultSerializer(PengadaanModelSerializer):
     parcel_number = serializers.CharField(source="parcel.parcel_number", read_only=True)
     party_name = serializers.CharField(
         source="party.name", read_only=True, default=None
@@ -521,7 +733,7 @@ class DeliberationResultSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class DeliberationSerializer(serializers.ModelSerializer):
+class DeliberationSerializer(PengadaanModelSerializer):
     chaired_by_name = UserNameField("chaired_by")
     result_count = serializers.SerializerMethodField()
 
@@ -543,7 +755,7 @@ class DeliberationSerializer(serializers.ModelSerializer):
         return obj.results.count()
 
 
-class ObjectionSerializer(serializers.ModelSerializer):
+class ObjectionSerializer(PengadaanModelSerializer):
     parcel_number = serializers.CharField(
         source="parcel.parcel_number", read_only=True, default=None
     )
@@ -594,7 +806,7 @@ class ObjectionSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class ConsignmentSerializer(serializers.ModelSerializer):
+class ConsignmentSerializer(PengadaanModelSerializer):
     parcel_number = serializers.CharField(source="parcel.parcel_number", read_only=True)
     party_name = serializers.CharField(
         source="party.name", read_only=True, default=None
@@ -622,8 +834,17 @@ class ConsignmentSerializer(serializers.ModelSerializer):
             "note",
         )
 
+    def validate(self, attrs):
+        parcel = attrs.get("parcel", getattr(self.instance, "parcel", None))
+        party = attrs.get("party", getattr(self.instance, "party", None))
+        if party and parcel and party.parcel_id != parcel.id:
+            raise serializers.ValidationError(
+                {"party": _("Party does not belong to the selected parcel.")}
+            )
+        return attrs
 
-class CompensationPaymentSerializer(serializers.ModelSerializer):
+
+class CompensationPaymentSerializer(PengadaanModelSerializer):
     class Meta:
         model = CompensationPayment
         fields = (
@@ -671,7 +892,7 @@ class CompensationPaymentSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class CompensationSerializer(serializers.ModelSerializer):
+class CompensationSerializer(NoticeMixin, PengadaanModelSerializer):
     parcel_number = serializers.CharField(source="parcel.parcel_number", read_only=True)
     party_name = serializers.CharField(
         source="party.name", read_only=True, default=None
@@ -708,25 +929,99 @@ class CompensationSerializer(serializers.ModelSerializer):
             "payments",
             "note",
         )
-        read_only_fields = ("validated_on", "validated_by")
+        # Status hanya berubah lewat aksi (validate, cancel, deliver) serta
+        # pencatatan pembayaran/konsinyasi; ganti kerugian baru selalu
+        # berstatus "ditetapkan".
+        read_only_fields = ("status", "validated_on", "validated_by")
 
-    def validate(self, attrs):
-        parcel = attrs.get("parcel", getattr(self.instance, "parcel", None))
-        party = attrs.get("party", getattr(self.instance, "party", None))
+    LOCKED_STATUSES = (
+        enums.CompensationStatus.PAID,
+        enums.CompensationStatus.CONSIGNED,
+        enums.CompensationStatus.CANCELLED,
+    )
+
+    def validate(self, attrs):  # noqa: C901
+        instance = self.instance
+        if instance is not None and instance.status in self.LOCKED_STATUSES:
+            if [f for f in _changed_fields(instance, attrs) if f != "note"]:
+                raise serializers.ValidationError(
+                    _(
+                        "Paid, consigned or cancelled compensation cannot be "
+                        "changed; only the note can be edited."
+                    )
+                )
+        parcel = attrs.get("parcel", getattr(instance, "parcel", None))
+        party = attrs.get("party", getattr(instance, "party", None))
         if party and parcel and party.parcel_id != parcel.id:
             raise serializers.ValidationError(
                 {"party": _("Party does not belong to the selected parcel.")}
             )
-        amount = attrs.get("amount", getattr(self.instance, "amount", None))
-        form = attrs.get("form", getattr(self.instance, "form", None))
+        valuation = attrs.get("valuation", getattr(instance, "valuation", None))
+        if valuation and parcel and valuation.parcel_id != parcel.id:
+            raise serializers.ValidationError(
+                {"valuation": _("Valuation does not belong to the selected parcel.")}
+            )
+        result = attrs.get(
+            "deliberation_result", getattr(instance, "deliberation_result", None)
+        )
+        if result and parcel and result.parcel_id != parcel.id:
+            raise serializers.ValidationError(
+                {
+                    "deliberation_result": _(
+                        "Deliberation result does not belong to the selected parcel."
+                    )
+                }
+            )
+        decision = attrs.get(
+            "court_decision", getattr(instance, "court_decision", None)
+        )
+        if (
+            decision
+            and parcel
+            and (
+                decision.project_id != parcel.project_id
+                or (decision.parcel_id and decision.parcel_id != parcel.id)
+            )
+        ):
+            raise serializers.ValidationError(
+                {
+                    "court_decision": _(
+                        "Court decision does not concern the selected parcel."
+                    )
+                }
+            )
+        amount = attrs.get("amount", getattr(instance, "amount", None))
+        form = attrs.get("form", getattr(instance, "form", None))
         if form == enums.CompensationForm.MONEY and (amount is None or amount <= 0):
             raise serializers.ValidationError(
                 {"amount": _("Monetary compensation must be greater than zero.")}
             )
+        if instance is not None and amount is not None:
+            if amount < instance.paid_amount:
+                raise serializers.ValidationError(
+                    {"amount": _("Amount cannot be less than what has been paid.")}
+                )
         return attrs
 
+    def update(self, instance, validated_data):
+        if instance.status == enums.CompensationStatus.VALIDATED and [
+            f for f in _changed_fields(instance, validated_data) if f != "note"
+        ]:
+            # Validasi berlaku untuk nilai, pihak dan bentuk yang divalidasi:
+            # setiap perubahan mengharuskan validasi ulang oleh Ketua Pelaksana.
+            validated_data.update(
+                status=enums.CompensationStatus.DETERMINED,
+                validated_on=None,
+                validated_by=None,
+            )
+            self.notice = _(
+                "The compensation was changed after validation and was returned "
+                "to determined; it must be validated again by the executing chair."
+            )
+        return super().update(instance, validated_data)
 
-class RightsReleaseSerializer(serializers.ModelSerializer):
+
+class RightsReleaseSerializer(PengadaanModelSerializer):
     parcel_number = serializers.CharField(source="parcel.parcel_number", read_only=True)
     party_name = serializers.CharField(
         source="party.name", read_only=True, default=None
@@ -749,33 +1044,32 @@ class RightsReleaseSerializer(serializers.ModelSerializer):
         )
 
     def validate(self, attrs):
+        # Bidang tidak dapat dipindah: syarat pelunasan diperiksa untuk bidang
+        # saat pelepasan hak dicatat.
+        _reject_changes(
+            self.instance,
+            attrs,
+            ("parcel",),
+            _("The parcel of a rights release cannot be changed."),
+        )
         parcel = attrs.get("parcel", getattr(self.instance, "parcel", None))
-        if parcel is not None and self.instance is None:
-            has_settlement = (
-                parcel.compensations.filter(
-                    status__in=[
-                        enums.CompensationStatus.PAID,
-                        enums.CompensationStatus.CONSIGNED,
-                    ]
-                ).exists()
-                or parcel.consignments.filter(
-                    status__in=[
-                        enums.ConsignmentStatus.DEPOSITED,
-                        enums.ConsignmentStatus.COLLECTED,
-                    ]
-                ).exists()
+        party = attrs.get("party", getattr(self.instance, "party", None))
+        if party and parcel and party.parcel_id != parcel.id:
+            raise serializers.ValidationError(
+                {"party": _("Party does not belong to the selected parcel.")}
             )
-            if not has_settlement:
+        if parcel is not None and self.instance is None:
+            if not is_parcel_settled(parcel):
                 raise serializers.ValidationError(
                     _(
-                        "Rights can only be released after compensation has been paid "
-                        "or consigned to the court."
+                        "Rights can only be released after all compensation of the "
+                        "parcel has been paid or consigned to the court."
                     )
                 )
         return attrs
 
 
-class HandoverSerializer(serializers.ModelSerializer):
+class HandoverSerializer(PengadaanModelSerializer):
     registration_deadline = serializers.DateField(read_only=True)
 
     class Meta:
@@ -810,7 +1104,7 @@ class HandoverSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class AffectedHouseholdSerializer(SensitiveDataMixin, serializers.ModelSerializer):
+class AffectedHouseholdSerializer(SensitiveDataMixin, PengadaanModelSerializer):
     sensitive_fields = ("nik", "family_card_number")
     parcel_number = serializers.CharField(
         source="parcel.parcel_number", read_only=True, default=None
@@ -852,7 +1146,7 @@ class AffectedHouseholdSerializer(SensitiveDataMixin, serializers.ModelSerialize
         return value
 
 
-class AcquisitionDocumentSerializer(serializers.ModelSerializer):
+class AcquisitionDocumentSerializer(PengadaanModelSerializer):
     uploaded_by_name = UserNameField("uploaded_by")
     file_name = serializers.SerializerMethodField()
 
@@ -879,6 +1173,44 @@ class AcquisitionDocumentSerializer(serializers.ModelSerializer):
 
     def get_file_name(self, obj):
         return obj.file.name.rsplit("/", 1)[-1] if obj.file else None
+
+    def validate(self, attrs):
+        instance = self.instance
+        project = attrs.get("project", getattr(instance, "project", None))
+        parcel = attrs.get("parcel", getattr(instance, "parcel", None))
+        party = attrs.get("party", getattr(instance, "party", None))
+        if parcel and project and parcel.project_id != project.id:
+            raise serializers.ValidationError(
+                {"parcel": _("Parcel does not belong to the selected project.")}
+            )
+        if party and parcel and party.parcel_id != parcel.id:
+            raise serializers.ValidationError(
+                {"party": _("Party does not belong to the selected parcel.")}
+            )
+        if party and project and party.parcel.project_id != project.id:
+            raise serializers.ValidationError(
+                {"party": _("Party does not belong to the selected project.")}
+            )
+        user = _request_user(self)
+        if user is not None and is_requesting_agency_only(user):
+            # Instansi pemohon hanya mengunggah dokumen dari pihaknya sendiri
+            # (lihat REQUESTING_AGENCY_DOCUMENT_TYPES), tanpa data pribadi pihak.
+            document_type = attrs.get(
+                "document_type", getattr(instance, "document_type", None)
+            )
+            if document_type not in REQUESTING_AGENCY_DOCUMENT_TYPES:
+                raise serializers.ValidationError(
+                    {
+                        "document_type": _(
+                            "Your role cannot upload this type of document."
+                        )
+                    }
+                )
+            if party is not None:
+                raise serializers.ValidationError(
+                    {"party": _("Your role cannot attach documents to a party.")}
+                )
+        return attrs
 
     def validate_file(self, value):
         from file_operations.viewsets.mixins import MAX_FILE_SIZE_BYTES

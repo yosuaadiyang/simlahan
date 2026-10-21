@@ -64,9 +64,12 @@ def test_full_allocation_flow(filled_application, officer, verifier, seeded):
     assert application.status == S.APPROVED  # masih ada tagihan administrasi
 
     fee = invoices[enums.InvoiceKind.ALLOCATION_FEE]
-    services.verify_payment(
-        fee, officer
-    )  # petugas boleh memverifikasi pembayaran tanpa unggahan
+    # Tanpa unggahan bukti, petugas wajib mencatat dasar pelunasannya.
+    with pytest.raises(ValidationError, match="Belum ada bukti bayar"):
+        services.verify_payment(fee, officer)
+    services.verify_payment(fee, officer, "Rekening koran 20-10-2026")
+    fee.refresh_from_db()
+    assert fee.note == "Rekening koran 20-10-2026"
     application.refresh_from_db()
     assert application.status == S.ISSUED
 
@@ -254,7 +257,20 @@ def test_transfer_flow(
         services.create_transfer_application(holder, allocation, recipient, "lagi")
     upload_required_docs(transfer)
     services.submit(transfer, holder.user)
-    transfer = approve_and_pay(transfer, officer, verifier)
+    # Petugas tidak boleh menyetujui sebelum penerima hak menyetujui.
+    services.start_verification(transfer, officer)
+    with pytest.raises(ValidationError, match="Penerima hak belum"):
+        services.approve(transfer, officer)
+    with pytest.raises(ValidationError, match="Hanya penerima hak"):
+        services.accept_transfer(transfer, holder, holder.user)
+    services.accept_transfer(transfer, recipient, recipient.user)
+    with pytest.raises(ValidationError, match="sudah Anda setujui"):
+        services.accept_transfer(transfer, recipient, recipient.user)
+    services.approve(transfer, officer, "Memenuhi syarat.")
+    for invoice in transfer.invoices.all():
+        services.upload_payment_proof(invoice, pdf_file("bukti.pdf"), holder.user)
+        services.verify_payment(invoice, officer)
+    transfer.refresh_from_db()
     assert transfer.status == S.ISSUED
 
     fee = transfer.invoices.get()

@@ -77,6 +77,11 @@ urlpatterns = [
         name="application_submit",
     ),
     path(
+        "permohonan/<str:number>/terima/",
+        views.application_accept_transfer,
+        name="application_accept_transfer",
+    ),
+    path(
         "permohonan/<str:number>/batal/",
         views.application_cancel,
         name="application_cancel",

@@ -2191,6 +2191,17 @@ class MapShare(TimeStampedModel):
     show_owner_names = models.BooleanField(
         _("Tampilkan nama pemegang hak"), default=False
     )
+    service_unit = models.ForeignKey(
+        "leasing.ServiceUnit",
+        verbose_name=_("Unit layanan / lokasi"),
+        related_name="+",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        help_text=_(
+            "Petugas unit ini dapat melihat tautan. Kosong = hanya pembuat dan Administrator."
+        ),
+    )
     expires_at = models.DateTimeField(
         _("Berlaku sampai"), default=_default_share_expiry
     )
@@ -2325,13 +2336,17 @@ class FieldReport(TimeStampedModel):
         if self.asset_id is None and self.location is not None:
             from asetlahan.geo import asset_at
 
-            self.asset = asset_at(self.location)
+            # Hanya aset di unit layanan pelapor: laporan tidak boleh masuk ke
+            # (dan membocorkan) aset unit lain.
+            self.asset = asset_at(self.location, self.reported_by)
         if self.service_unit_id is None and self.asset_id:
             self.service_unit_id = self.asset.service_unit_id
         super().save(*args, **kwargs)
         if self.asset_id and self.captured_at:
-            # Laporan lapangan = bukti aset sudah dipantau.
-            captured_on = timezone.localtime(self.captured_at).date()
+            # Laporan lapangan = bukti aset sudah dipantau. Waktu rekam dari
+            # perangkat tidak dipercaya melebihi waktu laporan diterima server.
+            received = self.created_at or timezone.now()
+            captured_on = timezone.localtime(min(self.captured_at, received)).date()
             LandAsset.objects.filter(pk=self.asset_id).filter(
                 models.Q(last_monitored_on__isnull=True)
                 | models.Q(last_monitored_on__lt=captured_on)

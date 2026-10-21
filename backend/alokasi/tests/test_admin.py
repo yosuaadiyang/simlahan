@@ -131,9 +131,16 @@ def test_admin_process_flow(client, officer, verifier, filled_application):
     assert invoice.status == enums.InvoiceStatus.UNPAID
     pdf = client.get(reverse("admin:alokasi_invoice_pdf", args=[invoice.pk]))
     assert pdf.content.startswith(b"%PDF")
+    # Tanpa bukti bayar, pelunasan wajib disertai dasar pelunasannya.
+    client.post(
+        reverse("admin:alokasi_invoice_verify", args=[invoice.pk]), {"note": ""}
+    )
+    invoice.refresh_from_db()
+    assert invoice.status == enums.InvoiceStatus.UNPAID
     for inv in application.invoices.all():
         client.post(
-            reverse("admin:alokasi_invoice_verify", args=[inv.pk]), {"note": ""}
+            reverse("admin:alokasi_invoice_verify", args=[inv.pk]),
+            {"note": "Rekening koran 20-10-2026"},
         )
     application.refresh_from_db()
     assert application.status == S.ISSUED

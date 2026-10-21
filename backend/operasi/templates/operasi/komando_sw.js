@@ -1,4 +1,7 @@
-/* Service worker pusat komando: cangkang aplikasi, lapisan peta, dan ubin peta tersedia luring. */
+/* Service worker pusat komando: cangkang aplikasi, lapisan peta, dan ubin peta tersedia luring.
+ * Data pribadi: berkas (/komando/berkas/), API selain lapisan peta, dan halaman lain tidak
+ * pernah disimpan. Halaman utama & lapisan peta dihapus saat sesi berakhir (dialihkan ke
+ * halaman masuk / 401 / 403), saat keluar, atau saat pengguna berganti (lihat komando.js). */
 "use strict";
 var VERSION = {{ version|safe }};
 var SHELL = {{ shell|safe }};
@@ -25,9 +28,27 @@ self.addEventListener("activate", function (event) {
   }).then(function () { return self.clients.claim(); }));
 });
 
+function purgePersonal() {
+  // Lapisan peta & halaman utama (berisi konfigurasi pengguna) dari sesi sebelumnya.
+  return caches.keys().then(function (keys) {
+    return Promise.all(keys.map(function (key) {
+      if (key.indexOf("komando-data-") === 0) { return caches.delete(key); }
+      if (key.indexOf("komando-shell-") === 0) {
+        return caches.open(key).then(function (cache) { return cache.delete(SHELL[0], { ignoreSearch: true }); });
+      }
+      return null;
+    }));
+  });
+}
+
 function networkFirst(request, cacheName) {
   return fetch(request).then(function (response) {
-    if (response.ok && !response.redirected) {
+    if (response.redirected || response.status === 401 || response.status === 403) {
+      // Sesi berakhir / pengguna lain: jangan sisakan data pengguna sebelumnya.
+      purgePersonal();
+      return response;
+    }
+    if (response.ok) {
       var copy = response.clone();
       caches.open(cacheName).then(function (cache) { cache.put(request, copy); });
     }
@@ -76,7 +97,8 @@ self.addEventListener("fetch", function (event) {
     return;
   }
   if (url.origin !== self.location.origin) { return; }
-  if (request.mode === "navigate" || url.pathname === SHELL[0]) {
+  if (url.pathname === SHELL[0]) {
+    // Hanya halaman utama; navigasi lain (mis. berkas privat) tidak disimpan.
     event.respondWith(networkFirst(request, SHELL_CACHE));
   } else if (url.pathname.indexOf(LAYER_PREFIX) === 0) {
     event.respondWith(networkFirst(request, DATA_CACHE));

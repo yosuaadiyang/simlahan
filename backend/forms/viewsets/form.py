@@ -83,6 +83,7 @@ class AnswerViewSet(viewsets.ModelViewSet):
         "PUT": ["forms.change_answer"],
         "PATCH": ["forms.change_answer"],
         "DELETE": ["forms.delete_answer"],
+        "POST": ["forms.add_answer"],
     }
     filter_backends = (DjangoFilterBackend, AnswerInBBoxFilter)
     filterset_class = AnswerFilterSet
@@ -104,9 +105,19 @@ class AnswerViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def get_queryset(self):
-        if self.action == "retrieve":
-            return Answer.objects.all()
-        return super().get_queryset()
+        queryset = (
+            Answer.objects.all()
+            if self.action == "retrieve"
+            else super().get_queryset()
+        )
+        user = self.request.user
+        if user.has_perm("forms.view_answer"):
+            return queryset
+        # Penyusun pencarian lahan tanpa izin model hanya melihat jawaban atas
+        # pencarian yang ia susun.
+        return queryset.filter(
+            statuses__plot_search_target__plot_search__preparers=user
+        ).distinct()
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -151,6 +162,7 @@ class AttachmentViewSet(FileDownloadMixin, viewsets.ModelViewSet):
         "PUT": ["forms.change_attachment"],
         "PATCH": ["forms.change_attachment"],
         "DELETE": ["forms.delete_attachment"],
+        "POST": ["forms.add_attachment"],
     }
 
     def get_queryset(self):
@@ -182,6 +194,8 @@ class AttachmentPublicViewSet(FileExtensionFileMixin, AttachmentViewSet):
     """Includes FileExtensionFileMixin to validate file extensions."""
 
     serializer_class = AttachmentPublicSerializer
+    # Pengguna publik mengunggah lampirannya sendiri tanpa izin model.
+    perms_map = {**AttachmentViewSet.perms_map, "POST": []}
 
     def destroy(self, request, *args, **kwargs):
         raise MethodNotAllowed("DELETE")

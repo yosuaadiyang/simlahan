@@ -183,3 +183,19 @@ def test_youtube_embed():
     assert page.youtube_embed_url == ""
     page.video_url = "https://youtu.be/<script>"
     assert page.youtube_embed_url == ""
+
+
+@pytest.mark.django_db
+def test_ensure_groups_recreates_every_role_group():
+    from django.contrib.auth.models import Group
+
+    from alokasi.setup import GROUP_NAMES
+    from utils.group_permissions import UserGroup
+
+    assert set(GROUP_NAMES) == set(UserGroup)
+    Group.objects.filter(pk__in=[UserGroup.PAAKAYTTAJA, UserGroup.PENILAI]).delete()
+    created = ensure_groups()
+    assert {UserGroup.PAAKAYTTAJA, UserGroup.PENILAI} <= set(created)
+    assert Group.objects.filter(pk__in=list(UserGroup)).count() == len(UserGroup)
+    assert Group.objects.get(pk=UserGroup.PAAKAYTTAJA).name == "Administrator"
+    assert ensure_groups() == []

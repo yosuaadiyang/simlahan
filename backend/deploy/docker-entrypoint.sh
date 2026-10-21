@@ -30,6 +30,8 @@ case "$1" in
         if [[ "${APPLY_MIGRATIONS:-1}" = "1" ]]; then
             python manage.py migrate --noinput
         fi
+        # Tabel cache bersama (pembatas percobaan login, kunci darurat komando).
+        python manage.py createcachetable
         if [[ "${RUN_BOOTSTRAP:-1}" = "1" ]]; then
             python manage.py simlahan_bootstrap
         fi

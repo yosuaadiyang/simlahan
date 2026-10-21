@@ -20,19 +20,38 @@ from .models import (
 )
 
 
+class SuperuserWriteAdmin:
+    """Hanya superuser yang boleh membuat, mengubah, atau menghapus.
+
+    Perintah bertipe "executable" menjalankan program di server, jadi izin
+    model biasa (mis. Administrator) tidak cukup untuk mengubahnya.
+    """
+
+    def has_add_permission(self, request: HttpRequest, *args, **kwargs) -> bool:
+        return request.user.is_superuser
+
+    def has_change_permission(self, request: HttpRequest, obj=None) -> bool:
+        return request.user.is_superuser
+
+    def has_delete_permission(self, request: HttpRequest, obj=None) -> bool:
+        return request.user.is_superuser
+
+
 @admin.register(Command)
-class CommandAdmin(admin.ModelAdmin[Command]):
+class CommandAdmin(SuperuserWriteAdmin, admin.ModelAdmin[Command]):
     list_display = ["type", "name"]
     exclude = ["parameters"]
 
 
 @admin.register(Job)
-class JobAdmin(admin.ModelAdmin[Job]):
+class JobAdmin(SuperuserWriteAdmin, admin.ModelAdmin[Job]):
     list_display = ["name", "comment", "command"]
 
 
 @admin.register(JobHistoryRetentionPolicy)
-class JobHistoryRetentionPolicyAdmin(admin.ModelAdmin[JobHistoryRetentionPolicy]):
+class JobHistoryRetentionPolicyAdmin(
+    SuperuserWriteAdmin, admin.ModelAdmin[JobHistoryRetentionPolicy]
+):
     list_display = [
         "identifier",
         "compact_logs_delay",
@@ -126,7 +145,7 @@ class JobRunQueueItemAdmin(ReadOnlyAdmin[JobRunQueueItem]):
 
 
 @admin.register(ScheduledJob)
-class ScheduledJobAdmin(admin.ModelAdmin[ScheduledJob]):
+class ScheduledJobAdmin(SuperuserWriteAdmin, admin.ModelAdmin[ScheduledJob]):
     list_display = [
         "job",
         "enabled",

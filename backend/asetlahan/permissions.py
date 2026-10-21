@@ -2,7 +2,9 @@
 
 Diterapkan dengan ``python manage.py set_group_model_permissions`` (otomatis
 lewat ``simlahan_bootstrap``). Hanya grup yang bekerja di panel /admin/ yang
-diberi izin, karena anggota grup lain bukan staf.
+diberi izin, karena anggota grup lain bukan staf. Perintah itu menghapus dulu
+seluruh izin model ini dari grup bawaan lalu memasang ulang matriks di bawah,
+sehingga izin yang dicabut dari matriks ikut hilang saat deploy.
 """
 
 from asetlahan.models import (
@@ -72,10 +74,11 @@ ASETLAHAN_GROUP_MODEL_PERMISSIONS: GroupModelPermissions = {
     HeirMember: _perms(ALL, ALL, V),
     Stakeholder: _perms(ALL, ALL, V),
     StakeholderEngagement: _perms(ALL, ALL, V),
-    AssetValuation: _perms(ALL, ALL, V),
-    ValuationItem: _perms(ALL, ALL, V),
-    TaxObligation: _perms(ALL, ALL, V),
-    LandTransaction: _perms(ALL, VAC, V),
+    # Penilaian, pajak & transaksi: urusan keuangan, bukan Petugas Hukum.
+    AssetValuation: _perms(ALL, ALL),
+    ValuationItem: _perms(ALL, ALL),
+    TaxObligation: _perms(ALL, ALL),
+    LandTransaction: _perms(ALL, VAC),
     ResettlementSite: _perms(ALL, ALL, None, V),
     ResettlementUnit: _perms(ALL, ALL, None, V),
     Advocate: _perms(ALL, V, ALL),
@@ -88,11 +91,12 @@ ASETLAHAN_GROUP_MODEL_PERMISSIONS: GroupModelPermissions = {
     Facilitator: _perms(ALL, ALL, V),
     LiaisonActivity: _perms(ALL, ALL, VAC),
     Task: _perms(ALL, ALL, VAC, VC, VAC),
+    # Petugas Hukum menindaklanjuti pengaduan bermuatan sengketa/hukum.
     Grievance: _perms(ALL, ALL, VC, VC),
     Tender: _perms(ALL, ALL),
     Bid: _perms(VC, VC),
     Document: _perms(ALL, ALL, ALL, VA),
-    MapShare: _perms(ALL, ALL, VA),
+    MapShare: _perms(ALL, ALL),
     MapOverlay: _perms(ALL, ALL, V, V),
     MapOverlayFeature: _perms(ALL, ALL, V, V),
     FieldReport: _perms(ALL, VAC, V, VA),

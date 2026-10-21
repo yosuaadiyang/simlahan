@@ -116,6 +116,14 @@ ABSENCE_STATUSES = [
 ]
 
 
+class LeaveApproval(models.TextChoices):
+    """Persetujuan pengajuan izin / sakit / cuti / dinas luar oleh koordinator."""
+
+    PENDING = "menunggu", _("Menunggu persetujuan")
+    APPROVED = "disetujui", _("Disetujui")
+    REJECTED = "ditolak", _("Ditolak")
+
+
 class SosStatus(models.TextChoices):
     ACTIVE = "aktif", _("Aktif – butuh bantuan")
     ACKNOWLEDGED = "ditangani", _("Sedang ditangani")
