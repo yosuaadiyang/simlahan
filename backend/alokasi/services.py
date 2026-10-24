@@ -305,7 +305,7 @@ def _notify_recipient_to_accept(application: Application) -> None:
         application.recipient,
         _("Persetujuan peralihan hak %s") % application.number,
         _(
-            "%(holder)s mengajukan peralihan hak alokasi KPT %(kpt)s kepada Anda. "
+            "%(holder)s mengajukan peralihan hak alokasi %(kpt)s kepada Anda. "
             "Peralihan baru dapat diproses setelah Anda menyetujuinya di %(url)s"
         )
         % {
@@ -521,7 +521,7 @@ def _create_invoices(  # noqa: C901
                 (
                     enums.InvoiceKind.UWT,
                     _(
-                        "UWT KPT %(kpt)s periode %(service)s: "
+                        "UWT %(kpt)s periode %(service)s: "
                         "%(area)s m² × Rp%(rate)s × %(years)s tahun"
                     )
                     % {
@@ -538,7 +538,7 @@ def _create_invoices(  # noqa: C901
             items.append(
                 (
                     enums.InvoiceKind.EXTENSION_FEE,
-                    _("Biaya administrasi %s KPT %s")
+                    _("Biaya administrasi %s %s")
                     % (
                         application.get_service_type_display(),
                         allocation.kpt_number,
@@ -551,7 +551,7 @@ def _create_invoices(  # noqa: C901
             items.append(
                 (
                     enums.InvoiceKind.SERVICE_FEE,
-                    _("Biaya administrasi %s KPT %s")
+                    _("Biaya administrasi %s %s")
                     % (
                         application.get_service_type_display(),
                         application.source_allocation.kpt_number,
@@ -762,7 +762,7 @@ def issue_documents(application: Application, officer=None) -> list[IssuedDocume
         number = _next_number("SPH")
         issued.append(documents.issue(application, allocation, "sph", number))
         body = _(
-            "Surat %(service)s untuk alokasi KPT %(kpt)s telah terbit; jangka waktu "
+            "Surat %(service)s untuk alokasi %(kpt)s telah terbit; jangka waktu "
             "kini berlaku sampai %(end)s. Unduh di %(url)s"
         ) % {
             "service": application.get_service_type_display(),
@@ -778,7 +778,7 @@ def issue_documents(application: Application, officer=None) -> list[IssuedDocume
         number = _next_number("SPT")
         issued.append(documents.issue(application, allocation, "spt", number))
         body = _(
-            "Surat persetujuan %(service)s untuk alokasi KPT %(kpt)s telah terbit. "
+            "Surat persetujuan %(service)s untuk alokasi %(kpt)s telah terbit. "
             "Unduh di %(url)s"
         ) % {
             "service": application.get_service_type_display(),

@@ -57,7 +57,7 @@ class Command(BaseCommand):
                     a.holder,
                     _("Peringatan lahan tidur %s") % a.kpt_number,
                     _(
-                        "Lahan %(plot)s (KPT %(kpt)s) belum dibangun hingga batas %(deadline)s. "
+                        "Lahan %(plot)s (%(kpt)s) belum dibangun hingga batas %(deadline)s. "
                         "Lahan yang tidak dimanfaatkan dapat dicabut alokasinya. Segera mulai "
                         "pembangunan dan laporkan progresnya di %(url)s"
                     )
@@ -73,7 +73,7 @@ class Command(BaseCommand):
                     a.holder,
                     _("Pengingat laporan progres %s") % a.kpt_number,
                     _(
-                        "Laporan progres perizinan dan pembangunan untuk KPT %(kpt)s sudah jatuh tempo. "
+                        "Laporan progres perizinan dan pembangunan untuk %(kpt)s sudah jatuh tempo. "
                         "Kirim laporan di %(url)s"
                     )
                     % {**self._a(a), "url": services.portal_url(f"alokasi/{a.pk}/")},

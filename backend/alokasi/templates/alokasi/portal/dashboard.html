@@ -14,8 +14,8 @@
 
 {% for a in allocations %}{% if a.report_due or a.is_idle %}
 <div class="alert {% if a.is_idle %}alert-danger{% else %}alert-warn{% endif %}">
-  {% if a.is_idle %}<strong>Peringatan lahan tidur:</strong> pembangunan di lahan {{ a.plot.code }} (KPT {{ a.kpt_number }}) belum dimulai melewati batas {{ a.idle_deadline|tanggal }}.
-  {% else %}<strong>Laporan jatuh tempo:</strong> kirim laporan progres untuk KPT {{ a.kpt_number }}.{% endif %}
+  {% if a.is_idle %}<strong>Peringatan lahan tidur:</strong> pembangunan di lahan {{ a.plot.code }} ({{ a.kpt_number }}) belum dimulai melewati batas {{ a.idle_deadline|tanggal }}.
+  {% else %}<strong>Laporan jatuh tempo:</strong> kirim laporan progres untuk {{ a.kpt_number }}.{% endif %}
   <a href="{% url 'portal:allocation_detail' a.pk %}">Buka</a>
 </div>
 {% endif %}{% endfor %}
@@ -67,7 +67,7 @@
       <tr>
         <td><a href="{% url 'portal:application_detail' app.number %}">{{ app.number }}</a></td>
         <td>{{ app.get_service_type_display }}</td>
-        <td>{% if app.is_allocation %}{{ app.plot.code }} {{ app.plot.name }}{% else %}KPT {{ app.source_allocation.kpt_number }}{% endif %}</td>
+        <td>{% if app.is_allocation %}{{ app.plot.code }} {{ app.plot.name }}{% else %}{{ app.source_allocation.kpt_number }}{% endif %}</td>
         <td>{{ app.submitted_at|tanggal }}</td>
         <td><span class="badge badge-{{ app.status }}">{{ app.get_status_display }}</span></td>
       </tr>{% endfor %}
@@ -80,7 +80,7 @@
 <section class="card">
   <h2>Peralihan hak kepada saya</h2>
   <ul>{% for app in incoming_transfers %}
-    <li><a href="{% url 'portal:application_detail' app.number %}">{{ app.number }}</a> – KPT {{ app.source_allocation.kpt_number }} dari {{ app.applicant.name }} <span class="badge badge-{{ app.status }}">{{ app.get_status_display }}</span></li>
+    <li><a href="{% url 'portal:application_detail' app.number %}">{{ app.number }}</a> – {{ app.source_allocation.kpt_number }} dari {{ app.applicant.name }} <span class="badge badge-{{ app.status }}">{{ app.get_status_display }}</span></li>
   {% endfor %}</ul>
 </section>
 {% endif %}

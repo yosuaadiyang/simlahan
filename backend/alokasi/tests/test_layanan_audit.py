@@ -139,7 +139,7 @@ def test_admin_header_for_service_application(allocation, admin_client, seeded):
     url = reverse("admin:alokasi_application_change", args=[application.pk])
     body = admin_client.get(url).content.decode()
     assert (
-        f"{application.get_service_type_display()} atas KPT "
+        f"{application.get_service_type_display()} atas "
         f"{allocation.kpt_number}" in body
     )
     assert "Peralihan " + allocation.kpt_number not in body

@@ -22,7 +22,7 @@
     {% if application.plot %}
     <dt>Lahan</dt><dd>{{ application.plot.code }} – {{ application.plot.name }}</dd>
     {% elif application.source_allocation %}
-    <dt>Alokasi</dt><dd>KPT {{ application.source_allocation.kpt_number }} · lahan {{ application.source_allocation.plot.code }}</dd>
+    <dt>Alokasi</dt><dd>{{ application.source_allocation.kpt_number }} · lahan {{ application.source_allocation.plot.code }}</dd>
     {% endif %}
     <dt>Diajukan</dt><dd>{{ application.submitted_at|tanggal|default:"–" }}</dd>
   </dl>

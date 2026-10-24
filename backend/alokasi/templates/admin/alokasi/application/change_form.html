@@ -18,7 +18,7 @@
   {% elif original.is_transfer %}
     · Peralihan {{ original.source_allocation.kpt_number }} kepada {{ original.recipient.name }}
   {% else %}
-    · {{ original.get_service_type_display }} atas KPT {{ original.source_allocation.kpt_number }}
+    · {{ original.get_service_type_display }} atas {{ original.source_allocation.kpt_number }}
   {% endif %}
   {% if missing_docs %}
     <p style="color:#ba2121;margin:6px 0 0">Dokumen wajib belum lengkap: {% for d in missing_docs %}{{ d.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
