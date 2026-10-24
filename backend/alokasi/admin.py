@@ -714,7 +714,7 @@ class ApplicationAdmin(admin.ModelAdmin):
             },
         ),
         (
-            _("Peralihan hak"),
+            _("Peralihan hak dan layanan atas alokasi"),
             {
                 "fields": (
                     "source_allocation",
@@ -841,7 +841,8 @@ class ApplicationAdmin(admin.ModelAdmin):
             ),
             "setujui": _(
                 "Tagihan UWT dan biaya administrasi dibuat otomatis. Setelah semua tagihan lunas, "
-                "KPT dan PPT (atau izin peralihan hak) terbit otomatis."
+                "dokumen keputusan (KPT dan PPT, izin peralihan hak, atau surat layanan) "
+                "terbit otomatis."
             ),
             "tolak": _(
                 "Permohonan ditolak dan lahan kembali tersedia. Alasan dikirim ke pemohon."

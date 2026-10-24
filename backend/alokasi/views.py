@@ -393,8 +393,8 @@ def uwt_calculator(request):
         }
     elif form.is_bound:
         # Isian belum lengkap: prapisi luas/jangka dari lahan terpilih bila ada.
-        plot_id = request.GET.get("plot")
-        if plot_id:
+        plot_id = request.GET.get("plot", "")
+        if plot_id.isdigit():
             plot = LandPlot.objects.filter(pk=plot_id, is_published=True).first()
             if plot:
                 form.fields["area_m2"].initial = plot.area_m2
@@ -1201,7 +1201,11 @@ def service_create(request, pk):
     """Ajukan layanan atas alokasi sendiri: perpanjangan, pembaruan, pecah
     PL, atau pengukuran ulang (alur permohonan sama dengan peralihan)."""
     allocation = _own_allocation(request, pk)
-    form = ServiceApplicationForm(request.POST or None)
+    form = ServiceApplicationForm(
+        request.POST or None,
+        allocation=allocation,
+        initial={"service_type": request.GET.get("jenis", "")},
+    )
     if request.method == "POST" and form.is_valid():
         try:
             application = services.create_service_application(
