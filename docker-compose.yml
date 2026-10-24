@@ -19,6 +19,11 @@ x-backend: &backend
     db:
       condition: service_healthy
   restart: unless-stopped
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
 
 services:
   db:
@@ -35,6 +40,11 @@ services:
       timeout: 5s
       retries: 20
     restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   backend:
     <<: *backend
@@ -75,15 +85,21 @@ services:
         VITE_MAP_WMS_LAYERS: ${MAP_WMS_LAYERS:-}
         VITE_MAP_WMS_NAME: ${MAP_WMS_NAME:-}
         VITE_FLAG_PLOTSEARCH: ${FLAG_PLOTSEARCH:-false}
+        VITE_SENTRY_DSN: ${VITE_SENTRY_DSN:-}
     image: simlahan-frontend:latest
     environment:
       BACKEND_URL: http://backend:8080
     ports:
-      - "${HTTP_PORT:-8080}:80"
+      - "${HTTP_PORT:-8080}:8080"
     depends_on:
       backend:
         condition: service_healthy
     restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 volumes:
   db_data:

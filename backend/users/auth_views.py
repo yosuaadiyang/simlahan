@@ -64,10 +64,23 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=128, trim_whitespace=False)
 
 
+class UsernameRateThrottle(ScopedRateThrottle):
+    """Batasi juga per nama akun, bukan hanya per IP: tebakan sandi terdistribusi
+    lintas alamat IP terhadap satu akun tetap terkena batas 10/menit.
+    ``ponytail:`` lockout per-akun membuat korban ikut terkunci sementara bila
+    akunnya disemprot; ganti dengan pembatasan adaptif bila jadi masalah."""
+
+    def get_cache_key(self, request, view):
+        ident = str(request.data.get("username") or "").strip().lower()[:150]
+        if not ident:
+            return None
+        return self.cache_format % {"scope": self.scope, "ident": f"u:{ident}"}
+
+
 class LoginView(APIView):
     permission_classes = (AllowAny,)
     authentication_classes = ()
-    throttle_classes = (ScopedRateThrottle,)
+    throttle_classes = (ScopedRateThrottle, UsernameRateThrottle)
     throttle_scope = "login"
 
     def get_view_name(self):

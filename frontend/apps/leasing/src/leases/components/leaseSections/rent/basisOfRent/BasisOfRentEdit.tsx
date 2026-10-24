@@ -63,6 +63,7 @@ import { getUserFullName } from "@/users/helpers";
 import {
   copyElementContentsToClipboard,
   displayUIMessage,
+  escapeHtml,
   formatDate,
   formatNumber,
   getFieldAttributes,
@@ -901,11 +902,11 @@ const BasisOfRentEdit: React.FC<Props> = ({
       </thead>
       <tbody>
         <tr>
-          ${isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.INTENDED_USE) ? `<td>${getLabelOfOption(intendedUseOptions, intendedUse) || "-"}</td>` : ""}
-          ${isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AREA) ? `<td>${areaText}</td>` : ""}
-          ${calculatorType === CalculatorTypes.LEASE && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AMOUNT_PER_AREA) ? `<td>${amountPerAreaText}</td>` : ""}
-          ${isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.INDEX) ? `<td>${getLabelOfOption(indexOptions, index) || "-"}</td>` : ""}
-          ${isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AMOUNT_PER_AREA) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.INDEX) ? `<td>${currentAmountPerAreaText}</td>` : ""}
+          ${isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.INTENDED_USE) ? `<td>${escapeHtml(getLabelOfOption(intendedUseOptions, intendedUse) || "-")}</td>` : ""}
+          ${isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AREA) ? `<td>${escapeHtml(areaText)}</td>` : ""}
+          ${calculatorType === CalculatorTypes.LEASE && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AMOUNT_PER_AREA) ? `<td>${escapeHtml(amountPerAreaText)}</td>` : ""}
+          ${isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.INDEX) ? `<td>${escapeHtml(getLabelOfOption(indexOptions, index) || "-")}</td>` : ""}
+          ${isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AMOUNT_PER_AREA) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.INDEX) ? `<td>${escapeHtml(currentAmountPerAreaText)}</td>` : ""}
           ${isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.PROFIT_MARGIN_PERCENTAGE) ? `<td>${!isEmptyValue(profitMarginPercentage) ? `${formatNumber(profitMarginPercentage)} %` : "-"}</td>` : ""}
           ${isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AREA) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AMOUNT_PER_AREA) ? `<td>${!isEmptyValue(basicAnnualRent) ? `Rp ${formatNumber(basicAnnualRent)}/thn` : "-"}</td>` : ""}
           ${isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AREA) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.AMOUNT_PER_AREA) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.INDEX) && isFieldAllowedToRead(leaseAttributes, LeaseBasisOfRentsFieldPaths.PROFIT_MARGIN_PERCENTAGE) ? `<td>${!isEmptyValue(initialYearRent) ? `Rp ${formatNumber(initialYearRent)}/thn` : "-"}</td>` : ""}

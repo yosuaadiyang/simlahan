@@ -40,8 +40,12 @@ ENV VITE_API_URL=$VITE_API_URL \
     VITE_SENTRY_DSN=$VITE_SENTRY_DSN
 RUN yarn build
 
-FROM nginx:1.27-alpine AS production
-COPY docker/nginx.conf.template /etc/nginx/templates/default.conf.template
-COPY --from=build /app/dist /usr/share/nginx/html
+# Nginx non-root: kontainer tidak berjalan sebagai root. Template & envsubst
+# tetap didukung; port internal 8080 (non-root tak boleh memakai port < 1024),
+# dipetakan compose ke HTTP_PORT.
+FROM nginxinc/nginx-unprivileged:1.27-alpine AS production
+USER nginx
+COPY --chown=nginx:nginx docker/nginx.conf.template /etc/nginx/templates/default.conf.template
+COPY --from=build --chown=nginx:nginx /app/dist /usr/share/nginx/html
 ENV BACKEND_URL=http://backend:8080
-EXPOSE 80
+EXPOSE 8080

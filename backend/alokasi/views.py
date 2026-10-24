@@ -136,6 +136,17 @@ def applicant_required(view):
     return wrapper
 
 
+# Tipe yang aman disajikan inline; lainnya (mis. .html/.svg hasil unggahan)
+# dipaksa unduh agar tidak dieksekusi sebagai konten aktif di domain portal.
+INLINE_SAFE_CONTENT_TYPES = {
+    "image/avif",
+    "image/gif",
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+}
+
+
 def serve_file(fieldfile, *, inline=False, filename=None):
     if not fieldfile:
         raise Http404
@@ -149,6 +160,7 @@ def serve_file(fieldfile, *, inline=False, filename=None):
         return HttpResponse(_("Berkas tidak aman untuk diunduh."), status=403)
     name = filename or os.path.basename(fieldfile.name)
     content_type = mimetypes.guess_type(name)[0] or "application/octet-stream"
+    inline = inline and content_type in INLINE_SAFE_CONTENT_TYPES
     response = FileResponse(
         handle, as_attachment=not inline, filename=name, content_type=content_type
     )

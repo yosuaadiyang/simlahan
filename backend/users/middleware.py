@@ -62,13 +62,24 @@ SESSION_LOGIN_PATHS = ("/admin/login/", "/auth/login/")
 
 
 class LoginThrottleMiddleware:
-    """Batasi percobaan login sesi per alamat IP agar sandi tidak bisa ditebak."""
+    """Batasi percobaan login sesi per alamat IP dan per nama akun agar sandi
+    tidak bisa ditebak, termasuk tebakan terdistribusi lintas IP.
+
+    ``ponytail:`` batas per-akun membuat pengguna sah ikut tertahan bila
+    akunnya disembot penyerang; naikkan batas atau pakai backoff adaptif bila
+    menimbulkan keluhan.
+    """
+
+    ACCOUNT_ATTEMPTS = 10
+    ACCOUNT_WINDOW = 60
 
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
         if request.method == "POST" and request.path in SESSION_LOGIN_PATHS:
+            from django.core.cache import cache
+
             from alokasi.views import _throttled
 
             if _throttled(request, "login-sesi", limit=10, window=60):
@@ -77,4 +88,20 @@ class LoginThrottleMiddleware:
                     status=429,
                     content_type="text/plain; charset=utf-8",
                 )
+            username = (request.POST.get("username") or "").strip().lower()[:150]
+            if username:
+                key = f"users:login-throttle:{username}"
+                try:
+                    count = cache.get_or_set(key, 0, self.ACCOUNT_WINDOW)
+                    if count >= self.ACCOUNT_ATTEMPTS:
+                        return HttpResponse(
+                            _(
+                                "Terlalu banyak percobaan masuk. Coba lagi dalam satu menit."
+                            ),
+                            status=429,
+                            content_type="text/plain; charset=utf-8",
+                        )
+                    cache.incr(key)
+                except ValueError:
+                    cache.set(key, 1, self.ACCOUNT_WINDOW)
         return self.get_response(request)

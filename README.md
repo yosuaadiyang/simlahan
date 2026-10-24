@@ -78,7 +78,8 @@ latar), `batchrun` (penjadwal), `frontend` (nginx + SPA, sekaligus reverse proxy
    dan nomor KK dienkripsi di basis data; tanpa kunci ini data tersebut tidak
    dapat dibaca kembali.
 3. Isi `EMAIL_URL` (SMTP) agar pengingat tenggat & laporan terkirim.
-4. Cadangkan volume `db_data` dan `private_files` secara berkala, mis.
+4. Cadangkan volume `db_data`, `private_files`, dan `media` (unggahan pengguna)
+   secara berkala, mis.
    `docker compose exec db pg_dump -U simlahan simlahan > cadangan.sql`.
 5. Perbarui daftar hari libur setiap tahun di **Pengadaan Tanah → Kalender &
    aturan tenggat** sesuai SKB 3 Menteri.

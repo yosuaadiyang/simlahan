@@ -8,7 +8,8 @@ map $http_x_forwarded_proto $simlahan_forwarded_proto {
 }
 
 server {
-    listen 80;
+    # Non-root: port >= 1024 (lihat Dockerfile & docker-compose.yml).
+    listen 8080;
     server_name _;
     client_max_body_size 100m;
 

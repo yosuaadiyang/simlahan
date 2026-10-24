@@ -25,7 +25,8 @@ sed \
   .env.example > .env
 chmod 600 .env
 
-echo "Berkas .env dibuat."
+echo "Berkas .env dibuat (mode 600)."
 echo "  Admin awal : admin"
-echo "  Kata sandi : ${ADMIN_PASSWORD}"
+echo "  Kata sandi : baca DJANGO_SUPERUSER_PASSWORD di .env (tidak dicetak di sini"
+echo "               agar tidak tersimpan di riwayat/log terminal)."
 echo "Simpan FIELD_ENCRYPTION_KEY di .env dengan aman – tanpa kunci ini data NIK/rekening tidak dapat dibaca."

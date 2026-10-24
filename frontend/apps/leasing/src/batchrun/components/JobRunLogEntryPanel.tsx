@@ -13,6 +13,7 @@ import {
 import {
   copyElementContentsToClipboard,
   displayUIMessage,
+  escapeHtml,
   formatDate,
   getApiResponseResults,
   isFieldAllowedToRead,
@@ -93,7 +94,7 @@ const JobRunLogEntryPanel = (props: Props) => {
     jobRunLogEntries.forEach((entry) => {
       bodyHtml += `<tr>
         ${isFieldAllowedToRead(jobRunLogEntryAttributes, JobRunLogEntryFieldPaths.TIME) ? `<td>${formatDate(entry.time, "dd.MM.yyyy H:mm:ss") || "-"}</td>` : ""}
-        ${isFieldAllowedToRead(jobRunLogEntryAttributes, JobRunLogEntryFieldPaths.TEXT) ? `<td>${entry.text || "-"}</td>` : ""}
+        ${isFieldAllowedToRead(jobRunLogEntryAttributes, JobRunLogEntryFieldPaths.TEXT) ? `<td>${escapeHtml(entry.text || "-")}</td>` : ""}
       </tr>`;
     });
 

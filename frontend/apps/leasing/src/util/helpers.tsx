@@ -942,3 +942,14 @@ export const toHdsOption = (option: SelectListOption): SelectOptionHds => ({
   label: option.label,
   value: String(option.value),
 });
+
+/**
+ * Escape teks sebelum ditempelkan ke innerHTML (tabel salin-ke-papan-klip,
+ * tooltip peta). Satu-satunya jalur: tidak ada sanitasi berbasis daftar hitam.
+ */
+export const escapeHtml = (text: unknown): string =>
+  String(text ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");

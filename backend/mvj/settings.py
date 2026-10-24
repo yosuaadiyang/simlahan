@@ -111,6 +111,24 @@ SECRET_KEY = env.str("SECRET_KEY", default=("dev-only-insecure-key" if DEBUG els
 if not SECRET_KEY:
     raise ImproperlyConfigured("SECRET_KEY wajib diisi untuk mode produksi.")
 
+
+def _reject_placeholder(name: str, value: str) -> None:
+    """Nilai contoh dari repo (mis. 'ganti-...') tidak boleh dipakai di
+    produksi: kunci tersebut diketahui publik sehingga token/sesi bisa
+    dipalsukan siapa pun yang membaca repositori."""
+    if DEBUG or not value:
+        return
+    lowered = value.lower()
+    for marker in ("ganti-", "ganti ", "dev-only", "changeme", "change-me", "example"):
+        if marker in lowered:
+            raise ImproperlyConfigured(
+                f"{name} masih memuat nilai contoh/placeholder. Isi nilai rahasia "
+                "yang sebenarnya (lihat .env.example untuk cara membuatnya)."
+            )
+
+
+_reject_placeholder("SECRET_KEY", SECRET_KEY)
+
 # Kunci Fernet (base64 urlsafe 32 byte) untuk enkripsi data pribadi (UU PDP):
 # NIK, nomor rekening, nomor KK. WAJIB diisi & disimpan aman di produksi; bila
 # berubah, data terenkripsi lama tidak dapat dibaca. Buat dengan:
@@ -118,6 +136,7 @@ if not SECRET_KEY:
 FIELD_ENCRYPTION_KEY = env.str("FIELD_ENCRYPTION_KEY")
 if not FIELD_ENCRYPTION_KEY and not DEBUG:
     raise ImproperlyConfigured("FIELD_ENCRYPTION_KEY wajib diisi untuk mode produksi.")
+_reject_placeholder("FIELD_ENCRYPTION_KEY", FIELD_ENCRYPTION_KEY)
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 

@@ -78,9 +78,10 @@ def issue(user, purpose: str) -> LoginOTP:
         expires_at=timezone.now() + datetime.timedelta(minutes=OTP_TTL_MINUTES),
     )
     try:
+        # Kode sengaja tidak diletakkan di subjek: subjek surel tampil di daftar
+        # notifikasi/preview klien surel dan bisa terbaca orang lain.
         send_mail(
-            subject=_("Kode masuk %(app)s: %(code)s")
-            % {"app": settings.ORGANIZATION_NAME, "code": code},
+            subject=_("Kode masuk %(app)s") % {"app": settings.ORGANIZATION_NAME},
             message=_(
                 "Kode masuk Anda: %(code)s\n\nKode berlaku %(minutes)d menit. Abaikan surel ini bila Anda tidak "
                 "sedang masuk, dan segera ganti kata sandi Anda."

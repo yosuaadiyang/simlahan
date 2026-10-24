@@ -323,43 +323,6 @@ class Search extends Component<Props & WithRouterProps, State> {
                     />
                   </SearchInputColumn>
                 </SearchRow>
-
-                {/*<SearchRow>
-               <SearchLabelColumn>
-               </SearchLabelColumn>
-               <SearchInputColumn>
-                 <FormField
-                   autoBlur
-                   disableDirty
-                   fieldAttributes={{
-                     label: 'Voimassa',
-                     type: FieldTypes.CHECKBOX,
-                     read_only: false,
-                   }}
-                   invisibleLabel
-                   overrideValues={{
-                     options: [{value: true, label: 'Voimassa'}],
-                   }}
-                   name="ongoing"
-                 />
-               </SearchInputColumn>
-               <SearchInputColumn>
-                 <FormField
-                   autoBlur
-                   disableDirty
-                   fieldAttributes={{
-                     label: 'Päättyneet',
-                     type: FieldTypes.CHECKBOX,
-                     read_only: false,
-                   }}
-                   invisibleLabel
-                   overrideValues={{
-                     options: [{value: true, label: 'Päättyneet'}],
-                   }}
-                   name="ended"
-                 />
-               </SearchInputColumn>
-              </SearchRow>*/}
               </Column>
 
               {/* Second column */}

@@ -3,6 +3,7 @@ import L from "leaflet";
 import { GeoJSON } from "react-leaflet";
 import MapContainer from "@/areaNote/components/MapContainer";
 import { DEFAULT_CENTER, DEFAULT_ZOOM } from "@/util/constants";
+import { escapeHtml } from "@/util/helpers";
 
 /** Warna bidang per status (mudah dibedakan juga oleh pengguna buta warna). */
 export const PARCEL_STATUS_COLORS: Record<string, string> = {
@@ -30,12 +31,6 @@ type Props = {
   showParties?: boolean;
 };
 
-const escapeHtml = (text: unknown) =>
-  String(text ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
 
 const AcquisitionMap: React.FC<Props> = ({
   featureCollection,
