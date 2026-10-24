@@ -151,3 +151,10 @@ def test_invoice_model_untouched_for_other_applications(allocation, officer):
     assert not Invoice.objects.filter(
         application=allocation.application, status=enums.InvoiceStatus.CANCELLED
     ).exists()
+
+
+def test_officer_can_manage_service_catalog(officer, verifier, seeded):
+    assert officer.has_perm("alokasi.change_servicecatalog")
+    assert officer.has_perm("alokasi.add_servicecatalog")
+    assert verifier.has_perm("alokasi.view_servicecatalog")
+    assert not verifier.has_perm("alokasi.change_servicecatalog")

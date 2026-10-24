@@ -26,3 +26,36 @@ def test_intended_use_can_be_created_through_api(admin_client, service_unit_fact
         content_type="application/json",
     )
     assert response.status_code == 201, response.content
+
+
+@pytest.mark.django_db
+def test_out_of_range_value_is_bad_request(admin_client):
+    from leasing.models import Municipality
+
+    municipality = Municipality.objects.create(
+        id=987654, name="Kota Uji", identifier="987654"
+    )
+    response = admin_client.patch(
+        reverse("v1:municipality-detail", args=[municipality.id]),
+        json.dumps({"id": 10**30}),
+        content_type="application/json",
+    )
+    assert response.status_code == 400
+    assert admin_client.get(reverse("v1:municipality-list")).status_code == 200
+
+
+@pytest.mark.django_db
+def test_notice_period_duration_must_be_iso8601(admin_client):
+    from leasing.models import NoticePeriod
+
+    period = NoticePeriod.objects.create(
+        name="Tiga bulan", type="time_period", duration="P3M"
+    )
+    url = reverse("v1:noticeperiod-detail", args=[period.id])
+    response = admin_client.patch(
+        url, json.dumps({"duration": "x"}), content_type="application/json"
+    )
+    assert response.status_code == 400
+    period.refresh_from_db()
+    assert period.duration == "P3M"
+    assert admin_client.get(reverse("v1:noticeperiod-list")).status_code == 200

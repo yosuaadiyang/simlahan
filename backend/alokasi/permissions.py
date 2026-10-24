@@ -19,6 +19,7 @@ from alokasi.models import (
     LandPlot,
     PermitReport,
     RequirementDocType,
+    ServiceCatalog,
     VerificationCriterion,
     VerificationScore,
 )
@@ -51,6 +52,7 @@ ALOKASI_GROUP_MODEL_PERMISSIONS: GroupModelPermissions = {
     InfoPage: _staff(ALL, ALL, None),
     Applicant: _staff(VC, VC, V),
     RequirementDocType: _staff(ALL, ALL, V),
+    ServiceCatalog: _staff(ALL, ALL, V),
     VerificationCriterion: _staff(ALL, V, V),
     Application: _staff(
         VC + ("verify_application", "decide_application"),
