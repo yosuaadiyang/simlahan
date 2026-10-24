@@ -158,3 +158,11 @@ def test_officer_can_manage_service_catalog(officer, verifier, seeded):
     assert officer.has_perm("alokasi.add_servicecatalog")
     assert verifier.has_perm("alokasi.view_servicecatalog")
     assert not verifier.has_perm("alokasi.change_servicecatalog")
+
+
+def test_uwt_calculator_prefills_from_plot(client, plot):
+    response = client.get(reverse("portal:uwt_calculator"), {"plot": plot.pk})
+    form = response.context["form"]
+    assert not form.is_bound and not form.errors
+    assert form["area_m2"].value() == plot.area_m2
+    assert form["years"].value() == plot.effective_term_years

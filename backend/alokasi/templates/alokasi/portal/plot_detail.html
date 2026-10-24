@@ -32,7 +32,7 @@
         <dt>Jangka waktu</dt><dd>{{ plot.effective_term_years }} tahun</dd>
         {% if plot.uwt_rate_per_m2_year %}
         <dt>Tarif UWT</dt><dd>{{ plot.uwt_rate_per_m2_year|rupiah|patah }} /m²/tahun</dd>
-        <dt>Perkiraan UWT</dt><dd>{{ plot.uwt_total|rupiah|patah }}</dd>
+        <dt>Perkiraan UWT</dt><dd>{{ plot.uwt_total|rupiah|patah }} <a class="small" href="{% url 'portal:uwt_calculator' %}?plot={{ plot.pk }}">Simulasikan</a></dd>
         {% endif %}
         {% if config.allocation_admin_fee %}<dt>Biaya administrasi</dt><dd>{{ config.allocation_admin_fee|rupiah|patah }}</dd>{% endif %}
       </dl>
