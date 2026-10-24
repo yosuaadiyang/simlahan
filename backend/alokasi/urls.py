@@ -14,8 +14,13 @@ urlpatterns = [
     path(
         "lahan/<str:code>/ajukan/", views.application_create, name="application_create"
     ),
-    # Informasi
-    path("layanan/", views.services_page, name="services"),
+    # Layanan & informasi
+    path("layanan/", views.service_catalog, name="services"),
+    path("layanan/ketentuan-umum/", views.services_page, name="service_terms"),
+    path("layanan/<slug:slug>/", views.service_catalog_detail, name="service_detail"),
+    path("kalkulator-uwt/", views.uwt_calculator, name="uwt_calculator"),
+    path("lacak/", views.track_application, name="track"),
+    path("bantuan/", views.help_page, name="help"),
     path("informasi/", views.info_index, name="info_index"),
     path("informasi/kategori/<str:category>/", views.info_index, name="info_category"),
     path("informasi/<slug:slug>/", views.info_detail, name="info_detail"),
@@ -117,4 +122,5 @@ urlpatterns = [
         name="development_attachment",
     ),
     path("alokasi/<int:pk>/peralihan/", views.transfer_create, name="transfer_create"),
+    path("alokasi/<int:pk>/layanan/", views.service_create, name="service_create"),
 ]

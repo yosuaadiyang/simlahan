@@ -1,0 +1,34 @@
+{% extends "alokasi/pdf/_base.html" %}{% load alokasi_tags %}
+{% block title %}Persetujuan Layanan Tanah {{ doc.number }}{% endblock %}
+{% block content %}
+<h1>SURAT PERSETUJUAN LAYANAN TANAH</h1>
+<p class="center">Nomor: {{ doc.number }}</p>
+
+<p>Berdasarkan permohonan Nomor {{ application.number }} tanggal {{ application.submitted_at|tanggal }},
+{{ config.authority_short_name }} memberikan persetujuan atas permohonan
+{{ application.get_service_type_display }} dengan rincian sebagai berikut:</p>
+
+<table class="data">
+  <tr><td style="width: 32%;">Dasar alokasi</td><td>: KPT {{ allocation.kpt_number }} / PPT {{ allocation.ppt_number }}</td></tr>
+  <tr><td>Kode lahan</td><td>: {{ plot.code }} – {{ plot.name }}</td></tr>
+  <tr><td>Luas</td><td>: {{ allocation.area_m2|angka:2 }} m²</td></tr>
+  <tr><td>Peruntukan</td><td>: {{ allocation.activity }}</td></tr>
+  <tr><td>Uraian permohonan</td><td>: {{ application.transfer_reason }}</td></tr>
+</table>
+
+<h2>Pemohon</h2>
+<table class="data">
+  <tr><td style="width: 32%;">Nama</td><td>: {{ holder.name }}</td></tr>
+  {% if holder.nib %}<tr><td>NIB</td><td>: {{ holder.nib }}</td></tr>{% endif %}
+  <tr><td>Alamat</td><td>: {{ holder.address }}</td></tr>
+</table>
+
+<h2>Ketentuan</h2>
+<ol>
+  <li>Persetujuan ini mengikat pelaksanaan {{ application.get_service_type_display }} sesuai peraturan perundang-undangan dan ketentuan instansi.</li>
+  <li>Hasil pelaksanaan wajib dilaporkan kepada {{ config.authority_short_name }} untuk diperbarui data lahan.</li>
+  <li>Surat ini tidak mengubah jangka waktu maupun kewajiban dalam Perjanjian Pemanfaatan Tanah Nomor {{ allocation.ppt_number }}.</li>
+</ol>
+
+{% include "alokasi/pdf/_signature.html" %}
+{% endblock %}

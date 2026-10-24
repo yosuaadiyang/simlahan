@@ -1,0 +1,27 @@
+{% extends "alokasi/portal/base.html" %}
+{% block title %}Layanan Perizinan{% endblock %}
+{% block content %}
+<h1>Layanan Perizinan</h1>
+<p class="muted">Daftar layanan beserta syarat, alur, durasi, tarif, dokumen terbit, dan dasar hukumnya.</p>
+
+{% for value, label, entries in grouped %}
+<section class="card">
+  <h2>{{ label }}</h2>
+  <div class="table-wrap"><table class="data">
+    <thead><tr><th>No</th><th>Layanan</th><th>Ringkasan</th><th></th></tr></thead>
+    <tbody>{% for entry in entries %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td><strong>{{ entry.name }}</strong>{% if entry.duration_note %}<br><span class="small muted">Durasi: {{ entry.duration_note }}</span>{% endif %}</td>
+        <td>{{ entry.summary|default:"–" }}</td>
+        <td><a class="btn btn-outline btn-small" href="{% url 'portal:service_detail' entry.slug %}">Selengkapnya</a></td>
+      </tr>
+    {% endfor %}</tbody>
+  </table></div>
+</section>
+{% empty %}
+<section class="card"><p class="muted">Katalog layanan belum dipublikasikan. Lihat <a href="{% url 'portal:service_terms' %}">ketentuan umum</a>.</p></section>
+{% endfor %}
+
+<p class="small muted">Ketentuan umum, kriteria penilaian teknis, dan daftar dokumen lintas layanan: <a href="{% url 'portal:service_terms' %}">Ketentuan Umum Layanan</a>. Simulasi biaya: <a href="{% url 'portal:uwt_calculator' %}">Kalkulator UWT</a>.</p>
+{% endblock %}

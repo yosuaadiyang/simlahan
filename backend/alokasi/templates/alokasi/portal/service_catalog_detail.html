@@ -1,0 +1,61 @@
+{% extends "alokasi/portal/base.html" %}
+{% load alokasi_tags %}
+{% block title %}{{ entry.name }}{% endblock %}
+{% block content %}
+<p class="small"><a href="{% url 'portal:services' %}">‹ Semua layanan</a></p>
+<h1>{{ entry.name }}</h1>
+{% if entry.summary %}<p class="muted">{{ entry.summary }}</p>{% endif %}
+
+<section class="card">
+  <h2>Deskripsi</h2>
+  <div class="prose">{{ entry.description|default:"–"|linebreaks }}</div>
+</section>
+
+<section class="card">
+  <h2>Syarat</h2>
+  {% if requirements %}
+  <div class="table-wrap"><table class="data">
+    <thead><tr><th>Dokumen</th><th>Keterangan</th><th>Wajib</th></tr></thead>
+    <tbody>{% for doc in requirements %}
+      <tr>
+        <td>{{ doc.name }}</td>
+        <td>{{ doc.description|default:"" }}</td>
+        <td>{% if doc.is_required %}Ya{% else %}Tidak{% endif %}</td>
+      </tr>
+    {% endfor %}</tbody>
+  </table></div>
+  {% else %}
+  <p class="muted">Belum ada daftar dokumen; hubungi {{ config.authority_short_name }}.</p>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2>Alur layanan</h2>
+  {% if entry.flow %}<div class="prose">{{ entry.flow|linebreaks }}</div>{% else %}<p class="muted">–</p>{% endif %}
+</section>
+
+<section class="card">
+  <h2>Durasi, tarif, dan dokumen terbit</h2>
+  <dl class="props">
+    <dt>Durasi pemrosesan</dt><dd>{{ entry.duration_note|default:"Sesuai ketentuan layanan" }}</dd>
+    <dt>Tarif</dt><dd class="prose">{{ entry.tariff_note|default:"Sesuai ketentuan layanan" }}{% if entry.service_type == 'alokasi' %} — perkiraan biaya lewat <a href="{% url 'portal:uwt_calculator' %}">Kalkulator UWT</a>{% endif %}</dd>
+    <dt>Dokumen terbit</dt><dd class="prose">{{ entry.issued_note|default:"–" }}</dd>
+  </dl>
+</section>
+
+<section class="card">
+  <h2>Dasar hukum</h2>
+  <div class="prose">{{ entry.legal_basis|default:"–"|linebreaks }}</div>
+</section>
+
+{% if entry.service_type %}
+<div class="alert alert-info">
+  Layanan ini diajukan secara daring melalui portal.
+  {% if entry.service_type == 'alokasi' %}
+  Pilih lahan tersedia di <a href="{% url 'portal:plot_list' %}">Peta Lahan</a> lalu klik <strong>Ajukan permohonan</strong>.
+  {% else %}
+  Pemegang alokasi mengajukannya dari halaman alokasinya (menu <strong>Akun Saya</strong>).
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

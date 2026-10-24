@@ -1,0 +1,18 @@
+{% extends "alokasi/portal/base.html" %}
+{% block title %}Ajukan Layanan{% endblock %}
+{% block content %}
+<p class="small"><a href="{% url 'portal:allocation_detail' allocation.pk %}">‹ Alokasi {{ allocation.kpt_number }}</a></p>
+<h1>Ajukan Layanan Alokasi</h1>
+<p class="muted">Perpanjangan / pembaruan hak, pemecahan penetapan lokasi (PL), atau pengukuran ulang atas alokasi KPT {{ allocation.kpt_number }}.</p>
+
+<section class="card">
+  <form method="post" action="{% url 'portal:service_create' allocation.pk %}">{% csrf_token %}
+    {% include "alokasi/portal/_form.html" with form=form %}
+    <button class="btn btn-accent" type="submit">Buat draf permohonan</button>
+  </form>
+</section>
+
+<section class="card small muted">
+  Setelah draf dibuat, unggah dokumen persyaratan lalu ajukan. Petugas memeriksa dan memutuskan; tagihan (bila ada) terbit setelah disetujui, dan surat keputusan terbit otomatis setelah pembayaran diverifikasi.
+</section>
+{% endblock %}

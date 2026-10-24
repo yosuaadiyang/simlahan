@@ -140,6 +140,47 @@ def create_allocation_application(applicant: Applicant, plot: LandPlot) -> Appli
 
 
 @transaction.atomic
+def create_service_application(
+    applicant: Applicant, allocation: Allocation, service_type: str, reason: str
+) -> Application:
+    """Permohonan layanan atas alokasi sendiri: perpanjangan, pembaruan,
+    pecah PL, atau pengukuran ulang."""
+    allocation = Allocation.objects.select_for_update().get(pk=allocation.pk)
+    _require(
+        allocation.holder_id == applicant.pk, _("Anda bukan pemegang alokasi ini.")
+    )
+    if service_type == enums.ServiceType.RENEWAL:
+        _require(
+            allocation.status
+            in (enums.AllocationStatus.ACTIVE, enums.AllocationStatus.EXPIRED),
+            _("Hanya alokasi aktif atau yang sudah berakhir yang dapat diperbarui."),
+        )
+    else:
+        _require(
+            allocation.status == enums.AllocationStatus.ACTIVE,
+            _("Hanya alokasi aktif yang dapat diajukan layanan ini."),
+        )
+    open_application = allocation.transfer_applications.exclude(
+        status__in=enums.FINAL_STATUSES
+    ).filter(applicant=applicant)
+    _require(
+        not open_application.exists(),
+        _("Masih ada permohonan Anda untuk alokasi ini yang sedang diproses."),
+    )
+    application = Application.objects.create(
+        service_type=service_type,
+        applicant=applicant,
+        source_allocation=allocation,
+        transfer_reason=reason,
+        activity=allocation.activity,
+    )
+    ApplicationEvent.objects.create(
+        application=application, status=S.DRAFT, actor=applicant.user
+    )
+    return application
+
+
+@transaction.atomic
 def create_transfer_application(
     applicant: Applicant, allocation: Allocation, recipient: Applicant, reason: str
 ) -> Application:
@@ -189,10 +230,10 @@ def validate_for_submission(application: Application) -> list[str]:
             if getattr(application, field) in (None, ""):
                 errors.append(_("%s wajib diisi.") % label)
     else:
-        if not application.recipient_id:
+        if application.is_transfer and not application.recipient_id:
             errors.append(_("Penerima hak belum dipilih."))
         if not application.transfer_reason:
-            errors.append(_("Alasan peralihan wajib diisi."))
+            errors.append(_("Alasan / uraian permohonan wajib diisi."))
     for doc in application.missing_required_documents():
         errors.append(_("Dokumen wajib belum diunggah: %s") % doc.name)
     return errors
@@ -220,14 +261,18 @@ def submit(application: Application, user) -> Application:
         plot.save(update_fields=["status", "modified_at"])
     else:
         allocation = application.source_allocation
+        allowed_status = (enums.AllocationStatus.ACTIVE,)
+        if application.service_type == enums.ServiceType.RENEWAL:
+            # Pembaruan diajukan setelah jangka waktu alokasi berakhir.
+            allowed_status += (enums.AllocationStatus.EXPIRED,)
         _require(
-            allocation.status == enums.AllocationStatus.ACTIVE
+            allocation.status in allowed_status
             and allocation.holder_id == application.applicant_id,
-            _("Alokasi tidak lagi dapat dialihkan oleh pemohon ini."),
+            _("Alokasi tidak lagi dapat diajukan layanan ini oleh pemohon ini."),
         )
     resubmission = application.status == S.REVISION
     application.submitted_at = timezone.now()
-    if not application.is_allocation:
+    if application.is_transfer:
         # Data peralihan bisa berubah saat perbaikan, jadi penerima hak
         # menyetujui ulang setiap kali permohonan diajukan.
         application.recipient_accepted_at = None
@@ -238,7 +283,7 @@ def submit(application: Application, user) -> Application:
         note=_("Diajukan ulang setelah perbaikan.") if resubmission else "",
     )
     _notify_status(application)
-    if not application.is_allocation:
+    if application.is_transfer:
         _notify_recipient_to_accept(application)
     return application
 
@@ -266,7 +311,7 @@ def accept_transfer(
     """Penerima hak menyetujui peralihan yang diajukan kepadanya."""
     application = Application.objects.select_for_update().get(pk=application.pk)
     _require(
-        not application.is_allocation and application.recipient_id == applicant.pk,
+        application.is_transfer and application.recipient_id == applicant.pk,
         _("Hanya penerima hak yang dapat menyetujui peralihan ini."),
     )
     _require(
@@ -373,7 +418,7 @@ def approve(application: Application, officer, note: str = "") -> Application:
             _("Nilai verifikasi %(score)s di bawah nilai minimum %(min)s.")
             % {"score": score, "min": config.passing_score},
         )
-    else:
+    elif application.is_transfer:
         _require(
             application.recipient_accepted_at is not None,
             _("Penerima hak belum menyetujui peralihan ini di portal."),
@@ -407,7 +452,9 @@ def reject(application: Application, officer, note: str) -> Application:
     return application
 
 
-def _create_invoices(application: Application, config: AllocationSettings) -> None:
+def _create_invoices(  # noqa: C901
+    application: Application, config: AllocationSettings
+) -> None:
     due = timezone.localdate() + datetime.timedelta(days=config.invoice_due_days)
     items = []
     if application.is_allocation:
@@ -434,7 +481,7 @@ def _create_invoices(application: Application, config: AllocationSettings) -> No
                     config.allocation_admin_fee,
                 )
             )
-    else:
+    elif application.is_transfer:
         area = application.source_allocation.area_m2
         amount = (
             config.transfer_admin_fee + config.transfer_fee_per_m2 * area
@@ -446,6 +493,56 @@ def _create_invoices(application: Application, config: AllocationSettings) -> No
                     _("Biaya administrasi peralihan hak %s")
                     % application.source_allocation.kpt_number,
                     amount,
+                )
+            )
+    elif application.is_extension:
+        allocation = application.source_allocation
+        plot = allocation.plot
+        years = plot.effective_term_years
+        uwt = (allocation.area_m2 * plot.uwt_rate_per_m2_year * years).quantize(
+            Decimal("1")
+        )
+        if uwt > 0:
+            items.append(
+                (
+                    enums.InvoiceKind.UWT,
+                    _(
+                        "UWT KPT %(kpt)s periode %(service)s: "
+                        "%(area)s m² × Rp%(rate)s × %(years)s tahun"
+                    )
+                    % {
+                        "kpt": allocation.kpt_number,
+                        "service": application.get_service_type_display(),
+                        "area": allocation.area_m2,
+                        "rate": plot.uwt_rate_per_m2_year,
+                        "years": years,
+                    },
+                    uwt,
+                ),
+            )
+        if config.extension_admin_fee > 0:
+            items.append(
+                (
+                    enums.InvoiceKind.EXTENSION_FEE,
+                    _("Biaya administrasi %s KPT %s")
+                    % (
+                        application.get_service_type_display(),
+                        allocation.kpt_number,
+                    ),
+                    config.extension_admin_fee,
+                )
+            )
+    else:  # Pecah PL dan pengukuran ulang.
+        if config.service_admin_fee > 0:
+            items.append(
+                (
+                    enums.InvoiceKind.SERVICE_FEE,
+                    _("Biaya administrasi %s KPT %s")
+                    % (
+                        application.get_service_type_display(),
+                        application.source_allocation.kpt_number,
+                    ),
+                    config.service_admin_fee,
                 )
             )
     for kind, description, amount in items:
@@ -595,7 +692,7 @@ def issue_documents(application: Application, officer=None) -> list[IssuedDocume
             "ppt": allocation.ppt_number,
             "url": portal_url(f"alokasi/{allocation.pk}/"),
         }
-    else:
+    elif application.is_transfer:
         allocation = Allocation.objects.select_for_update().get(
             pk=application.source_allocation_id
         )
@@ -627,6 +724,49 @@ def issue_documents(application: Application, officer=None) -> list[IssuedDocume
             _("Peralihan hak %s kepada Anda") % allocation.kpt_number,
             body,
         )
+    elif application.is_extension:
+        allocation = Allocation.objects.select_for_update().get(
+            pk=application.source_allocation_id
+        )
+        years = allocation.plot.effective_term_years
+        is_renewal = application.service_type == enums.ServiceType.RENEWAL
+        if is_renewal:
+            # Pembaruan: periode baru dimulai hari ini.
+            allocation.start_date = today
+            new_end = _add_years(today, years) - datetime.timedelta(days=1)
+        else:
+            # Perpanjangan: sambung dari akhir jangka berjalan, kecuali sudah
+            # lewat saat dokumen terbit.
+            base = max(allocation.end_date, today)
+            new_end = _add_years(base, years) - datetime.timedelta(days=1)
+        allocation.end_date = new_end
+        allocation.status = enums.AllocationStatus.ACTIVE
+        allocation.save(
+            update_fields=["start_date", "end_date", "status", "modified_at"]
+        )
+        number = _next_number("SPH")
+        issued.append(documents.issue(application, allocation, "sph", number))
+        body = _(
+            "Surat %(service)s untuk alokasi KPT %(kpt)s telah terbit; jangka waktu "
+            "kini berlaku sampai %(end)s. Unduh di %(url)s"
+        ) % {
+            "service": application.get_service_type_display(),
+            "kpt": allocation.kpt_number,
+            "end": allocation.end_date.strftime("%d-%m-%Y"),
+            "url": portal_url(f"permohonan/{application.number}/"),
+        }
+    else:  # Pecah PL dan pengukuran ulang: surat persetujuan, tanpa ubah alokasi.
+        allocation = application.source_allocation
+        number = _next_number("SPT")
+        issued.append(documents.issue(application, allocation, "spt", number))
+        body = _(
+            "Surat persetujuan %(service)s untuk alokasi KPT %(kpt)s telah terbit. "
+            "Unduh di %(url)s"
+        ) % {
+            "service": application.get_service_type_display(),
+            "kpt": allocation.kpt_number,
+            "url": portal_url(f"permohonan/{application.number}/"),
+        }
     _set_status(application, S.ISSUED, actor=officer)
     notify(
         application.applicant,

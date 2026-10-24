@@ -1,0 +1,36 @@
+{% extends "alokasi/portal/base.html" %}{% load alokasi_tags %}
+{% block title %}Lacak Permohonan{% endblock %}
+{% block content %}
+<h1>Lacak Permohonan</h1>
+<p class="muted">Lacak status permohonan Anda tanpa perlu masuk. Nomor permohonan dan PIN tercantum pada halaman permohonan di portal.</p>
+
+<section class="card">
+  <form method="post" action="{% url 'portal:track' %}">{% csrf_token %}
+    {% include "alokasi/portal/_form.html" with form=form %}
+    <button class="btn btn-accent" type="submit">Lacak</button>
+  </form>
+</section>
+
+{% if application %}
+<section class="card">
+  <div class="actions-row" style="justify-content:space-between">
+    <h2 style="margin:0">Permohonan {{ application.number }}</h2>
+    <span class="badge badge-{{ application.status }}">{{ application.get_status_display }}</span>
+  </div>
+  <dl class="props" style="margin-top:12px">
+    <dt>Layanan</dt><dd>{{ application.get_service_type_display }}</dd>
+    {% if application.plot %}
+    <dt>Lahan</dt><dd>{{ application.plot.code }} – {{ application.plot.name }}</dd>
+    {% elif application.source_allocation %}
+    <dt>Alokasi</dt><dd>KPT {{ application.source_allocation.kpt_number }} · lahan {{ application.source_allocation.plot.code }}</dd>
+    {% endif %}
+    <dt>Diajukan</dt><dd>{{ application.submitted_at|tanggal|default:"–" }}</dd>
+  </dl>
+  <h3>Riwayat</h3>
+  <ol class="timeline">
+    {% for e in public_events %}<li><strong>{{ e.get_status_display }}</strong><br><span class="small muted">{{ e.created_at|date:"d-m-Y H:i" }}</span>{% if e.note %}<div class="small prose">{{ e.note }}</div>{% endif %}</li>{% endfor %}
+  </ol>
+  <p class="small muted">Rincian lengkap, dokumen, dan tagihan hanya terlihat setelah Anda <a href="{% url 'portal:login' %}">masuk</a>.</p>
+</section>
+{% endif %}
+{% endblock %}

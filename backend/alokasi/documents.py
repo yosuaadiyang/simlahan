@@ -19,6 +19,8 @@ TEMPLATES = {
     "kpt": "alokasi/pdf/kpt.html",
     "ppt": "alokasi/pdf/ppt.html",
     "iph": "alokasi/pdf/iph.html",
+    "sph": "alokasi/pdf/sph.html",
+    "spt": "alokasi/pdf/spt.html",
 }
 
 

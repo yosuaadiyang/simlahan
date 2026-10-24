@@ -1,5 +1,7 @@
 """Formulir portal pemohon dan panel petugas."""
 
+from decimal import Decimal
+
 from django import forms
 from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.forms import AuthenticationForm
@@ -220,6 +222,31 @@ class TransferApplicationForm(RecipientEmailMixin, forms.Form):
     )
 
 
+# Layanan atas alokasi sendiri: perpanjangan, pembaruan, pecah PL, pengukuran ulang.
+SERVICE_APPLICATION_TYPES = tuple(
+    (value, label)
+    for value, label in enums.ServiceType.choices
+    if value in enums.OWN_ALLOCATION_SERVICES and value != enums.ServiceType.TRANSFER
+)
+
+
+class ServiceApplicationForm(forms.Form):
+    service_type = forms.ChoiceField(
+        label=_("Jenis layanan"), choices=SERVICE_APPLICATION_TYPES
+    )
+    reason = forms.CharField(
+        label=_("Alasan / uraian permohonan"), widget=forms.Textarea(attrs={"rows": 4})
+    )
+
+
+class ServiceReasonEditForm(forms.ModelForm):
+    class Meta:
+        model = Application
+        fields = ("transfer_reason",)
+        labels = {"transfer_reason": _("Alasan / uraian permohonan")}
+        widgets = {"transfer_reason": forms.Textarea(attrs={"rows": 4})}
+
+
 class TransferEditForm(RecipientEmailMixin, forms.ModelForm):
     recipient_email = forms.EmailField(label=_("Surel akun penerima hak"))
 
@@ -329,6 +356,42 @@ class VerifyCodeForm(forms.Form):
         help_text=_("Kode tercetak di bawah kode QR pada dokumen."),
         error_messages={"invalid": _("Format kode tidak valid.")},
     )
+
+
+class TrackApplicationForm(forms.Form):
+    """Lacak permohonan tanpa login: nomor + PIN."""
+
+    number = forms.CharField(label=_("Nomor permohonan"), max_length=32)
+    pin = forms.CharField(
+        label=_("PIN pelacakan"),
+        max_length=12,
+        help_text=_("PIN tercantum pada halaman permohonan Anda di portal."),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.setdefault("autocomplete", "off")
+
+
+class UwtCalculatorForm(forms.Form):
+    """Simulasi biaya UWT; tidak menyimpan data apa pun."""
+
+    plot = forms.ModelChoiceField(
+        label=_("Lahan"), queryset=None, empty_label=_("— pilih lahan —")
+    )
+    area_m2 = forms.DecimalField(
+        label=_("Luas (m²)"), min_value=Decimal("0.01"), max_digits=16, decimal_places=2
+    )
+    years = forms.IntegerField(
+        label=_("Jangka waktu (tahun)"), min_value=1, max_value=99
+    )
+
+    def __init__(self, *args, **kwargs):
+        from alokasi.models import LandPlot
+
+        super().__init__(*args, **kwargs)
+        self.fields["plot"].queryset = LandPlot.objects.filter(is_published=True)
 
 
 # --------------------------------------------------------------------------

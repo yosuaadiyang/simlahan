@@ -8,6 +8,7 @@ perizinan & pembangunan → pemantauan lahan tidur → izin peralihan hak.
 """
 
 import datetime
+import secrets
 import uuid
 from decimal import ROUND_HALF_UP, Decimal
 
@@ -113,6 +114,16 @@ class AllocationSettings(models.Model):
     )
     transfer_fee_per_m2 = models.DecimalField(
         verbose_name=_("Biaya administrasi peralihan hak per m² (Rp)"),
+        default=Decimal("0"),
+        **MONEY,
+    )
+    extension_admin_fee = models.DecimalField(
+        verbose_name=_("Biaya administrasi perpanjangan/pembaruan hak (Rp)"),
+        default=Decimal("0"),
+        **MONEY,
+    )
+    service_admin_fee = models.DecimalField(
+        verbose_name=_("Biaya administrasi pecah PL / pengukuran ulang (Rp)"),
         default=Decimal("0"),
         **MONEY,
     )
@@ -447,6 +458,90 @@ class RequirementDocType(models.Model):
         return qs
 
 
+class ServiceCatalog(models.Model):
+    """Katalog layanan perizinan portal (katalog terstruktur ala LMS).
+
+    Satu baris per layanan; tab halaman detail portal (deskripsi, syarat,
+    alur, durasi, tarif, dokumen terbit, dasar hukum) diambil dari isian di
+    sini plus daftar RequirementDocType yang berlaku untuk layanan tersebut.
+    """
+
+    class Category(models.TextChoices):
+        LAND = "pertanahan", _("Layanan pertanahan")
+        DOCUMENT = "perubahan_dokumen", _("Layanan perubahan dokumen")
+
+    name = models.CharField(verbose_name=_("Nama layanan"), max_length=255)
+    slug = models.SlugField(
+        verbose_name=_("Slug"), max_length=255, unique=True, blank=True
+    )
+    category = models.CharField(
+        verbose_name=_("Kelompok"),
+        max_length=32,
+        choices=Category.choices,
+        default=Category.LAND,
+    )
+    # Layanan daring: kosongkan bila hanya informasi (belum/tidak daring).
+    service_type = models.CharField(
+        verbose_name=_("Jenis permohonan daring"),
+        max_length=16,
+        choices=enums.ServiceType.choices,
+        blank=True,
+        default="",
+        help_text=_("Kosongkan bila layanan belum dapat diajukan secara daring."),
+    )
+    summary = models.CharField(
+        verbose_name=_("Ringkasan"), max_length=500, blank=True, default=""
+    )
+    description = models.TextField(verbose_name=_("Deskripsi"), blank=True, default="")
+    flow = models.TextField(
+        verbose_name=_("Alur layanan"),
+        blank=True,
+        default="",
+        help_text=_("Satu langkah per baris."),
+    )
+    duration_note = models.CharField(
+        verbose_name=_("Durasi pemrosesan"), max_length=255, blank=True, default=""
+    )
+    tariff_note = models.TextField(
+        verbose_name=_("Tarif"), blank=True, default="", help_text=_("Uraian tarif.")
+    )
+    issued_note = models.TextField(
+        verbose_name=_("Dokumen terbit"), blank=True, default=""
+    )
+    legal_basis = models.TextField(
+        verbose_name=_("Dasar hukum"), blank=True, default=""
+    )
+    order = models.PositiveIntegerField(verbose_name=_("Urutan"), default=0)
+    is_active = models.BooleanField(verbose_name=_("Aktif"), default=True)
+
+    class Meta:
+        verbose_name = _("Katalog layanan")
+        verbose_name_plural = _("Katalog layanan")
+        ordering = ["category", "order", "name"]
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base = slugify(self.name)[:200] or "layanan"
+            slug = base
+            n = 2
+            while ServiceCatalog.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base}-{n}"
+                n += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
+
+    @property
+    def requirement_docs(self):
+        if not self.service_type:
+            return ()
+        return RequirementDocType.objects.filter(
+            is_active=True, service_type=self.service_type
+        )
+
+
 class VerificationCriterion(models.Model):
     """Kriteria penilaian Tim Verifikasi Teknis."""
 
@@ -475,6 +570,17 @@ class Application(TimeStampedModel):
 
     number = models.CharField(
         verbose_name=_("Nomor"), max_length=32, unique=True, editable=False
+    )
+    # PIN pelacakan publik: nomor + PIN membuka halaman /portal/lacak/ tanpa
+    # login. Dibuat otomatis sekali dan tidak pernah ditampilkan ke publik
+    # selain kepada pemilik permohonan.
+    tracking_pin = models.CharField(
+        verbose_name=_("PIN pelacakan"),
+        max_length=12,
+        blank=True,
+        default="",
+        editable=False,
+        help_text=_("Nomor + PIN ini dapat dipakai melacak status tanpa login."),
     )
     service_type = models.CharField(
         verbose_name=_("Layanan"), max_length=16, choices=enums.ServiceType.choices
@@ -587,12 +693,22 @@ class Application(TimeStampedModel):
     def __str__(self):
         return self.number
 
+    NUMBER_PREFIXES = {
+        enums.ServiceType.ALLOCATION: "ALK",
+        enums.ServiceType.TRANSFER: "PRL",
+        enums.ServiceType.EXTENSION: "PPJ",
+        enums.ServiceType.RENEWAL: "PMB",
+        enums.ServiceType.SPLIT: "PCH",
+        enums.ServiceType.REMEASURE: "PGU",
+    }
+
     def save(self, *args, **kwargs):
         if not self.number:
-            prefix = (
-                "ALK" if self.service_type == enums.ServiceType.ALLOCATION else "PRL"
+            self.number = _next_number(
+                self.NUMBER_PREFIXES.get(self.service_type, "PRM")
             )
-            self.number = _next_number(prefix)
+        if not self.tracking_pin:
+            self.tracking_pin = secrets.token_hex(4).upper()
         super().save(*args, **kwargs)
 
     @property
@@ -602,6 +718,17 @@ class Application(TimeStampedModel):
     @property
     def is_allocation(self) -> bool:
         return self.service_type == enums.ServiceType.ALLOCATION
+
+    @property
+    def is_transfer(self) -> bool:
+        return self.service_type == enums.ServiceType.TRANSFER
+
+    @property
+    def is_extension(self) -> bool:
+        return self.service_type in (
+            enums.ServiceType.EXTENSION,
+            enums.ServiceType.RENEWAL,
+        )
 
     @property
     def area_m2(self) -> Decimal | None:
@@ -913,6 +1040,8 @@ class IssuedDocument(models.Model):
         ("kpt", _("Keputusan Pengalokasian Tanah (KPT)")),
         ("ppt", _("Perjanjian Pemanfaatan Tanah (PPT)")),
         ("iph", _("Surat Izin Persetujuan Peralihan Hak Atas Tanah")),
+        ("sph", _("Surat Perpanjangan / Pembaruan Hak Atas Tanah")),
+        ("spt", _("Surat Persetujuan Layanan Tanah (pecah PL / pengukuran ulang)")),
     )
 
     kind = models.CharField(verbose_name=_("Jenis"), max_length=8, choices=KIND_CHOICES)
@@ -1057,6 +1186,7 @@ for _model in (
     InfoPage,
     Applicant,
     RequirementDocType,
+    ServiceCatalog,
     VerificationCriterion,
     Application,
     ApplicationDocument,

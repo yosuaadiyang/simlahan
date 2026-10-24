@@ -52,8 +52,12 @@ def seeded(db):
         Group.objects.get_or_create(
             pk=group.value, defaults={"name": group.name.title()}
         )
-    module = importlib.import_module("alokasi.migrations.0002_seed_defaults")
-    module.seed(django_apps, None)
+    for migration_name in (
+        "alokasi.migrations.0002_seed_defaults",
+        "alokasi.migrations.0007_seed_layanan",
+    ):
+        module = importlib.import_module(migration_name)
+        module.seed(django_apps, None)
     call_command("set_group_model_permissions", verbosity=0, stdout=io.StringIO())
     config = AllocationSettings.load()
     config.allocation_admin_fee = Decimal("2500000")

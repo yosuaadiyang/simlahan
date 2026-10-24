@@ -40,8 +40,12 @@
         <dt>Alokasi</dt><dd>KPT {{ application.source_allocation.kpt_number }} · lahan {{ application.source_allocation.plot.code }}</dd>
         <dt>Luas</dt><dd>{{ application.source_allocation.area_m2|angka:2|patah }} m²</dd>
         <dt>Pemohon (pemegang)</dt><dd>{{ application.applicant.name }}</dd>
+        {% if application.is_transfer %}
         <dt>Penerima hak</dt><dd>{{ application.recipient.name|default:"-" }}</dd>
         <dt>Alasan peralihan</dt><dd class="prose">{{ application.transfer_reason|default:"-" }}</dd>
+        {% else %}
+        <dt>Alasan / uraian</dt><dd class="prose">{{ application.transfer_reason|default:"-" }}</dd>
+        {% endif %}
       </dl>
       {% endif %}
     </section>
@@ -145,6 +149,17 @@
       <form method="post" action="{% url 'portal:application_cancel' application.number %}" data-confirm="Batalkan permohonan ini? Tindakan ini tidak dapat diurungkan.">{% csrf_token %}
         <button class="btn btn-danger" type="submit">Batalkan permohonan</button>
       </form>
+    </section>
+    {% endif %}
+    {% if is_owner %}
+    <section class="card">
+      <h2>Lacak tanpa login</h2>
+      <p class="small">Gunakan nomor dan PIN berikut di menu <a href="{% url 'portal:track' %}">Lacak</a> untuk memantau status tanpa masuk:</p>
+      <dl class="props">
+        <dt>Nomor</dt><dd><strong>{{ application.number }}</strong></dd>
+        <dt>PIN</dt><dd><strong>{{ application.tracking_pin }}</strong></dd>
+      </dl>
+      <p class="small muted">Jangan bagikan PIN ini bila Anda tidak ingin orang lain melihat status permohonan.</p>
     </section>
     {% endif %}
     <section class="card">

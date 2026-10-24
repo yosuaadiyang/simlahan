@@ -3,6 +3,7 @@
 import json
 import mimetypes
 import os
+from decimal import Decimal
 from functools import wraps
 from urllib.parse import urlencode
 
@@ -37,8 +38,12 @@ from alokasi.forms import (
     PortalLoginForm,
     RegistrationForm,
     ResendActivationForm,
+    ServiceApplicationForm,
+    ServiceReasonEditForm,
+    TrackApplicationForm,
     TransferApplicationForm,
     TransferEditForm,
+    UwtCalculatorForm,
     VerifyCodeForm,
 )
 from alokasi.models import (
@@ -53,6 +58,7 @@ from alokasi.models import (
     LandPlot,
     PermitReport,
     RequirementDocType,
+    ServiceCatalog,
     VerificationCriterion,
 )
 from alokasi.monitoring import report_deadline
@@ -336,6 +342,121 @@ def services_page(request):
         ),
     }
     return render(request, "alokasi/portal/services.html", context)
+
+
+def service_catalog(request):
+    """Katalog layanan terstruktur (ala LMS): daftar per kelompok."""
+    entries = ServiceCatalog.objects.filter(is_active=True)
+    grouped = [
+        (value, label, list(entries.filter(category=value)))
+        for value, label in ServiceCatalog.Category.choices
+        if entries.filter(category=value).exists()
+    ]
+    return render(
+        request,
+        "alokasi/portal/service_catalog.html",
+        {"grouped": grouped},
+    )
+
+
+def service_catalog_detail(request, slug):
+    entry = get_object_or_404(ServiceCatalog, slug=slug, is_active=True)
+    return render(
+        request,
+        "alokasi/portal/service_catalog_detail.html",
+        {
+            "entry": entry,
+            "requirements": entry.requirement_docs,
+            "config": AllocationSettings.load(),
+        },
+    )
+
+
+def uwt_calculator(request):
+    """Simulasi biaya UWT lahan; murni hitungan, tidak menyimpan data."""
+    config = AllocationSettings.load()
+    form = UwtCalculatorForm(request.GET or None)
+    result = None
+    if form.is_valid():
+        plot = form.cleaned_data["plot"]
+        area = form.cleaned_data["area_m2"]
+        years = form.cleaned_data["years"]
+        total = (area * plot.uwt_rate_per_m2_year * years).quantize(Decimal("1"))
+        result = {
+            "plot": plot,
+            "area_m2": area,
+            "years": years,
+            "rate": plot.uwt_rate_per_m2_year,
+            "uwt_total": total,
+            "admin_fee": config.allocation_admin_fee,
+            "grand_total": (total + config.allocation_admin_fee).quantize(Decimal("1")),
+        }
+    elif form.is_bound:
+        # Isian belum lengkap: prapisi luas/jangka dari lahan terpilih bila ada.
+        plot_id = request.GET.get("plot")
+        if plot_id:
+            plot = LandPlot.objects.filter(pk=plot_id, is_published=True).first()
+            if plot:
+                form.fields["area_m2"].initial = plot.area_m2
+                form.fields["years"].initial = plot.effective_term_years
+    return render(
+        request,
+        "alokasi/portal/calculator.html",
+        {"form": form, "result": result, "config": config},
+    )
+
+
+def track_application(request):
+    """Lacak permohonan publik: nomor + PIN, tanpa login."""
+    form = TrackApplicationForm(request.POST or None)
+    application = None
+    public_events = []
+    if request.method == "POST" and form.is_valid():
+        if _throttled(request, "lacak", limit=10, window=60):
+            return _too_many(request)
+        application = (
+            Application.objects.filter(
+                number__iexact=form.cleaned_data["number"].strip(),
+                tracking_pin__iexact=form.cleaned_data["pin"].strip(),
+            )
+            .select_related("plot", "source_allocation__plot")
+            .first()
+        )
+        if application is None:
+            form.add_error(None, _("Nomor atau PIN pelacakan tidak ditemukan."))
+        else:
+            # Rincian hanya nomor, layanan, status, dan riwayat — tanpa data
+            # pribadi pemohon.
+            public_events = list(application.events.order_by("created_at", "pk"))
+    return render(
+        request,
+        "alokasi/portal/track.html",
+        {
+            "form": form,
+            "application": application,
+            "public_events": public_events,
+        },
+    )
+
+
+def help_page(request):
+    """Halaman bantuan: tanya jawab, regulasi, tutorial, dan kontak."""
+    return render(
+        request,
+        "alokasi/portal/help.html",
+        {
+            "faqs": InfoPage.objects.filter(
+                is_published=True, category=enums.InfoCategory.FAQ
+            ),
+            "regulations": InfoPage.objects.filter(
+                is_published=True, category=enums.InfoCategory.REGULATION
+            ),
+            "tutorials": InfoPage.objects.filter(
+                is_published=True, category=enums.InfoCategory.TUTORIAL
+            ),
+            "config": AllocationSettings.load(),
+        },
+    )
 
 
 def info_index(request, category=None):
@@ -702,7 +823,7 @@ def application_detail(request, number):
         ),
         "events": application.events.all(),
         "invoices": invoices if is_owner else [],
-        "transfer_in_review": not application.is_allocation
+        "transfer_in_review": application.is_transfer
         and application.status in (S.SUBMITTED, S.VERIFYING),
         "can_accept": not is_owner
         and application.status in (S.SUBMITTED, S.VERIFYING)
@@ -734,12 +855,16 @@ def application_edit(request, number):
     if not application.is_editable:
         messages.error(request, _("Permohonan ini tidak dapat diubah lagi."))
         return redirect("portal:application_detail", number=number)
-    form_class = (
-        AllocationApplicationForm if application.is_allocation else TransferEditForm
-    )
+    if application.is_allocation:
+        form_class = AllocationApplicationForm
+    elif application.is_transfer:
+        form_class = TransferEditForm
+    else:
+        # Perpanjangan, pembaruan, pecah PL, pengukuran ulang: hanya uraian.
+        form_class = ServiceReasonEditForm
     form = form_class(request.POST or None, instance=application)
     if request.method == "POST" and form.is_valid():
-        if not application.is_allocation and form.recipient.pk == request.applicant.pk:
+        if application.is_transfer and form.recipient.pk == request.applicant.pk:
             form.add_error(
                 "recipient_email", _("Penerima hak tidak boleh pemohon sendiri.")
             )
@@ -1067,5 +1192,36 @@ def transfer_create(request, pk):
     return render(
         request,
         "alokasi/portal/transfer_form.html",
+        {"allocation": allocation, "form": form},
+    )
+
+
+@applicant_required
+def service_create(request, pk):
+    """Ajukan layanan atas alokasi sendiri: perpanjangan, pembaruan, pecah
+    PL, atau pengukuran ulang (alur permohonan sama dengan peralihan)."""
+    allocation = _own_allocation(request, pk)
+    form = ServiceApplicationForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        try:
+            application = services.create_service_application(
+                request.applicant,
+                allocation,
+                form.cleaned_data["service_type"],
+                form.cleaned_data["reason"],
+            )
+        except ValidationError as error:
+            for message in _form_errors(error):
+                form.add_error(None, message)
+        else:
+            messages.success(
+                request,
+                _("Draf permohonan %s dibuat. Unggah dokumen lalu ajukan.")
+                % application.get_service_type_display(),
+            )
+            return redirect("portal:application_detail", number=application.number)
+    return render(
+        request,
+        "alokasi/portal/service_form.html",
         {"allocation": allocation, "form": form},
     )

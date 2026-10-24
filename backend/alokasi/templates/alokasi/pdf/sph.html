@@ -1,0 +1,34 @@
+{% extends "alokasi/pdf/_base.html" %}{% load alokasi_tags %}
+{% block title %}Perpanjangan Hak {{ doc.number }}{% endblock %}
+{% block content %}
+<h1>SURAT PERPANJANGAN / PEMBARUAN HAK ATAS TANAH</h1>
+<p class="center">Nomor: {{ doc.number }}</p>
+
+<p>Berdasarkan permohonan Nomor {{ application.number }} tanggal {{ application.submitted_at|tanggal }},
+{{ config.authority_short_name }} memberikan persetujuan perpanjangan/pembaruan hak atas tanah sebagai berikut:</p>
+
+<table class="data">
+  <tr><td style="width: 32%;">Dasar alokasi</td><td>: KPT {{ allocation.kpt_number }} / PPT {{ allocation.ppt_number }}</td></tr>
+  <tr><td>Kode lahan</td><td>: {{ plot.code }} – {{ plot.name }}</td></tr>
+  <tr><td>Luas</td><td>: {{ allocation.area_m2|angka:2 }} m²</td></tr>
+  <tr><td>Peruntukan</td><td>: {{ allocation.activity }}</td></tr>
+  <tr><td>Mulai berlaku</td><td>: {{ allocation.start_date|tanggal }}</td></tr>
+  <tr><td>Berlaku sampai</td><td>: {{ allocation.end_date|tanggal }}</td></tr>
+</table>
+
+<h2>Pemegang hak</h2>
+<table class="data">
+  <tr><td style="width: 32%;">Nama</td><td>: {{ holder.name }}</td></tr>
+  {% if holder.nib %}<tr><td>NIB</td><td>: {{ holder.nib }}</td></tr>{% endif %}
+  <tr><td>Alamat</td><td>: {{ holder.address }}</td></tr>
+</table>
+
+<h2>Ketentuan</h2>
+<ol>
+  <li>Perpanjangan/pembaruan berlaku untuk jangka waktu sebagaimana tercantum di atas dan tetap tunduk pada ketentuan Perjanjian Pemanfaatan Tanah Nomor {{ allocation.ppt_number }}.</li>
+  <li>Pemegang hak tetap wajib membayar UWT, melaporkan progres perizinan dan pembangunan, serta mematuhi seluruh ketentuan alokasi.</li>
+  <li>Surat ini bukan bukti kepemilikan; pendaftaran hak tetap dilakukan pada instansi pertanahan yang berwenang.</li>
+</ol>
+
+{% include "alokasi/pdf/_signature.html" %}
+{% endblock %}

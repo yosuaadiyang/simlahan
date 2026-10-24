@@ -48,9 +48,10 @@ SESSION_APP_PREFIXES = ("/portal/", "/aset/", "/komando/", "/oauth/")
 PUBLIC_SESSION_PAGES = (
     re.compile(
         r"^/portal/("
-        r"|lahan/|lahan/[^/]+/|lahan/[^/]+/foto/|layanan/"
+        r"|lahan/|lahan/[^/]+/|lahan/[^/]+/foto/|layanan/|layanan/[^/]+/"
         r"|informasi/.*|verifikasi/.*|daftar/|aktivasi/.*|masuk/|keluar/"
         r"|lupa-sandi/.*|atur-sandi/.*|pengaduan/.*|lelang/|lelang/[^/]+/"
+        r"|kalkulator-uwt/|lacak/|bantuan/"
         r")$"
     ),
     # Peta berbagi baca-saja; akses dikendalikan token di URL.

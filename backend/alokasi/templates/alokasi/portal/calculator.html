@@ -1,0 +1,39 @@
+{% extends "alokasi/portal/base.html" %}{% load alokasi_tags %}
+{% block title %}Kalkulator UWT{% endblock %}
+{% block content %}
+<h1>Simulasi Biaya UWT</h1>
+<p class="muted">Hitung perkiraan Uang Wajib Tahunan (UWT) untuk lahan yang tersedia sebelum mengajukan permohonan. Angka bersifat simulasi; tagihan resmi terbit setelah permohonan disetujui.</p>
+
+<div class="split">
+  <section class="card">
+    <form method="get" action="{% url 'portal:uwt_calculator' %}">
+      {% include "alokasi/portal/_form.html" with form=form %}
+      <button class="btn btn-accent" type="submit">Hitung</button>
+    </form>
+  </section>
+
+  {% if result %}
+  <section class="card">
+    <h2>Hasil simulasi</h2>
+    <dl class="props">
+      <dt>Lahan</dt><dd>{{ result.plot.code }} – {{ result.plot.name }}{% if result.plot.district %} (Kec. {{ result.plot.district }}){% endif %}</dd>
+      <dt>Tarif</dt><dd>Rp {{ result.rate|rupiah|patah }} / m² / tahun</dd>
+      <dt>Luas</dt><dd>{{ result.area_m2|angka:2|patah }} m²</dd>
+      <dt>Jangka waktu</dt><dd>{{ result.years }} tahun</dd>
+    </dl>
+    <table class="data" style="margin-top:12px">
+      <tr><td>UWT ({{ result.area_m2|angka:0 }} m² × Rp {{ result.rate|rupiah|patah }} × {{ result.years }} tahun)</td><td><strong>Rp {{ result.uwt_total|rupiah|patah }}</strong></td></tr>
+      <tr><td>Biaya administrasi alokasi</td><td>Rp {{ result.admin_fee|rupiah|patah }}</td></tr>
+      <tr><td><strong>Total perkiraan</strong></td><td><strong>Rp {{ result.grand_total|rupiah|patah }}</strong></td></tr>
+    </table>
+    {% if result.plot.uwt_rate_per_m2_year == 0 %}<div class="alert alert-warn small">Tarif lahan ini belum diisi petugas; hubungi {{ config.authority_short_name }} untuk informasi resmi.</div>{% endif %}
+    <p class="small muted">{{ config.payment_instructions }}</p>
+    <a class="btn btn-outline btn-small" href="{% url 'portal:plot_detail' result.plot.code %}">Lihat detail lahan & ajukan permohonan</a>
+  </section>
+  {% else %}
+  <section class="card small muted">
+    Pilih lahan, isi luas dan jangka waktu, lalu tekan <strong>Hitung</strong>. Tarif UWT per lahan tercantum juga pada halaman detail masing-masing lahan.
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

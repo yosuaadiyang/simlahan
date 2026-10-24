@@ -22,6 +22,8 @@
       <a href="{% url 'portal:services' %}"{% if name == 'services' %} class="active"{% endif %}>Layanan</a>
       <a href="{% url 'portal:info_index' %}"{% if name == 'info_index' or name == 'info_category' or name == 'info_detail' %} class="active"{% endif %}>Informasi</a>
       <a href="{% url 'portal:verify' %}"{% if name == 'verify' or name == 'verify_token' %} class="active"{% endif %}>Cek Dokumen</a>
+      <a href="{% url 'portal:track' %}"{% if name == 'track' %} class="active"{% endif %}>Lacak</a>
+      <a href="{% url 'portal:help' %}"{% if name == 'help' %} class="active"{% endif %}>Bantuan</a>
       {% aset_portal_flags as aset_flags %}
       {% if aset_flags.enable_tender %}<a href="{% url 'aset_portal:tender_list' %}"{% if name == 'tender_list' or name == 'tender_detail' or name == 'bid_submit' %} class="active"{% endif %}>Lelang</a>{% endif %}
       {% if aset_flags.enable_grievance %}<a href="{% url 'aset_portal:grievance_create' %}"{% if name == 'grievance_create' or name == 'grievance_done' or name == 'grievance_check' %} class="active"{% endif %}>Pengaduan</a>{% endif %}

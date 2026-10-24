@@ -46,6 +46,20 @@ class ApplicantType(models.TextChoices):
 class ServiceType(models.TextChoices):
     ALLOCATION = "alokasi", _("Permohonan alokasi tanah")
     TRANSFER = "peralihan", _("Permohonan izin peralihan hak")
+    EXTENSION = "perpanjangan", _("Permohonan perpanjangan hak atas tanah")
+    RENEWAL = "pembaruan", _("Permohonan pembaruan hak atas tanah")
+    SPLIT = "pecah_pl", _("Permohonan pemecahan penetapan lokasi (PL)")
+    REMEASURE = "ukur_ulang", _("Permohonan pengukuran ulang")
+
+
+# Layanan atas alokasi milik sendiri (bukan alokasi lahan baru).
+OWN_ALLOCATION_SERVICES = (
+    ServiceType.TRANSFER,
+    ServiceType.EXTENSION,
+    ServiceType.RENEWAL,
+    ServiceType.SPLIT,
+    ServiceType.REMEASURE,
+)
 
 
 class ApplicationStatus(models.TextChoices):
@@ -74,6 +88,10 @@ class InvoiceKind(models.TextChoices):
     UWT = "uwt", _("Uang Wajib Tahunan (UWT)")
     ALLOCATION_FEE = "adm_alokasi", _("Biaya administrasi alokasi")
     TRANSFER_FEE = "adm_peralihan", _("Biaya administrasi peralihan hak")
+    EXTENSION_FEE = "adm_perpanjangan", _(
+        "Biaya administrasi perpanjangan/pembaruan hak"
+    )
+    SERVICE_FEE = "adm_layanan", _("Biaya administrasi layanan tanah")
 
 
 class InvoiceStatus(models.TextChoices):

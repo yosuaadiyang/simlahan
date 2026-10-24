@@ -35,6 +35,7 @@ from alokasi.models import (
     LandPlot,
     PermitReport,
     RequirementDocType,
+    ServiceCatalog,
     VerificationCriterion,
     VerificationScore,
 )
@@ -185,6 +186,8 @@ class AllocationSettingsAdmin(admin.ModelAdmin):
                     "allocation_admin_fee",
                     "transfer_admin_fee",
                     "transfer_fee_per_m2",
+                    "extension_admin_fee",
+                    "service_admin_fee",
                     "invoice_due_days",
                     "payment_instructions",
                 )
@@ -412,6 +415,52 @@ class InfoPageAdmin(PrivateFileAdminMixin, admin.ModelAdmin):
         "published_at",
         "is_published",
     )
+
+
+@admin.register(ServiceCatalog)
+class ServiceCatalogAdmin(admin.ModelAdmin):
+    list_display = (
+        "name",
+        "category",
+        "service_type",
+        "duration_note",
+        "order",
+        "is_active",
+    )
+    list_filter = ("category", "service_type", "is_active")
+    list_editable = ("order", "is_active")
+    search_fields = ("name", "summary", "description")
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    "name",
+                    "slug",
+                    "category",
+                    "service_type",
+                    "order",
+                    "is_active",
+                )
+            },
+        ),
+        (_("Isian portal"), {"fields": ("summary", "description", "flow")}),
+        (
+            _("Ketentuan"),
+            {
+                "fields": (
+                    "duration_note",
+                    "tariff_note",
+                    "issued_note",
+                    "legal_basis",
+                ),
+                "description": _(
+                    "Kolom ini tampil sebagai bagian halaman detail layanan di portal."
+                ),
+            },
+        ),
+    )
+    prepopulated_fields = {"slug": ("name",)}
 
 
 @admin.register(RequirementDocType)

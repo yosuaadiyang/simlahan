@@ -1,0 +1,43 @@
+{% extends "alokasi/portal/base.html" %}
+{% block title %}Bantuan{% endblock %}
+{% block content %}
+<h1>Bantuan</h1>
+<p class="muted">Tanya jawab, regulasi, tutorial, dan kontak layanan {{ config.authority_name }}.</p>
+
+<div class="split">
+  <section class="card">
+    <h2>Tanya jawab</h2>
+    {% for item in faqs %}
+    <details class="panel">
+      <summary>{{ item.title }}</summary>
+      <div class="prose small" style="margin-top:8px">{{ item.body|linebreaks }}</div>
+    </details>
+    {% empty %}<p class="muted">Belum ada tanya jawab.</p>{% endfor %}
+    <p class="small muted" style="margin-top:12px">Pertanyaan lain? Hubungi kontak layanan di bawah.</p>
+  </section>
+
+  <aside>
+    <section class="card">
+      <h2>Regulasi</h2>
+      <ul>{% for item in regulations %}<li><a href="{% url 'portal:info_detail' item.slug %}">{{ item.title }}</a></li>{% empty %}<li class="muted">–</li>{% endfor %}</ul>
+    </section>
+    <section class="card">
+      <h2>Video tutorial</h2>
+      <ul>{% for item in tutorials %}<li><a href="{% url 'portal:info_detail' item.slug %}">{{ item.title }}</a></li>{% empty %}<li class="muted">–</li>{% endfor %}</ul>
+    </section>
+    <section class="card">
+      <h2>Kontak layanan</h2>
+      <div class="prose small">{{ config.contact_info|default:"Hubungi " }}{% if not config.contact_info %}{{ config.authority_name }}.{% endif %}</div>
+    </section>
+    <section class="card">
+      <h2>Panduan cepat</h2>
+      <ul class="small">
+        <li><a href="{% url 'portal:service_terms' %}">Ketentuan umum & tahapan</a></li>
+        <li><a href="{% url 'portal:uwt_calculator' %}">Kalkulator UWT</a></li>
+        <li><a href="{% url 'portal:track' %}">Lacak permohonan</a></li>
+        <li><a href="{% url 'portal:verify' %}">Cek keaslian dokumen</a></li>
+      </ul>
+    </section>
+  </aside>
+</div>
+{% endblock %}
