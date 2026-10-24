@@ -30,3 +30,12 @@ def test_null_byte_in_json_body_is_rejected(admin_client):
 @pytest.mark.django_db
 def test_normal_requests_pass(client):
     assert client.get("/portal/lahan/", {"q": "Rempang"}).status_code == 200
+
+
+@pytest.mark.django_db
+def test_api_multipart_upload_still_reaches_drf_parser(admin_client):
+    # Badan multipart untuk DRF tidak boleh dibaca middleware, karena parser
+    # DRF-lah yang membaca isian "data" berisi JSON.
+    response = admin_client.post("/v1/collection_letter/", {"x": "1"})
+    assert response.status_code == 400
+    assert "data" in response.json()["detail"]
