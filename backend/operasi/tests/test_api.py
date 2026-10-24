@@ -475,6 +475,10 @@ def test_satellite_analysis_without_ai(monkeypatch, field, korwil):
         content_type="application/json",
     )
     assert too_big.status_code == 400
+    not_object = client.post(
+        api("ai-satelit/"), json.dumps([]), content_type="application/json"
+    )
+    assert not_object.status_code == 400
 
 
 def test_satellite_analysis_with_ai(monkeypatch, field, korwil):

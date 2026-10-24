@@ -9,8 +9,8 @@ from django.utils import translation
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_400_BAD_REQUEST,
-    HTTP_500_INTERNAL_SERVER_ERROR,
     HTTP_502_BAD_GATEWAY,
+    HTTP_503_SERVICE_UNAVAILABLE,
     HTTP_504_GATEWAY_TIMEOUT,
 )
 
@@ -43,7 +43,7 @@ def test_missing_configuration(rf):
         url = reverse("v1:pub_owned_areas_wms_proxy")
         request = rf.get(url)
         response = owned_areas_wms_proxy(request)
-        assert response.status_code == HTTP_500_INTERNAL_SERVER_ERROR
+        assert response.status_code == HTTP_503_SERVICE_UNAVAILABLE
         assert response.data == "Service misconfigured."
 
 

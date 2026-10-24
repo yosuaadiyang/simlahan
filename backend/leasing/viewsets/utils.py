@@ -17,6 +17,15 @@ class AtomicTransactionMixin:
 class AtomicTransactionModelViewSet(AtomicTransactionMixin, viewsets.ModelViewSet):
     """Viewset that combines AtomicTransactionMixin and rest_framework.viewsets.ModelViewSet"""
 
+    def initial(self, request, *args, **kwargs):
+        super().initial(request, *args, **kwargs)
+        # Badan JSON berupa list/angka membuat create()/update() kustom gagal
+        # 500 saat memanggil request.data.get(...); laporkan sebagai 400.
+        if self.action in ("create", "update", "partial_update") and not isinstance(
+            request.data, dict
+        ):
+            raise ParseError(_("Request body must be a JSON object."))
+
 
 class MultiPartJsonParser(parsers.MultiPartParser):
     def parse(self, stream, media_type=None, parser_context=None):
