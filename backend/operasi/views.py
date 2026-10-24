@@ -1534,6 +1534,8 @@ def satellite_analysis(request):
         payload = json.loads(request.body or b"{}")
     except json.JSONDecodeError:
         raise ValidationError(_("Permintaan tidak sah."))
+    if not isinstance(payload, dict):
+        raise ValidationError(_("Permintaan tidak sah."))
     if _throttled(f"operasi:ai:{request.user.pk}", 20, 3600):
         return JsonResponse(
             {"error": _("Batas 20 analisis per jam tercapai. Coba lagi nanti.")},

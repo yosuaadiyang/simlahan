@@ -67,7 +67,7 @@ class LoginSerializer(serializers.Serializer):
 class UsernameRateThrottle(ScopedRateThrottle):
     """Batasi juga per nama akun, bukan hanya per IP: tebakan sandi terdistribusi
     lintas alamat IP terhadap satu akun tetap terkena batas 10/menit.
-    ``ponytail:`` lockout per-akun membuat korban ikut terkunci sementara bila
+    Catatan: lockout per-akun membuat korban ikut terkunci sementara bila
     akunnya disemprot; ganti dengan pembatasan adaptif bila jadi masalah."""
 
     def get_cache_key(self, request, view):

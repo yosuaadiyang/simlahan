@@ -238,6 +238,19 @@ class ServiceApplicationForm(forms.Form):
         label=_("Alasan / uraian permohonan"), widget=forms.Textarea(attrs={"rows": 4})
     )
 
+    def __init__(self, *args, allocation=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if (
+            allocation is not None
+            and allocation.status == enums.AllocationStatus.EXPIRED
+        ):
+            # Alokasi yang sudah berakhir hanya dapat diperbarui.
+            self.fields["service_type"].choices = [
+                (value, label)
+                for value, label in SERVICE_APPLICATION_TYPES
+                if value == enums.ServiceType.RENEWAL
+            ]
+
 
 class ServiceReasonEditForm(forms.ModelForm):
     class Meta:

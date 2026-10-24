@@ -65,8 +65,8 @@ class LoginThrottleMiddleware:
     """Batasi percobaan login sesi per alamat IP dan per nama akun agar sandi
     tidak bisa ditebak, termasuk tebakan terdistribusi lintas IP.
 
-    ``ponytail:`` batas per-akun membuat pengguna sah ikut tertahan bila
-    akunnya disembot penyerang; naikkan batas atau pakai backoff adaptif bila
+    Catatan: batas per-akun membuat pengguna sah ikut tertahan bila
+    akunnya disemprot penyerang; naikkan batas atau pakai backoff adaptif bila
     menimbulkan keluhan.
     """
 

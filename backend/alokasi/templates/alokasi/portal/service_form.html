@@ -3,7 +3,7 @@
 {% block content %}
 <p class="small"><a href="{% url 'portal:allocation_detail' allocation.pk %}">‹ Alokasi {{ allocation.kpt_number }}</a></p>
 <h1>Ajukan Layanan Alokasi</h1>
-<p class="muted">Perpanjangan / pembaruan hak, pemecahan penetapan lokasi (PL), atau pengukuran ulang atas alokasi KPT {{ allocation.kpt_number }}.</p>
+<p class="muted">Perpanjangan / pembaruan hak, pemecahan penetapan lokasi (PL), atau pengukuran ulang atas alokasi {{ allocation.kpt_number }}.</p>
 
 <section class="card">
   <form method="post" action="{% url 'portal:service_create' allocation.pk %}">{% csrf_token %}

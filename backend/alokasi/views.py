@@ -375,9 +375,30 @@ def service_catalog_detail(request, slug):
 def uwt_calculator(request):
     """Simulasi biaya UWT lahan; murni hitungan, tidak menyimpan data."""
     config = AllocationSettings.load()
-    form = UwtCalculatorForm(request.GET or None)
+    data = request.GET
+    plot_id = data.get("plot", "")
+    if plot_id and not data.get("area_m2") and not data.get("years"):
+        # Baru memilih lahan: prapisi luas & jangka dari lahan tersebut tanpa
+        # menampilkan galat "wajib diisi".
+        plot = (
+            LandPlot.objects.filter(pk=plot_id, is_published=True).first()
+            if plot_id.isdigit()
+            else None
+        )
+        initial = (
+            {
+                "plot": plot,
+                "area_m2": plot.area_m2,
+                "years": plot.effective_term_years,
+            }
+            if plot
+            else {}
+        )
+        form = UwtCalculatorForm(initial=initial)
+    else:
+        form = UwtCalculatorForm(data or None)
     result = None
-    if form.is_valid():
+    if form.is_bound and form.is_valid():
         plot = form.cleaned_data["plot"]
         area = form.cleaned_data["area_m2"]
         years = form.cleaned_data["years"]
@@ -391,14 +412,6 @@ def uwt_calculator(request):
             "admin_fee": config.allocation_admin_fee,
             "grand_total": (total + config.allocation_admin_fee).quantize(Decimal("1")),
         }
-    elif form.is_bound:
-        # Isian belum lengkap: prapisi luas/jangka dari lahan terpilih bila ada.
-        plot_id = request.GET.get("plot")
-        if plot_id:
-            plot = LandPlot.objects.filter(pk=plot_id, is_published=True).first()
-            if plot:
-                form.fields["area_m2"].initial = plot.area_m2
-                form.fields["years"].initial = plot.effective_term_years
     return render(
         request,
         "alokasi/portal/calculator.html",
@@ -1201,7 +1214,11 @@ def service_create(request, pk):
     """Ajukan layanan atas alokasi sendiri: perpanjangan, pembaruan, pecah
     PL, atau pengukuran ulang (alur permohonan sama dengan peralihan)."""
     allocation = _own_allocation(request, pk)
-    form = ServiceApplicationForm(request.POST or None)
+    form = ServiceApplicationForm(
+        request.POST or None,
+        allocation=allocation,
+        initial={"service_type": request.GET.get("jenis", "")},
+    )
     if request.method == "POST" and form.is_valid():
         try:
             application = services.create_service_application(

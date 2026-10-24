@@ -1,6 +1,6 @@
 import json
 
-from django.db import IntegrityError, transaction
+from django.db import DataError, IntegrityError, transaction
 from django.utils.translation import gettext_lazy as _
 from rest_framework import parsers, status, viewsets
 from rest_framework.exceptions import ParseError
@@ -16,6 +16,15 @@ class AtomicTransactionMixin:
 
 class AtomicTransactionModelViewSet(AtomicTransactionMixin, viewsets.ModelViewSet):
     """Viewset that combines AtomicTransactionMixin and rest_framework.viewsets.ModelViewSet"""
+
+    def initial(self, request, *args, **kwargs):
+        super().initial(request, *args, **kwargs)
+        # Badan JSON berupa list/angka membuat create()/update() kustom gagal
+        # 500 saat memanggil request.data.get(...); laporkan sebagai 400.
+        if self.action in ("create", "update", "partial_update") and not isinstance(
+            request.data, dict
+        ):
+            raise ParseError(_("Request body must be a JSON object."))
 
 
 class MultiPartJsonParser(parsers.MultiPartParser):
@@ -48,6 +57,14 @@ def integrityerror_exception_handler(exc, context):
     if isinstance(exc, IntegrityError) and not response:
         response = Response(
             {"detail": _("Data integrity error"), "error": str(exc)},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # Nilai di luar jangkauan kolom (angka terlalu besar, teks terlalu panjang,
+    # format interval salah) adalah kesalahan masukan, bukan galat server.
+    if isinstance(exc, DataError) and not response:
+        response = Response(
+            {"detail": _("Invalid data")},
             status=status.HTTP_400_BAD_REQUEST,
         )
 

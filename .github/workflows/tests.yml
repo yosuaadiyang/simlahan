@@ -75,6 +75,24 @@ jobs:
       - name: Check migrations are up to date
         run: python manage.py makemigrations --check --dry-run
 
+      # Tes memakai --nomigrations, jadi jalankan migrasi sungguhan (termasuk
+      # RunPython dengan model historis), bootstrap, dan data contoh seperti
+      # saat kontainer backend dimulai di server.
+      - name: Apply migrations, bootstrap and sample data on a real database
+        env:
+          DJANGO_SUPERUSER_USERNAME: admin
+          DJANGO_SUPERUSER_EMAIL: admin@example.invalid
+          DJANGO_SUPERUSER_PASSWORD: ci-only-Admin-123
+        run: |
+          python manage.py migrate --noinput
+          python manage.py createcachetable
+          python manage.py simlahan_bootstrap
+          python manage.py simlahan_bootstrap
+          for module in pengadaan alokasi asetlahan operasi; do
+            python manage.py "${module}_contoh_rempang"
+            python manage.py "${module}_contoh_rempang"
+          done
+
       - name: Run all backend tests
         run: pytest -p no:cacheprovider
 

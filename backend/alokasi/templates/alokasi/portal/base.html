@@ -19,7 +19,7 @@
       {% with name=request.resolver_match.url_name %}
       <a href="{% url 'portal:home' %}"{% if name == 'home' %} class="active"{% endif %}>Beranda</a>
       <a href="{% url 'portal:plot_list' %}"{% if name == 'plot_list' or name == 'plot_detail' %} class="active"{% endif %}>Peta Lahan</a>
-      <a href="{% url 'portal:services' %}"{% if name == 'services' %} class="active"{% endif %}>Layanan</a>
+      <a href="{% url 'portal:services' %}"{% if name == 'services' or name == 'service_detail' or name == 'service_terms' or name == 'uwt_calculator' %} class="active"{% endif %}>Layanan</a>
       <a href="{% url 'portal:info_index' %}"{% if name == 'info_index' or name == 'info_category' or name == 'info_detail' %} class="active"{% endif %}>Informasi</a>
       <a href="{% url 'portal:verify' %}"{% if name == 'verify' or name == 'verify_token' %} class="active"{% endif %}>Cek Dokumen</a>
       <a href="{% url 'portal:track' %}"{% if name == 'track' %} class="active"{% endif %}>Lacak</a>
