@@ -1444,7 +1444,13 @@ def sos(request):
             raise ValidationError({"client_id": [_("ID perangkat tidak sah.")]})
         existing = SosAlert.objects.filter(client_id=client_id).first()
         if existing is not None:
-            return JsonResponse({**_sos_json(existing), "duplicate": True})
+            return JsonResponse(
+                {
+                    **_sos_json(existing),
+                    "mine": existing.raised_by_id == user.pk,
+                    "duplicate": True,
+                }
+            )
         alert = SosAlert(
             client_id=client_id,
             raised_by=user,
@@ -1458,9 +1464,17 @@ def sos(request):
                 alert.save()
         except IntegrityError:
             existing = SosAlert.objects.get(client_id=client_id)
-            return JsonResponse({**_sos_json(existing), "duplicate": True})
+            return JsonResponse(
+                {
+                    **_sos_json(existing),
+                    "mine": existing.raised_by_id == user.pk,
+                    "duplicate": True,
+                }
+            )
         services.raise_sos(alert)
-        return JsonResponse({**_sos_json(alert), "duplicate": False}, status=201)
+        return JsonResponse(
+            {**_sos_json(alert), "mine": True, "duplicate": False}, status=201
+        )
     if not user.has_perm("operasi.view_sosalert"):
         return JsonResponse({"results": []})
     alerts = geo.scoped(
@@ -1481,7 +1495,9 @@ def sos_action(request, pk, action):
     if not (request.user.has_perm("operasi.change_sosalert") or own_close):
         raise PermissionDenied
     services.update_sos(alert, action, request.user, request.POST.get("catatan", ""))
-    return JsonResponse(_sos_json(alert))
+    return JsonResponse(
+        {**_sos_json(alert), "mine": alert.raised_by_id == request.user.pk}
+    )
 
 
 # --------------------------------------------------------------------------
