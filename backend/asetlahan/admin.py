@@ -159,19 +159,29 @@ class AsetAdminMixin(ForeignFieldsMixin):
     module_flag = ""
     file_kind = ""
 
-    def module_enabled(self) -> bool:
-        return not self.module_flag or getattr(
-            ModuleSettings.load(), self.module_flag, True
-        )
+    def module_enabled(self, request=None) -> bool:
+        if not self.module_flag:
+            return True
+        # Menu admin memeriksa setiap model; satu kueri pengaturan per permintaan.
+        config = getattr(request, "_asetlahan_module_settings", None)
+        if config is None:
+            config = ModuleSettings.load()
+            if request is not None:
+                request._asetlahan_module_settings = config
+        return getattr(config, self.module_flag, True)
 
     def has_module_permission(self, request):
-        return self.module_enabled() and super().has_module_permission(request)
+        return self.module_enabled(request) and super().has_module_permission(request)
 
     def has_view_permission(self, request, obj=None):
-        return self.module_enabled() and super().has_view_permission(request, obj)
+        return self.module_enabled(request) and super().has_view_permission(
+            request, obj
+        )
 
     def has_add_permission(self, request, *args):
-        return self.module_enabled() and super().has_add_permission(request, *args)
+        return self.module_enabled(request) and super().has_add_permission(
+            request, *args
+        )
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
@@ -474,6 +484,7 @@ class AssetImportForm(forms.Form):
 
 @admin.register(LandAsset)
 class LandAssetAdmin(AsetGISAdmin):
+    list_select_related = ("category",)
     list_display = (
         "code",
         "name",
@@ -985,6 +996,7 @@ class TaxObligationAdmin(AsetModelAdmin):
 @admin.register(LandTransaction)
 class LandTransactionAdmin(AsetModelAdmin):
     module_flag = "enable_valuation"
+    list_select_related = ("asset",)
     list_display = (
         "number",
         "date",

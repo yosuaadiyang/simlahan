@@ -832,6 +832,7 @@ class ServiceUnitGroupMappingAdmin(admin.ModelAdmin):
 
 @admin.register(IntendedUse)
 class IntendedUseAdmin(admin.ModelAdmin):
+    list_select_related = ("service_unit",)
     list_display = (
         "name",
         "service_unit",

@@ -501,6 +501,7 @@ class VerificationCriterionAdmin(admin.ModelAdmin):
 
 @admin.register(Applicant)
 class ApplicantAdmin(admin.ModelAdmin):
+    list_select_related = ("user",)
     list_display = (
         "name",
         "applicant_type",
