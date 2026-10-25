@@ -9,7 +9,7 @@
 {{ application.get_service_type_display }} dengan rincian sebagai berikut:</p>
 
 <table class="data">
-  <tr><td style="width: 32%;">Dasar alokasi</td><td>: KPT {{ allocation.kpt_number }} / PPT {{ allocation.ppt_number }}</td></tr>
+  <tr><td style="width: 32%;">Dasar alokasi</td><td>: {{ allocation.kpt_number }} / {{ allocation.ppt_number }}</td></tr>
   <tr><td>Kode lahan</td><td>: {{ plot.code }} – {{ plot.name }}</td></tr>
   <tr><td>Luas</td><td>: {{ allocation.area_m2|angka:2 }} m²</td></tr>
   <tr><td>Peruntukan</td><td>: {{ allocation.activity }}</td></tr>

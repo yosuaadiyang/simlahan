@@ -401,6 +401,7 @@ def test_sos_flow(settings, field, coordinator, manager, korwil):
         {"client_id": client_id, "lat": point.y, "lng": point.x, "pesan": "Dihadang"},
     )
     assert response.status_code == 201, response.content
+    assert response.json()["mine"] is True
     alert = SosAlert.objects.get()
     assert alert.korwil == korwil and alert.status == enums.SosStatus.ACTIVE
     assert ChatMessage.objects.filter(is_system=True, body__contains="SOS").exists()
@@ -413,11 +414,10 @@ def test_sos_flow(settings, field, coordinator, manager, korwil):
     feed = login(coordinator).get(api("sos/")).json()["results"]
     assert feed[0]["number"] == alert.number
     assert client.post(api(f"sos/{alert.pk}/tangani/")).status_code == 403
-    assert login(coordinator).post(api(f"sos/{alert.pk}/tangani/")).status_code == 200
-    assert (
-        client.post(api(f"sos/{alert.pk}/selesai/"), {"catatan": "Aman"}).status_code
-        == 200
-    )
+    handled = login(coordinator).post(api(f"sos/{alert.pk}/tangani/"))
+    assert handled.status_code == 200 and handled.json()["mine"] is False
+    resolved = client.post(api(f"sos/{alert.pk}/selesai/"), {"catatan": "Aman"})
+    assert resolved.status_code == 200 and resolved.json()["mine"] is True
     alert.refresh_from_db()
     assert alert.status == enums.SosStatus.RESOLVED and alert.resolution_note == "Aman"
     assert client.post(api(f"sos/{alert.pk}/palsu/")).status_code == 400
@@ -475,6 +475,10 @@ def test_satellite_analysis_without_ai(monkeypatch, field, korwil):
         content_type="application/json",
     )
     assert too_big.status_code == 400
+    not_object = client.post(
+        api("ai-satelit/"), json.dumps([]), content_type="application/json"
+    )
+    assert not_object.status_code == 400
 
 
 def test_satellite_analysis_with_ai(monkeypatch, field, korwil):

@@ -49,4 +49,8 @@ class FAQAdmin(admin.ModelAdmin):
 admin.site.register(PlotSearchStage, NameAdmin)
 admin.site.register(PlotSearchType, NameAdmin)
 admin.site.register(AreaSearchIntendedUse, NameAdmin)
-admin.site.register(PlotSearchSubtype, NameAdmin)
+
+
+@admin.register(PlotSearchSubtype)
+class PlotSearchSubtypeAdmin(NameAdmin):
+    list_select_related = ("plot_search_type",)

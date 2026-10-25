@@ -133,7 +133,7 @@ def test_wms_proxy_error_response_is_renderable(rf, settings):
     response = owned_areas_wms_proxy(request)
     response.render()
 
-    assert response.status_code == 500
+    assert response.status_code == 503
     assert json.loads(response.content) == "Service misconfigured."
 
 

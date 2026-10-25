@@ -6,6 +6,7 @@ perubahan dokumen) dengan isian yang dapat diubah petugas di
 """
 
 from django.db import migrations
+from django.utils.text import slugify
 
 SERVICE_CATALOG = [
     # (kategori, service_type, nama, ringkasan, durasi, tarif, dokumen_terbit,
@@ -148,6 +149,9 @@ def seed(apps, schema_editor):
     alias = schema_editor.connection.alias if schema_editor else "default"
     Catalog = apps.get_model("alokasi", "ServiceCatalog")
     if not Catalog.objects.using(alias).exists():
+        # Model historis tidak menjalankan ServiceCatalog.save(), jadi slug
+        # (unik) diisi di sini.
+        used = set()
         for order, entry in enumerate(SERVICE_CATALOG, 1):
             (
                 category,
@@ -160,7 +164,13 @@ def seed(apps, schema_editor):
                 legal,
                 flow,
             ) = entry
+            base = slugify(name)[:200] or "layanan"
+            slug, n = base, 2
+            while slug in used:
+                slug, n = f"{base}-{n}", n + 1
+            used.add(slug)
             Catalog.objects.using(alias).create(
+                slug=slug,
                 category=category,
                 service_type=service_type,
                 name=name,

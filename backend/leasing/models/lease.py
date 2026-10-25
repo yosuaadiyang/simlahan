@@ -56,6 +56,7 @@ from leasing.models.utils import (
     is_instance_empty,
     subtract_ranges_from_ranges,
 )
+from leasing.validators import validate_iso8601_duration
 from users.models import User
 
 if TYPE_CHECKING:
@@ -274,6 +275,7 @@ class NoticePeriod(NameModel):
         blank=True,
         max_length=255,
         help_text=_("In ISO 8601 Duration format"),
+        validators=[validate_iso8601_duration],
     )
 
     class Meta(NameModel.Meta):

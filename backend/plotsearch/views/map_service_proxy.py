@@ -12,6 +12,7 @@ from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_500_INTERNAL_SERVER_ERROR,
     HTTP_502_BAD_GATEWAY,
+    HTTP_503_SERVICE_UNAVAILABLE,
     HTTP_504_GATEWAY_TIMEOUT,
 )
 
@@ -47,10 +48,12 @@ def owned_areas_wms_proxy(request):
     layer = settings.MAP_SERVICE_WMS_OWNED_AREAS_LAYER
 
     if not all([username, password, map_service_url, layer]):
-        logger.error("Owned Areas WMS Proxy Public: Missing configuration settings.")
+        # Layanan opsional yang belum dikonfigurasi: endpoint publik ini tidak
+        # boleh menghasilkan galat server (dan log galat) bagi setiap pengunjung.
+        logger.debug("Owned Areas WMS Proxy Public: Missing configuration settings.")
         return _json_response(
             "Service misconfigured.",
-            status=HTTP_500_INTERNAL_SERVER_ERROR,
+            status=HTTP_503_SERVICE_UNAVAILABLE,
         )
 
     serializer = WmsRequestSerializer(data=request.GET)

@@ -180,6 +180,18 @@ def create_service_application(
     return application
 
 
+def _require_service_allocation(application: Application, allocation) -> None:
+    """Layanan atas alokasi sendiri hanya boleh berlanjut selama alokasinya
+    masih milik pemohon dan belum dicabut (perpanjangan yang terbit atas
+    alokasi yang sudah dicabut akan menghidupkannya kembali)."""
+    _require(
+        allocation.holder_id == application.applicant_id
+        and allocation.status
+        in (enums.AllocationStatus.ACTIVE, enums.AllocationStatus.EXPIRED),
+        _("Alokasi tidak lagi dapat diajukan layanan ini oleh pemohon ini."),
+    )
+
+
 @transaction.atomic
 def create_transfer_application(
     applicant: Applicant, allocation: Allocation, recipient: Applicant, reason: str
@@ -293,7 +305,7 @@ def _notify_recipient_to_accept(application: Application) -> None:
         application.recipient,
         _("Persetujuan peralihan hak %s") % application.number,
         _(
-            "%(holder)s mengajukan peralihan hak alokasi KPT %(kpt)s kepada Anda. "
+            "%(holder)s mengajukan peralihan hak alokasi %(kpt)s kepada Anda. "
             "Peralihan baru dapat diproses setelah Anda menyetujuinya di %(url)s"
         )
         % {
@@ -423,6 +435,8 @@ def approve(application: Application, officer, note: str = "") -> Application:
             application.recipient_accepted_at is not None,
             _("Penerima hak belum menyetujui peralihan ini di portal."),
         )
+    else:
+        _require_service_allocation(application, application.source_allocation)
     application.decided_at = timezone.now()
     application.decided_by = officer
     if note:
@@ -507,7 +521,7 @@ def _create_invoices(  # noqa: C901
                 (
                     enums.InvoiceKind.UWT,
                     _(
-                        "UWT KPT %(kpt)s periode %(service)s: "
+                        "UWT %(kpt)s periode %(service)s: "
                         "%(area)s m² × Rp%(rate)s × %(years)s tahun"
                     )
                     % {
@@ -524,7 +538,7 @@ def _create_invoices(  # noqa: C901
             items.append(
                 (
                     enums.InvoiceKind.EXTENSION_FEE,
-                    _("Biaya administrasi %s KPT %s")
+                    _("Biaya administrasi %s %s")
                     % (
                         application.get_service_type_display(),
                         allocation.kpt_number,
@@ -537,7 +551,7 @@ def _create_invoices(  # noqa: C901
             items.append(
                 (
                     enums.InvoiceKind.SERVICE_FEE,
-                    _("Biaya administrasi %s KPT %s")
+                    _("Biaya administrasi %s %s")
                     % (
                         application.get_service_type_display(),
                         application.source_allocation.kpt_number,
@@ -728,6 +742,7 @@ def issue_documents(application: Application, officer=None) -> list[IssuedDocume
         allocation = Allocation.objects.select_for_update().get(
             pk=application.source_allocation_id
         )
+        _require_service_allocation(application, allocation)
         years = allocation.plot.effective_term_years
         is_renewal = application.service_type == enums.ServiceType.RENEWAL
         if is_renewal:
@@ -747,7 +762,7 @@ def issue_documents(application: Application, officer=None) -> list[IssuedDocume
         number = _next_number("SPH")
         issued.append(documents.issue(application, allocation, "sph", number))
         body = _(
-            "Surat %(service)s untuk alokasi KPT %(kpt)s telah terbit; jangka waktu "
+            "Surat %(service)s untuk alokasi %(kpt)s telah terbit; jangka waktu "
             "kini berlaku sampai %(end)s. Unduh di %(url)s"
         ) % {
             "service": application.get_service_type_display(),
@@ -756,11 +771,14 @@ def issue_documents(application: Application, officer=None) -> list[IssuedDocume
             "url": portal_url(f"permohonan/{application.number}/"),
         }
     else:  # Pecah PL dan pengukuran ulang: surat persetujuan, tanpa ubah alokasi.
-        allocation = application.source_allocation
+        allocation = Allocation.objects.select_for_update().get(
+            pk=application.source_allocation_id
+        )
+        _require_service_allocation(application, allocation)
         number = _next_number("SPT")
         issued.append(documents.issue(application, allocation, "spt", number))
         body = _(
-            "Surat persetujuan %(service)s untuk alokasi KPT %(kpt)s telah terbit. "
+            "Surat persetujuan %(service)s untuk alokasi %(kpt)s telah terbit. "
             "Unduh di %(url)s"
         ) % {
             "service": application.get_service_type_display(),
@@ -787,6 +805,30 @@ def revoke_allocation(allocation: Allocation, officer, reason: str) -> Allocatio
     allocation.revoked_at = timezone.now()
     allocation.revoke_reason = reason
     allocation.save()
+    # Permohonan peralihan/perpanjangan/layanan lain atas alokasi ini tidak
+    # dapat diteruskan lagi: tolak dan batalkan tagihan yang belum lunas.
+    note = _("Alokasi %(kpt)s dicabut: %(reason)s") % {
+        "kpt": allocation.kpt_number,
+        "reason": reason,
+    }
+    open_applications = allocation.transfer_applications.select_for_update().exclude(
+        status__in=enums.FINAL_STATUSES
+    )
+    for application in open_applications:
+        application.invoices.filter(
+            status__in=(
+                enums.InvoiceStatus.UNPAID,
+                enums.InvoiceStatus.PROOF_UPLOADED,
+            )
+        ).update(status=enums.InvoiceStatus.CANCELLED)
+        application.officer_note = note
+        if application.status == S.DRAFT:
+            _set_status(application, S.CANCELLED, actor=officer, note=note)
+        else:
+            application.decided_at = timezone.now()
+            application.decided_by = officer
+            _set_status(application, S.REJECTED, actor=officer, note=note)
+        _notify_status(application, note)
     plot = allocation.plot
     plot.status = enums.PlotStatus.AVAILABLE
     plot.is_published = False

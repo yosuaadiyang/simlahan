@@ -97,9 +97,13 @@
     <section class="card">
       <h2>Layanan alokasi</h2>
       <ul class="small">
-        <li><a href="{% url 'portal:service_create' allocation.pk %}">Perpanjangan / pembaruan hak</a> — tambah jangka waktu alokasi.</li>
-        <li><a href="{% url 'portal:service_create' allocation.pk %}">Pemecahan penetapan lokasi (PL)</a> — pecah PL induk menjadi beberapa PL.</li>
-        <li><a href="{% url 'portal:service_create' allocation.pk %}">Pengukuran ulang</a> — ukur ulang objek penetapan lokasi.</li>
+        {% if is_active %}
+        <li><a href="{% url 'portal:service_create' allocation.pk %}?jenis=perpanjangan">Perpanjangan hak</a> — tambah jangka waktu sebelum alokasi berakhir.</li>
+        <li><a href="{% url 'portal:service_create' allocation.pk %}?jenis=pecah_pl">Pemecahan penetapan lokasi (PL)</a> — pecah PL induk menjadi beberapa PL.</li>
+        <li><a href="{% url 'portal:service_create' allocation.pk %}?jenis=ukur_ulang">Pengukuran ulang</a> — ukur ulang objek penetapan lokasi.</li>
+        {% else %}
+        <li><a href="{% url 'portal:service_create' allocation.pk %}?jenis=pembaruan">Pembaruan hak</a> — jangka waktu baru setelah alokasi berakhir.</li>
+        {% endif %}
       </ul>
     </section>
     {% endif %}

@@ -6999,3 +6999,12 @@ msgstr "Peran Anda tidak dapat mengunggah jenis dokumen ini."
 
 msgid "Your role cannot attach documents to a party."
 msgstr "Peran Anda tidak dapat melampirkan dokumen pada pihak yang berhak."
+
+msgid "Invalid data"
+msgstr "Data tidak sah"
+
+msgid "Request body must be a JSON object."
+msgstr "Badan permintaan harus berupa objek JSON."
+
+msgid "Enter a duration in ISO 8601 format, e.g. P3M or P1Y."
+msgstr "Masukkan durasi dalam format ISO 8601, mis. P3M atau P1Y."

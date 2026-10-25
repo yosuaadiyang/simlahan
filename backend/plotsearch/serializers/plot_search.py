@@ -596,7 +596,7 @@ class PlotSearchUpdateSerializer(
     serializers.ModelSerializer,
 ):
     id = serializers.ReadOnlyField()
-    name = serializers.CharField(required=True)
+    name = serializers.CharField(required=True, max_length=255)
     type = InstanceDictPrimaryKeyRelatedField(
         instance_class=PlotSearchType,
         queryset=PlotSearchType.objects.all(),
@@ -873,6 +873,10 @@ class AreaSearchAttachmentSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         amrs = _get_authentication_methods(self.context["request"])
 
+        if not validated_data.get("attachment"):
+            raise serializers.ValidationError(
+                {"attachment": [_("This field is required.")]}
+            )
         attachment = AreaSearchAttachment.objects.create(
             name=validated_data["name"],
             area_search=validated_data.pop("area_search", None),

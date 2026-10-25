@@ -514,6 +514,7 @@ def sees_nik(request) -> bool:
 
 @admin.register(Resident)
 class ResidentAdmin(OperasiGISAdmin):
+    list_select_related = ("korwil",)
     list_display = (
         "number",
         "head_name",
@@ -902,6 +903,7 @@ class ActivityAdmin(OperasiGISAdmin):
 class SoilTestAdmin(OperasiGISAdmin):
     owner_field = "sampled_by"
     file_kinds = {"photo": "tanah-foto", "lab_report": "tanah-lab"}
+    list_select_related = ("korwil", "sampled_by")
     list_display = (
         "number",
         "korwil",
@@ -1182,6 +1184,7 @@ class AttendanceAdmin(OperasiGISAdmin):
 @admin.register(ChatMessage)
 class ChatMessageAdmin(ReadOnlyAdminMixin, OperasiModelAdmin):
     scope_prefix = None
+    list_select_related = ("korwil", "sender")
     list_display = ("created_at", "channel", "sender", "short_body", "is_system")
     list_filter = ("is_system", "korwil", "created_at")
     date_hierarchy = "created_at"

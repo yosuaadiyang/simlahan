@@ -3,7 +3,7 @@
 {% block content %}
 <p class="small"><a href="{% url 'portal:allocation_detail' allocation.pk %}">‹ Alokasi {{ allocation.kpt_number }}</a></p>
 <h1>Permohonan izin peralihan hak</h1>
-<p>Alokasi KPT {{ allocation.kpt_number }} atas lahan {{ allocation.plot.code }} ({{ allocation.plot.name }}). Setelah draf dibuat, unggah dokumen persyaratan peralihan lalu ajukan.</p>
+<p>Alokasi {{ allocation.kpt_number }} atas lahan {{ allocation.plot.code }} ({{ allocation.plot.name }}). Setelah draf dibuat, unggah dokumen persyaratan peralihan lalu ajukan.</p>
 <form method="post" class="card">{% csrf_token %}
   {% include "alokasi/portal/_form.html" %}
   <div class="actions-row">

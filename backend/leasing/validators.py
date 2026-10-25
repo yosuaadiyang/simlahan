@@ -20,6 +20,20 @@ validate_national_identification_number = core_validators.RegexValidator(
     "invalid",
 )
 
+# Durasi ISO 8601 (mis. P3M, P1Y, P2W, P14D, PT12H) yang juga dapat dibaca
+# PostgreSQL sebagai interval; daftar masa pemberitahuan diurutkan dengan
+# CAST(duration AS interval), sehingga satu nilai tidak sah membuat daftar
+# dan formulir sewa gagal.
+iso8601_duration_re = core_validators._lazy_re_compile(
+    r"^P(?=\d|T\d)(?:\d+Y)?(?:\d+M)?(?:\d+W)?(?:\d+D)?"
+    r"(?:T(?=\d)(?:\d+H)?(?:\d+M)?(?:\d+(?:\.\d+)?S)?)?$"
+)
+validate_iso8601_duration = core_validators.RegexValidator(
+    iso8601_duration_re,
+    _("Enter a duration in ISO 8601 format, e.g. P3M or P1Y."),
+    "invalid",
+)
+
 
 class HexColorValidator(RegexValidator):
     # Startswith `#`, then has either 1 or 2 groups of 3 characters

@@ -37,7 +37,7 @@
       {% if application.description %}<h3>Uraian rencana usaha</h3><p class="prose">{{ application.description }}</p>{% endif %}
       {% else %}
       <dl class="props" style="margin-top:12px">
-        <dt>Alokasi</dt><dd>KPT {{ application.source_allocation.kpt_number }} · lahan {{ application.source_allocation.plot.code }}</dd>
+        <dt>Alokasi</dt><dd>{{ application.source_allocation.kpt_number }} · lahan {{ application.source_allocation.plot.code }}</dd>
         <dt>Luas</dt><dd>{{ application.source_allocation.area_m2|angka:2|patah }} m²</dd>
         <dt>Pemohon (pemegang)</dt><dd>{{ application.applicant.name }}</dd>
         {% if application.is_transfer %}

@@ -33,8 +33,10 @@ server {
         proxy_read_timeout 300s;
     }
 
-    location = /healthz { proxy_pass ${BACKEND_URL}; access_log off; }
-    location = /readiness { proxy_pass ${BACKEND_URL}; access_log off; }
+    # Host asli diteruskan agar lolos ALLOWED_HOSTS (tanpa ini Host menjadi
+    # nama kontainer backend dan Django menjawab 400).
+    location = /healthz { proxy_pass ${BACKEND_URL}; proxy_set_header Host $http_host; access_log off; }
+    location = /readiness { proxy_pass ${BACKEND_URL}; proxy_set_header Host $http_host; access_log off; }
 
     # Aset hasil build (nama berhash) boleh di-cache lama.
     location /assets/ {
