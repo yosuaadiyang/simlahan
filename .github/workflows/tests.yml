@@ -218,7 +218,14 @@ jobs:
           docker compose exec -T backend python manage.py alokasi_pemantauan
           docker compose exec -T backend python manage.py asetlahan_pengingat
           docker compose exec -T backend python manage.py operasi_harian
-          docker compose restart backend
+          # Deploy menghentikan kontainer lama: harus berhenti rapi, bukan
+          # menunggu batas 10 detik lalu dibunuh paksa.
+          started=$(date +%s)
+          docker compose stop backend qcluster batchrun
+          elapsed=$(( $(date +%s) - started ))
+          echo "stopped in ${elapsed}s"
+          test "$elapsed" -lt 9
+          docker compose up -d
           for attempt in $(seq 1 60); do
             curl -fsS -H "Host: simlahan.example.id" http://127.0.0.1:18100/healthz && exit 0
             sleep 5

@@ -7,6 +7,9 @@ x-backend: &backend
     context: ./backend
   image: simlahan-backend:latest
   env_file: .env
+  # Proses init meneruskan SIGTERM sehingga penjadwal & pekerja berhenti rapi
+  # (proses Python sebagai PID 1 mengabaikan SIGTERM).
+  init: true
   environment:
     DATABASE_URL: postgis://${POSTGRES_USER:-simlahan}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-simlahan}
     PRIVATE_FILES_LOCATION: /app/private_files
