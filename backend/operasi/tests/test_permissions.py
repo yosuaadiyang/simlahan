@@ -516,11 +516,13 @@ def test_writes_rejected_without_single_korwil(
 
 
 def test_service_worker_does_not_keep_personal_data(field, korwil):
-    from operasi.views import SW_VERSION
+    from operasi.views import SHELL_STATIC, SW_VERSION
+    from utils.pwa import shell_version
 
     client = login(field)
     body = client.get("/komando/sw.js").content.decode()
-    assert SW_VERSION == "4" and 'var VERSION = "4";' in body
+    version = shell_version(SW_VERSION, *SHELL_STATIC)
+    assert f'var VERSION = "{version}";' in body
     # Hanya halaman utama yang disimpan (bukan navigasi lain seperti berkas).
     assert 'request.mode === "navigate" ||' not in body
     assert "purgePersonal" in body and "response.redirected" in body

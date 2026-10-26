@@ -1272,24 +1272,24 @@
   // ================================================================ Tab
 
   var currentTab = "peta";
+  // Tab di balik tombol "Lainnya" agar bilah tab muat di layar ponsel.
+  var MORE_TABS = ["peringkat", "struktur", "feed", "ai"];
   function showTab(name) {
     currentTab = name;
+    var barTab = MORE_TABS.indexOf(name) !== -1 ? "lainnya" : name;
     document.querySelectorAll(".tab-view").forEach(function (view) {
       if (view.id === "tab-peta") { return; }
       view.hidden = view.id !== "tab-" + name;
     });
     document.querySelectorAll(".tabbar button").forEach(function (button) {
-      button.classList.toggle("active", button.getAttribute("data-tab") === name);
+      button.classList.toggle("active", button.getAttribute("data-tab") === barTab);
     });
     if (name === "absen") { loadAttendance(); }
     if (name === "korwil") { loadMyReports(); loadTaskOptions(); }
     if (name === "warga") { loadResidents(); }
     if (name === "tasks") { loadTasks(); }
     if (name === "perf") { loadPerformance(); }
-    if (name === "peringkat") {
-      fillSelect($("feed-korwil"), config.korwils.map(function (k) { return { value: k.id, label: "Korwil " + k.code }; }), "Semua Korwil");
-      loadLeaderboard();
-    }
+    if (name === "peringkat") { loadLeaderboard(); }
     if (name === "struktur") { loadStructure(); }
     if (name === "feed") {
       if ($("feed-korwil").options.length <= 1) {
@@ -1305,6 +1305,10 @@
   document.querySelector(".tabbar").addEventListener("click", function (event) {
     var button = event.target.closest("button[data-tab]");
     if (button) { showTab(button.getAttribute("data-tab")); }
+  });
+  $("tab-lainnya").addEventListener("click", function (event) {
+    var button = event.target.closest("button[data-buka]");
+    if (button) { showTab(button.getAttribute("data-buka")); }
   });
 
   // ================================================================ Absen
@@ -1469,14 +1473,15 @@
     Object.keys(chosenResidents).forEach(function (id) { if (chosenResidents[id].newStance) { stances[id] = chosenResidents[id].newStance; } });
     if (Object.keys(stances).length) { fields.sikap = JSON.stringify(stances); }
     if (!fields.judul) { toast("Judul wajib diisi.", "error"); return; }
+    var voiceInput = formEl.querySelector('[name="suara"]');
+    var voice = voiceInput && voiceInput.files && voiceInput.files[0];
+    if (voice && voice.size > 10 * 1024 * 1024) { toast("Rekaman suara maksimal 10 MB.", "error"); return; }
+    if (voice && !/\.(m4a|mp3|wav|ogg|webm)$/i.test(voice.name)) { toast("Rekaman suara harus M4A, MP3, WAV, OGG, atau WEBM.", "error"); return; }
     reportPoint($("kg-titik").checked).then(function (point) {
       if (point) { fields.lat = point.lat; fields.lng = point.lng; fields.accuracy = point.accuracy; }
       return photoFiles(formEl.querySelector('[name="foto"]'), "foto", 5);
     }).then(function (files) {
-      var voiceInput = formEl.querySelector('[name="suara"]');
-      if (voiceInput && voiceInput.files && voiceInput.files.length) {
-        files.push({ key: "suara", file: voiceInput.files[0] });
-      }
+      if (voice) { files.push({ field: "suara", blob: voice, name: voice.name }); }
       return enqueue(urls.activities, "Kegiatan: " + fields.judul, fields, files);
     }).then(function () {
       formEl.reset();
@@ -1532,6 +1537,7 @@
         return "<li><div class='title'>" + escapeHtml(a.title) + (a.verified ? " ✅" : "") + "</div><div class='sub'>" + escapeHtml(a.number + " · " + a.type_label + " · " + fmtDate(a.started_at, true) +
           (a.korwil ? " · Korwil " + a.korwil : "") + " · " + a.reporter) + "</div>" +
           (a.photos.length ? "<div class='row wrap'>" + a.photos.map(function (url) { return "<a href='" + escapeHtml(url) + "' target='_blank' rel='noopener'>📷</a>"; }).join(" ") + "</div>" : "") +
+          (a.voice ? "<div class='row wrap'><audio controls preload='none' src='" + escapeHtml(a.voice) + "'></audio><a class='small' href='" + escapeHtml(a.voice) + "'>🎙️ Unduh rekaman</a></div>" : "") +
           (perms.verifikasi && !a.verified ? "<div class='row'><button type='button' class='btn-small' data-verifikasi='" + a.id + "'>Verifikasi</button></div>" : "") +
           (a.lat !== null ? "<div class='row'><button type='button' class='btn-small' data-lihat='" + a.lat + "," + a.lng + "'>Lihat di peta</button></div>" : "") + "</li>";
       }).join("") || "<li class='muted'>Belum ada laporan.</li>";
@@ -1637,6 +1643,28 @@
     }).join("") + "</select>";
   }
 
+  function dossierHtml(r) {
+    var rows = [
+      ["Jenis kelamin", r.gender ? choiceLabel("gender", r.gender) : ""],
+      ["Umur", r.age !== null ? r.age + " tahun" : ""],
+      ["Pekerjaan", r.occupation],
+      ["Asal daerah", r.origin],
+      ["Lama menetap", r.years_living !== null ? r.years_living + " tahun" : ""],
+      ["Nama pasangan", r.spouse_name],
+      ["Jumlah anak", r.child_count !== null ? String(r.child_count) : ""],
+      ["Luas lahan", r.land_area_m2 !== null ? r.land_area_m2 + " m²" : ""],
+      ["Penggarapan", r.cultivation ? choiceLabel("cultivation", r.cultivation) : ""],
+      ["Zona RTRW", choiceLabel("zone", r.zone)],
+      ["Kondisi lahan", r.land_condition]
+    ].filter(function (row) { return row[1]; });
+    if (!rows.length) { return ""; }
+    return "<h4>Dossier warga</h4><dl class='small dossier'>" + rows.map(function (row) {
+      return "<dt>" + escapeHtml(row[0]) + "</dt><dd>" + escapeHtml(row[1]) + "</dd>";
+    }).join("") + "</dl>";
+  }
+
+  function numberValue(value) { return value === null || value === undefined ? "" : escapeHtml(String(value)); }
+
   function renderResident(r) {
     $("wd-judul").textContent = r.name + " · " + r.number;
     var edit = perms.ubahWarga;
@@ -1650,11 +1678,22 @@
         "<label class='field'>RTRW " + selectHtml("rtrw", "rtrw", r.rtrw) + "</label>" +
         "<label class='field'>Zona RTRW " + selectHtml("zona", "zone", r.zone) + "</label>" +
         "<label class='field'>Pilihan " + selectHtml("pilihan", "relocation", r.relocation) + "</label>" +
+        "<label class='field'>Penggarapan lahan " + selectHtml("penggarapan", "cultivation", r.cultivation) + "</label>" +
+        "<label class='field'>Jenis kelamin " + selectHtml("gender", "gender", r.gender) + "</label>" +
+        "<label class='field'>Umur <input type='number' name='umur' min='0' max='130' inputmode='numeric' value='" + numberValue(r.age) + "'></label>" +
+        "<label class='field'>Pekerjaan <input name='pekerjaan' maxlength='128' value='" + escapeHtml(r.occupation) + "'></label>" +
+        "<label class='field'>Asal daerah <input name='asal' maxlength='128' value='" + escapeHtml(r.origin) + "'></label>" +
+        "<label class='field'>Lama menetap (tahun) <input type='number' name='menetap' min='0' max='130' inputmode='numeric' value='" + numberValue(r.years_living) + "'></label>" +
+        "<label class='field'>Nama pasangan <input name='pasangan' maxlength='255' value='" + escapeHtml(r.spouse_name) + "'></label>" +
+        "<label class='field'>Jumlah anak <input type='number' name='anak' min='0' max='50' inputmode='numeric' value='" + numberValue(r.child_count) + "'></label>" +
+        "<label class='field'>Luas lahan (m²) <input type='number' step='0.01' min='0' name='luas_lahan' inputmode='decimal' value='" + numberValue(r.land_area_m2) + "'></label>" +
+        "<label class='field'>Kondisi lahan <textarea name='kondisi_lahan' rows='2' maxlength='2000'>" + escapeHtml(r.land_condition) + "</textarea></label>" +
         "<label class='field'>Catatan baru <input name='catatan' maxlength='2000'></label></div>" +
         "<div class='row wrap'><button type='button' class='btn primary' id='wd-simpan'>Simpan</button>" +
         "<button type='button' class='btn' id='wd-gps'>📍 Set lokasi dari GPS</button></div>";
     } else {
       html += "<p>Sikap: <b>" + escapeHtml(choiceLabel("stance", r.stance)) + "</b> · " + escapeHtml(choiceLabel("land", r.land)) + " · " + escapeHtml(choiceLabel("rtrw", r.rtrw)) + "</p>";
+      html += dossierHtml(r);
     }
     html += "<div class='row wrap'>" + (r.lat !== null ? "<button type='button' class='btn-small' id='wd-peta'>🗺️ Tampilkan di peta</button>" : "") +
       (perms.lapor ? "<button type='button' class='btn-small' id='wd-lapor'>📝 Lapor kunjungan</button>" : "") + "</div>";
@@ -1673,7 +1712,7 @@
     var save = function (extra) {
       var data = new FormData();
       var formEl = $("wd-form");
-      if (formEl) { formEl.querySelectorAll("select, input").forEach(function (input) { data.append(input.name, input.value); }); }
+      if (formEl) { formEl.querySelectorAll("select, input, textarea").forEach(function (input) { data.append(input.name, input.value); }); }
       Object.keys(extra || {}).forEach(function (k) { data.set(k, extra[k]); });
       return request(urls.resident.replace("/0/", "/" + r.id + "/"), { method: "POST", body: data }).then(function (updated) {
         toast("Data warga diperbarui.", "ok");
@@ -1825,7 +1864,6 @@
   };
 
   function loadLeaderboard() {
-    if (!config.perms.tim) { $("peringkat-isi").textContent = "Hanya koordinator dan administrator yang melihat peringkat tim."; return; }
     request(urls.leaderboard + "?periode=" + $("peringkat-periode").value).then(function (data) {
       $("peringkat-isi").innerHTML = data.results.map(function (row) {
         return "<div class='row' style='justify-content:space-between;align-items:center'>" +
@@ -1853,7 +1891,7 @@
       var ICON = { kegiatan: "📝", tanah: "🧪", sikap: "🔄", sos: "🆘" };
       $("feed-isi").innerHTML = data.results.map(function (item) {
         return "<li><b>" + (ICON[item.kind] || "•") + " " + escapeHtml(item.title) + "</b>" +
-          "<br><span class='muted small'>Korwil " + escapeHtml(item.korwil || "—") + " · " + escapeHtml(item.by) + " · " + escapeHtml(item.at) + "</span></li>";
+          "<br><span class='muted small'>Korwil " + escapeHtml(item.korwil || "—") + " · " + escapeHtml(item.by) + " · " + fmtDate(item.at, true) + "</span></li>";
       }).join("") || "<li class='muted'>Belum ada aktivitas.</li>";
     }).catch(function (error) { $("feed-isi").innerHTML = "<li class='muted'>" + escapeHtml(error.message) + "</li>"; });
   }
