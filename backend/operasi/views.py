@@ -16,7 +16,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, transaction
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.templatetags.static import static
@@ -33,6 +33,7 @@ from asetlahan.field_views import _parse_captured_at, _parse_location
 from asetlahan.geo import collection, feature
 from operasi import enums, geo, satellite, services
 from operasi.models import (
+    MAX_LAND_AREA_M2,
     RELEASED_PARCEL_STATUSES,
     Activity,
     ActivityPhoto,
@@ -48,9 +49,18 @@ from operasi.models import (
     StanceChange,
     SystemLock,
 )
+from utils.pwa import shell_version
 
 APP_VERSION = "1.0.0"
-SW_VERSION = "4"  # naikkan setiap kali berkas cangkang (JS/CSS) berubah
+# Versi dasar; sidik isi SHELL_STATIC ditambahkan otomatis (utils.pwa).
+SW_VERSION = "4"
+SHELL_STATIC = (
+    "operasi/komando.js",
+    "operasi/komando.css",
+    "operasi/komando-icon.svg",
+    "alokasi/vendor/leaflet/leaflet.js",
+    "alokasi/vendor/leaflet/leaflet.css",
+)
 MAX_FEATURES = 5000
 MAX_PHOTOS = 5
 MAX_STANCE_UPDATES = 50
@@ -374,19 +384,14 @@ def service_worker(request):
     shell = [
         reverse("operasi-command"),
         reverse("operasi-manifest"),
-        static("operasi/komando.js"),
-        static("operasi/komando.css"),
-        static("operasi/komando-icon.svg"),
-        static("alokasi/vendor/leaflet/leaflet.js"),
-        static("alokasi/vendor/leaflet/leaflet.css"),
-    ]
+    ] + [static(path) for path in SHELL_STATIC]
     body = render(
         request,
         "operasi/komando_sw.js",
         {
             "shell": json.dumps(shell),
             "layer_prefix": json.dumps(reverse("operasi-layer", args=["x"])[:-2]),
-            "version": json.dumps(SW_VERSION),
+            "version": json.dumps(shell_version(SW_VERSION, *SHELL_STATIC)),
         },
         content_type="application/javascript",
     ).content
@@ -1129,18 +1134,32 @@ def _resident_json(resident) -> dict:
 
 
 def _apply_resident_numbers(resident, data):
-    """Isian angka dossier warga (opsional)."""
+    """Isian angka dossier warga (opsional; kosong = tidak diketahui)."""
     numbers = (
         ("jiwa", "member_count", 0, 1000),
         ("umur", "age", 0, 130),
         ("anak", "child_count", 0, 50),
         ("menetap", "years_living", 0, 130),
     )
+    errors = {}
     for key, field, low, high in numbers:
         if key in data:
-            setattr(resident, field, _int_or_none(data.get(key), low, high))
+            raw = (data.get(key) or "").strip()
+            value = _int_or_none(raw, low, high)
+            if raw and value is None:
+                errors[key] = [
+                    _("Isi bilangan bulat %(low)s–%(high)s.")
+                    % {"low": low, "high": high}
+                ]
+            setattr(resident, field, value)
     if "luas_lahan" in data:
-        resident.land_area_m2 = _decimal_or_none(data.get("luas_lahan"), 0, places=2)
+        raw = (data.get("luas_lahan") or "").strip()
+        value = _decimal_or_none(raw, 0, MAX_LAND_AREA_M2, places=2)
+        if raw and value is None:
+            errors["luas_lahan"] = [_("Luas lahan harus angka 0 atau lebih.")]
+        resident.land_area_m2 = value
+    if errors:
+        raise ValidationError(errors)
 
 
 def _apply_resident_fields(resident, data):
@@ -1154,7 +1173,8 @@ def _apply_resident_fields(resident, data):
         ("penggarapan", "cultivation_status", enums.CultivationStatus.values),
     ):
         value = data.get(key)
-        if value:
+        # Pilihan opsional ("" = belum diketahui) boleh dikosongkan kembali.
+        if value or (key in data and "" in choices):
             if value not in choices:
                 raise ValidationError({key: [_("Pilihan tidak sah.")]})
             setattr(resident, field, value)
@@ -1391,7 +1411,7 @@ def performance(request):
         target = get_object_or_404(team, pk=request.GET["petugas"])
     data = {"me": services.performance(target, start, end)}
     if team.exclude(pk=request.user.pk).exists():
-        data["team"] = services.leaderboard(request.user, start, end)
+        data["team"] = services.leaderboard(request.user, start, end, trend=False)
     return JsonResponse(data)
 
 
@@ -1663,10 +1683,13 @@ def feed(request):
     if korwil_filter.isdigit():
         korwils = korwils.filter(pk=korwil_filter)
     korwil_codes = {k.pk: k.code for k in korwils}
+    user = request.user
     items = []
-    activities = Activity.objects.filter(korwil__in=korwils).select_related(
-        "reported_by"
-    )[:40]
+    activities = Activity.objects.none()
+    if user.has_perm("operasi.view_activity"):
+        activities = Activity.objects.filter(korwil__in=korwils).select_related(
+            "reported_by"
+        )[:40]
     for activity in activities:
         items.append(
             (
@@ -1680,7 +1703,11 @@ def feed(request):
                 ),
             )
         )
-    soil = SoilTest.objects.filter(korwil__in=korwils).select_related("sampled_by")[:30]
+    soil = SoilTest.objects.none()
+    if user.has_perm("operasi.view_soiltest"):
+        soil = SoilTest.objects.filter(korwil__in=korwils).select_related("sampled_by")[
+            :30
+        ]
     for test in soil:
         items.append(
             (
@@ -1694,9 +1721,11 @@ def feed(request):
                 ),
             )
         )
-    changes = StanceChange.objects.filter(resident__korwil__in=korwils).select_related(
-        "resident", "changed_by"
-    )[:30]
+    changes = StanceChange.objects.none()
+    if user.has_perm("operasi.view_resident"):
+        changes = StanceChange.objects.filter(
+            resident__korwil__in=korwils
+        ).select_related("resident", "changed_by")[:30]
     for change in changes:
         items.append(
             (
@@ -1711,7 +1740,13 @@ def feed(request):
                 ),
             )
         )
-    alerts = SosAlert.objects.filter(korwil__in=korwils).order_by("-created_at")[:20]
+    alerts = SosAlert.objects.none()
+    if user.has_perm("operasi.view_sosalert"):
+        alerts = (
+            SosAlert.objects.filter(korwil__in=korwils)
+            .select_related("raised_by")
+            .order_by("-created_at")[:20]
+        )
     for alert in alerts:
         items.append(
             (
@@ -1779,14 +1814,26 @@ def ai_chat(request):
 def _ai_context(user) -> str:
     """Ringkasan angka seluruh Korwil yang boleh dilihat pengguna."""
     stats = services.korwil_stats(user)
+    zone_labels = dict(enums.RtrwZone.choices)
+    zones = {}
+    for row in (
+        geo.scoped(Resident.objects.exclude(korwil=None), user)
+        .values("korwil", "rtrw_zone")
+        .annotate(n=Count("pk"))
+        .order_by("rtrw_zone")
+    ):
+        zones.setdefault(row["korwil"], []).append(
+            f"{zone_labels.get(row['rtrw_zone'], row['rtrw_zone'])} {row['n']}"
+        )
     lines = []
     for korwil in services.visible_korwils(user):
         row = stats.get(korwil.pk) or {}
+        zone_text = ", ".join(zones.get(korwil.pk, [])) or "-"
         lines.append(
-            f"Korwil {korwil.code} ({korwil.name}): {row.get('residents', 0)} warga, "
+            f"Korwil {korwil.code} ({korwil.name}): {row.get('total', 0)} warga, "
             f"Pro {row.get('pro_pct', 0)}%, RTRW sesuai {row.get('rtrw_pct', 0)}%, "
             f"lahan belum {row.get('pending', 0)}, lahan sudah {row.get('released', 0)}, "
-            f"kegiatan {row.get('activities', 0)}."
+            f"kegiatan {row.get('activities', 0)}, zona RTRW: {zone_text}."
         )
     return "\n".join(lines) or _("Belum ada data wilayah.")
 
@@ -1796,7 +1843,7 @@ def _ai_fallback(question: str, context: str) -> str:
     lowered = question.lower()
     topics = (
         (("pro", "dukung", "sikap"), _("Rekap sikap per Korwil:\n")),
-        (("rtrw", "ruang"), _("Rekap kesesuaian RTRW per Korwil:\n")),
+        (("rtrw", "ruang", "zona"), _("Rekap kesesuaian RTRW per Korwil:\n")),
         (("lahan", "bebas"), _("Rekap status lahan per Korwil:\n")),
     )
     for words, lead in topics:

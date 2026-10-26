@@ -30,9 +30,20 @@ from django.views.decorators.http import require_GET, require_POST
 from alokasi.templatetags.alokasi_tags import angka
 from asetlahan import enums, geo, scope
 from asetlahan.models import EncroachmentCase, FieldReport, LandAsset, MapShare
+from utils.pwa import shell_version
 
 MAX_FEATURES = 5000
-SW_VERSION = "2"  # naikkan setiap kali berkas cangkang (JS/CSS) berubah
+# Versi dasar; sidik isi SHELL_STATIC ditambahkan otomatis (utils.pwa).
+SW_VERSION = "2"
+SHELL_STATIC = (
+    "asetlahan/field.js",
+    "asetlahan/field.css",
+    "asetlahan/field-icon.svg",
+    "alokasi/vendor/leaflet/leaflet.js",
+    "alokasi/vendor/leaflet/leaflet.css",
+    "alokasi/vendor/leaflet/images/marker-icon.png",
+    "alokasi/vendor/leaflet/images/marker-shadow.png",
+)
 
 # --------------------------------------------------------------------------
 # Peta berbagi (tautan publik baca-saja)
@@ -246,21 +257,14 @@ def field_service_worker(request):
     shell = [
         reverse("asetlahan-field"),
         reverse("asetlahan-field-manifest"),
-        static("asetlahan/field.js"),
-        static("asetlahan/field.css"),
-        static("asetlahan/field-icon.svg"),
-        static("alokasi/vendor/leaflet/leaflet.js"),
-        static("alokasi/vendor/leaflet/leaflet.css"),
-        static("alokasi/vendor/leaflet/images/marker-icon.png"),
-        static("alokasi/vendor/leaflet/images/marker-shadow.png"),
-    ]
+    ] + [static(path) for path in SHELL_STATIC]
     body = render(
         request,
         "asetlahan/field_sw.js",
         {
             "shell": json.dumps(shell),
             "boundaries": json.dumps(reverse("asetlahan-field-boundaries")),
-            "version": json.dumps(SW_VERSION),
+            "version": json.dumps(shell_version(SW_VERSION, *SHELL_STATIC)),
         },
         content_type="application/javascript",
     ).content

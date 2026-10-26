@@ -27,7 +27,7 @@ from asetlahan.importers import AssetImportError
 from asetlahan.importers import _polygon as polygon_of
 from asetlahan.importers import _prop, _read_features
 from operasi import enums, geo
-from operasi.models import Korwil, Resident
+from operasi.models import MAX_LAND_AREA_M2, Korwil, Resident
 from pengadaan.crypto import fingerprint
 
 MAX_ROWS = 20000
@@ -294,20 +294,25 @@ def _apply_dossier(resident, props: dict) -> None:
         value = _prop(props, names)
         if value:
             setattr(resident, field, value[:size])
-    for field, names in (
-        ("age", AGE),
-        ("years_living", YEARS),
-        ("child_count", CHILDREN),
+    for field, names, high in (
+        ("age", AGE, 130),
+        ("years_living", YEARS, 130),
+        ("child_count", CHILDREN, 50),
     ):
         value = _prop(props, names)
-        if value and value.isdigit():
+        if value and value.isdigit() and int(value) <= high:
             setattr(resident, field, int(value))
     area = _prop(props, LAND_AREA).replace(",", ".")
     if area:
         try:
-            resident.land_area_m2 = Decimal(area)
+            number = Decimal(area)
         except InvalidOperation:
+            number = None
+        if number is None or not number.is_finite() or number < 0:
             raise AssetImportError(f"luas lahan '{area}' bukan angka.")
+        if number > MAX_LAND_AREA_M2:
+            raise AssetImportError(f"luas lahan '{area}' terlalu besar.")
+        resident.land_area_m2 = number.quantize(Decimal("0.01"))
 
 
 def _apply_row(resident, props: dict, point, korwils: dict, korwil, user=None) -> None:
@@ -327,6 +332,8 @@ def _apply_row(resident, props: dict, point, korwils: dict, korwil, user=None) -
     if members:
         if not members.isdigit():
             raise AssetImportError(f"jumlah jiwa '{members}' bukan angka.")
+        if int(members) > 1000:
+            raise AssetImportError(f"jumlah jiwa '{members}' terlalu besar.")
         resident.member_count = int(members)
     _apply_dossier(resident, props)
     _apply_korwil(resident, props, korwils, korwil)

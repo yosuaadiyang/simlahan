@@ -463,7 +463,9 @@ def _counts_late(attendance, config) -> bool:
     )
 
 
-def performance(user, start: datetime.date, end: datetime.date, config=None) -> dict:
+def performance(
+    user, start: datetime.date, end: datetime.date, config=None, weights=None
+) -> dict:
     from asetlahan.models import Task
 
     config = config or CommandSettings.load()
@@ -507,9 +509,10 @@ def performance(user, start: datetime.date, end: datetime.date, config=None) -> 
         reported_by=user, started_at__date__gte=start, started_at__date__lte=end
     )
     # Bobot USAHA: kegiatan bernilai poin per jenisnya (default 1).
-    points_map = ActivityWeight.points_map()
+    if weights is None:
+        weights = ActivityWeight.points_map()
     activity_count = sum(
-        points_map.get(a, 1) for a in activities.values_list("activity_type", flat=True)
+        weights.get(a, 1) for a in activities.values_list("activity_type", flat=True)
     )
     activity_target = (
         max(math.ceil(config.weekly_activity_target * len(workdays) / 5), 1)
@@ -610,41 +613,69 @@ def team_users(user):
     )
 
 
-def leaderboard(user, start, end) -> list[dict]:
-    """Peringkat tim untuk periode, lengkap dengan tren peringkat.
+def previous_period(start, end) -> tuple[datetime.date, datetime.date]:
+    """Periode sebelumnya: bulan kalender sebelumnya untuk periode sebulan
+    penuh, selain itu rentang sepanjang periode tepat sebelum ``start``."""
+    prev_end = start - datetime.timedelta(days=1)
+    if start.day == 1 and (end + datetime.timedelta(days=1)).day == 1:
+        return prev_end.replace(day=1), prev_end
+    return prev_end - (end - start), prev_end
 
-    Tren membandingkan posisi periode ini dengan periode sebelumnya yang
-    sama panjangnya: ``naik``, ``turun``, ``baru`` (belum ada skor periode
-    lalu), atau ``stabil``.
+
+def _ranks(scores: dict) -> dict:
+    """Peringkat kompetisi (1, 1, 3, …): skor sama berperingkat sama."""
+    return {
+        key: 1 + sum(1 for other in scores.values() if other > score)
+        for key, score in scores.items()
+    }
+
+
+def leaderboard(user, start, end, trend: bool = True) -> list[dict]:
+    """Peringkat tim untuk periode, bila ``trend`` lengkap dengan tren peringkat.
+
+    Tren membandingkan peringkat periode ini dengan periode sebelumnya
+    (bulan lalu untuk periode bulanan) di antara anggota yang sudah aktif
+    sejak awal periode sebelumnya: ``naik``, ``turun``, ``stabil``, atau
+    ``baru`` bagi anggota yang belum ada saat itu.
     """
     config = CommandSettings.load()
-    rows = [performance(member, start, end, config) for member in team_users(user)]
+    weights = ActivityWeight.points_map()
+    members = list(team_users(user))
+    rows = [performance(member, start, end, config, weights) for member in members]
     for row in rows:
         row.pop("days", None)
     rows.sort(key=lambda r: (-r["score"], r["user"]))
-    span = (end - start).days + 1
-    prev_end = start - datetime.timedelta(days=1)
-    prev_start = prev_end - datetime.timedelta(days=span - 1)
-    members = list(team_users(user))
-    prev = {
-        member.pk: performance(member, prev_start, prev_end, config)["score"]
+    ranks = _ranks({row["user_id"]: row["score"] for row in rows})
+    for row in rows:
+        row["rank"] = ranks[row["user_id"]]
+    if not trend:
+        return rows
+    prev_start, prev_end = previous_period(start, end)
+    veterans = {
+        member.pk
         for member in members
-        if member.date_joined is None
-        or timezone.localtime(member.date_joined).date() <= prev_start
+        if timezone.localtime(member.date_joined).date() <= prev_start
     }
-    prev_rank = sorted(prev.values(), reverse=True)
-    for index, row in enumerate(rows):
+    old = _ranks(
+        {
+            member.pk: performance(member, prev_start, prev_end, config, weights)[
+                "score"
+            ]
+            for member in members
+            if member.pk in veterans
+        }
+    )
+    now = _ranks({r["user_id"]: r["score"] for r in rows if r["user_id"] in veterans})
+    for row in rows:
         user_id = row["user_id"]
-        if user_id not in prev:
+        if user_id not in veterans:
             row["trend"] = "baru"
+        elif now[user_id] < old[user_id]:
+            row["trend"] = "naik"
+        elif now[user_id] > old[user_id]:
+            row["trend"] = "turun"
         else:
-            old_rank = prev_rank.index(prev[user_id])
-            row["trend"] = (
-                "naik"
-                if index < old_rank
-                else "turun" if index > old_rank else "stabil"
-            )
-        row["rank"] = index + 1
+            row["trend"] = "stabil"
     return rows
 
 

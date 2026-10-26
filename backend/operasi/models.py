@@ -9,6 +9,7 @@ dihubungkan ke modul pengadaan tanah dan bank tanah agar tidak dicatat dua kali.
 
 import datetime
 import uuid
+from decimal import Decimal
 
 from auditlog.registry import auditlog
 from django.conf import settings
@@ -38,6 +39,8 @@ DEFAULT_SATELLITE_TILES = (
 LOCK_CACHE_KEY = "operasi:system-lock"
 
 MAX_AUDIO_BYTES = 10 * 1024 * 1024
+# Batas kolom Resident.land_area_m2 (max_digits=16, decimal_places=2).
+MAX_LAND_AREA_M2 = Decimal("99999999999999.99")
 
 
 def validate_audio_size(value):

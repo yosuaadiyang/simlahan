@@ -37,7 +37,7 @@ RTRW_COLORS = {
 
 
 class RtrwZone(models.TextChoices):
-    """Kategori zona rencana tata ruang (drilldown per zona ala pusat komando."""
+    """Kategori zona rencana tata ruang (drilldown per zona ala pusat komando)."""
 
     PROTECTED = "lindung", _("Zona Lindung")
     CULTIVATION = "budi_daya", _("Zona Budi Daya")

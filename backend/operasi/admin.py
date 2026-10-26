@@ -755,7 +755,12 @@ class ResidentAdmin(OperasiGISAdmin):
                 "<code>kampung</code>, <code>alamat</code>, <code>korwil</code>, <code>lat</code>, "
                 "<code>lng</code>, <code>sikap</code> (pro/netral/kontra), <code>status_lahan</code> "
                 "(sudah/belum), <code>rtrw</code> (sesuai/tidak), <code>pilihan</code> "
-                "(relokasi/uang/geser), <code>catatan</code>. Warga di wilayah kerja Anda "
+                "(relokasi/uang/geser), <code>catatan</code>, <code>zona</code> "
+                "(lindung/budi daya/khusus/lainnya), <code>jenis_kelamin</code> (L/P), "
+                "<code>umur</code>, <code>pekerjaan</code>, <code>asal</code>, "
+                "<code>lama_menetap</code>, <code>pasangan</code>, <code>anak</code>, "
+                "<code>luas_lahan</code> (m²), <code>penggarapan</code> "
+                "(digarapi/disewakan/tidak), <code>kondisi_lahan</code>. Warga di wilayah kerja Anda "
                 "dengan NIK yang sudah ada diperbarui (catatan ditambahkan); baris lain "
                 "dengan NIK yang tidak dapat dipakai dilewati."
             ),
@@ -818,6 +823,7 @@ class ActivityAdmin(OperasiGISAdmin):
         "verified_at",
     )
     inlines = (ActivityPhotoInline,)
+    file_kinds = {"voice_note": "kegiatan-suara"}
     actions = ("mark_verified", "export_csv")
     fieldsets = (
         (
@@ -837,7 +843,15 @@ class ActivityAdmin(OperasiGISAdmin):
         (_("Lokasi"), {"fields": ("location", "accuracy_m")}),
         (
             _("Hasil"),
-            {"fields": ("participants_count", "residents", "outcome", "task")},
+            {
+                "fields": (
+                    "participants_count",
+                    "residents",
+                    "outcome",
+                    "voice_note",
+                    "task",
+                )
+            },
         ),
         (
             _("Pelapor & verifikasi"),

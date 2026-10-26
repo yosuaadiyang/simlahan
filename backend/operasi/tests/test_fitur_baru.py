@@ -27,9 +27,12 @@ def test_leaderboard_with_trend(admin_user, coordinator, korwil):
     assert rows
     codes = {row["trend"] for row in rows}
     assert codes <= {"naik", "turun", "baru", "stabil"}
-    assert [row["rank"] for row in rows] == list(range(1, len(rows) + 1))
     scores = [row["score"] for row in rows]
     assert scores == sorted(scores, reverse=True)
+    # Peringkat kompetisi: skor sama berperingkat sama (1, 1, 3, …).
+    assert [row["rank"] for row in rows] == [
+        1 + sum(1 for other in scores if other > score) for score in scores
+    ]
 
 
 def test_leaderboard_denied_for_anonymous(client, korwil):
