@@ -1,13 +1,11 @@
 import React, { Component } from "react";
 import classNames from "classnames";
 import { Link } from "react-router";
-import { IconMenuDots, IconSize } from "hds-react";
 import {
   withRouterLegacy,
   type WithRouterProps,
 } from "@/root/withRouterLegacy";
 import { ActionTypes, ModalConsumer } from "@/app/ModalContext";
-import MainMenuIcon from "@/components/icons/MainMenuIcon";
 import SearchInput from "@/components/inputs/SearchInput";
 import UserServiceUnitSelectInput from "@/components/inputs/UserServiceUnitSelectInput";
 import { ConfirmationModalTexts } from "@/enums";
@@ -20,6 +18,20 @@ import type {
   UserServiceUnit,
   UserServiceUnits,
 } from "@/usersPermissions/types";
+
+const APP_NAME = import.meta.env.VITE_APP_NAME || "SimLahan";
+
+// Inisial untuk avatar pengguna, mis. "Budi Santoso" -> "BS", "admin@x" -> "A".
+export const getInitials = (name?: string | null): string => {
+  const words = (name || "")
+    .replace(/@.*$/, "")
+    .split(/[\s._-]+/)
+    .filter(Boolean);
+  return words
+    .slice(0, 2)
+    .map((word) => word[0].toUpperCase())
+    .join("");
+};
 
 type Props = {
   isMenuOpen: boolean;
@@ -105,7 +117,9 @@ class TopNavigation extends Component<Props & WithRouterProps, State> {
             const hasDirtyPages = hasAnyPageDirtyForms();
 
             if (hasDirtyPages) {
-              const target = e.target;
+              // currentTarget: tautan <a> itu sendiri, juga saat yang diklik
+              // adalah gambar/teks di dalamnya.
+              const target = e.currentTarget;
               e.preventDefault();
               modalDispatch({
                 type: ActionTypes.SHOW_CONFIRMATION_MODAL,
@@ -177,7 +191,7 @@ class TopNavigation extends Component<Props & WithRouterProps, State> {
           };
 
           return (
-            <section className="top-navigation">
+            <header className="top-navigation">
               <div className="top-navigation__left-wrapper">
                 <div
                   className={classNames("top-navigation__title", {
@@ -187,17 +201,41 @@ class TopNavigation extends Component<Props & WithRouterProps, State> {
                   <button
                     className="top-navigation__title_button"
                     onClick={toggleSideMenu}
-                    tabIndex={0}
+                    aria-controls="side-menu"
+                    aria-expanded={isMenuOpen}
+                    aria-label={
+                      isMenuOpen ? "Tutup menu utama" : "Buka menu utama"
+                    }
+                    title="Menu utama"
+                    type="button"
                   >
-                    <span>SimLahan</span>
-                    <MainMenuIcon />
+                    <span className="top-navigation__burger" aria-hidden="true">
+                      <span />
+                      <span />
+                      <span />
+                    </span>
                   </button>
                 </div>
-                <div className="page-title">
-                  <Link onClick={handleLinkClick} to={linkUrl || ""}>
-                    {pageTitle}
-                  </Link>
-                </div>
+                <Link
+                  className="top-navigation__brand"
+                  onClick={handleLinkClick}
+                  to="/"
+                >
+                  <img
+                    src="/assets/images/logo-mark.svg"
+                    alt=""
+                    width={30}
+                    height={30}
+                  />
+                  <span>{APP_NAME}</span>
+                </Link>
+                {!!pageTitle && (
+                  <div className="page-title">
+                    <Link onClick={handleLinkClick} to={linkUrl || ""}>
+                      {pageTitle}
+                    </Link>
+                  </div>
+                )}
               </div>
               <div className="top-navigation__right-wrapper">
                 {!!showSearch && (
@@ -232,23 +270,45 @@ class TopNavigation extends Component<Props & WithRouterProps, State> {
                 )}
 
                 <div className="username-wrapper">
-                  <p className="username">
-                    <span className="username__text" title={username}>
-                      {username}
-                    </span>{" "}
-                    <button
-                      className={"user-group-button"}
-                      onClick={toggleDisplayUserGroups}
+                  <button
+                    className="user-group-button"
+                    onClick={toggleDisplayUserGroups}
+                    title="Grup pengguna dan unit layanan"
+                    type="button"
+                  >
+                    <span className="user-avatar" aria-hidden="true">
+                      {getInitials(username) || "?"}
+                    </span>
+                    <span className="username">
+                      <span className="username__text" title={username}>
+                        {username}
+                      </span>
+                      <svg
+                        className="username__chevron"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
+                        <path d="m6 9 6 6 6-6" />
+                      </svg>
+                    </span>
+                  </button>
+                  <button
+                    className="logout-link"
+                    onClick={handleLogout}
+                    type="button"
+                  >
+                    <svg
+                      className="logout-link__icon"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
                     >
-                      <IconMenuDots color="white" size={IconSize.ExtraSmall} />
-                    </button>{" "}
-                  </p>
-                  <button className="logout-link" onClick={handleLogout}>
-                    Keluar
+                      <path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H3" />
+                    </svg>
+                    <span>Keluar</span>
                   </button>
                 </div>
               </div>
-            </section>
+            </header>
           );
         }}
       </ModalConsumer>

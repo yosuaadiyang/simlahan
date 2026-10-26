@@ -20,7 +20,8 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font: 14px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font: 14px/1.45 var(--sl-font, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif);
+  -webkit-font-smoothing: antialiased;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -47,7 +48,8 @@ a { color: var(--accent-2); }
 .brand strong { display: block; letter-spacing: 1px; font-size: 13px; }
 .brand small { color: var(--muted); font-size: 11px; }
 .logo {
-  width: 34px; height: 34px; border-radius: 9px; background: #000; color: var(--accent);
+  width: 34px; height: 34px; border-radius: 10px; color: #fff;
+  background: linear-gradient(135deg, #14b8a6, #0d7e74); box-shadow: inset 0 0 0 1px rgba(255,255,255,.18);
   display: grid; place-items: center; font-weight: 800; font-size: 20px; flex: none;
 }
 .stats { display: flex; gap: 6px; margin-left: auto; overflow-x: auto; scrollbar-width: none; }

@@ -2297,6 +2297,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fontsource-variable/inter@npm:5.2.8":
+  version: 5.2.8
+  resolution: "@fontsource-variable/inter@npm:5.2.8"
+  checksum: 10c0/35b46df31c8c18f55f87228acf6297e4dac6cc9f38d0faaafdaf5a40e40c386cf1bfb115fb0fe0dcdb9b7e14f582843693ccf070d9c903072a5b2fc0f8dfde56
+  languageName: node
+  linkType: hard
+
 "@googlemaps/js-api-loader@npm:^1.16.6":
   version: 1.16.10
   resolution: "@googlemaps/js-api-loader@npm:1.16.10"
@@ -3319,6 +3326,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@simlahan/leasing@workspace:apps/leasing"
   dependencies:
+    "@fontsource-variable/inter": "npm:5.2.8"
     "@reduxjs/toolkit": "npm:2.12.0"
     "@types/file-saver": "npm:2.0.7"
     "@types/history": "npm:4.7.11"

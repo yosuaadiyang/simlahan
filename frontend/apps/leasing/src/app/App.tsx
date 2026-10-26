@@ -75,6 +75,16 @@ const App: React.FC<Props> = (props) => {
     setDisplaySideMenu(!displaySideMenu);
   };
 
+  // Esc menutup menu utama.
+  useEffect(() => {
+    if (!displaySideMenu) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setDisplaySideMenu(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [displaySideMenu]);
+
   const toggleDisplayUserGroups = () => {
     setDisplayUserGroups(!displayUserGroups);
   };
@@ -189,6 +199,13 @@ const App: React.FC<Props> = (props) => {
               )}
 
               <section className="app__content">
+                {displaySideMenu && (
+                  <div
+                    className="side-menu-backdrop"
+                    onClick={toggleSideMenu}
+                    aria-hidden="true"
+                  />
+                )}
                 <SideMenu
                   isOpen={displaySideMenu}
                   onLinkClick={toggleSideMenu}

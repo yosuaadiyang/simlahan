@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import { Link } from "react-router";
+import { NavLink as Link } from "react-router";
 import classNames from "classnames";
 import BackIcon from "@/components/icons/BackIcon";
 import Authorization from "@/components/authorization/Authorization";
@@ -83,6 +83,8 @@ class SubMenu extends PureComponent<Props> {
           className="side-menu__submenu_header"
           onKeyDown={this.handleHeaderKeyDown}
           onClick={this.handleHeaderClick}
+          role="button"
+          aria-expanded={isOpen}
           tabIndex={0}
         >
           <span>{header}</span>

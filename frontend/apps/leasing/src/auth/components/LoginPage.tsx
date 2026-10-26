@@ -9,6 +9,36 @@ const APP_NAME = import.meta.env.VITE_APP_NAME || "SimLahan";
 const ORGANIZATION_NAME =
   import.meta.env.VITE_ORGANIZATION_NAME || "Sistem Informasi Manajemen Lahan";
 
+// Kerangka halaman masuk: panel identitas (layar lebar) + kartu formulir.
+const LoginShell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div className="login-page">
+    <aside className="login-page__hero" aria-hidden="true">
+      <div className="login-page__hero-brand">
+        <img src="/assets/images/logo-mark.svg" alt="" width={40} height={40} />
+        <span>{APP_NAME}</span>
+      </div>
+      <div className="login-page__hero-text">
+        <h2>{ORGANIZATION_NAME}</h2>
+        <p>
+          Pengadaan tanah, alokasi lahan, aset, dan operasi lapangan dalam satu
+          sistem yang terhubung dengan peta.
+        </p>
+      </div>
+      <ul className="login-page__hero-points">
+        <li>Data bidang &amp; peta terpadu</li>
+        <li>Tenggat hukum terpantau otomatis</li>
+        <li>Bisa dipakai di HP dan komputer</li>
+      </ul>
+    </aside>
+    <main className="login-page__main">
+      {children}
+      <p className="login-page__footnote">
+        {APP_NAME} · {ORGANIZATION_NAME}
+      </p>
+    </main>
+  </div>
+);
+
 const LoginPage: React.FC<Props> = ({ onLogin }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -72,7 +102,7 @@ const LoginPage: React.FC<Props> = ({ onLogin }) => {
 
   if (otp) {
     return (
-      <div className="login-page">
+      <LoginShell>
         <form
           className="login-page__content"
           onSubmit={handleOtpSubmit}
@@ -80,7 +110,7 @@ const LoginPage: React.FC<Props> = ({ onLogin }) => {
         >
           <div className="app-logo" aria-hidden="true" />
           <h3>Verifikasi masuk</h3>
-          <p>
+          <p className="login-page__lead">
             Kode 6 digit telah dikirim ke surel{" "}
             <strong>{otp.email || "akun Anda"}</strong>. Kode berlaku 10 menit.
           </p>
@@ -120,18 +150,19 @@ const LoginPage: React.FC<Props> = ({ onLogin }) => {
             Kembali / kirim ulang kode
           </button>
         </form>
-        <div className="login-footer" />
-      </div>
+      </LoginShell>
     );
   }
 
   return (
-    <div className="login-page">
+    <LoginShell>
       <form className="login-page__content" onSubmit={handleSubmit} noValidate>
         <div className="app-logo" aria-hidden="true" />
         <h3>Selamat datang di {APP_NAME}</h3>
         <p className="login-page__organization">{ORGANIZATION_NAME}</p>
-        <p>Masuk untuk melanjutkan</p>
+        <p className="login-page__lead">
+          Masuk dengan akun petugas untuk melanjutkan.
+        </p>
         <label className="login-page__label" htmlFor="login-username">
           Nama pengguna
         </label>
@@ -170,8 +201,7 @@ const LoginPage: React.FC<Props> = ({ onLogin }) => {
           {isSubmitting ? "Memproses…" : "Masuk"}
         </button>
       </form>
-      <div className="login-footer" />
-    </div>
+    </LoginShell>
   );
 };
 

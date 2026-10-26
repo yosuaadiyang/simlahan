@@ -3,10 +3,10 @@
   "use strict";
 
   var STATUS_COLORS = {
-    tersedia: "#1a7f37",
-    dipesan: "#d4a72c",
-    dialokasikan: "#8250df",
-    ditutup: "#6e7781"
+    tersedia: "#059669",
+    dipesan: "#d97706",
+    dialokasikan: "#7c3aed",
+    ditutup: "#64748b"
   };
 
   function baseLayers() {
@@ -135,6 +135,14 @@
       toggle.addEventListener("click", function () {
         var open = nav.classList.toggle("open");
         toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      });
+      // Esc menutup menu ponsel dan mengembalikan fokus ke tombolnya.
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && nav.classList.contains("open")) {
+          nav.classList.remove("open");
+          toggle.setAttribute("aria-expanded", "false");
+          toggle.focus();
+        }
       });
     }
 

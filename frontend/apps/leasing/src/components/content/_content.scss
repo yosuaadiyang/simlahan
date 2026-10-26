@@ -79,7 +79,7 @@
       font-size: variables.$font-large;
       font-weight: variables.$semibold;
       color: variables.$blue;
-      text-transform: uppercase;
+      text-transform: none;
       margin: 0;
     }
 
@@ -88,7 +88,7 @@
       font-weight: variables.$semibold;
       color: variables.$black;
       margin: 0 0 rem-calc(10px) !important;
-      text-transform: uppercase;
+      text-transform: none;
     }
   }
 
@@ -111,7 +111,7 @@
     line-height: rem-calc(22px);
     font-weight: variables.$semibold;
     color: variables.$black;
-    text-transform: uppercase;
+    text-transform: none;
     margin: 0;
     display: block;
 
@@ -326,7 +326,7 @@
       line-height: rem-calc(22px);
       font-weight: variables.$semibold;
       color: variables.$black;
-      text-transform: uppercase;
+      text-transform: none;
       margin: 0;
     }
 
@@ -345,7 +345,7 @@
       line-height: rem-calc(18px);
       font-weight: variables.$semibold;
       color: variables.$black;
-      text-transform: uppercase;
+      text-transform: none;
       margin: 0;
     }
 

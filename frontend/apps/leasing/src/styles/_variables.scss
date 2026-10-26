@@ -1,7 +1,7 @@
 @use "hds-design-tokens/lib/all" as hds;
 
-$font-family-source: "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial,
-  "Noto Sans", sans-serif;
+$font-family-source: "Inter Variable", "Inter", system-ui, -apple-system,
+  "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
 
 /// @type Font
 $body-font-family: $font-family-source;
@@ -19,45 +19,64 @@ $semibold: 600;
 
 /// @type Map
 $foundation-palette: (
-  primary: #0072c6,
-  secondary: #6692ac,
-  success: #3adb76,
-  warning: #ffae00,
-  alert: #eb1414,
+  primary: #0d7e74,
+  secondary: #475569,
+  success: #059669,
+  warning: #d97706,
+  alert: #dc2626,
 );
 
 /// @type Color
-$neutral-color: #666666 !default;
-$focus-color: #d5d5d5 !default;
-$is-dirty-color: #e5f1f9 !default;
-$red: #bd2719 !default;
-$red-hover: #ca5247 !default;
-$dark-green: #007a3a !default;
-$dark-green-hover: #338e55 !default;
-$green: #e3f3eb !default;
-$light-green: #f9fcfb !default;
+$neutral-color: #64748b !default;
+$focus-color: #cbd5e1 !default;
+$is-dirty-color: #effcf9 !default;
+$red: #dc2626 !default;
+$red-hover: #b91c1c !default;
+$dark-green: #047857 !default;
+$dark-green-hover: #065f46 !default;
+$green: #ecfdf5 !default;
+$light-green: #f6fefb !default;
 $dark-yellow: #ffd600;
 $dark-yellow-hover: #ffde33 !default;
 $yellow: #ffe977 !default;
 $light-yellow: #fff6c9 !default;
 $yellow-enquiry-sent: #e1ae1a !default;
 
-$black: #000000 !default;
-$dark-gray: #666666 !default;
-$medium-dark-gray: #b7b7b7 !default;
-$medium-gray: #d5d5d5 !default;
-$light-gray: #f4f4f4 !default;
-$light-gray-secondary: #e6e6e6 !default;
-$lightest-gray: #fafafa !default;
+$black: #0f172a !default;
+$dark-gray: #64748b !default;
+$medium-dark-gray: #94a3b8 !default;
+$medium-gray: #e2e8f0 !default;
+$light-gray: #f4f6f9 !default;
+$light-gray-secondary: #eef2f6 !default;
+$lightest-gray: #f8fafc !default;
 $white: #ffffff !default;
 
 $mvj-text-color: $black;
-$mvj-focus-color: #9bdcfb;
+$mvj-focus-color: #94e9da;
 $body-background: $light-gray !default;
 $body-font-color: $mvj-text-color !default;
 
-$gray-separator: #979797 !default;
+$gray-separator: #cbd5e1 !default;
 
-$blue: #0078c0 !default;
-$blue-hover: #0084d6 !default;
-$light-blue: #e5f1f9 !default;
+$blue: #0d7e74 !default;
+$blue-hover: #0f665f !default;
+$light-blue: #effcf9 !default;
+
+// Token design system (lihat _tokens.scss) untuk gaya baru.
+$radius-sm: 6px;
+$radius: 10px;
+$radius-lg: 14px;
+$radius-full: 999px;
+$border-color: #e2e8f0;
+$border-strong: #cbd5e1;
+$text-muted: #475569;
+$shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.06);
+$shadow-sm:
+  0 1px 3px rgba(15, 23, 42, 0.08),
+  0 1px 2px rgba(15, 23, 42, 0.04);
+$shadow-md:
+  0 4px 12px -2px rgba(15, 23, 42, 0.1),
+  0 2px 4px -2px rgba(15, 23, 42, 0.06);
+$shadow-lg: 0 16px 40px -12px rgba(15, 23, 42, 0.25);
+$ring: 0 0 0 3px rgba(20, 157, 143, 0.35);
+$top-nav-height: 60px;

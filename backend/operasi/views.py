@@ -58,6 +58,8 @@ SHELL_STATIC = (
     "operasi/komando.js",
     "operasi/komando.css",
     "operasi/komando-icon.svg",
+    "simlahan/tokens.css",
+    "simlahan/fonts/inter-latin-wght-normal.woff2",
     "alokasi/vendor/leaflet/leaflet.js",
     "alokasi/vendor/leaflet/leaflet.css",
 )

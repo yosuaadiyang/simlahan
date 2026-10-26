@@ -12,6 +12,7 @@ komersial) selama pemberitahuan hak cipta dipertahankan.
 | wilayah | Cahya DSN – github.com/cahyadsn/wilayah | MIT | Data kode & nama provinsi, kabupaten/kota, kecamatan (Kepmendagri 300.2.2-2430/2025). |
 | hds-react / hds-design-tokens | City of Helsinki | MIT | Komponen UI. Font Helsinki Grotesk **tidak** dipakai. |
 | Leaflet, react-leaflet, leaflet-draw, leaflet-geosearch | masing-masing | BSD-2 / MIT | Peta. |
+| Inter (font, via @fontsource-variable/inter) | The Inter Project Authors – github.com/rsms/inter | SIL OFL 1.1 | Font antarmuka seluruh tampilan; disimpan lokal (`backend/utils/static/simlahan/fonts/`, lisensi di `OFL.txt`). |
 
 Layanan eksternal bawaan (dapat diganti lewat konfigurasi):
 
