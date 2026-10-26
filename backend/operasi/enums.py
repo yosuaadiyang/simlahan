@@ -36,6 +36,29 @@ RTRW_COLORS = {
 }
 
 
+class RtrwZone(models.TextChoices):
+    """Kategori zona rencana tata ruang (drilldown per zona ala pusat komando."""
+
+    PROTECTED = "lindung", _("Zona Lindung")
+    CULTIVATION = "budi_daya", _("Zona Budi Daya")
+    SPECIAL = "khusus", _("Zona Khusus / Ditunjuk")
+    OTHER = "lainnya", _("Zona lainnya")
+    UNASSESSED = "belum", _("Belum diketahui")
+
+
+class Gender(models.TextChoices):
+    MALE = "L", _("Laki-laki")
+    FEMALE = "P", _("Perempuan")
+    UNKNOWN = "", _("Belum diketahui")
+
+
+class CultivationStatus(models.TextChoices):
+    CULTIVATED = "digarapi", _("Digarapi sendiri")
+    LEASED = "disewakan", _("Disewakan / dieksploitasi pihak lain")
+    IDLE = "tidak", _("Tidak digarapi")
+    UNKNOWN = "", _("Belum diketahui")
+
+
 class RelocationChoice(models.TextChoices):
     UNDECIDED = "belum", _("Belum memilih")
     RELOCATION = "relokasi", _("Relokasi / hunian baru")

@@ -45,6 +45,7 @@ from operasi.models import (
     Resident,
     SoilTest,
     SosAlert,
+    StanceChange,
     SystemLock,
 )
 
@@ -240,7 +241,10 @@ def _config(request) -> dict:
             "stance": _choices(enums.Stance.choices),
             "land": _choices(enums.LandStatus.choices),
             "rtrw": _choices(enums.RtrwStatus.choices),
+            "zone": _choices(enums.RtrwZone.choices),
             "relocation": _choices(enums.RelocationChoice.choices),
+            "gender": _choices(enums.Gender.choices),
+            "cultivation": _choices(enums.CultivationStatus.choices),
             "activityType": _choices(enums.ActivityType.choices),
             "texture": _choices(enums.SoilTexture.choices),
             "suitability": _choices(enums.SoilSuitability.choices),
@@ -282,6 +286,11 @@ def _config(request) -> dict:
             "tasks": reverse("operasi-tasks"),
             "task": reverse("operasi-task", args=[0]),
             "performance": reverse("operasi-performance"),
+            "leaderboard": reverse("operasi-leaderboard"),
+            "structure": reverse("operasi-structure"),
+            "feed": reverse("operasi-feed"),
+            "aiChat": reverse("operasi-ai-chat"),
+            "activityVoice": reverse("operasi-file", args=["kegiatan-suara", 0]),
             "chat": reverse("operasi-chat"),
             "sos": reverse("operasi-sos"),
             "sosAction": reverse("operasi-sos-action", args=[0, "__aksi__"]),
@@ -392,6 +401,7 @@ def service_worker(request):
 
 FILE_KINDS = {
     "kegiatan": (ActivityPhoto, "photo", "operasi.view_activity", "activity__korwil"),
+    "kegiatan-suara": (Activity, "voice_note", "operasi.view_activity", "korwil"),
     "tanah-foto": (SoilTest, "photo", "operasi.view_soiltest", "korwil"),
     "tanah-lab": (SoilTest, "lab_report", "operasi.view_soiltest", "korwil"),
     "absen-masuk": (Attendance, "check_in_photo", "operasi.view_attendance", ""),
@@ -836,6 +846,7 @@ def _activity_json(activity) -> dict:
         "korwil": activity.korwil.code if activity.korwil_id else "",
         "participants": activity.participants_count,
         "outcome": activity.outcome,
+        "voice": file_url("kegiatan-suara", activity) if activity.voice_note else "",
         "reporter": _name(activity.reported_by),
         "verified": activity.verified,
         "lat": activity.location.y if activity.location else None,
@@ -942,6 +953,7 @@ def _create_activity(request):
     if existing is not None:
         return _duplicate(existing)
     photos = request.FILES.getlist("foto")[:MAX_PHOTOS]
+    voice = request.FILES.get("suara") or None
     stance_updates = _parse_stance_updates(data.get("sikap"))
     activity = Activity(
         client_id=client_id,
@@ -954,6 +966,7 @@ def _create_activity(request):
         accuracy_m=_accuracy(data.get("accuracy")),
         participants_count=_int_or_none(data.get("peserta"), 0, 1_000_000),
         outcome=(data.get("hasil") or "")[:10000],
+        voice_note=voice,
         reported_by=user,
     )
     _activity_relations(activity, data, user)
@@ -1091,9 +1104,20 @@ def _resident_json(resident) -> dict:
         "address": resident.address,
         "phone": resident.phone,
         "members": resident.member_count,
+        "gender": resident.gender,
+        "age": resident.age,
+        "occupation": resident.occupation,
+        "origin": resident.origin,
+        "years_living": resident.years_living,
+        "spouse_name": resident.spouse_name,
+        "child_count": resident.child_count,
+        "land_area_m2": str(resident.land_area_m2) if resident.land_area_m2 else None,
+        "cultivation": resident.cultivation_status,
+        "land_condition": resident.land_condition,
         "stance": resident.stance,
         "land": resident.land_status,
         "rtrw": resident.rtrw_status,
+        "zone": resident.rtrw_zone,
         "relocation": resident.relocation_choice,
         "last_visited": (
             resident.last_visited_on.isoformat() if resident.last_visited_on else ""
@@ -1104,12 +1128,30 @@ def _resident_json(resident) -> dict:
     }
 
 
+def _apply_resident_numbers(resident, data):
+    """Isian angka dossier warga (opsional)."""
+    numbers = (
+        ("jiwa", "member_count", 0, 1000),
+        ("umur", "age", 0, 130),
+        ("anak", "child_count", 0, 50),
+        ("menetap", "years_living", 0, 130),
+    )
+    for key, field, low, high in numbers:
+        if key in data:
+            setattr(resident, field, _int_or_none(data.get(key), low, high))
+    if "luas_lahan" in data:
+        resident.land_area_m2 = _decimal_or_none(data.get("luas_lahan"), 0, places=2)
+
+
 def _apply_resident_fields(resident, data):
     for key, field, choices in (
         ("sikap", "stance", enums.Stance.values),
         ("lahan", "land_status", enums.LandStatus.values),
         ("rtrw", "rtrw_status", enums.RtrwStatus.values),
+        ("zona", "rtrw_zone", enums.RtrwZone.values),
         ("pilihan", "relocation_choice", enums.RelocationChoice.values),
+        ("gender", "gender", enums.Gender.values),
+        ("penggarapan", "cultivation_status", enums.CultivationStatus.values),
     ):
         value = data.get(key)
         if value:
@@ -1121,11 +1163,14 @@ def _apply_resident_fields(resident, data):
         ("kampung", "village", 128),
         ("alamat", "address", 255),
         ("telepon", "phone", 32),
+        ("pekerjaan", "occupation", 128),
+        ("asal", "origin", 128),
+        ("pasangan", "spouse_name", 255),
+        ("kondisi_lahan", "land_condition", 2000),
     ):
         if key in data:
             setattr(resident, field, data.get(key, "").strip()[:size])
-    if "jiwa" in data:
-        resident.member_count = _int_or_none(data.get("jiwa"), 0, 1000)
+    _apply_resident_numbers(resident, data)
 
 
 def _apply_resident(resident, data, user):
@@ -1565,7 +1610,209 @@ def satellite_analysis(request):
 
 
 # --------------------------------------------------------------------------
-# Kunci hidup sistem
+# Leaderboard, struktur, feed, AI chat
+# --------------------------------------------------------------------------
+
+
+@api(permission="operasi.view_korwil", methods=("GET",))
+def leaderboard(request):
+    """Peringkat tim dengan tren posisi (naik/turun/baru/stabil)."""
+    start, end = services.period_bounds(request.GET.get("periode", "bulan"))
+    return JsonResponse({"results": services.leaderboard(request.user, start, end)})
+
+
+@api(permission="operasi.view_korwil", methods=("GET",))
+def structure(request):
+    """Struktur organisasi tim lapangan: Korwil → koordinator → anggota."""
+    rows = []
+    for korwil in services.visible_korwils(request.user).filter(is_active=True):
+        members = korwil.members.order_by("last_name", "first_name")
+        rows.append(
+            {
+                "id": korwil.pk,
+                "code": korwil.code,
+                "name": korwil.name,
+                "color": korwil.color,
+                "coordinator": (
+                    _name(korwil.coordinator) if korwil.coordinator_id else ""
+                ),
+                "coordinator_id": korwil.coordinator_id,
+                "villages": korwil.villages,
+                "members": [{"id": m.pk, "name": _name(m)} for m in members],
+            }
+        )
+    return JsonResponse({"results": rows})
+
+
+def _feed_item(kind, title, by, at, korwil, url=""):
+    return {
+        "kind": kind,
+        "title": title,
+        "by": by,
+        "at": _local(at),
+        "korwil": korwil,
+        "url": url,
+    }
+
+
+@api(permission="operasi.view_korwil", methods=("GET",))
+def feed(request):
+    """Feed aktivitas gabungan: kegiatan, uji tanah, perubahan sikap, SOS."""
+    korwils = services.visible_korwils(request.user)
+    korwil_filter = request.GET.get("korwil", "")
+    if korwil_filter.isdigit():
+        korwils = korwils.filter(pk=korwil_filter)
+    korwil_codes = {k.pk: k.code for k in korwils}
+    items = []
+    activities = Activity.objects.filter(korwil__in=korwils).select_related(
+        "reported_by"
+    )[:40]
+    for activity in activities:
+        items.append(
+            (
+                activity.started_at,
+                _feed_item(
+                    "kegiatan",
+                    f"{activity.get_activity_type_display()}: {activity.title}",
+                    _name(activity.reported_by) if activity.reported_by_id else "—",
+                    activity.started_at,
+                    korwil_codes.get(activity.korwil_id, ""),
+                ),
+            )
+        )
+    soil = SoilTest.objects.filter(korwil__in=korwils).select_related("sampled_by")[:30]
+    for test in soil:
+        items.append(
+            (
+                test.sampled_at,
+                _feed_item(
+                    "tanah",
+                    f"Uji tanah {test.number}",
+                    _name(test.sampled_by) if test.sampled_by_id else "—",
+                    test.sampled_at,
+                    korwil_codes.get(test.korwil_id, ""),
+                ),
+            )
+        )
+    changes = StanceChange.objects.filter(resident__korwil__in=korwils).select_related(
+        "resident", "changed_by"
+    )[:30]
+    for change in changes:
+        items.append(
+            (
+                change.changed_at,
+                _feed_item(
+                    "sikap",
+                    f"{change.resident.head_name}: {change.get_old_stance_display()}"
+                    f" → {change.get_new_stance_display()}",
+                    _name(change.changed_by) if change.changed_by_id else "—",
+                    change.changed_at,
+                    korwil_codes.get(change.resident.korwil_id, ""),
+                ),
+            )
+        )
+    alerts = SosAlert.objects.filter(korwil__in=korwils).order_by("-created_at")[:20]
+    for alert in alerts:
+        items.append(
+            (
+                alert.created_at,
+                _feed_item(
+                    "sos",
+                    f"SOS {alert.get_status_display()}",
+                    _name(alert.raised_by) if alert.raised_by_id else "—",
+                    alert.created_at,
+                    korwil_codes.get(alert.korwil_id, ""),
+                ),
+            )
+        )
+    items.sort(key=lambda pair: pair[0], reverse=True)
+    return JsonResponse({"results": [item for _, item in items[:60]]})
+
+
+# --------------------------------------------------------------------------
+
+
+@api(permission="operasi.view_korwil", methods=("POST",))
+def ai_chat(request):
+    """Asisten AI pusat komando: tanya data wilayah Anda dengan bahasa bebas.
+
+    Tanpa kunci API, pertanyaan umum tetap dijawab dari ringkasan angka
+    (pola sederhana), seperti asisten AI modul aset lahan.
+    """
+    from asetlahan import ai as ai_client
+
+    user = request.user
+    question = (request.POST.get("tanya") or "").strip()[:1000]
+    if not question:
+        raise ValidationError({"tanya": [_("Pertanyaan kosong.")]})
+    if _throttled(f"operasi:aichat:{user.pk}", 20, 3600):
+        return JsonResponse(
+            {"error": _("Batas 20 pertanyaan per jam tercapai. Coba lagi nanti.")},
+            status=429,
+        )
+    context = _ai_context(user)
+    answer = ""
+    if ai_client.enabled():
+        try:
+            response = ai_client.create(
+                max_tokens=700,
+                system=_(
+                    "Kamu adalah asisten pusat komando operasi lapangan. Jawab singkat, "
+                    "konkret, dalam bahasa Indonesia, hanya berdasarkan data berikut. "
+                    "Bila data tidak memuat jawabannya, katakan apa yang kurang."
+                ),
+                messages=[
+                    {
+                        "role": "user",
+                        "content": f"DATA WILAYAH KERJA:\n{context}\n\nPERTANYAAN: {question}",
+                    }
+                ],
+            )
+            answer = ai_client.text_of(response)
+        except ai_client.AIError as error:
+            answer = str(error)
+    if not answer:
+        answer = _ai_fallback(question, context)
+    return JsonResponse({"answer": answer[:4000]})
+
+
+def _ai_context(user) -> str:
+    """Ringkasan angka seluruh Korwil yang boleh dilihat pengguna."""
+    stats = services.korwil_stats(user)
+    lines = []
+    for korwil in services.visible_korwils(user):
+        row = stats.get(korwil.pk) or {}
+        lines.append(
+            f"Korwil {korwil.code} ({korwil.name}): {row.get('residents', 0)} warga, "
+            f"Pro {row.get('pro_pct', 0)}%, RTRW sesuai {row.get('rtrw_pct', 0)}%, "
+            f"lahan belum {row.get('pending', 0)}, lahan sudah {row.get('released', 0)}, "
+            f"kegiatan {row.get('activities', 0)}."
+        )
+    return "\n".join(lines) or _("Belum ada data wilayah.")
+
+
+def _ai_fallback(question: str, context: str) -> str:
+    """Jawaban pola sederhana saat AI tidak terkonfigurasi/gagal."""
+    lowered = question.lower()
+    topics = (
+        (("pro", "dukung", "sikap"), _("Rekap sikap per Korwil:\n")),
+        (("rtrw", "ruang"), _("Rekap kesesuaian RTRW per Korwil:\n")),
+        (("lahan", "bebas"), _("Rekap status lahan per Korwil:\n")),
+    )
+    for words, lead in topics:
+        if any(word in lowered for word in words):
+            return lead + context
+    return (
+        _(
+            "Asisten AI belum dikonfigurasi (ANTHROPIC_API_KEY kosong). "
+            "Ringkasan data wilayah Anda:\n"
+        )
+        + context
+    )
+
+
+# --------------------------------------------------------------------------
+# Kunci sistem
 # --------------------------------------------------------------------------
 
 

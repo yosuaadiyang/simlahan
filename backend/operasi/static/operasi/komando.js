@@ -1286,6 +1286,17 @@
     if (name === "warga") { loadResidents(); }
     if (name === "tasks") { loadTasks(); }
     if (name === "perf") { loadPerformance(); }
+    if (name === "peringkat") {
+      fillSelect($("feed-korwil"), config.korwils.map(function (k) { return { value: k.id, label: "Korwil " + k.code }; }), "Semua Korwil");
+      loadLeaderboard();
+    }
+    if (name === "struktur") { loadStructure(); }
+    if (name === "feed") {
+      if ($("feed-korwil").options.length <= 1) {
+        fillSelect($("feed-korwil"), config.korwils.map(function (k) { return { value: k.id, label: "Korwil " + k.code }; }), "Semua Korwil");
+      }
+      loadFeed();
+    }
     if (name === "chat") { loadChat(true); }
     syncSosSpace();
     setTimeout(function () { map.invalidateSize(); }, 50);
@@ -1462,6 +1473,10 @@
       if (point) { fields.lat = point.lat; fields.lng = point.lng; fields.accuracy = point.accuracy; }
       return photoFiles(formEl.querySelector('[name="foto"]'), "foto", 5);
     }).then(function (files) {
+      var voiceInput = formEl.querySelector('[name="suara"]');
+      if (voiceInput && voiceInput.files && voiceInput.files.length) {
+        files.push({ key: "suara", file: voiceInput.files[0] });
+      }
       return enqueue(urls.activities, "Kegiatan: " + fields.judul, fields, files);
     }).then(function () {
       formEl.reset();
@@ -1633,6 +1648,7 @@
       }).join("") + "</div>";
       html += "<div class='grid2' id='wd-form'><label class='field'>Status lahan " + selectHtml("lahan", "land", r.land) + "</label>" +
         "<label class='field'>RTRW " + selectHtml("rtrw", "rtrw", r.rtrw) + "</label>" +
+        "<label class='field'>Zona RTRW " + selectHtml("zona", "zone", r.zone) + "</label>" +
         "<label class='field'>Pilihan " + selectHtml("pilihan", "relocation", r.relocation) + "</label>" +
         "<label class='field'>Catatan baru <input name='catatan' maxlength='2000'></label></div>" +
         "<div class='row wrap'><button type='button' class='btn primary' id='wd-simpan'>Simpan</button>" +
@@ -1798,6 +1814,71 @@
 
   $("kinerja-periode").addEventListener("change", loadPerformance);
   $("kinerja-petugas").addEventListener("change", loadPerformance);
+
+  // ================================================================ Peringkat, struktur, feed, AI
+
+  var TREND_BADGE = {
+    naik: '<span class="badge" style="background:#1a7f37">↗ naik</span>',
+    turun: '<span class="badge" style="background:#cf222e">↘ turun</span>',
+    baru: '<span class="badge" style="background:#0969da">★ baru</span>',
+    stabil: '<span class="badge" style="background:#8c959f">→ stabil</span>'
+  };
+
+  function loadLeaderboard() {
+    if (!config.perms.tim) { $("peringkat-isi").textContent = "Hanya koordinator dan administrator yang melihat peringkat tim."; return; }
+    request(urls.leaderboard + "?periode=" + $("peringkat-periode").value).then(function (data) {
+      $("peringkat-isi").innerHTML = data.results.map(function (row) {
+        return "<div class='row' style='justify-content:space-between;align-items:center'>" +
+          "<span><b>#" + row.rank + "</b> " + escapeHtml(row.user) +
+          " <span class='muted small'>(" + escapeHtml(row.grade) + ")</span></span>" +
+          "<span><b>" + row.score + "</b> " + (TREND_BADGE[row.trend] || "") + "</span></div>";
+      }).join("") || "<p class='muted'>Belum ada anggota tim.</p>";
+    }).catch(function (error) { $("peringkat-isi").textContent = error.message; });
+  }
+
+  function loadStructure() {
+    request(urls.structure).then(function (data) {
+      $("struktur-isi").innerHTML = data.results.map(function (k) {
+        var members = k.members.map(function (m) { return escapeHtml(m.name); }).join(", ") || "—";
+        return "<div class='stack'><b style='color:" + escapeHtml(k.color) + "'>Korwil " + escapeHtml(k.code) + " – " + escapeHtml(k.name) + "</b>" +
+          "<div class='small'>Koordinator: <b>" + escapeHtml(k.coordinator || "—") + "</b></div>" +
+          "<div class='small muted'>Anggota: " + members + "</div></div>";
+      }).join("") || "<p class='muted'>Belum ada Korwil.</p>";
+    }).catch(function (error) { $("struktur-isi").textContent = error.message; });
+  }
+
+  function loadFeed() {
+    var korwil = $("feed-korwil").value;
+    request(urls.feed + (korwil ? "?korwil=" + korwil : "")).then(function (data) {
+      var ICON = { kegiatan: "📝", tanah: "🧪", sikap: "🔄", sos: "🆘" };
+      $("feed-isi").innerHTML = data.results.map(function (item) {
+        return "<li><b>" + (ICON[item.kind] || "•") + " " + escapeHtml(item.title) + "</b>" +
+          "<br><span class='muted small'>Korwil " + escapeHtml(item.korwil || "—") + " · " + escapeHtml(item.by) + " · " + escapeHtml(item.at) + "</span></li>";
+      }).join("") || "<li class='muted'>Belum ada aktivitas.</li>";
+    }).catch(function (error) { $("feed-isi").innerHTML = "<li class='muted'>" + escapeHtml(error.message) + "</li>"; });
+  }
+
+  $("peringkat-periode").addEventListener("change", loadLeaderboard);
+  $("feed-korwil").addEventListener("change", loadFeed);
+
+  $("form-ai").addEventListener("submit", function (event) {
+    event.preventDefault();
+    var input = $("ai-teks");
+    var question = (input.value || "").trim();
+    if (!question) { return; }
+    var list = $("ai-pesan");
+    list.insertAdjacentHTML("beforeend", "<li><b>Anda:</b> " + escapeHtml(question) + "</li>");
+    input.value = "";
+    list.insertAdjacentHTML("beforeend", "<li id='ai-loading' class='muted'>Menyusun jawaban…</li>");
+    request(urls.aiChat, { method: "POST", body: form({ tanya: question }) }).then(function (data) {
+      var loading = $("ai-loading"); if (loading) { loading.remove(); }
+      list.insertAdjacentHTML("beforeend", "<li><b>🤖</b> " + escapeHtml(data.answer).replace(/\n/g, "<br>") + "</li>");
+      list.scrollTop = list.scrollHeight;
+    }).catch(function (error) {
+      var loading = $("ai-loading"); if (loading) { loading.remove(); }
+      list.insertAdjacentHTML("beforeend", "<li class='muted'>" + escapeHtml(error.message) + "</li>");
+    });
+  });
   $("kinerja-tim-isi").addEventListener("click", function (event) {
     var row = event.target.closest("[data-petugas]");
     if (row) { $("kinerja-petugas").value = row.getAttribute("data-petugas"); loadPerformance(); }
@@ -2164,7 +2245,10 @@
     document.querySelectorAll(".pilih-sikap").forEach(function (s) { fillSelect(s, config.choices.stance); s.value = "belum"; });
     document.querySelectorAll(".pilih-lahan").forEach(function (s) { fillSelect(s, config.choices.land); });
     document.querySelectorAll(".pilih-rtrw").forEach(function (s) { fillSelect(s, config.choices.rtrw); s.value = "belum"; });
+    document.querySelectorAll(".pilih-zona").forEach(function (s) { fillSelect(s, config.choices.zone); s.value = "belum"; });
     document.querySelectorAll(".pilih-relokasi").forEach(function (s) { fillSelect(s, config.choices.relocation); });
+    document.querySelectorAll(".pilih-gender").forEach(function (s) { fillSelect(s, config.choices.gender); });
+    document.querySelectorAll(".pilih-penggarapan").forEach(function (s) { fillSelect(s, config.choices.cultivation); });
     $("chat-kanal").innerHTML = '<option value="umum">Kanal umum</option>' + config.korwils.map(function (k) {
       return '<option value="' + k.id + '">Korwil ' + escapeHtml(k.code) + "</option>";
     }).join("");

@@ -25,6 +25,7 @@ from operasi import enums, geo, services
 from operasi.models import (
     Activity,
     ActivityPhoto,
+    ActivityWeight,
     AreaAnalysis,
     Attendance,
     ChatMessage,
@@ -560,7 +561,32 @@ class ResidentAdmin(OperasiGISAdmin):
         (_("Tempat tinggal"), {"fields": ("village", "address", "location")}),
         (
             _("Status"),
-            {"fields": ("stance", "land_status", "rtrw_status", "relocation_choice")},
+            {
+                "fields": (
+                    "stance",
+                    "land_status",
+                    "rtrw_status",
+                    "rtrw_zone",
+                    "relocation_choice",
+                )
+            },
+        ),
+        (
+            _("Detail sosial-ekonomi"),
+            {
+                "fields": (
+                    "gender",
+                    "age",
+                    "occupation",
+                    "origin",
+                    "years_living",
+                    "spouse_name",
+                    "child_count",
+                    "land_area_m2",
+                    "cultivation_status",
+                    "land_condition",
+                )
+            },
         ),
         (
             _("Keterkaitan modul lain"),
@@ -751,6 +777,18 @@ class ActivityPhotoInline(admin.TabularInline):
         if isinstance(db_field, PrivateFileField):
             kwargs["widget"] = PrivateFileWidget("kegiatan")
         return super().formfield_for_dbfield(db_field, request, **kwargs)
+
+
+@admin.register(ActivityWeight)
+class ActivityWeightAdmin(admin.ModelAdmin):
+    list_display = ("activity_type", "points")
+    list_editable = ("points",)
+
+    def has_add_permission(self, request):
+        return request.user.has_perm("operasi.change_commandsettings")
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.has_perm("operasi.change_commandsettings")
 
 
 @admin.register(Activity)

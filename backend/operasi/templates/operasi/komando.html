@@ -186,6 +186,9 @@
       <label class="field">Foto (maks. 5) <input type="file" name="foto" accept="image/*" capture="environment" multiple></label>
       <label class="check"><input type="checkbox" id="kg-titik"> Pakai titik yang saya ketuk di peta</label>
       <p class="muted small" id="kg-gps">Mencari sinyal GPS…</p>
+      <label class="field">Rekaman suara (opsional, maks 10 MB)
+        <input type="file" name="suara" id="kg-suara" accept=".m4a,.mp3,.wav,.ogg,.webm,audio/*">
+      </label>
       <button type="submit" class="btn primary">Simpan laporan</button>
     </form>
     <form id="form-tanah" class="stack sub-view" data-sub-view="tanah" hidden autocomplete="off">
@@ -241,8 +244,21 @@
         <label class="field">Sikap <select name="sikap" class="pilih-sikap"></select></label>
         <label class="field">Status lahan <select name="lahan" class="pilih-lahan"></select></label>
         <label class="field">RTRW <select name="rtrw" class="pilih-rtrw"></select></label>
+        <label class="field">Zona RTRW <select name="zona" class="pilih-zona"></select></label>
         <label class="field">Pilihan <select name="pilihan" class="pilih-relokasi"></select></label>
+        <label class="field">Penggarapan lahan <select name="penggarapan" class="pilih-penggarapan"></select></label>
       </div>
+      <div class="grid2">
+        <label class="field">Jenis kelamin <select name="gender" class="pilih-gender"></select></label>
+        <label class="field">Umur <input type="number" name="umur" min="0" max="130" inputmode="numeric"></label>
+        <label class="field">Pekerjaan <input name="pekerjaan" maxlength="128"></label>
+        <label class="field">Asal daerah <input name="asal" maxlength="128"></label>
+        <label class="field">Lama menetap (tahun) <input type="number" name="menetap" min="0" max="130" inputmode="numeric"></label>
+        <label class="field">Nama pasangan <input name="pasangan" maxlength="255"></label>
+        <label class="field">Jumlah anak <input type="number" name="anak" min="0" max="50" inputmode="numeric"></label>
+        <label class="field">Luas lahan (m²) <input type="number" step="0.01" name="luas_lahan" min="0" inputmode="decimal"></label>
+      </div>
+      <label class="field">Kondisi lahan <textarea name="kondisi_lahan" rows="2" maxlength="2000"></textarea></label>
       <label class="check"><input type="checkbox" name="pakai_gps" checked> Simpan lokasi GPS saat ini sebagai lokasi rumah</label>
       <div class="row"><button type="submit" class="btn primary">Simpan warga</button><button type="button" class="btn" id="warga-tambah-batal">Batal</button></div>
     </form>
@@ -268,6 +284,36 @@
     </div>
   </section>
 
+  <section id="tab-peringkat" class="tab-view sheet" aria-label="Peringkat" hidden>
+    <h2>Peringkat Tim</h2>
+    <div class="row wrap">
+      <select id="peringkat-periode"><option value="minggu">Minggu ini</option><option value="bulan" selected>Bulan ini</option><option value="bulan-lalu">Bulan lalu</option></select>
+    </div>
+    <p class="muted small">Tren membandingkan posisi periode ini dengan periode sebelumnya.</p>
+    <div id="peringkat-isi" class="stack">Memuat…</div>
+  </section>
+
+  <section id="tab-struktur" class="tab-view sheet" aria-label="Struktur" hidden>
+    <h2>Struktur Tim Lapangan</h2>
+    <div id="struktur-isi" class="stack">Memuat…</div>
+  </section>
+
+  <section id="tab-feed" class="tab-view sheet" aria-label="Feed" hidden>
+    <h2>Feed Aktivitas</h2>
+    <div class="row"><select id="feed-korwil"><option value="">Semua Korwil</option></select></div>
+    <ul class="list" id="feed-isi"></ul>
+  </section>
+
+  <section id="tab-ai" class="tab-view sheet chat" aria-label="Asisten AI" hidden>
+    <div class="panel-head"><strong>🤖 Asisten AI Komando</strong></div>
+    <p class="muted small">Tanya data wilayah Anda dengan bahasa sehari-hari. Jawaban hanya dari data yang boleh Anda lihat.</p>
+    <ul class="messages" id="ai-pesan" aria-live="polite"></ul>
+    <form id="form-ai" class="chat-form" autocomplete="off">
+      <input id="ai-teks" name="tanya" maxlength="1000" placeholder="Tanyakan data wilayah, sikap warga, RTRW…" aria-label="Pertanyaan">
+      <button type="submit" class="btn primary">Tanya</button>
+    </form>
+  </section>
+
   <section id="tab-chat" class="tab-view sheet chat" aria-label="Chat internal" hidden>
     <div class="panel-head"><strong>💬 Chat internal</strong>
       <select id="chat-kanal"><option value="umum">Kanal umum</option></select>
@@ -289,6 +335,10 @@
   <button type="button" data-tab="warga">👥<span>Warga</span></button>
   <button type="button" data-tab="tasks">✅<span>Tugas</span></button>
   <button type="button" data-tab="perf">📈<span>Kinerja</span></button>
+  <button type="button" data-tab="peringkat">🏆<span>Peringkat</span></button>
+  <button type="button" data-tab="struktur">🕸️<span>Struktur</span></button>
+  <button type="button" data-tab="feed">📰<span>Feed</span></button>
+  <button type="button" data-tab="ai">🤖<span>AI</span></button>
   <button type="button" data-tab="chat">💬<span>Chat</span><i class="dot" id="tab-chat-dot" hidden></i></button>
 </nav>
 

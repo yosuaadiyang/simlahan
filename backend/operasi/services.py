@@ -16,6 +16,7 @@ from operasi import enums, geo
 from operasi.models import (
     RELEASED_PARCEL_STATUSES,
     Activity,
+    ActivityWeight,
     Attendance,
     ChatMessage,
     CommandSettings,
@@ -505,7 +506,11 @@ def performance(user, start: datetime.date, end: datetime.date, config=None) -> 
     activities = Activity.objects.filter(
         reported_by=user, started_at__date__gte=start, started_at__date__lte=end
     )
-    activity_count = activities.count()
+    # Bobot USAHA: kegiatan bernilai poin per jenisnya (default 1).
+    points_map = ActivityWeight.points_map()
+    activity_count = sum(
+        points_map.get(a, 1) for a in activities.values_list("activity_type", flat=True)
+    )
     activity_target = (
         max(math.ceil(config.weekly_activity_target * len(workdays) / 5), 1)
         if workdays and config.weekly_activity_target
@@ -606,11 +611,41 @@ def team_users(user):
 
 
 def leaderboard(user, start, end) -> list[dict]:
+    """Peringkat tim untuk periode, lengkap dengan tren peringkat.
+
+    Tren membandingkan posisi periode ini dengan periode sebelumnya yang
+    sama panjangnya: ``naik``, ``turun``, ``baru`` (belum ada skor periode
+    lalu), atau ``stabil``.
+    """
     config = CommandSettings.load()
     rows = [performance(member, start, end, config) for member in team_users(user)]
     for row in rows:
         row.pop("days", None)
-    return sorted(rows, key=lambda r: (-r["score"], r["user"]))
+    rows.sort(key=lambda r: (-r["score"], r["user"]))
+    span = (end - start).days + 1
+    prev_end = start - datetime.timedelta(days=1)
+    prev_start = prev_end - datetime.timedelta(days=span - 1)
+    members = list(team_users(user))
+    prev = {
+        member.pk: performance(member, prev_start, prev_end, config)["score"]
+        for member in members
+        if member.date_joined is None
+        or timezone.localtime(member.date_joined).date() <= prev_start
+    }
+    prev_rank = sorted(prev.values(), reverse=True)
+    for index, row in enumerate(rows):
+        user_id = row["user_id"]
+        if user_id not in prev:
+            row["trend"] = "baru"
+        else:
+            old_rank = prev_rank.index(prev[user_id])
+            row["trend"] = (
+                "naik"
+                if index < old_rank
+                else "turun" if index > old_rank else "stabil"
+            )
+        row["rank"] = index + 1
+    return rows
 
 
 # --------------------------------------------------------------------------

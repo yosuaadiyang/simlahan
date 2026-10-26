@@ -16,6 +16,7 @@ keberadaannya.
 import csv
 import io
 import os
+from decimal import Decimal, InvalidOperation
 
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ValidationError
@@ -55,8 +56,19 @@ LNG = ("lng", "lon", "long", "longitude", "bujur", "x")
 STANCE = ("sikap", "stance", "dukungan")
 LAND = ("status_lahan", "lahan")
 RTRW = ("rtrw", "kesesuaian_rtrw")
+ZONE = ("zona", "zona_rtrw", "kategori_zona")
 CHOICE = ("pilihan", "pilihan_penyelesaian")
 NOTE = ("catatan", "keterangan", "note")
+GENDER = ("gender", "jenis_kelamin", "jk")
+OCCUPATION = ("pekerjaan", "occupation")
+ORIGIN = ("asal", "asal_daerah")
+AGE = ("umur", "usia", "age")
+YEARS = ("menetap", "lama_menetap", "tahun_menetap")
+SPOUSE = ("pasangan", "nama_pasangan", "suami", "istri")
+CHILDREN = ("anak", "jumlah_anak")
+LAND_AREA = ("luas_lahan", "luas", "area_lahan")
+CULTIVATION = ("penggarapan", "status_penggarapan")
+LAND_CONDITION = ("kondisi_lahan", "kondisi")
 
 STANCE_WORDS = {
     "pro": enums.Stance.SUPPORT,
@@ -94,6 +106,31 @@ CHOICE_WORDS = {
     "geser": enums.RelocationChoice.SHIFT,
     "lainnya": enums.RelocationChoice.OTHER,
     "belum": enums.RelocationChoice.UNDECIDED,
+}
+ZONE_WORDS = {
+    "lindung": enums.RtrwZone.PROTECTED,
+    "budi daya": enums.RtrwZone.CULTIVATION,
+    "budidaya": enums.RtrwZone.CULTIVATION,
+    "khusus": enums.RtrwZone.SPECIAL,
+    "ditunjuk": enums.RtrwZone.SPECIAL,
+    "lainnya": enums.RtrwZone.OTHER,
+    "belum": enums.RtrwZone.UNASSESSED,
+}
+GENDER_WORDS = {
+    "l": enums.Gender.MALE,
+    "laki-laki": enums.Gender.MALE,
+    "pria": enums.Gender.MALE,
+    "p": enums.Gender.FEMALE,
+    "perempuan": enums.Gender.FEMALE,
+    "wanita": enums.Gender.FEMALE,
+}
+CULTIVATION_WORDS = {
+    "digarapi": enums.CultivationStatus.CULTIVATED,
+    "garap": enums.CultivationStatus.CULTIVATED,
+    "disewakan": enums.CultivationStatus.LEASED,
+    "sewa": enums.CultivationStatus.LEASED,
+    "tidak digarapi": enums.CultivationStatus.IDLE,
+    "tidak": enums.CultivationStatus.IDLE,
 }
 
 
@@ -246,6 +283,33 @@ def _apply_korwil(resident, props: dict, korwils: dict, korwil) -> None:
         resident.korwil = korwil
 
 
+def _apply_dossier(resident, props: dict) -> None:
+    """Kolom sosial-ekonomi opsional (dossier warga)."""
+    for field, names, size in (
+        ("occupation", OCCUPATION, 128),
+        ("origin", ORIGIN, 128),
+        ("spouse_name", SPOUSE, 255),
+        ("land_condition", LAND_CONDITION, 2000),
+    ):
+        value = _prop(props, names)
+        if value:
+            setattr(resident, field, value[:size])
+    for field, names in (
+        ("age", AGE),
+        ("years_living", YEARS),
+        ("child_count", CHILDREN),
+    ):
+        value = _prop(props, names)
+        if value and value.isdigit():
+            setattr(resident, field, int(value))
+    area = _prop(props, LAND_AREA).replace(",", ".")
+    if area:
+        try:
+            resident.land_area_m2 = Decimal(area)
+        except InvalidOperation:
+            raise AssetImportError(f"luas lahan '{area}' bukan angka.")
+
+
 def _apply_row(resident, props: dict, point, korwils: dict, korwil, user=None) -> None:
     for field, names, size in (
         ("family_card_number", KK, 32),
@@ -264,6 +328,7 @@ def _apply_row(resident, props: dict, point, korwils: dict, korwil, user=None) -
         if not members.isdigit():
             raise AssetImportError(f"jumlah jiwa '{members}' bukan angka.")
         resident.member_count = int(members)
+    _apply_dossier(resident, props)
     _apply_korwil(resident, props, korwils, korwil)
     if point is not None:
         resident.location = point
@@ -271,6 +336,9 @@ def _apply_row(resident, props: dict, point, korwils: dict, korwil, user=None) -
         ("stance", STANCE, STANCE_WORDS),
         ("land_status", LAND, LAND_WORDS),
         ("rtrw_status", RTRW, RTRW_WORDS),
+        ("rtrw_zone", ZONE, ZONE_WORDS),
+        ("gender", GENDER, GENDER_WORDS),
+        ("cultivation_status", CULTIVATION, CULTIVATION_WORDS),
         ("relocation_choice", CHOICE, CHOICE_WORDS),
     ):
         setattr(

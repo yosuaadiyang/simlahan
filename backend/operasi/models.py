@@ -15,7 +15,11 @@ from django.conf import settings
 from django.contrib.auth.hashers import check_password, make_password
 from django.contrib.gis.db import models as gmodels
 from django.core.cache import cache
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import (
+    FileExtensionValidator,
+    MaxValueValidator,
+    MinValueValidator,
+)
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -32,6 +36,21 @@ DEFAULT_SATELLITE_TILES = (
     "tile/{z}/{y}/{x}"
 )
 LOCK_CACHE_KEY = "operasi:system-lock"
+
+MAX_AUDIO_BYTES = 10 * 1024 * 1024
+
+
+def validate_audio_size(value):
+    from django.core.exceptions import ValidationError
+
+    if value and value.size > MAX_AUDIO_BYTES:
+        raise ValidationError(_("Ukuran rekaman maksimal 10 MB."))
+
+
+AUDIO_VALIDATORS = [
+    FileExtensionValidator(allowed_extensions=["m4a", "mp3", "wav", "ogg", "webm"]),
+    validate_audio_size,
+]
 
 
 def _upload_to(name, prefix):
@@ -329,6 +348,45 @@ class Resident(TimeStampedModel):
     member_count = models.PositiveSmallIntegerField(
         _("Jumlah jiwa"), null=True, blank=True
     )
+    # --- Detail sosial-ekonomi (dossier warga ala pusat komando lapangan) ---
+    gender = models.CharField(
+        _("Jenis kelamin"),
+        max_length=1,
+        choices=enums.Gender.choices,
+        blank=True,
+        default="",
+    )
+    age = models.PositiveSmallIntegerField(_("Umur (tahun)"), null=True, blank=True)
+    occupation = models.CharField(
+        _("Pekerjaan"), max_length=128, blank=True, default=""
+    )
+    origin = models.CharField(_("Asal daerah"), max_length=128, blank=True, default="")
+    years_living = models.PositiveSmallIntegerField(
+        _("Lama menetap (tahun)"), null=True, blank=True
+    )
+    spouse_name = models.CharField(
+        _("Nama pasangan"), max_length=255, blank=True, default=""
+    )
+    child_count = models.PositiveSmallIntegerField(
+        _("Jumlah anak"), null=True, blank=True
+    )
+    land_area_m2 = models.DecimalField(
+        _("Luas lahan yang dikuasai (m²)"),
+        max_digits=16,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
+    cultivation_status = models.CharField(
+        _("Status penggarapan lahan"),
+        max_length=16,
+        choices=enums.CultivationStatus.choices,
+        blank=True,
+        default="",
+    )
+    land_condition = models.TextField(
+        _("Kondisi lahan (uraian)"), blank=True, default=""
+    )
     phone = models.CharField(
         _("Telepon / WhatsApp"), max_length=32, blank=True, default=""
     )
@@ -352,6 +410,13 @@ class Resident(TimeStampedModel):
         max_length=8,
         choices=enums.RtrwStatus.choices,
         default=enums.RtrwStatus.UNASSESSED,
+    )
+    rtrw_zone = models.CharField(
+        _("Zona RTRW"),
+        max_length=16,
+        choices=enums.RtrwZone.choices,
+        default=enums.RtrwZone.UNASSESSED,
+        help_text=_("Kategori zona tata ruang untuk rekap drilldown."),
     )
     relocation_choice = models.CharField(
         _("Pilihan penyelesaian"),
@@ -517,6 +582,15 @@ class Activity(TimeStampedModel):
         _("Jumlah warga hadir / ditemui"), null=True, blank=True
     )
     outcome = models.TextField(_("Hasil & tindak lanjut"), blank=True, default="")
+    voice_note = PrivateFileField(
+        verbose_name=_("Rekaman suara (catatan lisan)"),
+        max_length=255,
+        upload_to=upload_activity,
+        null=True,
+        blank=True,
+        validators=AUDIO_VALIDATORS,
+        help_text=_("M4A/MP3/WAV/OGG/WEBM hingga 10 MB."),
+    )
     residents = models.ManyToManyField(
         Resident,
         verbose_name=_("Warga terkait"),
@@ -598,6 +672,36 @@ class ActivityPhoto(models.Model):
 
     def __str__(self):
         return self.caption or self.photo.name.rsplit("/", 1)[-1]
+
+
+class ActivityWeight(models.Model):
+    """Poin kegiatan pada KPI per jenis (bobot USAHA ala pusat komando).
+
+    Kosong/tidak diisi = setiap kegiatan bernilai 1. Izinkan nilai lebih
+    tinggi untuk kegiatan berat (mis. patroli kawasan, temuan lapangan).
+    """
+
+    activity_type = models.CharField(
+        _("Jenis kegiatan"),
+        max_length=16,
+        choices=enums.ActivityType.choices,
+        unique=True,
+    )
+    points = models.PositiveSmallIntegerField(
+        _("Poin per kegiatan"), default=1, validators=[MaxValueValidator(20)]
+    )
+
+    class Meta:
+        verbose_name = _("Bobot kegiatan (KPI)")
+        verbose_name_plural = _("Bobot kegiatan (KPI)")
+        ordering = ["activity_type"]
+
+    def __str__(self):
+        return f"{self.get_activity_type_display()}: {self.points}"
+
+    @classmethod
+    def points_map(cls) -> dict[str, int]:
+        return dict(cls.objects.values_list("activity_type", "points"))
 
 
 class SoilTest(TimeStampedModel):
