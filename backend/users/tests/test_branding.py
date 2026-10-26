@@ -64,7 +64,7 @@ def test_no_django_wording_for_visitors(language):
 def test_admin_header_uses_app_name(language, header, title):
     response = Client(HTTP_ACCEPT_LANGUAGE=language).get("/admin/login/")
     page = response.content.decode()
-    assert f">{header}</a>" in page
+    assert f'<span class="sl-site-title">{header}</span></a>' in page
     assert f"| {title}</title>" in page
 
 
