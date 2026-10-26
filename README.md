@@ -73,16 +73,60 @@ latar), `batchrun` (penjadwal), `frontend` (nginx + SPA, sekaligus reverse proxy
 1. Pasang di belakang HTTPS (mis. Caddy/Traefik/nginx di depan port `HTTP_PORT`),
    lalu set `SESSION_COOKIE_SECURE=1`, `CSRF_COOKIE_SECURE=1`,
    `CSRF_TRUSTED_ORIGINS=https://domain-anda`, `OFFICER_UI_URL=https://domain-anda`,
-   dan `TRUSTED_PROXY_COUNT=2`.
-2. **Cadangkan `FIELD_ENCRYPTION_KEY`** di tempat aman. NIK, nomor rekening,
+   `ALLOWED_HOSTS=domain-anda`, dan `TRUSTED_PROXY_COUNT=2`.
+2. **Set `HTTP_PORT=127.0.0.1:8080`** agar port aplikasi hanya terbuka untuk
+   reverse proxy HTTPS di server yang sama. Docker membuka port terbitan
+   langsung lewat iptables sehingga **UFW/firewalld tidak memblokirnya**; dengan
+   `HTTP_PORT=8080` siapa pun dapat mengakses aplikasi lewat HTTP biasa tanpa
+   HTTPS dan memalsukan `X-Forwarded-For` untuk lolos dari pembatas percobaan
+   masuk.
+3. Reverse proxy HTTPS harus meneruskan `Host`, `X-Forwarded-For`, dan
+   `X-Forwarded-Proto`, serta mengizinkan unggahan hingga 100 MB (nginx
+   bawaannya hanya 1 MB sehingga unggahan dokumen/foto gagal dengan galat 413).
+   Contoh nginx:
+
+   ```nginx
+   server {
+       listen 443 ssl http2;
+       server_name domain-anda;
+       # ssl_certificate ... (mis. dari certbot)
+       client_max_body_size 100m;
+       add_header Strict-Transport-Security "max-age=31536000" always;
+       location / {
+           proxy_pass http://127.0.0.1:8080;
+           proxy_set_header Host $host;
+           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+           proxy_set_header X-Forwarded-Proto https;
+           proxy_read_timeout 300s;
+       }
+   }
+   server { listen 80; server_name domain-anda; return 301 https://$host$request_uri; }
+   ```
+
+   Caddy cukup `domain-anda { reverse_proxy 127.0.0.1:8080 }`: sertifikat
+   HTTPS dan header diteruskan otomatis, tanpa batas ukuran unggahan.
+4. **Cadangkan `FIELD_ENCRYPTION_KEY`** di tempat aman. NIK, nomor rekening,
    dan nomor KK dienkripsi di basis data; tanpa kunci ini data tersebut tidak
    dapat dibaca kembali.
-3. Isi `EMAIL_URL` (SMTP) agar pengingat tenggat & laporan terkirim.
-4. Cadangkan volume `db_data`, `private_files`, dan `media` (unggahan pengguna)
+5. Isi `EMAIL_URL` (SMTP) agar pengingat tenggat & laporan terkirim.
+6. Cadangkan volume `db_data`, `private_files`, dan `media` (unggahan pengguna)
    secara berkala, mis.
-   `docker compose exec db pg_dump -U simlahan simlahan > cadangan.sql`.
-5. Perbarui daftar hari libur setiap tahun di **Pengadaan Tanah → Kalender &
+   `docker compose exec -T db pg_dump -U simlahan -Fc simlahan > cadangan.dump`
+   (`-T` wajib: tanpa itu keluaran melewati terminal semu dan berkas cadangan
+   bisa rusak; pulihkan dengan `pg_restore`).
+7. Perbarui daftar hari libur setiap tahun di **Pengadaan Tanah → Kalender &
    aturan tenggat** sesuai SKB 3 Menteri.
+
+### Memperbarui di server
+
+```bash
+docker compose exec -T db pg_dump -U simlahan -Fc simlahan > cadangan-$(date +%F).dump
+git pull
+docker compose up -d --build
+docker compose ps            # semua layanan "running", backend "healthy"
+```
+
+Migrasi basis data dijalankan otomatis saat kontainer `backend` dimulai.
 
 ## Pengguna & hak akses
 
