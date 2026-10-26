@@ -8,6 +8,7 @@ grup mana pun: hanya superuser yang dapat mengelolanya.
 from operasi.models import (
     Activity,
     ActivityPhoto,
+    ActivityWeight,
     AreaAnalysis,
     Attendance,
     ChatMessage,
@@ -51,6 +52,7 @@ OPERASI_GROUP_MODEL_PERMISSIONS: GroupModelPermissions = {
     StanceChange: _perms(V, V, V, V),
     Activity: _perms(ALL, VAC, VA, V),
     ActivityPhoto: _perms(ALL, VAC, VA, V),
+    ActivityWeight: _perms(VC),
     SoilTest: _perms(ALL, VAC, VA, V),
     Attendance: _perms(ALL, VA, VA, VA),
     ChatMessage: _perms(VAD, VA, VA, VA),
