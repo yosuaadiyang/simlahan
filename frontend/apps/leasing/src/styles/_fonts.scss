@@ -1,7 +1,8 @@
-// Font sistem (tanpa unduhan eksternal). Helsinki Grotesk berlisensi khusus
-// Kota Helsinki sehingga tidak dipakai.
-$font-stack: "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
-  sans-serif;
+// Font antarmuka: Inter (SIL OFL 1.1) dari paket @fontsource-variable/inter,
+// dimuat di main.tsx dan ikut dibundel (tanpa CDN, tetap tampil saat luring).
+// Helsinki Grotesk berlisensi khusus Kota Helsinki sehingga tidak dipakai.
+$font-stack: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI",
+  Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
 
 :root {
   --font-default: #{$font-stack};

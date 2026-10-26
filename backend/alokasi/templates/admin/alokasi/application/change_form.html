@@ -11,7 +11,7 @@
 {% endblock %}
 {% block field_sets %}
 {% if original %}
-<div class="module" style="padding:10px 12px;margin-bottom:16px;border-left:4px solid #417690">
+<div class="module" style="padding:10px 12px;margin-bottom:16px;border-left:4px solid var(--primary)">
   <strong>Status: {{ original.get_status_display }}</strong>
   {% if original.is_allocation %}
     · Lahan {{ original.plot.code }} ({{ original.plot.get_allocation_type_display }}, {{ original.plot.area_m2|angka:2 }} m²)

@@ -20,7 +20,7 @@
     font-size: rem-calc(16px);
     line-height: rem-calc(18px);
     font-weight: variables.$semibold;
-    text-transform: uppercase;
+    text-transform: none;
     color: variables.$black;
     margin-bottom: rem-calc(5px);
   }
@@ -44,7 +44,7 @@
     font-size: rem-calc(16px);
     line-height: rem-calc(18px);
     font-weight: variables.$semibold;
-    text-transform: uppercase;
+    text-transform: none;
     color: variables.$black;
     margin-bottom: rem-calc(10px);
   }

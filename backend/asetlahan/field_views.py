@@ -39,6 +39,8 @@ SHELL_STATIC = (
     "asetlahan/field.js",
     "asetlahan/field.css",
     "asetlahan/field-icon.svg",
+    "simlahan/tokens.css",
+    "simlahan/fonts/inter-latin-wght-normal.woff2",
     "alokasi/vendor/leaflet/leaflet.js",
     "alokasi/vendor/leaflet/leaflet.css",
     "alokasi/vendor/leaflet/images/marker-icon.png",
@@ -228,7 +230,7 @@ def field_manifest(request):
         "display": "standalone",
         "orientation": "portrait",
         "background_color": "#ffffff",
-        "theme_color": "#0b4f8a",
+        "theme_color": "#0d7e74",
         "lang": "id",
         "icons": [
             {

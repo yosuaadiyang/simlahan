@@ -46,6 +46,11 @@
     gap: 0.5rem;
   }
 
+  // Baris isian boleh menyempit selebar layar (bawaan flex: selebar isinya).
+  .search__row > .grid-row.lease-search-fieldset-group {
+    min-width: 0;
+  }
+
   // Lebih spesifik dari aturan umum `.search__row > .grid-row > *`.
   .search__row > .grid-row.lease-search-fieldset-group > * {
     min-width: calc(50% - 0.5rem);
@@ -68,14 +73,14 @@
 // regardless of production stylesheet order.
 .search__container .hds-input-with-value {
   // TextInput, DateInput
-  --input-background-default: #{hds.$color-coat-of-arms-light};
+  --input-background-default: #effcf9;
   // Select
-  --dropdown-background-default: #{hds.$color-coat-of-arms-light};
+  --dropdown-background-default: #effcf9;
 }
 
 #lease-list-table tbody tr:hover td,
 #lease-list-table tbody tr:focus-within td {
-  background-color: hds.$color-bus-light;
+  background-color: #effcf9;
   transition: background-color 120ms ease-in-out;
 }
 

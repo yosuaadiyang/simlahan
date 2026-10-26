@@ -9,6 +9,7 @@
         "start": "vite --config ./vite.config.js"
     },
     "dependencies": {
+        "@fontsource-variable/inter": "5.2.8",
         "@reduxjs/toolkit": "2.12.0",
         "classnames": "2.5.1",
         "copy-to-clipboard": "3.3.3",

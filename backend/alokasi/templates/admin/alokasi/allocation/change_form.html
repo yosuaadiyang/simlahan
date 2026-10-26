@@ -6,7 +6,7 @@
 {% endblock %}
 {% block field_sets %}
 {% if is_idle %}
-<div class="module" style="padding:10px 12px;margin-bottom:16px;border-left:4px solid #ba2121">
+<div class="module" style="padding:10px 12px;margin-bottom:16px;border-left:4px solid var(--delete-button-bg)">
   <strong>Lahan tidur:</strong> pembangunan belum dimulai hingga batas {{ original.idle_deadline|date:"d-m-Y" }}. Alokasi dapat dicabut sesuai ketentuan.
 </div>
 {% endif %}

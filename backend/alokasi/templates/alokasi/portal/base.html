@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Portal Alokasi Lahan{% endblock %} · {{ portal_config.authority_short_name }}</title>
   <meta name="description" content="Layanan informasi ketersediaan lahan dan permohonan alokasi tanah secara daring.">
-  <link rel="icon" href="data:,">
+  <meta name="theme-color" content="#0d7e74">
+  <link rel="icon" type="image/svg+xml" href="{% static 'simlahan/logo-mark.svg' %}">
+  <link rel="stylesheet" href="{% static 'simlahan/tokens.css' %}">
   <link rel="stylesheet" href="{% static 'alokasi/portal.css' %}">
   {% block head %}{% endblock %}
 </head>
@@ -13,8 +15,8 @@
 <a class="skip" href="#konten">Lewati ke konten</a>
 <header class="site-header">
   <div class="container">
-    <a class="brand" href="{% url 'portal:home' %}">Portal Alokasi Lahan<small>{{ portal_config.authority_short_name }}</small></a>
-    <button class="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false">Menu</button>
+    <a class="brand" href="{% url 'portal:home' %}"><img src="{% static 'simlahan/logo-mark.svg' %}" alt="" width="36" height="36"><span>Portal Alokasi Lahan<small>{{ portal_config.authority_short_name }}</small></span></a>
+    <button class="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false"><span class="nav-toggle-icon" aria-hidden="true"><span></span></span>Menu</button>
     <nav class="site-nav" id="site-nav" aria-label="Navigasi utama">
       {% with name=request.resolver_match.url_name %}
       <a href="{% url 'portal:home' %}"{% if name == 'home' %} class="active"{% endif %}>Beranda</a>
@@ -52,7 +54,7 @@
 <footer class="site-footer">
   <div class="container">
     <div>
-      <strong>{{ portal_config.authority_name }}</strong>
+      <div class="footer-brand"><img src="{% static 'simlahan/logo-mark.svg' %}" alt="" width="28" height="28"><strong>{{ portal_config.authority_name }}</strong></div>
       {% if portal_config.contact_info %}<p class="prose">{{ portal_config.contact_info }}</p>{% endif %}
     </div>
     <div>

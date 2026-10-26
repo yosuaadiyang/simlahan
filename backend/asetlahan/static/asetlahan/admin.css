@@ -1,36 +1,37 @@
 /* Halaman alat modul Manajemen Aset Lahan (panel petugas). */
 .al-tools { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 16px; padding: 0; list-style: none; }
 .al-tools li { list-style: none; padding: 0; margin: 0; }
-.al-tools a { display: inline-block; padding: 5px 10px; border: 1px solid var(--hairline-color, #ddd); border-radius: 4px; text-decoration: none; }
-.al-tools a.active { background: var(--primary, #417690); color: #fff; border-color: transparent; }
+.al-tools a { display: inline-flex; align-items: center; min-height: 34px; padding: 6px 12px; border: 1px solid var(--border-color, #ddd); border-radius: 999px; background: var(--sl-admin-card, #fff); color: var(--body-medium-color, #444); font-weight: 500; text-decoration: none; transition: background-color .15s, color .15s; }
+.al-tools a:hover { background: var(--darkened-bg, #f8f8f8); color: var(--body-loud-color, #000); }
+.al-tools a.active { background: var(--button-bg, #417690); color: var(--button-fg, #fff); border-color: transparent; font-weight: 600; }
 .al-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); margin-bottom: 16px; }
 .al-kpis { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); margin-bottom: 16px; }
 /* Nominal panjang (mis. Rp ratusan triliun) pindah baris di dalam kartu, tidak meluber. */
-.al-card { min-width: 0; overflow-wrap: anywhere; border: 1px solid var(--hairline-color, #ddd); border-radius: 6px; padding: 14px; background: var(--body-bg, #fff); }
-.al-card h2 { margin: 0 0 10px; font-size: 1rem; background: none; color: inherit; padding: 0; }
-.al-kpi { font-size: 1.6rem; font-weight: 700; line-height: 1.2; }
-.al-kpi-label { color: var(--body-quiet-color, #666); font-size: .85rem; }
+.al-card { min-width: 0; overflow-wrap: anywhere; border: 1px solid var(--sl-admin-card-border, #ddd); border-radius: var(--sl-radius-lg, 6px); padding: 16px; background: var(--sl-admin-card, #fff); box-shadow: var(--sl-admin-shadow, none); }
+.al-card h2 { margin: 0 0 12px; font-size: .9375rem; font-weight: 650; background: none; color: var(--body-loud-color, inherit); padding: 0; border: 0; }
+.al-kpi { font-size: 1.75rem; font-weight: 700; letter-spacing: -.02em; line-height: 1.2; font-variant-numeric: tabular-nums; color: var(--body-loud-color, inherit); }
+.al-kpi-label { color: var(--body-quiet-color, #666); font-size: .8125rem; font-weight: 500; }
 .al-bar { display: grid; grid-template-columns: minmax(0, 40%) minmax(40px, 1fr) minmax(0, max-content); gap: 8px; align-items: center; margin: 4px 0; font-size: .85rem; }
 .al-bar > span { min-width: 0; }
 .al-bar .al-num { white-space: normal; }
-.al-bar-track { background: var(--darkened-bg, #f0f0f0); border-radius: 3px; height: 14px; overflow: hidden; }
-.al-bar-fill { height: 100%; border-radius: 3px; }
+.al-bar-track { background: var(--selected-bg, #f0f0f0); border-radius: 999px; height: 10px; overflow: hidden; }
+.al-bar-fill { height: 100%; border-radius: 999px; }
 .al-alert { display: flex; justify-content: space-between; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--hairline-color, #eee); }
 .al-alert > span:first-child { min-width: 0; }
 .al-alert .count { font-weight: 700; min-width: 2em; text-align: right; }
 .al-alert.warn .count { color: #cf222e; }
-.al-map { height: 640px; border: 1px solid var(--hairline-color, #ddd); border-radius: 6px; }
+.al-map { height: 640px; border: 1px solid var(--sl-admin-card-border, #ddd); border-radius: var(--sl-radius-lg, 6px); overflow: hidden; box-shadow: var(--sl-admin-shadow, none); }
 .al-map-small { height: 420px; }
 .al-legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: .85rem; margin: 8px 0; }
 .al-swatch { display: inline-block; width: 12px; height: 12px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
 .al-filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; margin-bottom: 12px; }
 .al-filters label { display: flex; flex-direction: column; font-size: .8rem; gap: 2px; min-width: 0; max-width: 100%; }
 .al-swipe { width: 100%; margin: 8px 0; }
-.al-gantt { position: relative; border: 1px solid var(--hairline-color, #ddd); border-radius: 6px; overflow-x: auto; }
+.al-gantt { position: relative; border: 1px solid var(--sl-admin-card-border, #ddd); border-radius: var(--sl-radius-lg, 6px); overflow-x: auto; background: var(--sl-admin-card, #fff); }
 .al-gantt-row { display: grid; grid-template-columns: 320px 1fr; min-width: 900px; border-bottom: 1px solid var(--hairline-color, #eee); }
 .al-gantt-label { padding: 4px 8px; font-size: .82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .al-gantt-track { position: relative; height: 26px; }
-.al-gantt-bar { position: absolute; top: 5px; height: 16px; border-radius: 3px; background: #0969da; color: #fff; font-size: .7rem; overflow: hidden; white-space: nowrap; }
+.al-gantt-bar { position: absolute; top: 5px; height: 16px; border-radius: 4px; background: var(--sl-brand-600, #0969da); color: #fff; font-size: .7rem; overflow: hidden; white-space: nowrap; }
 .al-gantt-bar .done { background: rgba(255,255,255,.35); height: 100%; }
 .al-gantt-bar.overdue { background: #cf222e; }
 .al-gantt-bar.closed { background: #57606a; }
@@ -56,3 +57,5 @@
 .al-tree li { margin: 4px 0; }
 .al-tree .dead { color: #888; text-decoration: line-through; }
 @media (max-width: 767px) { .al-map { height: 420px; } .al-bar { grid-template-columns: minmax(0, 1fr) minmax(40px, 1fr) minmax(0, max-content); } }
+/* HP: deret alat digulir ke samping, tidak menumpuk beberapa baris. */
+@media (max-width: 767px) { .al-tools { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-left: -12px; margin-right: -12px; padding: 0 12px 4px; } .al-tools::-webkit-scrollbar { display: none; } .al-tools a { white-space: nowrap; } }

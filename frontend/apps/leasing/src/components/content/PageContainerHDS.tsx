@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import classNames from "classnames";
+import usePageNavigationOffset from "./usePageNavigationOffset";
 
 type Props = {
   children?: React.ReactNode;
@@ -14,23 +15,7 @@ const PageContainerHDS: React.FC<Props> = ({
 }) => {
   const componentRef = useRef<HTMLDivElement | null>(null);
 
-  const handleResize = useCallback(() => {
-    const pageNavigation = document.getElementsByClassName(
-      "content__page-navigator-wrapper",
-    );
-
-    if (pageNavigation.length && componentRef.current) {
-      const { height } = pageNavigation[0].getClientRects()[0];
-      componentRef.current.style.marginTop = height + "px";
-    }
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [handleResize]);
+  usePageNavigationOffset(componentRef);
 
   return (
     <div

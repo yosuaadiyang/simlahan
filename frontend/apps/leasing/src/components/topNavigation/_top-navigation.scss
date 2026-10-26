@@ -10,35 +10,40 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: rem-calc(60px);
+  gap: rem-calc(12px);
+  height: rem-calc(variables.$top-nav-height);
   font-family: variables.$font-family-source;
-  font-weight: 600;
-  font-size: rem-calc(20px);
-  padding: 0 rem-calc(20px);
-  background: variables.$white;
+  padding: 0 rem-calc(16px) 0 rem-calc(8px);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: saturate(180%) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid variables.$border-color;
   z-index: 1060;
-  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.06);
-  background-color: variables.$white;
 
   &__left-wrapper {
     display: flex;
     flex: 1 1 0%;
     align-items: center;
+    gap: rem-calc(4px);
     // Izinkan judul menyusut agar tidak menimpa menu kanan pada layar sempit.
     min-width: 0;
 
     .page-title {
-      font-size: rem-calc(20px);
-      margin: 0;
+      display: flex;
+      align-items: center;
       min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      padding: 0 rem-calc(20px);
-      line-height: rem-calc(60px);
-      background-color: variables.$white;
+      margin: 0 0 0 rem-calc(8px);
+      padding-left: rem-calc(16px);
+      border-left: 1px solid variables.$border-color;
+      height: rem-calc(28px);
+      font-size: rem-calc(16px);
+      font-weight: 600;
 
       a {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
         color: variables.$black;
 
         &:hover {
@@ -48,132 +53,125 @@
     }
   }
 
-  &__title {
-    &_button {
-      font-size: rem-calc(20px);
-      margin-left: rem-calc(-20px);
-      padding: 0 rem-calc(20px);
-      line-height: rem-calc(60px);
-      background-color: variables.$blue;
-      font-family: variables.$font-family-source;
-      font-weight: 600;
-      outline-offset: -2px !important;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
+  &__title_button {
+    display: grid;
+    place-items: center;
+    width: rem-calc(44px);
+    height: rem-calc(44px);
+    border-radius: variables.$radius;
+    cursor: pointer;
+    color: variables.$black;
+    transition: background-color 0.15s ease;
 
-      span {
-        color: variables.$white;
-        margin-right: rem-calc(10px);
-      }
-
-      .icons {
-        stroke: variables.$white;
-        @include mixins.transform(rotateX(180deg));
-        @include mixins.transition(0.3s, transform, ease-in-out);
-      }
+    &:hover {
+      background-color: variables.$light-gray-secondary;
     }
 
-    &.is-open {
-      .icons {
-        @include mixins.transform(rotateX(0));
+    &:focus-visible {
+      outline: none;
+      box-shadow: variables.$ring;
+    }
+  }
+
+  // Ikon garis tiga yang berubah menjadi "X" saat menu terbuka.
+  &__burger {
+    position: relative;
+    display: block;
+    width: rem-calc(20px);
+    height: rem-calc(14px);
+
+    span {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      border-radius: 2px;
+      background: currentColor;
+      transition:
+        transform 0.2s ease,
+        opacity 0.2s ease,
+        top 0.2s ease;
+
+      &:nth-child(1) {
+        top: 0;
       }
+
+      &:nth-child(2) {
+        top: 6px;
+      }
+
+      &:nth-child(3) {
+        top: 12px;
+      }
+    }
+  }
+
+  &__title.is-open &__burger span {
+    &:nth-child(1) {
+      top: 6px;
+      transform: rotate(45deg);
+    }
+
+    &:nth-child(2) {
+      opacity: 0;
+    }
+
+    &:nth-child(3) {
+      top: 6px;
+      transform: rotate(-45deg);
+    }
+  }
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: rem-calc(10px);
+    flex: 0 0 auto;
+    padding: rem-calc(6px) rem-calc(8px);
+    border-radius: variables.$radius;
+    color: variables.$black;
+    font-size: rem-calc(17px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+
+    img {
+      width: rem-calc(30px);
+      height: rem-calc(30px);
+      flex: 0 0 auto;
+    }
+
+    &:hover,
+    &:focus {
+      color: variables.$black;
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: variables.$ring;
     }
   }
 
   &__right-wrapper {
     display: flex;
     align-items: center;
+    gap: rem-calc(16px);
     // Bagian kanan boleh menyusut; nama pengguna panjang dipotong dengan "…"
     // alih-alih menimpa judul halaman.
     flex: 0 1 auto;
     min-width: 0;
 
-    .username-wrapper {
-      line-height: 1;
-      margin-left: 20px;
-      text-align: right;
-      min-width: 0;
-
-      .username {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        font-weight: 500;
-        font-size: rem-calc(16px);
-        margin-bottom: 0;
-        min-width: 0;
-
-        &__text {
-          min-width: 0;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-
-        .user-group-button {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          height: rem-calc(24px);
-          width: rem-calc(24px);
-          padding: rem-calc(2px);
-          border-radius: 50%;
-          margin-left: rem-calc(5px);
-          background-color: #0078c0;
-          flex: 0 0 auto;
-        }
-      }
-      .logout-link {
-        color: variables.$blue;
-        font-weight: variables.$semibold;
-        font-size: rem-calc(16px);
-        font-family: variables.$font-family-source;
-        margin: 0;
-        cursor: pointer;
-
-        &:hover {
-          text-decoration: underline;
-          color: variables.$blue-hover;
-        }
-      }
-    }
-
-    .menuIcon,
-    .userIcon,
-    .flagIcon {
-      width: 27px;
-      height: 27px;
-      fill: variables.$black;
-      cursor: pointer;
-    }
-
-    .menuIcon:hover,
-    .userIcon:hover {
-      fill: variables.$blue;
-    }
-
-    .menuIcon {
-      width: rem-calc(25px);
-      height: rem-calc(25px);
-      baseline-shift: rem-calc(10px);
-    }
-
     .search {
-      margin: 0 rem-calc(40px) 0 0;
-    }
-
-    .flag {
-      position: relative;
-      margin: 0 rem-calc(60px) 0 0;
+      min-width: 0;
     }
 
     .user-service-unit {
-      border-right: 1px solid #ddd;
-      padding-right: 20px;
+      min-width: 0;
+      padding-right: rem-calc(16px);
+      border-right: 1px solid variables.$border-color;
 
       form {
         min-width: 200px;
+
         label {
           display: inline;
         }
@@ -182,78 +180,188 @@
       .user-service-unit-text {
         line-height: 1.25;
         text-align: right;
+        min-width: 0;
       }
 
       .service-unit-label {
-        font-size: 0.8rem;
-        color: #666666;
+        font-size: rem-calc(12px);
+        color: variables.$text-muted;
         font-weight: 400;
       }
 
       .service-unit-name {
-        font-size: 0.85rem;
-        font-weight: 500;
+        font-size: rem-calc(13px);
+        font-weight: 600;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+    .username-wrapper {
+      display: flex;
+      align-items: center;
+      gap: rem-calc(4px);
+      min-width: 0;
+    }
+
+    .user-group-button {
+      display: flex;
+      align-items: center;
+      gap: rem-calc(8px);
+      min-width: 0;
+      padding: rem-calc(4px) rem-calc(8px) rem-calc(4px) rem-calc(4px);
+      border-radius: variables.$radius-full;
+      cursor: pointer;
+      color: variables.$black;
+      transition: background-color 0.15s ease;
+
+      &:hover {
+        background-color: variables.$light-gray-secondary;
+      }
+
+      &:focus-visible {
+        outline: none;
+        box-shadow: variables.$ring;
+      }
+    }
+
+    .user-avatar {
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      width: rem-calc(32px);
+      height: rem-calc(32px);
+      border-radius: 50%;
+      background: linear-gradient(135deg, #149d8f, #0f665f);
+      color: variables.$white;
+      font-size: rem-calc(13px);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .username {
+      display: flex;
+      align-items: center;
+      gap: rem-calc(4px);
+      min-width: 0;
+      font-size: rem-calc(14px);
+      font-weight: 500;
+
+      &__text {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      &__chevron {
+        flex: 0 0 auto;
+        width: rem-calc(16px);
+        height: rem-calc(16px);
+        fill: none;
+        stroke: variables.$text-muted;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+    }
+
+    .logout-link {
+      display: inline-flex;
+      align-items: center;
+      gap: rem-calc(6px);
+      height: rem-calc(36px);
+      padding: 0 rem-calc(12px);
+      border-radius: variables.$radius-sm;
+      color: variables.$text-muted;
+      font-weight: 600;
+      font-size: rem-calc(14px);
+      font-family: variables.$font-family-source;
+      margin: 0;
+      cursor: pointer;
+      transition:
+        background-color 0.15s ease,
+        color 0.15s ease;
+
+      &__icon {
+        width: rem-calc(18px);
+        height: rem-calc(18px);
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      &:hover {
+        background-color: variables.$is-dirty-color;
+        color: variables.$blue-hover;
+      }
+
+      &:focus-visible {
+        outline: none;
+        box-shadow: variables.$ring;
       }
     }
   }
 
-  // Layar sempit (tablet): persempit pilihan unit layanan agar judul halaman
-  // tetap terbaca dan tidak menimpa bagian kanan.
-  @include breakpoint(medium down) {
-    &__left-wrapper .page-title {
-      padding: 0 rem-calc(12px);
-    }
-
+  // Tablet: persempit pilihan unit layanan agar judul halaman tetap terbaca.
+  @include breakpoint(large down) {
     &__right-wrapper {
-      min-width: 0;
+      gap: rem-calc(8px);
 
       .user-service-unit {
-        min-width: 0;
-        padding-right: rem-calc(10px);
+        padding-right: rem-calc(8px);
 
         form {
           min-width: 0;
-          width: rem-calc(150px);
+          width: rem-calc(170px);
         }
       }
 
-      .username-wrapper {
-        margin-left: rem-calc(10px);
+      .username {
+        display: none;
+      }
+
+      .user-group-button {
+        padding: rem-calc(4px);
       }
     }
   }
 
   // Ponsel: judul halaman sudah tampil sebagai judul di konten dan unit
-  // layanan bisa dilihat lewat tombol grup, jadi keduanya disembunyikan agar
-  // tombol menu, nama pengguna, dan "Keluar" muat tanpa saling menimpa.
+  // layanan bisa dilihat lewat tombol avatar, jadi keduanya disembunyikan.
   @include breakpoint(small only) {
-    padding: 0 rem-calc(12px);
+    padding: 0 rem-calc(8px) 0 rem-calc(4px);
+    gap: rem-calc(4px);
 
     &__left-wrapper .page-title,
     &__right-wrapper .user-service-unit {
       display: none;
     }
 
-    &__title_button {
-      margin-left: rem-calc(-12px);
-      padding: 0 rem-calc(12px);
+    &__brand {
+      padding: rem-calc(6px) rem-calc(4px);
     }
 
     &__right-wrapper {
+      gap: rem-calc(4px);
+
       .search {
-        margin: 0 rem-calc(8px) 0 0;
-        min-width: 0;
         flex: 1 1 auto;
       }
 
-      .username-wrapper {
-        margin-left: rem-calc(8px);
-        max-width: 55vw;
-
-        .username {
-          font-size: rem-calc(14px);
-        }
+      .logout-link {
+        padding: 0 rem-calc(8px);
       }
+    }
+  }
+
+  @media (max-width: 360px) {
+    &__brand span,
+    &__right-wrapper .logout-link span {
+      display: none;
     }
   }
 }

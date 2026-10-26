@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import { Link } from "react-router";
+// NavLink menandai tautan halaman yang sedang dibuka (kelas "active").
+import { NavLink as Link } from "react-router";
 import {
   withRouterLegacy,
   type WithRouterProps,
@@ -95,17 +96,6 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
   setLinkRef = (element: HTMLElement | null) => {
     this.firstLink = element;
   };
-  getSideMenuWidth = () => {
-    const menuButton = document.getElementsByClassName(
-      "top-navigation__title_button",
-    );
-
-    if (menuButton.length) {
-      return menuButton[0].clientWidth;
-    }
-
-    return null;
-  };
   handleHeaderClick = (key) => {
     this.setState({
       subMenuKey: key,
@@ -115,7 +105,6 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
   render() {
     const { isFetchingUsersPermissions, isOpen, usersPermissions } = this.props;
     const { isClosing, isOpening, subMenuKey } = this.state;
-    const width = this.getSideMenuWidth();
     return (
       <ModalConsumer>
         {({ modalDispatch }) => {
@@ -151,16 +140,15 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
           };
 
           return (
-            <div
+            <nav
               ref={this.setComponentRef}
+              id="side-menu"
+              aria-label="Menu utama"
               className={classnames("side-menu", {
                 "is-closing": isClosing,
                 "is-menu-open": isOpen,
                 "is-opening": isOpening,
               })}
-              style={{
-                width: width,
-              }}
             >
               {isFetchingUsersPermissions && (
                 <LoaderWrapper>
@@ -495,9 +483,7 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
                   >
                     <li>
                       <Link
-                        style={{
-                          color: "#b7b7b7",
-                        }}
+                        className="side-menu__link--muted"
                         onClick={handleClick}
                         to={getRouteById(Routes.INFILL_DEVELOPMENTS)}
                       >
@@ -631,7 +617,7 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
                   </Authorization>
                 </ul>
               )}
-            </div>
+            </nav>
           );
         }}
       </ModalConsumer>

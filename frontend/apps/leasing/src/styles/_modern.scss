@@ -1,0 +1,551 @@
+// Lapisan tampilan modern SimLahan untuk komponen bawaan aplikasi petugas.
+// Dimuat paling akhir di main.scss sehingga menimpa gaya lama tanpa mengubah
+// struktur komponen. Nilai mengikuti token di _tokens.scss.
+@use "foundation-sites/scss/foundation" as *;
+@use "./variables";
+
+// ------------------------------------------------------------- Dasar & HDS
+// html:root lebih spesifik dari :root yang disuntikkan hds-react saat runtime.
+html:root {
+  color-scheme: light;
+
+  // Komponen Helsinki Design System memakai variabel warna ini.
+  --color-bus: #{variables.$blue};
+  --color-bus-dark: #{variables.$blue-hover};
+  --color-bus-medium-light: #94e9da;
+  --color-bus-light: #c9f5ec;
+  --color-coat-of-arms: #{variables.$blue};
+  --color-coat-of-arms-dark: #{variables.$blue-hover};
+  --color-coat-of-arms-light: #c9f5ec;
+  --focus-outline-color: #{variables.$blue};
+  --color-focus-outline: #{variables.$blue};
+  --font-default: var(--sl-font);
+}
+
+html {
+  text-rendering: optimizeLegibility;
+}
+
+body,
+#root {
+  font-family: var(--sl-font);
+  font-feature-settings:
+    "cv11" 1,
+    "ss01" 1;
+  color: variables.$black;
+}
+
+::selection {
+  background: #c9f5ec;
+  color: variables.$black;
+}
+
+a {
+  color: variables.$blue-hover;
+  text-underline-offset: 2px;
+}
+
+// Fokus papan ketik yang jelas dan seragam (bukan garis putus-putus).
+.app,
+.app-dev {
+  a,
+  button,
+  [role="button"],
+  [tabindex] {
+    &:focus-visible {
+      outline: 2px solid variables.$blue !important;
+      outline-offset: 2px;
+    }
+  }
+
+  input[type="text"],
+  input[type="search"],
+  input[type="number"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="date"],
+  input[type="time"],
+  select,
+  textarea {
+    &:focus {
+      outline: none !important;
+      border-color: variables.$blue !important;
+      box-shadow: variables.$ring !important;
+    }
+  }
+}
+
+// ------------------------------------------------------------- Tata letak
+.app,
+.app-dev {
+  .wrapper {
+    min-width: 0;
+  }
+
+  // Ruang bawah bagi area aman ponsel berponi.
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.app__usergroup-list {
+  top: rem-calc(64px) !important;
+  right: rem-calc(12px) !important;
+  min-width: rem-calc(240px);
+  max-width: calc(100vw - 24px);
+  padding: rem-calc(12px 16px) !important;
+  border: 1px solid variables.$border-color;
+  border-radius: variables.$radius;
+  box-shadow: variables.$shadow-lg !important;
+  font-size: rem-calc(14px);
+
+  strong {
+    display: block;
+    margin-bottom: rem-calc(6px);
+    font-size: rem-calc(12px);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: variables.$text-muted;
+  }
+}
+
+.content__page-container,
+.content-hds__page-container {
+  padding: rem-calc(24px 24px 120px);
+
+  @include breakpoint(small only) {
+    padding: rem-calc(16px 12px 96px);
+  }
+
+  h1 {
+    font-size: clamp(1.375rem, 1.15rem + 0.9vw, 1.75rem);
+    line-height: 1.25;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  h2,
+  h4 {
+    text-transform: none;
+    letter-spacing: -0.01em;
+  }
+}
+
+.content__title,
+.content__title-h3,
+.content__green-box h2,
+.content__green-box h3,
+.collapse__header_title {
+  text-transform: none !important;
+  letter-spacing: -0.01em;
+}
+
+.content__title {
+  font-size: rem-calc(19px);
+  font-weight: 700;
+}
+
+.content__divider {
+  border-top: 1px solid variables.$border-color;
+}
+
+// Kartu konten: sudut membulat, garis tipis, bayangan lembut.
+.content-container,
+.content-container-hds {
+  border: 1px solid variables.$border-color;
+  border-radius: variables.$radius-lg;
+  box-shadow: variables.$shadow-sm;
+  padding: rem-calc(20px);
+
+  @include breakpoint(small only) {
+    padding: rem-calc(14px);
+  }
+
+  .content-item {
+    border-top: 1px solid variables.$border-color;
+  }
+
+  .box-item-container .box-item {
+    border-bottom-style: solid;
+    border-color: variables.$border-color;
+
+    &:first-child {
+      border-top-style: solid;
+    }
+  }
+}
+
+.content__green-box,
+.content__gray-box {
+  border-radius: variables.$radius;
+  background-color: variables.$lightest-gray;
+  border: 1px solid variables.$border-color;
+}
+
+// Bilah kontrol & tab di bawah bilah atas.
+.control-button-bar,
+.tabs {
+  background-color: rgba(255, 255, 255, 0.96);
+  box-shadow: none;
+  border-bottom: 1px solid variables.$border-color;
+  backdrop-filter: saturate(180%) blur(8px);
+}
+
+.control-button-bar {
+  .info-component-wrapper h1 {
+    font-size: rem-calc(20px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  // Tombol pindah baris di HP, tidak memanjang keluar layar.
+  @include breakpoint(small only) {
+    &__wrapper {
+      flex-wrap: wrap;
+      gap: rem-calc(8px);
+      padding: rem-calc(8px 12px);
+    }
+
+    .control-buttons {
+      float: none;
+      flex-wrap: wrap;
+      gap: rem-calc(6px);
+    }
+  }
+}
+
+.tabs {
+  &__wrapper {
+    // Tab bergulir ke samping di HP.
+    overflow-x: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    @include breakpoint(small only) {
+      padding: 0 rem-calc(8px);
+    }
+  }
+
+  ul {
+    white-space: nowrap;
+
+    > li,
+    > li.is-active {
+      background: transparent !important;
+
+      > a {
+        border: 0 !important;
+        border-bottom: 2px solid transparent !important;
+        color: variables.$text-muted !important;
+        border-radius: variables.$radius-sm variables.$radius-sm 0 0;
+
+        &:hover {
+          background-color: variables.$lightest-gray !important;
+          color: variables.$black !important;
+        }
+
+        &:focus-visible {
+          outline: 2px solid variables.$blue;
+          outline-offset: -2px;
+        }
+      }
+    }
+
+    > li.is-active > a {
+      color: variables.$blue-hover !important;
+      border-bottom-color: variables.$blue !important;
+
+      &:hover {
+        background: transparent !important;
+      }
+    }
+  }
+}
+
+// ------------------------------------------------------------- Tombol
+.mvj-button {
+  border-radius: variables.$radius-sm;
+  font-size: rem-calc(14px);
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  box-shadow: variables.$shadow-xs;
+  height: rem-calc(32px);
+  padding: 0 rem-calc(14px);
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:focus-visible {
+    outline: none !important;
+    box-shadow: variables.$ring;
+  }
+
+  &:disabled {
+    background-color: variables.$light-gray-secondary !important;
+    color: variables.$medium-dark-gray !important;
+    box-shadow: none;
+  }
+
+  &.neutral,
+  &.secondary {
+    border-color: variables.$border-strong;
+    color: variables.$black;
+
+    &:hover {
+      background-color: variables.$lightest-gray;
+      border-color: variables.$medium-dark-gray;
+    }
+  }
+
+  &.neutral {
+    color: variables.$blue-hover;
+  }
+
+  &.link {
+    box-shadow: none;
+    height: auto;
+  }
+
+  &.button-xs {
+    height: rem-calc(28px);
+  }
+}
+
+// ------------------------------------------------------------- Formulir
+.app,
+.app-dev,
+.login-page {
+  input[type="text"],
+  input[type="search"],
+  input[type="number"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  input[type="url"],
+  select,
+  textarea {
+    border-color: variables.$border-strong;
+    border-radius: variables.$radius-sm;
+    box-shadow: variables.$shadow-xs;
+    color: variables.$black;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+
+    &:hover:not(:disabled):not(:focus) {
+      border-color: variables.$medium-dark-gray;
+    }
+
+    &:disabled,
+    &[readonly] {
+      background-color: variables.$lightest-gray;
+      color: variables.$text-muted;
+    }
+  }
+
+  select {
+    padding-right: rem-calc(28px);
+  }
+}
+
+// iOS memperbesar halaman bila isian < 16px saat difokuskan; di HP isian
+// memakai 16px agar tampilan tidak melompat.
+@media (max-width: 639px) and (pointer: coarse) {
+  .app,
+  .app-dev,
+  .login-page {
+    input[type="text"],
+    input[type="search"],
+    input[type="number"],
+    input[type="email"],
+    input[type="password"],
+    input[type="tel"],
+    input[type="url"],
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
+  }
+}
+
+// ------------------------------------------------------------- Kartu lipat
+.collapse {
+  background-color: variables.$white;
+  border: 1px solid variables.$border-color;
+  border-radius: variables.$radius-lg;
+  box-shadow: variables.$shadow-xs;
+
+  > .collapse__header {
+    padding: rem-calc(12px 14px);
+
+    .collapse__header_title {
+      font-size: rem-calc(17px);
+      font-weight: 650;
+    }
+  }
+
+  .collapse {
+    box-shadow: none;
+    border-radius: variables.$radius;
+    background-color: variables.$lightest-gray;
+  }
+}
+
+// ------------------------------------------------------------- Tabel
+// Tabel HDS: kepala tabel terang (bukan bilah biru gelap) seperti tabel lain.
+[class*="Table-module_table__"],
+[class*="table_hds-table__"],
+.hds-table {
+  --header-background-color: #{variables.$lightest-gray};
+  --content-background-color: #{variables.$white};
+  font-variant-numeric: tabular-nums;
+
+  th {
+    color: variables.$text-muted !important;
+    font-size: rem-calc(12px) !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    border-bottom: 1px solid variables.$border-color;
+
+    svg,
+    button {
+      color: inherit !important;
+    }
+  }
+
+  td {
+    border-bottom: 1px solid variables.$light-gray-secondary;
+  }
+}
+
+[class*="Table-module_container__"],
+[class*="table_hds-table-container__"],
+.hds-table-container {
+  border: 1px solid variables.$border-color;
+  border-radius: variables.$radius;
+  background: variables.$white;
+}
+
+.sortable-table__container {
+  border: 1px solid variables.$border-color;
+  border-radius: variables.$radius;
+  background: variables.$white;
+
+  table {
+    box-shadow: none !important;
+    width: 100%;
+
+    thead {
+      border-bottom: 1px solid variables.$border-color !important;
+
+      th,
+      td {
+        background-color: variables.$lightest-gray !important;
+        color: variables.$text-muted !important;
+        font-size: rem-calc(12px) !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+
+        div {
+          padding: rem-calc(10px 12px) !important;
+        }
+      }
+    }
+
+    tbody tr,
+    tfoot tr {
+      td,
+      th {
+        border-bottom-color: variables.$light-gray-secondary !important;
+        padding: rem-calc(10px 12px) !important;
+        font-variant-numeric: tabular-nums;
+      }
+
+      &:last-child td {
+        border-bottom: 0 !important;
+      }
+    }
+
+    tbody tr.clickable-row:hover td {
+      background-color: variables.$is-dirty-color !important;
+    }
+  }
+}
+
+.pagination {
+  li a,
+  li button {
+    border-radius: variables.$radius-sm;
+  }
+
+  .active,
+  .current {
+    border-radius: variables.$radius-sm;
+  }
+}
+
+// ------------------------------------------------------------- Modal & notifikasi
+.modal__wrapper {
+  max-width: calc(100vw - 24px);
+  border: 1px solid variables.$border-color;
+  border-radius: variables.$radius-lg;
+  box-shadow: variables.$shadow-lg;
+
+  .modal__header h1.title {
+    font-size: rem-calc(20px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  @include breakpoint(small only) {
+    .modal__header {
+      padding: rem-calc(16px) rem-calc(16px) 0;
+    }
+
+    .modal__content {
+      padding: rem-calc(16px);
+    }
+  }
+}
+
+.modal__overlay {
+  background-color: rgba(15, 23, 42, 0.45) !important;
+  backdrop-filter: blur(2px);
+}
+
+// ------------------------------------------------------------- Peta
+.leaflet-container {
+  font-family: var(--sl-font);
+  border-radius: inherit;
+}
+
+.leaflet-bar,
+.leaflet-control-layers {
+  border: 1px solid variables.$border-color !important;
+  border-radius: variables.$radius-sm !important;
+  box-shadow: variables.$shadow-sm !important;
+  overflow: hidden;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: variables.$radius !important;
+  box-shadow: variables.$shadow-lg !important;
+}
+
+// ------------------------------------------------------------- Gerak
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+}
