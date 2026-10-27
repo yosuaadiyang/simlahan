@@ -198,7 +198,7 @@ def import_plots(
             created += 1
         else:
             updated += 1
-            if plot.status in (enums.PlotStatus.RESERVED, enums.PlotStatus.ALLOCATED):
+            if plot.status in enums.BOUND_PLOT_STATUSES:
                 # Jangan ubah luas/tarif lahan yang sedang/telah dialokasikan.
                 for locked in ("area_m2", "uwt_rate_per_m2_year", "term_years"):
                     values.pop(locked, None)

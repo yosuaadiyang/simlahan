@@ -225,6 +225,10 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
                       hasPermissions(
                         usersPermissions,
                         UsersPermissions.VIEW_ALLOCATION,
+                      ) ||
+                      hasPermissions(
+                        usersPermissions,
+                        UsersPermissions.VIEW_INVESTMENTREQUEST,
                       )
                     }
                   >
@@ -265,9 +269,22 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
                           href: "/admin/alokasi/landplot/",
                         },
                         {
+                          allow: hasPermissions(
+                            usersPermissions,
+                            UsersPermissions.VIEW_INVESTMENTREQUEST,
+                          ),
+                          text: "Permintaan investasi",
+                          href: "/admin/alokasi/investmentrequest/",
+                        },
+                        {
                           allow: true,
                           text: "Portal publik",
                           href: "/portal/",
+                        },
+                        {
+                          allow: true,
+                          text: "Portal investasi",
+                          href: "/portal/investasi/",
                         },
                       ]}
                       menuKey="allocation"

@@ -1,0 +1,125 @@
+{% extends "alokasi/portal/base.html" %}{% load static alokasi_tags %}
+{% block title %}Peluang Investasi{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'alokasi/investasi.css' %}">{% endblock %}
+{% block hero %}
+<section class="hero inv-hero">
+  <div class="container">
+    <span class="eyebrow">Portal investasi & penggunaan lahan</span>
+    <h1>Temukan lahan untuk usaha Anda, sewa atau alokasi, dalam satu portal</h1>
+    <p>{{ config.investment_intro }}</p>
+    <form class="inv-search" method="get" action="{% url 'portal:investment_map' %}" role="search">
+      <label class="skip" for="inv-q">Cari lahan</label>
+      <input id="inv-q" type="search" name="q" placeholder="Cari kawasan, kelurahan, peruntukan…" autocomplete="off">
+      <button class="btn" type="submit">Jelajahi peta</button>
+    </form>
+    <div class="quick" aria-label="Pintasan">
+      <a href="{% url 'portal:investment_map' %}?skema=sewa">Lahan untuk disewa</a>
+      <a href="{% url 'portal:investment_map' %}?skema=alokasi">Lahan alokasi (UWT)</a>
+      <a href="{% url 'portal:investment_map' %}?siap=1">Siap bangun</a>
+      <a href="{% url 'portal:investment_request_create' %}">Ajukan minat investasi</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block content %}
+<div class="grid grid-4 inv-kpis">
+  <div class="card"><div class="stat">{{ stats.total|default:0 }}</div><div class="muted">Lahan siap diinvestasikan</div></div>
+  <div class="card"><div class="stat">{{ stats.area|default:0|hektare|patah }}</div><div class="muted">Total luas tersedia</div></div>
+  <div class="card"><div class="stat">{{ lease_count }}</div><div class="muted">Lahan dapat disewa</div></div>
+  <div class="card"><div class="stat">{{ zone_count }}</div><div class="muted">Kawasan investasi</div></div>
+</div>
+
+<div class="section-head">
+  <div><h2>Sektor usaha</h2><p>Pilih sektor untuk melihat lahan yang sesuai di peta.</p></div>
+  <a href="{% url 'portal:investment_map' %}">Lihat semua di peta ›</a>
+</div>
+<div class="sector-grid">
+  {% for sector, count in sectors %}
+  <a class="sector-card" style="--c:{{ sector.color }}" href="{% url 'portal:investment_map' %}?sektor={{ sector.slug }}">
+    <span class="ico" aria-hidden="true">{{ sector.icon|default:"📍" }}</span>
+    <span><strong>{{ sector.name }}</strong><span class="small">{{ count }} lahan tersedia</span></span>
+  </a>
+  {% endfor %}
+</div>
+
+{% if zones %}
+<div class="section-head">
+  <div><h2>Kawasan investasi</h2><p>Kawasan dengan arahan pemanfaatan, insentif, dan infrastruktur pendukung.</p></div>
+</div>
+<div class="grid grid-3">
+  {% for zone in zones %}
+  <a class="card zone-card" href="{% url 'portal:investment_zone' zone.slug %}">
+    <div class="cover"{% if zone.photo %} style="background-image:url('{% url 'portal:investment_zone_photo' zone.slug %}')"{% endif %}><span class="tag">{{ zone.plot_count }} lahan tersedia</span></div>
+    <div class="body">
+      <h3>{{ zone.name }}</h3>
+      {% if zone.summary %}<p class="small muted" style="margin:0">{{ zone.summary }}</p>{% endif %}
+      <div class="chips">{% for s in zone.sectors.all %}<span class="chip chip-sector" style="--c:{{ s.color }}">{{ s.icon }} {{ s.name }}</span>{% endfor %}</div>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if featured_plots %}
+<div class="section-head">
+  <div><h2>Lahan pilihan</h2><p>Bandingkan hingga 4 lahan, simpan, atau langsung ajukan minat.</p></div>
+  <a href="{% url 'portal:investment_map' %}">Semua lahan ›</a>
+</div>
+<div class="grid grid-3">
+  {% for plot in featured_plots %}{% include "alokasi/portal/investasi/_plot_tile.html" %}{% endfor %}
+</div>
+{% endif %}
+
+<div class="section-head"><div><h2>Pilih skema pemanfaatan lahan</h2><p>Belum yakin? Pilih "minta saran petugas" saat mengajukan minat.</p></div></div>
+<div class="grid grid-3">
+  <div class="card scheme-card" style="--c:var(--sl-accent-500)">
+    <h3>Sewa lahan</h3>
+    <p class="small muted">Untuk usaha yang ingin memulai cepat atau membutuhkan lahan dalam jangka pendek–menengah.</p>
+    <ul class="small"><li>Tarif per m² per tahun</li><li>Masa sewa sesuai ketentuan lahan</li><li>Kontrak sewa setelah penawaran diterima</li></ul>
+  </div>
+  <div class="card scheme-card">
+    <h3>Alokasi lahan (UWT)</h3>
+    <p class="small muted">Hak pemanfaatan jangka panjang dengan Uang Wajib Tahunan untuk seluruh jangka waktu.</p>
+    <ul class="small"><li>Verifikasi teknis rencana usaha</li><li>Tagihan UWT & biaya administrasi</li><li>KPT & PPT terbit secara elektronik</li></ul>
+  </div>
+  <div class="card scheme-card" style="--c:#7c3aed">
+    <h3>Kerja sama pemanfaatan</h3>
+    <p class="small muted">Untuk proyek besar atau skema khusus yang dirundingkan bersama petugas.</p>
+    <ul class="small"><li>Konsultasi & kunjungan lapangan</li><li>Penawaran disesuaikan kebutuhan proyek</li><li>Perjanjian kerja sama</li></ul>
+  </div>
+</div>
+
+<div class="section-head"><div><h2>Alur investasi</h2></div></div>
+<ol class="steps">
+  <li><strong>Jelajahi</strong><br><span class="small muted">Saring lahan di peta menurut sektor, skema, luas, dan kesiapan.</span></li>
+  <li><strong>Ajukan minat</strong><br><span class="small muted">Pilih lahan atau gambar usulan lokasi, lalu jelaskan rencana usaha.</span></li>
+  <li><strong>Konsultasi</strong><br><span class="small muted">Petugas meninjau, menjadwalkan pertemuan, atau kunjungan lapangan.</span></li>
+  <li><strong>Penawaran</strong><br><span class="small muted">Terima penawaran lahan, tarif, dan jangka waktu di portal.</span></li>
+  <li><strong>Kontrak / permohonan</strong><br><span class="small muted">Sewa & kerja sama dikontrakkan; alokasi diteruskan ke permohonan KPT.</span></li>
+</ol>
+
+{% if guides %}
+<div class="section-head"><div><h2>Pertanyaan umum investor</h2></div><a href="{% url 'portal:info_category' 'investasi' %}">Semua panduan ›</a></div>
+{% for page in guides %}
+<details class="panel">
+  <summary>{{ page.title }}</summary>
+  {% if page.summary %}<p><strong>{{ page.summary }}</strong></p>{% endif %}
+  {% if page.body %}<p class="prose">{{ page.body }}</p>{% endif %}
+  <a class="small" href="{% url 'portal:info_detail' page.slug %}">Baca selengkapnya</a>
+</details>
+{% endfor %}
+{% endif %}
+
+<section class="cta-band">
+  <div>
+    <h2>Siap berinvestasi?</h2>
+    <p>Ajukan minat sekarang. Lahan yang Anda butuhkan belum ada di peta? Gambar usulan lokasinya, petugas akan meninjau.{% if contact %}<br><span class="small">{{ contact|linebreaksbr }}</span>{% endif %}</p>
+  </div>
+  <div class="actions-row">
+    <a class="btn btn-accent" href="{% url 'portal:investment_request_create' %}">Ajukan minat investasi</a>
+    {% if not portal_applicant %}<a class="btn btn-outline" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.5)" href="{% url 'portal:register' %}">Daftar akun</a>{% endif %}
+  </div>
+</section>
+{% include "alokasi/portal/investasi/_compare_bar.html" %}
+{% endblock %}
+{% block scripts %}<script src="{% static 'alokasi/investasi.js' %}"></script>{% endblock %}

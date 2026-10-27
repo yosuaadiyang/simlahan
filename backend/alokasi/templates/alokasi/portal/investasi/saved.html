@@ -1,0 +1,18 @@
+{% extends "alokasi/portal/base.html" %}{% load static alokasi_tags %}
+{% block title %}Lahan Tersimpan{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'alokasi/investasi.css' %}">{% endblock %}
+{% block content %}
+<div class="actions-row" style="justify-content:space-between">
+  <h1 style="margin:0">Lahan tersimpan</h1>
+  <a class="btn btn-outline" href="{% url 'portal:investment_map' %}?simpan=1">Lihat di peta</a>
+</div>
+{% if saved %}
+<div class="grid grid-3" style="margin-top:20px">
+  {% for item in saved %}{% with plot=item.plot %}{% include "alokasi/portal/investasi/_plot_tile.html" %}{% endwith %}{% endfor %}
+</div>
+{% else %}
+<div class="card" style="margin-top:20px"><p>Belum ada lahan tersimpan. Tekan <strong>Simpan</strong> pada kartu lahan untuk menyimpannya di sini.</p><a class="btn" href="{% url 'portal:investment_map' %}">Jelajahi peta investasi</a></div>
+{% endif %}
+{% include "alokasi/portal/investasi/_compare_bar.html" %}
+{% endblock %}
+{% block scripts %}<script src="{% static 'alokasi/investasi.js' %}"></script>{% endblock %}

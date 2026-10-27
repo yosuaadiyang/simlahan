@@ -1,0 +1,26 @@
+{% load alokasi_tags %}<article class="card plot-tile" data-plot="{{ plot.code }}">
+  <div class="top">
+    <div>
+      <div class="code">{{ plot.code }}</div>
+      <h3><a href="{% url 'portal:plot_detail' plot.code %}">{{ plot.name }}</a></h3>
+    </div>
+    <span class="badge badge-{{ plot.status }}">{{ plot.get_status_display }}</span>
+  </div>
+  <div class="chips">
+    {% if plot.sector and plot.sector.is_active %}<span class="chip chip-sector" style="--c:{{ plot.sector.color }}">{{ plot.sector.icon }} {{ plot.sector.name }}</span>{% endif %}
+    {% if plot.offer_lease %}<span class="chip chip-sewa">Sewa</span>{% endif %}
+    {% if plot.offer_allocation %}<span class="chip chip-alokasi">Alokasi</span>{% endif %}
+    {% if plot.land_preparation_done %}<span class="chip chip-ready">Siap bangun</span>{% endif %}
+  </div>
+  <dl class="facts">
+    <div><dt>Luas</dt><dd>{{ plot.area_m2|hektare|patah }}</dd></div>
+    {% if plot.offer_lease %}<div><dt>Sewa /m²/thn</dt><dd>{{ plot.lease_rate_per_m2_year|rupiah|patah }}</dd></div>
+    {% elif plot.offer_allocation and plot.uwt_rate_per_m2_year %}<div><dt>UWT /m²/thn</dt><dd>{{ plot.uwt_rate_per_m2_year|rupiah|patah }}</dd></div>
+    {% else %}<div><dt>Lokasi</dt><dd>{{ plot.district|default:"-" }}</dd></div>{% endif %}
+  </dl>
+  <p class="small muted" style="margin:0">{% if plot.village %}Kel. {{ plot.village }}, {% endif %}{% if plot.district %}Kec. {{ plot.district }}{% endif %}{% if plot.zone and plot.zone.is_published %} · {{ plot.zone.name }}{% endif %}</p>
+  <div class="tile-actions">
+    <button type="button" class="btn-icon" data-compare="{{ plot.code }}" aria-pressed="false" title="Tambah ke perbandingan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M12 3v18"/></svg>Bandingkan</button>
+    {% if portal_applicant %}<button type="button" class="btn-icon save-btn" data-save="{{ plot.code }}" data-save-url="{% url 'portal:plot_save' plot.code %}" aria-pressed="{% if plot.code in saved_codes %}true{% else %}false{% endif %}" title="Simpan lahan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span>{% if plot.code in saved_codes %}Tersimpan{% else %}Simpan{% endif %}</span></button>{% endif %}
+  </div>
+</article>

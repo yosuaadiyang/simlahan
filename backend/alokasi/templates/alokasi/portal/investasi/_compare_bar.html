@@ -1,0 +1,6 @@
+<div class="compare-bar" id="compare-bar" data-url="{% url 'portal:investment_compare' %}" hidden>
+  <span><strong data-compare-count>0</strong> lahan dipilih</span>
+  <a class="btn btn-accent" href="{% url 'portal:investment_compare' %}" data-compare-go>Bandingkan</a>
+  <button type="button" class="clear" data-compare-clear aria-label="Kosongkan perbandingan">✕</button>
+</div>
+<form id="csrf-holder" hidden aria-hidden="true">{% csrf_token %}</form>

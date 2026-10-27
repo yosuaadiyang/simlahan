@@ -11,8 +11,9 @@
 {% endblock %}
 {% block content %}
 <div id="content-main">
-  <p>{{ intro }}</p>
-  <form method="post">{% csrf_token %}
+  {% if intro %}<p>{{ intro }}</p>{% endif %}
+  <form method="post"{% if multipart %} enctype="multipart/form-data"{% endif %}>{% csrf_token %}
+    {% if form.non_field_errors %}{{ form.non_field_errors }}{% endif %}
     <fieldset class="module aligned">
       {% for field in form %}
       <div class="form-row">
@@ -21,7 +22,7 @@
           <label for="{{ field.id_for_label }}"{% if field.field.required %} class="required"{% endif %}>{{ field.label }}</label>
           {{ field }}
         </div>
-        {% if not field.field.required %}<div class="help">Opsional.</div>{% endif %}
+        {% if field.help_text %}<div class="help">{{ field.help_text }}</div>{% elif not field.field.required %}<div class="help">Opsional.</div>{% endif %}
       </div>
       {% endfor %}
     </fieldset>

@@ -1,0 +1,10 @@
+<div class="field{% if field.field.required %} required{% endif %}{% if field.widget_type == 'checkbox' %} checkbox{% endif %}" id="field-{{ field.name }}"{% if wide %} style="grid-column: 1 / -1"{% endif %}>
+  {% if field.widget_type == 'checkbox' %}
+    <label for="{{ field.id_for_label }}">{{ field }} <span>{{ field.label }}</span></label>
+  {% else %}
+    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {{ field }}
+  {% endif %}
+  {% if field.help_text %}<span class="helptext">{{ field.help_text }}</span>{% endif %}
+  {{ field.errors }}
+</div>

@@ -1,23 +1,76 @@
-{% extends "alokasi/portal/base.html" %}{% load alokasi_tags %}
+{% extends "alokasi/portal/base.html" %}{% load static alokasi_tags l10n %}
 {% block title %}{{ plot.code }} {{ plot.name }}{% endblock %}
-{% block head %}{% include "alokasi/portal/_leaflet.html" %}{% endblock %}
+{% block head %}{% include "alokasi/portal/_leaflet.html" %}<link rel="stylesheet" href="{% static 'alokasi/investasi.css' %}">{% endblock %}
 {% block content %}
-<p class="small"><a href="{% url 'portal:plot_list' %}">‹ Kembali ke peta lahan</a></p>
-<h1>{{ plot.name }} <span class="badge badge-{{ plot.status }}">{{ plot.get_status_display }}</span></h1>
-<p class="muted">{{ plot.code }} · {{ plot.get_allocation_type_display }}</p>
+<p class="small"><a href="{% url 'portal:investment_map' %}?lahan={{ plot.code|urlencode }}">‹ Peta investasi</a> · <a href="{% url 'portal:plot_list' %}">Peta lahan</a></p>
+<div class="actions-row" style="justify-content:space-between;align-items:flex-start">
+  <div>
+    <h1 style="margin-bottom:4px">{{ plot.name }} <span class="badge badge-{{ plot.status }}">{{ plot.get_status_display }}</span></h1>
+    <p class="muted" style="margin:0">{{ plot.code }} · {{ plot.get_allocation_type_display }}{% if plot.zone and plot.zone.is_published %} · <a href="{% url 'portal:investment_zone' plot.zone.slug %}">{{ plot.zone.name }}</a>{% endif %}</p>
+    <div class="chips" style="margin-top:8px">
+      {% if plot.sector and plot.sector.is_active %}<span class="chip chip-sector" style="--c:{{ plot.sector.color }}">{{ plot.sector.icon }} {{ plot.sector.name }}</span>{% endif %}
+      {% if plot.offer_lease %}<span class="chip chip-sewa">Dapat disewa</span>{% endif %}
+      {% if plot.offer_allocation %}<span class="chip chip-alokasi">Alokasi (UWT)</span>{% endif %}
+      {% if plot.land_preparation_done %}<span class="chip chip-ready">Siap bangun</span>{% endif %}
+    </div>
+  </div>
+  <div class="tile-actions" style="margin:0">
+    <button type="button" class="btn-icon" data-compare="{{ plot.code }}" aria-pressed="false" title="Tambah ke perbandingan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M12 3v18"/></svg>Bandingkan</button>
+    {% if is_applicant %}<button type="button" class="btn-icon save-btn" data-save="{{ plot.code }}" data-save-url="{% url 'portal:plot_save' plot.code %}" aria-pressed="{% if is_saved %}true{% else %}false{% endif %}" title="Simpan lahan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span>{% if is_saved %}Tersimpan{% else %}Simpan{% endif %}</span></button>{% endif %}
+    <a class="btn-icon" href="{% url 'portal:plot_profile_pdf' plot.code %}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M12 12v6m-3-3 3 3 3-3"/></svg>Profil PDF</a>
+  </div>
+</div>
+
+<div class="metric-row" style="margin-top:16px">
+  <div class="metric"><div class="label">Luas</div><div class="value">{{ plot.area_m2|hektare|patah }}</div><div class="small muted">{{ plot.area_m2|angka:2|patah }} m²</div></div>
+  {% if plot.offer_lease %}<div class="metric"><div class="label">Sewa /m²/tahun</div><div class="value">{{ plot.lease_rate_per_m2_year|rupiah|patah }}</div>{% if plot.lease_min_years or plot.lease_max_years %}<div class="small muted">Masa {{ plot.lease_min_years|default:"1" }}{% if plot.lease_max_years %}–{{ plot.lease_max_years }}{% endif %} tahun</div>{% endif %}</div>{% endif %}
+  {% if plot.offer_allocation and plot.uwt_rate_per_m2_year %}<div class="metric"><div class="label">UWT /m²/tahun</div><div class="value">{{ plot.uwt_rate_per_m2_year|rupiah|patah }}</div><div class="small muted">{{ plot.effective_term_years }} tahun</div></div>{% endif %}
+  <div class="metric"><div class="label">Kesiapan</div><div class="value">{{ plot.land_preparation_done|yesno:"Siap bangun,Perlu pematangan" }}</div><div class="small muted">Dok. teknis {{ plot.has_technical_documents|yesno:"tersedia,belum" }}</div></div>
+</div>
+
+{% if plot.is_available and plot.schemes and not own_investment %}
+<div class="mobile-cta">
+  <a class="btn btn-accent" href="{% url 'portal:investment_request_create' %}?lahan={{ plot.code|urlencode }}">Ajukan minat investasi</a>
+  {% if sim_schemes %}<a class="btn btn-outline" href="#simulasi">Simulasi biaya</a>{% endif %}
+</div>
+{% endif %}
 <div class="split">
   <div>
     <div class="map" data-map="shape" data-status="{{ plot.status }}" data-geometry="{{ geometry }}" role="region" aria-label="Peta batas lahan"></div>
     {% if plot.photo %}<p><img src="{% url 'portal:plot_photo' plot.code %}" alt="Foto lahan {{ plot.code }}" loading="lazy" style="border-radius:8px;margin-top:16px"></p>{% endif %}
+    {% if plot.highlight_list %}<h2>Keunggulan lokasi</h2><ul class="check-list">{% for item in plot.highlight_list %}<li>{{ item }}</li>{% endfor %}</ul>{% endif %}
+    {% if plot.distances %}<h2>Jarak ke fasilitas utama</h2><div class="distance-list">{% for label, km in plot.distances %}<div><span class="small muted">{{ label }}</span><strong>{{ km|angka:1 }} km</strong></div>{% endfor %}</div>{% endif %}
+    {% if plot.utilities %}<h2>Utilitas tersedia</h2><div class="chips">{% for name in plot.utilities %}<span class="chip">{{ name }}</span>{% endfor %}</div>{% endif %}
+    {% if plot.incentive_list %}<h2>Insentif & kemudahan</h2><ul class="check-list">{% for item in plot.incentive_list %}<li>{{ item }}</li>{% endfor %}</ul>{% endif %}
     {% if plot.description %}<h2>Keterangan</h2><p class="prose">{{ plot.description }}</p>{% endif %}
     {% if plot.infrastructure %}<h2>Sarana & prasarana</h2><p class="prose">{{ plot.infrastructure }}</p>{% endif %}
-    <h2>Dokumen persyaratan permohonan</h2>
+    {% if plot.offer_allocation %}
+    <h2>Dokumen persyaratan permohonan alokasi</h2>
     <ul>
       {% for doc in requirements %}<li>{{ doc.name }}{% if not doc.is_required %} <span class="muted small">(opsional)</span>{% endif %}{% if doc.description %}<br><span class="small muted">{{ doc.description }}</span>{% endif %}</li>
       {% empty %}<li class="muted">Belum ditetapkan.</li>{% endfor %}
     </ul>
+    {% endif %}
   </div>
   <aside>
+    {% if plot.is_available and sim_schemes %}
+    <div class="card" id="simulasi">
+      <h2>Simulasi biaya</h2>
+      <div class="simulator" data-simulator
+           data-area="{{ plot.area_m2|unlocalize }}"
+           data-lease-rate="{{ plot.lease_rate_per_m2_year|default_if_none:0|unlocalize }}"
+           data-lease-min="{{ plot.lease_min_years|default:1 }}" data-lease-max="{{ plot.lease_max_years|default:99 }}"
+           data-uwt-rate="{{ plot.uwt_rate_per_m2_year|default_if_none:0|unlocalize }}" data-uwt-term="{{ plot.effective_term_years }}"
+           data-admin-fee="{{ config.allocation_admin_fee|default_if_none:0|unlocalize }}">
+        <div class="row">
+          <div><label for="sim-scheme">Skema</label><select id="sim-scheme" data-sim="scheme">{% for value, label in sim_schemes %}<option value="{{ value }}">{{ label }}</option>{% endfor %}</select></div>
+          <div><label for="sim-years">Jangka (tahun)</label><input id="sim-years" type="number" inputmode="numeric" data-sim="years"></div>
+        </div>
+        <div><span class="small muted">Perkiraan total</span><output data-sim="total" aria-live="polite">-</output><span class="per-year" data-sim="per-year"></span></div>
+        <p class="small muted" data-sim="hint" style="margin:0"></p>
+      </div>
+    </div>
+    {% endif %}
     <div class="card">
       <h2>Data lahan</h2>
       <dl class="props">
@@ -29,35 +82,51 @@
         {% if plot.intended_use %}<dt>Arahan pemanfaatan</dt><dd>{{ plot.intended_use }}</dd>{% endif %}
         <dt>Dokumen teknis</dt><dd>{{ plot.has_technical_documents|yesno:"Tersedia,Belum tersedia" }}</dd>
         <dt>Pematangan lahan</dt><dd>{{ plot.land_preparation_done|yesno:"Selesai,Belum" }}</dd>
-        <dt>Jangka waktu</dt><dd>{{ plot.effective_term_years }} tahun</dd>
+        {% if plot.offer_lease %}
+        <dt>Tarif sewa</dt><dd>{{ plot.lease_rate_per_m2_year|rupiah|patah }} /m²/tahun</dd>
+        <dt>Perkiraan sewa {{ plot.lease_term_years }} tahun</dt><dd>{{ plot.lease_estimate|rupiah|patah }}</dd>
+        {% endif %}
+        {% if plot.offer_allocation %}
+        <dt>Jangka waktu alokasi</dt><dd>{{ plot.effective_term_years }} tahun</dd>
         {% if plot.uwt_rate_per_m2_year %}
         <dt>Tarif UWT</dt><dd>{{ plot.uwt_rate_per_m2_year|rupiah|patah }} /m²/tahun</dd>
-        <dt>Perkiraan UWT</dt><dd>{{ plot.uwt_total|rupiah|patah }} <a class="small" href="{% url 'portal:uwt_calculator' %}?plot={{ plot.pk }}">Simulasikan</a></dd>
+        <dt>Perkiraan UWT</dt><dd>{{ plot.uwt_total|rupiah|patah }} <a class="small" href="{% url 'portal:uwt_calculator' %}?plot={{ plot.pk }}">Kalkulator</a></dd>
         {% endif %}
         {% if config.allocation_admin_fee %}<dt>Biaya administrasi</dt><dd>{{ config.allocation_admin_fee|rupiah|patah }}</dd>{% endif %}
+        {% endif %}
       </dl>
     </div>
     <div class="card">
+      {% if own_investment %}
+        <p>Anda sudah memiliki permintaan investasi <strong>{{ own_investment.number }}</strong> ({{ own_investment.get_status_display }}) untuk lahan ini.</p>
+        <a class="btn" href="{% url 'portal:investment_request' own_investment.number %}">Buka permintaan</a>
+      {% elif plot.is_available and plot.schemes %}
+        <h2>Tertarik dengan lahan ini?</h2>
+        <p class="small muted">Ajukan minat sewa, alokasi, atau kerja sama. Petugas meninjau rencana usaha Anda dan mengirim penawaran di portal.</p>
+        <a class="btn btn-accent" href="{% url 'portal:investment_request_create' %}?lahan={{ plot.code|urlencode }}">Ajukan minat investasi</a>
+      {% endif %}
       {% if own_application %}
-        <p>Anda sudah memiliki permohonan <strong>{{ own_application.number }}</strong> ({{ own_application.get_status_display }}) untuk lahan ini.</p>
+        <p style="margin-top:12px">Anda sudah memiliki permohonan <strong>{{ own_application.number }}</strong> ({{ own_application.get_status_display }}) untuk lahan ini.</p>
         <a class="btn" href="{% url 'portal:application_detail' own_application.number %}">Buka permohonan</a>
       {% elif plot.is_open_for_application %}
         {% if is_applicant %}
-          <form method="post" action="{% url 'portal:application_create' plot.code %}">{% csrf_token %}
-            <button class="btn btn-accent" type="submit">Ajukan permohonan alokasi</button>
+          <form method="post" action="{% url 'portal:application_create' plot.code %}" style="margin-top:12px">{% csrf_token %}
+            <button class="btn btn-outline" type="submit">Langsung ajukan permohonan alokasi</button>
           </form>
           <p class="small muted">Draf dibuat lebih dulu; lahan baru dipesan setelah permohonan diajukan.</p>
         {% else %}
-          <p>Masuk atau daftar sebagai pemohon untuk mengajukan alokasi lahan ini.</p>
+          <p style="margin-top:12px">Masuk atau daftar sebagai pemohon untuk mengajukan minat atau permohonan alokasi.</p>
           <div class="actions-row">
             <a class="btn" href="{% url 'portal:login' %}?next={{ request.get_full_path|urlencode }}">Masuk</a>
             <a class="btn btn-outline" href="{% url 'portal:register' %}">Daftar</a>
           </div>
         {% endif %}
-      {% else %}
-        <p class="muted">Lahan ini sedang tidak menerima permohonan.</p>
+      {% elif not plot.is_available %}
+        <p class="muted">Lahan ini sedang tidak menerima permohonan. <a href="{% url 'portal:investment_map' %}">Cari lahan lain</a>.</p>
       {% endif %}
     </div>
   </aside>
 </div>
+{% include "alokasi/portal/investasi/_compare_bar.html" %}
 {% endblock %}
+{% block scripts %}<script src="{% static 'alokasi/investasi.js' %}"></script>{% endblock %}

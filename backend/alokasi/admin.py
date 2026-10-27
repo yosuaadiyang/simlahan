@@ -17,10 +17,18 @@ from django.urls import path, reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from alokasi import documents, enums, services
+from alokasi import documents, enums
+from alokasi import investment_services as inv
+from alokasi import services
 from alokasi.admin_views import file_link, file_url
 from alokasi.forms import OfficerNoteForm, ScoreForm
 from alokasi.importers import PlotImportError, import_plots
+from alokasi.investment_forms import (
+    CompleteForm,
+    ConsultationForm,
+    OfferForm,
+    OfficerMessageForm,
+)
 from alokasi.models import (
     Allocation,
     AllocationSettings,
@@ -30,6 +38,10 @@ from alokasi.models import (
     ApplicationEvent,
     DevelopmentReport,
     InfoPage,
+    InvestmentEvent,
+    InvestmentRequest,
+    InvestmentSector,
+    InvestmentZone,
     Invoice,
     IssuedDocument,
     LandPlot,
@@ -130,7 +142,16 @@ def _status_badge(status, label):
 
 
 def _process_page(
-    request, admin_obj, obj, *, title, intro, form, submit_label, danger=False
+    request,
+    admin_obj,
+    obj,
+    *,
+    title,
+    intro,
+    form,
+    submit_label,
+    danger=False,
+    multipart=False,
 ):
     context = {
         **admin_obj.admin_site.each_context(request),
@@ -141,6 +162,7 @@ def _process_page(
         "form": form,
         "submit_label": submit_label,
         "danger": danger,
+        "multipart": multipart,
         "back_url": reverse(
             f"admin:alokasi_{admin_obj.model._meta.model_name}_change", args=[obj.pk]
         ),
@@ -205,6 +227,10 @@ class AllocationSettingsAdmin(admin.ModelAdmin):
             },
         ),
         (_("Portal"), {"fields": ("contact_info",)}),
+        (
+            _("Portal investasi"),
+            {"fields": ("investment_intro", "investment_contact")},
+        ),
     )
 
     def has_add_permission(self, request):
@@ -231,14 +257,34 @@ class LandPlotAdmin(PrivateFileAdminMixin, GISModelAdmin):
         "area_m2",
         "district",
         "village",
+        "sector",
+        "offer_lease",
         "has_map",
         "is_published",
     )
-    list_filter = ("status", "allocation_type", "is_published", "district")
+    list_filter = (
+        "status",
+        "allocation_type",
+        "is_published",
+        "sector",
+        "zone",
+        "offer_lease",
+        "offer_allocation",
+        "is_featured",
+        "district",
+    )
     search_fields = ("code", "name", "village", "district", "intended_use")
     list_editable = ("is_published",)
-    readonly_fields = ("uwt_preview",)
-    actions = ("publish", "unpublish", "close_plots", "reopen_plots")
+    list_select_related = ("sector",)
+    readonly_fields = ("uwt_preview", "lease_preview")
+    actions = (
+        "publish",
+        "unpublish",
+        "close_plots",
+        "reopen_plots",
+        "feature_plots",
+        "end_lease",
+    )
     change_list_template = "admin/alokasi/landplot/change_list.html"
     fieldsets = (
         (
@@ -262,7 +308,44 @@ class LandPlotAdmin(PrivateFileAdminMixin, GISModelAdmin):
             },
         ),
         (_("Tarif"), {"fields": ("uwt_rate_per_m2_year", "term_years", "uwt_preview")}),
+        (
+            _("Profil investasi"),
+            {
+                "fields": (
+                    "sector",
+                    "zone",
+                    "is_featured",
+                    "offer_allocation",
+                    "offer_lease",
+                    "lease_rate_per_m2_year",
+                    "lease_min_years",
+                    "lease_max_years",
+                    "lease_preview",
+                    "highlights",
+                    "incentives",
+                    ("has_road_access", "has_power", "has_water", "has_telecom"),
+                    (
+                        "distance_port_km",
+                        "distance_airport_km",
+                        "distance_road_km",
+                        "distance_city_km",
+                    ),
+                )
+            },
+        ),
     )
+
+    @admin.display(description=_("Perkiraan sewa"))
+    def lease_preview(self, obj):
+        if not obj.pk or not obj.offer_lease or obj.lease_rate_per_m2_year is None:
+            return "–"
+        from alokasi.templatetags.alokasi_tags import rupiah
+
+        return _("%(total)s untuk %(years)d tahun (%(year)s per tahun)") % {
+            "total": rupiah(obj.lease_estimate),
+            "years": obj.lease_term_years,
+            "year": rupiah(obj.lease_total(1)),
+        }
 
     @admin.display(boolean=True, description=_("Peta"))
     def has_map(self, obj):
@@ -278,12 +361,11 @@ class LandPlotAdmin(PrivateFileAdminMixin, GISModelAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         fields = list(super().get_readonly_fields(request, obj))
-        if obj and obj.status in (
-            enums.PlotStatus.RESERVED,
-            enums.PlotStatus.ALLOCATED,
-        ):
+        if obj and obj.status in enums.BOUND_PLOT_STATUSES:
             # Status dikelola alur permohonan; ukuran & tarif dikunci agar tagihan konsisten.
             fields += ["status", "area_m2", "uwt_rate_per_m2_year", "term_years"]
+        if obj and obj.status == enums.PlotStatus.LEASED:
+            fields += ["offer_lease", "lease_rate_per_m2_year"]
         return fields
 
     def save_model(self, request, obj, form, change):
@@ -324,6 +406,23 @@ class LandPlotAdmin(PrivateFileAdminMixin, GISModelAdmin):
             status=enums.PlotStatus.AVAILABLE
         )
         self.message_user(request, _("%d lahan dibuka kembali.") % updated)
+
+    @admin.action(
+        description=_("Tandai sebagai lahan unggulan portal investasi"),
+        permissions=["change"],
+    )
+    def feature_plots(self, request, queryset):
+        updated = queryset.update(is_featured=True)
+        self.message_user(request, _("%d lahan ditandai unggulan.") % updated)
+
+    @admin.action(
+        description=_("Akhiri sewa (lahan kembali tersedia)"), permissions=["change"]
+    )
+    def end_lease(self, request, queryset):
+        updated = queryset.filter(status=enums.PlotStatus.LEASED).update(
+            status=enums.PlotStatus.AVAILABLE
+        )
+        self.message_user(request, _("%d lahan sewa dikembalikan.") % updated)
 
     def get_urls(self):
         return [
@@ -1375,3 +1474,449 @@ class DevelopmentReportAdmin(ReadOnlyAdmin):
     @admin.display(description=_("Lampiran"))
     def download(self, obj):
         return file_link("progres", obj)
+
+
+# --------------------------------------------------------------------------
+# Portal investasi
+# --------------------------------------------------------------------------
+
+
+@admin.register(InvestmentSector)
+class InvestmentSectorAdmin(admin.ModelAdmin):
+    list_display = ("name", "icon", "color", "order", "plot_count", "is_active")
+    list_editable = ("order", "is_active")
+    search_fields = ("name",)
+    fields = ("name", "slug", "icon", "color", "description", "order", "is_active")
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).annotate(n_plots=Count("plots"))
+
+    @admin.display(description=_("Lahan"), ordering="n_plots")
+    def plot_count(self, obj):
+        return obj.n_plots
+
+
+@admin.register(InvestmentZone)
+class InvestmentZoneAdmin(PrivateFileAdminMixin, GISModelAdmin):
+    file_kind = "kawasan"
+    list_display = ("name", "plot_count", "order", "is_featured", "is_published")
+    list_editable = ("order", "is_featured", "is_published")
+    list_filter = ("is_published", "is_featured", "sectors")
+    search_fields = ("name", "summary")
+    filter_horizontal = ("sectors",)
+    fieldsets = (
+        (None, {"fields": ("name", "slug", "summary", "sectors", "photo")}),
+        (_("Peta"), {"fields": ("geometry",)}),
+        (
+            _("Uraian"),
+            {"fields": ("description", "incentives", "infrastructure")},
+        ),
+        (_("Tampilan"), {"fields": ("order", "is_featured", "is_published")}),
+    )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).annotate(n_plots=Count("plots"))
+
+    @admin.display(description=_("Lahan"), ordering="n_plots")
+    def plot_count(self, obj):
+        return obj.n_plots
+
+
+class InvestmentEventInline(ReadOnlyInline):
+    model = InvestmentEvent
+    fields = ("created_at", "status", "actor", "note")
+    readonly_fields = fields
+    verbose_name_plural = _("Riwayat status")
+
+
+def _investment_badge(status, label):
+    IS = enums.InvestmentStatus
+    colors = {
+        IS.SUBMITTED: "#1f6feb",
+        IS.REVIEW: "#0a7ea4",
+        IS.CONSULTATION: "#8250df",
+        IS.OFFERED: "#bf8700",
+        IS.ACCEPTED: "#1a7f37",
+        IS.COMPLETED: "#1a7f37",
+        IS.REJECTED: "#cf222e",
+        IS.CANCELLED: "#777",
+    }
+    return format_html(
+        '<span style="color:#fff;background:{};padding:2px 6px;border-radius:3px;white-space:nowrap">{}</span>',
+        colors.get(status, "#777"),
+        label,
+    )
+
+
+class OpenInvestmentFilter(admin.SimpleListFilter):
+    title = _("Tahap")
+    parameter_name = "tahap"
+
+    def lookups(self, request, model_admin):
+        return (
+            ("aktif", _("Perlu ditangani")),
+            ("saya", _("Ditugaskan ke saya")),
+            ("tutup", _("Sudah ditutup")),
+        )
+
+    def queryset(self, request, queryset):
+        final = enums.INVESTMENT_FINAL_STATUSES
+        if self.value() == "aktif":
+            return queryset.exclude(status__in=final)
+        if self.value() == "saya":
+            return queryset.filter(assigned_to=request.user).exclude(status__in=final)
+        if self.value() == "tutup":
+            return queryset.filter(status__in=final)
+        return queryset
+
+
+@admin.register(InvestmentRequest)
+class InvestmentRequestAdmin(admin.ModelAdmin):
+    list_display = (
+        "number",
+        "project_name",
+        "applicant",
+        "scheme",
+        "sector",
+        "status_badge",
+        "investment_value",
+        "assigned_to",
+        "submitted_at",
+    )
+    list_filter = (
+        OpenInvestmentFilter,
+        "status",
+        "scheme",
+        "sector",
+        "zone",
+        "capital_origin",
+    )
+    search_fields = (
+        "number",
+        "project_name",
+        "applicant__name",
+        "plots__code",
+        "contract_number",
+    )
+    list_select_related = ("applicant", "sector", "assigned_to")
+    date_hierarchy = "submitted_at"
+    inlines = (InvestmentEventInline,)
+    change_form_template = "admin/alokasi/investmentrequest/change_form.html"
+    change_list_template = "admin/alokasi/investmentrequest/change_list.html"
+    EDITABLE = ("assigned_to", "internal_note")
+    fieldsets = (
+        (None, {"fields": ("number", "status", "applicant", "submitted_at")}),
+        (_("Penanganan"), {"fields": ("assigned_to", "internal_note")}),
+        (
+            _("Rencana investasi"),
+            {
+                "fields": (
+                    "scheme",
+                    "sector",
+                    "project_name",
+                    "activity",
+                    "investment_value",
+                    "workforce",
+                    "capital_origin",
+                    "origin_country",
+                    "target_start",
+                    "term_years",
+                    "power_kva",
+                    "water_m3_day",
+                    "attachment_link",
+                )
+            },
+        ),
+        (
+            _("Lokasi"),
+            {"fields": ("plot_links", "zone", "requested_area_m2", "drawn_area")},
+        ),
+        (_("Konsultasi"), {"fields": ("meeting_at", "meeting_place")}),
+        (
+            _("Penawaran"),
+            {
+                "fields": (
+                    "offer_scheme",
+                    "offer_plot",
+                    "offer_area_m2",
+                    "offer_rate_per_m2_year",
+                    "offer_term_years",
+                    "offer_total_display",
+                    "offer_valid_until",
+                    "offer_note",
+                    "offered_at",
+                )
+            },
+        ),
+        (
+            _("Penutupan"),
+            {"fields": ("application", "contract_number", "closed_at")},
+        ),
+    )
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("applicant", "sector", "zone", "offer_plot", "application")
+        )
+
+    def get_readonly_fields(self, request, obj=None):
+        return [
+            f
+            for fieldset in self.fieldsets
+            for f in fieldset[1]["fields"]
+            if f not in self.EDITABLE
+        ]
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "assigned_to":
+            from django.contrib.auth import get_user_model
+
+            kwargs["queryset"] = get_user_model().objects.filter(
+                is_active=True, is_staff=True
+            )
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    @admin.display(description=_("Status"), ordering="status")
+    def status_badge(self, obj):
+        return _investment_badge(obj.status, obj.get_status_display())
+
+    @admin.display(description=_("Lampiran"))
+    def attachment_link(self, obj):
+        return file_link("investasi", obj, obj.attachment_name)
+
+    @admin.display(description=_("Lahan diminati"))
+    def plot_links(self, obj):
+        plots = list(obj.plots.all())
+        if not plots:
+            return "–"
+        return format_html(
+            "<br>".join(["{}"] * len(plots)),
+            *[f"{p.code} – {p.name} ({p.get_status_display()})" for p in plots],
+        )
+
+    @admin.display(description=_("Luas area digambar"))
+    def drawn_area(self, obj):
+        size = obj.requested_area_size_m2
+        if size is None:
+            return "–"
+        from alokasi.templatetags.alokasi_tags import angka
+
+        return f"{angka(size, 0)} m²"
+
+    @admin.display(description=_("Total penawaran"))
+    def offer_total_display(self, obj):
+        total = obj.offer_total
+        if total is None:
+            return "–"
+        from alokasi.templatetags.alokasi_tags import rupiah
+
+        return rupiah(total)
+
+    def changelist_view(self, request, extra_context=None):
+        counts = dict(
+            InvestmentRequest.objects.values_list("status").annotate(n=Count("pk"))
+        )
+        extra_context = {
+            **(extra_context or {}),
+            "status_counts": [
+                (value, label, counts.get(value, 0))
+                for value, label in enums.InvestmentStatus.choices
+            ],
+        }
+        return super().changelist_view(request, extra_context)
+
+    def change_view(self, request, object_id, form_url="", extra_context=None):
+        obj = self.get_object(request, object_id)
+        extra = {}
+        if obj is not None:
+            IS = enums.InvestmentStatus
+            can = request.user.has_perm("alokasi.process_investmentrequest")
+            status = obj.status
+            plots = [
+                {
+                    "code": p.code,
+                    "name": p.name,
+                    "geometry": p.geometry.geojson if p.geometry else "",
+                }
+                for p in obj.plots.all()
+            ]
+            if obj.offer_plot and obj.offer_plot.code not in {p["code"] for p in plots}:
+                p = obj.offer_plot
+                plots.append(
+                    {
+                        "code": p.code,
+                        "name": p.name,
+                        "geometry": p.geometry.geojson if p.geometry else "",
+                    }
+                )
+            extra = {
+                "can_review": can and status == IS.SUBMITTED,
+                "can_consult": can
+                and status in (IS.SUBMITTED, IS.REVIEW, IS.CONSULTATION),
+                "can_offer": can
+                and status in (IS.SUBMITTED, IS.REVIEW, IS.CONSULTATION, IS.OFFERED),
+                "can_complete": can and status == IS.ACCEPTED,
+                "can_reject": can and not obj.is_final,
+                "can_message": can and not obj.is_final,
+                "thread": obj.messages.select_related("author"),
+                "message_form": OfficerMessageForm(),
+                "map_plots": plots,
+                "map_area": obj.requested_area.geojson if obj.requested_area else "",
+            }
+        return super().change_view(
+            request, object_id, form_url, {**(extra_context or {}), **extra}
+        )
+
+    def get_urls(self):
+        view = self.admin_site.admin_view
+        return [
+            path(
+                "<int:pk>/proses/<str:action>/",
+                view(self.process_view),
+                name="alokasi_investmentrequest_process",
+            ),
+            path(
+                "<int:pk>/pesan/",
+                view(self.message_view),
+                name="alokasi_investmentrequest_message",
+            ),
+        ] + super().get_urls()
+
+    PROCESS_ACTIONS = {
+        "tinjau": _("Mulai tinjau permintaan"),
+        "konsultasi": _("Jadwalkan konsultasi / kunjungan lapangan"),
+        "penawaran": _("Kirim penawaran kepada investor"),
+        "selesaikan": _("Selesaikan (kontrak / permohonan alokasi)"),
+        "tolak": _("Tolak permintaan"),
+    }
+
+    def _check(self, request):
+        if not request.user.has_perm("alokasi.process_investmentrequest"):
+            raise PermissionDenied
+
+    def process_view(self, request, pk, action):  # noqa: C901
+        if action not in self.PROCESS_ACTIONS:
+            raise PermissionDenied
+        self._check(request)
+        investment = get_object_or_404(InvestmentRequest, pk=pk)
+        title = self.PROCESS_ACTIONS[action]
+        back = reverse("admin:alokasi_investmentrequest_change", args=[pk])
+        user = request.user
+        data = request.POST or None
+        if action == "konsultasi":
+            form = ConsultationForm(data)
+        elif action == "penawaran":
+            form = OfferForm(data, investment=investment)
+        elif action == "selesaikan":
+            form = CompleteForm(data)
+        else:
+            form = OfficerNoteForm(data, required=action == "tolak")
+        if request.method == "POST" and form.is_valid():
+            cd = form.cleaned_data
+            funcs = {
+                "tinjau": lambda: inv.start_review(investment, user, cd["note"]),
+                "konsultasi": lambda: inv.schedule_consultation(
+                    investment, user, cd["meeting_at"], cd["place"], cd["note"]
+                ),
+                "penawaran": lambda: inv.make_offer(
+                    investment,
+                    user,
+                    scheme=cd["scheme"],
+                    plot=cd["plot"],
+                    area_m2=cd["area_m2"],
+                    rate_per_m2_year=cd["rate_per_m2_year"],
+                    term_years=cd["term_years"],
+                    valid_until=cd["valid_until"],
+                    note=cd["note"],
+                ),
+                "selesaikan": lambda: inv.complete(
+                    investment,
+                    user,
+                    contract_number=cd["contract_number"],
+                    note=cd["note"],
+                ),
+                "tolak": lambda: inv.reject(investment, user, cd["note"]),
+            }
+            if _run(
+                request,
+                funcs[action],
+                _("Permintaan %(n)s: %(t)s berhasil.")
+                % {"n": investment.number, "t": title},
+            ):
+                return HttpResponseRedirect(back)
+            if action in ("konsultasi", "penawaran", "selesaikan"):
+                # Biarkan petugas memperbaiki isian tanpa mengetik ulang.
+                return _process_page(
+                    request,
+                    self,
+                    investment,
+                    title=title,
+                    intro="",
+                    form=form,
+                    submit_label=title,
+                )
+            return HttpResponseRedirect(back)
+        intro = {
+            "tinjau": _(
+                "Permintaan ditandai sedang ditinjau dan ditugaskan kepada Anda bila belum "
+                "ada petugas. Investor diberi tahu lewat surel."
+            ),
+            "konsultasi": _(
+                "Investor menerima undangan konsultasi atau kunjungan lapangan lewat portal dan surel."
+            ),
+            "penawaran": _(
+                "Investor dapat menerima atau menolak penawaran di portal sampai tanggal berlaku. "
+                "Skema alokasi wajib memilih lahan yang membuka alokasi; luas dan tarif "
+                "diisi dari data lahan bila dikosongkan. Lahan belum dipesan sampai "
+                "penawaran diteruskan."
+            ),
+            "selesaikan": _(
+                "Skema alokasi: draf permohonan alokasi dibuat atas nama investor (rencana usaha "
+                "terisi), lalu investor melengkapi dokumen dan mengajukannya. Skema sewa/kerja "
+                "sama: isi nomor kontrak; lahan yang ditawarkan ditandai Sudah disewakan."
+            ),
+            "tolak": _("Permintaan ditutup. Alasan dikirim ke investor."),
+        }[action]
+        return _process_page(
+            request,
+            self,
+            investment,
+            title=title,
+            intro=intro,
+            form=form,
+            submit_label=title,
+            danger=action == "tolak",
+        )
+
+    def message_view(self, request, pk):
+        self._check(request)
+        investment = get_object_or_404(InvestmentRequest, pk=pk)
+        back = reverse("admin:alokasi_investmentrequest_change", args=[pk])
+        if request.method != "POST":
+            return HttpResponseRedirect(back + "#pesan")
+        form = OfficerMessageForm(request.POST, request.FILES)
+        if form.is_valid():
+            _run(
+                request,
+                lambda: inv.post_message(
+                    investment,
+                    request.user,
+                    form.cleaned_data["body"],
+                    form.cleaned_data.get("attachment"),
+                    officer=True,
+                ),
+                _("Pesan terkirim ke investor."),
+            )
+        else:
+            for errors in form.errors.values():
+                for error in errors:
+                    messages.error(request, error)
+        return HttpResponseRedirect(back + "#pesan")

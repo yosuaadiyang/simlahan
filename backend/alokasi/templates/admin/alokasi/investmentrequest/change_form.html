@@ -1,0 +1,73 @@
+{% extends "admin/change_form.html" %}
+{% load static alokasi_tags %}
+{% block extrahead %}{{ block.super }}
+<link rel="stylesheet" href="{% static 'alokasi/vendor/leaflet/leaflet.css' %}">
+<script src="{% static 'alokasi/vendor/leaflet/leaflet.js' %}"></script>
+<style>
+  .inv-summary { padding: 10px 12px; margin-bottom: 16px; border-left: 4px solid var(--primary); }
+  .inv-map { height: 320px; border-radius: 6px; margin: 8px 0 4px; }
+  .inv-thread { display: grid; gap: 8px; margin: 8px 0 12px; }
+  .inv-msg { padding: 8px 12px; border-radius: 8px; background: var(--darkened-bg); max-width: 80ch; overflow-wrap: anywhere; }
+  .inv-msg.officer { background: var(--selected-bg); margin-left: auto; }
+  .inv-msg .meta { font-size: .75rem; color: var(--body-quiet-color); margin-bottom: 2px; }
+  .inv-msg .text { white-space: pre-line; }
+  .inv-reply textarea { width: 100%; max-width: 80ch; box-sizing: border-box; }
+</style>
+{% endblock %}
+{% block object-tools-items %}
+  {% if can_review %}<li><a href="{% url 'admin:alokasi_investmentrequest_process' original.pk 'tinjau' %}">Mulai tinjau</a></li>{% endif %}
+  {% if can_consult %}<li><a href="{% url 'admin:alokasi_investmentrequest_process' original.pk 'konsultasi' %}">Jadwalkan konsultasi</a></li>{% endif %}
+  {% if can_offer %}<li><a href="{% url 'admin:alokasi_investmentrequest_process' original.pk 'penawaran' %}">{% if original.status == 'ditawarkan' %}Perbarui penawaran{% else %}Kirim penawaran{% endif %}</a></li>{% endif %}
+  {% if can_complete %}<li><a href="{% url 'admin:alokasi_investmentrequest_process' original.pk 'selesaikan' %}">Selesaikan</a></li>{% endif %}
+  {% if can_reject %}<li><a href="{% url 'admin:alokasi_investmentrequest_process' original.pk 'tolak' %}">Tolak</a></li>{% endif %}
+  {% if original.application %}<li><a href="{% url 'admin:alokasi_application_change' original.application.pk %}">Lihat permohonan</a></li>{% endif %}
+  {{ block.super }}
+{% endblock %}
+{% block field_sets %}
+{% if original %}
+<div class="module inv-summary">
+  <strong>Status: {{ original.get_status_display }}</strong>
+  · {{ original.get_scheme_display }} · {{ original.sector|default:"tanpa sektor" }}
+  · nilai investasi {{ original.investment_value|rupiah }}
+  {% if original.status == 'ditawarkan' %}<p style="margin:6px 0 0">Penawaran {{ original.get_offer_scheme_display }} {{ original.offer_total|rupiah }} berlaku s.d. {{ original.offer_valid_until|tanggal }}{% if original.offer_expired %} <strong style="color:#ba2121">(kedaluwarsa)</strong>{% endif %}. Menunggu jawaban investor.</p>{% endif %}
+  {% if original.status == 'diterima' %}<p style="margin:6px 0 0">Investor menerima penawaran. Tekan <strong>Selesaikan</strong> untuk {% if original.offer_scheme == 'alokasi' %}membuat draf permohonan alokasi{% else %}mencatat nomor kontrak{% endif %}.</p>{% endif %}
+  {% if original.meeting_at and original.status == 'konsultasi' %}<p style="margin:6px 0 0">Konsultasi: {{ original.meeting_at|date:"d-m-Y H.i" }} — {{ original.meeting_place }}</p>{% endif %}
+  {% if map_area or map_plots %}
+  <div class="inv-map" id="inv-map" data-area="{{ map_area }}" role="region" aria-label="Peta lokasi diminati"></div>
+  {{ map_plots|json_script:"inv-map-plots" }}
+  <p class="help">Biru: lahan diminati/ditawarkan · Jingga: area yang digambar investor.</p>
+  {% endif %}
+</div>
+
+<div class="module" id="pesan" style="padding:10px 12px;margin-bottom:16px">
+  <h2 style="margin:-10px -12px 8px;padding:8px 12px">Pesan dengan investor</h2>
+  {% if thread %}
+  <div class="inv-thread">
+    {% for m in thread %}
+    <div class="inv-msg{% if m.from_officer %} officer{% endif %}">
+      <div class="meta">{% if m.from_officer %}Petugas{% if m.author %} ({{ m.author.get_display_name }}){% endif %}{% else %}Investor{% endif %} · {{ m.created_at|date:"d-m-Y H.i" }}</div>
+      <div class="text">{{ m.body }}</div>
+      {% if m.attachment %}<a href="{% url 'alokasi-officer-file' 'pesan_investasi' m.pk %}" target="_blank" rel="noopener">📎 {{ m.attachment_name|default:"Lampiran" }}</a>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}<p class="help">Belum ada pesan.</p>{% endif %}
+  {% if can_message %}
+  <div class="inv-reply">
+    {# Formulir balasan dikirim lewat tombol di luar form utama (form bersarang tidak sah). #}
+    <label for="id_reply_body" class="required">Balas investor</label>
+    <textarea id="id_reply_body" name="body" rows="4" maxlength="5000" form="inv-reply-form"></textarea>
+    <p><input type="file" name="attachment" form="inv-reply-form" accept=".pdf,.jpg,.jpeg,.png"> <span class="help">PDF/JPG/PNG, maks. 10 MB.</span></p>
+    <button type="submit" class="button" form="inv-reply-form">Kirim pesan</button>
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+{{ block.super }}
+{% endblock %}
+{% block content %}{{ block.super }}
+{% if original and can_message %}
+<form id="inv-reply-form" method="post" enctype="multipart/form-data" action="{% url 'admin:alokasi_investmentrequest_message' original.pk %}" hidden>{% csrf_token %}</form>
+{% endif %}
+<script src="{% static 'alokasi/admin_investasi.js' %}"></script>
+{% endblock %}

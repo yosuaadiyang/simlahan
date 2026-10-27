@@ -1,0 +1,90 @@
+{% extends "alokasi/portal/base.html" %}{% load static l10n alokasi_tags %}
+{% block title %}Ajukan Minat Investasi{% endblock %}
+{% block head %}{% include "alokasi/portal/_leaflet.html" %}<link rel="stylesheet" href="{% static 'alokasi/investasi.css' %}">{% endblock %}
+{% block content %}
+<p class="small"><a href="{% url 'portal:investment_home' %}">‹ Portal investasi</a></p>
+<h1>Ajukan minat investasi & penggunaan lahan</h1>
+<p class="muted">Isi rencana usaha Anda. Pilih lahan yang tersedia, gambar usulan lokasi di peta, atau cukup sebutkan kebutuhan luas. Petugas akan meninjau dan menghubungi Anda lewat portal.</p>
+{% if form.errors %}<div class="alert alert-danger" role="alert">Periksa kembali isian yang ditandai.{% for e in form.non_field_errors %}<br>{{ e }}{% endfor %}</div>{% endif %}
+<form method="post" enctype="multipart/form-data" class="form-steps" novalidate>{% csrf_token %}
+  {{ form.requested_area_geojson }}
+  <section class="form-section">
+    <h2>Skema & sektor</h2>
+    <div class="field required scheme-options">
+      <label>{{ form.scheme.label }}</label>
+      {{ form.scheme }}
+      {{ form.scheme.errors }}
+    </div>
+    <div class="form-grid">
+      {% include "alokasi/portal/investasi/_field.html" with field=form.sector %}
+      {% include "alokasi/portal/investasi/_field.html" with field=form.zone %}
+    </div>
+  </section>
+
+  <section class="form-section">
+    <h2>Rencana usaha</h2>
+    <div class="form-grid">
+      {% include "alokasi/portal/investasi/_field.html" with field=form.project_name wide=1 %}
+      {% include "alokasi/portal/investasi/_field.html" with field=form.activity wide=1 %}
+      {% include "alokasi/portal/investasi/_field.html" with field=form.investment_value %}
+      {% include "alokasi/portal/investasi/_field.html" with field=form.workforce %}
+      {% include "alokasi/portal/investasi/_field.html" with field=form.capital_origin %}
+      {% include "alokasi/portal/investasi/_field.html" with field=form.origin_country %}
+      {% include "alokasi/portal/investasi/_field.html" with field=form.target_start %}
+      {% include "alokasi/portal/investasi/_field.html" with field=form.term_years %}
+      {% include "alokasi/portal/investasi/_field.html" with field=form.power_kva %}
+      {% include "alokasi/portal/investasi/_field.html" with field=form.water_m3_day %}
+    </div>
+  </section>
+
+  <section class="form-section">
+    <h2>Lokasi yang diminati</h2>
+    <div class="field" id="field-plots">
+      <label>{{ form.plots.label }} <span class="small muted">(<span data-selected-count>0</span> dipilih)</span></label>
+      {% if plot_options %}
+      <div class="plot-picker">
+        <input type="search" placeholder="Cari kode, nama, atau sektor lahan…" aria-label="Cari lahan">
+        <div>
+        {% for option in plot_options %}
+          <label class="plot-option">
+            <input type="checkbox" name="plots" value="{{ option.pk }}" data-code="{{ option.code }}"{% if option.selected %} checked{% endif %}>
+            <span class="po-main"><span class="po-name">{{ option.code }} · {{ option.name }}</span><br><span class="po-meta">{{ option.area_m2|hektare }}{% if option.sector %} · {{ option.sector }}{% endif %}{% if option.schemes %} · {{ option.schemes|join:", " }}{% endif %}</span></span>
+          </label>
+        {% endfor %}
+        </div>
+      </div>
+      {% else %}<p class="muted small">Belum ada lahan tersedia di daftar. Gambar usulan lokasi atau isi kebutuhan luas.</p>{% endif %}
+      {% if form.plots.help_text %}<span class="helptext">{{ form.plots.help_text }}</span>{% endif %}
+      {{ form.plots.errors }}
+    </div>
+    <div class="field">
+      <label>{{ form.requested_area_geojson.label }} <span class="small muted">(opsional)</span></label>
+      <div class="draw-toolbar">
+        <button type="button" class="btn btn-small" data-draw="start">Mulai gambar</button>
+        <button type="button" class="btn btn-small btn-outline" data-draw="undo" disabled>Batalkan titik</button>
+        <button type="button" class="btn btn-small btn-accent" data-draw="finish" disabled>Selesai</button>
+        <button type="button" class="btn btn-small btn-danger" data-draw="clear" disabled>Hapus gambar</button>
+      </div>
+      <div class="map draw-map" data-map="draw" data-input="{{ form.requested_area_geojson.id_for_label }}" data-url="{% url 'portal:investment_data' %}" data-lat="{{ map_center.0|unlocalize }}" data-lng="{{ map_center.1|unlocalize }}" data-zoom="{{ map_zoom|unlocalize }}" role="region" aria-label="Peta untuk menggambar usulan lokasi"></div>
+      <p class="draw-status" data-draw="status" aria-live="polite">Belum ada usulan lokasi yang digambar. Klik lahan berwarna di peta untuk memilihnya.</p>
+      {{ form.requested_area_geojson.errors }}
+    </div>
+    <div class="form-grid">
+      {% include "alokasi/portal/investasi/_field.html" with field=form.requested_area_m2 %}
+    </div>
+  </section>
+
+  <section class="form-section">
+    <h2>Lampiran & pernyataan</h2>
+    {% include "alokasi/portal/investasi/_field.html" with field=form.attachment %}
+    {% include "alokasi/portal/investasi/_field.html" with field=form.agree %}
+  </section>
+
+  <div class="form-actions">
+    <button class="btn btn-accent" type="submit">Kirim permintaan</button>
+    <a class="btn btn-outline" href="{% url 'portal:investment_map' %}">Batal</a>
+    <span class="small muted">Investor: {{ portal_applicant.name }}</span>
+  </div>
+</form>
+{% endblock %}
+{% block scripts %}<script src="{% static 'alokasi/investasi.js' %}"></script>{% endblock %}

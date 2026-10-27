@@ -24,7 +24,13 @@ class PlotStatus(models.TextChoices):
     AVAILABLE = "tersedia", _("Tersedia")
     RESERVED = "dipesan", _("Dalam proses permohonan")
     ALLOCATED = "dialokasikan", _("Sudah dialokasikan")
+    LEASED = "disewa", _("Sudah disewakan")
     CLOSED = "ditutup", _("Ditutup")
+
+
+# Lahan yang sudah terikat permohonan, alokasi, atau sewa: ukuran & tarifnya
+# dikunci dan tidak boleh ditimpa impor.
+BOUND_PLOT_STATUSES = (PlotStatus.RESERVED, PlotStatus.ALLOCATED, PlotStatus.LEASED)
 
 
 class InfoCategory(models.TextChoices):
@@ -35,6 +41,7 @@ class InfoCategory(models.TextChoices):
     TUTORIAL = "tutorial", _("Video tutorial")
     DOWNLOAD = "unduhan", _("Unduhan")
     FAQ = "faq", _("Tanya jawab")
+    INVESTMENT = "investasi", _("Panduan investasi")
 
 
 class ApplicantType(models.TextChoices):
@@ -131,3 +138,46 @@ class DevelopmentStage(models.TextChoices):
     PREPARATION = "persiapan", _("Pematangan / persiapan lahan")
     CONSTRUCTION = "konstruksi", _("Konstruksi")
     OPERATIONAL = "operasional", _("Sudah beroperasi")
+
+
+# --------------------------------------------------------------------------
+# Portal investasi
+# --------------------------------------------------------------------------
+
+
+class InvestmentScheme(models.TextChoices):
+    LEASE = "sewa", _("Sewa lahan")
+    ALLOCATION = "alokasi", _("Alokasi lahan (UWT)")
+    PARTNERSHIP = "kerja_sama", _("Kerja sama pemanfaatan")
+    UNDECIDED = "belum", _("Belum ditentukan, minta saran petugas")
+
+
+# Skema yang dapat ditawarkan petugas (bukan "belum ditentukan").
+OFFER_SCHEMES = (
+    InvestmentScheme.LEASE,
+    InvestmentScheme.ALLOCATION,
+    InvestmentScheme.PARTNERSHIP,
+)
+
+
+class CapitalOrigin(models.TextChoices):
+    DOMESTIC = "pmdn", _("Penanaman modal dalam negeri (PMDN)")
+    FOREIGN = "pma", _("Penanaman modal asing (PMA)")
+
+
+class InvestmentStatus(models.TextChoices):
+    SUBMITTED = "diajukan", _("Diajukan")
+    REVIEW = "ditinjau", _("Sedang ditinjau")
+    CONSULTATION = "konsultasi", _("Konsultasi / kunjungan lapangan")
+    OFFERED = "ditawarkan", _("Penawaran dikirim")
+    ACCEPTED = "diterima", _("Penawaran diterima")
+    COMPLETED = "selesai", _("Selesai, diteruskan")
+    REJECTED = "ditolak", _("Ditolak")
+    CANCELLED = "dibatalkan", _("Dibatalkan investor")
+
+
+INVESTMENT_FINAL_STATUSES = (
+    InvestmentStatus.COMPLETED,
+    InvestmentStatus.REJECTED,
+    InvestmentStatus.CANCELLED,
+)

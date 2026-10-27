@@ -25,7 +25,7 @@ Panduan yang sama tersedia di aplikasi (`/akun/panduan/`) dan hanya menampilkan 
 | Petugas Hukum | Menangani perkara dan sidang terkait aset lahan. | Panel admin → Perkara. | `contoh.hukum` |
 | Petugas Lapangan | Bekerja di lapangan untuk Korwil tempatnya menjadi anggota. | Pusat komando (`/komando/`). | `contoh.lapangan` |
 | Koordinator Wilayah | Memimpin tim lapangan di Korwil yang dipimpinnya. | Pusat komando (`/komando/`). | `contoh.korwil` |
-| Pemohon portal | Badan usaha atau perorangan yang mengajukan alokasi lahan. | Portal → Akun saya. | `pemohon@contoh.simlahan.invalid` |
+| Pemohon portal | Badan usaha, investor, atau perorangan yang mengajukan alokasi, sewa, atau investasi lahan. | Portal → Akun saya. | `pemohon@contoh.simlahan.invalid` |
 
 ## Dasar penggunaan
 
@@ -249,7 +249,7 @@ Mengelola seluruh modul dan data master SimLahan.
 
 - Sewa
 - Pengadaan Tanah: Dasbor & tenggat, Proyek pengadaan, Kalender & aturan tenggat
-- Alokasi Lahan: Permohonan & verifikasi, Tagihan & pembayaran, Alokasi & lahan tidur, Data lahan, Portal publik
+- Alokasi Lahan: Permohonan & verifikasi, Tagihan & pembayaran, Alokasi & lahan tidur, Data lahan, Portal investasi (permintaan investasi, sektor, kawasan), Portal publik
 - Manajemen Aset Lahan: Dasbor aset, Data aset & peta, Perkara & sidang, Okupasi & perambahan, Pengaduan masyarakat, Lelang & seleksi lahan, Laporan & asisten AI, Aplikasi lapangan
 - Pusat Komando: Peta operasi & PWA, Absen, Lapor kegiatan, Tugas, Kinerja (KPI), Korwil, warga & laporan
 - Kontak
@@ -373,12 +373,14 @@ Memproses permohonan alokasi lahan dari portal sampai terbit.
 
 **Menu**
 
-- Panel admin, Alokasi lahan: Permohonan, Tagihan, Alokasi, Data lahan (termasuk impor peta), Pemohon, Laporan pembangunan, konten portal
+- Panel admin, Alokasi lahan: Permohonan, Tagihan, Alokasi, Data lahan (termasuk impor peta dan profil investasi), Pemohon, Laporan pembangunan, konten portal
+- Panel admin, Alokasi lahan: Permintaan investasi, Sektor investasi, Kawasan investasi
 
 **Yang bisa dilakukan**
 
 - Memeriksa kelengkapan, meminta perbaikan, menyetujui/menolak permohonan, memverifikasi pembayaran, dan mencabut alokasi.
-- Mengelola data lahan dan konten portal.
+- Memproses permintaan investasi: tinjau, jadwalkan konsultasi, kirim penawaran sewa/alokasi/kerja sama, balas pesan investor, lalu selesaikan (kontrak atau draf permohonan alokasi) atau tolak.
+- Mengelola data lahan (termasuk tarif sewa, sektor, kawasan, insentif) dan konten portal.
 - Menerima ringkasan pemantauan mingguan lewat surel.
 
 **Batas akses**
@@ -396,16 +398,16 @@ Memberi penilaian teknis atas permohonan alokasi lahan.
 
 **Menu**
 
-- Panel admin, Alokasi lahan: Permohonan, Tagihan, Alokasi, Data lahan, Pemohon, Laporan pembangunan
+- Panel admin, Alokasi lahan: Permohonan, Tagihan, Alokasi, Data lahan, Pemohon, Laporan pembangunan, Permintaan investasi (baca)
 
 **Yang bisa dilakukan**
 
-- Membaca permohonan, tagihan, dan alokasi.
+- Membaca permohonan, tagihan, alokasi, dan permintaan investasi.
 - Mengisi penilaian teknis per kriteria.
 
 **Batas akses**
 
-- Tidak memutuskan permohonan dan tidak mengubah data lahan.
+- Tidak memutuskan permohonan, tidak memproses permintaan investasi, dan tidak mengubah data lahan.
 - Tidak membuka modul lain.
 
 ## Petugas Aset Lahan
@@ -507,7 +509,7 @@ Memimpin tim lapangan di Korwil yang dipimpinnya.
 
 ## Pemohon portal
 
-Badan usaha atau perorangan yang mengajukan alokasi lahan.
+Badan usaha, investor, atau perorangan yang mengajukan alokasi, sewa, atau investasi lahan.
 
 - **Masuk:** Portal (`/portal/masuk/`) dengan alamat surel; daftar sendiri di `/portal/daftar/`.
 - **Halaman awal:** Portal → Akun saya.
@@ -515,11 +517,12 @@ Badan usaha atau perorangan yang mengajukan alokasi lahan.
 
 **Menu**
 
-- Portal: Layanan, Lahan, Lelang, Pengaduan, Lacak, Verifikasi dokumen, Bantuan, Akun saya (permohonan, tagihan, profil, sandi)
+- Portal: Layanan, Lahan, Investasi (peta peluang, kawasan, bandingkan, ajukan minat), Lelang, Pengaduan, Lacak, Verifikasi dokumen, Bantuan, Akun saya (permohonan, permintaan investasi, lahan tersimpan, tagihan, profil, sandi)
 
 **Yang bisa dilakukan**
 
 - Mengajukan dan melengkapi permohonan, membayar tagihan, melacak status, dan mengunduh dokumen terbit.
+- Menjelajah peta investasi tanpa masuk; setelah masuk: menyimpan lahan, mengajukan minat sewa/alokasi/kerja sama (memilih lahan atau menggambar usulan lokasi), berkirim pesan dengan petugas, serta menerima atau menolak penawaran.
 - Mengubah profil dan sandi; memakai Lupa sandi bila lupa.
 
 **Batas akses**

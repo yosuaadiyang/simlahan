@@ -214,7 +214,8 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "Sewa",
             ACQUISITION_MENU,
             "Alokasi Lahan: Permohonan & verifikasi, Tagihan & pembayaran, "
-            "Alokasi & lahan tidur, Data lahan, Portal publik",
+            "Alokasi & lahan tidur, Data lahan, Portal investasi (permintaan "
+            "investasi, sektor, kawasan), Portal publik",
             "Manajemen Aset Lahan: Dasbor aset, Data aset & peta, Perkara & "
             "sidang, Okupasi & perambahan, Pengaduan masyarakat, Lelang & seleksi "
             "lahan, Laporan & asisten AI, Aplikasi lapangan",
@@ -327,12 +328,19 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
         home="Panel admin → Permohonan alokasi.",
         menus=(
             "Panel admin, Alokasi lahan: Permohonan, Tagihan, Alokasi, Data lahan "
-            "(termasuk impor peta), Pemohon, Laporan pembangunan, konten portal",
+            "(termasuk impor peta dan profil investasi), Pemohon, Laporan "
+            "pembangunan, konten portal",
+            "Panel admin, Alokasi lahan: Permintaan investasi, Sektor investasi, "
+            "Kawasan investasi",
         ),
         can=(
             "Memeriksa kelengkapan, meminta perbaikan, menyetujui/menolak "
             "permohonan, memverifikasi pembayaran, dan mencabut alokasi.",
-            "Mengelola data lahan dan konten portal.",
+            "Memproses permintaan investasi: tinjau, jadwalkan konsultasi, kirim "
+            "penawaran sewa/alokasi/kerja sama, balas pesan investor, lalu "
+            "selesaikan (kontrak atau draf permohonan alokasi) atau tolak.",
+            "Mengelola data lahan (termasuk tarif sewa, sektor, kawasan, insentif) "
+            "dan konten portal.",
             "Menerima ringkasan pemantauan mingguan lewat surel.",
         ),
         limits=(
@@ -348,14 +356,15 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
         home="Panel admin → Permohonan alokasi.",
         menus=(
             "Panel admin, Alokasi lahan: Permohonan, Tagihan, Alokasi, Data lahan, "
-            "Pemohon, Laporan pembangunan",
+            "Pemohon, Laporan pembangunan, Permintaan investasi (baca)",
         ),
         can=(
-            "Membaca permohonan, tagihan, dan alokasi.",
+            "Membaca permohonan, tagihan, alokasi, dan permintaan investasi.",
             "Mengisi penilaian teknis per kriteria.",
         ),
         limits=(
-            "Tidak memutuskan permohonan dan tidak mengubah data lahan.",
+            "Tidak memutuskan permohonan, tidak memproses permintaan investasi, "
+            "dan tidak mengubah data lahan.",
             "Tidak membuka modul lain.",
         ),
     ),
@@ -459,19 +468,28 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
 APPLICANT_GUIDE = RoleGuide(
     name="Pemohon portal",
     sample="pemohon@contoh.simlahan.invalid",
-    summary="Badan usaha atau perorangan yang mengajukan alokasi lahan.",
+    summary=(
+        "Badan usaha, investor, atau perorangan yang mengajukan alokasi, sewa, "
+        "atau investasi lahan."
+    ),
     login=(
         "Portal (`/portal/masuk/`) dengan alamat surel; daftar sendiri di "
         "`/portal/daftar/`."
     ),
     home="Portal → Akun saya.",
     menus=(
-        "Portal: Layanan, Lahan, Lelang, Pengaduan, Lacak, Verifikasi dokumen, "
-        "Bantuan, Akun saya (permohonan, tagihan, profil, sandi)",
+        "Portal: Layanan, Lahan, Investasi (peta peluang, kawasan, bandingkan, "
+        "ajukan minat), Lelang, Pengaduan, Lacak, Verifikasi dokumen, Bantuan, "
+        "Akun saya (permohonan, permintaan investasi, lahan tersimpan, tagihan, "
+        "profil, sandi)",
     ),
     can=(
         "Mengajukan dan melengkapi permohonan, membayar tagihan, melacak status, "
         "dan mengunduh dokumen terbit.",
+        "Menjelajah peta investasi tanpa masuk; setelah masuk: menyimpan lahan, "
+        "mengajukan minat sewa/alokasi/kerja sama (memilih lahan atau menggambar "
+        "usulan lokasi), berkirim pesan dengan petugas, serta menerima atau "
+        "menolak penawaran.",
         "Mengubah profil dan sandi; memakai Lupa sandi bila lupa.",
     ),
     limits=(

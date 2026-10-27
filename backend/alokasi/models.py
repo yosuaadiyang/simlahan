@@ -15,10 +15,12 @@ from decimal import ROUND_HALF_UP, Decimal
 from auditlog.registry import auditlog
 from django.conf import settings
 from django.contrib.gis.db import models as gmodels
+from django.core.exceptions import ValidationError
 from django.core.validators import (
     FileExtensionValidator,
     MaxValueValidator,
     MinValueValidator,
+    RegexValidator,
 )
 from django.db import models
 from django.utils import timezone
@@ -39,8 +41,6 @@ MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 
 
 def validate_upload_size(value):
-    from django.core.exceptions import ValidationError
-
     if value and value.size > MAX_UPLOAD_BYTES:
         raise ValidationError(_("Ukuran berkas maksimal 10 MB."))
 
@@ -66,6 +66,8 @@ upload_proof = _upload_to("upload_proof", "bukti_bayar")
 upload_issued = _upload_to("upload_issued", "terbitan")
 upload_report = _upload_to("upload_report", "laporan")
 upload_plot = _upload_to("upload_plot", "lahan")
+upload_zone = _upload_to("upload_zone", "kawasan")
+upload_investment = _upload_to("upload_investment", "investasi")
 
 
 def _next_number(prefix: str) -> str:
@@ -159,6 +161,23 @@ class AllocationSettings(models.Model):
     contact_info = models.TextField(
         verbose_name=_("Kontak layanan"), blank=True, default=""
     )
+    investment_intro = models.TextField(
+        verbose_name=_("Pengantar portal investasi"),
+        blank=True,
+        default=(
+            "Temukan lahan siap investasi, bandingkan skema sewa dan alokasi, lalu "
+            "ajukan minat secara daring. Petugas mendampingi sejak konsultasi hingga "
+            "kontrak."
+        ),
+    )
+    investment_contact = models.TextField(
+        verbose_name=_("Kontak layanan investasi"),
+        blank=True,
+        default="",
+        help_text=_(
+            "Ditampilkan di portal investasi. Kosongkan untuk memakai kontak layanan."
+        ),
+    )
 
     class Meta:
         verbose_name = _("Pengaturan layanan alokasi")
@@ -175,6 +194,141 @@ class AllocationSettings(models.Model):
     def load(cls) -> "AllocationSettings":
         obj, _created = cls.objects.get_or_create(pk=1)
         return obj
+
+
+HEX_COLOR = RegexValidator(
+    r"^#[0-9a-fA-F]{6}$", _("Gunakan kode warna heksadesimal, mis. #0d7e74.")
+)
+# Batas usulan luas/jarak agar nilai yang salah ketik tidak merusak perhitungan.
+MAX_DISTANCE_KM = Decimal("9999")
+
+
+def _unique_slug(instance, source: str, max_length: int = 80) -> str:
+    base = slugify(source)[: max_length - 6] or "item"
+    slug = base
+    n = 2
+    model = type(instance)
+    while model.objects.filter(slug=slug).exclude(pk=instance.pk).exists():
+        slug = f"{base}-{n}"
+        n += 1
+    return slug
+
+
+class InvestmentSector(models.Model):
+    """Sektor usaha untuk mengelompokkan lahan di portal investasi."""
+
+    name = models.CharField(verbose_name=_("Nama sektor"), max_length=100, unique=True)
+    slug = models.SlugField(
+        verbose_name=_("Slug"),
+        max_length=80,
+        unique=True,
+        blank=True,
+        help_text=_("Dipakai di alamat halaman; dikosongkan untuk dibuat otomatis."),
+    )
+    icon = models.CharField(
+        verbose_name=_("Ikon (emoji)"), max_length=8, blank=True, default=""
+    )
+    color = models.CharField(
+        verbose_name=_("Warna peta"),
+        max_length=7,
+        default="#0d7e74",
+        validators=[HEX_COLOR],
+    )
+    description = models.TextField(verbose_name=_("Keterangan"), blank=True, default="")
+    order = models.PositiveSmallIntegerField(verbose_name=_("Urutan"), default=0)
+    is_active = models.BooleanField(verbose_name=_("Aktif"), default=True)
+
+    class Meta:
+        verbose_name = _("Sektor investasi")
+        verbose_name_plural = _("Sektor investasi")
+        ordering = ["order", "name"]
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = _unique_slug(self, self.name)
+        super().save(*args, **kwargs)
+
+
+class InvestmentZone(TimeStampedModel):
+    """Kawasan investasi: kumpulan lahan dengan arahan dan insentif yang sama."""
+
+    name = models.CharField(verbose_name=_("Nama kawasan"), max_length=255)
+    slug = models.SlugField(
+        verbose_name=_("Slug"),
+        max_length=80,
+        unique=True,
+        blank=True,
+        help_text=_("Dipakai di alamat halaman; dikosongkan untuk dibuat otomatis."),
+    )
+    sectors = models.ManyToManyField(
+        InvestmentSector,
+        verbose_name=_("Sektor unggulan"),
+        blank=True,
+        related_name="zones",
+    )
+    summary = models.CharField(
+        verbose_name=_("Ringkasan"), max_length=300, blank=True, default=""
+    )
+    description = models.TextField(verbose_name=_("Uraian"), blank=True, default="")
+    incentives = models.TextField(
+        verbose_name=_("Insentif & kemudahan"),
+        blank=True,
+        default="",
+        help_text=_("Satu butir per baris."),
+    )
+    infrastructure = models.TextField(
+        verbose_name=_("Infrastruktur pendukung"),
+        blank=True,
+        default="",
+        help_text=_("Satu butir per baris."),
+    )
+    geometry = gmodels.MultiPolygonField(
+        verbose_name=_("Batas kawasan"), srid=4326, null=True, blank=True
+    )
+    photo = PrivateFileField(
+        max_length=255,
+        verbose_name=_("Foto"),
+        upload_to=upload_zone,
+        null=True,
+        blank=True,
+        validators=[
+            FileExtensionValidator(["jpg", "jpeg", "png"]),
+            validate_upload_size,
+        ],
+    )
+    order = models.PositiveSmallIntegerField(verbose_name=_("Urutan"), default=0)
+    is_featured = models.BooleanField(verbose_name=_("Unggulan"), default=False)
+    is_published = models.BooleanField(verbose_name=_("Tampil di portal"), default=True)
+
+    class Meta:
+        verbose_name = _("Kawasan investasi")
+        verbose_name_plural = _("Kawasan investasi")
+        ordering = ["order", "name"]
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = _unique_slug(self, self.name)
+        super().save(*args, **kwargs)
+
+    @property
+    def incentive_list(self) -> list[str]:
+        return _lines(self.incentives)
+
+    @property
+    def infrastructure_list(self) -> list[str]:
+        return _lines(self.infrastructure)
+
+
+def _lines(text: str) -> list[str]:
+    return [
+        line.strip(" -•\t") for line in (text or "").splitlines() if line.strip(" -•\t")
+    ]
 
 
 class LandPlot(TimeStampedModel):
@@ -251,6 +405,103 @@ class LandPlot(TimeStampedModel):
         ],
     )
     is_published = models.BooleanField(verbose_name=_("Tampil di portal"), default=True)
+    # Profil investasi (portal /portal/investasi/)
+    sector = models.ForeignKey(
+        InvestmentSector,
+        verbose_name=_("Sektor investasi"),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="plots",
+    )
+    zone = models.ForeignKey(
+        InvestmentZone,
+        verbose_name=_("Kawasan investasi"),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="plots",
+    )
+    offer_allocation = models.BooleanField(
+        verbose_name=_("Ditawarkan dengan skema alokasi (UWT)"),
+        default=True,
+        help_text=_("Bila tidak dicentang, lahan tidak dapat dimohonkan alokasinya."),
+    )
+    offer_lease = models.BooleanField(
+        verbose_name=_("Ditawarkan untuk disewa"), default=False
+    )
+    lease_rate_per_m2_year = models.DecimalField(
+        verbose_name=_("Tarif sewa per m² per tahun (Rp)"),
+        default=Decimal("0"),
+        **MONEY,
+    )
+    lease_min_years = models.PositiveSmallIntegerField(
+        verbose_name=_("Masa sewa minimum (tahun)"),
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(1), MaxValueValidator(MAX_TERM_YEARS)],
+    )
+    lease_max_years = models.PositiveSmallIntegerField(
+        verbose_name=_("Masa sewa maksimum (tahun)"),
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(1), MaxValueValidator(MAX_TERM_YEARS)],
+    )
+    highlights = models.TextField(
+        verbose_name=_("Keunggulan lokasi"),
+        blank=True,
+        default="",
+        help_text=_("Satu butir per baris."),
+    )
+    incentives = models.TextField(
+        verbose_name=_("Insentif"),
+        blank=True,
+        default="",
+        help_text=_("Satu butir per baris. Kosongkan untuk memakai insentif kawasan."),
+    )
+    distance_port_km = models.DecimalField(
+        verbose_name=_("Jarak ke pelabuhan (km)"),
+        max_digits=7,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0), MaxValueValidator(MAX_DISTANCE_KM)],
+    )
+    distance_airport_km = models.DecimalField(
+        verbose_name=_("Jarak ke bandara (km)"),
+        max_digits=7,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0), MaxValueValidator(MAX_DISTANCE_KM)],
+    )
+    distance_road_km = models.DecimalField(
+        verbose_name=_("Jarak ke jalan utama (km)"),
+        max_digits=7,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0), MaxValueValidator(MAX_DISTANCE_KM)],
+    )
+    distance_city_km = models.DecimalField(
+        verbose_name=_("Jarak ke pusat kota (km)"),
+        max_digits=7,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0), MaxValueValidator(MAX_DISTANCE_KM)],
+    )
+    has_power = models.BooleanField(verbose_name=_("Jaringan listrik"), default=False)
+    has_water = models.BooleanField(
+        verbose_name=_("Jaringan air bersih"), default=False
+    )
+    has_telecom = models.BooleanField(
+        verbose_name=_("Jaringan telekomunikasi"), default=False
+    )
+    has_road_access = models.BooleanField(verbose_name=_("Akses jalan"), default=False)
+    is_featured = models.BooleanField(
+        verbose_name=_("Unggulan di portal investasi"), default=False
+    )
 
     class Meta:
         verbose_name = _("Lahan")
@@ -267,6 +518,31 @@ class LandPlot(TimeStampedModel):
 
             # Total UWT menjadi tagihan; harus muat di kolom jumlah tagihan.
             check_fits(Invoice, "amount", self.uwt_total)
+        if self.area_m2 is not None and self.lease_rate_per_m2_year:
+            from utils.money import check_fits
+
+            years = self.lease_max_years or self.lease_min_years or 1
+            check_fits(Invoice, "amount", self.lease_total(years))
+        if (
+            self.lease_min_years
+            and self.lease_max_years
+            and self.lease_min_years > self.lease_max_years
+        ):
+            raise ValidationError(
+                {
+                    "lease_max_years": _(
+                        "Masa sewa maksimum tidak boleh kurang dari minimum."
+                    )
+                }
+            )
+        if self.offer_lease and not self.lease_rate_per_m2_year:
+            raise ValidationError(
+                {
+                    "lease_rate_per_m2_year": _(
+                        "Isi tarif sewa bila lahan ditawarkan untuk disewa."
+                    )
+                }
+            )
 
     def save(self, *args, **kwargs):
         if not self.code:
@@ -284,8 +560,77 @@ class LandPlot(TimeStampedModel):
         ).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
 
     @property
-    def is_open_for_application(self) -> bool:
+    def is_available(self) -> bool:
         return self.is_published and self.status == enums.PlotStatus.AVAILABLE
+
+    @property
+    def is_open_for_application(self) -> bool:
+        return self.is_available and self.offer_allocation
+
+    def lease_total(self, years: int) -> Decimal:
+        return (self.area_m2 * self.lease_rate_per_m2_year * years).quantize(
+            Decimal("1"), rounding=ROUND_HALF_UP
+        )
+
+    @property
+    def lease_term_years(self) -> int:
+        """Masa sewa untuk perkiraan biaya: minimum yang ditetapkan, atau 1 tahun."""
+        return self.lease_min_years or 1
+
+    @property
+    def lease_estimate(self) -> Decimal:
+        return self.lease_total(self.lease_term_years)
+
+    @property
+    def highlight_list(self) -> list[str]:
+        return _lines(self.highlights)
+
+    @property
+    def incentive_list(self) -> list[str]:
+        own = _lines(self.incentives)
+        if own or self.zone_id is None:
+            return own
+        return self.zone.incentive_list
+
+    @property
+    def schemes(self) -> list[tuple[str, str]]:
+        result = []
+        if self.offer_lease:
+            result.append(
+                (enums.InvestmentScheme.LEASE, enums.InvestmentScheme.LEASE.label)
+            )
+        if self.offer_allocation:
+            result.append(
+                (
+                    enums.InvestmentScheme.ALLOCATION,
+                    enums.InvestmentScheme.ALLOCATION.label,
+                )
+            )
+        return result
+
+    @property
+    def utilities(self) -> list[str]:
+        names = (
+            ("has_road_access", _("Akses jalan")),
+            ("has_power", _("Listrik")),
+            ("has_water", _("Air bersih")),
+            ("has_telecom", _("Telekomunikasi")),
+        )
+        return [str(label) for field, label in names if getattr(self, field)]
+
+    @property
+    def distances(self) -> list[tuple[str, Decimal]]:
+        names = (
+            ("distance_port_km", _("Pelabuhan")),
+            ("distance_airport_km", _("Bandara")),
+            ("distance_road_km", _("Jalan utama")),
+            ("distance_city_km", _("Pusat kota")),
+        )
+        return [
+            (str(label), getattr(self, field))
+            for field, label in names
+            if getattr(self, field) is not None
+        ]
 
 
 class InfoPage(TimeStampedModel):
@@ -1180,6 +1525,377 @@ class DevelopmentReport(TimeStampedModel):
         return f"{self.allocation} {self.report_date:%d-%m-%Y} {self.progress_percent}%"
 
 
+# --------------------------------------------------------------------------
+# Portal investasi: permintaan investasi & penggunaan lahan
+# --------------------------------------------------------------------------
+
+# Usulan area yang digambar investor: batas atas luas dan jumlah titik agar
+# satu permintaan tidak membebani peta dan basis data.
+MAX_REQUEST_AREA_M2 = Decimal("100000000")  # 10.000 ha
+MAX_REQUEST_VERTICES = 500
+
+
+class InvestmentRequest(TimeStampedModel):
+    """Minat investasi atau penggunaan lahan dari investor (pemohon portal).
+
+    Alur: diajukan → ditinjau → konsultasi/kunjungan lapangan → penawaran →
+    diterima investor → selesai (diteruskan ke permohonan alokasi atau kontrak
+    sewa/kerja sama). Ditolak atau dibatalkan dapat terjadi sebelum selesai.
+    """
+
+    number = models.CharField(
+        verbose_name=_("Nomor"), max_length=32, unique=True, editable=False
+    )
+    applicant = models.ForeignKey(
+        Applicant,
+        verbose_name=_("Investor"),
+        on_delete=models.PROTECT,
+        related_name="investment_requests",
+    )
+    status = models.CharField(
+        verbose_name=_("Status"),
+        max_length=16,
+        choices=enums.InvestmentStatus.choices,
+        default=enums.InvestmentStatus.SUBMITTED,
+    )
+    scheme = models.CharField(
+        verbose_name=_("Skema yang diminati"),
+        max_length=16,
+        choices=enums.InvestmentScheme.choices,
+        default=enums.InvestmentScheme.UNDECIDED,
+    )
+    sector = models.ForeignKey(
+        InvestmentSector,
+        verbose_name=_("Sektor usaha"),
+        on_delete=models.PROTECT,
+        null=True,
+        related_name="requests",
+    )
+    project_name = models.CharField(verbose_name=_("Nama proyek"), max_length=255)
+    activity = models.TextField(verbose_name=_("Rencana kegiatan usaha"))
+    plots = models.ManyToManyField(
+        LandPlot,
+        verbose_name=_("Lahan yang diminati"),
+        blank=True,
+        related_name="investment_requests",
+    )
+    zone = models.ForeignKey(
+        InvestmentZone,
+        verbose_name=_("Kawasan yang diminati"),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="requests",
+    )
+    requested_area = gmodels.MultiPolygonField(
+        verbose_name=_("Usulan lokasi (digambar)"), srid=4326, null=True, blank=True
+    )
+    requested_area_m2 = models.DecimalField(
+        verbose_name=_("Kebutuhan luas (m²)"),
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(1), MaxValueValidator(MAX_REQUEST_AREA_M2)],
+        **AREA,
+    )
+    term_years = models.PositiveSmallIntegerField(
+        verbose_name=_("Jangka waktu yang diinginkan (tahun)"),
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(1), MaxValueValidator(MAX_TERM_YEARS)],
+    )
+    investment_value = models.DecimalField(
+        verbose_name=_("Rencana nilai investasi (Rp)"),
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(1)],
+        **MONEY,
+    )
+    workforce = models.PositiveIntegerField(
+        verbose_name=_("Rencana tenaga kerja (orang)"),
+        null=True,
+        blank=True,
+        validators=[MaxValueValidator(10_000_000)],
+    )
+    capital_origin = models.CharField(
+        verbose_name=_("Asal modal"),
+        max_length=8,
+        choices=enums.CapitalOrigin.choices,
+        default=enums.CapitalOrigin.DOMESTIC,
+    )
+    origin_country = models.CharField(
+        verbose_name=_("Negara asal investor"), max_length=100, blank=True, default=""
+    )
+    target_start = models.DateField(
+        verbose_name=_("Rencana mulai pembangunan"), null=True, blank=True
+    )
+    power_kva = models.PositiveIntegerField(
+        verbose_name=_("Kebutuhan listrik (kVA)"),
+        null=True,
+        blank=True,
+        validators=[MaxValueValidator(100_000_000)],
+    )
+    water_m3_day = models.PositiveIntegerField(
+        verbose_name=_("Kebutuhan air (m³/hari)"),
+        null=True,
+        blank=True,
+        validators=[MaxValueValidator(100_000_000)],
+    )
+    attachment = PrivateFileField(
+        max_length=255,
+        verbose_name=_("Proposal / profil perusahaan"),
+        upload_to=upload_investment,
+        null=True,
+        blank=True,
+        validators=UPLOAD_VALIDATORS,
+    )
+    attachment_name = models.CharField(
+        verbose_name=_("Nama berkas"), max_length=255, blank=True, default=""
+    )
+    submitted_at = models.DateTimeField(
+        verbose_name=_("Diajukan"), default=timezone.now, editable=False
+    )
+    assigned_to = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Petugas penanggung jawab"),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+    )
+    internal_note = models.TextField(
+        verbose_name=_("Catatan internal petugas"),
+        blank=True,
+        default="",
+        help_text=_("Tidak ditampilkan kepada investor."),
+    )
+    meeting_at = models.DateTimeField(
+        verbose_name=_("Jadwal konsultasi / kunjungan"), null=True, blank=True
+    )
+    meeting_place = models.CharField(
+        verbose_name=_("Tempat / tautan pertemuan"),
+        max_length=255,
+        blank=True,
+        default="",
+    )
+    # Penawaran petugas
+    offer_scheme = models.CharField(
+        verbose_name=_("Skema ditawarkan"),
+        max_length=16,
+        choices=enums.InvestmentScheme.choices,
+        blank=True,
+        default="",
+    )
+    offer_plot = models.ForeignKey(
+        LandPlot,
+        verbose_name=_("Lahan ditawarkan"),
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="investment_offers",
+    )
+    offer_area_m2 = models.DecimalField(
+        verbose_name=_("Luas ditawarkan (m²)"),
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(1), MaxValueValidator(MAX_REQUEST_AREA_M2)],
+        **AREA,
+    )
+    offer_rate_per_m2_year = models.DecimalField(
+        verbose_name=_("Tarif ditawarkan per m² per tahun (Rp)"),
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0)],
+        **MONEY,
+    )
+    offer_term_years = models.PositiveSmallIntegerField(
+        verbose_name=_("Jangka waktu ditawarkan (tahun)"),
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(1), MaxValueValidator(MAX_TERM_YEARS)],
+    )
+    offer_valid_until = models.DateField(
+        verbose_name=_("Penawaran berlaku s.d."), null=True, blank=True
+    )
+    offer_note = models.TextField(
+        verbose_name=_("Ketentuan penawaran"), blank=True, default=""
+    )
+    offered_at = models.DateTimeField(
+        verbose_name=_("Penawaran dikirim"), null=True, blank=True
+    )
+    # Penyelesaian
+    application = models.ForeignKey(
+        Application,
+        verbose_name=_("Permohonan alokasi"),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="investment_requests",
+    )
+    contract_number = models.CharField(
+        verbose_name=_("Nomor kontrak / perjanjian"),
+        max_length=64,
+        blank=True,
+        default="",
+    )
+    closed_at = models.DateTimeField(verbose_name=_("Ditutup"), null=True, blank=True)
+
+    class Meta:
+        verbose_name = _("Permintaan investasi")
+        verbose_name_plural = _("Permintaan investasi")
+        ordering = ["-submitted_at", "-pk"]
+        permissions = [
+            (
+                "process_investmentrequest",
+                _("Dapat memproses permintaan investasi"),
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.number} {self.project_name}"
+
+    def save(self, *args, **kwargs):
+        if not self.number:
+            self.number = _next_number("INV")
+        super().save(*args, **kwargs)
+
+    @property
+    def is_final(self) -> bool:
+        return self.status in enums.INVESTMENT_FINAL_STATUSES
+
+    @property
+    def requested_area_size_m2(self) -> Decimal | None:
+        if self.requested_area is None:
+            return None
+        from asetlahan.geo import area_m2
+
+        return area_m2(self.requested_area)
+
+    @property
+    def offer_total(self) -> Decimal | None:
+        if None in (
+            self.offer_area_m2,
+            self.offer_rate_per_m2_year,
+            self.offer_term_years,
+        ):
+            return None
+        return (
+            self.offer_area_m2 * self.offer_rate_per_m2_year * self.offer_term_years
+        ).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+
+    @property
+    def offer_expired(self) -> bool:
+        return bool(
+            self.offer_valid_until and self.offer_valid_until < timezone.localdate()
+        )
+
+    @property
+    def can_accept_offer(self) -> bool:
+        return self.status == enums.InvestmentStatus.OFFERED and not self.offer_expired
+
+
+class InvestmentMessage(models.Model):
+    """Percakapan investor ↔ petugas atas satu permintaan investasi."""
+
+    request = models.ForeignKey(
+        InvestmentRequest,
+        verbose_name=_("Permintaan investasi"),
+        on_delete=models.CASCADE,
+        related_name="messages",
+    )
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Pengirim"),
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="+",
+    )
+    from_officer = models.BooleanField(verbose_name=_("Dari petugas"), default=False)
+    body = models.TextField(verbose_name=_("Pesan"), max_length=5000)
+    attachment = PrivateFileField(
+        max_length=255,
+        verbose_name=_("Lampiran"),
+        upload_to=upload_investment,
+        null=True,
+        blank=True,
+        validators=UPLOAD_VALIDATORS,
+    )
+    attachment_name = models.CharField(
+        verbose_name=_("Nama berkas"), max_length=255, blank=True, default=""
+    )
+    created_at = models.DateTimeField(verbose_name=_("Waktu"), default=timezone.now)
+
+    class Meta:
+        verbose_name = _("Pesan permintaan investasi")
+        verbose_name_plural = _("Pesan permintaan investasi")
+        ordering = ["created_at", "pk"]
+
+    def __str__(self):
+        return f"{self.request.number} {self.created_at:%d-%m-%Y %H:%M}"
+
+
+class InvestmentEvent(models.Model):
+    request = models.ForeignKey(
+        InvestmentRequest,
+        verbose_name=_("Permintaan investasi"),
+        on_delete=models.CASCADE,
+        related_name="events",
+    )
+    status = models.CharField(
+        verbose_name=_("Status"),
+        max_length=16,
+        choices=enums.InvestmentStatus.choices,
+    )
+    note = models.TextField(verbose_name=_("Catatan"), blank=True, default="")
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Oleh"),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+    )
+    created_at = models.DateTimeField(verbose_name=_("Waktu"), default=timezone.now)
+
+    class Meta:
+        verbose_name = _("Riwayat permintaan investasi")
+        verbose_name_plural = _("Riwayat permintaan investasi")
+        ordering = ["created_at", "pk"]
+
+    def __str__(self):
+        return f"{self.request.number} {self.get_status_display()}"
+
+
+class SavedPlot(models.Model):
+    """Lahan yang disimpan investor untuk ditinjau kembali."""
+
+    applicant = models.ForeignKey(
+        Applicant,
+        verbose_name=_("Investor"),
+        on_delete=models.CASCADE,
+        related_name="saved_plots",
+    )
+    plot = models.ForeignKey(
+        LandPlot,
+        verbose_name=_("Lahan"),
+        on_delete=models.CASCADE,
+        related_name="saved_by",
+    )
+    created_at = models.DateTimeField(verbose_name=_("Disimpan"), default=timezone.now)
+
+    class Meta:
+        verbose_name = _("Lahan tersimpan")
+        verbose_name_plural = _("Lahan tersimpan")
+        ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=("applicant", "plot"), name="alokasi_savedplot_unique"
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.applicant} – {self.plot}"
+
+
 for _model in (
     AllocationSettings,
     LandPlot,
@@ -1196,5 +1912,9 @@ for _model in (
     IssuedDocument,
     PermitReport,
     DevelopmentReport,
+    InvestmentSector,
+    InvestmentZone,
+    InvestmentRequest,
+    InvestmentMessage,
 ):
     auditlog.register(_model)

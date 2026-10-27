@@ -18,6 +18,12 @@ SimLahan adalah aplikasi web untuk instansi pengelola lahan di Indonesia:
   administrasi, penerbitan KPT/PPT/izin peralihan ber-QR, cek keaslian
   dokumen, pelaporan izin & progres pembangunan, pemantauan lahan tidur, dan
   pencabutan alokasi.
+- **Portal investor** (`/portal/investasi/`): peta peluang investasi dengan
+  filter sektor/skema/luas/kesiapan, kawasan investasi, perbandingan lahan,
+  simulasi biaya sewa & UWT, profil lahan PDF ber-QR, lahan tersimpan, serta
+  permintaan investasi (sewa, alokasi, atau kerja sama; pilih lahan atau
+  gambar usulan lokasi) dengan pesan dua arah, jadwal konsultasi, penawaran
+  daring, dan penerusan ke kontrak sewa atau permohonan alokasi.
 - **Manajemen aset lahan**: inventaris aset + batas bidang, rantai kepemilikan,
   silsilah ahli waris, pemangku kepentingan, penilaian, pajak, transaksi &
   ekspor jurnal ERP, perkara & jadwal sidang, okupasi/perambahan + citra
@@ -60,6 +66,7 @@ tenggat, hari libur, dsb.), menyetel izin grup, dan membuat admin awal.
 |---|---|
 | `/` | Aplikasi petugas |
 | `/portal/` | Portal publik & pemohon alokasi lahan |
+| `/portal/investasi/` | Portal investor: peta peluang, kawasan, bandingkan, ajukan minat |
 | `/admin/alokasi/` | Panel petugas alokasi lahan |
 | `/admin/` | Panel admin SimLahan (pengguna, grup, unit layanan, data master) |
 | `/docs/` | Dokumentasi API (Swagger), perlu masuk |
@@ -127,8 +134,8 @@ Grup alokasi lahan (anggotanya otomatis diberi akses `/admin/`):
 
 | Grup | Alokasi lahan |
 |---|---|
-| Petugas Alokasi Lahan | data lahan & konten portal, pemeriksaan kelengkapan, perbaikan, persetujuan/penolakan, verifikasi pembayaran, pencabutan alokasi; menerima ringkasan pemantauan mingguan |
-| Tim Verifikasi Teknis | baca permohonan, tagihan & alokasi, penilaian teknis per kriteria |
+| Petugas Alokasi Lahan | data lahan & konten portal, pemeriksaan kelengkapan, perbaikan, persetujuan/penolakan, verifikasi pembayaran, pencabutan alokasi; sektor & kawasan investasi, proses permintaan investasi (tinjau, konsultasi, penawaran, selesaikan, tolak, pesan); menerima ringkasan pemantauan mingguan |
+| Tim Verifikasi Teknis | baca permohonan, tagihan, alokasi & permintaan investasi, penilaian teknis per kriteria |
 
 Grup manajemen aset lahan (anggotanya otomatis diberi akses `/admin/`):
 
@@ -246,12 +253,32 @@ yang ditambahkan manual ke proyek itu.
    belum dibayar. Jalankan manual tanpa surel dengan
    `docker compose exec backend python manage.py alokasi_pemantauan`.
 
-Data contoh 6 lahan fiktif di Pulau Rempang:
+Data contoh 8 lahan fiktif di Pulau Rempang, termasuk profil investasi (sektor,
+2 kawasan contoh, lahan sewa, jarak, utilitas):
 
 ```sh
 docker compose exec backend python manage.py alokasi_contoh_rempang          # buat
 docker compose exec backend python manage.py alokasi_contoh_rempang --hapus  # hapus
 ```
+
+### Portal investor
+
+1. Sektor usaha sudah terisi (8 sektor) dan dapat diubah di
+   `/admin/alokasi/investmentsector/`. Gambar kawasan investasi beserta
+   insentif & infrastrukturnya di `/admin/alokasi/investmentzone/`.
+2. Di setiap lahan, bagian **Profil investasi** mengatur sektor, kawasan,
+   skema yang dibuka (alokasi dan/atau sewa dengan tarif & masa sewa),
+   keunggulan, insentif, jarak, utilitas, dan tanda unggulan. Lahan tanpa
+   skema tidak muncul sebagai lahan yang dapat diminati.
+3. Teks pembuka dan kontak portal investasi diatur di pengaturan layanan
+   alokasi (`/admin/alokasi/allocationsettings/`).
+4. Alur: investor (akun pemohon) mengajukan minat → petugas **Mulai tinjau**
+   → **Jadwalkan konsultasi** (opsional) → **Kirim penawaran** (skema, lahan,
+   luas, tarif, jangka, masa berlaku) → investor menerima/menolak di portal →
+   **Selesaikan**: skema alokasi menjadi draf permohonan alokasi atas nama
+   investor; sewa/kerja sama mencatat nomor kontrak dan lahan berstatus
+   *Sudah disewakan*. Saat sewa berakhir, pakai aksi **Akhiri sewa** di
+   daftar lahan. Setiap langkah tercatat di riwayat dan dikirim lewat surel.
 
 ## Manajemen aset lahan
 

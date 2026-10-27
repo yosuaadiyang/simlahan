@@ -1,5 +1,6 @@
 from django.urls import path
 
+from alokasi import investment_views as iv
 from alokasi import views
 
 app_name = "portal"
@@ -11,8 +12,54 @@ urlpatterns = [
     path("lahan.geojson", views.plot_geojson, name="plot_geojson"),
     path("lahan/<str:code>/", views.plot_detail, name="plot_detail"),
     path("lahan/<str:code>/foto/", views.plot_photo, name="plot_photo"),
+    path("lahan/<str:code>/profil.pdf", iv.plot_profile_pdf, name="plot_profile_pdf"),
+    path("lahan/<str:code>/simpan/", iv.save_toggle, name="plot_save"),
     path(
         "lahan/<str:code>/ajukan/", views.application_create, name="application_create"
+    ),
+    # Investasi
+    path("investasi/", iv.investment_home, name="investment_home"),
+    path("investasi/peta/", iv.investment_map, name="investment_map"),
+    path("investasi/peta.json", iv.investment_data, name="investment_data"),
+    path("investasi/kawasan/<slug:slug>/", iv.zone_detail, name="investment_zone"),
+    path(
+        "investasi/kawasan/<slug:slug>/foto/",
+        iv.zone_photo,
+        name="investment_zone_photo",
+    ),
+    path("investasi/bandingkan/", iv.compare, name="investment_compare"),
+    path("investasi/ajukan/", iv.request_create, name="investment_request_create"),
+    path("investasi/tersimpan/", iv.saved_list, name="investment_saved"),
+    path("investasi/permintaan/", iv.request_list, name="investment_requests"),
+    path(
+        "investasi/permintaan/<str:number>/",
+        iv.request_detail,
+        name="investment_request",
+    ),
+    path(
+        "investasi/permintaan/<str:number>/terima/",
+        iv.request_accept,
+        name="investment_request_accept",
+    ),
+    path(
+        "investasi/permintaan/<str:number>/tolak-penawaran/",
+        iv.request_decline,
+        name="investment_request_decline",
+    ),
+    path(
+        "investasi/permintaan/<str:number>/batal/",
+        iv.request_cancel,
+        name="investment_request_cancel",
+    ),
+    path(
+        "investasi/permintaan/<str:number>/lampiran/",
+        iv.request_attachment,
+        name="investment_request_attachment",
+    ),
+    path(
+        "investasi/permintaan/<str:number>/pesan/<int:pk>/lampiran/",
+        iv.message_attachment,
+        name="investment_message_attachment",
     ),
     # Layanan & informasi
     path("layanan/", views.service_catalog, name="services"),

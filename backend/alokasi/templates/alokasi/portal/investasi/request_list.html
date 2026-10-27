@@ -1,0 +1,29 @@
+{% extends "alokasi/portal/base.html" %}{% load static alokasi_tags %}
+{% block title %}Permintaan Investasi Saya{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'alokasi/investasi.css' %}">{% endblock %}
+{% block content %}
+<div class="actions-row" style="justify-content:space-between">
+  <h1 style="margin:0">Permintaan investasi saya</h1>
+  <div class="actions-row">
+    <a class="btn btn-outline" href="{% url 'portal:investment_saved' %}">Lahan tersimpan</a>
+    <a class="btn btn-accent" href="{% url 'portal:investment_request_create' %}">Ajukan minat baru</a>
+  </div>
+</div>
+{% if requests %}
+<div class="table-wrap" style="margin-top:20px"><table class="data">
+  <thead><tr><th>Nomor</th><th>Proyek</th><th>Skema</th><th>Lahan</th><th>Diajukan</th><th>Status</th></tr></thead>
+  <tbody>{% for r in requests %}
+    <tr>
+      <td><a href="{% url 'portal:investment_request' r.number %}">{{ r.number }}</a></td>
+      <td>{{ r.project_name }}<br><span class="small muted">{{ r.sector|default:"" }}</span></td>
+      <td>{{ r.get_scheme_display }}</td>
+      <td>{% for p in r.plots.all %}{{ p.code }}{% if not forloop.last %}, {% endif %}{% empty %}{% if r.requested_area_m2 %}{{ r.requested_area_m2|hektare }}{% else %}-{% endif %}{% endfor %}</td>
+      <td>{{ r.submitted_at|tanggal }}</td>
+      <td><span class="badge badge-{{ r.status }}">{{ r.get_status_display }}</span></td>
+    </tr>{% endfor %}
+  </tbody>
+</table></div>
+{% else %}
+<div class="card" style="margin-top:20px"><p>Belum ada permintaan investasi.</p><a class="btn" href="{% url 'portal:investment_map' %}">Jelajahi peta investasi</a></div>
+{% endif %}
+{% endblock %}
