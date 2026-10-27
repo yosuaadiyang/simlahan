@@ -20,7 +20,11 @@ const HOME_ROUTES: Array<[string, string]> = [
  * untuk peran yang tidak memiliki halaman di aplikasi petugas.
  */
 const EXTERNAL_HOME_PAGES: Array<[string, string]> = [
-  // Koordinator wilayah bekerja dari pusat komando.
+  // Petugas aset lahan dan petugas hukum mulai dari pekerjaan utamanya,
+  // walaupun juga boleh membuka pusat komando.
+  [UsersPermissions.ADD_LANDASSET, "/admin/asetlahan/dasbor/"],
+  [UsersPermissions.ADD_LEGALCASE, "/admin/asetlahan/legalcase/"],
+  // Koordinator wilayah dan petugas lapangan bekerja dari pusat komando.
   [UsersPermissions.VIEW_KORWIL, "/komando/"],
   [UsersPermissions.VIEW_APPLICATION, "/admin/alokasi/application/"],
   [UsersPermissions.VERIFY_PAYMENT, "/admin/alokasi/invoice/"],

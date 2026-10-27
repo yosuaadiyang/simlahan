@@ -92,6 +92,9 @@ jobs:
             python manage.py "${module}_contoh_rempang"
             python manage.py "${module}_contoh_rempang"
           done
+          python manage.py pengguna_contoh
+          python manage.py pengguna_contoh
+          python manage.py pengguna_contoh --hapus
 
       - name: Run all backend tests
         run: pytest -p no:cacheprovider
@@ -214,6 +217,7 @@ jobs:
           for module in pengadaan alokasi asetlahan operasi; do
             docker compose exec -T backend python manage.py "${module}_contoh_rempang"
           done
+          docker compose exec -T backend python manage.py pengguna_contoh
           docker compose exec -T backend python manage.py pengadaan_cek_tenggat
           docker compose exec -T backend python manage.py alokasi_pemantauan
           docker compose exec -T backend python manage.py asetlahan_pengingat

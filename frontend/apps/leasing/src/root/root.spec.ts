@@ -37,6 +37,24 @@ describe("getExternalHomeHref", () => {
       ]),
     ).toBe("/komando/");
   });
+  it("opens the asset dashboard for asset officers", () => {
+    expect(
+      getExternalHomeHref([
+        { codename: "view_landasset" },
+        { codename: "add_landasset" },
+        { codename: "view_korwil" },
+      ]),
+    ).toBe("/admin/asetlahan/dasbor/");
+  });
+  it("opens legal cases for legal officers", () => {
+    expect(
+      getExternalHomeHref([
+        { codename: "view_landasset" },
+        { codename: "view_legalcase" },
+        { codename: "add_legalcase" },
+      ]),
+    ).toBe("/admin/asetlahan/legalcase/");
+  });
   it("opens the allocation admin for allocation officers", () => {
     expect(getExternalHomeHref([{ codename: "view_application" }])).toBe(
       "/admin/alokasi/application/",

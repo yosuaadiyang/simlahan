@@ -24,6 +24,8 @@ export const UsersPermissions = {
   VERIFY_PAYMENT: "verify_payment",
   // Manajemen aset lahan (panel petugas di /admin/asetlahan/)
   VIEW_LANDASSET: "view_landasset",
+  ADD_LANDASSET: "add_landasset",
+  ADD_LEGALCASE: "add_legalcase",
   VIEW_LEGALCASE: "view_legalcase",
   VIEW_ENCROACHMENTCASE: "view_encroachmentcase",
   VIEW_GRIEVANCE: "view_grievance",
@@ -31,6 +33,10 @@ export const UsersPermissions = {
   ADD_FIELDREPORT: "add_fieldreport",
   // Pusat komando operasi lapangan (/komando/)
   VIEW_KORWIL: "view_korwil",
+  ADD_ATTENDANCE: "add_attendance",
+  ADD_ACTIVITY: "add_activity",
+  VIEW_ACTIVITY: "view_activity",
+  VIEW_TASK: "view_task",
   ADD_ANSWEROPENINGRECORD: "add_answeropeningrecord",
   ADD_BASISOFRENTDECISION: "add_basisofrentdecision",
   ADD_BASISOFRENTPROPERTYIDENTIFIER: "add_basisofrentpropertyidentifier",

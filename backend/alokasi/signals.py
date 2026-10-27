@@ -1,4 +1,5 @@
-"""Petugas alokasi & aset lahan bekerja di /admin/, jadi anggota grupnya otomatis berstatus staf.
+"""Administrator serta petugas alokasi, aset lahan dan pusat komando bekerja di
+/admin/, jadi anggota grupnya otomatis berstatus staf.
 
 Sebaliknya, pengguna yang dikeluarkan dari grup panel admin terakhirnya kehilangan
 status staf sehingga tidak dapat lagi masuk ke /admin/ dengan sisa izinnya.
@@ -8,17 +9,14 @@ from django.contrib.auth import get_user_model
 from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
 
-from utils.group_permissions import ADMIN_PANEL_GROUPS, UserGroup
-
-# Administrator juga bekerja di panel admin, jadi tidak dicabut status stafnya.
-STAFF_GROUPS = ADMIN_PANEL_GROUPS | {UserGroup.PAAKAYTTAJA}
+from utils.group_permissions import ADMIN_PANEL_GROUPS
 
 
 def _revoke_staff_without_panel_group(user_ids) -> None:
     User = get_user_model()
     (
         User.objects.filter(pk__in=user_ids, is_staff=True, is_superuser=False)
-        .exclude(groups__in=STAFF_GROUPS)
+        .exclude(groups__in=ADMIN_PANEL_GROUPS)
         .update(is_staff=False)
     )
 
