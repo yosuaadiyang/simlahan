@@ -126,6 +126,19 @@ a {
     font-weight: 400;
     color: variables.$text-muted;
   }
+
+  .app__usergroup-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: rem-calc(4px) rem-calc(16px);
+    margin-top: rem-calc(10px);
+    padding-top: rem-calc(10px);
+    border-top: 1px solid variables.$border-color;
+
+    a {
+      font-weight: 600;
+    }
+  }
 }
 
 .content__page-container,

@@ -215,6 +215,11 @@ const App: React.FC<Props> = (props) => {
                       )}
                     </div>
                   )}
+                  {/* Halaman server: sesi peramban dibuat saat login. */}
+                  <nav className="app__usergroup-links" aria-label="Akun">
+                    <a href="/akun/panduan/">Panduan peran</a>
+                    <a href="/akun/sandi/">Ganti sandi</a>
+                  </nav>
                 </section>
               )}
 

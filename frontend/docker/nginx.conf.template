@@ -37,8 +37,8 @@ server {
         add_header Referrer-Policy strict-origin-when-cross-origin always;
     }
 
-    # API, panel admin SimLahan, portal pemohon, aplikasi lapangan / peta berbagi (/aset), pusat komando (/komando)
-    location ~ ^/(v1|admin|auth|oauth|static|docs|redoc|swagger|portal|aset|komando)(/|\.|$) {
+    # API, panel admin SimLahan, portal pemohon, aplikasi lapangan / peta berbagi (/aset), pusat komando (/komando), panduan & sandi (/akun)
+    location ~ ^/(v1|admin|auth|oauth|static|docs|redoc|swagger|portal|aset|komando|akun)(/|\.|$) {
         proxy_pass ${BACKEND_URL};
         # $http_host mempertahankan port (mis. :8080) agar tautan absolut benar.
         proxy_set_header Host $http_host;

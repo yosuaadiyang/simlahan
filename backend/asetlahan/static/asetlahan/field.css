@@ -14,6 +14,7 @@ a { color: var(--sl-link, #0f665f); }
 .pill::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: currentColor; margin-right: 6px; vertical-align: 1px; opacity: .9; }
 .pill.online { background: #d1fae5; color: #065f46; }
 .pill.offline { background: #fee2e2; color: #991b1b; }
+a.link { text-decoration: none; }
 .link { background: rgba(255, 255, 255, .12); border: 1px solid rgba(255, 255, 255, .5); color: #fff; border-radius: 8px; padding: 6px 12px; font-size: 13px; font-weight: 600; min-height: 0; }
 #peta { height: 42vh; min-height: 240px; flex: none; border-bottom: 1px solid var(--sl-border, #e2e8f0); }
 .panel {
