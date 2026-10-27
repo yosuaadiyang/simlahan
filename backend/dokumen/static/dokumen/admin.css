@@ -1,0 +1,86 @@
+/* Modul Dokumen & perizinan — panel petugas. */
+.dk-count { display: inline-block; min-width: 1.5em; padding: 0 6px; border-radius: 999px; background: #cf222e; color: #fff; font-size: .75rem; font-weight: 700; text-align: center; }
+.dk-summary { padding: 12px 16px; margin-bottom: 16px; border-left: 4px solid var(--primary, #417690); overflow-wrap: anywhere; }
+.dk-summary h3 { margin: 16px 0 6px; font-size: .875rem; font-weight: 650; background: none; color: var(--body-loud-color, inherit); padding: 0; }
+.dk-summary-head { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+.dk-muted { color: var(--body-quiet-color, #666); font-size: .8125rem; }
+.dk-warn-text { color: #9a6700; }
+.dk-danger-text { color: #cf222e; }
+.dk-break { overflow-wrap: anywhere; word-break: break-word; }
+.dk-pre { white-space: pre-line; overflow-wrap: anywhere; }
+.dk-progress { height: 8px; margin: 8px 0 4px; border-radius: 999px; background: var(--selected-bg, #e5e7eb); overflow: hidden; }
+.dk-progress span { display: block; height: 100%; background: #1a7f37; border-radius: 999px; }
+.dk-chips { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+.dk-chip { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: .75rem; font-weight: 600; background: var(--selected-bg, #eef); color: var(--body-fg, #333); text-decoration: none; }
+.dk-chip.ok { background: #dafbe1; color: #116329; }
+.dk-chip.info { background: #ddf4ff; color: #0550ae; }
+.dk-chip.warn { background: #fff8c5; color: #7d4e00; }
+.dk-chip.danger { background: #ffebe9; color: #a40e26; }
+.dk-status { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: .75rem; font-weight: 600; color: #fff; background: #6e7781; white-space: nowrap; }
+.dk-s-belum, .dk-s-perbaikan, .dk-s-menunggu { background: #9a6700; }
+.dk-s-proses, .dk-s-disetujui { background: #0a7ea4; }
+.dk-s-diajukan, .dk-s-dikirim, .dk-s-dilihat { background: #1f6feb; }
+.dk-s-terverifikasi, .dk-s-selesai, .dk-s-aktif { background: #1a7f37; }
+.dk-s-kedaluwarsa, .dk-s-ditolak, .dk-s-dicabut { background: #cf222e; }
+.dk-s-menunggu_persetujuan, .dk-s-berakhir { background: #8250df; }
+.dk-s-draf, .dk-s-tidak_wajib, .dk-s-dibatalkan { background: #6e7781; }
+.dk-table-wrap { overflow-x: auto; max-width: 100%; }
+.dk-table { width: 100%; border-collapse: collapse; font-size: .8125rem; }
+.dk-table th, .dk-table td { padding: 6px 8px; border-bottom: 1px solid var(--hairline-color, #eee); text-align: left; vertical-align: top; }
+.dk-table tr.dk-current td { background: var(--selected-bg, #f1f8ff); }
+.dk-actions a { display: inline-block; margin: 0 8px 4px 0; white-space: nowrap; }
+.dk-hash { font-size: .75rem; }
+.dk-list { margin: 4px 0 8px; padding-left: 18px; }
+.dk-list li { margin: 3px 0; list-style: disc; }
+.dk-problems { margin: 8px 0; padding: 8px 12px 8px 28px; border-radius: 6px; background: #fff8c5; color: #4d2d00; }
+.dk-problems li { list-style: disc; }
+.dk-paper { max-width: 800px; padding: 32px 40px; background: #fff; color: #111; border: 1px solid var(--border-color, #ddd); border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,.08); font-family: Georgia, "Times New Roman", serif; line-height: 1.55; overflow-wrap: anywhere; }
+.dk-paper table { border-collapse: collapse; max-width: 100%; }
+.dk-paper img { max-width: 100%; height: auto; }
+.dk-paper .merge-field { background: #fff3a3; color: #5c4400; padding: 0 2px; border-radius: 2px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .85em; }
+.dk-body-details summary { cursor: pointer; font-weight: 600; margin: 12px 0 8px; }
+.dk-below { display: grid; gap: 16px; margin-top: 16px; clear: both; width: 100%; max-width: 100%; box-sizing: border-box; }
+.dk-below > * { min-width: 0; }
+.dk-panel { padding: 12px 16px; box-sizing: border-box; max-width: 100%; }
+.dk-panel h2 { margin: 0 0 12px; padding: 0; background: none; color: var(--body-loud-color, inherit); font-size: .9375rem; }
+.dk-panel textarea { width: 100%; max-width: 80ch; box-sizing: border-box; display: block; margin: 4px 0 8px; }
+.dk-panel .form-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.dk-check { display: inline-flex; gap: 6px; align-items: center; margin: 0 12px 8px 0; font-weight: normal; }
+.dk-comment { padding: 8px 12px; margin: 0 0 8px; border-radius: 8px; background: var(--darkened-bg, #f6f8fa); max-width: 80ch; }
+.dk-comment.internal { border-left: 3px solid #8250df; }
+.dk-tool-btn { border: 0; cursor: pointer; font: inherit; }
+.object-tools form { display: inline; margin: 0; }
+.object-tools .dk-tool-btn { display: inline-flex; align-items: center; min-height: 34px; padding: 7px 14px; border: 1px solid var(--border-color, #ccc); border-radius: var(--sl-radius-sm, 4px); background-color: var(--object-tools-bg, #fff); color: var(--object-tools-fg, #333); font-size: .8125rem; font-weight: 600; letter-spacing: 0; text-transform: none; line-height: 1.2; box-shadow: var(--sl-shadow-xs, none); }
+.object-tools .dk-tool-btn:hover { background-color: var(--object-tools-hover-bg, #f6f6f6); border-color: var(--body-quiet-color, #999); }
+.object-tools .dk-tool-btn.dk-primary { background-color: var(--button-bg, #417690); color: var(--button-fg, #fff); border-color: transparent; }
+.object-tools .dk-tool-btn:disabled { opacity: .5; cursor: not-allowed; }
+.dk-small { padding: 3px 8px !important; font-size: .75rem !important; }
+.dk-danger, input.dk-danger { background: #cf222e !important; color: #fff !important; }
+.dk-decide { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.dk-reason { padding: 8px 12px; margin: 6px 0 10px; border-radius: 6px; background: var(--darkened-bg, #f6f8fa); max-width: 80ch; }
+.dk-primary-link { display: inline-block; }
+.dk-inline-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+.dk-inline-form .select2-container { min-width: min(320px, 100%); }
+.dk-narrow { max-width: 760px; }
+.dk-intro { max-width: 80ch; }
+.dk-fields { margin-top: 16px; padding: 12px 16px; }
+.dk-fields summary { cursor: pointer; font-weight: 600; }
+.dk-field-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); margin-top: 8px; font-size: .8125rem; }
+.dk-field-grid ul { margin: 4px 0; padding-left: 0; }
+.dk-field-grid li { list-style: none; margin: 2px 0; }
+.dk-tasks ul { margin: 0; padding-left: 18px; }
+.dk-activity { padding: 4px 0; border-bottom: 1px solid var(--hairline-color, #eee); font-size: .8125rem; overflow-wrap: anywhere; }
+.dk-process ul.errorlist.nonfield { max-width: 80ch; }
+@media (max-width: 767px) {
+  .dk-paper { padding: 16px; }
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .dk-problems { background: #3b2e00; color: #f5e0a0; }
+}
+:root[data-theme="dark"] .dk-problems { background: #3b2e00; color: #f5e0a0; }
+.dk-narrow textarea, .dk-process textarea, .dk-summary textarea { max-width: 100%; box-sizing: border-box; }
+.dk-narrow .flex-container, .dk-process .flex-container { flex-wrap: wrap; min-width: 0; }
+.dk-narrow fieldset, .dk-process fieldset { min-width: 0; max-width: 100%; }
+.dk-narrow select, .dk-process select { max-width: 100%; }
+.dk-narrow .flex-container, .dk-process .flex-container { width: auto !important; max-width: 100%; }
+.dk-narrow textarea, .dk-process textarea { width: 100% !important; }

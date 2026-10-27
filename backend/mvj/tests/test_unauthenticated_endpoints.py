@@ -54,6 +54,8 @@ PUBLIC_SESSION_PAGES = (
         r"|kalkulator-uwt/|lacak/|bantuan/"
         r"|investasi/|investasi/peta/|investasi/kawasan/[^/]+/"
         r"|investasi/kawasan/[^/]+/foto/|investasi/bandingkan/"
+        # Penanda tangan tanpa akun memakai token + kode surel; verifikasi keaslian publik.
+        r"|dokumen/ttd/[^/]+/|dokumen/ttd/[^/]+/pdf/|dokumen/verifikasi/|dokumen/verifikasi/[^/]+/"
         r")$"
     ),
     # Peta berbagi baca-saja; akses dikendalikan token di URL.

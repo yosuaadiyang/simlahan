@@ -1,0 +1,88 @@
+{% extends "alokasi/portal/base.html" %}{% load alokasi_tags dokumen_tags static %}
+{% block title %}{{ land_use.number }} · Dokumen perizinan{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'dokumen/portal.css' %}">{% endblock %}
+{% block content %}
+<p class="small"><a href="{% url 'dokumen_portal:index' %}">‹ Dokumen &amp; perizinan</a></p>
+<h1>{{ land_use.title }} <span class="badge badge-{{ land_use.status }}">{{ land_use.get_status_display }}</span></h1>
+<p class="muted">{{ land_use.number }} · {{ land_use.get_scheme_display }}{% if land_use.plot %} · lahan {{ land_use.plot.code }} – {{ land_use.plot.name }}{% endif %}{% if land_use.reference %} · {{ land_use.reference }}{% endif %}</p>
+
+{% if not is_active %}<div class="alert alert-info">Pemanfaatan lahan ini sudah {{ land_use.get_status_display|lower }}. Dokumen tetap dapat dilihat, tetapi tidak dapat diperbarui.</div>{% endif %}
+{% if summary.revision %}<div class="alert alert-warn"><strong>{{ summary.revision }} dokumen perlu perbaikan.</strong> Lihat catatan petugas pada dokumen bertanda “Perlu perbaikan”, lalu unggah ulang.</div>{% endif %}
+{% if summary.expired %}<div class="alert alert-danger"><strong>{{ summary.expired }} dokumen kedaluwarsa.</strong> Perpanjang izin dan unggah dokumen terbaru.</div>{% endif %}
+
+<section class="card">
+  <div class="actions-row" style="justify-content:space-between"><h2 style="margin:0">Kelengkapan dokumen wajib</h2><strong>{{ summary.done }}/{{ summary.required }}</strong></div>
+  <div class="progress" title="{{ summary.percent }}%" style="margin-top:8px"><span style="width:{{ summary.percent }}%"></span></div>
+  <p class="small muted" style="margin-top:6px">{{ summary.total }} dokumen dalam daftar{% if summary.waiting %} · {{ summary.waiting }} menunggu verifikasi petugas{% endif %}.</p>
+</section>
+
+<div class="dk-records">
+{% for r in records %}
+<section class="card dk-record" id="izin-{{ r.pk }}">
+  <div class="dk-record-head">
+    <div>
+      <h2>{{ r.permit_type.name }}{% if not r.permit_type.is_required %} <span class="small muted">(opsional)</span>{% endif %}</h2>
+      <div class="small muted">{{ r.permit_type.get_category_display }}{% if r.permit_type.issuer %} · diterbitkan {{ r.permit_type.issuer }}{% endif %}{% if r.permit_type.confidentiality == 'rahasia' %} · rahasia{% endif %}</div>
+    </div>
+    <span class="badge badge-{{ r.status }}">{{ r.get_status_display }}</span>
+  </div>
+  {% if r.permit_type.description %}<p class="small">{{ r.permit_type.description }}</p>{% endif %}
+  <dl class="props dk-props">
+    <dt>Nomor</dt><dd>{{ r.number|default:"–" }}</dd>
+    <dt>Terbit</dt><dd>{% if r.issued_date %}{{ r.issued_date|tanggal }}{% else %}–{% endif %}</dd>
+    <dt>Berlaku s.d.</dt><dd>{% if r.expiry_date %}{{ r.expiry_date|tanggal }}{% if r.days_to_expiry is not None and r.days_to_expiry >= 0 and r.days_to_expiry <= 60 %} <strong class="dk-warn">({{ r.days_to_expiry }} hari lagi)</strong>{% endif %}{% else %}–{% endif %}</dd>
+  </dl>
+  {% if r.review_note %}<div class="alert {% if r.status == 'perbaikan' %}alert-warn{% else %}alert-info{% endif %}"><strong>Catatan petugas:</strong> <span class="prose">{{ r.review_note }}</span></div>{% endif %}
+
+  {% if r.version_list %}
+  <div class="table-wrap"><table class="data">
+    <thead><tr><th>Versi</th><th>Berkas</th><th>Tanggal</th><th>Unduh</th></tr></thead>
+    <tbody>
+    {% for v in r.version_list %}
+      {% with req=my_requests|ambil:v.pk %}
+      <tr>
+        <td>v{{ v.number }}</td>
+        <td class="dk-break">{{ v.original_name }}<br><span class="small muted">{{ v.get_source_display }}</span></td>
+        <td>{{ v.created_at|date:"d-m-Y H.i" }}</td>
+        <td>{% if req.status == 'menunggu' or req.is_usable %}{% include "dokumen/portal/_request_state.html" with r=req %}{% else %}{% if req %}<div class="small">{% include "dokumen/portal/_request_state.html" with r=req %}</div>{% endif %}{% url 'dokumen_portal:request_version_download' v.pk as action %}{% include "dokumen/portal/_download_form.html" with action=action %}{% endif %}</td>
+      </tr>
+      {% endwith %}
+    {% endfor %}
+    </tbody>
+  </table></div>
+  {% endif %}
+
+  <div class="actions-row">
+    {% if r.permit_type.template and r.permit_type.template.is_active %}<a class="btn btn-outline btn-small" href="{% url 'dokumen_portal:template_download' r.pk %}">Unduh format dokumen</a>{% endif %}
+  </div>
+
+  {% if r.form %}
+  <details class="panel" style="margin-top:12px"{% if r.form.errors %} open{% endif %}>
+    <summary>{% if r.status == 'perbaikan' %}Unggah perbaikan{% elif r.version_list %}Unggah versi baru / perbarui status{% else %}Unggah dokumen / perbarui status{% endif %}</summary>
+    <form method="post" enctype="multipart/form-data" action="{% url 'dokumen_portal:record_update' r.pk %}" style="margin-top:12px">{% csrf_token %}
+      {% include "alokasi/portal/_form.html" with form=r.form %}
+      <button class="btn" type="submit">Simpan</button>
+    </form>
+  </details>
+  {% endif %}
+</section>
+{% empty %}
+<div class="card"><p class="muted">Belum ada daftar dokumen untuk pemanfaatan lahan ini.</p></div>
+{% endfor %}
+</div>
+
+{% if documents %}
+<section class="card">
+  <h2>Dokumen tanda tangan</h2>
+  <ul class="dk-plain">{% for d in documents %}<li><a href="{% url 'dokumen_portal:signing_detail' d.number %}">{{ d.title }}</a> <span class="badge badge-{{ d.status }}">{{ d.get_status_display }}</span> <span class="small muted">{{ d.number }}</span></li>{% endfor %}</ul>
+</section>
+{% endif %}
+
+<section class="card">
+  <h2>Riwayat</h2>
+  <ul class="dk-timeline">
+    {% for a in activities %}<li><span class="small muted">{{ a.created_at|date:"d-m-Y H.i" }}</span> {{ a.get_action_display }}{% if a.record %} · {{ a.record.permit_type.name }}{% endif %}{% if a.detail %} — <span class="small">{{ a.detail|truncatechars:160 }}</span>{% endif %}</li>
+    {% empty %}<li class="muted">Belum ada aktivitas.</li>{% endfor %}
+  </ul>
+</section>
+{% endblock %}

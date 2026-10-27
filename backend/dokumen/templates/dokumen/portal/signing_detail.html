@@ -1,0 +1,48 @@
+{% extends "alokasi/portal/base.html" %}{% load alokasi_tags static %}
+{% block title %}{{ document.number }}{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'dokumen/portal.css' %}">{% endblock %}
+{% block content %}
+<p class="small"><a href="{% if document.land_use %}{% url 'dokumen_portal:land_use' document.land_use.number %}{% else %}{% url 'dokumen_portal:index' %}{% endif %}">‹ Kembali</a></p>
+<h1>{{ document.title }} <span class="badge badge-{{ document.status }}">{{ document.get_status_display }}</span></h1>
+<p class="muted">{{ document.number }}{% if document.sent_at %} · dikirim {{ document.sent_at|date:"d-m-Y H.i" }}{% endif %}{% if document.expires_on and document.is_open %} · batas {{ document.expires_on|tanggal }}{% endif %}</p>
+{% if my_turn %}<div class="alert alert-info"><strong>Giliran Anda.</strong> <a href="{% url 'dokumen_portal:sign' my_recipient.token %}">{% if my_recipient.action == 'tanda_tangan' %}Tanda tangani dokumen{% else %}Tinjau dan setujui dokumen{% endif %} ›</a></div>{% endif %}
+{% if document.closed_reason %}<div class="alert alert-warn">{{ document.closed_reason }}</div>{% endif %}
+
+<div class="split">
+  <div>
+    <section class="card">
+      <h2>Penanda tangan</h2>
+      <ol class="dk-steps">
+        {% for r in recipients %}
+        <li class="dk-step dk-step-{{ r.status }}">
+          <strong>{{ r.name }}</strong>{% if r.role %} <span class="small muted">({{ r.role }})</span>{% endif %}
+          <div class="small">{{ r.get_action_display }} · <span class="badge badge-{{ r.status }}">{{ r.get_status_display }}</span>{% if r.completed_at %} · {{ r.completed_at|date:"d-m-Y H.i" }}{% endif %}</div>
+        </li>
+        {% endfor %}
+      </ol>
+    </section>
+    <section class="card" id="komentar">
+      <h2>Komentar</h2>
+      {% for c in comments %}<div class="dk-comment"><div class="small muted">{{ c.author_name }} · {{ c.created_at|date:"d-m-Y H.i" }}</div><div class="prose">{{ c.body }}</div></div>{% empty %}<p class="muted">Belum ada komentar.</p>{% endfor %}
+      {% if document.is_open %}
+      <form method="post" action="{% url 'dokumen_portal:signing_comment' document.number %}">{% csrf_token %}
+        {% include "alokasi/portal/_form.html" with form=comment_form %}
+        <button type="submit" class="btn btn-outline btn-small">Kirim komentar</button>
+      </form>
+      {% endif %}
+    </section>
+  </div>
+  <aside>
+    <section class="card">
+      <h2>Dokumen final</h2>
+      {% if document.status == 'selesai' %}
+        <p class="small">Selesai {{ document.completed_at|date:"d-m-Y H.i" }}. Keaslian dapat dicek di <a href="{% url 'dokumen_portal:verify_token' document.verify_token %}">halaman verifikasi</a>.</p>
+        {% for r in my_requests %}<p class="small"><strong>{{ r.number }}</strong> {% include "dokumen/portal/_request_state.html" %}</p>{% endfor %}
+        {% if can_request %}{% url 'dokumen_portal:request_signing_download' document.number as action %}{% include "dokumen/portal/_download_form.html" with action=action %}{% endif %}
+      {% else %}
+        <p class="small muted">PDF final tersedia setelah semua pihak selesai menandatangani.</p>
+      {% endif %}
+    </section>
+  </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,105 @@
+{% extends "alokasi/portal/base.html" %}{% load alokasi_tags dokumen_tags static %}
+{% block title %}{{ document.title }}{% endblock %}
+{% block head %}<meta name="robots" content="noindex"><meta name="referrer" content="same-origin"><link rel="stylesheet" href="{% static 'dokumen/portal.css' %}">{% endblock %}
+{% block content %}
+<h1>{{ document.title }} <span class="badge badge-{{ document.status }}">{{ document.get_status_display }}</span></h1>
+<p class="muted">{{ document.number }} · untuk {{ recipient.name }}{% if recipient.role %} ({{ recipient.role }}){% endif %} · {{ recipient.get_action_display }}{% if document.expires_on and document.is_open %} · batas {{ document.expires_on|tanggal }}{% endif %}</p>
+
+{% if recipient.status == 'selesai' %}
+<div class="alert alert-ok"><strong>Terima kasih.</strong> {% if recipient.action == 'tanda_tangan' %}Tanda tangan{% else %}Persetujuan{% endif %} Anda tercatat pada {{ recipient.completed_at|date:"d-m-Y H.i" }}.{% if document.status == 'selesai' %} Dokumen telah selesai; keaslian dapat dicek di <a href="{% url 'dokumen_portal:verify_token' document.verify_token %}">halaman verifikasi</a>.{% else %} Dokumen menunggu pihak lain.{% endif %}</div>
+{% elif recipient.status == 'ditolak' %}
+<div class="alert alert-warn">Anda menolak dokumen ini pada {{ recipient.completed_at|date:"d-m-Y H.i" }}.</div>
+{% elif document.status == 'dibatalkan' %}
+<div class="alert alert-warn">Dokumen ini dibatalkan pengirim.{% if document.closed_reason %} {{ document.closed_reason }}{% endif %}</div>
+{% elif document.status == 'kedaluwarsa' or document.status == 'ditolak' %}
+<div class="alert alert-warn">Dokumen ini sudah ditutup ({{ document.get_status_display|lower }}).{% if document.closed_reason %} {{ document.closed_reason }}{% endif %}</div>
+{% elif not my_turn and recipient.action != 'salinan' %}
+<div class="alert alert-info">Dokumen ini masih menunggu penanda tangan sebelumnya. Anda akan menerima surel saat giliran Anda tiba.</div>
+{% endif %}
+
+{% if not verified %}
+{% if recipient.action == 'salinan' %}
+<section class="card dk-narrow"><p>Anda tercatat sebagai penerima salinan dokumen ini dan akan diberi tahu lewat surel saat dokumen selesai ditandatangani.{% if document.status == 'selesai' %} Keaslian dokumen dapat dicek di <a href="{% url 'dokumen_portal:verify_token' document.verify_token %}">halaman verifikasi</a>.{% endif %}</p></section>
+{% elif my_turn %}
+<section class="card dk-narrow">
+  <h2>Verifikasi penerima</h2>
+  <p>Untuk melindungi dokumen, kami mengirim kode 6 angka ke surel <strong>{{ masked_email }}</strong>.</p>
+  <form method="post">{% csrf_token %}<input type="hidden" name="aksi" value="kirim_kode"><button type="submit" class="btn btn-outline">Kirim kode ke surel</button></form>
+  <form method="post" style="margin-top:12px">{% csrf_token %}<input type="hidden" name="aksi" value="cek_kode">
+    {% include "alokasi/portal/_form.html" with form=otp_form %}
+    <button type="submit" class="btn">Lanjutkan</button>
+  </form>
+  <p class="small muted">Kode berlaku 10 menit. Jangan berikan kode kepada siapa pun, termasuk yang mengaku petugas.</p>
+</section>
+{% endif %}
+{% else %}
+<div class="split">
+  <div>
+    {% if show_content %}
+    <section class="card">
+      <h2>Isi dokumen</h2>
+      {% if document.source == 'html' %}
+        <div class="dk-paper">{{ document.body|bersih }}</div>
+      {% elif document.is_open %}
+        <p class="small"><a class="btn btn-outline btn-small" href="{% url 'dokumen_portal:sign_pdf' recipient.token %}" target="_blank" rel="noopener">Buka PDF di tab baru</a></p>
+        <iframe class="dk-pdf" src="{% url 'dokumen_portal:sign_pdf' recipient.token %}" title="Dokumen {{ document.number }}"></iframe>
+      {% else %}
+        <p class="muted">Isi PDF hanya ditampilkan selama dokumen menunggu tanda tangan.</p>
+      {% endif %}
+    </section>
+    {% endif %}
+
+    {% if my_turn %}
+    <section class="card" id="tindakan">
+      <h2>{% if recipient.action == 'tanda_tangan' %}Tanda tangani{% else %}Setujui dokumen{% endif %}</h2>
+      <form method="post" id="dk-sign-form">{% csrf_token %}<input type="hidden" name="aksi" value="tanda_tangan">
+        {% if sign_form.non_field_errors %}<div class="alert alert-danger">{% for e in sign_form.non_field_errors %}{{ e }} {% endfor %}</div>{% endif %}
+        <div class="field required"><label for="{{ sign_form.name.id_for_label }}">{{ sign_form.name.label }}</label>{{ sign_form.name }}{{ sign_form.name.errors }}</div>
+        {% if recipient.action == 'tanda_tangan' %}
+        <div class="dk-sigpad" data-sigpad>
+          <div class="tabs dk-sig-tabs" role="tablist">
+            <button type="button" class="active" data-mode="gambar" role="tab" aria-selected="true">Gambar</button>
+            <button type="button" data-mode="ketik" role="tab" aria-selected="false">Ketik</button>
+          </div>
+          <canvas width="600" height="200" aria-label="Kotak tanda tangan. Gambar tanda tangan dengan jari atau tetikus." role="img"></canvas>
+          <div class="actions-row"><button type="button" class="btn btn-outline btn-small" data-clear>Hapus</button><span class="small muted" data-hint>Gambar tanda tangan di kotak di atas.</span></div>
+          {{ sign_form.signature }}
+          {{ sign_form.signature.errors }}
+        </div>
+        {% endif %}
+        <div class="field checkbox required"><label for="{{ sign_form.agree.id_for_label }}">{{ sign_form.agree }} <span>{{ sign_form.agree.label }}</span></label>{{ sign_form.agree.errors }}</div>
+        <button type="submit" class="btn">{% if recipient.action == 'tanda_tangan' %}Tanda tangani{% else %}Setujui{% endif %}</button>
+      </form>
+      <details class="panel" style="margin-top:16px"{% if open_decline %} open{% endif %}>
+        <summary>Tolak dokumen</summary>
+        <form method="post">{% csrf_token %}<input type="hidden" name="aksi" value="tolak">
+          {% include "alokasi/portal/_form.html" with form=decline_form %}
+          <button type="submit" class="btn btn-danger">Tolak dokumen</button>
+        </form>
+      </details>
+      <p class="small muted">Waktu, alamat IP, dan perangkat Anda dicatat sebagai bukti tanda tangan elektronik.</p>
+    </section>
+    {% endif %}
+  </div>
+  <aside>
+    <section class="card">
+      <h2>Urutan</h2>
+      <ol class="dk-steps">
+        {% for r in recipients %}<li class="dk-step dk-step-{{ r.status }}"><strong>{{ r.name }}</strong>{% if r.role %} <span class="small muted">({{ r.role }})</span>{% endif %}<div class="small">{{ r.get_action_display }} · <span class="badge badge-{{ r.status }}">{{ r.get_status_display }}</span></div></li>{% endfor %}
+      </ol>
+    </section>
+    <section class="card" id="komentar">
+      <h2>Komentar</h2>
+      {% for c in comments %}<div class="dk-comment"><div class="small muted">{{ c.author_name }} · {{ c.created_at|date:"d-m-Y H.i" }}</div><div class="prose">{{ c.body }}</div></div>{% empty %}<p class="small muted">Belum ada komentar.</p>{% endfor %}
+      {% if document.is_open %}
+      <form method="post">{% csrf_token %}<input type="hidden" name="aksi" value="komentar">
+        {% include "alokasi/portal/_form.html" with form=comment_form grid_class="dk-form-grid" %}
+        <button type="submit" class="btn btn-outline btn-small">Kirim komentar</button>
+      </form>
+      {% endif %}
+    </section>
+  </aside>
+</div>
+{% endif %}
+{% endblock %}
+{% block scripts %}<script src="{% static 'dokumen/sign.js' %}"></script>{% endblock %}

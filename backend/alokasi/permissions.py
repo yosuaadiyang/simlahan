@@ -22,7 +22,6 @@ from alokasi.models import (
     Invoice,
     IssuedDocument,
     LandPlot,
-    PermitReport,
     RequirementDocType,
     ServiceCatalog,
     VerificationCriterion,
@@ -70,7 +69,6 @@ ALOKASI_GROUP_MODEL_PERMISSIONS: GroupModelPermissions = {
     Invoice: _staff(VC + ("verify_payment",), VC + ("verify_payment",), V),
     Allocation: _staff(VC + ("revoke_allocation",), VC + ("revoke_allocation",), V),
     IssuedDocument: _staff(V, V, V),
-    PermitReport: _staff(V, V, V),
     DevelopmentReport: _staff(V, V, V),
     # Portal investasi: sektor & kawasan dikelola petugas; permintaan investor
     # hanya diubah lewat tombol proses (penugasan & catatan internal boleh diedit).

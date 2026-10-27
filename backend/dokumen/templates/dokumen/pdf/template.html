@@ -1,0 +1,4 @@
+{% extends "dokumen/pdf/_base.html" %}{% load alokasi_tags %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}{{ body|safe }}{% endblock %}
+{% block footer %}{% if number %}{{ number }} · {% endif %}{{ title }} · dibuat {{ generated_at|date:"d-m-Y H.i" }}{% endblock %}

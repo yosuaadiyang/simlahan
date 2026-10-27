@@ -1,0 +1,37 @@
+{% load alokasi_tags %}<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>{% block title %}{% endblock %}</title>
+<style>
+  @page { size: a4 portrait; margin: 2cm 2.2cm 2.4cm 2.2cm;
+    @frame footer { -pdf-frame-content: footer; bottom: 0.9cm; margin-left: 2.2cm; margin-right: 2.2cm; height: 1.1cm; } }
+  body { font-family: Helvetica; font-size: 10.5pt; line-height: 1.35; color: #111; }
+  h1 { font-size: 14pt; margin: 0 0 6pt 0; }
+  h2 { font-size: 12.5pt; margin: 10pt 0 4pt 0; }
+  h3 { font-size: 11pt; margin: 8pt 0 3pt 0; }
+  h4 { font-size: 10.5pt; margin: 6pt 0 2pt 0; }
+  p { margin: 4pt 0; }
+  ol, ul { margin-top: 2pt; margin-bottom: 2pt; }
+  li { margin-bottom: 2pt; }
+  table { border-collapse: collapse; }
+  td, th { padding: 3pt 4pt; vertical-align: top; }
+  .kop { border-bottom: 2px solid #111; padding-bottom: 6pt; margin-bottom: 12pt; text-align: center; }
+  .kop .org { font-size: 12pt; font-weight: bold; }
+  .muted { color: #555; font-size: 8.5pt; }
+  .page-break { page-break-before: always; }
+  .merge-field { background-color: #fff3bf; }
+  table.grid { width: 100%; border-collapse: collapse; }
+  table.grid th, table.grid td { border: 0.5pt solid #555; padding: 4pt; font-size: 9pt; }
+  table.grid th { background-color: #eceff3; text-align: left; }
+  .sign-box { border: 0.5pt solid #888; padding: 6pt; }
+  .small { font-size: 8.5pt; }
+  .center { text-align: center; }
+</style>
+</head>
+<body>
+<div class="kop"><div class="org">{{ config.authority_name|upper }}</div></div>
+{% block content %}{% endblock %}
+<div id="footer" class="muted">{% block footer %}{% endblock %}</div>
+</body>
+</html>

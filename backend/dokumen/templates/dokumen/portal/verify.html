@@ -1,0 +1,50 @@
+{% extends "alokasi/portal/base.html" %}{% load alokasi_tags static %}
+{% block title %}Verifikasi dokumen elektronik{% endblock %}
+{% block head %}<meta name="robots" content="noindex"><link rel="stylesheet" href="{% static 'dokumen/portal.css' %}">{% endblock %}
+{% block content %}
+<h1>Verifikasi dokumen elektronik</h1>
+{% if not document %}
+  {% if not_found %}<div class="alert alert-danger">Dokumen tidak ditemukan. Pastikan kode QR atau tautan berasal dari dokumen resmi.</div>{% endif %}
+  <section class="card dk-narrow">
+    <p>Masukkan kode verifikasi yang tercetak di bawah kode QR pada lembar pengesahan dokumen.</p>
+    <form method="get" class="dk-inline-form">
+      <label for="kode" class="sr-only">Kode verifikasi</label>
+      <input id="kode" name="kode" required maxlength="64" placeholder="mis. 1b4e28ba-2fa1-11d2-883f-0016d3cca427" autocomplete="off">
+      <button type="submit" class="btn">Periksa</button>
+    </form>
+  </section>
+{% else %}
+  {% if document.status == 'selesai' %}
+  <div class="alert alert-ok"><strong>Dokumen terdaftar dan sah ditandatangani secara elektronik.</strong> Selesai {{ document.completed_at|date:"d-m-Y H.i" }}.</div>
+  {% else %}
+  <div class="alert alert-warn"><strong>Dokumen terdaftar tetapi belum selesai ditandatangani</strong> (status: {{ document.get_status_display|lower }}).</div>
+  {% endif %}
+  <div class="split">
+    <section class="card">
+      <h2>{{ document.title }}</h2>
+      <dl class="props">
+        <dt>Nomor</dt><dd>{{ document.number }}</dd>
+        <dt>Status</dt><dd>{{ document.get_status_display }}</dd>
+        {% if document.sent_at %}<dt>Dikirim</dt><dd>{{ document.sent_at|date:"d-m-Y H.i" }}</dd>{% endif %}
+        {% if document.final_sha256 %}<dt>Sidik SHA-256</dt><dd class="dk-break"><code>{{ document.final_sha256 }}</code></dd>{% endif %}
+      </dl>
+      <h3>Penanda tangan</h3>
+      <ol class="dk-steps">
+        {% for s in signers %}<li class="dk-step"><strong>{{ s.name }}</strong>{% if s.role %} <span class="small muted">({{ s.role }})</span>{% endif %}<div class="small">{{ s.action }} · {{ s.status }}{% if s.at %} · {{ s.at|date:"d-m-Y H.i" }}{% endif %}</div></li>{% endfor %}
+      </ol>
+    </section>
+    {% if document.status == 'selesai' %}
+    <section class="card">
+      <h2>Cocokkan berkas</h2>
+      <p class="small">Unggah PDF yang Anda terima untuk memastikan isinya sama persis dengan dokumen asli (tidak diubah). Berkas tidak disimpan.</p>
+      {% if match.kind == 'asli' %}<div class="alert alert-ok"><strong>Cocok.</strong> Berkas identik dengan dokumen final.</div>{% elif match.kind == 'salinan' %}<div class="alert alert-ok"><strong>Cocok.</strong> Berkas adalah salinan resmi bertanda air yang diunduh {{ match.name }} pada {{ match.at|date:"d-m-Y H.i" }}.</div>{% elif match is False %}<div class="alert alert-danger"><strong>Tidak cocok.</strong> Berkas berbeda dari dokumen final (mungkin telah diubah).</div>{% endif %}
+      <form method="post" enctype="multipart/form-data">{% csrf_token %}
+        {% include "alokasi/portal/_form.html" %}
+        <button type="submit" class="btn btn-outline">Cocokkan</button>
+      </form>
+      <p class="small muted">Salinan resmi yang diunduh lewat SimLahan (bertanda air) juga dikenali.</p>
+    </section>
+    {% endif %}
+  </div>
+{% endif %}
+{% endblock %}

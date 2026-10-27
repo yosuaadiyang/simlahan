@@ -296,6 +296,88 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
                     allow={
                       hasPermissions(
                         usersPermissions,
+                        UsersPermissions.VIEW_LANDUSE,
+                      ) ||
+                      hasPermissions(
+                        usersPermissions,
+                        UsersPermissions.VIEW_PERMITRECORD,
+                      ) ||
+                      hasPermissions(
+                        usersPermissions,
+                        UsersPermissions.VIEW_SIGNINGDOCUMENT,
+                      ) ||
+                      hasPermissions(
+                        usersPermissions,
+                        UsersPermissions.VIEW_DOCUMENTTEMPLATE,
+                      ) ||
+                      hasPermissions(
+                        usersPermissions,
+                        UsersPermissions.VIEW_DOWNLOADREQUEST,
+                      )
+                    }
+                  >
+                    <SubMenu
+                      header="Dokumen & Perizinan"
+                      isOpen={subMenuKey === "documents"}
+                      items={[
+                        {
+                          allow: hasPermissions(
+                            usersPermissions,
+                            UsersPermissions.VIEW_LANDUSE,
+                          ),
+                          text: "Dasbor dokumen",
+                          href: "/admin/dokumen/dasbor/",
+                        },
+                        {
+                          allow: hasPermissions(
+                            usersPermissions,
+                            UsersPermissions.VIEW_LANDUSE,
+                          ),
+                          text: "Pemanfaatan lahan",
+                          href: "/admin/dokumen/landuse/",
+                        },
+                        {
+                          allow: hasPermissions(
+                            usersPermissions,
+                            UsersPermissions.VIEW_PERMITRECORD,
+                          ),
+                          text: "Dokumen perizinan",
+                          href: "/admin/dokumen/permitrecord/",
+                        },
+                        {
+                          allow: hasPermissions(
+                            usersPermissions,
+                            UsersPermissions.VIEW_SIGNINGDOCUMENT,
+                          ),
+                          text: "Dokumen tanda tangan",
+                          href: "/admin/dokumen/signingdocument/",
+                        },
+                        {
+                          allow: hasPermissions(
+                            usersPermissions,
+                            UsersPermissions.VIEW_DOCUMENTTEMPLATE,
+                          ),
+                          text: "Templat dokumen",
+                          href: "/admin/dokumen/documenttemplate/",
+                        },
+                        {
+                          allow: hasPermissions(
+                            usersPermissions,
+                            UsersPermissions.VIEW_DOWNLOADREQUEST,
+                          ),
+                          text: "Permintaan unduh",
+                          href: "/admin/dokumen/downloadrequest/",
+                        },
+                      ]}
+                      menuKey="documents"
+                      onHeaderClick={this.handleHeaderClick}
+                    />
+                  </Authorization>
+
+                  <Authorization
+                    allow={
+                      hasPermissions(
+                        usersPermissions,
                         UsersPermissions.VIEW_LANDASSET,
                       ) ||
                       hasPermissions(

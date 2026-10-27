@@ -6,7 +6,7 @@ from django.utils import translation
 from enumfields.fields import EnumFieldMixin
 
 # Aplikasi yang teks sumbernya sudah berbahasa Indonesia (msgid = teks tampil).
-INDONESIAN_SOURCE_APPS = {"alokasi", "asetlahan", "operasi", "pengadaan"}
+INDONESIAN_SOURCE_APPS = {"alokasi", "asetlahan", "dokumen", "operasi", "pengadaan"}
 # Kata yang sama dalam bahasa Inggris dan Indonesia.
 SAME_IN_BOTH = {"Area", "log", "Token"}
 

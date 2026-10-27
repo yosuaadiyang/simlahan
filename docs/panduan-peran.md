@@ -252,6 +252,7 @@ Mengelola seluruh modul dan data master SimLahan.
 - Alokasi Lahan: Permohonan & verifikasi, Tagihan & pembayaran, Alokasi & lahan tidur, Data lahan, Portal investasi (permintaan investasi, sektor, kawasan), Portal publik
 - Manajemen Aset Lahan: Dasbor aset, Data aset & peta, Perkara & sidang, Okupasi & perambahan, Pengaduan masyarakat, Lelang & seleksi lahan, Laporan & asisten AI, Aplikasi lapangan
 - Pusat Komando: Peta operasi & PWA, Absen, Lapor kegiatan, Tugas, Kinerja (KPI), Korwil, warga & laporan
+- Dokumen & Perizinan: Dasbor dokumen, Pemanfaatan lahan, Dokumen perizinan, Dokumen tanda tangan, Templat dokumen, Permintaan unduh
 - Kontak
 - Catatan area
 - Prinsip sewa
@@ -266,12 +267,14 @@ Mengelola seluruh modul dan data master SimLahan.
 - Membuat, mengubah, dan menghapus data di semua modul, termasuk validasi ganti kerugian dan data pribadi (NIK/rekening).
 - Melihat data semua unit layanan dan semua Korwil, termasuk NIK warga.
 - Mengatur data master (jenis, kategori, tarif, aturan tenggat, konten portal) dan pengaturan modul di panel admin.
+- Dokumen & perizinan: mengatur jenis dokumen wajib, templat, dan pengaturan modul; menyetujui dokumen tanda tangan sebelum dikirim; menyetujui permintaan unduh, termasuk dokumen rahasia.
 - Melihat daftar pengguna.
 
 **Batas akses**
 
 - Menambah pengguna, mengatur grup, dan mengganti sandi orang lain hanya bisa dilakukan superuser.
 - Tugas terjadwal hanya bisa dilihat; mengubahnya dan kunci sistem hanya untuk superuser.
+- Tidak bisa menyetujui permintaan unduh miliknya sendiri.
 
 ## Pelaksana Pengadaan Tanah
 
@@ -375,17 +378,21 @@ Memproses permohonan alokasi lahan dari portal sampai terbit.
 
 - Panel admin, Alokasi lahan: Permohonan, Tagihan, Alokasi, Data lahan (termasuk impor peta dan profil investasi), Pemohon, Laporan pembangunan, konten portal
 - Panel admin, Alokasi lahan: Permintaan investasi, Sektor investasi, Kawasan investasi
+- Panel admin, Dokumen & Perizinan: Dasbor dokumen, Pemanfaatan lahan, Dokumen perizinan, Dokumen tanda tangan, Templat dokumen, Permintaan unduh, Jenis dokumen, Riwayat unduhan
 
 **Yang bisa dilakukan**
 
 - Memeriksa kelengkapan, meminta perbaikan, menyetujui/menolak permohonan, memverifikasi pembayaran, dan mencabut alokasi.
 - Memproses permintaan investasi: tinjau, jadwalkan konsultasi, kirim penawaran sewa/alokasi/kerja sama, balas pesan investor, lalu selesaikan (kontrak atau draf permohonan alokasi) atau tolak.
 - Mengelola data lahan (termasuk tarif sewa, sektor, kawasan, insentif) dan konten portal.
+- Mencatat pemanfaatan lahan, menentukan dokumen perizinan wajib, mengunggah/mengimpor templat (Word, PDF, HTML), memverifikasi atau meminta revisi dokumen, dan mengirim dokumen untuk ditandatangani (berurutan, OTP surel, sertifikat & kode QR verifikasi).
+- Menyetujui atau menolak permintaan unduh dokumen biasa.
 - Menerima ringkasan pemantauan mingguan lewat surel.
 
 **Batas akses**
 
 - Tidak membuka modul sewa, pengadaan, aset lahan, atau pusat komando.
+- Tidak menyetujui unduhan dokumen rahasia, tidak menyetujui permintaan unduh miliknya sendiri, dan tidak mengubah pengaturan modul dokumen.
 - Tidak bisa membuka data akun pengguna.
 
 ## Tim Verifikasi Teknis
@@ -399,15 +406,19 @@ Memberi penilaian teknis atas permohonan alokasi lahan.
 **Menu**
 
 - Panel admin, Alokasi lahan: Permohonan, Tagihan, Alokasi, Data lahan, Pemohon, Laporan pembangunan, Permintaan investasi (baca)
+- Panel admin, Dokumen & Perizinan: Dasbor dokumen, Pemanfaatan lahan, Dokumen perizinan, Dokumen tanda tangan, Templat dokumen, Permintaan unduh (baca dan verifikasi)
 
 **Yang bisa dilakukan**
 
 - Membaca permohonan, tagihan, alokasi, dan permintaan investasi.
 - Mengisi penilaian teknis per kriteria.
+- Memverifikasi atau meminta revisi dokumen perizinan.
+- Mengajukan permintaan unduh dokumen. Mengunduh dokumen selalu lewat permintaan unduh yang disetujui orang lain; setiap unduhan diberi tanda air dan tercatat.
 
 **Batas akses**
 
 - Tidak memutuskan permohonan, tidak memproses permintaan investasi, dan tidak mengubah data lahan.
+- Tidak membuat templat atau dokumen tanda tangan dan tidak menyetujui permintaan unduh.
 - Tidak membuka modul lain.
 
 ## Petugas Aset Lahan
@@ -447,16 +458,20 @@ Menangani perkara dan sidang terkait aset lahan.
 **Menu**
 
 - Panel admin, Manajemen aset lahan: perkara, advokat & jadwal sidang, dokumen, okupasi, pengaduan, urusan instansi, tugas, dasbor & peta
+- Panel admin, Dokumen & Perizinan: Dasbor dokumen, Pemanfaatan lahan, Dokumen perizinan, Dokumen tanda tangan, Templat dokumen, Permintaan unduh
 
 **Yang bisa dilakukan**
 
 - Mengelola perkara, advokat, jadwal sidang, dan dokumen perkara.
 - Menindaklanjuti okupasi dan pengaduan; mengelola urusan instansi dan tugas.
 - Membaca aset, kepemilikan, pemangku kepentingan, dan survei.
+- Menyusun templat dan blok isi, membuat dan mengirim dokumen tanda tangan (kontrak, perjanjian), serta membaca dokumen perizinan.
+- Mengajukan permintaan unduh dokumen. Mengunduh dokumen selalu lewat permintaan unduh yang disetujui orang lain; setiap unduhan diberi tanda air dan tercatat.
 
 **Batas akses**
 
 - Tidak melihat penilaian, pajak, transaksi, dan peta berbagi.
+- Tidak memverifikasi dokumen perizinan dan tidak menyetujui permintaan unduh.
 - Tidak membuka pusat komando, aplikasi lapangan, atau modul lain.
 
 ## Petugas Lapangan
@@ -518,11 +533,14 @@ Badan usaha, investor, atau perorangan yang mengajukan alokasi, sewa, atau inves
 **Menu**
 
 - Portal: Layanan, Lahan, Investasi (peta peluang, kawasan, bandingkan, ajukan minat), Lelang, Pengaduan, Lacak, Verifikasi dokumen, Bantuan, Akun saya (permohonan, permintaan investasi, lahan tersimpan, tagihan, profil, sandi)
+- Akun saya → Dokumen & perizinan (`/portal/dokumen/`): pemanfaatan lahan, dokumen tanda tangan, permintaan unduh
 
 **Yang bisa dilakukan**
 
 - Mengajukan dan melengkapi permohonan, membayar tagihan, melacak status, dan mengunduh dokumen terbit.
 - Menjelajah peta investasi tanpa masuk; setelah masuk: menyimpan lahan, mengajukan minat sewa/alokasi/kerja sama (memilih lahan atau menggambar usulan lokasi), berkirim pesan dengan petugas, serta menerima atau menolak penawaran.
+- Melihat status setiap dokumen perizinan pemanfaatan lahannya, mengunduh format templat, mengunggah dokumen atau revisi, serta menandatangani dokumen secara elektronik.
+- Mengajukan permintaan unduh dokumen; unduhan terbuka setelah disetujui petugas, diberi tanda air, dan tercatat.
 - Mengubah profil dan sandi; memakai Lupa sandi bila lupa.
 
 **Batas akses**

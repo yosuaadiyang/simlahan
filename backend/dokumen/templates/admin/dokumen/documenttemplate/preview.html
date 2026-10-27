@@ -1,0 +1,26 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+{% block extrahead %}{{ block.super }}{{ media }}{% endblock %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static 'dokumen/admin.css' %}">{% endblock %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+  &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+  &rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+  &rsaquo; <a href="{% url opts|admin_urlname:'change' original.pk %}">{{ original }}</a>
+  &rsaquo; Pratinjau
+</div>
+{% endblock %}
+{% block content %}
+<div id="content-main">
+  <form method="get" class="dk-inline-form">
+    <label for="{{ form.land_use.id_for_label }}">Isi dengan data pemanfaatan lahan:</label>
+    {{ form.land_use }}
+    <button type="submit" class="button">Terapkan</button>
+    <a href="{% url 'admin:dokumen_documenttemplate_preview' original.pk %}">Pakai data contoh</a>
+    <a class="button" href="{% url 'admin:dokumen_documenttemplate_download' original.pk %}{% if form.cleaned_data.land_use %}?land_use={{ form.cleaned_data.land_use.pk }}{% endif %}">Unduh PDF</a>
+  </form>
+  <p class="help">Isian yang tidak ada datanya ditandai <span class="merge-field">kuning</span>.{% if custom %} Isian yang diisi petugas saat membuat dokumen: {% for key in custom %}<code>isian.{{ key }}</code>{% if not forloop.last %}, {% endif %}{% endfor %}.{% endif %}</p>
+  <div class="dk-paper">{{ body|safe }}</div>
+</div>
+{% endblock %}

@@ -1,0 +1,11 @@
+.dk-editor { flex: 1 1 100%; min-width: 0; max-width: 900px; border: 1px solid var(--border-color, #ccc); border-radius: 6px; background: var(--body-bg, #fff); }
+.dk-editor-bar { display: flex; flex-wrap: wrap; gap: 4px; padding: 6px; border-bottom: 1px solid var(--border-color, #ccc); background: var(--darkened-bg, #f8f8f8); border-radius: 6px 6px 0 0; position: sticky; top: 0; z-index: 2; }
+.dk-editor-bar button { min-height: 30px; padding: 2px 8px; border: 1px solid var(--border-color, #ccc); border-radius: 4px; background: var(--body-bg, #fff); color: var(--body-fg, #333); font-size: .8125rem; cursor: pointer; }
+.dk-editor-bar button:hover { background: var(--selected-bg, #eef); }
+.dk-editor-bar button.active { background: var(--button-bg, #417690); color: var(--button-fg, #fff); }
+.dk-editor-bar button:disabled { opacity: .45; cursor: not-allowed; }
+.dk-editor-bar select { min-height: 30px; max-width: 100%; }
+.dk-editor-area { min-height: 320px; max-height: 70vh; overflow: auto; padding: 16px 20px; outline: none; border-radius: 0 0 6px 6px; }
+.dk-editor-area:focus { box-shadow: inset 0 0 0 2px var(--sl-brand-200, #b6d4fe); }
+.dk-editor textarea { width: 100%; box-sizing: border-box; min-height: 320px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .8125rem; border: 0; border-radius: 0 0 6px 6px; }
+.dk-editor-hidden { display: none !important; }

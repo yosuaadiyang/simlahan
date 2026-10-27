@@ -17,14 +17,12 @@ from alokasi.models import (
     Invoice,
     IssuedDocument,
     LandPlot,
-    PermitReport,
 )
 
 FILE_KINDS = {
     "dokumen": (ApplicationDocument, "file"),
     "bukti": (Invoice, "payment_proof"),
     "terbit": (IssuedDocument, "file"),
-    "izin": (PermitReport, "document"),
     "progres": (DevelopmentReport, "photo"),
     "lahan": (LandPlot, "photo"),
     "informasi": (InfoPage, "attachment"),

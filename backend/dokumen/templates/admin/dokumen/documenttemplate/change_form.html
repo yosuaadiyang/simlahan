@@ -1,0 +1,11 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static 'dokumen/admin.css' %}">{% endblock %}
+{% block object-tools-items %}
+  {% if original.pk %}
+  {% if original.kind == 'html' %}<li><a href="{% url 'admin:dokumen_documenttemplate_preview' original.pk %}">Pratinjau</a></li>{% endif %}
+  {% if original.kind != 'html' and original.file or original.kind == 'html' %}<li><a href="{% url 'admin:dokumen_documenttemplate_download' original.pk %}">Unduh contoh</a></li>{% endif %}
+  {% if original.can_sign and original.is_active and perms.dokumen.add_signingdocument %}<li><a href="{% url 'admin:dokumen_signingdocument_add' %}?templat={{ original.pk }}">Buat dokumen tanda tangan</a></li>{% endif %}
+  {% endif %}
+  {{ block.super }}
+{% endblock %}

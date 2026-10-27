@@ -29,7 +29,6 @@ CHANGELISTS = (
     "invoice",
     "allocation",
     "issueddocument",
-    "permitreport",
     "developmentreport",
 )
 

@@ -494,40 +494,9 @@ def test_allocation_reporting_and_transfer(
     assert page.status_code == 200
     assert "Batas memulai pembangunan" in page.content.decode()
 
-    # Laporan izin: status terbit wajib nomor & tanggal.
-    response = client.post(
-        reverse("portal:permit_report_save", args=[allocation.pk]),
-        {"izin-permit_type": "pkkpr", "izin-status": "terbit"},
-    )
-    assert not allocation.permit_reports.exists()
-    # Galat ditampilkan pada formulir yang sama, isian tidak hilang.
-    assert response.status_code == 200
-    assert response.context["permit_form"].errors["permit_number"]
-    assert response.context["permit_form"]["status"].value() == "terbit"
-    client.post(
-        reverse("portal:permit_report_save", args=[allocation.pk]),
-        {
-            "izin-permit_type": "pkkpr",
-            "izin-status": "terbit",
-            "izin-permit_number": "PKKPR-001",
-            "izin-issued_date": "2026-10-01",
-            "izin-document": pdf_file("pkkpr.pdf"),
-        },
-    )
-    report = allocation.permit_reports.get()
-    assert report.permit_number == "PKKPR-001"
-    # Laporan jenis yang sama menggantikan laporan sebelumnya.
-    client.post(
-        reverse("portal:permit_report_save", args=[allocation.pk]),
-        {"izin-permit_type": "pkkpr", "izin-status": "proses", "izin-note": "revisi"},
-    )
-    assert allocation.permit_reports.count() == 1
-    assert (
-        client.get(
-            reverse("portal:permit_document", args=[allocation.pk, report.pk])
-        ).status_code
-        == 200
-    )
+    # Daftar dokumen perizinan kini dikelola modul dokumen.
+    land_use_url = reverse("dokumen_portal:land_use", args=[allocation.land_use.number])
+    assert land_use_url in page.content.decode()
 
     client.post(
         reverse("portal:development_report_create", args=[allocation.pk]),

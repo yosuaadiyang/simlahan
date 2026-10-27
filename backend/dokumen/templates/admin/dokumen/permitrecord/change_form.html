@@ -1,0 +1,61 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static 'dokumen/admin.css' %}">{% endblock %}
+{% block object-tools-items %}
+  {% if original.pk %}
+  {% if can_verify %}<li><a href="{% url 'admin:dokumen_permitrecord_process' original.pk 'verifikasi' %}">Verifikasi</a></li>{% endif %}
+  {% if can_revise %}<li><a href="{% url 'admin:dokumen_permitrecord_process' original.pk 'perbaikan' %}">Minta perbaikan</a></li>{% endif %}
+  {% if can_upload %}<li><a href="{% url 'admin:dokumen_permitrecord_process' original.pk 'unggah' %}">Unggah versi</a></li>{% endif %}
+  {% if can_generate %}<li><a href="{% url 'admin:dokumen_permitrecord_generate' original.pk %}">Buat dari templat</a></li>{% endif %}
+  {% if can_sign %}<li><a href="{% url 'admin:dokumen_signingdocument_add' %}?izin={{ original.pk }}">Minta tanda tangan</a></li>{% endif %}
+  {% if can_waive %}<li><a href="{% url 'admin:dokumen_permitrecord_process' original.pk 'tidak-wajib' %}">Tidak wajib</a></li>{% endif %}
+  {% if can_reopen %}<li><a href="{% url 'admin:dokumen_permitrecord_process' original.pk 'buka' %}">Buka kembali</a></li>{% endif %}
+  <li><a href="{% url 'admin:dokumen_landuse_change' original.land_use_id %}">Pemanfaatan lahan</a></li>
+  {% endif %}
+  {{ block.super }}
+{% endblock %}
+{% block field_sets %}
+{% if original.pk %}
+<div class="module dk-summary">
+  <div class="dk-summary-head">
+    <strong>{{ original.permit_type.name }}</strong>
+    <span class="dk-status dk-s-{{ original.status }}">{{ original.get_status_display }}</span>
+    <span class="dk-muted">{{ original.land_use.number }} · {{ original.land_use.holder_display }} · sifat {{ original.permit_type.get_confidentiality_display|lower }}{% if not original.permit_type.is_required %} · opsional{% endif %}</span>
+  </div>
+  {% if original.expiry_date %}<p class="dk-muted">Berlaku sampai {{ original.expiry_date|date:"d-m-Y" }}{% if original.days_to_expiry is not None %}{% if original.days_to_expiry < 0 %} — <strong class="dk-danger-text">lewat {{ original.days_to_expiry|stringformat:"d"|slice:"1:" }} hari</strong>{% elif original.days_to_expiry <= 60 %} — <strong class="dk-warn-text">{{ original.days_to_expiry }} hari lagi</strong>{% endif %}{% endif %}</p>{% endif %}
+  {% if original.permit_type.description %}<p class="dk-muted">{{ original.permit_type.description }}</p>{% endif %}
+
+  <h3>Versi berkas</h3>
+  <div class="dk-table-wrap"><table class="dk-table">
+    <thead><tr><th>Versi</th><th>Berkas</th><th>Sumber</th><th>Diunggah</th><th>Sidik SHA-256</th><th>Tindakan</th></tr></thead>
+    <tbody>
+    {% for v in versions %}
+      <tr>
+        <td>v{{ v.number }}{% if forloop.first %} <span class="dk-chip ok">terbaru</span>{% endif %}</td>
+        <td class="dk-break">{{ v.original_name }}<br><span class="dk-muted">{{ v.size_label }}</span>{% if v.note %}<br><span class="dk-muted">{{ v.note }}</span>{% endif %}</td>
+        <td>{{ v.get_source_display }}</td>
+        <td>{{ v.created_at|date:"d-m-Y H.i" }}<br><span class="dk-muted">{% if v.uploaded_by %}{{ v.uploaded_by.get_full_name|default:v.uploaded_by.get_username }}{% else %}{{ v.get_source_display }}{% endif %}</span></td>
+        <td><code class="dk-hash" title="{{ v.sha256 }}">{{ v.sha256|truncatechars:17 }}</code></td>
+        <td class="dk-actions">
+          {% if can_preview and v.previewable %}<a href="{% url 'dokumen-version-preview' v.pk %}" target="_blank" rel="noopener">Pratinjau</a>{% endif %}
+          <a href="{% url 'dokumen-staff-request' 'versi' v.pk %}">Minta unduh</a>
+        </td>
+      </tr>
+    {% empty %}<tr><td colspan="6" class="dk-muted">Belum ada berkas.</td></tr>{% endfor %}
+    </tbody>
+  </table></div>
+  {% if can_preview %}<p class="help">Pratinjau verifikasi (PDF/gambar) diberi tanda air dan tercatat. Mengunduh berkas asli wajib lewat permintaan unduh yang disetujui pejabat lain.</p>{% endif %}
+
+  {% if my_requests %}
+  <h3>Permintaan unduh saya</h3>
+  <ul class="dk-list">{% for r in my_requests %}<li><a href="{% url 'admin:dokumen_downloadrequest_change' r.pk %}">{{ r.number }}</a> · v{{ r.version.number }} · {{ r.state_label }}{% if r.is_usable %} · <a href="{% url 'dokumen-staff-download' r.number %}">Unduh ({{ r.remaining }} sisa)</a>{% endif %}</li>{% endfor %}</ul>
+  {% endif %}
+
+  {% if signing_documents %}
+  <h3>Dokumen tanda tangan</h3>
+  <ul class="dk-list">{% for d in signing_documents %}<li><a href="{% url 'admin:dokumen_signingdocument_change' d.pk %}">{{ d.number }} – {{ d.title }}</a> <span class="dk-status dk-s-{{ d.status }}">{{ d.get_status_display }}</span></li>{% endfor %}</ul>
+  {% endif %}
+</div>
+{% endif %}
+{{ block.super }}
+{% endblock %}

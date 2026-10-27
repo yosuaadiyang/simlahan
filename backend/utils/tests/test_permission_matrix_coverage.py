@@ -6,6 +6,7 @@ from django.contrib import admin
 
 from alokasi.permissions import ALOKASI_GROUP_MODEL_PERMISSIONS
 from asetlahan.permissions import ASETLAHAN_GROUP_MODEL_PERMISSIONS
+from dokumen.permissions import DOKUMEN_GROUP_MODEL_PERMISSIONS
 from operasi.permissions import OPERASI_GROUP_MODEL_PERMISSIONS
 from pengadaan.permissions import PENGADAAN_GROUP_MODEL_PERMISSIONS
 
@@ -13,6 +14,7 @@ MATRICES = {
     "alokasi": ALOKASI_GROUP_MODEL_PERMISSIONS,
     "asetlahan": ASETLAHAN_GROUP_MODEL_PERMISSIONS,
     "operasi": OPERASI_GROUP_MODEL_PERMISSIONS,
+    "dokumen": DOKUMEN_GROUP_MODEL_PERMISSIONS,
     "pengadaan": PENGADAAN_GROUP_MODEL_PERMISSIONS,
 }
 

@@ -1,0 +1,24 @@
+{% extends "alokasi/portal/base.html" %}{% load static %}
+{% block title %}Permintaan unduh{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'dokumen/portal.css' %}">{% endblock %}
+{% block content %}
+<p class="small"><a href="{% url 'dokumen_portal:index' %}">‹ Dokumen &amp; perizinan</a></p>
+<h1>Permintaan unduh</h1>
+<p class="muted">Setiap unduhan dokumen memerlukan persetujuan petugas berwenang. Izin unduh berlaku terbatas waktu dan jumlahnya, berkas PDF diberi tanda air nama Anda, dan semua unduhan tercatat.</p>
+{% include "dokumen/portal/_nav.html" %}
+<div class="table-wrap"><table class="data">
+  <thead><tr><th>Nomor</th><th>Dokumen</th><th>Keperluan</th><th>Diajukan</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+  {% for r in requests %}
+    <tr>
+      <td>{{ r.number }}</td>
+      <td class="dk-break">{{ r.target_label }}</td>
+      <td>{{ r.get_purpose_display }}</td>
+      <td>{{ r.created_at|date:"d-m-Y H.i" }}</td>
+      <td>{% include "dokumen/portal/_request_state.html" %}</td>
+      <td>{% if r.status == 'menunggu' %}<form method="post" action="{% url 'dokumen_portal:download_cancel' r.number %}">{% csrf_token %}<button type="submit" class="btn btn-danger btn-small">Batalkan</button></form>{% endif %}</td>
+    </tr>
+  {% empty %}<tr><td colspan="6" class="muted">Belum ada permintaan unduh. Ajukan dari halaman pemanfaatan lahan atau dokumen tanda tangan.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}

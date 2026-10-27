@@ -115,24 +115,6 @@ class AllocationStatus(models.TextChoices):
     EXPIRED = "berakhir", _("Berakhir")
 
 
-class PermitType(models.TextChoices):
-    PKKPR = "pkkpr", _("PKKPR (Persetujuan Kesesuaian Kegiatan Pemanfaatan Ruang)")
-    PKKPRL = "pkkprl", _(
-        "PKKPRL (Persetujuan Kesesuaian Kegiatan Pemanfaatan Ruang Laut)"
-    )
-    ENVIRONMENT = "lingkungan", _("Persetujuan Lingkungan")
-    PBG = "pbg", _("PBG (Persetujuan Bangunan Gedung)")
-    SLF = "slf", _("SLF (Sertifikat Laik Fungsi)")
-    OTHER = "lainnya", _("Izin lainnya")
-
-
-class PermitStatus(models.TextChoices):
-    NOT_STARTED = "belum", _("Belum diurus")
-    IN_PROCESS = "proses", _("Dalam proses")
-    ISSUED = "terbit", _("Sudah terbit")
-    NOT_REQUIRED = "tidak_wajib", _("Tidak diwajibkan")
-
-
 class DevelopmentStage(models.TextChoices):
     NOT_STARTED = "belum_mulai", _("Belum dimulai")
     PREPARATION = "persiapan", _("Pematangan / persiapan lahan")

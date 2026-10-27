@@ -1,0 +1,51 @@
+{% extends "dokumen/pdf/_base.html" %}{% load alokasi_tags dokumen_tags %}
+{% block title %}{{ doc.number }} {{ doc.title }}{% endblock %}
+{% block content %}
+{% if body %}
+{{ body|safe }}
+{% endif %}
+
+<div{% if body %} class="page-break"{% endif %}>
+<h2>LEMBAR PENGESAHAN</h2>
+<p>Dokumen <strong>{{ doc.number }}</strong> — {{ doc.title }} telah ditandatangani/disetujui secara elektronik oleh pihak-pihak berikut.</p>
+<table class="grid">
+  <tr><th style="width:28%">Pihak</th><th style="width:34%">Tanda tangan</th><th>Waktu &amp; jejak</th></tr>
+  {% for r in signers %}
+  <tr>
+    <td><strong>{{ r.signature_name|default:r.name }}</strong><br>{{ r.role|default:r.get_action_display }}<br><span class="small">{{ r.email|pecah:24 }}</span></td>
+    <td>{% if r.signature_image %}<img src="{{ r.signature_image }}" width="170" height="60">{% else %}<strong>DISETUJUI</strong>{% endif %}<br><span class="small">{{ r.get_action_display }}</span></td>
+    <td class="small">{{ r.completed_at|date:"d-m-Y H.i.s" }} WIB<br>IP {{ r.ip_address|default:"-" }}{% if r.user_id %}<br>Masuk dengan akun SimLahan{% else %}<br>Kode verifikasi surel{% endif %}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% if copies %}<p class="small">Salinan: {% for r in copies %}{{ r.name }} ({{ r.email|pecah:32 }}){% if not forloop.last %}, {% endif %}{% endfor %}</p>{% endif %}
+</div>
+
+<div class="page-break">
+<h2>SERTIFIKAT PENYELESAIAN</h2>
+<table style="width:100%">
+  <tr>
+    <td style="width:72%">
+      <table class="grid">
+        <tr><th style="width:38%">Nomor dokumen</th><td>{{ doc.number }}</td></tr>
+        <tr><th>Judul</th><td>{{ doc.title }}</td></tr>
+        <tr><th>Dikirim</th><td>{{ doc.sent_at|date:"d-m-Y H.i.s" }} WIB</td></tr>
+        <tr><th>Selesai</th><td>{{ completed_at|date:"d-m-Y H.i.s" }} WIB</td></tr>
+        <tr><th>Sidik isi saat dikirim (SHA-256)</th><td class="small">{{ doc.content_sha256|pecah:32 }}</td></tr>
+        <tr><th>Periksa keaslian</th><td class="small">{{ verification_url|pecah:40 }}</td></tr>
+      </table>
+    </td>
+    <td style="width:28%; text-align:center"><img src="{{ qr }}" width="110" height="110"><br><span class="small">Pindai untuk verifikasi</span></td>
+  </tr>
+</table>
+<h3>Jejak audit</h3>
+<table class="grid">
+  <tr><th style="width:22%">Waktu (WIB)</th><th style="width:22%">Pelaku</th><th style="width:22%">Aktivitas</th><th>Keterangan</th></tr>
+  {% for e in events %}
+  <tr><td>{{ e.created_at|date:"d-m-Y H.i.s" }}</td><td>{{ e.actor_name|pecah:20 }}</td><td>{{ e.get_action_display }}</td><td>{{ e.detail|truncatechars:120|pecah:28 }}{% if e.ip_address %} · IP {{ e.ip_address }}{% endif %}</td></tr>
+  {% endfor %}
+</table>
+<p class="small">Sidik SHA-256 berkas PDF final tercatat di sistem; unggah berkas di halaman verifikasi untuk memastikan berkas tidak diubah.</p>
+</div>
+{% endblock %}
+{% block footer %}Ditandatangani elektronik {{ doc.number }} · verifikasi: {{ verification_url }}{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "admin/dokumen/tool_base.html" %}
+{% block tool %}
+<div class="al-card dk-narrow">
+  <h2>{{ label }}</h2>
+  <p>Sifat dokumen: <strong>{{ level }}</strong>. Setiap unduhan wajib disetujui pejabat berwenang selain Anda, berlaku terbatas, diberi tanda air, dan tercatat.</p>
+  <form method="post">{% csrf_token %}
+    {% if form.non_field_errors %}<ul class="errorlist nonfield">{% for e in form.non_field_errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    <fieldset class="module aligned">
+      {% for field in form %}
+      <div class="form-row">{{ field.errors }}<div class="flex-container"><label for="{{ field.id_for_label }}" class="required">{{ field.label }}</label>{{ field }}</div>{% if field.help_text %}<div class="help">{{ field.help_text }}</div>{% endif %}</div>
+      {% endfor %}
+    </fieldset>
+    <div class="submit-row"><input type="submit" class="default" value="Kirim permintaan"><a href="{{ back_url }}" class="closelink">Batal</a></div>
+  </form>
+</div>
+{% endblock %}

@@ -1426,54 +1426,6 @@ class IssuedDocument(models.Model):
         return f"{self.get_kind_display()} {self.number}"
 
 
-class PermitReport(TimeStampedModel):
-    """Progres perizinan pemegang alokasi (satu baris per jenis izin)."""
-
-    allocation = models.ForeignKey(
-        Allocation,
-        verbose_name=_("Alokasi"),
-        on_delete=models.CASCADE,
-        related_name="permit_reports",
-    )
-    permit_type = models.CharField(
-        verbose_name=_("Jenis izin"), max_length=16, choices=enums.PermitType.choices
-    )
-    status = models.CharField(
-        verbose_name=_("Status"),
-        max_length=16,
-        choices=enums.PermitStatus.choices,
-        default=enums.PermitStatus.NOT_STARTED,
-    )
-    permit_number = models.CharField(
-        verbose_name=_("Nomor izin"), max_length=128, blank=True, default=""
-    )
-    issued_date = models.DateField(
-        verbose_name=_("Tanggal terbit"), null=True, blank=True
-    )
-    document = PrivateFileField(
-        max_length=255,
-        verbose_name=_("Dokumen izin"),
-        upload_to=upload_report,
-        null=True,
-        blank=True,
-        validators=UPLOAD_VALIDATORS,
-    )
-    note = models.TextField(verbose_name=_("Keterangan"), blank=True, default="")
-
-    class Meta:
-        verbose_name = _("Laporan perizinan")
-        verbose_name_plural = _("Laporan perizinan")
-        ordering = ["allocation", "permit_type"]
-        constraints = [
-            models.UniqueConstraint(
-                fields=["allocation", "permit_type"], name="alokasi_unique_permit_type"
-            )
-        ]
-
-    def __str__(self):
-        return f"{self.allocation} / {self.get_permit_type_display()}"
-
-
 class DevelopmentReport(TimeStampedModel):
     """Laporan berkala progres pembangunan di lahan yang dialokasikan."""
 
@@ -1910,7 +1862,6 @@ for _model in (
     Invoice,
     Allocation,
     IssuedDocument,
-    PermitReport,
     DevelopmentReport,
     InvestmentSector,
     InvestmentZone,

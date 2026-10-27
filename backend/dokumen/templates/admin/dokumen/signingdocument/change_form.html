@@ -1,0 +1,95 @@
+{% extends "admin/change_form.html" %}
+{% load static dokumen_tags %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static 'dokumen/admin.css' %}">{% endblock %}
+{% block object-tools-items %}
+  {% if original.pk %}
+  {% if can_preview %}<li><a href="{% url 'admin:dokumen_signingdocument_preview' original.pk %}" target="_blank" rel="noopener">Pratinjau PDF</a></li>{% endif %}
+  {% if can_submit_approval %}<li><form method="post" action="{% url 'admin:dokumen_signingdocument_process' original.pk 'ajukan' %}">{% csrf_token %}<button type="submit" class="dk-tool-btn">Minta persetujuan</button></form></li>{% endif %}
+  {% if can_approve %}<li><a href="{% url 'admin:dokumen_signingdocument_process' original.pk 'setujui' %}">Setujui</a></li>{% endif %}
+  {% if can_reject_approval %}<li><a href="{% url 'admin:dokumen_signingdocument_process' original.pk 'tolak-persetujuan' %}">Kembalikan ke draf</a></li>{% endif %}
+  {% if can_send %}<li><form method="post" action="{% url 'admin:dokumen_signingdocument_process' original.pk 'kirim' %}">{% csrf_token %}<button type="submit" class="dk-tool-btn dk-primary"{% if problems %} disabled title="Selesaikan catatan di bawah dulu"{% endif %}>Kirim untuk ditandatangani</button></form></li>{% endif %}
+  {% if can_remind %}<li><form method="post" action="{% url 'admin:dokumen_signingdocument_process' original.pk 'ingatkan' %}">{% csrf_token %}<button type="submit" class="dk-tool-btn">Kirim pengingat</button></form></li>{% endif %}
+  {% if can_duplicate %}<li><form method="post" action="{% url 'admin:dokumen_signingdocument_process' original.pk 'salin' %}">{% csrf_token %}<button type="submit" class="dk-tool-btn">Salin jadi draf baru</button></form></li>{% endif %}
+  {% if can_cancel %}<li><a href="{% url 'admin:dokumen_signingdocument_process' original.pk 'batal' %}">Batalkan</a></li>{% endif %}
+  {% endif %}
+  {{ block.super }}
+{% endblock %}
+{% block field_sets %}
+{% if original.pk %}
+<div class="module dk-summary">
+  <div class="dk-summary-head">
+    <strong>{{ original.number }}</strong>
+    <span class="dk-status dk-s-{{ original.status }}">{{ original.get_status_display }}</span>
+    <span class="dk-muted">{{ original.get_source_display }} · sifat {{ original.get_confidentiality_display|lower }}{% if original.expires_on %} · berlaku s.d. {{ original.expires_on|date:"d-m-Y" }}{% endif %}</span>
+  </div>
+  {% if original.status == 'draf' %}<p class="dk-muted">Draf dapat diedit. Lengkapi penerima (urutan sama = bertindak bersamaan), lalu {% if original.needs_approval %}minta persetujuan internal sebelum dikirim{% else %}kirim untuk ditandatangani{% endif %}.</p>{% endif %}
+  {% if original.status == 'menunggu_persetujuan' %}<p class="dk-muted">Menunggu persetujuan internal oleh pejabat selain pembuat.</p>{% endif %}
+  {% if original.status == 'disetujui' %}<p class="dk-muted">Disetujui {{ original.approved_by.get_full_name|default:original.approved_by }} pada {{ original.approved_at|date:"d-m-Y H.i" }}. Siap dikirim.</p>{% endif %}
+  {% if original.closed_reason %}<p class="dk-warn-text">{{ original.closed_reason }}</p>{% endif %}
+  {% if problems %}
+  <ul class="dk-problems">{% for p in problems %}<li>{{ p }}</li>{% endfor %}</ul>
+  {% endif %}
+
+  {% if recipients %}
+  <h3>Penerima &amp; urutan</h3>
+  <div class="dk-table-wrap"><table class="dk-table">
+    <thead><tr><th>Urutan</th><th>Penerima</th><th>Tindakan</th><th>Status</th><th>Waktu</th>{% if can_remind %}<th></th>{% endif %}</tr></thead>
+    <tbody>
+    {% for r in recipients %}
+      <tr{% if current_order == r.order and r.status != 'selesai' and r.action != 'salinan' %} class="dk-current"{% endif %}>
+        <td>{{ r.order }}</td>
+        <td class="dk-break">{{ r.name }}{% if r.role %} <span class="dk-muted">({{ r.role }})</span>{% endif %}<br><span class="dk-muted">{{ r.email }}{% if r.user_id %} · akun SimLahan{% else %} · verifikasi kode surel{% endif %}</span></td>
+        <td>{{ r.get_action_display }}</td>
+        <td><span class="dk-status dk-s-{{ r.status }}">{{ r.get_status_display }}</span>{% if r.decline_reason %}<br><span class="dk-muted">{{ r.decline_reason }}</span>{% endif %}</td>
+        <td class="dk-muted">{% if r.completed_at %}{{ r.completed_at|date:"d-m-Y H.i" }}{% elif r.viewed_at %}dilihat {{ r.viewed_at|date:"d-m-Y H.i" }}{% elif r.notified_at %}dikirim {{ r.notified_at|date:"d-m-Y H.i" }}{% else %}–{% endif %}</td>
+        {% if can_remind %}<td>{% if r.status != 'selesai' and r.status != 'ditolak' and r.notified_at %}<button type="submit" class="button dk-small" form="dk-resend-{{ r.pk }}">Kirim ulang</button>{% endif %}</td>{% endif %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  {% endif %}
+
+  {% if original.status == 'selesai' %}
+  <h3>Dokumen final</h3>
+  <p>Selesai {{ original.completed_at|date:"d-m-Y H.i" }}. Sidik SHA-256: <code class="dk-hash dk-break">{{ original.final_sha256 }}</code></p>
+  <p><a href="{{ verify_url }}" target="_blank" rel="noopener">Halaman verifikasi keaslian</a>{% if can_request_download %} · <a href="{% url 'dokumen-staff-request' 'dokumen' original.pk %}">Minta unduh PDF final</a>{% endif %}{% if original.record_id %} · <a href="{% url 'admin:dokumen_permitrecord_change' original.record_id %}">Tersimpan di dokumen perizinan</a>{% endif %}</p>
+  {% endif %}
+  {% if my_requests %}
+  <ul class="dk-list">{% for r in my_requests %}<li><a href="{% url 'admin:dokumen_downloadrequest_change' r.pk %}">{{ r.number }}</a> · {{ r.state_label }}{% if r.is_usable %} · <a href="{% url 'dokumen-staff-download' r.number %}">Unduh ({{ r.remaining }} sisa)</a>{% endif %}</li>{% endfor %}</ul>
+  {% endif %}
+
+  {% if original.source == 'html' and not original.is_editable %}
+  <details class="dk-body-details"><summary>Lihat isi dokumen</summary><div class="dk-paper">{{ original.body|bersih }}</div></details>
+  {% endif %}
+</div>
+{% endif %}
+{{ block.super }}
+{% endblock %}
+{% block content %}{{ block.super }}
+{% if original.pk %}
+{% for r in recipients %}<form id="dk-resend-{{ r.pk }}" method="post" action="{% url 'admin:dokumen_signingdocument_resend' r.pk %}" hidden>{% csrf_token %}</form>{% endfor %}
+<div class="dk-below">
+  {% if fill_form %}
+  <div class="module dk-panel">
+    <h2>Isian yang perlu dilengkapi</h2>
+    <form method="post" action="{% url 'admin:dokumen_signingdocument_fill' original.pk %}">{% csrf_token %}
+      {% for field in fill_form %}<div class="form-row">{{ field.errors }}<label for="{{ field.id_for_label }}" class="required">{{ field.label }}</label> {{ field }} <span class="help">{{ field.help_text }}</span></div>{% endfor %}
+      <button type="submit" class="button">Terapkan ke isi dokumen</button>
+    </form>
+  </div>
+  {% endif %}
+  <div class="module dk-panel" id="komentar">
+    <h2>Komentar</h2>
+    {% for c in comments %}
+    <div class="dk-comment{% if c.is_internal %} internal{% endif %}"><div class="dk-muted">{{ c.author_name }} · {{ c.created_at|date:"d-m-Y H.i" }}{% if c.is_internal %} · internal (tidak terlihat penerima){% endif %}</div><div class="dk-pre">{{ c.body }}</div></div>
+    {% empty %}<p class="dk-muted">Belum ada komentar.</p>{% endfor %}
+    <form method="post" action="{% url 'admin:dokumen_signingdocument_comment' original.pk %}">{% csrf_token %}
+      <label for="dk-comment-body" class="required">Tulis komentar</label>
+      <textarea id="dk-comment-body" name="body" rows="3" maxlength="5000" required></textarea>
+      <label class="dk-check"><input type="checkbox" name="internal" value="1" checked> Internal (hanya petugas)</label>
+      <button type="submit" class="button">Kirim komentar</button>
+    </form>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

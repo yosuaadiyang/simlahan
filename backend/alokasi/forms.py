@@ -14,7 +14,6 @@ from alokasi.models import (
     ApplicationDocument,
     DevelopmentReport,
     Invoice,
-    PermitReport,
     RequirementDocType,
     VerificationCriterion,
 )
@@ -307,34 +306,6 @@ class PaymentProofForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["payment_proof"].required = True
-
-
-class PermitReportForm(forms.ModelForm):
-    class Meta:
-        model = PermitReport
-        fields = (
-            "permit_type",
-            "status",
-            "permit_number",
-            "issued_date",
-            "document",
-            "note",
-        )
-        widgets = {"issued_date": DATE_INPUT, "note": forms.Textarea(attrs={"rows": 2})}
-
-    def clean(self):
-        cleaned = super().clean()
-        if cleaned.get("status") == enums.PermitStatus.ISSUED:
-            if not cleaned.get("permit_number"):
-                self.add_error(
-                    "permit_number", _("Nomor izin wajib diisi bila izin sudah terbit.")
-                )
-            if not cleaned.get("issued_date"):
-                self.add_error(
-                    "issued_date",
-                    _("Tanggal terbit wajib diisi bila izin sudah terbit."),
-                )
-        return cleaned
 
 
 class DevelopmentReportForm(forms.ModelForm):
