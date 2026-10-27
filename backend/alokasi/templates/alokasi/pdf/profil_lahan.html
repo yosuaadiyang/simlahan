@@ -1,0 +1,44 @@
+{% extends "alokasi/pdf/_base.html" %}{% load alokasi_tags %}
+{% block title %}Profil Lahan {{ plot.code }}{% endblock %}
+{% block content %}
+<table class="data"><tr>
+  <td>
+    <h1 style="text-align:left">PROFIL PELUANG INVESTASI LAHAN</h1>
+    <p style="font-size:12pt"><strong>{{ plot.code }} &middot; {{ plot.name }}</strong></p>
+    <p class="muted">Status: {{ plot.get_status_display }}{% if plot.sector and plot.sector.is_active %} &middot; Sektor: {{ plot.sector.name }}{% endif %}{% if plot.zone and plot.zone.is_published %} &middot; Kawasan: {{ plot.zone.name }}{% endif %}</p>
+  </td>
+  <td class="right" style="width:3cm"><img src="{{ qr }}" width="85" height="85" alt=""></td>
+</tr></table>
+
+<h2>Data lahan</h2>
+<table class="grid">
+  <tr><th style="width:38%;text-align:left">Luas</th><td>{{ plot.area_m2|angka:2 }} m² ({{ plot.area_m2|hektare }})</td></tr>
+  {% if plot.district or plot.village %}<tr><th style="text-align:left">Lokasi</th><td>{% if plot.village %}Kel. {{ plot.village }}, {% endif %}{% if plot.district %}Kec. {{ plot.district }}{% endif %}{% if plot.address %}<br>{{ plot.address }}{% endif %}</td></tr>{% endif %}
+  {% if plot.zoning %}<tr><th style="text-align:left">Peruntukan ruang</th><td>{{ plot.zoning }}</td></tr>{% endif %}
+  {% if plot.intended_use %}<tr><th style="text-align:left">Arahan pemanfaatan</th><td>{{ plot.intended_use }}</td></tr>{% endif %}
+  <tr><th style="text-align:left">Jenis alokasi</th><td>{{ plot.get_allocation_type_display }}</td></tr>
+  <tr><th style="text-align:left">Pematangan lahan</th><td>{{ plot.land_preparation_done|yesno:"Selesai (siap bangun),Belum" }}</td></tr>
+  <tr><th style="text-align:left">Dokumen teknis</th><td>{{ plot.has_technical_documents|yesno:"Tersedia,Belum tersedia" }}</td></tr>
+  {% if plot.utilities %}<tr><th style="text-align:left">Utilitas</th><td>{{ plot.utilities|join:", " }}</td></tr>{% endif %}
+  {% for label, km in plot.distances %}<tr><th style="text-align:left">Jarak ke {{ label|lower }}</th><td>{{ km|angka:1 }} km</td></tr>{% endfor %}
+</table>
+
+<h2>Skema & perkiraan biaya</h2>
+<table class="grid">
+  <tr><th style="text-align:left">Skema</th><th style="text-align:left">Tarif</th><th style="text-align:left">Jangka waktu</th><th style="text-align:left">Perkiraan</th></tr>
+  {% if plot.offer_lease %}<tr><td>Sewa lahan</td><td>{{ plot.lease_rate_per_m2_year|rupiah }} /m²/tahun</td><td>{{ plot.lease_min_years|default:"1" }}{% if plot.lease_max_years %}&ndash;{{ plot.lease_max_years }}{% endif %} tahun</td><td>{{ plot.lease_estimate|rupiah }} ({{ plot.lease_term_years }} tahun)</td></tr>{% endif %}
+  {% if plot.offer_allocation %}<tr><td>Alokasi lahan (UWT)</td><td>{% if plot.uwt_rate_per_m2_year %}{{ plot.uwt_rate_per_m2_year|rupiah }} /m²/tahun{% else %}-{% endif %}</td><td>{{ plot.effective_term_years }} tahun</td><td>{% if plot.uwt_rate_per_m2_year %}{{ plot.uwt_total|rupiah }}{% else %}-{% endif %}{% if config.allocation_admin_fee %}<br><span class="muted">+ biaya administrasi {{ config.allocation_admin_fee|rupiah }}</span>{% endif %}</td></tr>{% endif %}
+  <tr><td>Kerja sama pemanfaatan</td><td colspan="3">Dirundingkan sesuai rencana proyek.</td></tr>
+</table>
+<p class="muted">Perkiraan belum termasuk pajak dan dapat berubah sesuai penawaran resmi petugas.</p>
+
+{% if plot.highlight_list %}<h2>Keunggulan lokasi</h2><ul>{% for item in plot.highlight_list %}<li>{{ item }}</li>{% endfor %}</ul>{% endif %}
+{% if plot.incentive_list %}<h2>Insentif & kemudahan</h2><ul>{% for item in plot.incentive_list %}<li>{{ item }}</li>{% endfor %}</ul>{% endif %}
+{% if plot.description %}<h2>Keterangan</h2><p>{{ plot.description|linebreaksbr }}</p>{% endif %}
+{% if plot.infrastructure %}<h2>Sarana & prasarana</h2><p>{{ plot.infrastructure|linebreaksbr }}</p>{% endif %}
+
+<h2>Cara mengajukan minat</h2>
+<p>Pindai kode QR atau buka {{ url }} lalu pilih <strong>Ajukan minat investasi</strong>. Seluruh proses dilakukan daring melalui portal.</p>
+{% if config.investment_contact or config.contact_info %}<p class="muted">{{ config.investment_contact|default:config.contact_info|linebreaksbr }}</p>{% endif %}
+{% endblock %}
+{% block footer %}Profil lahan {{ plot.code }} dicetak {% now "d-m-Y H.i" %}. Informasi terbaru: {{ url }}{% endblock %}

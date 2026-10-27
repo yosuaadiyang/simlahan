@@ -14,6 +14,11 @@ from alokasi.models import (
     ApplicationEvent,
     DevelopmentReport,
     InfoPage,
+    InvestmentEvent,
+    InvestmentMessage,
+    InvestmentRequest,
+    InvestmentSector,
+    InvestmentZone,
     Invoice,
     IssuedDocument,
     LandPlot,
@@ -67,4 +72,13 @@ ALOKASI_GROUP_MODEL_PERMISSIONS: GroupModelPermissions = {
     IssuedDocument: _staff(V, V, V),
     PermitReport: _staff(V, V, V),
     DevelopmentReport: _staff(V, V, V),
+    # Portal investasi: sektor & kawasan dikelola petugas; permintaan investor
+    # hanya diubah lewat tombol proses (penugasan & catatan internal boleh diedit).
+    InvestmentSector: _staff(ALL, ALL, V),
+    InvestmentZone: _staff(ALL, ALL, V),
+    InvestmentRequest: _staff(
+        VC + ("process_investmentrequest",), VC + ("process_investmentrequest",), V
+    ),
+    InvestmentMessage: _staff(V, V, V),
+    InvestmentEvent: _staff(V, V, V),
 }

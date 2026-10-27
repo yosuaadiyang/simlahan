@@ -52,6 +52,8 @@ PUBLIC_SESSION_PAGES = (
         r"|informasi/.*|verifikasi/.*|daftar/|aktivasi/.*|masuk/|keluar/"
         r"|lupa-sandi/.*|atur-sandi/.*|pengaduan/.*|lelang/|lelang/[^/]+/"
         r"|kalkulator-uwt/|lacak/|bantuan/"
+        r"|investasi/|investasi/peta/|investasi/kawasan/[^/]+/"
+        r"|investasi/kawasan/[^/]+/foto/|investasi/bandingkan/"
         r")$"
     ),
     # Peta berbagi baca-saja; akses dikendalikan token di URL.

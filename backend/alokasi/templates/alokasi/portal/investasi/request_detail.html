@@ -1,0 +1,141 @@
+{% extends "alokasi/portal/base.html" %}{% load static alokasi_tags %}
+{% block title %}Permintaan {{ investment.number }}{% endblock %}
+{% block head %}{% include "alokasi/portal/_leaflet.html" %}<link rel="stylesheet" href="{% static 'alokasi/investasi.css' %}">{% endblock %}
+{% block content %}
+<p class="small"><a href="{% url 'portal:investment_requests' %}">‹ Permintaan investasi saya</a></p>
+<div class="actions-row" style="justify-content:space-between;align-items:flex-start">
+  <div>
+    <h1 style="margin-bottom:4px">{{ investment.project_name }}</h1>
+    <p class="muted" style="margin:0">{{ investment.number }} · diajukan {{ investment.submitted_at|tanggal }}</p>
+  </div>
+  <span class="badge badge-{{ investment.status }}" style="font-size:.875rem">{{ investment.get_status_display }}</span>
+</div>
+
+{% with s=investment.status %}
+{% if s != 'ditolak' and s != 'dibatalkan' %}
+<ol class="status-track" aria-label="Tahapan">
+  <li class="{% if s == 'diajukan' %}current{% else %}done{% endif %}">Diajukan</li>
+  <li class="{% if s == 'ditinjau' %}current{% elif s == 'diajukan' %}{% else %}done{% endif %}">Ditinjau</li>
+  <li class="{% if s == 'konsultasi' %}current{% elif s == 'ditawarkan' or s == 'diterima' or s == 'selesai' %}done{% endif %}">Konsultasi</li>
+  <li class="{% if s == 'ditawarkan' %}current{% elif s == 'diterima' or s == 'selesai' %}done{% endif %}">Penawaran</li>
+  <li class="{% if s == 'diterima' %}current{% elif s == 'selesai' %}done{% endif %}">Diterima</li>
+  <li class="{% if s == 'selesai' %}current done{% endif %}">Selesai</li>
+</ol>
+{% endif %}
+{% endwith %}
+
+<div class="split">
+  <div>
+    {% if investment.status == 'ditawarkan' %}
+    <section class="card offer-card" id="penawaran">
+      <h2>Penawaran dari petugas</h2>
+      <dl class="props">
+        <dt>Skema</dt><dd>{{ investment.get_offer_scheme_display }}</dd>
+        {% if investment.offer_plot %}<dt>Lahan</dt><dd><a href="{% url 'portal:plot_detail' investment.offer_plot.code %}">{{ investment.offer_plot.code }} {{ investment.offer_plot.name }}</a></dd>{% endif %}
+        <dt>Luas</dt><dd>{{ investment.offer_area_m2|angka:2|patah }} m² ({{ investment.offer_area_m2|hektare }})</dd>
+        <dt>Tarif</dt><dd>{{ investment.offer_rate_per_m2_year|rupiah|patah }} /m²/tahun</dd>
+        <dt>Jangka waktu</dt><dd>{{ investment.offer_term_years }} tahun</dd>
+        <dt>Perkiraan total</dt><dd><strong>{{ investment.offer_total|rupiah|patah }}</strong></dd>
+        <dt>Berlaku s.d.</dt><dd>{{ investment.offer_valid_until|tanggal }}{% if investment.offer_expired %} <span class="badge badge-ditolak">Kedaluwarsa</span>{% endif %}</dd>
+      </dl>
+      {% if investment.offer_note %}<h3>Ketentuan</h3><p class="prose">{{ investment.offer_note }}</p>{% endif %}
+      {% if investment.can_accept_offer %}
+      <div class="actions-row" style="margin-top:12px">
+        <form method="post" action="{% url 'portal:investment_request_accept' investment.number %}" data-confirm="Terima penawaran ini? Petugas akan meneruskan ke tahap kontrak atau permohonan.">{% csrf_token %}<button class="btn btn-accent" type="submit">Terima penawaran</button></form>
+      </div>
+      {% else %}<p class="alert alert-warn" style="margin-top:12px">Masa berlaku penawaran sudah lewat. Kirim pesan untuk meminta penawaran baru.</p>{% endif %}
+      <details class="panel" style="margin-top:12px">
+        <summary>Tolak / minta penyesuaian</summary>
+        <form method="post" action="{% url 'portal:investment_request_decline' investment.number %}">{% csrf_token %}
+          <div class="field required"><label for="id_reason">{{ decline_form.reason.label }}</label>{{ decline_form.reason }}</div>
+          <button class="btn btn-outline" type="submit">Kirim</button>
+        </form>
+      </details>
+    </section>
+    {% endif %}
+
+    {% if investment.status == 'diterima' %}
+    <div class="alert alert-ok">Anda telah menerima penawaran. Petugas sedang menyiapkan {% if investment.offer_scheme == 'alokasi' %}draf permohonan alokasi{% else %}kontrak{% endif %}.</div>
+    {% endif %}
+    {% if investment.status == 'selesai' %}
+    <div class="alert alert-ok">
+      {% if investment.application %}Permintaan diteruskan menjadi permohonan alokasi <a href="{% url 'portal:application_detail' investment.application.number %}">{{ investment.application.number }}</a>. Lengkapi dokumen persyaratan lalu ajukan permohonan.
+      {% else %}Kontrak/perjanjian <strong>{{ investment.contract_number }}</strong> telah dicatat. Petugas akan menghubungi Anda untuk penandatanganan dan pembayaran.{% endif %}
+    </div>
+    {% endif %}
+    {% if investment.meeting_at and investment.status == 'konsultasi' %}
+    <div class="alert alert-info"><strong>Jadwal konsultasi:</strong> {{ investment.meeting_at|date:"l, d F Y H.i" }} — {{ investment.meeting_place|urlize }}</div>
+    {% endif %}
+
+    <section class="card" id="pesan">
+      <h2>Pesan dengan petugas</h2>
+      {% if thread %}
+      <div class="thread">
+        {% for m in thread %}
+        <div class="bubble{% if not m.from_officer %} mine{% endif %}">
+          <div class="meta">{% if m.from_officer %}Petugas{% else %}Anda{% endif %} · {{ m.created_at|date:"d-m-Y H.i" }}</div>
+          <div class="text">{{ m.body }}</div>
+          {% if m.attachment %}<a class="small" href="{% url 'portal:investment_message_attachment' investment.number m.pk %}">📎 {{ m.attachment_name|default:"Lampiran" }}</a>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}<p class="muted">Belum ada pesan. Kirim pertanyaan atau dokumen tambahan kepada petugas.</p>{% endif %}
+      {% if not investment.is_final %}
+      <form method="post" enctype="multipart/form-data">{% csrf_token %}
+        <div class="field"><label for="{{ form.body.id_for_label }}">{{ form.body.label }}</label>{{ form.body }}{{ form.body.errors }}</div>
+        <div class="field"><label for="{{ form.attachment.id_for_label }}">Lampiran</label>{{ form.attachment }}<span class="helptext">{{ form.attachment.help_text }}</span>{{ form.attachment.errors }}</div>
+        <button class="btn" type="submit">Kirim pesan</button>
+      </form>
+      {% else %}<p class="small muted">Permintaan sudah ditutup.</p>{% endif %}
+    </section>
+
+    <section class="card">
+      <h2>Rencana usaha</h2>
+      <p class="prose">{{ investment.activity }}</p>
+      {% if area_geojson %}
+      <h3>Usulan lokasi</h3>
+      <div class="map map-small" data-map="shape" data-status="dipesan" data-geometry="{{ area_geojson }}" role="region" aria-label="Peta usulan lokasi"></div>
+      <p class="small muted">Luas gambar: {{ investment.requested_area_size_m2|angka:0|patah }} m²</p>
+      {% endif %}
+    </section>
+  </div>
+  <aside>
+    <div class="card">
+      <h2>Ringkasan</h2>
+      <dl class="props">
+        <dt>Skema diminati</dt><dd>{{ investment.get_scheme_display }}</dd>
+        <dt>Sektor</dt><dd>{{ investment.sector|default:"-" }}</dd>
+        {% if investment.zone %}<dt>Kawasan</dt><dd>{{ investment.zone }}</dd>{% endif %}
+        <dt>Nilai investasi</dt><dd>{{ investment.investment_value|rupiah|patah }}</dd>
+        {% if investment.workforce %}<dt>Tenaga kerja</dt><dd>{{ investment.workforce|angka }} orang</dd>{% endif %}
+        {% if investment.requested_area_m2 %}<dt>Kebutuhan luas</dt><dd>{{ investment.requested_area_m2|angka:2|patah }} m²</dd>{% endif %}
+        {% if investment.term_years %}<dt>Jangka waktu</dt><dd>{{ investment.term_years }} tahun</dd>{% endif %}
+        <dt>Asal modal</dt><dd>{{ investment.get_capital_origin_display }}{% if investment.origin_country %} ({{ investment.origin_country }}){% endif %}</dd>
+        {% if investment.target_start %}<dt>Rencana mulai</dt><dd>{{ investment.target_start|tanggal }}</dd>{% endif %}
+        {% if investment.power_kva %}<dt>Listrik</dt><dd>{{ investment.power_kva|angka }} kVA</dd>{% endif %}
+        {% if investment.water_m3_day %}<dt>Air</dt><dd>{{ investment.water_m3_day|angka }} m³/hari</dd>{% endif %}
+        {% if investment.attachment %}<dt>Lampiran</dt><dd><a href="{% url 'portal:investment_request_attachment' investment.number %}">{{ investment.attachment_name|default:"Unduh" }}</a></dd>{% endif %}
+      </dl>
+      {% if plots %}
+      <h3>Lahan diminati</h3>
+      <ul>{% for p in plots %}<li><a href="{% url 'portal:plot_detail' p.code %}">{{ p.code }}</a> {{ p.name }} <span class="badge badge-{{ p.status }}">{{ p.get_status_display }}</span></li>{% endfor %}</ul>
+      {% endif %}
+    </div>
+    <div class="card">
+      <h2>Riwayat</h2>
+      <ul class="timeline">
+        {% for e in events %}<li><strong>{{ e.get_status_display }}</strong><br><span class="small muted">{{ e.created_at|date:"d-m-Y H.i" }}</span>{% if e.note %}<div class="small prose">{{ e.note }}</div>{% endif %}</li>{% endfor %}
+      </ul>
+    </div>
+    {% if can_cancel %}
+    <details class="panel">
+      <summary>Batalkan permintaan</summary>
+      <form method="post" action="{% url 'portal:investment_request_cancel' investment.number %}" data-confirm="Batalkan permintaan investasi ini?">{% csrf_token %}
+        <div class="field"><label for="id_note">{{ cancel_form.note.label }}</label>{{ cancel_form.note }}</div>
+        <button class="btn btn-danger" type="submit">Batalkan permintaan</button>
+      </form>
+    </details>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

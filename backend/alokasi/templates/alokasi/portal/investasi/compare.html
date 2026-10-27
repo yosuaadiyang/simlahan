@@ -1,0 +1,41 @@
+{% extends "alokasi/portal/base.html" %}{% load static alokasi_tags %}
+{% block title %}Bandingkan Lahan{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'alokasi/investasi.css' %}">{% endblock %}
+{% block content %}
+<p class="small"><a href="{% url 'portal:investment_map' %}">‹ Kembali ke peta investasi</a></p>
+<h1>Bandingkan lahan</h1>
+{% if plots|length < 2 %}
+<div class="alert alert-info">Pilih minimal 2 dan maksimal {{ max_compare }} lahan dengan tombol <strong>Bandingkan</strong> di peta investasi atau halaman lahan.</div>
+{% endif %}
+{% if plots %}
+<div class="table-wrap" data-compare-sync="{% for p in plots %}{{ p.code }}{% if not forloop.last %},{% endif %}{% endfor %}">
+<table class="data compare-table">
+  <thead><tr><th scope="col">Lahan</th>{% for p in plots %}<th scope="col"><a href="{% url 'portal:plot_detail' p.code %}">{{ p.code }}</a><br><span style="text-transform:none;letter-spacing:0;font-weight:500;color:var(--sl-gray-800)">{{ p.name }}</span></th>{% endfor %}</tr></thead>
+  <tbody>
+    <tr><th scope="row">Status</th>{% for p in plots %}<td><span class="badge badge-{{ p.status }}">{{ p.get_status_display }}</span></td>{% endfor %}</tr>
+    <tr><th scope="row">Sektor</th>{% for p in plots %}<td>{% if p.sector %}{{ p.sector.icon }} {{ p.sector.name }}{% else %}-{% endif %}</td>{% endfor %}</tr>
+    <tr><th scope="row">Kawasan</th>{% for p in plots %}<td>{% if p.zone and p.zone.is_published %}<a href="{% url 'portal:investment_zone' p.zone.slug %}">{{ p.zone.name }}</a>{% else %}-{% endif %}</td>{% endfor %}</tr>
+    <tr><th scope="row">Lokasi</th>{% for p in plots %}<td>{{ p.village|default:"-" }}{% if p.district %}, {{ p.district }}{% endif %}</td>{% endfor %}</tr>
+    <tr><th scope="row">Luas</th>{% for p in plots %}<td>{{ p.area_m2|angka:2|patah }} m²<br><span class="small muted">{{ p.area_m2|hektare }}</span></td>{% endfor %}</tr>
+    <tr><th scope="row">Peruntukan</th>{% for p in plots %}<td>{{ p.zoning|default:p.intended_use|default:"-" }}</td>{% endfor %}</tr>
+    <tr class="group"><th scope="row" colspan="{{ plots|length|add:1 }}">Skema & biaya</th></tr>
+    <tr><th scope="row">Skema</th>{% for p in plots %}<td><div class="chips">{% for value, label in p.schemes %}<span class="chip chip-{{ value }}">{{ label }}</span>{% empty %}-{% endfor %}</div></td>{% endfor %}</tr>
+    <tr><th scope="row">Tarif sewa /m²/thn</th>{% for p in plots %}<td>{% if p.offer_lease %}{{ p.lease_rate_per_m2_year|rupiah|patah }}{% else %}-{% endif %}</td>{% endfor %}</tr>
+    <tr><th scope="row">Masa sewa</th>{% for p in plots %}<td>{% if p.offer_lease %}{{ p.lease_min_years|default:1 }}{% if p.lease_max_years %}–{{ p.lease_max_years }}{% endif %} tahun{% else %}-{% endif %}</td>{% endfor %}</tr>
+    <tr><th scope="row">Perkiraan sewa (masa minimum)</th>{% for p in plots %}<td>{% if p.offer_lease %}{{ p.lease_estimate|rupiah|patah }}{% else %}-{% endif %}</td>{% endfor %}</tr>
+    <tr><th scope="row">Tarif UWT /m²/thn</th>{% for p in plots %}<td>{% if p.offer_allocation %}{{ p.uwt_rate_per_m2_year|rupiah|patah }}{% else %}-{% endif %}</td>{% endfor %}</tr>
+    <tr><th scope="row">Perkiraan UWT total</th>{% for p in plots %}<td>{% if p.offer_allocation %}{{ p.uwt_total|rupiah|patah }}<br><span class="small muted">{{ p.effective_term_years }} tahun</span>{% else %}-{% endif %}</td>{% endfor %}</tr>
+    <tr class="group"><th scope="row" colspan="{{ plots|length|add:1 }}">Kesiapan</th></tr>
+    <tr><th scope="row">Pematangan lahan</th>{% for p in plots %}<td>{{ p.land_preparation_done|yesno:"Selesai,Belum" }}</td>{% endfor %}</tr>
+    <tr><th scope="row">Dokumen teknis</th>{% for p in plots %}<td>{{ p.has_technical_documents|yesno:"Tersedia,Belum" }}</td>{% endfor %}</tr>
+    <tr><th scope="row">Utilitas</th>{% for p in plots %}<td>{{ p.utilities|join:", "|default:"-" }}</td>{% endfor %}</tr>
+    <tr><th scope="row">Jarak</th>{% for p in plots %}<td>{% for label, km in p.distances %}{{ label }}: {{ km|angka:1 }} km{% if not forloop.last %}<br>{% endif %}{% empty %}-{% endfor %}</td>{% endfor %}</tr>
+    <tr><th scope="row"></th>{% for p in plots %}<td><div class="actions-row">{% if p.is_available %}<a class="btn btn-small btn-accent" href="{% url 'portal:investment_request_create' %}?lahan={{ p.code }}">Ajukan minat</a>{% endif %}<button type="button" class="btn-icon" data-compare="{{ p.code }}" aria-pressed="true">Hapus</button></div></td>{% endfor %}</tr>
+  </tbody>
+</table>
+</div>
+{% if plots|length > 1 %}<p class="actions-row" style="margin-top:16px"><a class="btn" href="{% url 'portal:investment_request_create' %}?lahan={% for p in plots %}{% if p.is_available %}{{ p.code }}{% if not forloop.last %},{% endif %}{% endif %}{% endfor %}">Ajukan minat untuk semua lahan ini</a></p>{% endif %}
+{% endif %}
+{% include "alokasi/portal/investasi/_compare_bar.html" %}
+{% endblock %}
+{% block scripts %}<script src="{% static 'alokasi/investasi.js' %}"></script>{% endblock %}

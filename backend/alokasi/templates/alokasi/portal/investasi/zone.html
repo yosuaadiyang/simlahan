@@ -1,0 +1,39 @@
+{% extends "alokasi/portal/base.html" %}{% load static l10n alokasi_tags %}
+{% block title %}{{ zone.name }}{% endblock %}
+{% block head %}{% include "alokasi/portal/_leaflet.html" %}<link rel="stylesheet" href="{% static 'alokasi/investasi.css' %}">{% endblock %}
+{% block content %}
+<p class="small"><a href="{% url 'portal:investment_home' %}">‹ Portal investasi</a></p>
+<div class="actions-row" style="justify-content:space-between;align-items:flex-start">
+  <div>
+    <h1 style="margin-bottom:4px">{{ zone.name }}</h1>
+    {% if zone.summary %}<p class="muted" style="margin:0 0 8px">{{ zone.summary }}</p>{% endif %}
+    <div class="chips">{% for s in zone.sectors.all %}<span class="chip chip-sector" style="--c:{{ s.color }}">{{ s.icon }} {{ s.name }}</span>{% endfor %}</div>
+  </div>
+  <div class="actions-row">
+    <a class="btn btn-outline" href="{% url 'portal:investment_map' %}?kawasan={{ zone.slug }}">Buka di peta investasi</a>
+    <a class="btn btn-accent" href="{% url 'portal:investment_request_create' %}?kawasan={{ zone.slug }}">Ajukan minat di kawasan ini</a>
+  </div>
+</div>
+<div class="metric-row" style="margin-top:20px">
+  <div class="metric"><div class="label">Lahan tersedia</div><div class="value">{{ stats.total|default:0 }}</div></div>
+  <div class="metric"><div class="label">Luas tersedia</div><div class="value">{{ stats.area|default:0|hektare|patah }}</div></div>
+  <div class="metric"><div class="label">Total lahan di kawasan</div><div class="value">{{ plots|length }}</div></div>
+</div>
+<div class="split">
+  <div>
+    <div class="map" data-map="zone" data-zone="{{ zone.slug }}" data-url="{{ data_url }}" data-geometry="{{ geometry }}" data-lat="{{ map_center.0|unlocalize }}" data-lng="{{ map_center.1|unlocalize }}" data-zoom="{{ map_zoom|unlocalize }}" role="region" aria-label="Peta kawasan {{ zone.name }}"></div>
+    {% if zone.photo %}<p><img src="{% url 'portal:investment_zone_photo' zone.slug %}" alt="Foto {{ zone.name }}" loading="lazy" style="border-radius:12px;margin-top:16px"></p>{% endif %}
+    {% if zone.description %}<h2>Tentang kawasan</h2><p class="prose">{{ zone.description }}</p>{% endif %}
+  </div>
+  <aside>
+    {% if zone.incentive_list %}<div class="card"><h2>Insentif & kemudahan</h2><ul class="check-list">{% for item in zone.incentive_list %}<li>{{ item }}</li>{% endfor %}</ul></div>{% endif %}
+    {% if zone.infrastructure_list %}<div class="card"><h2>Infrastruktur pendukung</h2><ul class="check-list">{% for item in zone.infrastructure_list %}<li>{{ item }}</li>{% endfor %}</ul></div>{% endif %}
+  </aside>
+</div>
+<div class="section-head"><div><h2>Lahan di kawasan ini</h2></div></div>
+{% if plots %}
+<div class="grid grid-3">{% for plot in plots %}{% include "alokasi/portal/investasi/_plot_tile.html" %}{% endfor %}</div>
+{% else %}<p class="muted">Belum ada lahan yang ditampilkan di kawasan ini.</p>{% endif %}
+{% include "alokasi/portal/investasi/_compare_bar.html" %}
+{% endblock %}
+{% block scripts %}<script src="{% static 'alokasi/investasi.js' %}"></script>{% endblock %}

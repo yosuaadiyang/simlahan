@@ -6,6 +6,7 @@
     tersedia: "#059669",
     dipesan: "#d97706",
     dialokasikan: "#7c3aed",
+    disewa: "#db2777",
     ditutup: "#64748b"
   };
 

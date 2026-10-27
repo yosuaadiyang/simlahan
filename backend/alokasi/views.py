@@ -294,7 +294,9 @@ def plot_geojson(request):
 
 
 def plot_detail(request, code):
-    plot = get_object_or_404(LandPlot, code=code, is_published=True)
+    plot = get_object_or_404(
+        LandPlot.objects.select_related("sector", "zone"), code=code, is_published=True
+    )
     config = AllocationSettings.load()
     own_application = None
     applicant = (
@@ -302,12 +304,25 @@ def plot_detail(request, code):
         if request.user.is_authenticated
         else None
     )
+    own_investment = None
+    is_saved = False
     if applicant:
         own_application = (
             applicant.applications.filter(plot=plot)
             .exclude(status__in=enums.FINAL_STATUSES)
             .first()
         )
+        own_investment = (
+            applicant.investment_requests.filter(plots=plot)
+            .exclude(status__in=enums.INVESTMENT_FINAL_STATUSES)
+            .first()
+        )
+        is_saved = applicant.saved_plots.filter(plot=plot).exists()
+    sim_schemes = []
+    if plot.offer_lease and plot.lease_rate_per_m2_year:
+        sim_schemes.append(("sewa", _("Sewa")))
+    if plot.offer_allocation and plot.uwt_rate_per_m2_year:
+        sim_schemes.append(("alokasi", _("Alokasi (UWT)")))
     context = {
         "plot": plot,
         "config": config,
@@ -316,6 +331,9 @@ def plot_detail(request, code):
             is_active=True, service_type=enums.ServiceType.ALLOCATION
         ).filter(Q(allocation_type="") | Q(allocation_type=plot.allocation_type)),
         "own_application": own_application,
+        "own_investment": own_investment,
+        "is_saved": is_saved,
+        "sim_schemes": sim_schemes,
         "is_applicant": applicant is not None,
     }
     return render(request, "alokasi/portal/plot_detail.html", context)
@@ -736,6 +754,8 @@ def _report_due(allocation: Allocation, config: AllocationSettings) -> bool:
 
 @applicant_required
 def dashboard(request):
+    from alokasi.investment_views import investment_summary
+
     applicant = request.applicant
     config = AllocationSettings.load()
     allocations = list(
@@ -757,6 +777,7 @@ def dashboard(request):
             status__in=(enums.InvoiceStatus.UNPAID, enums.InvoiceStatus.PROOF_UPLOADED),
         ).select_related("application"),
         "config": config,
+        **investment_summary(applicant),
     }
     return render(request, "alokasi/portal/dashboard.html", context)
 

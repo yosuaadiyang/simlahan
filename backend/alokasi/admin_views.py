@@ -11,6 +11,9 @@ from alokasi.models import (
     ApplicationDocument,
     DevelopmentReport,
     InfoPage,
+    InvestmentMessage,
+    InvestmentRequest,
+    InvestmentZone,
     Invoice,
     IssuedDocument,
     LandPlot,
@@ -25,6 +28,9 @@ FILE_KINDS = {
     "progres": (DevelopmentReport, "photo"),
     "lahan": (LandPlot, "photo"),
     "informasi": (InfoPage, "attachment"),
+    "kawasan": (InvestmentZone, "photo"),
+    "investasi": (InvestmentRequest, "attachment"),
+    "pesan_investasi": (InvestmentMessage, "attachment"),
 }
 
 
@@ -54,6 +60,8 @@ def officer_file(request, kind, pk):
     if not request.user.has_perm(f"alokasi.view_{model._meta.model_name}"):
         raise PermissionDenied
     obj = get_object_or_404(model, pk=pk)
-    filename = getattr(obj, "original_name", "") or None
+    filename = (
+        getattr(obj, "original_name", "") or getattr(obj, "attachment_name", "") or None
+    )
     inline = request.GET.get("lihat") == "1"
     return serve_file(getattr(obj, field), inline=inline, filename=filename)

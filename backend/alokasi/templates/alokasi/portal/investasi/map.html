@@ -1,0 +1,82 @@
+{% extends "alokasi/portal/base.html" %}{% load static l10n %}
+{% block title %}Peta Investasi{% endblock %}
+{% block head %}{% include "alokasi/portal/_leaflet.html" %}<link rel="stylesheet" href="{% static 'alokasi/investasi.css' %}">
+<style>main#konten { padding: 0; } main#konten > .container { max-width: none; padding: 0; } main#konten .messages { margin: 12px 16px; } .site-footer { display: none; }</style>{% endblock %}
+{% block content %}
+<div class="explorer" id="explorer"
+     data-url="{{ data_url }}"
+     data-saved="{{ saved_codes|join:',' }}"
+     data-applicant="{{ is_applicant|yesno:'1,0' }}"
+     data-request-url="{% url 'portal:investment_request_create' %}"
+     data-lat="{{ map_center.0|unlocalize }}" data-lng="{{ map_center.1|unlocalize }}" data-zoom="{{ map_zoom|unlocalize }}">
+  <section class="explorer-panel" aria-label="Filter dan daftar lahan">
+    <div class="explorer-head">
+      <h1>Peta peluang investasi</h1>
+      <div class="explorer-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <label class="skip" for="f-q">Cari lahan</label>
+        <input id="f-q" type="search" placeholder="Cari kode, nama, kelurahan, peruntukan" autocomplete="off" data-filter="q">
+      </div>
+      <div class="seg" role="group" aria-label="Skema">
+        <button type="button" data-scheme="" aria-pressed="true">Semua skema</button>
+        <button type="button" data-scheme="sewa" aria-pressed="false">Sewa</button>
+        <button type="button" data-scheme="alokasi" aria-pressed="false">Alokasi</button>
+      </div>
+      <div class="sector-filter" role="group" aria-label="Sektor">
+        {% for sector in sectors %}<button type="button" data-sector="{{ sector.slug }}" style="--c:{{ sector.color }}" aria-pressed="false">{{ sector.icon }} {{ sector.name }}</button>{% endfor %}
+      </div>
+      <details class="more-filters">
+        <summary>Filter lainnya <span class="small muted" data-filter-count></span></summary>
+        <div class="grid-filters">
+          <div>
+            <label for="f-zone">Kawasan</label>
+            <select id="f-zone" data-filter="kawasan"><option value="">Semua</option>{% for zone in zones %}<option value="{{ zone.slug }}">{{ zone.name }}</option>{% endfor %}</select>
+          </div>
+          <div>
+            <label for="f-district">Kecamatan</label>
+            <select id="f-district" data-filter="kecamatan"><option value="">Semua</option>{% for d in districts %}<option value="{{ d }}">{{ d }}</option>{% endfor %}</select>
+          </div>
+          <div>
+            <label for="f-min">Luas min. (ha)</label>
+            <input id="f-min" type="number" min="0" step="0.1" inputmode="decimal" data-filter="min">
+          </div>
+          <div>
+            <label for="f-max">Luas maks. (ha)</label>
+            <input id="f-max" type="number" min="0" step="0.1" inputmode="decimal" data-filter="max">
+          </div>
+          <label class="check"><input type="checkbox" data-filter="siap"> Siap bangun (pematangan lahan selesai)</label>
+          <label class="check"><input type="checkbox" data-filter="dokumen"> Dokumen teknis tersedia</label>
+          <label class="check"><input type="checkbox" data-filter="semua"> Tampilkan juga lahan yang sudah terikat</label>
+          {% if is_applicant %}<label class="check"><input type="checkbox" data-filter="simpan"> Hanya lahan tersimpan</label>{% endif %}
+        </div>
+      </details>
+    </div>
+    <div class="explorer-meta">
+      <span aria-live="polite"><strong data-count>…</strong> lahan</span>
+      <span>
+        <label class="skip" for="f-sort">Urutkan</label>
+        <select id="f-sort" data-filter="urut">
+          <option value="">Unggulan</option>
+          <option value="luas-desc">Luas terbesar</option>
+          <option value="luas-asc">Luas terkecil</option>
+          <option value="tarif-asc">Tarif termurah</option>
+          <option value="kode">Kode lahan</option>
+        </select>
+        <button type="button" class="reset" data-reset>Atur ulang</button>
+      </span>
+    </div>
+    <ul class="result-list" id="result-list" aria-label="Daftar lahan"></ul>
+    <div class="explorer-head" style="border-top:1px solid var(--border);border-bottom:0">
+      <a class="btn btn-accent" href="{% url 'portal:investment_request_create' %}">Lahan belum ada? Ajukan usulan lokasi</a>
+    </div>
+  </section>
+  <section class="explorer-map" aria-label="Peta lahan">
+    <div id="inv-map" role="region" aria-label="Peta interaktif lahan investasi"></div>
+    <details class="map-legend" id="map-legend-box" open><summary>Legenda</summary><div class="items" id="map-legend"></div></details>
+    <a class="btn btn-small map-toggle" href="#result-list">Lihat daftar ↓</a>
+    <noscript><p class="alert alert-warn" style="position:absolute;inset:auto 12px 12px 12px;z-index:900">Peta memerlukan JavaScript. <a href="{% url 'portal:plot_list' %}">Buka daftar lahan</a>.</p></noscript>
+  </section>
+</div>
+{% include "alokasi/portal/investasi/_compare_bar.html" %}
+{% endblock %}
+{% block scripts %}<script src="{% static 'alokasi/investasi.js' %}"></script>{% endblock %}

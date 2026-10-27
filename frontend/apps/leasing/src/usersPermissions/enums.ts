@@ -21,6 +21,7 @@ export const UsersPermissions = {
   VIEW_APPLICATION: "view_application",
   VIEW_ALLOCATION: "view_allocation",
   VIEW_LANDPLOT: "view_landplot",
+  VIEW_INVESTMENTREQUEST: "view_investmentrequest",
   VERIFY_PAYMENT: "verify_payment",
   // Manajemen aset lahan (panel petugas di /admin/asetlahan/)
   VIEW_LANDASSET: "view_landasset",

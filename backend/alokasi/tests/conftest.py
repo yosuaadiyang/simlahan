@@ -55,6 +55,7 @@ def seeded(db):
     for migration_name in (
         "alokasi.migrations.0002_seed_defaults",
         "alokasi.migrations.0007_seed_layanan",
+        "alokasi.migrations.0010_seed_investasi",
     ):
         module = importlib.import_module(migration_name)
         module.seed(django_apps, None)

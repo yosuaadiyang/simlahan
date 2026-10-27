@@ -8,7 +8,8 @@
   </div>
   <div class="actions-row">
     <a class="btn btn-outline" href="{% url 'portal:profile' %}">Ubah profil</a>
-    <a class="btn btn-accent" href="{% url 'portal:plot_list' %}">Ajukan alokasi baru</a>
+    <a class="btn btn-outline" href="{% url 'portal:plot_list' %}">Ajukan alokasi baru</a>
+    <a class="btn btn-accent" href="{% url 'portal:investment_request_create' %}">Ajukan minat investasi</a>
   </div>
 </div>
 
@@ -19,6 +20,10 @@
   <a href="{% url 'portal:allocation_detail' a.pk %}">Buka</a>
 </div>
 {% endif %}{% endfor %}
+
+{% for r in pending_offers %}
+<div class="alert alert-info"><strong>Penawaran menunggu jawaban:</strong> {{ r.number }} ({{ r.project_name }}){% if r.offer_valid_until %}, berlaku s.d. {{ r.offer_valid_until|tanggal }}{% endif %}. <a href="{% url 'portal:investment_request' r.number %}#penawaran">Tinjau penawaran</a></div>
+{% endfor %}
 
 {% if open_invoices %}
 <section class="card">
@@ -75,6 +80,33 @@
   </table></div>
   {% else %}<p class="muted">Belum ada permohonan. <a href="{% url 'portal:plot_list' %}">Cari lahan</a> untuk memulai.</p>{% endif %}
 </section>
+
+<section class="card">
+  <div class="actions-row" style="justify-content:space-between"><h2 style="margin:0">Permintaan investasi saya</h2><a class="small" href="{% url 'portal:investment_requests' %}">Semua ›</a></div>
+  {% if investment_requests %}
+  <div class="table-wrap" style="margin-top:12px"><table class="data">
+    <thead><tr><th>Nomor</th><th>Proyek</th><th>Skema</th><th>Lahan</th><th>Status</th></tr></thead>
+    <tbody>{% for r in investment_requests %}
+      <tr>
+        <td><a href="{% url 'portal:investment_request' r.number %}">{{ r.number }}</a></td>
+        <td>{{ r.project_name }}</td>
+        <td>{{ r.get_scheme_display }}</td>
+        <td>{% for p in r.plots.all %}{{ p.code }}{% if not forloop.last %}, {% endif %}{% empty %}{% if r.requested_area_m2 %}{{ r.requested_area_m2|hektare }}{% else %}Usulan lokasi{% endif %}{% endfor %}</td>
+        <td><span class="badge badge-{{ r.status }}">{{ r.get_status_display }}</span></td>
+      </tr>{% endfor %}
+    </tbody>
+  </table></div>
+  {% else %}<p class="muted">Belum ada permintaan investasi. <a href="{% url 'portal:investment_home' %}">Lihat peluang investasi</a>.</p>{% endif %}
+</section>
+
+{% if saved_plots %}
+<section class="card">
+  <div class="actions-row" style="justify-content:space-between"><h2 style="margin:0">Lahan tersimpan</h2><a class="small" href="{% url 'portal:investment_saved' %}">Semua ›</a></div>
+  <ul style="margin-top:12px">{% for item in saved_plots %}
+    <li><a href="{% url 'portal:plot_detail' item.plot.code %}">{{ item.plot.code }}</a> {{ item.plot.name }} · {{ item.plot.area_m2|hektare }} <span class="badge badge-{{ item.plot.status }}">{{ item.plot.get_status_display }}</span></li>
+  {% endfor %}</ul>
+</section>
+{% endif %}
 
 {% if incoming_transfers %}
 <section class="card">

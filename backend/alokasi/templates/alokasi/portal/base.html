@@ -21,6 +21,7 @@
       {% with name=request.resolver_match.url_name %}
       <a href="{% url 'portal:home' %}"{% if name == 'home' %} class="active"{% endif %}>Beranda</a>
       <a href="{% url 'portal:plot_list' %}"{% if name == 'plot_list' or name == 'plot_detail' %} class="active"{% endif %}>Peta Lahan</a>
+      <a href="{% url 'portal:investment_home' %}"{% if name|slice:":11" == "investment_" %} class="active"{% endif %}>Investasi</a>
       <a href="{% url 'portal:services' %}"{% if name == 'services' or name == 'service_detail' or name == 'service_terms' or name == 'uwt_calculator' %} class="active"{% endif %}>Layanan</a>
       <a href="{% url 'portal:info_index' %}"{% if name == 'info_index' or name == 'info_category' or name == 'info_detail' %} class="active"{% endif %}>Informasi</a>
       <a href="{% url 'portal:verify' %}"{% if name == 'verify' or name == 'verify_token' %} class="active"{% endif %}>Cek Dokumen</a>
@@ -59,6 +60,7 @@
     </div>
     <div>
       <strong>Tautan</strong><br>
+      <a href="{% url 'portal:investment_home' %}">Peluang investasi</a><br>
       <a href="{% url 'portal:services' %}">Layanan & persyaratan</a><br>
       <a href="{% url 'portal:info_category' 'regulasi' %}">Regulasi</a><br>
       <a href="{% url 'portal:info_category' 'tutorial' %}">Video tutorial</a><br>

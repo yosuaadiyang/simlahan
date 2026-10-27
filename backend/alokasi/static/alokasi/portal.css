@@ -102,6 +102,13 @@ h3 { font-size: 1.0625rem; font-weight: 650; letter-spacing: -0.01em; margin: 1.
 .site-nav .cta { margin-left: 4px; background: var(--primary); color: #fff; font-weight: 600; box-shadow: var(--sl-shadow-xs); }
 .site-nav .cta:hover { background: var(--primary-dark); color: #fff; }
 .site-nav form { margin: 0; }
+/* Menu desktop lengkap (12 tautan) tetap satu baris di kontainer 1200px. */
+@media (min-width: 1181px) {
+  .site-header .container { gap: 12px; }
+  .site-nav { flex-wrap: nowrap; }
+  .site-nav a, .site-nav button { padding: 7px 8px; white-space: nowrap; }
+  .site-nav .cta { margin-left: 2px; }
+}
 @media (max-width: 1180px) {
   .nav-toggle { display: inline-flex; }
   .site-header .container { flex-wrap: wrap; gap: 8px 16px; }
@@ -255,6 +262,10 @@ form.inline { display: inline; }
 .badge-perbaikan, .badge-belum_bayar, .badge-belum { background: var(--sl-warning-100); color: #92400e; }
 .badge-dialokasikan, .badge-dialihkan, .badge-berakhir { background: #ede9fe; color: #5b21b6; }
 .badge-ditolak, .badge-dibatalkan, .badge-dicabut, .badge-batal, .badge-ditutup { background: var(--sl-danger-100); color: #991b1b; }
+.badge-ditinjau, .badge-konsultasi { background: var(--sl-info-100); color: #1e40af; }
+.badge-ditawarkan { background: var(--sl-warning-100); color: #92400e; }
+.badge-diterima, .badge-selesai { background: var(--sl-success-100); color: #065f46; }
+.badge-disewa { background: #fce7f3; color: #9d174d; }
 
 /* ------------------------------------------------------------ Tabel & daftar properti */
 .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--sl-radius); background: #fff; }
