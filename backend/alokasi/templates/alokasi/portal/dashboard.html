@@ -25,6 +25,18 @@
 <div class="alert alert-info"><strong>Penawaran menunggu jawaban:</strong> {{ r.number }} ({{ r.project_name }}){% if r.offer_valid_until %}, berlaku s.d. {{ r.offer_valid_until|tanggal }}{% endif %}. <a href="{% url 'portal:investment_request' r.number %}#penawaran">Tinjau penawaran</a></div>
 {% endfor %}
 
+{% if dokumen.tasks %}<div class="alert alert-info"><strong>{{ dokumen.tasks }} dokumen menunggu tanda tangan Anda.</strong> <a href="{% url 'dokumen_portal:index' %}">Buka dokumen</a></div>{% endif %}
+{% if dokumen.revision or dokumen.expired %}<div class="alert alert-warn"><strong>Dokumen perizinan perlu tindakan:</strong>{% if dokumen.revision %} {{ dokumen.revision }} perlu perbaikan{% endif %}{% if dokumen.revision and dokumen.expired %},{% endif %}{% if dokumen.expired %} {{ dokumen.expired }} kedaluwarsa{% endif %}. <a href="{% url 'dokumen_portal:index' %}">Perbarui dokumen</a></div>{% endif %}
+
+<section class="card">
+  <div class="actions-row" style="justify-content:space-between"><h2 style="margin:0">Dokumen &amp; perizinan</h2><a class="small" href="{% url 'dokumen_portal:index' %}">Buka ›</a></div>
+  {% if dokumen.land_uses %}
+  <p class="small" style="margin:8px 0 0">{{ dokumen.land_uses }} pemanfaatan lahan{% if dokumen.missing %} · {{ dokumen.missing }} dokumen wajib belum diunggah{% endif %}{% if dokumen.downloads_ready %} · {{ dokumen.downloads_ready }} unduhan siap{% endif %}. Pantau status, unggah dokumen, tanda tangani dokumen elektronik, dan ajukan izin unduh.</p>
+  {% else %}
+  <p class="small muted" style="margin:8px 0 0">Daftar dokumen perizinan muncul otomatis setelah alokasi lahan terbit atau kontrak sewa/kerja sama dicatat.</p>
+  {% endif %}
+</section>
+
 {% if open_invoices %}
 <section class="card">
   <h2>Tagihan belum lunas</h2>

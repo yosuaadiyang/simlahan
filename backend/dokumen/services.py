@@ -170,7 +170,11 @@ def sync_from_allocation(allocation) -> LandUse:
             start_date=allocation.start_date,
             end_date=allocation.end_date,
         )
-        log(enums.Action.CREATED, land_use=land_use, detail=_("Dari alokasi %s") % allocation.kpt_number)
+        log(
+            enums.Action.CREATED,
+            land_use=land_use,
+            detail=_("Dari alokasi %s") % allocation.kpt_number,
+        )
         ensure_records(land_use)
         return land_use
     changed = []
@@ -199,9 +203,13 @@ def sync_from_allocation(allocation) -> LandUse:
 def sync_from_investment(investment) -> LandUse | None:
     from alokasi.enums import InvestmentScheme, InvestmentStatus
 
-    if investment.status != InvestmentStatus.COMPLETED or investment.offer_scheme not in (
-        InvestmentScheme.LEASE,
-        InvestmentScheme.PARTNERSHIP,
+    if (
+        investment.status != InvestmentStatus.COMPLETED
+        or investment.offer_scheme
+        not in (
+            InvestmentScheme.LEASE,
+            InvestmentScheme.PARTNERSHIP,
+        )
     ):
         return None
     existing = LandUse.objects.filter(investment=investment).first()
@@ -217,7 +225,9 @@ def sync_from_investment(investment) -> LandUse | None:
     if investment.offer_term_years:
         from alokasi.services import _add_years
 
-        end = _add_years(start, investment.offer_term_years) - datetime.timedelta(days=1)
+        end = _add_years(start, investment.offer_term_years) - datetime.timedelta(
+            days=1
+        )
     plot = investment.offer_plot
     land_use = LandUse.objects.create(
         title=investment.project_name,
@@ -233,7 +243,11 @@ def sync_from_investment(investment) -> LandUse | None:
         end_date=end,
         assigned_to=investment.assigned_to,
     )
-    log(enums.Action.CREATED, land_use=land_use, detail=_("Dari permintaan investasi %s") % investment.number)
+    log(
+        enums.Action.CREATED,
+        land_use=land_use,
+        detail=_("Dari permintaan investasi %s") % investment.number,
+    )
     ensure_records(land_use)
     return land_use
 
@@ -248,9 +262,16 @@ def end_land_uses_for_plots(plot_ids, actor=None) -> int:
     count = 0
     for land_use in land_uses:
         land_use.status = enums.LandUseStatus.ENDED
-        land_use.end_date = min(land_use.end_date or timezone.localdate(), timezone.localdate())
+        land_use.end_date = min(
+            land_use.end_date or timezone.localdate(), timezone.localdate()
+        )
         land_use.save(update_fields=["status", "end_date", "modified_at"])
-        log(enums.Action.STATUS, actor=actor, land_use=land_use, detail=_("Sewa diakhiri."))
+        log(
+            enums.Action.STATUS,
+            actor=actor,
+            land_use=land_use,
+            detail=_("Sewa diakhiri."),
+        )
         count += 1
     return count
 
@@ -261,9 +282,11 @@ def end_land_uses_for_plots(plot_ids, actor=None) -> int:
 
 
 def _lock_record(record: PermitRecord) -> PermitRecord:
-    return PermitRecord.objects.select_for_update().select_related(
-        "land_use", "permit_type"
-    ).get(pk=record.pk)
+    return (
+        PermitRecord.objects.select_for_update(of=("self",))
+        .select_related("land_use", "permit_type")
+        .get(pk=record.pk)
+    )
 
 
 def validate_upload(upload) -> None:
@@ -291,7 +314,9 @@ def add_version(
 ) -> DocumentVersion:
     """Simpan berkas sebagai versi berikutnya. ``upload`` = UploadedFile atau ContentFile."""
     last = record.versions.order_by("-number").values_list("number", flat=True).first()
-    name = os.path.basename(original_name or getattr(upload, "name", "") or "dokumen")[:200]
+    name = os.path.basename(original_name or getattr(upload, "name", "") or "dokumen")[
+        :200
+    ]
     digest, size = file_digest(upload)
     version = DocumentVersion(
         record=record,
@@ -326,7 +351,11 @@ def _apply_dates(record, number, issued_date, expiry_date):
     if record.issued_date and not record.expiry_date:
         record.expiry_date = record.default_expiry()
     require(
-        not (record.issued_date and record.expiry_date and record.expiry_date < record.issued_date),
+        not (
+            record.issued_date
+            and record.expiry_date
+            and record.expiry_date < record.issued_date
+        ),
         _("Masa berlaku berakhir sebelum tanggal terbit."),
     )
     if record.expiry_date != record.expiry_warned_for:
@@ -339,7 +368,9 @@ def _staff_recipients(record) -> list:
         return [land_use.assigned_to]
     from dokumen.access import users_with_perm
 
-    return list(users_with_perm("dokumen.verify_permitrecord").exclude(is_superuser=True)[:20])
+    return list(
+        users_with_perm("dokumen.verify_permitrecord").exclude(is_superuser=True)[:20]
+    )
 
 
 def _notify_holder(record, subject, lines):
@@ -349,7 +380,14 @@ def _notify_holder(record, subject, lines):
     from alokasi.services import portal_url
 
     body = "\n".join(
-        [_("Yth. %s,") % holder.name, "", *lines, "", _("Lihat rincian: %s") % portal_url(f"dokumen/pemanfaatan/{record.land_use.number}/")]
+        [
+            _("Yth. %s,") % holder.name,
+            "",
+            *lines,
+            "",
+            _("Lihat rincian: %s")
+            % portal_url(f"dokumen/pemanfaatan/{record.land_use.number}/"),
+        ]
     )
     on_commit_email([holder.user.email], subject, body)
 
@@ -377,10 +415,23 @@ def holder_update(
     record.holder_note = (note or "").strip()[:5000] or record.holder_note
     if upload is not None:
         validate_upload(upload)
-        add_version(record, upload, user=user, source=enums.VersionSource.HOLDER, note=note, request=request)
+        add_version(
+            record,
+            upload,
+            user=user,
+            source=enums.VersionSource.HOLDER,
+            note=note,
+            request=request,
+        )
         record.status = RS.SUBMITTED
         record.save()
-        log(enums.Action.STATUS, actor=user, request=request, record=record, detail=record.get_status_display())
+        log(
+            enums.Action.STATUS,
+            actor=user,
+            request=request,
+            record=record,
+            detail=record.get_status_display(),
+        )
         transaction.on_commit(lambda: _notify_staff_submitted(record))
         return record
     require(status in enums.HOLDER_RECORD_STATUSES, _("Pilih status yang valid."))
@@ -392,7 +443,13 @@ def holder_update(
     record.status = status
     record.save()
     if previous != status:
-        log(enums.Action.STATUS, actor=user, request=request, record=record, detail=record.get_status_display())
+        log(
+            enums.Action.STATUS,
+            actor=user,
+            request=request,
+            record=record,
+            detail=record.get_status_display(),
+        )
     return record
 
 
@@ -409,23 +466,49 @@ def _notify_staff_submitted(record):
         "title": record.land_use.title,
         "url": url,
     }
-    email_users(_staff_recipients(record), _("Dokumen menunggu verifikasi: %s") % record.permit_type.name, body)
+    email_users(
+        _staff_recipients(record),
+        _("Dokumen menunggu verifikasi: %s") % record.permit_type.name,
+        body,
+    )
 
 
 @transaction.atomic
 def officer_upload(
-    record, user, upload, *, note="", number=None, issued_date=None, expiry_date=None, verify_now=False, request=None
+    record,
+    user,
+    upload,
+    *,
+    note="",
+    number=None,
+    issued_date=None,
+    expiry_date=None,
+    verify_now=False,
+    request=None,
 ) -> DocumentVersion:
     record = _lock_record(record)
     validate_upload(upload)
     _apply_dates(record, number, issued_date, expiry_date)
-    version = add_version(record, upload, user=user, source=enums.VersionSource.OFFICER, note=note, request=request)
+    version = add_version(
+        record,
+        upload,
+        user=user,
+        source=enums.VersionSource.OFFICER,
+        note=note,
+        request=request,
+    )
     if verify_now:
         _set_verified(record, user, note, request)
     elif record.status in (RS.NOT_STARTED, RS.IN_PROGRESS, RS.REVISION, RS.EXPIRED):
         record.status = RS.SUBMITTED
         record.save()
-        log(enums.Action.STATUS, actor=user, request=request, record=record, detail=record.get_status_display())
+        log(
+            enums.Action.STATUS,
+            actor=user,
+            request=request,
+            record=record,
+            detail=record.get_status_display(),
+        )
     else:
         record.save()
     return version
@@ -444,18 +527,32 @@ def _set_verified(record, user, note, request):
     _notify_holder(
         record,
         _("%s terverifikasi") % record.permit_type.name,
-        [_("Dokumen %(type)s untuk %(number)s telah diverifikasi petugas.") % {"type": record.permit_type.name, "number": record.land_use.number}]
+        [
+            _("Dokumen %(type)s untuk %(number)s telah diverifikasi petugas.")
+            % {"type": record.permit_type.name, "number": record.land_use.number}
+        ]
         + ([_("Catatan: %s") % note] if note else []),
     )
 
 
 @transaction.atomic
-def verify(record, user, *, number=None, issued_date=None, expiry_date=None, note="", request=None):
+def verify(
+    record,
+    user,
+    *,
+    number=None,
+    issued_date=None,
+    expiry_date=None,
+    note="",
+    request=None,
+):
     record = _lock_record(record)
     require(record.status != RS.VERIFIED, _("Dokumen ini sudah terverifikasi."))
     require(
         record.versions.exists() or bool((note or "").strip()),
-        _("Belum ada berkas. Tulis catatan dasar verifikasi (mis. diperiksa di sistem OSS)."),
+        _(
+            "Belum ada berkas. Tulis catatan dasar verifikasi (mis. diperiksa di sistem OSS)."
+        ),
     )
     _apply_dates(record, number, issued_date, expiry_date)
     _set_verified(record, user, (note or "").strip(), request)
@@ -475,7 +572,11 @@ def request_revision(record, user, note: str, request=None):
     _notify_holder(
         record,
         _("%s perlu diperbaiki") % record.permit_type.name,
-        [_("Petugas meminta perbaikan dokumen %(type)s untuk %(number)s:") % {"type": record.permit_type.name, "number": record.land_use.number}, note],
+        [
+            _("Petugas meminta perbaikan dokumen %(type)s untuk %(number)s:")
+            % {"type": record.permit_type.name, "number": record.land_use.number},
+            note,
+        ],
     )
     return record
 
@@ -499,7 +600,10 @@ def reopen(record, user, note: str, request=None):
     record = _lock_record(record)
     note = (note or "").strip()
     require(bool(note), _("Tuliskan alasan membuka kembali."))
-    require(record.status in (RS.VERIFIED, RS.WAIVED, RS.EXPIRED), _("Dokumen ini masih terbuka."))
+    require(
+        record.status in (RS.VERIFIED, RS.WAIVED, RS.EXPIRED),
+        _("Dokumen ini masih terbuka."),
+    )
     record.status = RS.SUBMITTED if record.versions.exists() else RS.NOT_STARTED
     record.review_note = note[:5000]
     record.verified_by = None
@@ -513,16 +617,30 @@ def expire_records(today=None) -> list[PermitRecord]:
     today = today or timezone.localdate()
     expired = []
     for record in PermitRecord.objects.select_related("land_use", "permit_type").filter(
-        status=RS.VERIFIED, expiry_date__lt=today
+        status=RS.VERIFIED,
+        expiry_date__lt=today,
+        land_use__status=enums.LandUseStatus.ACTIVE,
     ):
         with transaction.atomic():
             record.status = RS.EXPIRED
             record.save(update_fields=["status", "modified_at"])
-            log(enums.Action.EXPIRED, record=record, detail=_("Masa berlaku berakhir %s") % record.expiry_date)
+            log(
+                enums.Action.EXPIRED,
+                record=record,
+                detail=_("Masa berlaku berakhir %s") % record.expiry_date,
+            )
             _notify_holder(
                 record,
                 _("%s kedaluwarsa") % record.permit_type.name,
-                [_("Masa berlaku %(type)s untuk %(number)s telah berakhir. Unggah dokumen yang diperbarui.") % {"type": record.permit_type.name, "number": record.land_use.number}],
+                [
+                    _(
+                        "Masa berlaku %(type)s untuk %(number)s telah berakhir. Unggah dokumen yang diperbarui."
+                    )
+                    % {
+                        "type": record.permit_type.name,
+                        "number": record.land_use.number,
+                    }
+                ],
             )
         expired.append(record)
     return expired
@@ -532,7 +650,9 @@ def warn_expiring(today=None, days=60) -> list[PermitRecord]:
     today = today or timezone.localdate()
     limit = today + datetime.timedelta(days=days)
     warned = []
-    records = PermitRecord.objects.select_related("land_use", "permit_type", "land_use__holder__user").filter(
+    records = PermitRecord.objects.select_related(
+        "land_use", "permit_type", "land_use__holder__user"
+    ).filter(
         status=RS.VERIFIED,
         expiry_date__gte=today,
         expiry_date__lte=limit,
@@ -547,7 +667,19 @@ def warn_expiring(today=None, days=60) -> list[PermitRecord]:
             _notify_holder(
                 record,
                 _("%s akan kedaluwarsa") % record.permit_type.name,
-                [_("Masa berlaku %(type)s untuk %(number)s berakhir %(date)s (%(days)s hari lagi). Segera perpanjang lalu unggah dokumen terbaru.") % {"type": record.permit_type.name, "number": record.land_use.number, "date": record.expiry_date.strftime("%d-%m-%Y"), "days": (record.expiry_date - today).days}],
+                [
+                    _(
+                        "Masa berlaku %(type)s untuk %(number)s berakhir %(date)s "
+                        "(%(days)s hari lagi). Segera perpanjang lalu unggah dokumen "
+                        "terbaru."
+                    )
+                    % {
+                        "type": record.permit_type.name,
+                        "number": record.land_use.number,
+                        "date": record.expiry_date.strftime("%d-%m-%Y"),
+                        "days": (record.expiry_date - today).days,
+                    }
+                ],
             )
         warned.append(record)
     return warned
@@ -574,7 +706,9 @@ def safe_filename(text: str, extension: str) -> str:
     return f"{stem}.{extension}"
 
 
-def render_template(template: DocumentTemplate, *, land_use=None, record=None, extra=None, title="") -> tuple[bytes, str]:
+def render_template(
+    template: DocumentTemplate, *, land_use=None, record=None, extra=None, title=""
+) -> tuple[bytes, str]:
     """Hasilkan berkas dari templat: (isi, nama berkas)."""
     from dokumen import pdf
 
@@ -586,15 +720,24 @@ def render_template(template: DocumentTemplate, *, land_use=None, record=None, e
     data = read_file(template.file)
     if template.kind == enums.TemplateKind.DOCX:
         return merge.render_docx(data, context), safe_filename(title, "docx")
-    extension = (template.original_name or template.file.name).rsplit(".", 1)[-1].lower()
+    extension = (
+        (template.original_name or template.file.name).rsplit(".", 1)[-1].lower()
+    )
     return data, safe_filename(title, extension)
 
 
 @transaction.atomic
-def generate_version(record, user, template, *, extra=None, note="", request=None) -> DocumentVersion:
+def generate_version(
+    record, user, template, *, extra=None, note="", request=None
+) -> DocumentVersion:
     record = _lock_record(record)
     try:
-        data, filename = render_template(template, record=record, extra=extra, title=f"{record.permit_type.name} {record.land_use.number}")
+        data, filename = render_template(
+            template,
+            record=record,
+            extra=extra,
+            title=f"{record.permit_type.name} {record.land_use.number}",
+        )
     except merge.TemplateRenderError as error:
         raise ValidationError(str(error)) from error
     version = add_version(
@@ -605,7 +748,13 @@ def generate_version(record, user, template, *, extra=None, note="", request=Non
         note=note or _("Dari templat %s") % template,
         request=request,
     )
-    log(enums.Action.GENERATED, actor=user, request=request, record=record, detail=str(template))
+    log(
+        enums.Action.GENERATED,
+        actor=user,
+        request=request,
+        record=record,
+        detail=str(template),
+    )
     return version
 
 
@@ -620,40 +769,56 @@ def _stem(name: str) -> str:
     return (stem[:1].upper() + stem[1:])[:255] or _("Templat tanpa nama")
 
 
-def _import_one(name: str, data: bytes, *, user, category, docx_mode: str) -> DocumentTemplate | None:
+def _text_to_html(data: bytes, extension: str) -> str:
+    try:
+        text = data.decode("utf-8")
+    except UnicodeDecodeError:
+        text = data.decode("latin-1")
+    if extension == "txt":
+        from html import escape
+
+        text = "".join(
+            f"<p>{escape(line)}</p>" for line in text.splitlines() if line.strip()
+        )
+    return sanitize_html(text)
+
+
+def _docx_html(name: str, data: bytes) -> str:
+    try:
+        return merge.docx_to_html(data)
+    except merge.TemplateRenderError as error:
+        raise ValidationError(f"{name}: {error}") from error
+
+
+def _check_import_file(name: str, extension: str, data: bytes) -> None:
     from file_operations.validators import SIGNATURE_CHECKS
 
-    extension = os.path.splitext(name)[1].lower().lstrip(".")
     if len(data) > MAX_UPLOAD_BYTES:
         raise ValidationError(_("%s lebih dari 20 MB.") % name)
     check = SIGNATURE_CHECKS.get(extension)
     if check is not None and not check(data[:1024]):
         raise ValidationError(_("Isi %s tidak sesuai dengan jenisnya.") % name)
-    template = DocumentTemplate(name=_stem(name), category=category, created_by=user)
-    if extension in ("html", "htm", "txt"):
-        try:
-            text = data.decode("utf-8")
-        except UnicodeDecodeError:
-            text = data.decode("latin-1")
-        if extension == "txt":
-            from html import escape
 
-            text = "".join(f"<p>{escape(line)}</p>" for line in text.splitlines() if line.strip())
-        template.kind = enums.TemplateKind.HTML
-        template.body = sanitize_html(text)
+
+def _import_one(
+    name: str, data: bytes, *, user, category, docx_mode: str
+) -> DocumentTemplate | None:
+    extension = os.path.splitext(name)[1].lower().lstrip(".")
+    _check_import_file(name, extension, data)
+    template = DocumentTemplate(name=_stem(name), category=category, created_by=user)
+    if extension in ("html", "htm", "txt") or (
+        extension == "docx" and docx_mode == "html"
+    ):
+        if extension == "docx":
+            template.body = _docx_html(name, data)
+        else:
+            template.body = _text_to_html(data, extension)
         require(bool(template.body), _("%s kosong setelah dibersihkan.") % name)
+        template.kind = enums.TemplateKind.HTML
         template.save()
         return template
     if extension == "docx":
-        if docx_mode == "html":
-            try:
-                template.body = merge.docx_to_html(data)
-            except merge.TemplateRenderError as error:
-                raise ValidationError(f"{name}: {error}") from error
-            template.kind = enums.TemplateKind.HTML
-            template.save()
-            return template
-        merge.docx_to_html(data)  # validasi: berkas harus dapat dibaca
+        _docx_html(name, data)  # validasi: berkas harus dapat dibaca
         template.kind = enums.TemplateKind.DOCX
     elif extension in IMPORT_FILE_EXTENSIONS:
         template.kind = enums.TemplateKind.FILE
@@ -677,18 +842,26 @@ def _zip_entries(data: bytes):
         and not os.path.basename(info.filename).startswith((".", "~$"))
         and "__MACOSX" not in info.filename
     ]
-    require(len(entries) <= MAX_IMPORT_FILES, _("ZIP berisi lebih dari %d berkas.") % MAX_IMPORT_FILES)
+    require(
+        len(entries) <= MAX_IMPORT_FILES,
+        _("ZIP berisi lebih dari %d berkas.") % MAX_IMPORT_FILES,
+    )
     require(
         sum(info.file_size for info in entries) <= MAX_IMPORT_TOTAL,
         _("Isi ZIP lebih dari 100 MB setelah diekstrak."),
     )
     for info in entries:
-        require(info.file_size <= MAX_UPLOAD_BYTES, _("%s lebih dari 20 MB.") % info.filename)
+        require(
+            info.file_size <= MAX_UPLOAD_BYTES,
+            _("%s lebih dari 20 MB.") % info.filename,
+        )
         yield info.filename, archive.read(info)
 
 
 @transaction.atomic
-def import_templates(uploads, *, user, category, docx_mode="docx") -> tuple[list, list[str]]:
+def import_templates(
+    uploads, *, user, category, docx_mode="docx"
+) -> tuple[list, list[str]]:
     """Impor satu/banyak berkas (atau ZIP) menjadi templat. Kembalikan (templat, dilewati)."""
     created, skipped = [], []
     for upload in uploads:
@@ -699,10 +872,22 @@ def import_templates(uploads, *, user, category, docx_mode="docx") -> tuple[list
         else:
             entries = [(name, data)]
         for entry_name, entry_data in entries:
-            template = _import_one(entry_name, entry_data, user=user, category=category, docx_mode=docx_mode)
+            template = _import_one(
+                entry_name,
+                entry_data,
+                user=user,
+                category=category,
+                docx_mode=docx_mode,
+            )
             if template is None:
                 skipped.append(os.path.basename(entry_name))
             else:
                 created.append(template)
-    require(bool(created), _("Tidak ada berkas yang dapat diimpor (format didukung: DOCX, HTML, TXT, PDF, XLSX, JPG, PNG, atau ZIP berisi berkas tersebut)."))
+    require(
+        bool(created),
+        _(
+            "Tidak ada berkas yang dapat diimpor (format didukung: DOCX, HTML, TXT, "
+            "PDF, XLSX, JPG, PNG, atau ZIP berisi berkas tersebut)."
+        ),
+    )
     return created, skipped

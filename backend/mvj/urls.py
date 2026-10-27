@@ -11,8 +11,8 @@ from rest_framework import permissions, routers
 from alokasi.admin_views import officer_file
 from asetlahan import urls as asetlahan_urls
 from asetlahan.api import urlpatterns as asetlahan_api_urls
-from dokumen import urls as dokumen_urls
 from audittrail.viewsets import AuditTrailView
+from dokumen import urls as dokumen_urls
 from forms.viewsets.form import (
     AnswerOpeningRecordViewset,
     AnswerPublicViewSet,

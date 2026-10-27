@@ -20,7 +20,12 @@ ALLOCATION_STATUS = {
     "berakhir": "berakhir",
     "dicabut": "dicabut",
 }
-OLD_STATUS = {"belum": "belum", "proses": "proses", "terbit": "diajukan", "tidak_wajib": "tidak_wajib"}
+OLD_STATUS = {
+    "belum": "belum",
+    "proses": "proses",
+    "terbit": "diajukan",
+    "tidak_wajib": "tidak_wajib",
+}
 SCHEME_FLAGS = {
     "alokasi": "applies_allocation",
     "sewa": "applies_lease",
@@ -45,7 +50,11 @@ def _ensure_records(apps, land_use):
     PermitType = apps.get_model("dokumen", "PermitType")
     PermitRecord = apps.get_model("dokumen", "PermitRecord")
     flag = SCHEME_FLAGS.get(land_use.scheme, "applies_other")
-    existing = set(PermitRecord.objects.filter(land_use=land_use).values_list("permit_type_id", flat=True))
+    existing = set(
+        PermitRecord.objects.filter(land_use=land_use).values_list(
+            "permit_type_id", flat=True
+        )
+    )
     for permit_type in PermitType.objects.filter(is_active=True, **{flag: True}):
         sectors = set(permit_type.sectors.values_list("pk", flat=True))
         if sectors and land_use.sector_id not in sectors:
@@ -71,7 +80,9 @@ def backfill_allocations(apps):
     Allocation = apps.get_model("alokasi", "Allocation")
     LandUse = apps.get_model("dokumen", "LandUse")
     Activity = apps.get_model("dokumen", "Activity")
-    for allocation in Allocation.objects.select_related("plot", "holder").order_by("pk"):
+    for allocation in Allocation.objects.select_related("plot", "holder").order_by(
+        "pk"
+    ):
         if LandUse.objects.filter(allocation=allocation).exists():
             continue
         land_use = LandUse.objects.create(
@@ -90,7 +101,10 @@ def backfill_allocations(apps):
             end_date=allocation.end_date,
         )
         Activity.objects.create(
-            action="dibuat", land_use=land_use, actor_name="Sistem", detail=f"Dari alokasi {allocation.kpt_number}"
+            action="dibuat",
+            land_use=land_use,
+            actor_name="Sistem",
+            detail=f"Dari alokasi {allocation.kpt_number}",
         )
         _ensure_records(apps, land_use)
 
@@ -108,7 +122,9 @@ def backfill_investments(apps):
         start = (investment.closed_at or timezone.now()).date()
         end = None
         if investment.offer_term_years:
-            end = _add_years(start, investment.offer_term_years) - datetime.timedelta(days=1)
+            end = _add_years(start, investment.offer_term_years) - datetime.timedelta(
+                days=1
+            )
         plot = investment.offer_plot
         land_use = LandUse.objects.create(
             number=_number(),
@@ -127,7 +143,10 @@ def backfill_investments(apps):
             assigned_to_id=investment.assigned_to_id,
         )
         Activity.objects.create(
-            action="dibuat", land_use=land_use, actor_name="Sistem", detail=f"Dari permintaan investasi {investment.number}"
+            action="dibuat",
+            land_use=land_use,
+            actor_name="Sistem",
+            detail=f"Dari permintaan investasi {investment.number}",
         )
         _ensure_records(apps, land_use)
 
@@ -147,7 +166,9 @@ def move_permit_reports(apps):
         permit_type = types.get(report.permit_type) or fallback
         if land_use is None or permit_type is None:
             continue
-        record, _created = PermitRecord.objects.get_or_create(land_use=land_use, permit_type=permit_type)
+        record, _created = PermitRecord.objects.get_or_create(
+            land_use=land_use, permit_type=permit_type
+        )
         has_file = bool(report.document and report.document.name)
         status = OLD_STATUS.get(report.status, "belum")
         if status == "diajukan" and not has_file and not report.permit_number:
@@ -159,7 +180,12 @@ def move_permit_reports(apps):
         if record.status == "tidak_wajib":
             record.review_note = "Dilaporkan tidak wajib oleh pemegang hak (data lama)."
         record.save()
-        if has_file and not DocumentVersion.objects.filter(record=record, file=report.document.name).exists():
+        if (
+            has_file
+            and not DocumentVersion.objects.filter(
+                record=record, file=report.document.name
+            ).exists()
+        ):
             digest, size = _digest(storage, report.document.name)
             number = (DocumentVersion.objects.filter(record=record).count() or 0) + 1
             DocumentVersion.objects.create(

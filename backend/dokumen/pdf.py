@@ -101,6 +101,8 @@ def _overlay(data: bytes, draw) -> bytes:
 
 
 def stamp_footer(data: bytes, text: str) -> bytes:
+    text = str(text)
+
     def draw(sheet, width, height):
         sheet.setFont("Helvetica", 7)
         sheet.setFillGray(0.35)
@@ -111,6 +113,7 @@ def stamp_footer(data: bytes, text: str) -> bytes:
 
 def watermark(data: bytes, lines: list[str]) -> bytes:
     """Tanda air diagonal + baris kaki berisi identitas pengunduh."""
+    lines = [str(line) for line in lines]
 
     def draw(sheet, width, height):
         sheet.saveState()
@@ -133,7 +136,9 @@ def watermark(data: bytes, lines: list[str]) -> bytes:
 def signing_pdf(document) -> bytes:
     """PDF final dokumen tanda tangan beserta lembar pengesahan dan sertifikat."""
     if document.source == enums.SigningSource.HTML:
-        return render_pdf("dokumen/pdf/signed.html", _context(document, include_body=True))
+        return render_pdf(
+            "dokumen/pdf/signed.html", _context(document, include_body=True)
+        )
     with document.source_file.open("rb") as handle:
         original = handle.read()
     footer = (
@@ -141,7 +146,9 @@ def signing_pdf(document) -> bytes:
         f"{verification_url(document)}"
     )
     stamped = stamp_footer(original, footer)
-    appendix = render_pdf("dokumen/pdf/signed.html", _context(document, include_body=False))
+    appendix = render_pdf(
+        "dokumen/pdf/signed.html", _context(document, include_body=False)
+    )
     return _merge([stamped, appendix])
 
 

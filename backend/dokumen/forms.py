@@ -36,16 +36,22 @@ class RichTextarea(forms.Textarea):
         groups = [
             {
                 "label": str(label),
-                "fields": [{"key": f"{group}.{field}", "label": text} for field, text in fields],
+                "fields": [
+                    {"key": f"{group}.{field}", "label": text} for field, text in fields
+                ],
             }
             for group, label, fields in merge.FIELD_GROUPS
         ]
-        blocks = list(ContentBlock.objects.filter(is_active=True).values("code", "name"))
+        blocks = list(
+            ContentBlock.objects.filter(is_active=True).values("code", "name")
+        )
         if blocks:
             groups.append(
                 {
                     "label": str(_("Pustaka konten")),
-                    "fields": [{"key": f"blok.{b['code']}", "label": b["name"]} for b in blocks],
+                    "fields": [
+                        {"key": f"blok.{b['code']}", "label": b["name"]} for b in blocks
+                    ],
                 }
             )
         context["widget"]["attrs"]["data-fields"] = json.dumps(groups)
@@ -81,17 +87,27 @@ class HolderRecordForm(forms.Form):
     status = forms.ChoiceField(
         label=_("Status pengurusan"),
         choices=[("", _("— tidak diubah —"))]
-        + [(v, label) for v, label in enums.RecordStatus.choices if v in enums.HOLDER_RECORD_STATUSES],
+        + [
+            (v, label)
+            for v, label in enums.RecordStatus.choices
+            if v in enums.HOLDER_RECORD_STATUSES
+        ],
         required=False,
     )
     file = forms.FileField(
         label=_("Unggah dokumen"),
         required=False,
         widget=forms.ClearableFileInput(attrs={"accept": ACCEPT_DOCUMENT}),
-        help_text=_("PDF, JPG, PNG, DOCX, atau XLSX; maksimal 20 MB. Mengunggah berarti mengajukan verifikasi."),
+        help_text=_(
+            "PDF, JPG, PNG, DOCX, atau XLSX; maksimal 20 MB. Mengunggah berarti mengajukan verifikasi."
+        ),
     )
-    number = forms.CharField(label=_("Nomor dokumen / izin"), max_length=128, required=False)
-    issued_date = forms.DateField(label=_("Tanggal terbit"), required=False, widget=DATE_INPUT)
+    number = forms.CharField(
+        label=_("Nomor dokumen / izin"), max_length=128, required=False
+    )
+    issued_date = forms.DateField(
+        label=_("Tanggal terbit"), required=False, widget=DATE_INPUT
+    )
     expiry_date = forms.DateField(
         label=_("Berlaku sampai"),
         required=False,
@@ -108,15 +124,21 @@ class HolderRecordForm(forms.Form):
     def clean(self):
         cleaned = super().clean()
         if not cleaned.get("file") and not cleaned.get("status"):
-            raise forms.ValidationError(_("Unggah dokumen atau pilih status pengurusan."))
+            raise forms.ValidationError(
+                _("Unggah dokumen atau pilih status pengurusan.")
+            )
         issued, expiry = cleaned.get("issued_date"), cleaned.get("expiry_date")
         if issued and expiry and expiry < issued:
-            self.add_error("expiry_date", _("Masa berlaku berakhir sebelum tanggal terbit."))
+            self.add_error(
+                "expiry_date", _("Masa berlaku berakhir sebelum tanggal terbit.")
+            )
         return cleaned
 
 
 class DownloadRequestForm(forms.Form):
-    purpose = forms.ChoiceField(label=_("Keperluan"), choices=enums.DownloadPurpose.choices)
+    purpose = forms.ChoiceField(
+        label=_("Keperluan"), choices=enums.DownloadPurpose.choices
+    )
     reason = forms.CharField(
         label=_("Alasan"),
         min_length=5,
@@ -128,16 +150,22 @@ class DownloadRequestForm(forms.Form):
 
 class SignForm(forms.Form):
     name = forms.CharField(label=_("Nama lengkap"), max_length=255, min_length=3)
-    signature = forms.CharField(widget=forms.HiddenInput, required=False, max_length=600_000)
+    signature = forms.CharField(
+        widget=forms.HiddenInput, required=False, max_length=600_000
+    )
     agree = forms.BooleanField(
-        label=_("Saya telah membaca dokumen ini dan setuju menandatanganinya secara elektronik."),
+        label=_(
+            "Saya telah membaca dokumen ini dan setuju menandatanganinya secara elektronik."
+        ),
         required=True,
     )
 
 
 class DeclineForm(forms.Form):
     reason = forms.CharField(
-        label=_("Alasan menolak"), max_length=5000, widget=forms.Textarea(attrs={"rows": 3})
+        label=_("Alasan menolak"),
+        max_length=5000,
+        widget=forms.Textarea(attrs={"rows": 3}),
     )
 
 
@@ -146,7 +174,13 @@ class OtpForm(forms.Form):
         label=_("Kode verifikasi"),
         min_length=6,
         max_length=6,
-        widget=forms.TextInput(attrs={"inputmode": "numeric", "autocomplete": "one-time-code", "pattern": "[0-9]{6}"}),
+        widget=forms.TextInput(
+            attrs={
+                "inputmode": "numeric",
+                "autocomplete": "one-time-code",
+                "pattern": "[0-9]{6}",
+            }
+        ),
     )
 
 
@@ -175,13 +209,19 @@ class HashCheckForm(forms.Form):
 
 
 class OfficerVerifyForm(forms.Form):
-    number = forms.CharField(label=_("Nomor dokumen / izin"), max_length=128, required=False)
-    issued_date = forms.DateField(label=_("Tanggal terbit"), required=False, widget=DATE_INPUT)
+    number = forms.CharField(
+        label=_("Nomor dokumen / izin"), max_length=128, required=False
+    )
+    issued_date = forms.DateField(
+        label=_("Tanggal terbit"), required=False, widget=DATE_INPUT
+    )
     expiry_date = forms.DateField(
         label=_("Berlaku sampai"),
         required=False,
         widget=DATE_INPUT,
-        help_text=_("Kosong = dihitung dari masa berlaku bawaan jenis dokumen (bila ada)."),
+        help_text=_(
+            "Kosong = dihitung dari masa berlaku bawaan jenis dokumen (bila ada)."
+        ),
     )
     note = forms.CharField(
         label=_("Catatan verifikasi"),
@@ -234,7 +274,7 @@ class GenerateForm(forms.Form):
 
     def custom_values(self) -> dict:
         return {
-            name[len("isian_"):]: value
+            name[len("isian_") :]: value
             for name, value in self.cleaned_data.items()
             if name.startswith("isian_")
         }
@@ -246,7 +286,9 @@ class FillFieldsForm(forms.Form):
         self.fields.update(custom_value_fields(keys))
 
     def values(self) -> dict:
-        return {name[len("isian_"):]: value for name, value in self.cleaned_data.items()}
+        return {
+            name[len("isian_") :]: value for name, value in self.cleaned_data.items()
+        }
 
 
 class DownloadDecisionForm(forms.Form):
@@ -258,11 +300,17 @@ class DownloadDecisionForm(forms.Form):
         help_text=_("Wajib diisi bila menolak."),
     )
     hours = forms.IntegerField(
-        label=_("Berlaku (jam)"), min_value=1, max_value=720, required=False,
+        label=_("Berlaku (jam)"),
+        min_value=1,
+        max_value=720,
+        required=False,
         help_text=_("Kosong = sesuai pengaturan."),
     )
     max_count = forms.IntegerField(
-        label=_("Batas unduh"), min_value=1, max_value=20, required=False,
+        label=_("Batas unduh"),
+        min_value=1,
+        max_value=20,
+        required=False,
         help_text=_("Kosong = sesuai pengaturan."),
     )
 
@@ -299,7 +347,9 @@ class TemplatePreviewForm(forms.Form):
         label=_("Contoh data dari pemanfaatan lahan"),
         queryset=LandUse.objects.all(),
         required=False,
-        widget=AutocompleteSelect(SigningDocument._meta.get_field("land_use"), admin.site),
+        widget=AutocompleteSelect(
+            SigningDocument._meta.get_field("land_use"), admin.site
+        ),
         help_text=_("Kosongkan untuk memakai data contoh."),
     )
 
@@ -308,21 +358,29 @@ class SigningCreateForm(forms.Form):
     title = forms.CharField(label=_("Judul dokumen"), max_length=255)
     template = forms.ModelChoiceField(
         label=_("Templat isian"),
-        queryset=DocumentTemplate.objects.filter(is_active=True, kind=enums.TemplateKind.HTML),
+        queryset=DocumentTemplate.objects.filter(
+            is_active=True, kind=enums.TemplateKind.HTML
+        ),
         required=False,
     )
     source_file = forms.FileField(
         label=_("Atau unggah PDF"),
         required=False,
         widget=forms.ClearableFileInput(attrs={"accept": ".pdf"}),
-        help_text=_("PDF siap tanda tangan (maks. 20 MB). Lembar pengesahan & sertifikat ditambahkan otomatis."),
+        help_text=_(
+            "PDF siap tanda tangan (maks. 20 MB). Lembar pengesahan & sertifikat ditambahkan otomatis."
+        ),
     )
     land_use = forms.ModelChoiceField(
         label=_("Pemanfaatan lahan"),
         queryset=LandUse.objects.all(),
         required=False,
-        widget=AutocompleteSelect(SigningDocument._meta.get_field("land_use"), admin.site),
-        help_text=_("Data pemegang hak & lahan dipakai untuk isian otomatis; pemegang hak ditambahkan sebagai penanda tangan."),
+        widget=AutocompleteSelect(
+            SigningDocument._meta.get_field("land_use"), admin.site
+        ),
+        help_text=_(
+            "Data pemegang hak & lahan dipakai untuk isian otomatis; pemegang hak ditambahkan sebagai penanda tangan."
+        ),
     )
     record = forms.ModelChoiceField(
         label=_("Untuk dokumen perizinan"),
@@ -348,13 +406,17 @@ class SigningCreateForm(forms.Form):
         cleaned = super().clean()
         template, upload = cleaned.get("template"), cleaned.get("source_file")
         if bool(template) == bool(upload):
-            raise forms.ValidationError(_("Pilih salah satu: templat isian atau unggah PDF."))
+            raise forms.ValidationError(
+                _("Pilih salah satu: templat isian atau unggah PDF.")
+            )
         record = cleaned.get("record")
         if record is not None:
             if cleaned.get("land_use") is None:
                 cleaned["land_use"] = record.land_use
             elif cleaned["land_use"].pk != record.land_use_id:
-                raise forms.ValidationError(_("Dokumen perizinan bukan milik pemanfaatan lahan ini."))
+                raise forms.ValidationError(
+                    _("Dokumen perizinan bukan milik pemanfaatan lahan ini.")
+                )
         return cleaned
 
 
@@ -371,7 +433,12 @@ def recipient_user_queryset(document=None):
     query = Q(is_staff=True, groups__in=group_ids) | Q(is_superuser=True)
     if document is not None and document.land_use_id and document.land_use.holder_id:
         query |= Q(pk=document.land_use.holder.user_id)
-    return User.objects.filter(query, is_active=True).exclude(email="").distinct().order_by("first_name", "last_name", "email")
+    return (
+        User.objects.filter(query, is_active=True)
+        .exclude(email="")
+        .distinct()
+        .order_by("first_name", "last_name", "email")
+    )
 
 
 class RecipientForm(forms.ModelForm):
@@ -384,7 +451,9 @@ class RecipientForm(forms.ModelForm):
         self.fields["name"].required = False
         self.fields["email"].required = False
         if "user" in self.fields:
-            self.fields["user"].label_from_instance = lambda u: f"{u.get_full_name() or u.username} <{u.email}>"
+            self.fields["user"].label_from_instance = (
+                lambda u: f"{u.get_full_name() or u.username} <{u.email}>"
+            )
 
     def clean(self):
         cleaned = super().clean()
@@ -397,7 +466,9 @@ class RecipientForm(forms.ModelForm):
             if not cleaned.get("email"):
                 cleaned["email"] = user.email
             elif cleaned["email"].lower() != (user.email or "").lower():
-                self.add_error("email", _("Surel harus sama dengan surel akun yang dipilih."))
+                self.add_error(
+                    "email", _("Surel harus sama dengan surel akun yang dipilih.")
+                )
         else:
             if not cleaned.get("name"):
                 self.add_error("name", _("Isi nama atau pilih akun."))
@@ -434,9 +505,18 @@ class SigningDocumentForm(forms.ModelForm):
     def clean(self):
         cleaned = super().clean()
         land_use, record = cleaned.get("land_use"), cleaned.get("record")
-        if record is not None and (land_use is None or record.land_use_id != land_use.pk):
-            self.add_error("record", _("Dokumen perizinan harus milik pemanfaatan lahan yang dipilih."))
-        if self.instance.source == enums.SigningSource.HTML and "body" in self.fields and not cleaned.get("body"):
+        if record is not None and (
+            land_use is None or record.land_use_id != land_use.pk
+        ):
+            self.add_error(
+                "record",
+                _("Dokumen perizinan harus milik pemanfaatan lahan yang dipilih."),
+            )
+        if (
+            self.instance.source == enums.SigningSource.HTML
+            and "body" in self.fields
+            and not cleaned.get("body")
+        ):
             self.add_error("body", _("Isi dokumen tidak boleh kosong."))
         return cleaned
 
@@ -445,7 +525,10 @@ class DocumentTemplateForm(forms.ModelForm):
     class Meta:
         model = DocumentTemplate
         fields = "__all__"
-        widgets = {"body": RichTextarea(), "signer_roles": forms.Textarea(attrs={"rows": 3})}
+        widgets = {
+            "body": RichTextarea(),
+            "signer_roles": forms.Textarea(attrs={"rows": 3}),
+        }
 
     def clean_body(self):
         from dokumen.sanitizer import sanitize_html

@@ -21,7 +21,9 @@ def applicant_of(user):
 def is_holder(user, land_use) -> bool:
     applicant = applicant_of(user)
     return bool(
-        applicant is not None and land_use is not None and land_use.holder_id == applicant.pk
+        applicant is not None
+        and land_use is not None
+        and land_use.holder_id == applicant.pk
     )
 
 
@@ -30,7 +32,9 @@ def can_view_land_use(user, land_use) -> bool:
 
 
 def can_view_record(user, record) -> bool:
-    return user.has_perm("dokumen.view_permitrecord") or is_holder(user, record.land_use)
+    return user.has_perm("dokumen.view_permitrecord") or is_holder(
+        user, record.land_use
+    )
 
 
 def can_view_signing(user, document) -> bool:

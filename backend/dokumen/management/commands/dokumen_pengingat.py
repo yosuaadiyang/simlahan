@@ -32,8 +32,12 @@ class Command(BaseCommand):
         warned = services.warn_expiring(days=config.expiry_warning_days)
         documents = signing.expire_documents()
         reminded = signing.send_due_reminders()
-        waiting = PermitRecord.objects.filter(status=enums.RecordStatus.SUBMITTED).count()
-        downloads = DownloadRequest.objects.filter(status=enums.DownloadStatus.PENDING).count()
+        waiting = PermitRecord.objects.filter(
+            status=enums.RecordStatus.SUBMITTED
+        ).count()
+        downloads = DownloadRequest.objects.filter(
+            status=enums.DownloadStatus.PENDING
+        ).count()
         lines = [
             _("Izin kedaluwarsa hari ini: %d") % len(expired),
             _("Peringatan masa berlaku terkirim: %d") % len(warned),

@@ -18,6 +18,9 @@
 {% endif %}
 
 {% if not verified %}
+{% if recipient.action == 'salinan' %}
+<section class="card dk-narrow"><p>Anda tercatat sebagai penerima salinan dokumen ini dan akan diberi tahu lewat surel saat dokumen selesai ditandatangani.{% if document.status == 'selesai' %} Keaslian dokumen dapat dicek di <a href="{% url 'dokumen_portal:verify_token' document.verify_token %}">halaman verifikasi</a>.{% endif %}</p></section>
+{% elif my_turn %}
 <section class="card dk-narrow">
   <h2>Verifikasi penerima</h2>
   <p>Untuk melindungi dokumen, kami mengirim kode 6 angka ke surel <strong>{{ masked_email }}</strong>.</p>
@@ -28,6 +31,7 @@
   </form>
   <p class="small muted">Kode berlaku 10 menit. Jangan berikan kode kepada siapa pun, termasuk yang mengaku petugas.</p>
 </section>
+{% endif %}
 {% else %}
 <div class="split">
   <div>

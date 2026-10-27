@@ -48,7 +48,21 @@ ALLOWED_TAGS = {
 }
 VOID_TAGS = {"br", "hr", "img", "col"}
 # Isi tag ini dibuang seluruhnya, bukan hanya tagnya.
-DROP_CONTENT_TAGS = {"script", "style", "iframe", "object", "embed", "noscript", "template", "svg", "math", "head", "title", "textarea", "select"}
+DROP_CONTENT_TAGS = {
+    "script",
+    "style",
+    "iframe",
+    "object",
+    "embed",
+    "noscript",
+    "template",
+    "svg",
+    "math",
+    "head",
+    "title",
+    "textarea",
+    "select",
+}
 
 ALLOWED_ATTRS = {
     "*": {"style", "class"},
@@ -126,7 +140,15 @@ def _clean_attr(tag: str, name: str, value: str) -> str | None:
         return value if SAFE_HREF.match(value) else None
     if name == "src":
         return value if SAFE_IMG.match(value) else None
-    if name in {"colspan", "rowspan", "span", "start", "border", "cellpadding", "cellspacing"}:
+    if name in {
+        "colspan",
+        "rowspan",
+        "span",
+        "start",
+        "border",
+        "cellpadding",
+        "cellspacing",
+    }:
         return value if value.isdigit() and len(value) <= 3 else None
     if name in {"width", "height"}:
         return value if SAFE_NUMBER.match(value) else None

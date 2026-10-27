@@ -124,7 +124,9 @@ class DocumentSettings(models.Model):
     watermark = models.BooleanField(
         verbose_name=_("Beri tanda air pada PDF yang diunduh"),
         default=True,
-        help_text=_("Nama pengunduh, waktu, dan nomor permintaan dicetak di setiap halaman."),
+        help_text=_(
+            "Nama pengunduh, waktu, dan nomor permintaan dicetak di setiap halaman."
+        ),
     )
     signing_expiry_days = models.PositiveSmallIntegerField(
         verbose_name=_("Batas waktu tanda tangan bawaan (hari)"),
@@ -168,8 +170,12 @@ class ContentBlock(TimeStampedModel):
         verbose_name=_("Kode"),
         max_length=40,
         unique=True,
-        help_text=_("Huruf kecil, angka, dan garis bawah; dipakai sebagai {{ blok.kode }}."),
-        validators=[RegexValidator(r"^[a-z0-9_]+$", _("Hanya huruf kecil, angka, dan _."))],
+        help_text=_(
+            "Huruf kecil, angka, dan garis bawah; dipakai sebagai {{ blok.kode }}."
+        ),
+        validators=[
+            RegexValidator(r"^[a-z0-9_]+$", _("Hanya huruf kecil, angka, dan _."))
+        ],
     )
     name = models.CharField(verbose_name=_("Nama"), max_length=255)
     body = models.TextField(verbose_name=_("Isi"), max_length=MAX_BODY_CHARS)
@@ -206,7 +212,9 @@ class DocumentTemplate(TimeStampedModel):
         blank=True,
         default="",
         max_length=MAX_BODY_CHARS,
-        help_text=_("Sisipkan isian otomatis, mis. {{ pemohon.nama }} atau {{ lahan.kode }}."),
+        help_text=_(
+            "Sisipkan isian otomatis, mis. {{ pemohon.nama }} atau {{ lahan.kode }}."
+        ),
     )
     file = PrivateFileField(
         verbose_name=_("Berkas templat"),
@@ -225,8 +233,8 @@ class DocumentTemplate(TimeStampedModel):
         blank=True,
         default="",
         help_text=_(
-            "Satu peran per baris, berurutan, mis. \"Pemegang hak\" lalu "
-            "\"Pejabat penandatangan\". Dipakai mengisi daftar penerima."
+            'Satu peran per baris, berurutan, mis. "Pemegang hak" lalu '
+            '"Pejabat penandatangan". Dipakai mengisi daftar penerima.'
         ),
     )
     confidentiality = models.CharField(
@@ -267,16 +275,23 @@ class DocumentTemplate(TimeStampedModel):
         super().clean()
         if self.kind == enums.TemplateKind.HTML and not (self.body or "").strip():
             raise ValidationError({"body": _("Isi dokumen wajib diisi.")})
-        if self.kind in (enums.TemplateKind.DOCX, enums.TemplateKind.FILE) and not self.file:
+        if (
+            self.kind in (enums.TemplateKind.DOCX, enums.TemplateKind.FILE)
+            and not self.file
+        ):
             raise ValidationError({"file": _("Unggah berkas templat.")})
         if self.kind == enums.TemplateKind.DOCX and self.file:
             name = (self.original_name or self.file.name or "").lower()
             if not name.endswith(".docx"):
-                raise ValidationError({"file": _("Templat Word harus berformat .docx.")})
+                raise ValidationError(
+                    {"file": _("Templat Word harus berformat .docx.")}
+                )
 
     @property
     def roles(self) -> list[str]:
-        return [r.strip()[:100] for r in self.signer_roles.splitlines() if r.strip()][:10]
+        return [r.strip()[:100] for r in self.signer_roles.splitlines() if r.strip()][
+            :10
+        ]
 
     @property
     def can_sign(self) -> bool:
@@ -290,7 +305,9 @@ class PermitType(models.Model):
         verbose_name=_("Kode"),
         max_length=32,
         unique=True,
-        validators=[RegexValidator(r"^[a-z0-9_]+$", _("Hanya huruf kecil, angka, dan _."))],
+        validators=[
+            RegexValidator(r"^[a-z0-9_]+$", _("Hanya huruf kecil, angka, dan _."))
+        ],
     )
     name = models.CharField(verbose_name=_("Nama dokumen / izin"), max_length=255)
     category = models.CharField(
@@ -308,7 +325,9 @@ class PermitType(models.Model):
     applies_allocation = models.BooleanField(
         verbose_name=_("Berlaku untuk alokasi"), default=True
     )
-    applies_lease = models.BooleanField(verbose_name=_("Berlaku untuk sewa"), default=True)
+    applies_lease = models.BooleanField(
+        verbose_name=_("Berlaku untuk sewa"), default=True
+    )
     applies_partnership = models.BooleanField(
         verbose_name=_("Berlaku untuk kerja sama"), default=True
     )
@@ -328,7 +347,9 @@ class PermitType(models.Model):
         null=True,
         blank=True,
         validators=[MinValueValidator(1), MaxValueValidator(MAX_TERM_YEARS * 12)],
-        help_text=_("Untuk menghitung tanggal kedaluwarsa bila tidak diisi. Kosong = tidak kedaluwarsa."),
+        help_text=_(
+            "Untuk menghitung tanggal kedaluwarsa bila tidak diisi. Kosong = tidak kedaluwarsa."
+        ),
     )
     confidentiality = models.CharField(
         verbose_name=_("Sifat dokumen"),
@@ -402,7 +423,9 @@ class LandUse(TimeStampedModel):
         null=True,
         blank=True,
         related_name="land_uses",
-        help_text=_("Pemegang hak dengan akun portal dapat melihat dan mengunggah dokumennya."),
+        help_text=_(
+            "Pemegang hak dengan akun portal dapat melihat dan mengunggah dokumennya."
+        ),
     )
     holder_name = models.CharField(
         verbose_name=_("Nama pemegang hak"),
@@ -444,7 +467,10 @@ class LandUse(TimeStampedModel):
         related_name="land_uses",
     )
     reference = models.CharField(
-        verbose_name=_("Nomor dasar hak / kontrak"), max_length=128, blank=True, default=""
+        verbose_name=_("Nomor dasar hak / kontrak"),
+        max_length=128,
+        blank=True,
+        default="",
     )
     area_m2 = models.DecimalField(
         verbose_name=_("Luas (m²)"),
@@ -476,10 +502,16 @@ class LandUse(TimeStampedModel):
     def clean(self):
         super().clean()
         if self.start_date and self.end_date and self.end_date < self.start_date:
-            raise ValidationError({"end_date": _("Tanggal berakhir sebelum tanggal mulai.")})
+            raise ValidationError(
+                {"end_date": _("Tanggal berakhir sebelum tanggal mulai.")}
+            )
         if not self.holder_id and not (self.holder_name or "").strip():
             raise ValidationError(
-                {"holder_name": _("Pilih akun pemegang hak atau isi nama pemegang hak.")}
+                {
+                    "holder_name": _(
+                        "Pilih akun pemegang hak atau isi nama pemegang hak."
+                    )
+                }
             )
 
     def save(self, *args, **kwargs):
@@ -503,9 +535,15 @@ class LandUse(TimeStampedModel):
             "required": len(required),
             "done": len(done),
             "percent": round(len(done) * 100 / len(required)) if required else 100,
-            "waiting": sum(1 for r in records if r.status == enums.RecordStatus.SUBMITTED),
-            "revision": sum(1 for r in records if r.status == enums.RecordStatus.REVISION),
-            "expired": sum(1 for r in records if r.status == enums.RecordStatus.EXPIRED),
+            "waiting": sum(
+                1 for r in records if r.status == enums.RecordStatus.SUBMITTED
+            ),
+            "revision": sum(
+                1 for r in records if r.status == enums.RecordStatus.REVISION
+            ),
+            "expired": sum(
+                1 for r in records if r.status == enums.RecordStatus.EXPIRED
+            ),
         }
 
 
@@ -533,14 +571,18 @@ class PermitRecord(TimeStampedModel):
     number = models.CharField(
         verbose_name=_("Nomor dokumen / izin"), max_length=128, blank=True, default=""
     )
-    issued_date = models.DateField(verbose_name=_("Tanggal terbit"), null=True, blank=True)
+    issued_date = models.DateField(
+        verbose_name=_("Tanggal terbit"), null=True, blank=True
+    )
     expiry_date = models.DateField(
         verbose_name=_("Berlaku sampai"), null=True, blank=True
     )
     holder_note = models.TextField(
         verbose_name=_("Catatan pemegang hak"), blank=True, default=""
     )
-    review_note = models.TextField(verbose_name=_("Catatan petugas"), blank=True, default="")
+    review_note = models.TextField(
+        verbose_name=_("Catatan petugas"), blank=True, default=""
+    )
     verified_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_("Diverifikasi oleh"),
@@ -549,7 +591,9 @@ class PermitRecord(TimeStampedModel):
         blank=True,
         related_name="+",
     )
-    verified_at = models.DateTimeField(verbose_name=_("Diverifikasi"), null=True, blank=True)
+    verified_at = models.DateTimeField(
+        verbose_name=_("Diverifikasi"), null=True, blank=True
+    )
     expiry_warned_for = models.DateField(
         verbose_name=_("Peringatan kedaluwarsa terkirim untuk"),
         null=True,
@@ -566,15 +610,23 @@ class PermitRecord(TimeStampedModel):
                 fields=["land_use", "permit_type"], name="dokumen_unique_record_type"
             )
         ]
-        permissions = [("verify_permitrecord", _("Dapat memverifikasi dokumen perizinan"))]
+        permissions = [
+            ("verify_permitrecord", _("Dapat memverifikasi dokumen perizinan"))
+        ]
 
     def __str__(self):
         return f"{self.land_use.number} / {self.permit_type}"
 
     def clean(self):
         super().clean()
-        if self.issued_date and self.expiry_date and self.expiry_date < self.issued_date:
-            raise ValidationError({"expiry_date": _("Masa berlaku berakhir sebelum tanggal terbit.")})
+        if (
+            self.issued_date
+            and self.expiry_date
+            and self.expiry_date < self.issued_date
+        ):
+            raise ValidationError(
+                {"expiry_date": _("Masa berlaku berakhir sebelum tanggal terbit.")}
+            )
 
     @property
     def latest_version(self):
@@ -615,7 +667,9 @@ class DocumentVersion(models.Model):
     )
     original_name = models.CharField(verbose_name=_("Nama berkas"), max_length=255)
     size = models.PositiveBigIntegerField(verbose_name=_("Ukuran (bita)"), default=0)
-    sha256 = models.CharField(verbose_name=_("Sidik SHA-256"), max_length=64, blank=True, default="")
+    sha256 = models.CharField(
+        verbose_name=_("Sidik SHA-256"), max_length=64, blank=True, default=""
+    )
     source = models.CharField(
         verbose_name=_("Sumber"),
         max_length=16,
@@ -648,7 +702,9 @@ class DocumentVersion(models.Model):
 
     @property
     def extension(self) -> str:
-        return (self.original_name.rsplit(".", 1)[-1] if "." in self.original_name else "").lower()
+        return (
+            self.original_name.rsplit(".", 1)[-1] if "." in self.original_name else ""
+        ).lower()
 
 
 class SigningDocument(TimeStampedModel):
@@ -690,7 +746,9 @@ class SigningDocument(TimeStampedModel):
         null=True,
         blank=True,
         related_name="signing_documents",
-        help_text=_("Saat selesai, PDF bertanda tangan menjadi versi baru dokumen ini."),
+        help_text=_(
+            "Saat selesai, PDF bertanda tangan menjadi versi baru dokumen ini."
+        ),
     )
     body = models.TextField(
         verbose_name=_("Isi dokumen"), blank=True, default="", max_length=MAX_BODY_CHARS
@@ -742,11 +800,15 @@ class SigningDocument(TimeStampedModel):
         blank=True,
         related_name="+",
     )
-    approved_at = models.DateTimeField(verbose_name=_("Disetujui"), null=True, blank=True)
+    approved_at = models.DateTimeField(
+        verbose_name=_("Disetujui"), null=True, blank=True
+    )
     message = models.TextField(
         verbose_name=_("Pesan untuk penerima"), blank=True, default="", max_length=5000
     )
-    expires_on = models.DateField(verbose_name=_("Batas tanda tangan"), null=True, blank=True)
+    expires_on = models.DateField(
+        verbose_name=_("Batas tanda tangan"), null=True, blank=True
+    )
     reminder_every_days = models.PositiveSmallIntegerField(
         verbose_name=_("Pengingat setiap (hari)"),
         default=3,
@@ -757,12 +819,17 @@ class SigningDocument(TimeStampedModel):
         verbose_name=_("Pengingat terakhir"), null=True, blank=True
     )
     sent_at = models.DateTimeField(verbose_name=_("Dikirim"), null=True, blank=True)
-    completed_at = models.DateTimeField(verbose_name=_("Selesai"), null=True, blank=True)
+    completed_at = models.DateTimeField(
+        verbose_name=_("Selesai"), null=True, blank=True
+    )
     closed_reason = models.TextField(
         verbose_name=_("Alasan penolakan / pembatalan"), blank=True, default=""
     )
     verify_token = models.UUIDField(
-        verbose_name=_("Kode verifikasi"), default=uuid.uuid4, unique=True, editable=False
+        verbose_name=_("Kode verifikasi"),
+        default=uuid.uuid4,
+        unique=True,
+        editable=False,
     )
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -835,7 +902,9 @@ class DocumentRecipient(models.Model):
         validators=[MinValueValidator(1), MaxValueValidator(20)],
         help_text=_("Urutan sama = bertindak bersamaan."),
     )
-    role = models.CharField(verbose_name=_("Peran"), max_length=100, blank=True, default="")
+    role = models.CharField(
+        verbose_name=_("Peran"), max_length=100, blank=True, default=""
+    )
     action = models.CharField(
         verbose_name=_("Tindakan"),
         max_length=16,
@@ -860,17 +929,25 @@ class DocumentRecipient(models.Model):
         choices=enums.RecipientStatus.choices,
         default=enums.RecipientStatus.WAITING,
     )
-    notified_at = models.DateTimeField(verbose_name=_("Diberi tahu"), null=True, blank=True)
+    notified_at = models.DateTimeField(
+        verbose_name=_("Diberi tahu"), null=True, blank=True
+    )
     viewed_at = models.DateTimeField(verbose_name=_("Dilihat"), null=True, blank=True)
-    completed_at = models.DateTimeField(verbose_name=_("Selesai"), null=True, blank=True)
+    completed_at = models.DateTimeField(
+        verbose_name=_("Selesai"), null=True, blank=True
+    )
     signature_name = models.CharField(
         verbose_name=_("Nama pada tanda tangan"), max_length=255, blank=True, default=""
     )
     signature_image = models.TextField(
         verbose_name=_("Gambar tanda tangan"), blank=True, default="", editable=False
     )
-    decline_reason = models.TextField(verbose_name=_("Alasan menolak"), blank=True, default="")
-    ip_address = models.GenericIPAddressField(verbose_name=_("Alamat IP"), null=True, blank=True)
+    decline_reason = models.TextField(
+        verbose_name=_("Alasan menolak"), blank=True, default=""
+    )
+    ip_address = models.GenericIPAddressField(
+        verbose_name=_("Alamat IP"), null=True, blank=True
+    )
     user_agent = models.CharField(
         verbose_name=_("Peramban"), max_length=255, blank=True, default=""
     )
@@ -984,15 +1061,23 @@ class DownloadRequest(models.Model):
         blank=True,
         related_name="+",
     )
-    decided_at = models.DateTimeField(verbose_name=_("Diputuskan"), null=True, blank=True)
-    decision_note = models.TextField(verbose_name=_("Catatan keputusan"), blank=True, default="")
-    valid_until = models.DateTimeField(verbose_name=_("Berlaku sampai"), null=True, blank=True)
+    decided_at = models.DateTimeField(
+        verbose_name=_("Diputuskan"), null=True, blank=True
+    )
+    decision_note = models.TextField(
+        verbose_name=_("Catatan keputusan"), blank=True, default=""
+    )
+    valid_until = models.DateTimeField(
+        verbose_name=_("Berlaku sampai"), null=True, blank=True
+    )
     max_downloads = models.PositiveSmallIntegerField(
         verbose_name=_("Batas unduh"),
         default=1,
         validators=[MinValueValidator(1), MaxValueValidator(20)],
     )
-    download_count = models.PositiveSmallIntegerField(verbose_name=_("Sudah diunduh"), default=0)
+    download_count = models.PositiveSmallIntegerField(
+        verbose_name=_("Sudah diunduh"), default=0
+    )
     created_at = models.DateTimeField(verbose_name=_("Diajukan"), default=timezone.now)
 
     class Meta:
@@ -1104,10 +1189,16 @@ class DownloadLog(models.Model):
     )
     is_preview = models.BooleanField(verbose_name=_("Pratinjau"), default=False)
     filename = models.CharField(verbose_name=_("Nama berkas"), max_length=255)
-    sha256 = models.CharField(verbose_name=_("Sidik berkas terkirim"), max_length=64, blank=True, default="")
+    sha256 = models.CharField(
+        verbose_name=_("Sidik berkas terkirim"), max_length=64, blank=True, default=""
+    )
     watermarked = models.BooleanField(verbose_name=_("Bertanda air"), default=False)
-    ip_address = models.GenericIPAddressField(verbose_name=_("Alamat IP"), null=True, blank=True)
-    user_agent = models.CharField(verbose_name=_("Peramban"), max_length=255, blank=True, default="")
+    ip_address = models.GenericIPAddressField(
+        verbose_name=_("Alamat IP"), null=True, blank=True
+    )
+    user_agent = models.CharField(
+        verbose_name=_("Peramban"), max_length=255, blank=True, default=""
+    )
 
     class Meta:
         verbose_name = _("Riwayat unduhan")
@@ -1130,8 +1221,12 @@ class Activity(models.Model):
         blank=True,
         related_name="+",
     )
-    actor_name = models.CharField(verbose_name=_("Nama pelaku"), max_length=255, blank=True, default="")
-    action = models.CharField(verbose_name=_("Aktivitas"), max_length=24, choices=enums.Action.choices)
+    actor_name = models.CharField(
+        verbose_name=_("Nama pelaku"), max_length=255, blank=True, default=""
+    )
+    action = models.CharField(
+        verbose_name=_("Aktivitas"), max_length=24, choices=enums.Action.choices
+    )
     land_use = models.ForeignKey(
         LandUse,
         verbose_name=_("Pemanfaatan lahan"),
@@ -1165,7 +1260,9 @@ class Activity(models.Model):
         related_name="activities",
     )
     detail = models.TextField(verbose_name=_("Keterangan"), blank=True, default="")
-    ip_address = models.GenericIPAddressField(verbose_name=_("Alamat IP"), null=True, blank=True)
+    ip_address = models.GenericIPAddressField(
+        verbose_name=_("Alamat IP"), null=True, blank=True
+    )
 
     class Meta:
         verbose_name = _("Jejak aktivitas dokumen")

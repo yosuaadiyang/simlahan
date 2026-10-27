@@ -23,6 +23,12 @@ export const UsersPermissions = {
   VIEW_LANDPLOT: "view_landplot",
   VIEW_INVESTMENTREQUEST: "view_investmentrequest",
   VERIFY_PAYMENT: "verify_payment",
+  // Dokumen & perizinan (panel petugas di /admin/dokumen/)
+  VIEW_LANDUSE: "view_landuse",
+  VIEW_PERMITRECORD: "view_permitrecord",
+  VIEW_SIGNINGDOCUMENT: "view_signingdocument",
+  VIEW_DOCUMENTTEMPLATE: "view_documenttemplate",
+  VIEW_DOWNLOADREQUEST: "view_downloadrequest",
   // Manajemen aset lahan (panel petugas di /admin/asetlahan/)
   VIEW_LANDASSET: "view_landasset",
   ADD_LANDASSET: "add_landasset",

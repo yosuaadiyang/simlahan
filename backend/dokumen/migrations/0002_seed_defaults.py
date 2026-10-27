@@ -230,7 +230,9 @@ def seed(apps, schema_editor):
     DocumentTemplate = apps.get_model("dokumen", "DocumentTemplate")
     DocumentSettings.objects.get_or_create(pk=1)
     for order, row in enumerate(PERMIT_TYPES, start=1):
-        code, name, category, issuer, required, months, level, schemes, description = row
+        code, name, category, issuer, required, months, level, schemes, description = (
+            row
+        )
         PermitType.objects.get_or_create(
             code=code,
             defaults={
@@ -249,7 +251,9 @@ def seed(apps, schema_editor):
             },
         )
     for code, name, body in BLOCKS:
-        ContentBlock.objects.get_or_create(code=code, defaults={"name": name, "body": body})
+        ContentBlock.objects.get_or_create(
+            code=code, defaults={"name": name, "body": body}
+        )
     for item in TEMPLATES:
         template, created = DocumentTemplate.objects.get_or_create(
             name=item["name"],
@@ -263,9 +267,9 @@ def seed(apps, schema_editor):
             },
         )
         if created and item["permit"]:
-            PermitType.objects.filter(code=item["permit"], template__isnull=True).update(
-                template=template
-            )
+            PermitType.objects.filter(
+                code=item["permit"], template__isnull=True
+            ).update(template=template)
 
 
 class Migration(migrations.Migration):

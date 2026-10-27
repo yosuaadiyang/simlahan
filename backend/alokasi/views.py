@@ -753,6 +753,7 @@ def _report_due(allocation: Allocation, config: AllocationSettings) -> bool:
 @applicant_required
 def dashboard(request):
     from alokasi.investment_views import investment_summary
+    from dokumen.views import portal_summary
 
     applicant = request.applicant
     config = AllocationSettings.load()
@@ -776,6 +777,7 @@ def dashboard(request):
         ).select_related("application"),
         "config": config,
         **investment_summary(applicant),
+        "dokumen": portal_summary(applicant, request.user),
     }
     return render(request, "alokasi/portal/dashboard.html", context)
 

@@ -40,7 +40,9 @@ def _errors(error: ValidationError) -> str:
     return " ".join(error.messages)
 
 
-def file_response(data: bytes, filename: str, content_type: str, *, inline=False) -> HttpResponse:
+def file_response(
+    data: bytes, filename: str, content_type: str, *, inline=False
+) -> HttpResponse:
     response = HttpResponse(data, content_type=content_type)
     response["Content-Disposition"] = content_disposition_header(not inline, filename)
     response["X-Content-Type-Options"] = "nosniff"
@@ -51,12 +53,16 @@ def file_response(data: bytes, filename: str, content_type: str, *, inline=False
 def serve_download(request, dl: DownloadRequest, fallback: str) -> HttpResponse:
     """Unduh berkas lewat permintaan yang disetujui (dipakai portal & panel)."""
     try:
-        data, filename, content_type, _marked = downloads.consume(dl, request.user, request=request)
+        data, filename, content_type, _marked = downloads.consume(
+            dl, request.user, request=request
+        )
     except ValidationError as error:
         messages.error(request, _errors(error))
         return redirect(fallback)
     except FileNotFoundError:
-        messages.error(request, _("Berkas tidak ditemukan di penyimpanan. Hubungi petugas."))
+        messages.error(
+            request, _("Berkas tidak ditemukan di penyimpanan. Hubungi petugas.")
+        )
         return redirect(fallback)
     except FileScanPendingError:
         messages.error(request, _("Berkas masih menunggu pemindaian virus."))
@@ -82,10 +88,36 @@ def _my_signing_tasks(user):
     return tasks
 
 
+def portal_summary(applicant, user) -> dict:
+    """Ringkasan untuk kartu "Dokumen & perizinan" di halaman Akun Saya."""
+    records = PermitRecord.objects.filter(
+        land_use__holder=applicant, land_use__status=enums.LandUseStatus.ACTIVE
+    )
+    return {
+        "land_uses": LandUse.objects.filter(holder=applicant).count(),
+        "revision": records.filter(status=enums.RecordStatus.REVISION).count(),
+        "expired": records.filter(status=enums.RecordStatus.EXPIRED).count(),
+        "missing": records.filter(
+            permit_type__is_required=True,
+            status__in=(enums.RecordStatus.NOT_STARTED, enums.RecordStatus.IN_PROGRESS),
+        ).count(),
+        "tasks": len(_my_signing_tasks(user)),
+        "downloads_ready": sum(
+            1
+            for dl in DownloadRequest.objects.filter(
+                requester=user, status=enums.DownloadStatus.APPROVED
+            )
+            if dl.is_usable
+        ),
+    }
+
+
 @applicant_required
 def index(request):
     land_uses = list(
-        LandUse.objects.filter(holder=request.applicant).select_related("plot").order_by("status", "-created_at")
+        LandUse.objects.filter(holder=request.applicant)
+        .select_related("plot")
+        .order_by("status", "-created_at")
     )
     for land_use in land_uses:
         land_use.summary = land_use.progress()
@@ -93,7 +125,13 @@ def index(request):
         SigningDocument.objects.filter(
             Q(land_use__holder=request.applicant) | Q(recipients__user=request.user)
         )
-        .exclude(status__in=(enums.SigningStatus.DRAFT, enums.SigningStatus.PENDING_APPROVAL, enums.SigningStatus.APPROVED))
+        .exclude(
+            status__in=(
+                enums.SigningStatus.DRAFT,
+                enums.SigningStatus.PENDING_APPROVAL,
+                enums.SigningStatus.APPROVED,
+            )
+        )
         .distinct()
         .order_by("-created_at")[:30]
     )
@@ -102,7 +140,9 @@ def index(request):
         "tasks": _my_signing_tasks(request.user),
         "documents": documents,
         "requests": DownloadRequest.objects.filter(requester=request.user)
-        .select_related("version__record__permit_type", "version__record__land_use", "signing")
+        .select_related(
+            "version__record__permit_type", "version__record__land_use", "signing"
+        )
         .order_by("-created_at")[:10],
     }
     return render(request, "dokumen/portal/index.html", context)
@@ -118,18 +158,28 @@ def _own_land_use(request, number) -> LandUse:
 
 def _render_land_use(request, land_use, *, failed=None, failed_form=None):
     records = list(
-        land_use.records.select_related("permit_type", "permit_type__template").prefetch_related("versions")
+        land_use.records.select_related(
+            "permit_type", "permit_type__template"
+        ).prefetch_related("versions")
     )
     is_active = land_use.status == enums.LandUseStatus.ACTIVE
     for record in records:
         record.form = (
-            failed_form
-            if failed is not None and failed.pk == record.pk
-            else HolderRecordForm(
-                prefix=f"r{record.pk}",
-                initial={"number": record.number, "issued_date": record.issued_date, "expiry_date": record.expiry_date},
+            (
+                failed_form
+                if failed is not None and failed.pk == record.pk
+                else HolderRecordForm(
+                    prefix=f"r{record.pk}",
+                    initial={
+                        "number": record.number,
+                        "issued_date": record.issued_date,
+                        "expiry_date": record.expiry_date,
+                    },
+                )
             )
-        ) if is_active else None
+            if is_active
+            else None
+        )
         record.version_list = sorted(record.versions.all(), key=lambda v: -v.number)
     # Hanya riwayat dokumen perizinan; aktivitas internal dokumen tanda tangan & unduhan tidak ditampilkan.
     activities = (
@@ -143,16 +193,27 @@ def _render_land_use(request, land_use, *, failed=None, failed_form=None):
         "summary": land_use.progress(),
         "is_active": is_active,
         "documents": land_use.signing_documents.exclude(
-            status__in=(enums.SigningStatus.DRAFT, enums.SigningStatus.PENDING_APPROVAL, enums.SigningStatus.APPROVED)
+            status__in=(
+                enums.SigningStatus.DRAFT,
+                enums.SigningStatus.PENDING_APPROVAL,
+                enums.SigningStatus.APPROVED,
+            )
         ).order_by("-created_at"),
         "activities": activities,
         "download_form": DownloadRequestForm(),
         "my_requests": {
             r.version_id: r
-            for r in DownloadRequest.objects.filter(requester=request.user, version__record__land_use=land_use).order_by("created_at")
+            for r in DownloadRequest.objects.filter(
+                requester=request.user, version__record__land_use=land_use
+            ).order_by("created_at")
         },
     }
-    return render(request, "dokumen/portal/land_use.html", context, status=400 if failed_form else 200)
+    return render(
+        request,
+        "dokumen/portal/land_use.html",
+        context,
+        status=400 if failed_form else 200,
+    )
 
 
 @applicant_required
@@ -193,9 +254,15 @@ def record_update(request, pk):
         else:
             messages.success(
                 request,
-                _("Dokumen diunggah dan menunggu verifikasi petugas.") if data["file"] else _("Status dokumen diperbarui."),
+                (
+                    _("Dokumen diunggah dan menunggu verifikasi petugas.")
+                    if data["file"]
+                    else _("Status dokumen diperbarui.")
+                ),
             )
-            return redirect(f"{reverse('dokumen_portal:land_use', args=[land_use.number])}#izin-{record.pk}")
+            return redirect(
+                f"{reverse('dokumen_portal:land_use', args=[land_use.number])}#izin-{record.pk}"
+            )
     return _render_land_use(request, land_use, failed=record, failed_form=form)
 
 
@@ -209,17 +276,30 @@ def template_download(request, pk):
     try:
         data, filename = services.render_template(template, record=record)
     except (merge.TemplateRenderError, OSError):
-        messages.error(request, _("Format dokumen belum dapat dibuat. Hubungi petugas."))
+        messages.error(
+            request, _("Format dokumen belum dapat dibuat. Hubungi petugas.")
+        )
         return redirect("dokumen_portal:land_use", number=record.land_use.number)
-    downloads.log_preview(request.user, template=template, filename=filename, data=data, request=request, preview=False)
-    content_type = services.CONTENT_TYPES.get(filename.rsplit(".", 1)[-1], "application/octet-stream")
+    downloads.log_preview(
+        request.user,
+        template=template,
+        filename=filename,
+        data=data,
+        request=request,
+        preview=False,
+    )
+    content_type = services.CONTENT_TYPES.get(
+        filename.rsplit(".", 1)[-1], "application/octet-stream"
+    )
     return file_response(data, filename, content_type)
 
 
 def _create_request(request, *, version=None, signing_doc=None, fallback):
     form = DownloadRequestForm(request.POST)
     if not form.is_valid():
-        messages.error(request, _("Lengkapi keperluan dan alasan unduhan (minimal 5 karakter)."))
+        messages.error(
+            request, _("Lengkapi keperluan dan alasan unduhan (minimal 5 karakter).")
+        )
         return redirect(fallback)
     try:
         dl = downloads.request_download(
@@ -236,7 +316,11 @@ def _create_request(request, *, version=None, signing_doc=None, fallback):
     if dl.is_usable:
         messages.success(request, _("Unduhan %s siap. Klik Unduh.") % dl.number)
     else:
-        messages.success(request, _("Permintaan unduh %s dikirim dan menunggu persetujuan petugas berwenang.") % dl.number)
+        messages.success(
+            request,
+            _("Permintaan unduh %s dikirim dan menunggu persetujuan petugas berwenang.")
+            % dl.number,
+        )
     return redirect("dokumen_portal:downloads")
 
 
@@ -244,7 +328,9 @@ def _create_request(request, *, version=None, signing_doc=None, fallback):
 @require_POST
 def request_version_download(request, pk):
     version = get_object_or_404(
-        DocumentVersion.objects.select_related("record__land_use", "record__permit_type"),
+        DocumentVersion.objects.select_related(
+            "record__land_use", "record__permit_type"
+        ),
         pk=pk,
         record__land_use__holder=request.applicant,
     )
@@ -257,7 +343,9 @@ def downloads_list(request):
     requests = DownloadRequest.objects.filter(requester=request.user).select_related(
         "version__record__permit_type", "version__record__land_use", "signing"
     )
-    return render(request, "dokumen/portal/downloads.html", {"requests": requests[:100]})
+    return render(
+        request, "dokumen/portal/downloads.html", {"requests": requests[:100]}
+    )
 
 
 @applicant_required
@@ -287,7 +375,9 @@ def download(request, number):
 def _visible_document(request, number) -> SigningDocument:
     if not request.user.is_authenticated:
         raise PermissionDenied
-    document = get_object_or_404(SigningDocument.objects.select_related("land_use"), number=number)
+    document = get_object_or_404(
+        SigningDocument.objects.select_related("land_use"), number=number
+    )
     if not access.can_view_signing(request.user, document):
         raise Http404
     return document
@@ -306,7 +396,9 @@ def signing_detail(request, number):
         "my_recipient": mine,
         "my_turn": mine is not None and signing.is_turn(mine),
         "can_request": access.can_request_download(request.user, signing=document),
-        "my_requests": DownloadRequest.objects.filter(requester=request.user, signing=document).order_by("-created_at")[:5],
+        "my_requests": DownloadRequest.objects.filter(
+            requester=request.user, signing=document
+        ).order_by("-created_at")[:5],
     }
     return render(request, "dokumen/portal/signing_detail.html", context)
 
@@ -318,14 +410,18 @@ def signing_comment(request, number):
     form = CommentForm(request.POST)
     if form.is_valid():
         try:
-            signing.add_comment(document, request.user, form.cleaned_data["body"], request=request)
+            signing.add_comment(
+                document, request.user, form.cleaned_data["body"], request=request
+            )
         except ValidationError as error:
             messages.error(request, _errors(error))
         else:
             messages.success(request, _("Komentar terkirim."))
     else:
         messages.error(request, _("Komentar tidak boleh kosong."))
-    return redirect(f"{reverse('dokumen_portal:signing_detail', args=[number])}#komentar")
+    return redirect(
+        f"{reverse('dokumen_portal:signing_detail', args=[number])}#komentar"
+    )
 
 
 @applicant_required
@@ -343,7 +439,10 @@ def request_signing_download(request, number):
 
 def _recipient(token) -> DocumentRecipient:
     return get_object_or_404(
-        DocumentRecipient.objects.select_related("document", "document__land_use", "user"), token=token
+        DocumentRecipient.objects.select_related(
+            "document", "document__land_use", "user"
+        ),
+        token=token,
     )
 
 
@@ -352,10 +451,19 @@ def _gate(request, recipient):
     if recipient.user_id is None:
         return None
     if not request.user.is_authenticated:
-        login = reverse("admin:login") if recipient.user.is_staff else reverse("portal:login")
+        login = (
+            reverse("admin:login")
+            if recipient.user.is_staff
+            else reverse("portal:login")
+        )
         return redirect(f"{login}?next={request.get_full_path()}")
     if request.user.pk != recipient.user_id:
-        return render(request, "dokumen/portal/wrong_account.html", {"recipient": recipient}, status=403)
+        return render(
+            request,
+            "dokumen/portal/wrong_account.html",
+            {"recipient": recipient},
+            status=403,
+        )
     return None
 
 
@@ -375,60 +483,99 @@ def _sign_context(request, recipient, **extra):
         "my_turn": signing.is_turn(recipient),
         "masked_email": _mask_email(recipient.email),
         "otp_form": extra.pop("otp_form", OtpForm()),
-        "sign_form": extra.pop("sign_form", SignForm(initial={"name": recipient.signature_name or recipient.name})),
+        "sign_form": extra.pop(
+            "sign_form",
+            SignForm(initial={"name": recipient.signature_name or recipient.name}),
+        ),
         "decline_form": extra.pop("decline_form", DeclineForm()),
         "comment_form": extra.pop("comment_form", CommentForm()),
         "comments": document.comments.filter(is_internal=False).order_by("created_at"),
-        "show_content": verified and document.status not in (enums.SigningStatus.CANCELLED,),
+        "show_content": verified
+        and document.status not in (enums.SigningStatus.CANCELLED,),
         **extra,
     }
 
 
-SIGN_ACTIONS = ("kirim_kode", "cek_kode", "tanda_tangan", "tolak", "komentar")
+def _sign_send_code(request, recipient):
+    signing.send_otp(recipient, request=request)
+    messages.success(
+        request, _("Kode verifikasi dikirim ke %s.") % _mask_email(recipient.email)
+    )
+    return None
+
+
+def _sign_check_code(request, recipient):
+    form = OtpForm(request.POST)
+    if form.is_valid() and signing.check_otp(recipient, form.cleaned_data["code"]):
+        messages.success(request, _("Kode cocok. Silakan tinjau dokumen."))
+        return None
+    form.add_error(None, _("Kode salah atau kedaluwarsa. Minta kode baru bila perlu."))
+    return {"otp_form": form}
+
+
+def _sign_comment(request, recipient):
+    form = CommentForm(request.POST)
+    if not form.is_valid():
+        return {"comment_form": form}
+    signing.add_comment(
+        recipient.document,
+        request.user,
+        form.cleaned_data["body"],
+        request=request,
+        author_name=recipient.name,
+    )
+    messages.success(request, _("Komentar terkirim."))
+    return None
+
+
+def _sign_decline(request, recipient):
+    form = DeclineForm(request.POST)
+    if not form.is_valid():
+        return {"decline_form": form, "open_decline": True}
+    signing.decline(recipient, form.cleaned_data["reason"], request=request)
+    messages.success(request, _("Penolakan Anda tercatat dan pengirim diberi tahu."))
+    return None
+
+
+def _sign_act(request, recipient):
+    form = SignForm(request.POST)
+    if not form.is_valid():
+        return {"sign_form": form}
+    signing.act(
+        recipient,
+        name=form.cleaned_data["name"],
+        signature=form.cleaned_data["signature"],
+        request=request,
+    )
+    messages.success(
+        request,
+        (
+            _("Terima kasih, tanda tangan Anda tercatat.")
+            if recipient.action == enums.RecipientAction.SIGN
+            else _("Terima kasih, persetujuan Anda tercatat.")
+        ),
+    )
+    return None
+
+
+# Aksi yang tidak memerlukan kode OTP lebih dahulu.
+SIGN_OTP_ACTIONS = {"kirim_kode": _sign_send_code, "cek_kode": _sign_check_code}
+SIGN_ACTIONS = {
+    "tanda_tangan": _sign_act,
+    "tolak": _sign_decline,
+    "komentar": _sign_comment,
+}
 
 
 def _sign_post(request, recipient):
     action = request.POST.get("aksi", "")
+    if action in SIGN_OTP_ACTIONS:
+        return SIGN_OTP_ACTIONS[action](request, recipient)
     if action not in SIGN_ACTIONS:
         raise PermissionDenied
-    if action == "kirim_kode":
-        signing.send_otp(recipient, request=request)
-        messages.success(request, _("Kode verifikasi dikirim ke %s.") % _mask_email(recipient.email))
-        return None
-    if action == "cek_kode":
-        form = OtpForm(request.POST)
-        if form.is_valid() and signing.check_otp(recipient, form.cleaned_data["code"]):
-            messages.success(request, _("Kode cocok. Silakan tinjau dokumen."))
-            return None
-        form.add_error(None, _("Kode salah atau kedaluwarsa. Minta kode baru bila perlu."))
-        return {"otp_form": form}
     if not signing.otp_ok(recipient):
         raise ValidationError(_("Masukkan kode verifikasi yang dikirim ke surel Anda."))
-    if action == "komentar":
-        form = CommentForm(request.POST)
-        if not form.is_valid():
-            return {"comment_form": form}
-        signing.add_comment(recipient.document, request.user, form.cleaned_data["body"], request=request, author_name=recipient.name)
-        messages.success(request, _("Komentar terkirim."))
-        return None
-    if action == "tolak":
-        form = DeclineForm(request.POST)
-        if not form.is_valid():
-            return {"decline_form": form, "open_decline": True}
-        signing.decline(recipient, form.cleaned_data["reason"], request=request)
-        messages.success(request, _("Penolakan Anda tercatat dan pengirim diberi tahu."))
-        return None
-    form = SignForm(request.POST)
-    if not form.is_valid():
-        return {"sign_form": form}
-    signing.act(recipient, name=form.cleaned_data["name"], signature=form.cleaned_data["signature"], request=request)
-    messages.success(
-        request,
-        _("Terima kasih, tanda tangan Anda tercatat.")
-        if recipient.action == enums.RecipientAction.SIGN
-        else _("Terima kasih, persetujuan Anda tercatat."),
-    )
-    return None
+    return SIGN_ACTIONS[action](request, recipient)
 
 
 @require_http_methods(["GET", "POST"])
@@ -437,7 +584,11 @@ def sign(request, token):
     gate = _gate(request, recipient)
     if gate is not None:
         return gate
-    if recipient.document.status in (enums.SigningStatus.DRAFT, enums.SigningStatus.PENDING_APPROVAL, enums.SigningStatus.APPROVED):
+    if recipient.document.status in (
+        enums.SigningStatus.DRAFT,
+        enums.SigningStatus.PENDING_APPROVAL,
+        enums.SigningStatus.APPROVED,
+    ):
         raise Http404
     extra = {}
     if request.method == "POST":
@@ -455,7 +606,9 @@ def sign(request, token):
     elif signing.otp_ok(recipient):
         signing.record_view(recipient, request=request)
         recipient.refresh_from_db()
-    return render(request, "dokumen/portal/sign.html", _sign_context(request, recipient, **extra))
+    return render(
+        request, "dokumen/portal/sign.html", _sign_context(request, recipient, **extra)
+    )
 
 
 def sign_pdf(request, token):
@@ -475,10 +628,19 @@ def sign_pdf(request, token):
     ):
         raise Http404
     try:
-        data = pdf.watermark(services.read_file(document.source_file), [_("Untuk ditinjau: %s") % recipient.name, document.number])
+        data = pdf.watermark(
+            services.read_file(document.source_file),
+            [_("Untuk ditinjau: %s") % recipient.name, document.number],
+        )
     except (OSError, pdf.PdfReadError):
         raise Http404
-    services.log(enums.Action.VIEWED, actor_name=recipient.name, request=request, signing=document, detail=_("PDF dibuka"))
+    services.log(
+        enums.Action.VIEWED,
+        actor_name=recipient.name,
+        request=request,
+        signing=document,
+        detail=_("PDF dibuka"),
+    )
     return file_response(data, f"{document.number}.pdf", "application/pdf", inline=True)
 
 
@@ -510,35 +672,60 @@ def _match_copy(document, sha) -> dict | bool:
     return {"kind": "salinan", "at": log.created_at, "name": _mask_name(log.user_name)}
 
 
+def _verify_lookup(request):
+    code = request.GET.get("kode", "").strip()
+    if code:
+        try:
+            document = SigningDocument.objects.filter(verify_token=code).first()
+        except ValidationError:
+            document = None
+        if document is not None:
+            return redirect("dokumen_portal:verify_token", token=document.verify_token)
+        messages.error(request, _("Kode verifikasi tidak ditemukan."))
+    return render(request, "dokumen/portal/verify.html", {"document": None})
+
+
+def _sha256(upload) -> str:
+    digest = hashlib.sha256()
+    for chunk in upload.chunks():
+        digest.update(chunk)
+    return digest.hexdigest()
+
+
 @require_http_methods(["GET", "POST"])
 def verify(request, token=None):
     if token is None:
-        code = request.GET.get("kode", "").strip()
-        if code:
-            try:
-                document = SigningDocument.objects.filter(verify_token=code).first()
-            except ValidationError:
-                document = None
-            if document is not None:
-                return redirect("dokumen_portal:verify_token", token=document.verify_token)
-            messages.error(request, _("Kode verifikasi tidak ditemukan."))
-        return render(request, "dokumen/portal/verify.html", {"document": None})
-    document = SigningDocument.objects.filter(verify_token=token).exclude(status=enums.SigningStatus.DRAFT).first()
+        return _verify_lookup(request)
+    document = (
+        SigningDocument.objects.filter(verify_token=token)
+        .exclude(status=enums.SigningStatus.DRAFT)
+        .first()
+    )
     if document is None:
-        return render(request, "dokumen/portal/verify.html", {"document": None, "not_found": True}, status=404)
+        return render(
+            request,
+            "dokumen/portal/verify.html",
+            {"document": None, "not_found": True},
+            status=404,
+        )
     form = HashCheckForm(request.POST or None, request.FILES or None)
     match = None
     if request.method == "POST":
         if _throttled(request, "dokumen-verifikasi", limit=20, window=300):
             return _too_many(request)
         if form.is_valid():
-            digest = hashlib.sha256()
-            for chunk in form.cleaned_data["file"].chunks():
-                digest.update(chunk)
-            match = _match_copy(document, digest.hexdigest())
+            match = _match_copy(document, _sha256(form.cleaned_data["file"]))
     signers = [
-        {"name": _mask_name(r.signature_name or r.name), "role": r.role, "action": r.get_action_display(), "at": r.completed_at, "status": r.get_status_display()}
-        for r in document.recipients.exclude(action=enums.RecipientAction.COPY).order_by("order", "pk")
+        {
+            "name": _mask_name(r.signature_name or r.name),
+            "role": r.role,
+            "action": r.get_action_display(),
+            "at": r.completed_at,
+            "status": r.get_status_display(),
+        }
+        for r in document.recipients.exclude(
+            action=enums.RecipientAction.COPY
+        ).order_by("order", "pk")
     ]
     return render(
         request,

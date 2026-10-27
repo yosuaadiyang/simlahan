@@ -124,7 +124,9 @@ FIELD_GROUPS = (
         (("hari_ini", "Tanggal hari ini"), ("tahun", "Tahun berjalan")),
     ),
 )
-KNOWN_KEYS = {f"{group}.{name}" for group, _label, fields in FIELD_GROUPS for name, _l in fields}
+KNOWN_KEYS = {
+    f"{group}.{name}" for group, _label, fields in FIELD_GROUPS for name, _l in fields
+}
 
 
 def _text(value) -> str:
@@ -171,9 +173,13 @@ def _land_use_fields(land_use) -> dict:
         "pemanfaatan.nama": land_use.title,
         "pemanfaatan.skema": land_use.get_scheme_display(),
         "pemanfaatan.referensi": land_use.reference,
-        "pemanfaatan.luas": angka(land_use.area_m2, 2) if land_use.area_m2 is not None else "",
+        "pemanfaatan.luas": (
+            angka(land_use.area_m2, 2) if land_use.area_m2 is not None else ""
+        ),
         "pemanfaatan.sektor": land_use.sector.name if land_use.sector_id else "",
-        "pemanfaatan.mulai": tanggal(land_use.start_date) if land_use.start_date else "",
+        "pemanfaatan.mulai": (
+            tanggal(land_use.start_date) if land_use.start_date else ""
+        ),
         "pemanfaatan.berakhir": tanggal(land_use.end_date) if land_use.end_date else "",
     }
     data.update(_applicant_fields(land_use.holder, land_use.holder_name))
@@ -194,17 +200,23 @@ def _land_use_fields(land_use) -> dict:
             {
                 "investasi.nomor": investment.number,
                 "investasi.proyek": investment.project_name,
-                "investasi.nilai": rupiah(investment.investment_value)
-                if investment.investment_value is not None
-                else "",
+                "investasi.nilai": (
+                    rupiah(investment.investment_value)
+                    if investment.investment_value is not None
+                    else ""
+                ),
                 "investasi.tenaga_kerja": _text(investment.workforce),
-                "investasi.tarif": rupiah(investment.offer_rate_per_m2_year)
-                if investment.offer_rate_per_m2_year is not None
-                else "",
+                "investasi.tarif": (
+                    rupiah(investment.offer_rate_per_m2_year)
+                    if investment.offer_rate_per_m2_year is not None
+                    else ""
+                ),
                 "investasi.jangka": _text(investment.offer_term_years),
-                "investasi.total": rupiah(investment.offer_total)
-                if investment.offer_total is not None
-                else "",
+                "investasi.total": (
+                    rupiah(investment.offer_total)
+                    if investment.offer_total is not None
+                    else ""
+                ),
             }
         )
     return data
@@ -237,8 +249,12 @@ def build_context(*, land_use=None, record=None, document=None, extra=None) -> d
             {
                 "izin.jenis": record.permit_type.name,
                 "izin.nomor": record.number,
-                "izin.terbit": tanggal(record.issued_date) if record.issued_date else "",
-                "izin.berlaku": tanggal(record.expiry_date) if record.expiry_date else "",
+                "izin.terbit": (
+                    tanggal(record.issued_date) if record.issued_date else ""
+                ),
+                "izin.berlaku": (
+                    tanggal(record.expiry_date) if record.expiry_date else ""
+                ),
                 "izin.penerbit": record.permit_type.issuer,
             }
         )
@@ -274,7 +290,9 @@ def custom_fields(*texts: str) -> list[str]:
 def unknown_fields(text: str) -> list[str]:
     from dokumen.models import ContentBlock
 
-    blocks = set(ContentBlock.objects.filter(is_active=True).values_list("code", flat=True))
+    blocks = set(
+        ContentBlock.objects.filter(is_active=True).values_list("code", flat=True)
+    )
     found = []
     for group, name in FIELD_RE.findall(text or ""):
         key = f"{group}.{name}"
@@ -292,7 +310,8 @@ def merge_html(body: str, context: dict, *, highlight_missing: bool = False) -> 
     from dokumen.models import ContentBlock
 
     blocks = {
-        b.code: b.body for b in ContentBlock.objects.filter(is_active=True).only("code", "body")
+        b.code: b.body
+        for b in ContentBlock.objects.filter(is_active=True).only("code", "body")
     }
 
     def expand_blocks(text: str, depth: int = 0) -> str:
@@ -345,7 +364,9 @@ def render_docx(data: bytes, context: dict) -> bytes:
         raise TemplateRenderError(_("Berkas templat terlalu besar."))
     try:
         template = DocxTemplate(io.BytesIO(data))
-        template.render(_nested(context), jinja_env=SandboxedEnvironment(), autoescape=True)
+        template.render(
+            _nested(context), jinja_env=SandboxedEnvironment(), autoescape=True
+        )
         output = io.BytesIO()
         template.save(output)
     except TemplateError as error:
@@ -387,7 +408,9 @@ def _run_html(run) -> str:
 def _paragraph_html(paragraph) -> str:
     content = "".join(_run_html(run) for run in paragraph.runs) or ""
     style = (paragraph.style.name or "").lower() if paragraph.style is not None else ""
-    align = ALIGN.get(int(paragraph.alignment)) if paragraph.alignment is not None else None
+    align = (
+        ALIGN.get(int(paragraph.alignment)) if paragraph.alignment is not None else None
+    )
     attr = f' style="text-align: {align}"' if align else ""
     if style.startswith("heading 1") or style == "title":
         return f"<h1{attr}>{content}</h1>"
@@ -400,53 +423,55 @@ def _paragraph_html(paragraph) -> str:
     return f"<p{attr}>{content or '&nbsp;'}</p>"
 
 
-def docx_to_html(data: bytes) -> str:
-    """Ubah dokumen Word menjadi HTML sederhana untuk templat yang dapat diedit."""
+def _table_html(table) -> str:
+    rows = []
+    for row in table.rows:
+        cells = "".join(
+            "<td>" + "".join(_paragraph_html(p) for p in cell.paragraphs) + "</td>"
+            for cell in row.cells
+        )
+        rows.append(f"<tr>{cells}</tr>")
+    return (
+        '<table style="width: 100%; border-collapse: collapse" border="1">'
+        + "".join(rows)
+        + "</table>"
+    )
+
+
+def _open_docx(data: bytes):
     import docx
-    from docx.table import Table
-    from docx.text.paragraph import Paragraph
 
     if len(data) > MAX_DOCX_BYTES:
         raise TemplateRenderError(_("Berkas terlalu besar."))
     try:
-        document = docx.Document(io.BytesIO(data))
+        return docx.Document(io.BytesIO(data))
     except Exception as error:  # noqa: BLE001
         raise TemplateRenderError(
             _("Berkas Word tidak dapat dibaca. Pastikan formatnya .docx yang sah.")
         ) from error
+
+
+def docx_to_html(data: bytes) -> str:
+    """Ubah dokumen Word menjadi HTML sederhana untuk templat yang dapat diedit."""
+    from docx.table import Table
+    from docx.text.paragraph import Paragraph
+
+    document = _open_docx(data)
     parts: list[str] = []
     in_list = False
     for child in document.element.body.iterchildren():
         tag = child.tag.rsplit("}", 1)[-1]
         if tag == "p":
             html = _paragraph_html(Paragraph(child, document))
-            if html.startswith("<li>"):
-                if not in_list:
-                    parts.append("<ul>")
-                    in_list = True
-            elif in_list:
-                parts.append("</ul>")
-                in_list = False
-            parts.append(html)
         elif tag == "tbl":
-            if in_list:
-                parts.append("</ul>")
-                in_list = False
-            table = Table(child, document)
-            rows = []
-            for row in table.rows:
-                cells = "".join(
-                    "<td>"
-                    + "".join(_paragraph_html(p) for p in cell.paragraphs)
-                    + "</td>"
-                    for cell in row.cells
-                )
-                rows.append(f"<tr>{cells}</tr>")
-            parts.append(
-                '<table style="width: 100%; border-collapse: collapse" border="1">'
-                + "".join(rows)
-                + "</table>"
-            )
+            html = _table_html(Table(child, document))
+        else:
+            continue
+        is_item = html.startswith("<li>")
+        if is_item != in_list:
+            parts.append("<ul>" if is_item else "</ul>")
+            in_list = is_item
+        parts.append(html)
     if in_list:
         parts.append("</ul>")
     return sanitize_html("".join(parts))

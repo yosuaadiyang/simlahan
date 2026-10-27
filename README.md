@@ -24,6 +24,12 @@ SimLahan adalah aplikasi web untuk instansi pengelola lahan di Indonesia:
   permintaan investasi (sewa, alokasi, atau kerja sama; pilih lahan atau
   gambar usulan lokasi) dengan pesan dua arah, jadwal konsultasi, penawaran
   daring, dan penerusan ke kontrak sewa atau permohonan alokasi.
+- **Dokumen & perizinan** (`/admin/dokumen/`, `/portal/dokumen/`): daftar
+  dokumen perizinan wajib per pemanfaatan lahan beserta statusnya, versi &
+  masa berlaku, impor templat (DOCX/HTML/PDF/ZIP) dengan isian otomatis,
+  editor dokumen, tanda tangan elektronik berurutan (OTP surel, sertifikat,
+  kode QR verifikasi), persetujuan internal, serta unduhan yang wajib disetujui
+  sesuai peran, bertanda air, dan tercatat.
 - **Manajemen aset lahan**: inventaris aset + batas bidang, rantai kepemilikan,
   silsilah ahli waris, pemangku kepentingan, penilaian, pajak, transaksi &
   ekspor jurnal ERP, perkara & jadwal sidang, okupasi/perambahan + citra
@@ -68,6 +74,9 @@ tenggat, hari libur, dsb.), menyetel izin grup, dan membuat admin awal.
 | `/portal/` | Portal publik & pemohon alokasi lahan |
 | `/portal/investasi/` | Portal investor: peta peluang, kawasan, bandingkan, ajukan minat |
 | `/admin/alokasi/` | Panel petugas alokasi lahan |
+| `/admin/dokumen/dasbor/` | Dasbor dokumen & perizinan (petugas) |
+| `/portal/dokumen/` | Dokumen perizinan, tanda tangan & permintaan unduh pemegang hak |
+| `/portal/dokumen/verifikasi/` | Cek keaslian dokumen bertanda tangan elektronik |
 | `/admin/` | Panel admin SimLahan (pengguna, grup, unit layanan, data master) |
 | `/docs/` | Dokumentasi API (Swagger), perlu masuk |
 | `/healthz`, `/readiness` | Pemeriksaan kesehatan |
@@ -136,6 +145,19 @@ Grup alokasi lahan (anggotanya otomatis diberi akses `/admin/`):
 |---|---|
 | Petugas Alokasi Lahan | data lahan & konten portal, pemeriksaan kelengkapan, perbaikan, persetujuan/penolakan, verifikasi pembayaran, pencabutan alokasi; sektor & kawasan investasi, proses permintaan investasi (tinjau, konsultasi, penawaran, selesaikan, tolak, pesan); menerima ringkasan pemantauan mingguan |
 | Tim Verifikasi Teknis | baca permohonan, tagihan, alokasi & permintaan investasi, penilaian teknis per kriteria |
+
+Dokumen & perizinan (`/admin/dokumen/`):
+
+| Grup | Dokumen & perizinan |
+|---|---|
+| Administrator | semua, termasuk pengaturan modul, persetujuan internal dokumen tanda tangan, dan persetujuan unduhan dokumen rahasia |
+| Petugas Alokasi Lahan | pemanfaatan lahan, jenis dokumen wajib, templat, verifikasi dokumen, dokumen tanda tangan, persetujuan unduhan dokumen biasa, riwayat unduhan |
+| Tim Verifikasi Teknis | baca dokumen & templat, verifikasi atau minta perbaikan dokumen perizinan |
+| Petugas Hukum | templat & blok isi, dokumen tanda tangan (kontrak/perjanjian); baca dokumen perizinan |
+
+Siapa pun yang boleh melihat dokumen dapat mengajukan permintaan unduh, tetapi
+tidak ada yang dapat menyetujui permintaannya sendiri (kecuali pengaturan
+**Izinkan menyetujui permintaan sendiri** dinyalakan).
 
 Grup manajemen aset lahan (anggotanya otomatis diberi akses `/admin/`):
 
@@ -279,6 +301,49 @@ docker compose exec backend python manage.py alokasi_contoh_rempang --hapus  # h
    investor; sewa/kerja sama mencatat nomor kontrak dan lahan berstatus
    *Sudah disewakan*. Saat sewa berakhir, pakai aksi **Akhiri sewa** di
    daftar lahan. Setiap langkah tercatat di riwayat dan dikirim lewat surel.
+
+## Dokumen & perizinan
+
+Setiap pemanfaatan lahan (alokasi, sewa, kerja sama, lainnya) punya daftar
+dokumen perizinan wajib yang diambil dari **Jenis dokumen** sesuai skemanya.
+Status tiap dokumen: Belum diurus → Sedang diurus → Menunggu verifikasi →
+Terverifikasi / Perlu perbaikan, ditambah Kedaluwarsa (otomatis saat masa
+berlaku habis) dan Tidak wajib. Setiap unggahan menjadi versi baru dan setiap
+perubahan tercatat di riwayat.
+
+1. **Templat**: `/admin/dokumen/documenttemplate/` → **Impor templat**
+   (beberapa berkas atau satu ZIP: DOCX, HTML, TXT, PDF, XLSX, gambar). Word
+   bisa dipakai sebagai templat isian otomatis (`{{ pemohon.nama }}`,
+   `{{ lahan.kode }}`, dan lainnya) atau diubah menjadi dokumen isian yang
+   dapat diedit. Tombol
+   **Pratinjau** mengisi templat dengan data pemanfaatan lahan.
+2. **Pemegang hak** membuka `/portal/dokumen/`: melihat status, mengunduh
+   format templat, mengunggah dokumen/revisi, dan menandatangani dokumen.
+3. **Tanda tangan elektronik** (`/admin/dokumen/signingdocument/`): buat dari
+   templat atau PDF, tambah penerima (tanda tangan, menyetujui, salinan)
+   berurutan, minta persetujuan internal bila perlu, lalu **Kirim**. Penerima
+   tanpa akun memakai OTP surel. Setelah selesai terbit PDF final dengan
+   lembar pengesahan, sertifikat audit, dan kode QR yang dapat dicek di
+   `/portal/dokumen/verifikasi/`; PDF itu otomatis menjadi versi terverifikasi
+   dokumen perizinan terkait.
+4. **Unduhan**: semua unduhan (petugas maupun pemegang hak) lewat
+   **Permintaan unduh** dengan alasan & keperluan → disetujui/ditolak oleh
+   pemegang izin persetujuan (dokumen rahasia hanya Administrator) → unduh
+   dalam batas waktu dan jumlah tertentu. PDF diberi tanda air nama pengunduh
+   dan setiap unduhan tercatat di **Riwayat unduhan**.
+5. Pengaturan (masa berlaku izin unduh, batas unduh, tanda air, batas waktu
+   & pengingat tanda tangan, peringatan kedaluwarsa) di
+   `/admin/dokumen/documentsettings/`. Pengingat harian berjalan otomatis
+   pukul 06.45 WIB.
+
+Data contoh (3 pemanfaatan lahan fiktif, satu dokumen tanda tangan, satu
+permintaan unduh; jalankan `pengguna_contoh` lebih dahulu agar terlihat di
+portal pemohon contoh):
+
+```bash
+docker compose exec backend python manage.py dokumen_contoh_rempang          # buat
+docker compose exec backend python manage.py dokumen_contoh_rempang --hapus  # hapus
+```
 
 ## Manajemen aset lahan
 

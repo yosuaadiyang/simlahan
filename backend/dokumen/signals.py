@@ -15,7 +15,9 @@ def allocation_saved(sender, instance, raw=False, **kwargs):
     services.sync_from_allocation(instance)
 
 
-@receiver(post_save, sender=InvestmentRequest, dispatch_uid="dokumen_investment_land_use")
+@receiver(
+    post_save, sender=InvestmentRequest, dispatch_uid="dokumen_investment_land_use"
+)
 def investment_saved(sender, instance, raw=False, **kwargs):
     if raw:
         return

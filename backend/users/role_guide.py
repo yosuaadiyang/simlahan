@@ -49,6 +49,14 @@ ACQUISITION_ONLY = (
     "Hanya modul pengadaan tanah; modul sewa, alokasi, aset, pusat komando, dan "
     "panel admin tidak terbuka."
 )
+DOCUMENTS_MENU = (
+    "Dokumen & Perizinan: Dasbor dokumen, Pemanfaatan lahan, Dokumen perizinan, "
+    "Dokumen tanda tangan, Templat dokumen, Permintaan unduh"
+)
+DOWNLOAD_RULE = (
+    "Mengunduh dokumen selalu lewat permintaan unduh yang disetujui orang lain; "
+    "setiap unduhan diberi tanda air dan tercatat."
+)
 COMMAND_TABS = (
     "Pusat komando (`/komando/`): Peta, Absen, Lapor (kegiatan, uji tanah, "
     "laporan saya), Warga, Tugas, Kinerja, Chat; Menu: Peringkat tim, Struktur "
@@ -221,6 +229,7 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "lahan, Laporan & asisten AI, Aplikasi lapangan",
             "Pusat Komando: Peta operasi & PWA, Absen, Lapor kegiatan, Tugas, "
             "Kinerja (KPI), Korwil, warga & laporan",
+            DOCUMENTS_MENU,
             "Kontak",
             "Catatan area",
             "Prinsip sewa",
@@ -238,6 +247,9 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "Melihat data semua unit layanan dan semua Korwil, termasuk NIK warga.",
             "Mengatur data master (jenis, kategori, tarif, aturan tenggat, konten "
             "portal) dan pengaturan modul di panel admin.",
+            "Dokumen & perizinan: mengatur jenis dokumen wajib, templat, dan "
+            "pengaturan modul; menyetujui dokumen tanda tangan sebelum dikirim; "
+            "menyetujui permintaan unduh, termasuk dokumen rahasia.",
             "Melihat daftar pengguna.",
         ),
         limits=(
@@ -245,6 +257,7 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "bisa dilakukan superuser.",
             "Tugas terjadwal hanya bisa dilihat; mengubahnya dan kunci sistem "
             "hanya untuk superuser.",
+            "Tidak bisa menyetujui permintaan unduh miliknya sendiri.",
         ),
     ),
     UserGroup.PELAKSANA_PENGADAAN: RoleGuide(
@@ -332,6 +345,7 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "pembangunan, konten portal",
             "Panel admin, Alokasi lahan: Permintaan investasi, Sektor investasi, "
             "Kawasan investasi",
+            "Panel admin, " + DOCUMENTS_MENU + ", Jenis dokumen, Riwayat unduhan",
         ),
         can=(
             "Memeriksa kelengkapan, meminta perbaikan, menyetujui/menolak "
@@ -341,10 +355,17 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "selesaikan (kontrak atau draf permohonan alokasi) atau tolak.",
             "Mengelola data lahan (termasuk tarif sewa, sektor, kawasan, insentif) "
             "dan konten portal.",
+            "Mencatat pemanfaatan lahan, menentukan dokumen perizinan wajib, "
+            "mengunggah/mengimpor templat (Word, PDF, HTML), memverifikasi atau "
+            "meminta revisi dokumen, dan mengirim dokumen untuk ditandatangani "
+            "(berurutan, OTP surel, sertifikat & kode QR verifikasi).",
+            "Menyetujui atau menolak permintaan unduh dokumen biasa.",
             "Menerima ringkasan pemantauan mingguan lewat surel.",
         ),
         limits=(
             "Tidak membuka modul sewa, pengadaan, aset lahan, atau pusat komando.",
+            "Tidak menyetujui unduhan dokumen rahasia, tidak menyetujui permintaan "
+            "unduh miliknya sendiri, dan tidak mengubah pengaturan modul dokumen.",
             "Tidak bisa membuka data akun pengguna.",
         ),
     ),
@@ -357,14 +378,19 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
         menus=(
             "Panel admin, Alokasi lahan: Permohonan, Tagihan, Alokasi, Data lahan, "
             "Pemohon, Laporan pembangunan, Permintaan investasi (baca)",
+            "Panel admin, " + DOCUMENTS_MENU + " (baca dan verifikasi)",
         ),
         can=(
             "Membaca permohonan, tagihan, alokasi, dan permintaan investasi.",
             "Mengisi penilaian teknis per kriteria.",
+            "Memverifikasi atau meminta revisi dokumen perizinan.",
+            "Mengajukan permintaan unduh dokumen. " + DOWNLOAD_RULE,
         ),
         limits=(
             "Tidak memutuskan permohonan, tidak memproses permintaan investasi, "
             "dan tidak mengubah data lahan.",
+            "Tidak membuat templat atau dokumen tanda tangan dan tidak menyetujui "
+            "permintaan unduh.",
             "Tidak membuka modul lain.",
         ),
     ),
@@ -404,15 +430,21 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
         menus=(
             "Panel admin, Manajemen aset lahan: perkara, advokat & jadwal sidang, "
             "dokumen, okupasi, pengaduan, urusan instansi, tugas, dasbor & peta",
+            "Panel admin, " + DOCUMENTS_MENU,
         ),
         can=(
             "Mengelola perkara, advokat, jadwal sidang, dan dokumen perkara.",
             "Menindaklanjuti okupasi dan pengaduan; mengelola urusan instansi dan "
             "tugas.",
             "Membaca aset, kepemilikan, pemangku kepentingan, dan survei.",
+            "Menyusun templat dan blok isi, membuat dan mengirim dokumen tanda "
+            "tangan (kontrak, perjanjian), serta membaca dokumen perizinan.",
+            "Mengajukan permintaan unduh dokumen. " + DOWNLOAD_RULE,
         ),
         limits=(
             "Tidak melihat penilaian, pajak, transaksi, dan peta berbagi.",
+            "Tidak memverifikasi dokumen perizinan dan tidak menyetujui permintaan "
+            "unduh.",
             "Tidak membuka pusat komando, aplikasi lapangan, atau modul lain.",
         ),
     ),
@@ -482,6 +514,8 @@ APPLICANT_GUIDE = RoleGuide(
         "ajukan minat), Lelang, Pengaduan, Lacak, Verifikasi dokumen, Bantuan, "
         "Akun saya (permohonan, permintaan investasi, lahan tersimpan, tagihan, "
         "profil, sandi)",
+        "Akun saya → Dokumen & perizinan (`/portal/dokumen/`): pemanfaatan lahan, "
+        "dokumen tanda tangan, permintaan unduh",
     ),
     can=(
         "Mengajukan dan melengkapi permohonan, membayar tagihan, melacak status, "
@@ -490,6 +524,11 @@ APPLICANT_GUIDE = RoleGuide(
         "mengajukan minat sewa/alokasi/kerja sama (memilih lahan atau menggambar "
         "usulan lokasi), berkirim pesan dengan petugas, serta menerima atau "
         "menolak penawaran.",
+        "Melihat status setiap dokumen perizinan pemanfaatan lahannya, mengunduh "
+        "format templat, mengunggah dokumen atau revisi, serta menandatangani "
+        "dokumen secara elektronik.",
+        "Mengajukan permintaan unduh dokumen; unduhan terbuka setelah disetujui "
+        "petugas, diberi tanda air, dan tercatat.",
         "Mengubah profil dan sandi; memakai Lupa sandi bila lupa.",
     ),
     limits=(

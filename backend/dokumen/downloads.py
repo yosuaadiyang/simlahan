@@ -65,7 +65,9 @@ def can_decide(user, dl: DownloadRequest) -> bool:
 
 
 @transaction.atomic
-def request_download(user, *, version=None, signing=None, purpose: str, reason: str, request=None) -> DownloadRequest:
+def request_download(
+    user, *, version=None, signing=None, purpose: str, reason: str, request=None
+) -> DownloadRequest:
     require(
         access.can_request_download(user, version=version, signing=signing),
         _("Anda tidak berhak meminta unduhan dokumen ini."),
@@ -73,12 +75,16 @@ def request_download(user, *, version=None, signing=None, purpose: str, reason: 
     reason = (reason or "").strip()
     require(len(reason) >= 5, _("Jelaskan alasan unduhan (minimal 5 karakter)."))
     require(purpose in enums.DownloadPurpose.values, _("Pilih keperluan unduhan."))
-    open_requests = DownloadRequest.objects.filter(requester=user, version=version, signing=signing)
+    open_requests = DownloadRequest.objects.filter(
+        requester=user, version=version, signing=signing
+    )
     for existing in open_requests.filter(status__in=(D.PENDING, D.APPROVED)):
         if existing.status == D.PENDING or existing.is_usable:
             return existing
     confidentiality = (
-        version.record.permit_type.confidentiality if version is not None else signing.confidentiality
+        version.record.permit_type.confidentiality
+        if version is not None
+        else signing.confidentiality
     )
     dl = DownloadRequest.objects.create(
         requester=user,
@@ -88,7 +94,13 @@ def request_download(user, *, version=None, signing=None, purpose: str, reason: 
         purpose=purpose,
         reason=reason[:2000],
     )
-    log(enums.Action.DOWNLOAD_REQUESTED, actor=user, request=request, detail=f"{dl.number}: {reason[:200]}", **_targets(dl))
+    log(
+        enums.Action.DOWNLOAD_REQUESTED,
+        actor=user,
+        request=request,
+        detail=f"{dl.number}: {reason[:200]}",
+        **_targets(dl),
+    )
     config = DocumentSettings.load()
     land_use = _target_land_use(dl)
     auto = (
@@ -97,7 +109,12 @@ def request_download(user, *, version=None, signing=None, purpose: str, reason: 
         and access.is_holder(user, land_use)
     )
     if auto:
-        _approve(dl, None, _("Disetujui otomatis sesuai pengaturan (dokumen milik sendiri)."), request=request)
+        _approve(
+            dl,
+            None,
+            _("Disetujui otomatis sesuai pengaturan (dokumen milik sendiri)."),
+            request=request,
+        )
         return dl
     approvers = access.users_with_perm(access.approver_permission(confidentiality))
     if not config.allow_self_approval:
@@ -132,7 +149,13 @@ def _approve(dl, approver, note, *, hours=None, max_count=None, request=None):
     dl.valid_until = dl.decided_at + datetime.timedelta(hours=hours)
     dl.max_downloads = max_count or config.download_max_count
     dl.save()
-    log(enums.Action.DOWNLOAD_APPROVED, actor=approver, request=request, detail=f"{dl.number}: {dl.decision_note}", **_targets(dl))
+    log(
+        enums.Action.DOWNLOAD_APPROVED,
+        actor=approver,
+        request=request,
+        detail=f"{dl.number}: {dl.decision_note}",
+        **_targets(dl),
+    )
     if dl.requester.email:
         on_commit_email(
             [dl.requester.email],
@@ -155,10 +178,14 @@ def _lock(dl: DownloadRequest) -> DownloadRequest:
 
 
 @transaction.atomic
-def approve(dl, approver, *, note="", hours=None, max_count=None, request=None) -> DownloadRequest:
+def approve(
+    dl, approver, *, note="", hours=None, max_count=None, request=None
+) -> DownloadRequest:
     dl = _lock(dl)
     require(dl.status == D.PENDING, _("Permintaan ini sudah diputuskan."))
-    require(can_decide(approver, dl), _("Anda tidak berwenang menyetujui permintaan ini."))
+    require(
+        can_decide(approver, dl), _("Anda tidak berwenang menyetujui permintaan ini.")
+    )
     if hours is not None:
         require(1 <= hours <= 720, _("Masa berlaku 1–720 jam."))
     if max_count is not None:
@@ -172,19 +199,28 @@ def reject(dl, approver, note: str, request=None) -> DownloadRequest:
     dl = _lock(dl)
     note = (note or "").strip()
     require(dl.status == D.PENDING, _("Permintaan ini sudah diputuskan."))
-    require(can_decide(approver, dl), _("Anda tidak berwenang memutuskan permintaan ini."))
+    require(
+        can_decide(approver, dl), _("Anda tidak berwenang memutuskan permintaan ini.")
+    )
     require(bool(note), _("Tuliskan alasan penolakan."))
     dl.status = D.REJECTED
     dl.decided_by = approver
     dl.decided_at = timezone.now()
     dl.decision_note = note[:2000]
     dl.save()
-    log(enums.Action.DOWNLOAD_REJECTED, actor=approver, request=request, detail=f"{dl.number}: {note}", **_targets(dl))
+    log(
+        enums.Action.DOWNLOAD_REJECTED,
+        actor=approver,
+        request=request,
+        detail=f"{dl.number}: {note}",
+        **_targets(dl),
+    )
     if dl.requester.email:
         on_commit_email(
             [dl.requester.email],
             _("Unduhan %s ditolak") % dl.number,
-            _("Permintaan unduh %(target)s ditolak.\nAlasan: %(note)s") % {"target": dl.target_label, "note": note},
+            _("Permintaan unduh %(target)s ditolak.\nAlasan: %(note)s")
+            % {"target": dl.target_label, "note": note},
         )
     return dl
 
@@ -196,7 +232,13 @@ def cancel(dl, user, request=None) -> DownloadRequest:
     require(dl.status in (D.PENDING, D.APPROVED), _("Permintaan ini sudah ditutup."))
     dl.status = D.CANCELLED
     dl.save()
-    log(enums.Action.DOWNLOAD_CANCELLED, actor=user, request=request, detail=dl.number, **_targets(dl))
+    log(
+        enums.Action.DOWNLOAD_CANCELLED,
+        actor=user,
+        request=request,
+        detail=dl.number,
+        **_targets(dl),
+    )
     return dl
 
 
@@ -218,13 +260,18 @@ def _watermark_lines(user, dl) -> list[str]:
 def consume(dl: DownloadRequest, user, request=None) -> tuple[bytes, str, str, bool]:
     """Periksa izin lalu kurangi kuota; kembalikan (isi, nama, tipe, bertanda air)."""
     with transaction.atomic():
-        dl = DownloadRequest.objects.select_for_update().select_related(
-            "version__record__land_use", "signing__land_use"
-        ).get(pk=dl.pk)
+        dl = (
+            DownloadRequest.objects.select_for_update(of=("self",))
+            .select_related("version__record__land_use", "signing__land_use")
+            .get(pk=dl.pk)
+        )
         if dl.requester_id != user.pk:
             raise PermissionDenied
         require(dl.status == D.APPROVED, _("Permintaan unduh belum disetujui."))
-        require(not dl.is_expired, _("Izin unduh sudah kedaluwarsa. Ajukan permintaan baru."))
+        require(
+            not dl.is_expired,
+            _("Izin unduh sudah kedaluwarsa. Ajukan permintaan baru."),
+        )
         require(dl.remaining > 0, _("Kuota unduh sudah habis. Ajukan permintaan baru."))
         version, signing = dl.version, dl.signing
         require(
@@ -254,12 +301,28 @@ def consume(dl: DownloadRequest, user, request=None) -> tuple[bytes, str, str, b
             ip_address=client_ip(request),
             user_agent=user_agent(request),
         )
-        log(enums.Action.DOWNLOADED, actor=user, request=request, detail=f"{dl.number} ({dl.download_count}/{dl.max_downloads}) {filename}", **_targets(dl))
+        log(
+            enums.Action.DOWNLOADED,
+            actor=user,
+            request=request,
+            detail=f"{dl.number} ({dl.download_count}/{dl.max_downloads}) {filename}",
+            **_targets(dl),
+        )
     content_type = mimetypes.guess_type(filename)[0] or "application/octet-stream"
     return data, filename, content_type, watermarked
 
 
-def log_preview(user, *, version=None, signing=None, template=None, filename="", data=b"", request=None, preview=True):
+def log_preview(
+    user,
+    *,
+    version=None,
+    signing=None,
+    template=None,
+    filename="",
+    data=b"",
+    request=None,
+    preview=True,
+):
     DownloadLog.objects.create(
         user=user,
         user_name=access.display_name(user)[:255],
@@ -278,7 +341,13 @@ def log_preview(user, *, version=None, signing=None, template=None, filename="",
     if signing is not None:
         targets["signing"] = signing
     if targets:
-        log(enums.Action.PREVIEWED if preview else enums.Action.DOWNLOADED, actor=user, request=request, detail=filename, **targets)
+        log(
+            enums.Action.PREVIEWED if preview else enums.Action.DOWNLOADED,
+            actor=user,
+            request=request,
+            detail=filename,
+            **targets,
+        )
 
 
 def pending_for(user):

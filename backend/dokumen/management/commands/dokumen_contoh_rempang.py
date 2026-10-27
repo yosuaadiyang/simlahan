@@ -39,9 +39,27 @@ LOCMEM = "django.core.mail.backends.locmem.EmailBackend"
 
 # (kode, judul, skema, kode lahan contoh, luas m²)
 LAND_USES = [
-    ("01", "Pabrik pengolahan hasil laut (contoh)", enums.Scheme.LEASE, "CONTOH-RMP-01", Decimal("25000")),
-    ("02", "Resor wisata bahari (contoh)", enums.Scheme.PARTNERSHIP, "CONTOH-RMP-03", Decimal("40000")),
-    ("03", "Gudang logistik (contoh)", enums.Scheme.OTHER, "CONTOH-RMP-02", Decimal("12000")),
+    (
+        "01",
+        "Pabrik pengolahan hasil laut (contoh)",
+        enums.Scheme.LEASE,
+        "CONTOH-RMP-01",
+        Decimal("25000"),
+    ),
+    (
+        "02",
+        "Resor wisata bahari (contoh)",
+        enums.Scheme.PARTNERSHIP,
+        "CONTOH-RMP-03",
+        Decimal("40000"),
+    ),
+    (
+        "03",
+        "Gudang logistik (contoh)",
+        enums.Scheme.OTHER,
+        "CONTOH-RMP-02",
+        Decimal("12000"),
+    ),
 ]
 
 
@@ -55,7 +73,9 @@ def sample_pdf(title: str) -> bytes:
     page.drawString(72, 770, title)
     page.setFont("Helvetica", 11)
     page.drawString(72, 745, "DOKUMEN CONTOH - FIKTIF - BUKAN DOKUMEN SAH")
-    page.drawString(72, 725, "Dibuat oleh perintah dokumen_contoh_rempang untuk uji coba SimLahan.")
+    page.drawString(
+        72, 725, "Dibuat oleh perintah dokumen_contoh_rempang untuk uji coba SimLahan."
+    )
     page.showPage()
     page.save()
     return buffer.getvalue()
@@ -96,17 +116,25 @@ class Command(BaseCommand):
                 if field:
                     field.delete(save=False)
         documents.delete()
-        for record in PermitRecord.objects.filter(land_use__in=land_uses).prefetch_related("versions"):
+        for record in PermitRecord.objects.filter(
+            land_use__in=land_uses
+        ).prefetch_related("versions"):
             for version in record.versions.all():
                 version.file.delete(save=False)
         count = len(land_uses)
         LandUse.objects.filter(pk__in=[lu.pk for lu in land_uses]).delete()
-        self.stdout.write(f"{count} pemanfaatan lahan contoh dan {count_docs} dokumen tanda tangan contoh dihapus.")
+        self.stdout.write(
+            f"{count} pemanfaatan lahan contoh dan {count_docs} dokumen tanda tangan contoh dihapus."
+        )
 
     def _create(self):
         User = get_user_model()
         officer = User.objects.filter(username=OFFICER_USERNAME).first()
-        applicant = Applicant.objects.filter(user__email__iexact=APPLICANT_EMAIL).select_related("user").first()
+        applicant = (
+            Applicant.objects.filter(user__email__iexact=APPLICANT_EMAIL)
+            .select_related("user")
+            .first()
+        )
         if applicant is None:
             self.stdout.write(
                 "Akun pemohon contoh belum ada: pemanfaatan lahan dibuat tanpa akun portal "
@@ -115,12 +143,16 @@ class Command(BaseCommand):
         created = 0
         for code, title, scheme, plot_code, area in LAND_USES:
             with transaction.atomic():
-                land_use, is_new = self._land_use(code, title, scheme, plot_code, area, applicant)
+                land_use, is_new = self._land_use(
+                    code, title, scheme, plot_code, area, applicant
+                )
                 created += is_new
                 services.ensure_records(land_use)
                 if is_new:
                     self._fill(land_use, officer, applicant)
-        self.stdout.write(f"{created} pemanfaatan lahan contoh dibuat, {len(LAND_USES) - created} sudah ada.")
+        self.stdout.write(
+            f"{created} pemanfaatan lahan contoh dibuat, {len(LAND_USES) - created} sudah ada."
+        )
         with transaction.atomic():
             self._signing(officer, applicant)
         with transaction.atomic():
@@ -132,7 +164,9 @@ class Command(BaseCommand):
             "title": title,
             "scheme": scheme,
             "holder": applicant,
-            "holder_name": applicant.name if applicant else "PT Contoh Investasi Rempang",
+            "holder_name": (
+                applicant.name if applicant else "PT Contoh Investasi Rempang"
+            ),
             "plot": LandPlot.objects.filter(code=plot_code).first(),
             "area_m2": area,
             "start_date": today.replace(month=1, day=1),
@@ -151,10 +185,17 @@ class Command(BaseCommand):
         """Beragam status agar dasbor, antrean verifikasi, dan portal terisi."""
         today = timezone.localdate()
         holder_user = applicant.user if applicant else None
-        records = {r.permit_type.code: r for r in land_use.records.select_related("permit_type")}
+        records = {
+            r.permit_type.code: r
+            for r in land_use.records.select_related("permit_type")
+        }
         plan = {
             "nib": ("verified", today - datetime.timedelta(days=400), None),
-            "pkkpr": ("verified", today - datetime.timedelta(days=200), today + datetime.timedelta(days=25)),
+            "pkkpr": (
+                "verified",
+                today - datetime.timedelta(days=200),
+                today + datetime.timedelta(days=25),
+            ),
             "lingkungan": ("submitted", None, None),
             "pbg": ("revision", None, None),
             "andalalin": ("progress", None, None),
@@ -166,20 +207,33 @@ class Command(BaseCommand):
             name = f"{record.permit_type.name} {land_use.number}"
             if state == "verified" and officer is not None:
                 services.officer_upload(
-                    record, officer, upload(name), note="Contoh", number=f"{code.upper()}/CONTOH/{today.year}",
-                    issued_date=issued, expiry_date=expiry, verify_now=True,
+                    record,
+                    officer,
+                    upload(name),
+                    note="Contoh",
+                    number=f"{code.upper()}/CONTOH/{today.year}",
+                    issued_date=issued,
+                    expiry_date=expiry,
+                    verify_now=True,
                 )
             elif state in ("submitted", "revision"):
                 services.holder_update(
-                    record, holder_user, upload=upload(name), number=f"{code.upper()}/CONTOH/{today.year}",
+                    record,
+                    holder_user,
+                    upload=upload(name),
+                    number=f"{code.upper()}/CONTOH/{today.year}",
                     note="Unggahan contoh",
                 )
                 if state == "revision" and officer is not None:
                     services.request_revision(
-                        record, officer, "Contoh: halaman tanda tangan pejabat belum terbaca, unggah ulang hasil pindai yang jelas."
+                        record,
+                        officer,
+                        "Contoh: halaman tanda tangan pejabat belum terbaca, unggah ulang hasil pindai yang jelas.",
                     )
             elif state == "progress":
-                services.holder_update(record, holder_user, status=enums.RecordStatus.IN_PROGRESS)
+                services.holder_update(
+                    record, holder_user, status=enums.RecordStatus.IN_PROGRESS
+                )
 
     def _signing(self, officer, applicant):
         land_use = sample_land_uses().filter(reference=f"{PREFIX}01").first()
@@ -187,7 +241,9 @@ class Command(BaseCommand):
             return
         if land_use.signing_documents.exists():
             return
-        template = DocumentTemplate.objects.filter(name__istartswith="Surat pernyataan", is_active=True).first()
+        template = DocumentTemplate.objects.filter(
+            name__istartswith="Surat pernyataan", is_active=True
+        ).first()
         if template is None:
             return
         document = signing.create(
@@ -221,10 +277,17 @@ class Command(BaseCommand):
         if applicant is None:
             return
         record = PermitRecord.objects.filter(
-            land_use__reference=f"{PREFIX}01", permit_type__code="nib", status=enums.RecordStatus.VERIFIED
+            land_use__reference=f"{PREFIX}01",
+            permit_type__code="nib",
+            status=enums.RecordStatus.VERIFIED,
         ).first()
         version = record.latest_version if record else None
-        if version is None or DownloadRequest.objects.filter(version=version, requester=applicant.user).exists():
+        if (
+            version is None
+            or DownloadRequest.objects.filter(
+                version=version, requester=applicant.user
+            ).exists()
+        ):
             return
         downloads.request_download(
             applicant.user,

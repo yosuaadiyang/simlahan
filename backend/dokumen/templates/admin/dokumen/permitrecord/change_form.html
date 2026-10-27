@@ -34,7 +34,7 @@
         <td>v{{ v.number }}{% if forloop.first %} <span class="dk-chip ok">terbaru</span>{% endif %}</td>
         <td class="dk-break">{{ v.original_name }}<br><span class="dk-muted">{{ v.size_label }}</span>{% if v.note %}<br><span class="dk-muted">{{ v.note }}</span>{% endif %}</td>
         <td>{{ v.get_source_display }}</td>
-        <td>{{ v.created_at|date:"d-m-Y H.i" }}<br><span class="dk-muted">{{ v.uploaded_by.get_full_name|default:v.uploaded_by.get_username|default:"–" }}</span></td>
+        <td>{{ v.created_at|date:"d-m-Y H.i" }}<br><span class="dk-muted">{% if v.uploaded_by %}{{ v.uploaded_by.get_full_name|default:v.uploaded_by.get_username }}{% else %}{{ v.get_source_display }}{% endif %}</span></td>
         <td><code class="dk-hash" title="{{ v.sha256 }}">{{ v.sha256|truncatechars:17 }}</code></td>
         <td class="dk-actions">
           {% if can_preview and v.previewable %}<a href="{% url 'dokumen-version-preview' v.pk %}" target="_blank" rel="noopener">Pratinjau</a>{% endif %}
