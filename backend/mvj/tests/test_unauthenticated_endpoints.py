@@ -44,7 +44,7 @@ WHITELIST_DJANGO_URLS = (
 
 # Aplikasi berbasis sesi (bukan API): tanpa login harus dialihkan ke halaman
 # masuk atau ditolak, kecuali halaman yang memang publik di bawah ini.
-SESSION_APP_PREFIXES = ("/portal/", "/aset/", "/komando/", "/oauth/")
+SESSION_APP_PREFIXES = ("/portal/", "/aset/", "/komando/", "/oauth/", "/akun/")
 PUBLIC_SESSION_PAGES = (
     re.compile(
         r"^/portal/("
@@ -112,8 +112,9 @@ def test_urls(client, path):
 
 def _is_login_redirect(response):
     location = response.get("Location", "")
+    # "/" = layar masuk aplikasi petugas (halaman /akun/).
     return response.status_code == 302 and (
-        "/login/" in location or "/masuk/" in location
+        "/login/" in location or "/masuk/" in location or location == "/"
     )
 
 
