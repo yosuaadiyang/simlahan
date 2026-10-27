@@ -761,6 +761,9 @@ select[multiple] {
 
 textarea {
   min-height: 80px;
+  /* width:100% di template tidak boleh meluber karena padding/border. */
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 input:not([type]):focus,

@@ -13,6 +13,7 @@ import useAuth from "@/auth/useAuth";
 import LoginPage from "@/auth/components/LoginPage";
 import SideMenu from "@/components/sideMenu/SideMenu";
 import TopNavigation from "@/components/topNavigation/TopNavigation";
+import UserServiceUnitSelectInput from "@/components/inputs/UserServiceUnitSelectInput";
 import { clearError } from "@/api/slice";
 import { getError } from "@/api/selectors";
 import { getLoggedInUser } from "@/auth/selectors";
@@ -195,6 +196,25 @@ const App: React.FC<Props> = (props) => {
                         </p>
                       );
                     })}
+                  {/* Unit layanan juga di sini: di HP bilah atas tidak muat. */}
+                  {!!userServiceUnits?.length && userActiveServiceUnit && (
+                    <div className="app__usergroup-service-unit">
+                      {userServiceUnits.length > 1 ? (
+                        <UserServiceUnitSelectInput
+                          id="userServiceUnitSelectMenu"
+                          userServiceUnits={userServiceUnits}
+                          userActiveServiceUnit={userActiveServiceUnit}
+                        />
+                      ) : (
+                        <>
+                          <span className="app__usergroup-service-unit-label">
+                            Unit layanan sendiri
+                          </span>
+                          {userActiveServiceUnit.name}
+                        </>
+                      )}
+                    </div>
+                  )}
                 </section>
               )}
 

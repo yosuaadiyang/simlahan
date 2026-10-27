@@ -108,6 +108,24 @@ a {
     text-transform: uppercase;
     color: variables.$text-muted;
   }
+
+  .app__usergroup-service-unit {
+    margin-top: rem-calc(10px);
+    padding-top: rem-calc(10px);
+    border-top: 1px solid variables.$border-color;
+    font-weight: 600;
+
+    form {
+      min-width: rem-calc(220px);
+    }
+  }
+
+  .app__usergroup-service-unit-label {
+    display: block;
+    font-size: rem-calc(12px);
+    font-weight: 400;
+    color: variables.$text-muted;
+  }
 }
 
 .content__page-container,
@@ -211,6 +229,31 @@ a {
       float: none;
       flex-wrap: wrap;
       gap: rem-calc(6px);
+    }
+
+    // Ringkasan info (mis. pengenal sewa, jenis, tanggal): kolom tidak
+    // diperas sampai labelnya bertumpuk, tetapi pindah baris.
+    .info-component-wrapper {
+      flex: 1 1 calc(100% - #{rem-calc(52px)});
+      min-width: 0;
+      padding-right: 0;
+
+      .grid-row {
+        gap: rem-calc(6px 16px);
+      }
+
+      .grid-column {
+        flex: 0 1 auto;
+        max-width: 100%;
+      }
+
+      .grid-column:first-child {
+        flex-basis: 100%;
+      }
+
+      h1 {
+        overflow-wrap: anywhere;
+      }
     }
   }
 }

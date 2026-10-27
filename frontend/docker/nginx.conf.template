@@ -22,6 +22,21 @@ server {
     add_header X-Frame-Options SAMEORIGIN always;
     add_header Referrer-Policy strict-origin-when-cross-origin always;
 
+    # Berkas statis panel/portal/PWA bernama tetap (mis. admin.css): selalu dicek
+    # ulang ke backend (304 bila tidak berubah) agar tampilan baru langsung
+    # dipakai setelah deploy, tanpa perlu muat ulang paksa di peramban.
+    location ^~ /static/ {
+        proxy_pass ${BACKEND_URL};
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Forwarded-Host $http_host;
+        proxy_set_header X-Forwarded-Proto $simlahan_forwarded_proto;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        add_header Cache-Control "no-cache";
+        add_header X-Content-Type-Options nosniff always;
+        add_header X-Frame-Options SAMEORIGIN always;
+        add_header Referrer-Policy strict-origin-when-cross-origin always;
+    }
+
     # API, panel admin SimLahan, portal pemohon, aplikasi lapangan / peta berbagi (/aset), pusat komando (/komando)
     location ~ ^/(v1|admin|auth|oauth|static|docs|redoc|swagger|portal|aset|komando)(/|\.|$) {
         proxy_pass ${BACKEND_URL};
@@ -38,10 +53,18 @@ server {
     location = /healthz { proxy_pass ${BACKEND_URL}; proxy_set_header Host $http_host; access_log off; }
     location = /readiness { proxy_pass ${BACKEND_URL}; proxy_set_header Host $http_host; access_log off; }
 
-    # Aset hasil build (nama berhash) boleh di-cache lama.
-    location /assets/ {
+    # Aset hasil build Vite (nama berhash, mis. index-BsUM6zPN.js) boleh di-cache lama.
+    location ~ "^/assets/[^/]+-[A-Za-z0-9_-]{8}\.[A-Za-z0-9]+$" {
         expires 30d;
         add_header Cache-Control "public, immutable";
+        add_header X-Content-Type-Options nosniff always;
+        try_files $uri =404;
+    }
+
+    # Gambar/ikon publik bernama tetap (mis. /assets/images/logo.svg): selalu
+    # dicek ulang (304 bila tidak berubah) agar logo baru langsung tampil.
+    location /assets/ {
+        add_header Cache-Control "no-cache";
         add_header X-Content-Type-Options nosniff always;
         try_files $uri =404;
     }

@@ -1,4 +1,5 @@
 # Register your models here.
+from django.conf import settings
 from django.contrib.gis import admin, forms
 from nested_inline.admin import (
     NestedModelAdmin,
@@ -105,3 +106,13 @@ class FormModelAdmin(NestedModelAdmin):
     list_display = ("name",)
     model = Form
     inlines = [SectionInline]
+
+    class Media:
+        # Skrip nested_inline memakai django.jQuery, jadi harus dimuat setelah
+        # jquery.init.js (urutan bawaannya terbalik dan memicu galat JS).
+        _min = "" if settings.DEBUG else ".min"
+        js = (
+            f"admin/js/vendor/jquery/jquery{_min}.js",
+            "admin/js/jquery.init.js",
+            f"admin/js/inlines-nested{_min}.js",
+        )
