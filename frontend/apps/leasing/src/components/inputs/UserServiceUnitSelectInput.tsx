@@ -11,11 +11,14 @@ import type {
 } from "@/usersPermissions/types";
 
 type Props = {
+  // Id unik bila komponen tampil dua kali (bilah atas dan menu pengguna).
+  id?: string;
   userServiceUnits: UserServiceUnits;
   userActiveServiceUnit: UserServiceUnit;
 };
 
 const UserServiceUnitSelectInput: React.FC<Props> = ({
+  id = "userServiceUnitSelect",
   userServiceUnits,
   userActiveServiceUnit,
 }) => {
@@ -47,9 +50,7 @@ const UserServiceUnitSelectInput: React.FC<Props> = ({
   return (
     <form>
       <div className={"form-field"}>
-        <FormFieldLabel htmlFor={"userServiceUnitSelect"}>
-          Unit layanan sendiri
-        </FormFieldLabel>
+        <FormFieldLabel htmlFor={id}>Unit layanan sendiri</FormFieldLabel>
         <div className={"form-field__component"}>
           <div className={"form-field__select"}>
             <Select
@@ -61,7 +62,7 @@ const UserServiceUnitSelectInput: React.FC<Props> = ({
                 LoadingIndicator,
               }}
               isDisabled={userServiceUnits.length <= 1}
-              id={"userServiceUnitSelect"}
+              id={id}
               onBlur={handleChange}
               onChange={handleChange}
               noOptionsMessage={() => "Tidak ada hasil"}

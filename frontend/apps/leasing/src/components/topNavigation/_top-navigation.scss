@@ -25,8 +25,9 @@
     flex: 1 1 0%;
     align-items: center;
     gap: rem-calc(4px);
-    // Izinkan judul menyusut agar tidak menimpa menu kanan pada layar sempit.
-    min-width: 0;
+    // Judul boleh menyusut, tetapi tombol menu + logo selalu terlihat (tidak
+    // tertimpa kolom cari di kanan pada layar sempit).
+    min-width: min-content;
 
     .page-title {
       display: flex;
@@ -51,6 +52,10 @@
         }
       }
     }
+  }
+
+  &__title {
+    flex: 0 0 auto;
   }
 
   &__title_button {
@@ -140,6 +145,10 @@
       flex: 0 0 auto;
     }
 
+    span {
+      white-space: nowrap;
+    }
+
     &:hover,
     &:focus {
       color: variables.$black;
@@ -160,8 +169,14 @@
     flex: 0 1 auto;
     min-width: 0;
 
+    // Kolom cari lentur (maks. 250px) supaya menyusut di layar sempit.
     .search {
+      flex: 0 1 rem-calc(250px);
       min-width: 0;
+
+      .search-input__component .search-input {
+        width: 100%;
+      }
     }
 
     .user-service-unit {
@@ -209,7 +224,8 @@
       display: flex;
       align-items: center;
       gap: rem-calc(8px);
-      min-width: 0;
+      // Avatar tetap utuh; hanya nama pengguna yang dipotong "…".
+      min-width: rem-calc(44px);
       padding: rem-calc(4px) rem-calc(8px) rem-calc(4px) rem-calc(4px);
       border-radius: variables.$radius-full;
       cursor: pointer;
@@ -269,6 +285,7 @@
 
     .logout-link {
       display: inline-flex;
+      flex: 0 0 auto;
       align-items: center;
       gap: rem-calc(6px);
       height: rem-calc(36px);
@@ -342,14 +359,27 @@
     }
 
     &__brand {
+      flex: 0 1 auto;
+      min-width: 0;
       padding: rem-calc(6px) rem-calc(4px);
+
+      span {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    .username-wrapper,
+    .user-group-button {
+      flex-shrink: 0;
     }
 
     &__right-wrapper {
       gap: rem-calc(4px);
 
       .search {
-        flex: 1 1 auto;
+        flex: 1 1 rem-calc(250px);
       }
 
       .logout-link {
@@ -361,6 +391,28 @@
   @media (max-width: 360px) {
     &__brand span,
     &__right-wrapper .logout-link span {
+      display: none;
+    }
+  }
+
+  // Halaman dengan kolom cari di HP/tablet: tombol keluar cukup ikon dan judul
+  // halaman disembunyikan agar kolom cari cukup lebar; di HP logo tanpa teks.
+  @include breakpoint(medium down) {
+    &:has(.search) &__left-wrapper .page-title,
+    &:has(.search) &__right-wrapper .logout-link span {
+      display: none;
+    }
+  }
+
+  // Tablet sempit: unit layanan tetap bisa dilihat/diganti lewat tombol avatar.
+  @media (max-width: 767px) {
+    &:has(.search) &__right-wrapper .user-service-unit {
+      display: none;
+    }
+  }
+
+  @include breakpoint(small only) {
+    &:has(.search) &__brand span {
       display: none;
     }
   }
