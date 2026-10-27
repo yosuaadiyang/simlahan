@@ -1274,7 +1274,31 @@
   var currentTab = "peta";
   // Tab di balik tombol "Lainnya" agar bilah tab muat di layar ponsel.
   var MORE_TABS = ["peringkat", "struktur", "feed", "ai"];
+  // Tab dan sub-tab yang tidak bisa dipakai peran pengguna tidak ditampilkan.
+  var TAB_ALLOWED = {
+    absen: perms.absen,
+    korwil: perms.lapor || perms.tambahTanah || perms.kegiatan,
+    warga: perms.warga,
+    tasks: perms.tugas,
+    chat: perms.chat
+  };
+  var SUB_ALLOWED = { kegiatan: perms.lapor, tanah: perms.tambahTanah, riwayat: perms.kegiatan };
+  function applyTabPermissions() {
+    Object.keys(TAB_ALLOWED).forEach(function (name) {
+      var button = document.querySelector('.tabbar button[data-tab="' + name + '"]');
+      if (button) { button.hidden = !TAB_ALLOWED[name]; }
+    });
+    var firstSub = null;
+    document.querySelectorAll(".segmented button[data-sub]").forEach(function (button) {
+      var sub = button.getAttribute("data-sub");
+      button.hidden = SUB_ALLOWED[sub] === false;
+      if (!button.hidden && !firstSub) { firstSub = button; }
+    });
+    var active = document.querySelector(".segmented button.active");
+    if (firstSub && active && active.hidden) { firstSub.click(); }
+  }
   function showTab(name) {
+    if (TAB_ALLOWED[name] === false) { name = "peta"; }
     currentTab = name;
     var barTab = MORE_TABS.indexOf(name) !== -1 ? "lainnya" : name;
     document.querySelectorAll(".tab-view").forEach(function (view) {
@@ -1521,6 +1545,7 @@
 
   document.querySelectorAll(".segmented button").forEach(function (button) {
     button.addEventListener("click", function () {
+      if (button.hidden) { return; }
       var sub = button.getAttribute("data-sub");
       document.querySelectorAll(".segmented button").forEach(function (b) { b.classList.toggle("active", b === button); });
       document.querySelectorAll("[data-sub-view]").forEach(function (view) { view.hidden = view.getAttribute("data-sub-view") !== sub; });
@@ -2313,6 +2338,7 @@
     setInterval(function () { if (layerState.sos) { loadLayer("sos"); } }, 30000);
     setInterval(function () { sync(true); }, 45000);
     setInterval(function () { if (navigator.onLine) { loadLayer("korwil"); loadLayer("warga"); } }, 300000);
+    applyTabPermissions();
     showTab(config.initialTab);
   }
 

@@ -113,16 +113,38 @@ def test_staff_status_follows_panel_groups(make_officer, django_user_model):
     fourth.refresh_from_db()
     assert not fourth.is_staff
 
-    # Administrator tetap staf; superuser tidak disentuh.
+    # Administrator otomatis staf dan tetap staf saat grup panel lain dicabut.
     admin = make_officer("admin", UserGroup.PAAKAYTTAJA)
-    admin.is_staff = True
-    admin.save()
+    admin.refresh_from_db()
+    assert admin.is_staff
     admin.groups.add(Group.objects.get(pk=UserGroup.PETUGAS_ALOKASI))
     admin.groups.remove(Group.objects.get(pk=UserGroup.PETUGAS_ALOKASI))
     admin.refresh_from_db()
     assert admin.is_staff
+    admin.groups.remove(Group.objects.get(pk=UserGroup.PAAKAYTTAJA))
+    admin.refresh_from_db()
+    assert not admin.is_staff
+    # Superuser tidak disentuh.
     root = django_user_model.objects.create_superuser("root", "r@x.id", "x")
     root.groups.add(Group.objects.get(pk=UserGroup.PETUGAS_ALOKASI))
     root.groups.clear()
     root.refresh_from_db()
     assert root.is_staff
+
+
+def test_readonly_related_link_only_for_users_allowed_to_open_it(
+    client, officer, applicant, django_user_model
+):
+    url = reverse("admin:alokasi_applicant_change", args=[applicant.pk])
+    user_url = reverse("admin:users_user_change", args=[applicant.user.pk])
+
+    # Petugas alokasi tidak boleh membuka akun pengguna: nama tanpa tautan 403.
+    client.force_login(officer)
+    page = client.get(url).content.decode()
+    assert applicant.user.username in page
+    assert user_url not in page
+    assert client.get(user_url).status_code == 403
+
+    root = django_user_model.objects.create_superuser("akar", "akar@x.id", "x")
+    client.force_login(root)
+    assert user_url in client.get(url).content.decode()

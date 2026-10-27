@@ -140,6 +140,30 @@ dilihat pembuatnya dan terlihat oleh petugas unit layanannya.
 Pemohon mendaftar sendiri di `/portal/daftar/` dan tidak bisa masuk ke
 aplikasi petugas atau API. Akun petugas tidak bisa masuk ke portal.
 
+Anggota grup Administrator, alokasi lahan, manajemen aset lahan, dan
+Koordinator Wilayah otomatis berstatus staf (boleh membuka `/admin/`) dan
+kehilangan status itu saat dikeluarkan dari grup terakhirnya.
+
+### Akun contoh per peran
+
+Untuk mencoba menu dan batas hak akses setiap peran, buat satu akun per grup
+ditambah satu pemohon portal:
+
+```sh
+docker compose exec backend python manage.py pengguna_contoh               # buat; sandi acak ditampilkan sekali
+docker compose exec backend python manage.py pengguna_contoh --sandi-baru  # buat ulang sandi semua akun contoh
+docker compose exec backend python manage.py pengguna_contoh --hapus       # hapus semua akun contoh
+```
+
+Nama pengguna `contoh.<peran>` (mis. `contoh.penilai`, `contoh.korwil`) dan
+pemohon `pemohon@contoh.simlahan.invalid`. Semua petugas masuk di `/` dan
+langsung dibawa ke halaman kerjanya (aplikasi petugas, panel admin, pusat
+komando, atau aplikasi lapangan); pemohon masuk di `/portal/masuk/`. Jalankan
+data contoh pengadaan dan pusat komando lebih dahulu agar Penilai/Instansi
+ditugaskan ke proyek contoh dan Koordinator/Petugas Lapangan punya Korwil A.
+Akun contoh yang sudah dipakai bekerja dinonaktifkan oleh `--hapus` (bukan
+dihapus) agar riwayat kerjanya tetap utuh.
+
 Setiap pengguna juga perlu minimal satu **unit layanan** (untuk modul sewa).
 Ganti kerugian wajib divalidasi Ketua Pelaksana (izin *validasi ganti
 kerugian*, dimiliki grup Administrator dan Pelaksana) sebelum dapat dibayar;

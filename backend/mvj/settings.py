@@ -235,6 +235,7 @@ MIDDLEWARE = [
     "utils.middleware.RejectNullBytesMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "utils.admin_links.CurrentRequestMiddleware",
     "users.middleware.LoginThrottleMiddleware",
     "alokasi.middleware.ApplicantIsolationMiddleware",
     "users.middleware.OfficerOTPMiddleware",

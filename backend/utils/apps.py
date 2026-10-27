@@ -17,7 +17,8 @@ class UtilsConfig(AppConfig):
     name = "utils"
 
     def ready(self):
-        from utils.admin_numbers import install
+        from utils import admin_links, admin_numbers
 
-        install()
+        admin_numbers.install()
+        admin_links.install()
         _freeze_constraint_fields()

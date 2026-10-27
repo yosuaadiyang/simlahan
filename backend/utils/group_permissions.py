@@ -30,9 +30,11 @@ class UserGroup(IntEnum):
 
 UG = UserGroup
 
-# Grup yang bekerja di panel /admin/ (alokasi & aset lahan): anggotanya
-# otomatis berstatus staf.
+# Grup yang bekerja di panel /admin/ (Administrator, alokasi, aset lahan, pusat
+# komando): anggotanya otomatis berstatus staf, dan kehilangan status staf saat
+# dikeluarkan dari grup panel terakhirnya.
 ADMIN_PANEL_GROUPS = {
+    UserGroup.PAAKAYTTAJA,
     UserGroup.PETUGAS_ALOKASI,
     UserGroup.TIM_VERIFIKASI,
     UserGroup.PETUGAS_ASET,

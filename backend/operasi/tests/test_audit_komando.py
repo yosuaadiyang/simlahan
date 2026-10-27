@@ -284,8 +284,11 @@ def test_tabbar_fits_columns(field, korwil):
     tabbar = page.split('<nav class="tabbar"')[1].split("</nav>")[0]
     buttons = tabbar.count("<button")
     css = open(finders.find("operasi/komando.css")).read()
-    columns = int(re.search(r"\.tabbar \{[^}]*repeat\((\d+),", css).group(1))
-    assert buttons == columns
+    rule = re.search(r"\.tabbar \{([^}]*)\}", css).group(1)
+    # Kolom dibagi rata di antara tombol yang tampil (tombol tanpa izin
+    # disembunyikan); lebih dari 8 tombol tidak muat di ponsel 320 px.
+    assert "grid-auto-flow: column" in rule
+    assert buttons <= 8
     assert 'data-tab="chat"' in tabbar
     for tab in ("peringkat", "struktur", "feed", "ai"):
         assert f'data-buka="{tab}"' in page

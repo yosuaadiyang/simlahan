@@ -381,17 +381,31 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
                           href: "/komando/",
                         },
                         {
-                          allow: true,
+                          allow: hasPermissions(
+                            usersPermissions,
+                            UsersPermissions.ADD_ATTENDANCE,
+                          ),
                           text: "Absen",
                           href: "/komando/?tab=absen",
                         },
                         {
-                          allow: true,
+                          allow:
+                            hasPermissions(
+                              usersPermissions,
+                              UsersPermissions.ADD_ACTIVITY,
+                            ) ||
+                            hasPermissions(
+                              usersPermissions,
+                              UsersPermissions.VIEW_ACTIVITY,
+                            ),
                           text: "Lapor kegiatan",
                           href: "/komando/?tab=korwil",
                         },
                         {
-                          allow: true,
+                          allow: hasPermissions(
+                            usersPermissions,
+                            UsersPermissions.VIEW_TASK,
+                          ),
                           text: "Tugas",
                           href: "/komando/?tab=tasks",
                         },
