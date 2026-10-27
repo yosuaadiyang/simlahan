@@ -1,0 +1,26 @@
+{% extends "users/akun_base.html" %}
+{% block content %}
+<div id="content-main" class="sl-akun">
+  {% if done %}
+    <p class="success">Sandi berhasil diganti. Aplikasi petugas dan perangkat lain akan meminta Anda masuk ulang dengan sandi baru.</p>
+    <p><a class="button" href="/">Kembali ke aplikasi petugas</a></p>
+  {% elif blocked %}
+    <p class="errornote">Terlalu banyak percobaan dengan sandi lama yang salah. Coba lagi dalam 1 jam atau hubungi superuser SimLahan.</p>
+  {% else %}
+    <p>Masukkan sandi lama, lalu sandi baru dua kali.</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<p class="errornote">{{ form.non_field_errors|join:" " }}</p>{% endif %}
+      {% for field in form %}
+        <p>
+          <label for="{{ field.id_for_label }}" class="required">{{ field.label }}</label><br>
+          {{ field }}
+          {% if field.errors %}<span class="errorlist">{{ field.errors|join:" " }}</span>{% endif %}
+          {% if field.help_text %}<span class="helptext"><br>{{ field.help_text|safe }}</span>{% endif %}
+        </p>
+      {% endfor %}
+      <div class="submit-row"><input type="submit" class="default" value="Ganti sandi"></div>
+    </form>
+  {% endif %}
+</div>
+{% endblock %}

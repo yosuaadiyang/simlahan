@@ -1,0 +1,43 @@
+{% extends "users/akun_base.html" %}
+{% load panduan %}
+{% block content %}
+<div id="content-main" class="sl-akun">
+  {% if sees_all %}
+    <p>Anda melihat panduan semua peran karena dapat mengelola seluruh sistem.</p>
+  {% elif guides %}
+    <p>Peran Anda: <strong>{{ groups|join:", " }}</strong>. Menu dan halaman yang Anda lihat mengikuti peran ini.</p>
+  {% else %}
+    <p class="errornote">Akun Anda belum memiliki peran, sehingga belum ada menu yang terbuka. Hubungi superuser SimLahan untuk diberi grup peran.</p>
+  {% endif %}
+
+  {% if guides|length > 1 %}
+  <ul class="sl-toc">{% for guide in guides %}<li><a href="#peran-{{ forloop.counter }}">{{ guide.name }}</a></li>{% endfor %}</ul>
+  {% endif %}
+
+  {% for guide in guides %}
+  <section class="sl-role" id="peran-{{ forloop.counter }}">
+    <h2>{{ guide.name }}</h2>
+    <p>{{ guide.summary|sebaris }}</p>
+    <dl class="sl-meta">
+      <dt>Masuk</dt><dd>{{ guide.login|sebaris }}</dd>
+      <dt>Halaman awal</dt><dd>{{ guide.home|sebaris }}</dd>
+      {% if sees_all %}<dt>Akun contoh</dt><dd><code>{{ guide.sample }}</code></dd>{% endif %}
+    </dl>
+    <h3>Menu</h3>
+    <ul>{% for item in guide.menus %}<li>{{ item|sebaris }}</li>{% endfor %}</ul>
+    <h3>Yang bisa dilakukan</h3>
+    <ul>{% for item in guide.can %}<li>{{ item|sebaris }}</li>{% endfor %}</ul>
+    <h3>Batas akses</h3>
+    <ul>{% for item in guide.limits %}<li>{{ item|sebaris }}</li>{% endfor %}</ul>
+  </section>
+  {% endfor %}
+
+  <h2>Dasar penggunaan</h2>
+  <ul>{% for title, text in general_steps %}<li><strong>{{ title }}.</strong> {{ text|sebaris }}</li>{% endfor %}</ul>
+
+  {% if sees_all %}
+  <h2>Menyiapkan akun petugas (superuser)</h2>
+  <ol>{% for step in admin_steps %}<li>{{ step|sebaris }}</li>{% endfor %}</ol>
+  {% endif %}
+</div>
+{% endblock %}

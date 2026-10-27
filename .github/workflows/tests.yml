@@ -199,6 +199,8 @@ jobs:
           check /portal/kalkulator-uwt/ 200
           check /komando/ 302
           check /aset/lapangan/ 302
+          check /akun/panduan/ 302
+          check /akun/sandi/ 302
           check /static/admin/css/base.css 200
           check /v1/ 401
           check /halaman-tidak-ada/ 200

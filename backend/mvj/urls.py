@@ -133,6 +133,7 @@ from plotsearch.views.plot_search import (
     RelatedPlotApplicationViewSet,
     TargetStatusGeneratePDF,
 )
+from users import account_views
 from users.auth_views import (
     LoginOTPView,
     LoginView,
@@ -414,6 +415,8 @@ urlpatterns = [
     path("portal/", include((asetlahan_urls.portal_urlpatterns, "aset_portal"))),
     path("aset/", include(asetlahan_urls.public_urlpatterns)),
     path("komando/", include("operasi.urls")),
+    path("akun/panduan/", account_views.guide, name="akun-panduan"),
+    path("akun/sandi/", account_views.change_password, name="akun-sandi"),
 ]
 
 # Generate a schema

@@ -86,6 +86,16 @@ latar), `batchrun` (penjadwal), `frontend` (nginx + SPA, sekaligus reverse proxy
 
 ## Pengguna & hak akses
 
+**Panduan per peran** (menu, tugas, dan batas akses setiap grup, termasuk Sewa,
+Administrator, dan pemohon portal) ada di [docs/panduan-peran.md](docs/panduan-peran.md)
+dan di dalam aplikasi pada `/akun/panduan/` (tautan *Panduan peran* di menu akun
+aplikasi petugas, bilah atas panel admin, menu pusat komando, dan aplikasi
+lapangan). Petugas melihat panduan perannya sendiri; Administrator melihat
+semua. Petugas mengganti sandinya sendiri di `/akun/sandi/`. Isi panduan
+bersumber dari `backend/users/role_guide.py`; setelah mengubahnya, buat ulang
+dokumen dengan `cd backend && python manage.py panduan_peran > ../docs/panduan-peran.md`
+(uji otomatis gagal bila keduanya tidak sama).
+
 Grup bawaan (atur di `/admin/` → Pengguna):
 
 | Grup | Pengadaan tanah | Data pribadi (NIK/rekening) |
