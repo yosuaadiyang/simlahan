@@ -45,7 +45,6 @@ from alokasi.models import (
     Invoice,
     IssuedDocument,
     LandPlot,
-    PermitReport,
     RequirementDocType,
     ServiceCatalog,
     VerificationCriterion,
@@ -419,9 +418,15 @@ class LandPlotAdmin(PrivateFileAdminMixin, GISModelAdmin):
         description=_("Akhiri sewa (lahan kembali tersedia)"), permissions=["change"]
     )
     def end_lease(self, request, queryset):
-        updated = queryset.filter(status=enums.PlotStatus.LEASED).update(
+        from dokumen.services import end_land_uses_for_plots
+
+        leased = list(
+            queryset.filter(status=enums.PlotStatus.LEASED).values_list("pk", flat=True)
+        )
+        updated = LandPlot.objects.filter(pk__in=leased).update(
             status=enums.PlotStatus.AVAILABLE
         )
+        end_land_uses_for_plots(leased, actor=request.user)
         self.message_user(request, _("%d lahan sewa dikembalikan.") % updated)
 
     def get_urls(self):
@@ -1224,25 +1229,6 @@ class ReportOverdueFilter(admin.SimpleListFilter):
         return queryset
 
 
-class PermitReportInline(ReadOnlyInline):
-    model = PermitReport
-    fields = (
-        "permit_type",
-        "status",
-        "permit_number",
-        "issued_date",
-        "download",
-        "note",
-        "modified_at",
-    )
-    readonly_fields = fields
-    verbose_name_plural = _("Progres perizinan")
-
-    @admin.display(description=_("Dokumen"))
-    def download(self, obj):
-        return file_link("izin", obj)
-
-
 class DevelopmentReportInline(ReadOnlyInline):
     model = DevelopmentReport
     fields = (
@@ -1290,7 +1276,7 @@ class AllocationAdmin(ReadOnlyAdmin):
     )
     list_select_related = ("holder", "plot")
     date_hierarchy = "issued_date"
-    inlines = (AllocationIssuedInline, PermitReportInline, DevelopmentReportInline)
+    inlines = (AllocationIssuedInline, DevelopmentReportInline)
     change_form_template = "admin/alokasi/allocation/change_form.html"
     fields = (
         "kpt_number",
@@ -1307,8 +1293,33 @@ class AllocationAdmin(ReadOnlyAdmin):
         "status",
         "revoked_at",
         "revoke_reason",
+        "permit_documents",
     )
     readonly_fields = fields
+
+    @admin.display(description=_("Dokumen perizinan"))
+    def permit_documents(self, obj):
+        from dokumen.models import LandUse
+
+        land_use = LandUse.objects.filter(allocation=obj).first()
+        if land_use is None:
+            return "–"
+        progress = land_use.progress()
+        label = _("%(number)s · %(done)s/%(required)s dokumen wajib lengkap") % {
+            "number": land_use.number,
+            "done": progress["done"],
+            "required": progress["required"],
+        }
+        from utils.admin_links import current_request
+
+        request = current_request.get()
+        if request is not None and request.user.has_perm("dokumen.view_landuse"):
+            return format_html(
+                '<a href="{}">{}</a>',
+                reverse("admin:dokumen_landuse_change", args=[land_use.pk]),
+                label,
+            )
+        return label
 
     @admin.display(boolean=True, description=_("Lahan tidur"))
     def idle(self, obj):
@@ -1408,40 +1419,6 @@ class IssuedDocumentAdmin(ReadOnlyAdmin):
             reverse("portal:verify_token", args=[obj.token]),
             _("Buka"),
         )
-
-
-@admin.register(PermitReport)
-class PermitReportAdmin(ReadOnlyAdmin):
-    list_display = (
-        "allocation",
-        "permit_type",
-        "status",
-        "permit_number",
-        "issued_date",
-        "modified_at",
-    )
-    list_filter = ("permit_type", "status")
-    search_fields = (
-        "allocation__kpt_number",
-        "allocation__holder__name",
-        "permit_number",
-    )
-    list_select_related = ("allocation", "allocation__holder")
-    fields = (
-        "allocation",
-        "permit_type",
-        "status",
-        "permit_number",
-        "issued_date",
-        "download",
-        "note",
-        "modified_at",
-    )
-    readonly_fields = fields
-
-    @admin.display(description=_("Dokumen"))
-    def download(self, obj):
-        return file_link("izin", obj)
 
 
 @admin.register(DevelopmentReport)

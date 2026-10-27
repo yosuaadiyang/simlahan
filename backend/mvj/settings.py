@@ -224,6 +224,7 @@ INSTALLED_APPS = [
     "alokasi",
     "asetlahan",
     "operasi",
+    "dokumen",
 ]
 
 MIDDLEWARE = [

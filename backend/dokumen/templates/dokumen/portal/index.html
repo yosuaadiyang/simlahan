@@ -1,0 +1,54 @@
+{% extends "alokasi/portal/base.html" %}{% load alokasi_tags static %}
+{% block title %}Dokumen & perizinan{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'dokumen/portal.css' %}">{% endblock %}
+{% block content %}
+<p class="small"><a href="{% url 'portal:dashboard' %}">‹ Akun saya</a></p>
+<h1>Dokumen &amp; perizinan</h1>
+<p class="muted">Pantau kelengkapan dokumen perizinan setiap pemanfaatan lahan Anda, unggah dokumen, tanda tangani dokumen elektronik, dan ajukan izin unduh.</p>
+{% include "dokumen/portal/_nav.html" %}
+
+{% if tasks %}
+<section class="card dk-tasks">
+  <h2>Menunggu tindakan Anda</h2>
+  <ul class="dk-plain">
+    {% for r in tasks %}<li><a class="btn btn-small" href="{% url 'dokumen_portal:sign' r.token %}">{% if r.action == 'tanda_tangan' %}Tanda tangani{% else %}Tinjau &amp; setujui{% endif %}</a> <strong>{{ r.document.title }}</strong> <span class="small muted">{{ r.document.number }}{% if r.document.expires_on %} · batas {{ r.document.expires_on|tanggal }}{% endif %}</span></li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+<section>
+  <h2>Pemanfaatan lahan</h2>
+  {% if land_uses %}
+  <div class="grid grid-2">
+    {% for lu in land_uses %}
+    <a class="card dk-land-card" href="{% url 'dokumen_portal:land_use' lu.number %}">
+      <div class="actions-row" style="justify-content:space-between"><strong>{{ lu.title }}</strong><span class="badge badge-{{ lu.status }}">{{ lu.get_status_display }}</span></div>
+      <div class="small muted">{{ lu.number }} · {{ lu.get_scheme_display }}{% if lu.plot %} · lahan {{ lu.plot.code }}{% endif %}</div>
+      <div class="progress" title="{{ lu.summary.percent }}%"><span style="width:{{ lu.summary.percent }}%"></span></div>
+      <div class="small">{{ lu.summary.done }} dari {{ lu.summary.required }} dokumen wajib lengkap{% if lu.summary.waiting %} · {{ lu.summary.waiting }} menunggu verifikasi{% endif %}{% if lu.summary.revision %} · <strong class="dk-warn">{{ lu.summary.revision }} perlu perbaikan</strong>{% endif %}{% if lu.summary.expired %} · <strong class="dk-danger">{{ lu.summary.expired }} kedaluwarsa</strong>{% endif %}</div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card"><p class="muted">Belum ada pemanfaatan lahan. Daftar dokumen perizinan muncul otomatis setelah alokasi lahan terbit atau kontrak sewa/kerja sama dicatat.</p></div>
+  {% endif %}
+</section>
+
+<div class="grid grid-2" style="margin-top:16px">
+  <section class="card">
+    <h2>Dokumen tanda tangan</h2>
+    <ul class="dk-plain">
+      {% for d in documents %}<li><a href="{% url 'dokumen_portal:signing_detail' d.number %}">{{ d.title }}</a> <span class="badge badge-{{ d.status }}">{{ d.get_status_display }}</span><br><span class="small muted">{{ d.number }}{% if d.sent_at %} · dikirim {{ d.sent_at|date:"d-m-Y" }}{% endif %}</span></li>
+      {% empty %}<li class="muted">Belum ada.</li>{% endfor %}
+    </ul>
+  </section>
+  <section class="card">
+    <h2>Permintaan unduh terbaru</h2>
+    <ul class="dk-plain">
+      {% for r in requests %}<li><strong>{{ r.number }}</strong> · {{ r.target_label }}<br><span class="badge badge-{% if r.is_usable %}disetujui{% elif r.status == 'disetujui' %}berakhir{% else %}{{ r.status }}{% endif %}">{{ r.state_label }}</span>{% if r.is_usable %} <a href="{% url 'dokumen_portal:download' r.number %}">Unduh</a>{% endif %}</li>
+      {% empty %}<li class="muted">Belum ada.</li>{% endfor %}
+    </ul>
+    <p class="small"><a href="{% url 'dokumen_portal:downloads' %}">Semua permintaan unduh ›</a></p>
+  </section>
+</div>
+{% endblock %}

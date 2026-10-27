@@ -1,0 +1,40 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static 'dokumen/admin.css' %}">{% endblock %}
+{% block object-tools-items %}
+  {% if original.pk and is_mine and original.status == 'menunggu' %}<li><form method="post" action="{% url 'admin:dokumen_downloadrequest_cancel' original.pk %}">{% csrf_token %}<button type="submit" class="dk-tool-btn">Batalkan permintaan</button></form></li>{% endif %}
+  {{ block.super }}
+{% endblock %}
+{% block field_sets %}
+{% if original.pk %}
+<div class="module dk-summary">
+  <div class="dk-summary-head">
+    <strong>{{ original.number }}</strong>
+    <span class="dk-status dk-s-{{ original.status }}">{{ original.state_label }}</span>
+    <span class="dk-muted">{{ original.target_label }} · sifat {{ original.get_confidentiality_display|lower }}</span>
+  </div>
+  {% if download_url %}
+  <p><a class="button dk-primary-link" href="{{ download_url }}">Unduh sekarang</a> <span class="dk-muted">Sisa {{ original.remaining }} kali, berlaku s.d. {{ original.valid_until|date:"d-m-Y H.i" }}. Berkas PDF diberi tanda air nama Anda dan setiap unduhan tercatat.</span></p>
+  {% endif %}
+  {% if self_blocked %}<p class="dk-warn-text">Permintaan Anda sendiri harus diputuskan pejabat lain yang berwenang.</p>{% endif %}
+  {% if can_decide %}
+  <h3>Keputusan</h3>
+  <p class="dk-muted">Pemohon: {{ original.requester.get_full_name|default:original.requester }} ({{ original.requester.email }}) · keperluan: {{ original.get_purpose_display }}</p>
+  <div class="dk-reason dk-pre">{{ original.reason }}</div>
+  {% for field in decision_form %}<div class="form-row">{{ field.errors }}<label for="{{ field.id_for_label }}">{{ field.label }}</label> {{ field }}{% if field.help_text %} <span class="help">{{ field.help_text }}</span>{% endif %}</div>{% endfor %}
+  <div class="dk-decide">
+    <button type="submit" class="button default" form="dk-decide" name="decision" value="setuju">Setujui</button>
+    <button type="submit" class="button dk-danger" form="dk-decide" name="decision" value="tolak">Tolak</button>
+  </div>
+  {% endif %}
+  {% if history %}
+  <h3>Riwayat permintaan pemohon ini</h3>
+  <ul class="dk-list">{% for h in history %}<li><a href="{% url 'admin:dokumen_downloadrequest_change' h.pk %}">{{ h.number }}</a> · {{ h.target_label }} · {{ h.state_label }} · {{ h.created_at|date:"d-m-Y" }}</li>{% endfor %}</ul>
+  {% endif %}
+</div>
+{% endif %}
+{{ block.super }}
+{% endblock %}
+{% block content %}{{ block.super }}
+{% if can_decide %}<form id="dk-decide" method="post" action="{% url 'admin:dokumen_downloadrequest_decide' original.pk %}" hidden>{% csrf_token %}</form>{% endif %}
+{% endblock %}

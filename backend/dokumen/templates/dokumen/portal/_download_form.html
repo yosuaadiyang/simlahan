@@ -1,0 +1,8 @@
+<details class="dk-request">
+  <summary>Minta unduh</summary>
+  <form method="post" action="{{ action }}">{% csrf_token %}
+    {% include "alokasi/portal/_form.html" with form=download_form grid_class="dk-form-grid" %}
+    <p class="small muted">Berkas dapat diunduh setelah disetujui petugas berwenang, berlaku terbatas, diberi tanda air nama Anda, dan setiap unduhan tercatat.</p>
+    <button type="submit" class="btn btn-small">Kirim permintaan</button>
+  </form>
+</details>

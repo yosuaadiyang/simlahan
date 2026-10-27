@@ -34,7 +34,6 @@ from alokasi.forms import (
     DevelopmentReportForm,
     DocumentUploadForm,
     PaymentProofForm,
-    PermitReportForm,
     PortalLoginForm,
     RegistrationForm,
     ResendActivationForm,
@@ -56,7 +55,6 @@ from alokasi.models import (
     Invoice,
     IssuedDocument,
     LandPlot,
-    PermitReport,
     RequirementDocType,
     ServiceCatalog,
     VerificationCriterion,
@@ -1100,12 +1098,11 @@ def allocation_detail(request, pk):
     return _render_allocation(request, _own_allocation(request, pk))
 
 
-def _render_allocation(request, allocation, *, permit_form=None, development_form=None):
+def _render_allocation(request, allocation, *, development_form=None):
+    from dokumen.models import LandUse
+
     config = AllocationSettings.load()
-    reports = {r.permit_type: r for r in allocation.permit_reports.all()}
-    permit_rows = [
-        (value, label, reports.get(value)) for value, label in enums.PermitType.choices
-    ]
+    land_use = LandUse.objects.filter(allocation=allocation).first()
     is_active = allocation.status == enums.AllocationStatus.ACTIVE
     open_transfer = allocation.transfer_applications.exclude(
         status__in=enums.FINAL_STATUSES
@@ -1119,11 +1116,12 @@ def _render_allocation(request, allocation, *, permit_form=None, development_for
             allocation.plot.geometry.geojson if allocation.plot.geometry else ""
         ),
         "issued": allocation.issued_documents.all(),
-        "permit_rows": permit_rows,
-        "development_reports": allocation.development_reports.all(),
-        "permit_form": (
-            (permit_form or PermitReportForm(prefix="izin")) if is_active else None
+        "land_use": land_use,
+        "land_use_progress": land_use.progress() if land_use else None,
+        "permit_records": (
+            land_use.records.select_related("permit_type") if land_use else []
         ),
+        "development_reports": allocation.development_reports.all(),
         "development_form": (
             (
                 development_form
@@ -1142,39 +1140,6 @@ def _render_allocation(request, allocation, *, permit_form=None, development_for
         "open_transfer": open_transfer,
     }
     return render(request, "alokasi/portal/allocation_detail.html", context)
-
-
-@applicant_required
-@require_POST
-def permit_report_save(request, pk):
-    allocation = _own_allocation(request, pk)
-    if allocation.status != enums.AllocationStatus.ACTIVE:
-        raise PermissionDenied
-    permit_type = request.POST.get("izin-permit_type", "")
-    instance = PermitReport.objects.filter(
-        allocation=allocation, permit_type=permit_type
-    ).first()
-    old_document = instance.document.name if instance and instance.document else ""
-    form = PermitReportForm(
-        request.POST, request.FILES, prefix="izin", instance=instance
-    )
-    form.instance.allocation = allocation
-    if form.is_valid():
-        report = form.save()
-        if old_document and report.document.name != old_document:
-            report.document.storage.delete(old_document)
-        messages.success(request, _("Laporan perizinan disimpan."))
-    else:
-        # Tampilkan ulang formulir beserta isian dan pesan galat per kolom.
-        return _render_allocation(request, allocation, permit_form=form)
-    return redirect(f"{reverse('portal:allocation_detail', args=[pk])}#perizinan")
-
-
-@applicant_required
-def permit_document(request, pk, report_pk):
-    allocation = _own_allocation(request, pk)
-    report = get_object_or_404(PermitReport, pk=report_pk, allocation=allocation)
-    return serve_file(report.document)
 
 
 @applicant_required

@@ -1,0 +1,48 @@
+/* Modul Dokumen & perizinan — portal pemegang hak & penanda tangan. */
+.dk-plain { list-style: none; margin: 0; padding: 0; }
+.dk-plain li { padding: 8px 0; border-bottom: 1px solid var(--border); overflow-wrap: anywhere; }
+.dk-plain li:last-child { border-bottom: 0; }
+.dk-tasks { border-left: 4px solid var(--primary); margin-bottom: 16px; }
+.dk-land-card { display: block; text-decoration: none; color: inherit; }
+.dk-land-card:hover { border-color: var(--sl-gray-400); }
+.dk-land-card .progress { margin: 10px 0 6px; }
+.dk-warn { color: #92400e; }
+.dk-danger { color: #991b1b; }
+.dk-break { overflow-wrap: anywhere; word-break: break-word; }
+.dk-records { display: grid; gap: 16px; margin: 16px 0; }
+.dk-records > .card + .card { margin-top: 0; }
+.dk-records > * { min-width: 0; }
+.dk-record td .badge { white-space: normal; }
+.dk-record h2 { margin: 0 0 2px; font-size: 1.0625rem; }
+.dk-record-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+.dk-record-head > div { min-width: 0; }
+.dk-props { margin: 12px 0; }
+.dk-request summary { cursor: pointer; color: var(--primary); font-weight: 600; font-size: .875rem; }
+.dk-request[open] { min-width: min(320px, 70vw); }
+.dk-request form { margin-top: 8px; }
+.dk-form-grid { display: grid; gap: 10px; }
+.dk-steps { margin: 0; padding-left: 20px; }
+.dk-step { padding: 6px 0; overflow-wrap: anywhere; }
+.dk-step-selesai::marker { color: #047857; }
+.dk-step-ditolak::marker { color: #b91c1c; }
+.dk-comment { padding: 8px 12px; margin-bottom: 8px; border-radius: var(--sl-radius); background: var(--sl-gray-50); overflow-wrap: anywhere; }
+.dk-timeline { list-style: none; margin: 0; padding: 0; }
+.dk-timeline li { padding: 6px 0 6px 14px; border-left: 2px solid var(--border); overflow-wrap: anywhere; }
+.dk-narrow { max-width: 640px; }
+.dk-inline-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.dk-inline-form input { flex: 1 1 260px; min-width: 0; }
+.dk-paper { padding: 28px 32px; background: #fff; color: #111; border: 1px solid var(--border); border-radius: var(--sl-radius); font-family: Georgia, "Times New Roman", serif; line-height: 1.55; overflow-wrap: anywhere; overflow-x: auto; }
+.dk-paper table { border-collapse: collapse; max-width: 100%; }
+.dk-paper img { max-width: 100%; height: auto; }
+.dk-pdf { width: 100%; height: 70vh; min-height: 420px; border: 1px solid var(--border); border-radius: var(--sl-radius); background: var(--sl-gray-50); }
+.dk-sigpad { margin: 12px 0; }
+.dk-sigpad canvas { display: block; width: 100%; max-width: 600px; aspect-ratio: 3 / 1; height: auto; border: 2px dashed var(--sl-border-strong); border-radius: var(--sl-radius); background: #fff; touch-action: none; cursor: crosshair; }
+.dk-sig-tabs { margin-bottom: 8px; }
+.dk-sig-tabs button { padding: 6px 14px; border: 1px solid var(--border); border-radius: 999px; background: #fff; font: inherit; font-size: .875rem; cursor: pointer; }
+.dk-sig-tabs button.active { background: var(--sl-gray-900); color: #fff; border-color: var(--sl-gray-900); }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+@media (max-width: 600px) {
+  .dk-paper { padding: 16px; }
+  .dk-record-head { flex-direction: column; }
+}
+.dk-sigpad .actions-row { margin-top: 8px; }

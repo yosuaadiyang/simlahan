@@ -22,28 +22,21 @@
     <div class="map map-small" data-map="shape" data-status="dialokasikan" data-geometry="{{ geometry }}" role="region" aria-label="Peta lahan"></div>
 
     <section class="card" id="perizinan" style="margin-top:16px">
-      <h2>Progres perizinan</h2>
-      <div class="table-wrap"><table class="data">
-        <thead><tr><th>Izin</th><th>Status</th><th>Nomor / tanggal</th><th>Dokumen</th></tr></thead>
-        <tbody>{% for value, label, report in permit_rows %}
+      <div class="actions-row" style="justify-content:space-between"><h2 style="margin:0">Dokumen perizinan</h2>{% if land_use %}<a class="btn btn-outline" href="{% url 'dokumen_portal:land_use' land_use.number %}">Kelola dokumen</a>{% endif %}</div>
+      {% if land_use %}
+      <p class="small muted" style="margin-top:8px">{{ land_use_progress.done }} dari {{ land_use_progress.required }} dokumen wajib lengkap{% if land_use_progress.revision %} · <strong>{{ land_use_progress.revision }} perlu perbaikan</strong>{% endif %}{% if land_use_progress.expired %} · <strong>{{ land_use_progress.expired }} kedaluwarsa</strong>{% endif %}.</p>
+      <div class="progress" title="{{ land_use_progress.percent }}%"><span style="width:{{ land_use_progress.percent }}%"></span></div>
+      <div class="table-wrap" style="margin-top:12px"><table class="data">
+        <thead><tr><th>Dokumen</th><th>Status</th><th>Nomor / berlaku</th></tr></thead>
+        <tbody>{% for r in permit_records %}
           <tr>
-            <td>{{ label }}</td>
-            <td>{% if report %}<span class="badge badge-{{ report.status }}">{{ report.get_status_display }}</span>{% else %}<span class="badge">Belum dilaporkan</span>{% endif %}</td>
-            <td>{% if report.permit_number %}{{ report.permit_number }}<br><span class="small muted">{{ report.issued_date|tanggal }}</span>{% else %}-{% endif %}</td>
-            <td>{% if report and report.document %}<a href="{% url 'portal:permit_document' allocation.pk report.pk %}">Unduh</a>{% else %}-{% endif %}</td>
-          </tr>{% endfor %}
+            <td>{{ r.permit_type.name }}{% if not r.permit_type.is_required %} <span class="small muted">(opsional)</span>{% endif %}</td>
+            <td><span class="badge badge-{{ r.status }}">{{ r.get_status_display }}</span></td>
+            <td>{% if r.number %}{{ r.number }}{% else %}-{% endif %}{% if r.expiry_date %}<br><span class="small muted">s.d. {{ r.expiry_date|tanggal }}</span>{% endif %}</td>
+          </tr>{% empty %}<tr><td colspan="3" class="muted">Belum ada daftar dokumen.</td></tr>{% endfor %}
         </tbody>
       </table></div>
-      {% if permit_form %}
-      <details class="panel" style="margin-top:12px"{% if permit_form.errors %} open{% endif %}>
-        <summary>Perbarui status izin</summary>
-        <form method="post" enctype="multipart/form-data" action="{% url 'portal:permit_report_save' allocation.pk %}" style="margin-top:12px">{% csrf_token %}
-          {% include "alokasi/portal/_form.html" with form=permit_form %}
-          <p class="small muted">Laporan untuk jenis izin yang sama akan menggantikan laporan sebelumnya.</p>
-          <button class="btn" type="submit">Simpan laporan izin</button>
-        </form>
-      </details>
-      {% endif %}
+      {% else %}<p class="muted">Daftar dokumen perizinan belum tersedia.</p>{% endif %}
     </section>
 
     <section class="card" id="pembangunan">

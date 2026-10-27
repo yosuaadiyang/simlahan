@@ -152,12 +152,6 @@ urlpatterns = [
     path("dokumen/<uuid:token>/unduh/", views.issued_download, name="issued_download"),
     # Alokasi
     path("alokasi/<int:pk>/", views.allocation_detail, name="allocation_detail"),
-    path("alokasi/<int:pk>/izin/", views.permit_report_save, name="permit_report_save"),
-    path(
-        "alokasi/<int:pk>/izin/<int:report_pk>/dokumen/",
-        views.permit_document,
-        name="permit_document",
-    ),
     path(
         "alokasi/<int:pk>/progres/",
         views.development_report_create,

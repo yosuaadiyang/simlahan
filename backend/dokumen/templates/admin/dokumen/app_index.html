@@ -1,0 +1,19 @@
+{% extends "admin/app_index.html" %}
+{% load static dokumen_tags %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static 'asetlahan/admin.css' %}"><link rel="stylesheet" href="{% static 'dokumen/admin.css' %}">{% endblock %}
+{% block content %}
+<div id="content-main">
+  {% dokumen_shortcuts as shortcuts %}
+  {% if shortcuts %}
+  <div class="module">
+    <table class="simlahan-tools">
+      <caption>Pintasan</caption>
+      {% for item in shortcuts %}
+      <tr><th scope="row"><a href="{{ item.url }}">{{ item.label }}</a>{% if item.count %} <span class="dk-count">{{ item.count }}</span>{% endif %}</th><td>{{ item.description }}</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% endif %}
+  {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
+</div>
+{% endblock %}

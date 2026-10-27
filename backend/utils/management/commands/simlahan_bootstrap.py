@@ -2,8 +2,8 @@
 
 0. Membuat tabel cache bersama bila belum ada.
 1. Memuat data master (fixture) bila basis data masih kosong.
-2. Memastikan grup, jadwal pemantauan alokasi lahan, pengingat aset lahan, dan
-   rekap harian pusat komando ada.
+2. Memastikan grup, jadwal pemantauan alokasi lahan, pengingat aset lahan,
+   rekap harian pusat komando, dan pengingat dokumen & perizinan ada.
 3. Menyetel ulang izin grup (model, kolom, laporan).
 4. Membuat akun admin awal dari variabel lingkungan bila belum ada.
 """
@@ -19,6 +19,7 @@ from django.db import transaction
 
 from alokasi.setup import ensure_groups, ensure_monitoring_job
 from asetlahan.setup import ensure_reminder_job
+from dokumen.setup import ensure_reminder_job as ensure_document_job
 from leasing.models import Municipality, ServiceUnit
 from operasi.setup import ensure_daily_job
 from utils.group_permissions import UserGroup
@@ -56,6 +57,7 @@ class Command(BaseCommand):
             (ensure_monitoring_job, "Jadwal pemantauan alokasi lahan dibuat."),
             (ensure_reminder_job, "Jadwal pengingat aset lahan dibuat."),
             (ensure_daily_job, "Jadwal rekap harian pusat komando dibuat."),
+            (ensure_document_job, "Jadwal pengingat dokumen & perizinan dibuat."),
         ):
             if ensure():
                 self.stdout.write(message)

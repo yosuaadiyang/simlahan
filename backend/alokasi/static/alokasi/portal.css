@@ -266,6 +266,13 @@ form.inline { display: inline; }
 .badge-ditawarkan { background: var(--sl-warning-100); color: #92400e; }
 .badge-diterima, .badge-selesai { background: var(--sl-success-100); color: #065f46; }
 .badge-disewa { background: #fce7f3; color: #9d174d; }
+/* Dokumen & perizinan */
+.badge-terverifikasi { background: var(--sl-success-100); color: #065f46; }
+.badge-kedaluwarsa { background: var(--sl-danger-100); color: #991b1b; }
+.badge-tidak_wajib, .badge-draf { background: var(--sl-gray-100); color: var(--sl-gray-700); }
+.badge-menunggu_persetujuan { background: #ede9fe; color: #5b21b6; }
+.badge-dikirim, .badge-dilihat { background: var(--sl-info-100); color: #1e40af; }
+.badge-menunggu { background: var(--sl-warning-100); color: #92400e; }
 
 /* ------------------------------------------------------------ Tabel & daftar properti */
 .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--sl-radius); background: #fff; }

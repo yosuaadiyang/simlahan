@@ -11,6 +11,7 @@ from rest_framework import permissions, routers
 from alokasi.admin_views import officer_file
 from asetlahan import urls as asetlahan_urls
 from asetlahan.api import urlpatterns as asetlahan_api_urls
+from dokumen import urls as dokumen_urls
 from audittrail.viewsets import AuditTrailView
 from forms.viewsets.form import (
     AnswerOpeningRecordViewset,
@@ -408,11 +409,16 @@ urlpatterns = [
     ),
     path("admin/otp/", officer_otp, name="officer-otp"),
     path("admin/asetlahan/", include(asetlahan_urls.admin_urlpatterns)),
+    path("admin/dokumen/", include(dokumen_urls.admin_urlpatterns)),
     path("admin/", admin.site.urls),
     path("auth/", include(rest_framework.urls)),
     path("oauth/", include("users.oauth_views")),
     path("portal/", include("alokasi.urls")),
     path("portal/", include((asetlahan_urls.portal_urlpatterns, "aset_portal"))),
+    path(
+        "portal/dokumen/",
+        include((dokumen_urls.portal_urlpatterns, "dokumen_portal")),
+    ),
     path("aset/", include(asetlahan_urls.public_urlpatterns)),
     path("komando/", include("operasi.urls")),
     path("akun/panduan/", account_views.guide, name="akun-panduan"),

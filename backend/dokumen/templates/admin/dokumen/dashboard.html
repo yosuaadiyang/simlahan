@@ -1,0 +1,49 @@
+{% extends "admin/dokumen/tool_base.html" %}
+{% load alokasi_tags %}
+{% block tool %}
+<div class="al-kpis">
+  {% if land_uses %}
+  <div class="al-card"><div class="al-kpi">{{ land_uses.active|angka }}</div><div class="al-kpi-label">Pemanfaatan lahan aktif</div></div>
+  <div class="al-card"><div class="al-kpi"><a href="{% url 'admin:dokumen_landuse_changelist' %}?kelengkapan=belum_lengkap">{{ land_uses.incomplete|angka }}</a></div><div class="al-kpi-label">Dokumen wajib belum lengkap</div></div>
+  {% endif %}
+  {% if records %}
+  <div class="al-card"><div class="al-kpi"><a href="{% url 'admin:dokumen_permitrecord_changelist' %}?status__exact=diajukan">{{ records.waiting|angka }}</a></div><div class="al-kpi-label">Menunggu verifikasi</div></div>
+  <div class="al-card"><div class="al-kpi"><a href="{% url 'admin:dokumen_permitrecord_changelist' %}?berlaku=30">{{ records.expiring_30|angka }}</a></div><div class="al-kpi-label">Izin habis ≤ 30 hari · {{ records.expiring_90 }} ≤ 90 hari</div></div>
+  <div class="al-card"><div class="al-kpi"><a href="{% url 'admin:dokumen_permitrecord_changelist' %}?status__exact=kedaluwarsa">{{ records.expired|angka }}</a></div><div class="al-kpi-label">Izin kedaluwarsa</div></div>
+  {% endif %}
+  {% if signing %}
+  <div class="al-card"><div class="al-kpi"><a href="{% url 'admin:dokumen_signingdocument_changelist' %}?status__in=dikirim,dilihat">{{ signing.open|angka }}</a></div><div class="al-kpi-label">Menunggu tanda tangan · {{ signing.completed_month }} selesai bulan ini{% if signing.avg_days is not None %} · rata-rata {{ signing.avg_days }} hari{% endif %}</div></div>
+  {% endif %}
+  {% if downloads %}
+  <div class="al-card"><div class="al-kpi">{% if downloads.pending_mine is not None %}<a href="{% url 'admin:dokumen_downloadrequest_changelist' %}?saya=putuskan">{{ downloads.pending_mine|angka }}</a>{% else %}{{ downloads.pending|angka }}{% endif %}</div><div class="al-kpi-label">{% if downloads.pending_mine is not None %}Permintaan unduh menunggu keputusan Anda{% else %}Permintaan unduh menunggu{% endif %}</div></div>
+  <div class="al-card"><div class="al-kpi">{{ downloads.downloads_30|angka }}</div><div class="al-kpi-label">Unduhan 30 hari · {{ downloads.approved_30 }} disetujui · {{ downloads.rejected_30 }} ditolak</div></div>
+  {% endif %}
+</div>
+
+{% if my_tasks %}
+<div class="al-card dk-tasks">
+  <h2>Menunggu tanda tangan Anda</h2>
+  <ul>{% for r in my_tasks %}<li><a href="{% url 'dokumen_portal:sign' r.token %}">{{ r.document.number }} – {{ r.document.title }}</a> <span class="al-muted">({{ r.get_action_display }})</span></li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+<div class="al-grid">
+  {% if records %}
+  <div class="al-card"><h2>Dokumen perizinan per status</h2>{% include "admin/asetlahan/_bars.html" with bars=records.bars %}</div>
+  <div class="al-card"><h2>Antrean verifikasi</h2>
+    {% for r in records.queue %}<div class="al-alert"><span><a href="{% url 'admin:dokumen_permitrecord_change' r.pk %}">{{ r.permit_type.name }}</a><br><span class="al-muted">{{ r.land_use.number }} · {{ r.land_use.holder_display }} · sejak {{ r.modified_at|date:"d-m-Y" }}</span></span></div>{% empty %}<p class="al-muted">Tidak ada antrean.</p>{% endfor %}
+  </div>
+  <div class="al-card"><h2>Izin segera habis (≤ 60 hari)</h2>
+    {% for r in records.soon %}<div class="al-alert warn"><span><a href="{% url 'admin:dokumen_permitrecord_change' r.pk %}">{{ r.permit_type.name }}</a><br><span class="al-muted">{{ r.land_use.number }} · {{ r.land_use.holder_display }}</span></span><span class="count">{{ r.expiry_date|date:"d-m-Y" }}</span></div>{% empty %}<p class="al-muted">Tidak ada.</p>{% endfor %}
+  </div>
+  {% endif %}
+  {% if land_uses %}<div class="al-card"><h2>Pemanfaatan aktif per skema</h2>{% include "admin/asetlahan/_bars.html" with bars=land_uses.bars %}</div>{% endif %}
+  {% if signing %}<div class="al-card"><h2>Dokumen tanda tangan per status</h2>{% include "admin/asetlahan/_bars.html" with bars=signing.bars %}</div>{% endif %}
+  {% if activities %}
+  <div class="al-card"><h2>Aktivitas terbaru</h2>
+    {% for a in activities %}<div class="dk-activity"><span class="al-muted">{{ a.created_at|date:"d-m H.i" }}</span> <strong>{{ a.actor_name }}</strong> · {{ a.get_action_display }}{% if a.signing %} · {{ a.signing.number }}{% elif a.record %} · {{ a.record.permit_type.name }}{% elif a.land_use %} · {{ a.land_use.number }}{% endif %}</div>{% endfor %}
+    <p><a href="{% url 'admin:dokumen_activity_changelist' %}">Semua aktivitas ›</a></p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

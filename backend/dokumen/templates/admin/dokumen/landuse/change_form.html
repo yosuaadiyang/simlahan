@@ -1,0 +1,34 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static 'dokumen/admin.css' %}">{% endblock %}
+{% block object-tools-items %}
+  {% if original.pk %}
+  {% if can_add_record %}<li><a href="{% url 'admin:dokumen_landuse_add_record' original.pk %}">Tambah dokumen ke daftar</a></li>{% endif %}
+  {% if can_sign %}<li><a href="{% url 'admin:dokumen_signingdocument_add' %}?pemanfaatan={{ original.pk }}">Buat dokumen tanda tangan</a></li>{% endif %}
+  {% if original.allocation_id and perms.alokasi.view_allocation %}<li><a href="{% url 'admin:alokasi_allocation_change' original.allocation_id %}">Lihat alokasi</a></li>{% endif %}
+  {% if original.investment_id and perms.alokasi.view_investmentrequest %}<li><a href="{% url 'admin:alokasi_investmentrequest_change' original.investment_id %}">Lihat permintaan investasi</a></li>{% endif %}
+  {% endif %}
+  {{ block.super }}
+{% endblock %}
+{% block field_sets %}
+{% if original.pk and progress %}
+<div class="module dk-summary">
+  <div class="dk-summary-head">
+    <strong>Kelengkapan dokumen wajib: {{ progress.done }}/{{ progress.required }} ({{ progress.percent }}%)</strong>
+    <span class="dk-chips">
+      {% if progress.waiting %}<a class="dk-chip info" href="{% url 'admin:dokumen_permitrecord_changelist' %}?land_use__exact={{ original.pk }}&amp;status__exact=diajukan">{{ progress.waiting }} menunggu verifikasi</a>{% endif %}
+      {% if progress.revision %}<span class="dk-chip warn">{{ progress.revision }} perlu perbaikan</span>{% endif %}
+      {% if progress.expired %}<span class="dk-chip danger">{{ progress.expired }} kedaluwarsa</span>{% endif %}
+    </span>
+  </div>
+  <div class="dk-progress" role="progressbar" aria-valuenow="{{ progress.percent }}" aria-valuemin="0" aria-valuemax="100"><span style="width:{{ progress.percent }}%"></span></div>
+  {% if signing_documents %}
+  <h3>Dokumen tanda tangan</h3>
+  <ul class="dk-list">
+    {% for d in signing_documents %}<li><a href="{% url 'admin:dokumen_signingdocument_change' d.pk %}">{{ d.number }} – {{ d.title }}</a> <span class="dk-status dk-s-{{ d.status }}">{{ d.get_status_display }}</span></li>{% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% endif %}
+{{ block.super }}
+{% endblock %}
