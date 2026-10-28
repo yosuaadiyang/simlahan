@@ -130,7 +130,9 @@ def applicant_required(view):
     def wrapper(request, *args, **kwargs):
         if not request.user.is_authenticated:
             login_url = reverse("portal:login")
-            return redirect(f"{login_url}?next={request.get_full_path()}")
+            return redirect(
+                f"{login_url}?{urlencode({'next': request.get_full_path()})}"
+            )
         applicant = getattr(request.user, "pemohon", None)
         if applicant is None:
             return render(request, "alokasi/portal/not_applicant.html", status=403)

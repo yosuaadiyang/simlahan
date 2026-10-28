@@ -607,3 +607,12 @@ def test_logout_by_typed_address_redirects_without_logging_out(client, applicant
     response = client.post(reverse("portal:logout"))
     assert response.status_code == 302
     assert client.get(reverse("portal:dashboard")).status_code == 302
+
+
+@pytest.mark.django_db
+def test_login_redirect_keeps_full_query(client):
+    response = client.get("/portal/investasi/ajukan/?lahan=A-1&skema=sewa")
+    assert response.status_code == 302
+    assert response.url == (
+        "/portal/masuk/?next=%2Fportal%2Finvestasi%2Fajukan%2F%3Flahan%3DA-1%26skema%3Dsewa"
+    )

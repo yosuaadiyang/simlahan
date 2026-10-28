@@ -9,7 +9,7 @@ from django.db.models import Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.utils.http import content_disposition_header
+from django.utils.http import content_disposition_header, urlencode
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods, require_POST
 
@@ -456,7 +456,7 @@ def _gate(request, recipient):
             if recipient.user.is_staff
             else reverse("portal:login")
         )
-        return redirect(f"{login}?next={request.get_full_path()}")
+        return redirect(f"{login}?{urlencode({'next': request.get_full_path()})}")
     if request.user.pk != recipient.user_id:
         return render(
             request,
