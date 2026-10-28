@@ -229,6 +229,7 @@ pelepasan hak hanya bisa dicatat setelah ganti kerugian lunas atau dititipkan.
 | `OFFICER_UI_URL` | Alamat publik, mis. `https://domain-anda`; dipakai untuk tautan surel portal dan kode QR KPT/PPT |
 | `JWT_ACCESS_TOKEN_MINUTES`, `JWT_REFRESH_TOKEN_HOURS` | Masa berlaku sesi |
 | `SECURE_HSTS_SECONDS` | HSTS (detik) bila HTTPS tidak mengaturnya sendiri; bawaan `0` (mati). Aktifkan hanya bila seluruh situs sudah lewat HTTPS |
+| `FLAG_FILE_SCAN`, `FILE_SCAN_SERVICE_URL` | Pindai virus berkas unggahan (termasuk unggahan publik portal) lewat layanan REST ClamAV; berkas terinfeksi dihapus dan unduhan ditahan sampai lolos pindai. Bawaan mati — disarankan aktif di produksi |
 | `OFFICER_OTP_REQUIRED` | `1` = petugas wajib memasukkan kode OTP surel setiap masuk |
 | `MAP_EXTRA_BASEMAPS` | Peta dasar tambahan (JSON), mis. citra berlisensi milik instansi |
 | `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL` | Asisten AI & pembacaan dokumen pindaian (opsional) |
