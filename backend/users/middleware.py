@@ -56,9 +56,11 @@ class OfficerOTPMiddleware:
         return request.session.get(otp.SESSION_KEY) != user.pk
 
 
-# Halaman login sesi (panel admin & API yang dapat dijelajah). Login JWT
-# /v1/auth/login/ sudah dibatasi oleh ScopedRateThrottle DRF.
-SESSION_LOGIN_PATHS = ("/admin/login/", "/auth/login/")
+# Halaman login sesi (panel admin, API yang dapat dijelajah, portal pemohon).
+# Login JWT /v1/auth/login/ sudah dibatasi oleh ScopedRateThrottle DRF. Portal
+# ikut dibatasi per akun: formulirnya baru menolak akun petugas setelah sandi
+# terbukti benar, jadi tanpa batas ini sandi petugas bisa ditebak lewat portal.
+SESSION_LOGIN_PATHS = ("/admin/login/", "/auth/login/", "/portal/masuk/")
 
 
 class LoginThrottleMiddleware:

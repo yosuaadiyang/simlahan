@@ -12,8 +12,9 @@ black==26.3.1
     # via -r requirements-dev.in
 blessed==1.38.0
     # via -r requirements-dev.in
-certifi==2025.10.5
+certifi==2026.10.23
     # via
+    #   -c constraints.txt
     #   -c requirements.txt
     #   requests
 charset-normalizer==3.3.2
@@ -118,8 +119,9 @@ requests==2.34.2
     # via
     #   -c requirements.txt
     #   djangorestframework-stubs
-sqlparse==0.5.0
+sqlparse==0.6.0
     # via
+    #   -c constraints.txt
     #   -c requirements.txt
     #   django
     #   django-debug-toolbar
@@ -144,7 +146,7 @@ typing-extensions==4.15.0
     #   djangorestframework-stubs
     #   mypy
     #   pytest-factoryboy
-urllib3==2.5.0
+urllib3==2.8.0
     # via
     #   -c constraints.txt
     #   -c requirements.txt

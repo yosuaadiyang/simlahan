@@ -232,17 +232,21 @@ def test_throttle_per_visitor_behind_proxy(client, seeded, settings, hops, chain
     data = {"username": "x@y.id", "password": "salah"}
     url = reverse("portal:login")
 
-    def post(ip, prefix=""):
+    def post(ip, prefix="", username="x@y.id"):
         forwarded = prefix + chain.format(ip=ip)
-        return client.post(url, data, HTTP_X_FORWARDED_FOR=forwarded).status_code
+        return client.post(
+            url, {**data, "username": username}, HTTP_X_FORWARDED_FOR=forwarded
+        ).status_code
 
     for _ in range(10):
         assert post("203.0.113.5") == 200
     assert post("203.0.113.5") == 429
     # Alamat palsu di depan rantai tidak bisa dipakai untuk mengelak.
     assert post("203.0.113.5", prefix="198.51.100.1, ") == 429
-    # Pengunjung lain tidak ikut terblokir.
-    assert post("203.0.113.9") == 200
+    # Pengunjung lain (akun lain) tidak ikut terblokir. Akun yang sama tetap
+    # tertahan dari alamat mana pun (batas per akun, lihat users.middleware).
+    assert post("203.0.113.9", username="lain@y.id") == 200
+    assert post("203.0.113.9") == 429
 
 
 def test_client_ip_hop_count_bounds(rf, settings):

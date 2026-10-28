@@ -467,6 +467,28 @@ def _gate(request, recipient):
     return None
 
 
+# Penerima tanpa akun membuktikan diri dengan OTP surel. Bukti itu berlaku
+# untuk peramban yang memasukkan kode saja: tanpa ikatan sesi, siapa pun yang
+# memegang tautan (mis. surel yang diteruskan) dapat ikut menandatangani
+# selama masa berlaku OTP setelah pemilik aslinya memasukkan kode.
+OTP_SESSION_KEY = "dokumen_otp_penerima"
+
+
+def _otp_ok(request, recipient) -> bool:
+    if not recipient.needs_otp:
+        return True
+    return signing.otp_ok(recipient) and str(recipient.pk) in request.session.get(
+        OTP_SESSION_KEY, []
+    )
+
+
+def _remember_otp(request, recipient) -> None:
+    verified = [
+        pk for pk in request.session.get(OTP_SESSION_KEY, []) if pk != str(recipient.pk)
+    ]
+    request.session[OTP_SESSION_KEY] = (verified + [str(recipient.pk)])[-20:]
+
+
 def _mask_email(email: str) -> str:
     name, _at, domain = email.partition("@")
     return f"{name[:2]}{'*' * max(len(name) - 2, 1)}@{domain}"
@@ -474,7 +496,7 @@ def _mask_email(email: str) -> str:
 
 def _sign_context(request, recipient, **extra):
     document = recipient.document
-    verified = signing.otp_ok(recipient)
+    verified = _otp_ok(request, recipient)
     return {
         "recipient": recipient,
         "document": document,
@@ -507,6 +529,7 @@ def _sign_send_code(request, recipient):
 def _sign_check_code(request, recipient):
     form = OtpForm(request.POST)
     if form.is_valid() and signing.check_otp(recipient, form.cleaned_data["code"]):
+        _remember_otp(request, recipient)
         messages.success(request, _("Kode cocok. Silakan tinjau dokumen."))
         return None
     form.add_error(None, _("Kode salah atau kedaluwarsa. Minta kode baru bila perlu."))
@@ -573,7 +596,7 @@ def _sign_post(request, recipient):
         return SIGN_OTP_ACTIONS[action](request, recipient)
     if action not in SIGN_ACTIONS:
         raise PermissionDenied
-    if not signing.otp_ok(recipient):
+    if not _otp_ok(request, recipient):
         raise ValidationError(_("Masukkan kode verifikasi yang dikirim ke surel Anda."))
     return SIGN_ACTIONS[action](request, recipient)
 
@@ -603,7 +626,7 @@ def sign(request, token):
             return redirect("dokumen_portal:sign", token=token)
         extra = failed
         recipient.refresh_from_db()
-    elif signing.otp_ok(recipient):
+    elif _otp_ok(request, recipient):
         signing.record_view(recipient, request=request)
         recipient.refresh_from_db()
     return render(
@@ -623,7 +646,7 @@ def sign_pdf(request, token):
     if (
         document.source != enums.SigningSource.PDF
         or not document.source_file
-        or not signing.otp_ok(recipient)
+        or not _otp_ok(request, recipient)
         or document.status not in enums.OPEN_SIGNING_STATUSES
     ):
         raise Http404
