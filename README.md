@@ -106,6 +106,20 @@ latar), `batchrun` (penjadwal), `frontend` (nginx + SPA, sekaligus reverse proxy
    (`-T` wajib: tanpa itu keluaran melewati TTY dan berkas cadangan bisa rusak).
 5. Perbarui daftar hari libur setiap tahun di **Pengadaan Tanah → Kalender &
    aturan tenggat** sesuai SKB 3 Menteri.
+6. **Sebelum dibuka untuk publik**, hapus akun & data contoh lalu periksa
+   kesiapan:
+
+   ```bash
+   docker compose exec backend python manage.py hapus_data_contoh
+   docker compose exec backend python manage.py cek_produksi
+   ```
+
+   `cek_produksi` menolak (kode keluar 1) bila masih ada akun contoh aktif,
+   lahan contoh di peta publik, `DEBUG` aktif, surel belum SMTP, alamat publik
+   atau cookie aman belum benar, dan memperingatkan data contoh lain, sandi
+   admin awal, serta pemindaian virus yang mati. Data kerja nyata tidak
+   disentuh `hapus_data_contoh`; lahan contoh yang sudah dipakai permohonan
+   dilewati dan disebutkan.
 
 ## Pengguna & hak akses
 

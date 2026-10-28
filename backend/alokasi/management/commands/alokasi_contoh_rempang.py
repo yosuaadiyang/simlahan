@@ -247,16 +247,17 @@ class Command(BaseCommand):
     @transaction.atomic
     def handle(self, *args, **options):
         if options["hapus"]:
-            plots = LandPlot.objects.filter(
-                code__startswith=PREFIX,
+            samples = LandPlot.objects.filter(code__startswith=PREFIX)
+            plots = samples.filter(
                 applications__isnull=True,
                 investment_requests__isnull=True,
                 investment_offers__isnull=True,
+                land_uses__isnull=True,
             )
-            count = plots.count()
-            LandPlot.objects.filter(
-                pk__in=list(plots.values_list("pk", flat=True))
-            ).delete()
+            pks = list(plots.values_list("pk", flat=True).distinct())
+            kept = samples.exclude(pk__in=pks).count()
+            LandPlot.objects.filter(pk__in=pks).delete()
+            count = len(pks)
             zones = (
                 InvestmentZone.objects.filter(slug__in=ZONES)
                 .delete()[1]
@@ -267,6 +268,14 @@ class Command(BaseCommand):
                     f"{count} lahan contoh dan {zones} kawasan contoh dihapus."
                 )
             )
+            if kept:
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"{kept} lahan contoh dilewati karena masih dipakai permohonan, "
+                        "permintaan investasi, atau pemanfaatan lahan (hapus "
+                        "dokumen_contoh_rempang --hapus dahulu bila itu data contoh)."
+                    )
+                )
             return
         zones = {}
         for slug, data in ZONES.items():

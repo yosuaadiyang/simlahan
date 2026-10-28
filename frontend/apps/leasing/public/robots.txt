@@ -1,0 +1,16 @@
+# Hanya portal publik yang boleh diindeks mesin pencari. Aplikasi petugas,
+# panel admin, API, dan halaman pribadi portal (akun, dokumen, tanda tangan,
+# tagihan) tidak.
+User-agent: *
+Allow: /portal/
+Disallow: /portal/akun/
+Disallow: /portal/alokasi/
+Disallow: /portal/aktivasi/
+Disallow: /portal/dokumen/
+Disallow: /portal/investasi/permintaan/
+Disallow: /portal/investasi/tersimpan/
+Disallow: /portal/keluar/
+Disallow: /portal/lupa-sandi/
+Disallow: /portal/masuk/
+Disallow: /portal/tagihan/
+Disallow: /
