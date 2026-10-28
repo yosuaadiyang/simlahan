@@ -60,3 +60,22 @@ def test_reminder_command_runs_on_empty_db(dokumen_seeded):
     out = io.StringIO()
     call_command("dokumen_pengingat", stdout=out)
     assert "Izin kedaluwarsa hari ini: 0" in out.getvalue()
+
+
+def test_sample_plots_used_by_sample_land_uses_delete_cleanly(
+    dokumen_seeded, make_officer
+):
+    from alokasi.models import LandPlot
+    from utils.group_permissions import UserGroup
+
+    make_officer("contoh.alokasi", UserGroup.PETUGAS_ALOKASI)
+    out = io.StringIO()
+    call_command("alokasi_contoh_rempang", stdout=out)
+    call_command("dokumen_contoh_rempang", stdout=out)
+    assert LandUse.objects.filter(plot__code__startswith="CONTOH-RMP-").exists()
+    # Urutan salah tidak lagi berakhir galat: lahan yang dipakai dilewati.
+    call_command("alokasi_contoh_rempang", "--hapus", stdout=out)
+    assert "dilewati" in out.getvalue()
+    call_command("hapus_data_contoh", stdout=out)
+    assert not LandPlot.objects.filter(code__startswith="CONTOH-RMP-").exists()
+    assert not LandUse.objects.filter(reference__startswith="CONTOH-DOK-").exists()
