@@ -1,0 +1,7 @@
+{% load alokasi_tags %}{% for a in allocations %}{% if a.report_due or a.is_idle %}
+<div class="alert {% if a.is_idle %}alert-danger{% else %}alert-warn{% endif %}">
+  {% if a.is_idle %}<strong>Peringatan lahan tidur:</strong> pembangunan di lahan {{ a.plot.code }} ({{ a.kpt_number }}) belum dimulai melewati batas {{ a.idle_deadline|tanggal }}.
+  {% else %}<strong>Laporan jatuh tempo:</strong> kirim laporan progres untuk {{ a.kpt_number }}.{% endif %}
+  <a href="{% url 'portal:allocation_detail' a.pk %}">Buka</a>
+</div>
+{% endif %}{% endfor %}

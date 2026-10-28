@@ -52,6 +52,7 @@ from alokasi.models import (
 )
 from alokasi.monitoring import idle_queryset, overdue_report_allocations
 from file_operations.private_files import PrivateFileField
+from utils.admin_links import current_request
 
 S = enums.ApplicationStatus
 
@@ -612,35 +613,57 @@ class ApplicantAdmin(admin.ModelAdmin):
         "email_display",
         "phone",
         "nib",
+        "is_investor",
         "account_active",
         "created_at",
     )
-    list_filter = ("applicant_type", "user__is_active")
+    list_filter = ("is_investor", "applicant_type", "capital_origin", "user__is_active")
     search_fields = ("name", "nib", "npwp", "pic_name", "user__email", "phone")
     readonly_fields = (
         "user",
         "email_display",
         "account_active",
+        "investment_requests_link",
         "created_at",
         "modified_at",
     )
     actions = ("activate_accounts", "deactivate_accounts")
-    fields = (
-        "user",
-        "email_display",
-        "account_active",
-        "applicant_type",
-        "name",
-        "nib",
-        "npwp",
-        "nik",
-        "pic_name",
-        "pic_position",
-        "phone",
-        "address",
-        "city",
-        "created_at",
-        "modified_at",
+    filter_horizontal = ("interest_sectors",)
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    "user",
+                    "email_display",
+                    "account_active",
+                    "applicant_type",
+                    "name",
+                    "nib",
+                    "npwp",
+                    "nik",
+                    "pic_name",
+                    "pic_position",
+                    "phone",
+                    "address",
+                    "city",
+                )
+            },
+        ),
+        (
+            _("Profil investor"),
+            {
+                "fields": (
+                    "is_investor",
+                    "interest_sectors",
+                    "capital_origin",
+                    "origin_country",
+                    "website",
+                    "investment_requests_link",
+                )
+            },
+        ),
+        (None, {"fields": ("created_at", "modified_at")}),
     )
 
     def has_add_permission(self, request):
@@ -663,6 +686,29 @@ class ApplicantAdmin(admin.ModelAdmin):
     )
     def account_active(self, obj):
         return obj.user.is_active
+
+    @admin.display(description=_("Permintaan investasi"))
+    def investment_requests_link(self, obj):
+        if obj.pk is None:
+            return "-"
+        count = obj.investment_requests.count()
+        if not count:
+            return _("Belum ada")
+        label = _("%d permintaan") % count
+        if not self._can_view_investments(obj):
+            return label
+        return format_html(
+            '<a href="{}?applicant__id__exact={}">{}</a>',
+            reverse("admin:alokasi_investmentrequest_changelist"),
+            obj.pk,
+            label,
+        )
+
+    def _can_view_investments(self, obj):
+        request = current_request.get()
+        return request is not None and request.user.has_perm(
+            "alokasi.view_investmentrequest"
+        )
 
     @admin.action(description=_("Aktifkan akun"), permissions=["change"])
     def activate_accounts(self, request, queryset):

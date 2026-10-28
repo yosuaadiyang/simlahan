@@ -10,6 +10,7 @@ from django.db.models import Count, Prefetch, Q, Sum
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
@@ -37,6 +38,7 @@ from alokasi.views import (
     _throttled,
     _too_many,
     applicant_required,
+    register,
     serve_file,
 )
 
@@ -291,6 +293,11 @@ def plot_profile_pdf(request, code):
 # --------------------------------------------------------------------------
 
 
+def investor_register(request):
+    """Pendaftaran akun investor: akun pemohon dengan profil investor."""
+    return register(request, investor=True)
+
+
 def _own_request(request, number) -> InvestmentRequest:
     return get_object_or_404(
         InvestmentRequest.objects.select_related(
@@ -299,6 +306,18 @@ def _own_request(request, number) -> InvestmentRequest:
         number=number,
         applicant=request.applicant,
     )
+
+
+def _initial_from_profile(applicant) -> dict:
+    """Isi awal dari profil investor; tautan peta/lahan/kawasan menimpanya."""
+    initial = {
+        "capital_origin": applicant.capital_origin,
+        "origin_country": applicant.origin_country,
+    }
+    sectors = [s.pk for s in applicant.interest_sectors.all() if s.is_active]
+    if len(sectors) == 1:
+        initial["sector"] = sectors[0]
+    return initial
 
 
 def _initial_from_query(params) -> dict:
@@ -334,7 +353,10 @@ def _initial_from_query(params) -> dict:
 
 @applicant_required
 def request_create(request):
-    initial = _initial_from_query(request.GET)
+    initial = {
+        **_initial_from_profile(request.applicant),
+        **_initial_from_query(request.GET),
+    }
     form = InvestmentRequestForm(
         request.POST or None, request.FILES or None, initial=initial
     )
@@ -535,20 +557,57 @@ def saved_list(request):
 
 
 def investment_summary(applicant):
-    """Ringkasan untuk dasbor akun pemohon."""
+    """Ringkasan untuk dasbor akun pemohon/investor."""
     requests = list(
-        applicant.investment_requests.select_related("sector").prefetch_related(
-            Prefetch("plots", queryset=LandPlot.objects.only("code"))
-        )[:20]
+        applicant.investment_requests.select_related(
+            "sector", "application"
+        ).prefetch_related(Prefetch("plots", queryset=LandPlot.objects.only("code")))[
+            :20
+        ]
     )
+    saved = list(
+        applicant.saved_plots.select_related(
+            "plot", "plot__sector", "plot__zone"
+        ).filter(plot__is_published=True)[:12]
+    )
+    now = timezone.now()
     return {
         "investment_requests": requests,
+        "active_investments": applicant.investment_requests.exclude(
+            status__in=enums.INVESTMENT_FINAL_STATUSES
+        ).count(),
         "pending_offers": [
             r for r in requests if r.status == enums.InvestmentStatus.OFFERED
         ],
-        "saved_plots": list(
-            applicant.saved_plots.select_related("plot", "plot__sector").filter(
-                plot__is_published=True
-            )[:12]
+        "upcoming_meetings": sorted(
+            (
+                r
+                for r in requests
+                if r.status == enums.InvestmentStatus.CONSULTATION
+                and r.meeting_at
+                and r.meeting_at >= now
+            ),
+            key=lambda r: r.meeting_at,
         ),
+        "saved_plots": saved,
+        "saved_codes": [item.plot.code for item in saved],
     }
+
+
+def recommended_plots(applicant, exclude_codes, limit: int = 6) -> list[LandPlot]:
+    """Lahan siap investasi yang cocok dengan sektor minat investor; tanpa minat
+    sektor, lahan unggulan. Lahan yang sudah disimpan atau sedang diminta tidak
+    diulang."""
+    plots = _investable(_public_plots()).exclude(code__in=exclude_codes)
+    requested = (
+        applicant.investment_requests.exclude(
+            status__in=enums.INVESTMENT_FINAL_STATUSES
+        )
+        .exclude(plots=None)
+        .values("plots")
+    )
+    plots = plots.exclude(pk__in=requested)
+    sectors = applicant.interest_sectors.filter(is_active=True)
+    if sectors.exists():
+        plots = plots.filter(sector__in=sectors)
+    return list(plots.order_by("-is_featured", "-created_at", "code")[:limit])

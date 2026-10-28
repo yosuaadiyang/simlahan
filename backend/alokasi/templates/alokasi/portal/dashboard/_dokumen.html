@@ -1,0 +1,8 @@
+{% load alokasi_tags %}<section class="card">
+  <div class="actions-row" style="justify-content:space-between"><h2 style="margin:0">Dokumen &amp; perizinan</h2><a class="small" href="{% url 'dokumen_portal:index' %}">Buka ›</a></div>
+  {% if dokumen.land_uses %}
+  <p class="small" style="margin:8px 0 0">{{ dokumen.land_uses }} pemanfaatan lahan{% if dokumen.missing %} · {{ dokumen.missing }} dokumen wajib belum diunggah{% endif %}{% if dokumen.downloads_ready %} · {{ dokumen.downloads_ready }} unduhan siap{% endif %}. Pantau status, unggah dokumen, tanda tangani dokumen elektronik, dan ajukan izin unduh.</p>
+  {% else %}
+  <p class="small muted" style="margin:8px 0 0">Daftar dokumen perizinan muncul otomatis setelah alokasi lahan terbit atau kontrak sewa/kerja sama dicatat.</p>
+  {% endif %}
+</section>

@@ -747,6 +747,33 @@ class Applicant(TimeStampedModel):
     city = models.CharField(
         verbose_name=_("Kota"), max_length=128, blank=True, default=""
     )
+    # Profil investor: dasbor portal mendahulukan peluang & permintaan investasi.
+    is_investor = models.BooleanField(
+        verbose_name=_("Akun investor"),
+        default=False,
+        help_text=_(
+            "Dasbor portal mendahulukan permintaan investasi, penawaran, dan lahan "
+            "yang sesuai minat. Otomatis aktif saat mengajukan minat investasi."
+        ),
+    )
+    interest_sectors = models.ManyToManyField(
+        InvestmentSector,
+        verbose_name=_("Sektor usaha yang diminati"),
+        blank=True,
+        related_name="interested_applicants",
+    )
+    capital_origin = models.CharField(
+        verbose_name=_("Asal modal"),
+        max_length=8,
+        choices=enums.CapitalOrigin.choices,
+        default=enums.CapitalOrigin.DOMESTIC,
+    )
+    origin_country = models.CharField(
+        verbose_name=_("Negara asal investor"), max_length=100, blank=True, default=""
+    )
+    website = models.URLField(
+        verbose_name=_("Situs web perusahaan"), max_length=255, blank=True, default=""
+    )
 
     class Meta:
         verbose_name = _("Pemohon")

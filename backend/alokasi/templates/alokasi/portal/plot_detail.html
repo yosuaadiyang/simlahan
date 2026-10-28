@@ -119,6 +119,7 @@
           <div class="actions-row">
             <a class="btn" href="{% url 'portal:login' %}?next={{ request.get_full_path|urlencode }}">Masuk</a>
             <a class="btn btn-outline" href="{% url 'portal:register' %}">Daftar</a>
+            <a class="btn btn-outline" href="{% url 'portal:investor_register' %}">Daftar sebagai investor</a>
           </div>
         {% endif %}
       {% elif not plot.is_available %}

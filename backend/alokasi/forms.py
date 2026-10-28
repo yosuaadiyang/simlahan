@@ -13,6 +13,7 @@ from alokasi.models import (
     Application,
     ApplicationDocument,
     DevelopmentReport,
+    InvestmentSector,
     Invoice,
     RequirementDocType,
     VerificationCriterion,
@@ -25,6 +26,16 @@ DATE_INPUT = forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d")
 
 def _normalize_email(value: str) -> str:
     return (value or "").strip().lower()
+
+
+# Profil investor; pendaftaran pemohon biasa tidak menampilkannya.
+INVESTOR_FIELDS = (
+    "is_investor",
+    "interest_sectors",
+    "capital_origin",
+    "origin_country",
+    "website",
+)
 
 
 class ApplicantProfileForm(forms.ModelForm):
@@ -41,15 +52,34 @@ class ApplicantProfileForm(forms.ModelForm):
             "phone",
             "address",
             "city",
-        )
+        ) + INVESTOR_FIELDS
         widgets = {
             "address": forms.Textarea(attrs={"rows": 3}),
             "nik": forms.TextInput(attrs={"maxlength": 16, "inputmode": "numeric"}),
+            "interest_sectors": forms.CheckboxSelectMultiple,
+            "website": forms.URLInput(attrs={"placeholder": "https://"}),
         }
         help_texts = {
             "nib": _("Wajib untuk badan usaha (Nomor Induk Berusaha dari OSS)."),
             "nik": _("Disimpan terenkripsi."),
+            "interest_sectors": _(
+                "Dipakai untuk menampilkan lahan yang sesuai di dasbor dan mengisi "
+                "formulir minat investasi."
+            ),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if "interest_sectors" in self.fields:
+            self.fields["interest_sectors"].queryset = InvestmentSector.objects.filter(
+                is_active=True
+            )
+        if "capital_origin" in self.fields:
+            # Pemohon yang bukan investor tidak wajib mengisinya.
+            self.fields["capital_origin"].required = False
+
+    def clean_capital_origin(self):
+        return self.cleaned_data.get("capital_origin") or enums.CapitalOrigin.DOMESTIC
 
     def clean(self):
         cleaned = super().clean()
@@ -60,6 +90,12 @@ class ApplicantProfileForm(forms.ModelForm):
         nik = cleaned.get("nik") or ""
         if nik and (not nik.isdigit() or len(nik) != 16):
             self.add_error("nik", _("NIK harus 16 digit angka."))
+        if (
+            "capital_origin" in self.fields
+            and cleaned.get("capital_origin") == enums.CapitalOrigin.FOREIGN
+            and not cleaned.get("origin_country")
+        ):
+            self.add_error("origin_country", _("Isi negara asal untuk PMA."))
         return cleaned
 
 
@@ -85,6 +121,17 @@ class RegistrationForm(ApplicantProfileForm):
     )
 
     field_order = ["email", "password1", "password2"]
+
+    def __init__(self, *args, investor: bool = False, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.investor = investor
+        # Lewat pendaftaran investor akun langsung menjadi akun investor.
+        removed = ("is_investor",) if investor else INVESTOR_FIELDS
+        for name in removed:
+            del self.fields[name]
+        if investor:
+            sectors = self.fields["interest_sectors"]
+            sectors.required = sectors.queryset.exists()
 
     def clean_email(self):
         email = _normalize_email(self.cleaned_data["email"])

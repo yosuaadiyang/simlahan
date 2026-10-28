@@ -1,0 +1,73 @@
+{% extends "alokasi/portal/base.html" %}{% load static alokasi_tags %}
+{% block title %}Dasbor Investor{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'alokasi/investasi.css' %}">{% endblock %}
+{% block content %}
+<div class="actions-row investor-head" style="justify-content:space-between">
+  <div>
+    <span class="eyebrow-label">Dasbor investor</span>
+    <h1 style="margin-bottom:0">{{ applicant.name }}</h1>
+    <p class="muted" style="margin:4px 0 0">{{ applicant.get_capital_origin_display }}{% if applicant.origin_country %} · {{ applicant.origin_country }}{% endif %}{% if applicant.nib %} · NIB {{ applicant.nib }}{% endif %} · {{ request.user.email }}</p>
+    {% if interest_sectors %}<div class="chips" style="margin-top:8px">{% for s in interest_sectors %}<span class="chip chip-sector" style="--c:{{ s.color }}">{{ s.icon }} {{ s.name }}</span>{% endfor %}</div>{% endif %}
+  </div>
+  <div class="actions-row">
+    <a class="btn btn-outline" href="{% url 'portal:profile' %}">Ubah profil</a>
+    <a class="btn btn-outline" href="{% url 'portal:investment_map' %}">Jelajahi peta</a>
+    <a class="btn btn-accent" href="{% url 'portal:investment_request_create' %}">Ajukan minat investasi</a>
+  </div>
+</div>
+
+{% include "alokasi/portal/dashboard/_offers.html" %}
+{% for r in upcoming_meetings %}
+<div class="alert alert-info"><strong>Jadwal konsultasi:</strong> {{ r.number }} ({{ r.project_name }}), {{ r.meeting_at|tanggal }} pukul {{ r.meeting_at|time:"H:i" }}{% if r.meeting_place %} di {{ r.meeting_place }}{% endif %}. <a href="{% url 'portal:investment_request' r.number %}">Rincian</a></div>
+{% endfor %}
+{% include "alokasi/portal/dashboard/_alerts.html" %}
+{% include "alokasi/portal/dashboard/_dokumen_alerts.html" %}
+
+<div class="grid grid-4 investor-kpis">
+  <a class="card kpi-link" href="{% url 'portal:investment_requests' %}"><div class="stat">{{ active_investments }}</div><div class="muted">Permintaan aktif</div></a>
+  <a class="card kpi-link" href="{% if pending_offers %}{% url 'portal:investment_request' pending_offers.0.number %}#penawaran{% else %}{% url 'portal:investment_requests' %}{% endif %}"><div class="stat">{{ pending_offers|length }}</div><div class="muted">Penawaran menunggu jawaban</div></a>
+  <a class="card kpi-link" href="{% if upcoming_meetings %}{% url 'portal:investment_request' upcoming_meetings.0.number %}{% else %}{% url 'portal:investment_requests' %}{% endif %}"><div class="stat">{{ upcoming_meetings|length }}</div><div class="muted">Konsultasi terjadwal</div></a>
+  <a class="card kpi-link" href="{% url 'portal:investment_saved' %}"><div class="stat">{{ saved_plots|length }}</div><div class="muted">Lahan tersimpan</div></a>
+</div>
+
+{% include "alokasi/portal/dashboard/_investments.html" with investor=True %}
+
+{% if saved_plots %}
+<div class="section-head">
+  <div><h2>Lahan tersimpan</h2><p>Bandingkan berdampingan atau ajukan minat untuk beberapa lahan sekaligus.</p></div>
+  <div class="actions-row">
+    <a class="btn btn-outline" href="{% url 'portal:investment_compare' %}?lahan={% for item in saved_plots|slice:':4' %}{{ item.plot.code|urlencode }}{% if not forloop.last %},{% endif %}{% endfor %}">Bandingkan</a>
+    <a class="btn btn-outline" href="{% url 'portal:investment_request_create' %}?lahan={% for item in saved_plots|slice:':10' %}{{ item.plot.code|urlencode }}{% if not forloop.last %},{% endif %}{% endfor %}">Ajukan minat</a>
+  </div>
+</div>
+<div class="grid grid-3 grid-fill">
+  {% for item in saved_plots|slice:":6" %}{% with plot=item.plot %}{% include "alokasi/portal/investasi/_plot_tile.html" %}{% endwith %}{% endfor %}
+</div>
+{% if saved_plots|length > 6 %}<p class="small"><a href="{% url 'portal:investment_saved' %}">Semua lahan tersimpan ›</a></p>{% endif %}
+{% endif %}
+
+<div class="section-head">
+  <div><h2>{% if interest_sectors %}Lahan sesuai minat Anda{% else %}Lahan pilihan{% endif %}</h2><p>{% if interest_sectors %}Lahan tersedia di sektor yang Anda pilih pada profil.{% else %}Pilih sektor usaha di <a href="{% url 'portal:profile' %}">profil</a> agar rekomendasi lebih tepat.{% endif %}</p></div>
+  <a href="{% url 'portal:investment_map' %}">Semua di peta ›</a>
+</div>
+{% if recommended %}
+<div class="grid grid-3 grid-fill">
+  {% for plot in recommended %}{% include "alokasi/portal/investasi/_plot_tile.html" %}{% endfor %}
+</div>
+{% else %}
+<div class="card"><p class="muted" style="margin:0">Belum ada lahan baru yang cocok. Lihat semua peluang di <a href="{% url 'portal:investment_map' %}">peta investasi</a> atau minta saran petugas lewat formulir minat investasi.</p></div>
+{% endif %}
+
+{% include "alokasi/portal/dashboard/_dokumen.html" %}
+{% include "alokasi/portal/dashboard/_invoices.html" %}
+{% if allocations %}{% include "alokasi/portal/dashboard/_allocations.html" %}{% endif %}
+{% if applications %}{% include "alokasi/portal/dashboard/_applications.html" %}{% endif %}
+{% include "alokasi/portal/dashboard/_transfers.html" %}
+
+<section class="card">
+  <h2 style="margin-top:0">Layanan pertanahan lain</h2>
+  <p class="small muted" style="margin:0">Permohonan alokasi langsung dari daftar lahan, peralihan hak, perpanjangan, dan layanan lain tetap tersedia: <a href="{% url 'portal:plot_list' %}">Peta lahan</a> · <a href="{% url 'portal:services' %}">Layanan &amp; persyaratan</a> · <a href="{% url 'portal:uwt_calculator' %}">Kalkulator UWT</a></p>
+</section>
+{% include "alokasi/portal/investasi/_compare_bar.html" %}
+{% endblock %}
+{% block scripts %}<script src="{% static 'alokasi/investasi.js' %}"></script>{% endblock %}

@@ -14,10 +14,17 @@ Agar pembatasan data terlihat, Penilai dan Instansi ditugaskan ke proyek contoh
 ``pengadaan_contoh_rempang``, Koordinator Wilayah memimpin Korwil A dan Petugas
 Lapangan menjadi anggota Korwil A dari ``operasi_contoh_rempang`` (jalankan
 perintah data contoh itu lebih dahulu, lalu perintah ini sekali lagi).
+
+Investor contoh (``investor@contoh.simlahan.invalid``) mendapat lahan tersimpan
+dan tiga permintaan investasi contoh (diajukan, konsultasi terjadwal, penawaran
+menunggu jawaban) di lahan ``alokasi_contoh_rempang``. Data itu dibuat tanpa
+mengirim surel dan ikut terhapus oleh --hapus.
 """
 
+import datetime
 import secrets
 import string
+from decimal import Decimal
 
 from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.models import Group
@@ -25,9 +32,20 @@ from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, router, transaction
 from django.db.models.deletion import Collector, ProtectedError, RestrictedError
+from django.utils import timezone
 
 from alokasi import enums as alokasi_enums
-from alokasi.models import Applicant
+from alokasi.management.commands import alokasi_contoh_rempang as alokasi_samples
+from alokasi.models import (
+    Applicant,
+    InvestmentEvent,
+    InvestmentMessage,
+    InvestmentRequest,
+    InvestmentSector,
+    InvestmentZone,
+    LandPlot,
+    SavedPlot,
+)
 from leasing.models import ServiceUnit
 from operasi.management.commands.operasi_contoh_rempang import MARK as KORWIL_MARK
 from operasi.models import Korwil
@@ -74,6 +92,10 @@ OFFICERS = [
     ),
 ]
 APPLICANT_EMAIL = f"pemohon@{DOMAIN}"
+INVESTOR_EMAIL = f"investor@{DOMAIN}"
+INVESTOR_SECTORS = ("Industri", "Logistik & pergudangan")
+SAVED_PLOTS = ("01", "04", "07")
+SAMPLE_TAG = "(CONTOH)"
 
 # Data yang ikut terhapus bersama akun tanpa kehilangan catatan kerja.
 DISPOSABLE_MODELS = {
@@ -182,17 +204,18 @@ class Command(BaseCommand):
 
         self._assign_scopes(User)
         rows.append(self._applicant(fixed, renew))
+        rows.append(self._investor(fixed, renew))
         return rows
 
-    def _applicant(self, fixed, renew):
+    def _portal_user(self, email, last_name, fixed, renew):
         User = get_user_model()
-        user = User.objects.filter(username=APPLICANT_EMAIL).first()
+        user = User.objects.filter(username=email).first()
         created = user is None
         if created:
-            user = User(username=APPLICANT_EMAIL)
-        user.email = APPLICANT_EMAIL
+            user = User(username=email)
+        user.email = email
         user.first_name = "Contoh"
-        user.last_name = "Pemohon"
+        user.last_name = last_name
         user.is_active = True
         user.is_staff = False
         user.is_superuser = False
@@ -202,6 +225,10 @@ class Command(BaseCommand):
         user.groups.clear()
         user.user_permissions.clear()
         user.service_units.clear()
+        return user, password
+
+    def _applicant(self, fixed, renew):
+        user, password = self._portal_user(APPLICANT_EMAIL, "Pemohon", fixed, renew)
         Applicant.objects.update_or_create(
             user=user,
             defaults={
@@ -212,9 +239,236 @@ class Command(BaseCommand):
                 "phone": "0778000000",
                 "address": "Jl. Contoh No. 1, Batam",
                 "city": "Batam",
+                "is_investor": False,
             },
         )
         return ("Pemohon portal", APPLICANT_EMAIL, password, "Portal (/portal/)")
+
+    def _investor(self, fixed, renew):
+        user, password = self._portal_user(INVESTOR_EMAIL, "Investor", fixed, renew)
+        investor, _created = Applicant.objects.update_or_create(
+            user=user,
+            defaults={
+                "applicant_type": alokasi_enums.ApplicantType.COMPANY,
+                "name": "PT Contoh Investor Nusantara",
+                "nib": "9120000000001",
+                "pic_name": "Contoh Investor",
+                "pic_position": "Direktur Pengembangan Usaha",
+                "phone": "0778000001",
+                "address": "Jl. Contoh No. 2, Batam",
+                "city": "Batam",
+                "is_investor": True,
+                "capital_origin": alokasi_enums.CapitalOrigin.DOMESTIC,
+                "origin_country": "",
+                "website": "https://contoh.simlahan.invalid",
+            },
+        )
+        investor.interest_sectors.set(
+            InvestmentSector.objects.filter(name__in=INVESTOR_SECTORS)
+        )
+        self._investment_samples(investor)
+        return (
+            "Investor",
+            INVESTOR_EMAIL,
+            password,
+            "Portal investasi (/portal/investasi/)",
+        )
+
+    # ------------------------------------------------------------------
+    # Data investasi contoh (tanpa surel; status diatur langsung)
+    # ------------------------------------------------------------------
+
+    def _investment_samples(self, investor):
+        plots = {
+            plot.code.removeprefix(alokasi_samples.PREFIX): plot
+            for plot in LandPlot.objects.filter(
+                code__startswith=alokasi_samples.PREFIX, is_published=True
+            ).select_related("sector", "zone")
+        }
+        if not plots:
+            self.stdout.write(
+                "Lahan contoh belum ada: investor contoh belum punya lahan tersimpan "
+                "dan permintaan investasi (jalankan alokasi_contoh_rempang lalu "
+                "perintah ini lagi)."
+            )
+            return
+        for code in SAVED_PLOTS:
+            if code in plots:
+                SavedPlot.objects.get_or_create(applicant=investor, plot=plots[code])
+        officer = sample_users().filter(username="contoh.alokasi").first()
+        now = timezone.now()
+        today = timezone.localdate()
+        self._sample_request(
+            investor,
+            officer,
+            plots.get("01"),
+            project_name=f"Pabrik Pengolahan Rumput Laut {SAMPLE_TAG}",
+            scheme=alokasi_enums.InvestmentScheme.LEASE,
+            activity="Pabrik pengolahan rumput laut menjadi karagenan untuk pasar "
+            "ekspor, dibangun dua tahap. Data fiktif untuk uji coba.",
+            investment_value=Decimal("85000000000"),
+            workforce=180,
+            term_years=20,
+            history=[
+                (alokasi_enums.InvestmentStatus.SUBMITTED, 12, ""),
+                (alokasi_enums.InvestmentStatus.REVIEW, 10, ""),
+                (
+                    alokasi_enums.InvestmentStatus.CONSULTATION,
+                    8,
+                    "Konsultasi di kantor pelayanan lahan.",
+                ),
+            ],
+            extra={
+                "meeting_at": timezone.localtime(
+                    now + datetime.timedelta(days=7)
+                ).replace(hour=10, minute=0, second=0, microsecond=0),
+                "meeting_place": "Kantor pelayanan lahan, ruang rapat 2 (contoh)",
+            },
+            messages=[
+                (
+                    True,
+                    9,
+                    "Terima kasih atas minat Anda. Mohon kirim rencana tata letak "
+                    "pabrik dan kebutuhan air untuk bahan konsultasi.",
+                ),
+                (
+                    False,
+                    8,
+                    "Baik, rencana tata letak kami bawa saat konsultasi. Kebutuhan "
+                    "air sekitar 300 m³/hari.",
+                ),
+            ],
+        )
+        lease_plot = plots.get("07")
+        self._sample_request(
+            investor,
+            officer,
+            lease_plot,
+            project_name=f"Gudang Logistik Berpendingin {SAMPLE_TAG}",
+            scheme=alokasi_enums.InvestmentScheme.LEASE,
+            activity="Gudang berpendingin untuk distribusi hasil laut dan "
+            "logistik pelabuhan. Data fiktif untuk uji coba.",
+            investment_value=Decimal("12500000000"),
+            workforce=40,
+            term_years=5,
+            history=[
+                (alokasi_enums.InvestmentStatus.SUBMITTED, 20, ""),
+                (alokasi_enums.InvestmentStatus.REVIEW, 18, ""),
+                (
+                    alokasi_enums.InvestmentStatus.OFFERED,
+                    2,
+                    "Penawaran sewa lahan contoh.",
+                ),
+            ],
+            extra=(
+                {
+                    "offer_scheme": alokasi_enums.InvestmentScheme.LEASE,
+                    "offer_plot": lease_plot,
+                    "offer_area_m2": lease_plot.area_m2,
+                    "offer_rate_per_m2_year": lease_plot.lease_rate_per_m2_year,
+                    "offer_term_years": 5,
+                    "offer_valid_until": today + datetime.timedelta(days=30),
+                    "offer_note": "Tarif belum termasuk pajak. Data fiktif.",
+                    "offered_at": now - datetime.timedelta(days=2),
+                }
+                if lease_plot is not None
+                else {}
+            ),
+        )
+        zone = InvestmentZone.objects.filter(slug=alokasi_samples.ZONE_TOURISM).first()
+        self._sample_request(
+            investor,
+            officer,
+            None,
+            project_name=f"Resor Wisata Bahari {SAMPLE_TAG}",
+            scheme=alokasi_enums.InvestmentScheme.UNDECIDED,
+            sector_name="Pariwisata & perhotelan",
+            activity="Resor 120 kamar dengan dermaga wisata. Minta saran skema "
+            "dan lokasi dari petugas. Data fiktif untuk uji coba.",
+            investment_value=Decimal("150000000000"),
+            workforce=250,
+            term_years=30,
+            history=[(alokasi_enums.InvestmentStatus.SUBMITTED, 1, "")],
+            extra={"zone": zone, "requested_area_m2": Decimal("50000")},
+        )
+
+    def _sample_request(  # noqa: C901
+        self,
+        investor,
+        officer,
+        plot,
+        *,
+        project_name,
+        scheme,
+        activity,
+        investment_value,
+        workforce,
+        term_years,
+        history,
+        extra,
+        messages=(),
+        sector_name=None,
+    ):
+        existing = investor.investment_requests.filter(
+            project_name=project_name
+        ).first()
+        if existing is not None:
+            # Penawaran contoh yang kedaluwarsa diperpanjang agar tetap bisa dicoba.
+            if (
+                existing.status == alokasi_enums.InvestmentStatus.OFFERED
+                and existing.offer_expired
+            ):
+                existing.offer_valid_until = timezone.localdate() + datetime.timedelta(
+                    days=30
+                )
+                existing.save(update_fields=["offer_valid_until", "modified_at"])
+            return
+        needs_plot = "offer_plot" in extra or sector_name is None
+        if needs_plot and (plot is None or not plot.is_available):
+            return
+        if sector_name:
+            sector = InvestmentSector.objects.filter(name=sector_name).first()
+        else:
+            sector = plot.sector
+        now = timezone.now()
+        status = history[-1][0]
+        investment = InvestmentRequest.objects.create(
+            applicant=investor,
+            status=status,
+            scheme=scheme,
+            sector=sector,
+            project_name=project_name,
+            activity=activity,
+            investment_value=investment_value,
+            workforce=workforce,
+            term_years=term_years,
+            capital_origin=investor.capital_origin,
+            submitted_at=now - datetime.timedelta(days=history[0][1]),
+            assigned_to=officer if len(history) > 1 else None,
+            **extra,
+        )
+        if plot is not None:
+            investment.plots.add(plot)
+        for event_status, days_ago, note in history:
+            InvestmentEvent.objects.create(
+                request=investment,
+                status=event_status,
+                note=note,
+                actor=(
+                    investor.user
+                    if event_status == alokasi_enums.InvestmentStatus.SUBMITTED
+                    else officer
+                ),
+                created_at=now - datetime.timedelta(days=days_ago),
+            )
+        for from_officer, days_ago, body in messages:
+            InvestmentMessage.objects.create(
+                request=investment,
+                author=officer if from_officer else investor.user,
+                from_officer=from_officer,
+                body=body,
+                created_at=now - datetime.timedelta(days=days_ago),
+            )
 
     def _assign_scopes(self, User):
         users = {
@@ -271,6 +525,9 @@ class Command(BaseCommand):
     # ------------------------------------------------------------------
 
     def _delete(self):
+        removed = self._delete_investment_samples()
+        if removed:
+            self.stdout.write(f"{removed} permintaan investasi akun contoh dihapus.")
         deleted, kept = [], []
         for user in sample_users().order_by("username"):
             with transaction.atomic():
@@ -293,6 +550,28 @@ class Command(BaseCommand):
                 f"{len(kept)} akun dinonaktifkan karena masih tercatat pada data "
                 "kerja: " + ", ".join(kept)
             )
+
+    @transaction.atomic
+    def _delete_investment_samples(self) -> int:
+        """Lahan tersimpan dan permintaan investasi akun contoh. Permintaan yang
+        sudah diteruskan menjadi permohonan atau kontrak dibiarkan (akunnya lalu
+        dinonaktifkan, bukan dihapus)."""
+        applicants = Applicant.objects.filter(user__in=sample_users())
+        SavedPlot.objects.filter(applicant__in=applicants).delete()
+        requests = InvestmentRequest.objects.filter(
+            applicant__in=applicants, application__isnull=True
+        ).exclude(status=alokasi_enums.InvestmentStatus.COMPLETED)
+        count = 0
+        for investment in requests.prefetch_related("messages"):
+            files = [investment.attachment] + [
+                m.attachment for m in investment.messages.all()
+            ]
+            investment.delete()
+            for field in files:
+                if field:
+                    field.delete(save=False)
+            count += 1
+        return count
 
     def _can_delete(self, user) -> bool:
         collector = Collector(using=router.db_for_write(type(user)) or DEFAULT_DB_ALIAS)

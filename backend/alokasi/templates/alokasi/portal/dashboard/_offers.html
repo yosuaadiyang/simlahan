@@ -1,0 +1,3 @@
+{% load alokasi_tags %}{% for r in pending_offers %}
+<div class="alert alert-info"><strong>Penawaran menunggu jawaban:</strong> {{ r.number }} ({{ r.project_name }}){% if r.offer_valid_until %}, berlaku s.d. {{ r.offer_valid_until|tanggal }}{% endif %}. <a href="{% url 'portal:investment_request' r.number %}#penawaran">Tinjau penawaran</a></div>
+{% endfor %}

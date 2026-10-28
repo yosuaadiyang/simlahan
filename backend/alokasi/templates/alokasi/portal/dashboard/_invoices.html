@@ -1,0 +1,18 @@
+{% load alokasi_tags %}{% if open_invoices %}
+<section class="card">
+  <h2>Tagihan belum lunas</h2>
+  <div class="table-wrap"><table class="data">
+    <thead><tr><th>Nomor</th><th>Permohonan</th><th>Jenis</th><th>Jumlah</th><th>Jatuh tempo</th><th>Status</th></tr></thead>
+    <tbody>{% for inv in open_invoices %}
+      <tr>
+        <td>{{ inv.number }}</td>
+        <td><a href="{% url 'portal:application_detail' inv.application.number %}#tagihan">{{ inv.application.number }}</a></td>
+        <td>{{ inv.get_kind_display }}</td>
+        <td>{{ inv.amount|rupiah|patah }}</td>
+        <td>{{ inv.due_date|tanggal }}{% if inv.is_overdue %} <span class="badge badge-ditolak">Lewat</span>{% endif %}</td>
+        <td><span class="badge badge-{{ inv.status }}">{{ inv.get_status_display }}</span></td>
+      </tr>{% endfor %}
+    </tbody>
+  </table></div>
+</section>
+{% endif %}

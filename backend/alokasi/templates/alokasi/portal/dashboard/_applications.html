@@ -1,0 +1,17 @@
+{% load alokasi_tags %}<section class="card">
+  <h2>Permohonan saya</h2>
+  {% if applications %}
+  <div class="table-wrap"><table class="data">
+    <thead><tr><th>Nomor</th><th>Layanan</th><th>Objek</th><th>Diajukan</th><th>Status</th></tr></thead>
+    <tbody>{% for app in applications %}
+      <tr>
+        <td><a href="{% url 'portal:application_detail' app.number %}">{{ app.number }}</a></td>
+        <td>{{ app.get_service_type_display }}</td>
+        <td>{% if app.is_allocation %}{{ app.plot.code }} {{ app.plot.name }}{% else %}{{ app.source_allocation.kpt_number }}{% endif %}</td>
+        <td>{{ app.submitted_at|tanggal }}</td>
+        <td><span class="badge badge-{{ app.status }}">{{ app.get_status_display }}</span></td>
+      </tr>{% endfor %}
+    </tbody>
+  </table></div>
+  {% else %}<p class="muted">Belum ada permohonan. <a href="{% url 'portal:plot_list' %}">Cari lahan</a> untuk memulai.</p>{% endif %}
+</section>

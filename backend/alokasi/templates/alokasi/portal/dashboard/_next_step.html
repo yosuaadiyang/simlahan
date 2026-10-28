@@ -1,0 +1,7 @@
+{% load alokasi_tags %}{% with s=r.status %}{% if s == "diajukan" %}Menunggu peninjauan petugas.
+{% elif s == "ditinjau" %}Petugas meninjau; <a href="{% url 'portal:investment_request' r.number %}#pesan">balas pesan</a> bila diminta.
+{% elif s == "konsultasi" %}{% if r.meeting_at %}Konsultasi {{ r.meeting_at|tanggal }} pukul {{ r.meeting_at|time:"H:i" }}{% if r.meeting_place %}, {{ r.meeting_place }}{% endif %}.{% else %}Menunggu jadwal konsultasi.{% endif %}
+{% elif s == "ditawarkan" %}<a href="{% url 'portal:investment_request' r.number %}#penawaran"><strong>Tinjau penawaran</strong></a>{% if r.offer_valid_until %} s.d. {{ r.offer_valid_until|tanggal }}{% endif %}.
+{% elif s == "diterima" %}Petugas menyiapkan kontrak atau permohonan.
+{% elif s == "selesai" %}{% if r.application %}<a href="{% url 'portal:application_detail' r.application.number %}">Lengkapi permohonan {{ r.application.number }}</a>.{% elif r.contract_number %}Kontrak {{ r.contract_number }} tercatat; pantau <a href="{% url 'dokumen_portal:index' %}">dokumen perizinan</a>.{% else %}Selesai.{% endif %}
+{% else %}Ditutup.{% endif %}{% endwith %}
