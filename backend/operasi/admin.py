@@ -622,6 +622,21 @@ class ResidentAdmin(OperasiGISAdmin):
             ),
         )
 
+    # Tautan ke modul lain: tanpa izin melihat modul itu, jendela pencarian
+    # raw_id berujung 403, jadi kolomnya hanya ditampilkan (baca saja).
+    LINKED_FIELD_PERMS = (
+        ("pengadaan_household", "pengadaan.view_affectedhousehold"),
+        ("pengadaan_parcel", "pengadaan.view_acquisitionparcel"),
+        ("land_asset", "asetlahan.view_landasset"),
+    )
+
+    def get_readonly_fields(self, request, obj=None):
+        fields = list(super().get_readonly_fields(request, obj))
+        for name, perm in self.LINKED_FIELD_PERMS:
+            if name not in fields and not request.user.has_perm(perm):
+                fields.append(name)
+        return fields
+
     def get_fieldsets(self, request, obj=None):
         fieldsets = super().get_fieldsets(request, obj)
         if sees_nik(request):

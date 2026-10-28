@@ -9,7 +9,9 @@
 
 # Vulnerability in versions below 6.0.0:
 # - CVE-2025-55197 https://security.snyk.io/vuln/SNYK-PYTHON-PYPDF-11798040
-pypdf>=6.0.0
+# Many parser DoS/memory-exhaustion advisories fixed up to 6.21.2
+# (pip-audit, 2026-10). PDFs come from public portal uploads.
+pypdf>=6.21.2
 
 # Vulnerability in versions below 3.1.6
 # - CVE-2025-27516 https://security.snyk.io/vuln/SNYK-PYTHON-JINJA2-9292516
@@ -22,4 +24,21 @@ jinja2>=3.1.6
 # - CVE-2024-37891 https://security.snyk.io/vuln/SNYK-PYTHON-URLLIB3-7267250
 # - CVE-2025-50182 https://security.snyk.io/vuln/SNYK-PYTHON-URLLIB3-10390193
 # - CVE-2025-50181 https://security.snyk.io/vuln/SNYK-PYTHON-URLLIB3-10390194
-urllib3>=2.5.0
+# Further advisories fixed in 2.6.0 - 2.8.0 (pip-audit, 2026-10)
+urllib3>=2.8.0
+
+# Pillow decodes untrusted images (portal uploads, e-signature canvas, OCR).
+# Advisories fixed in 12.1.1 - 13.0.0 (pip-audit, 2026-10).
+pillow>=13.0.0
+
+# Advisories fixed in 0.5.4 - 0.6.0 (via Django; pip-audit, 2026-10)
+sqlparse>=0.6.0
+
+# Token/crypto libraries behind login, JWT and OAuth2 (pip-audit, 2026-10)
+pyjwt>=2.15.0
+oauthlib>=4.0.0
+jwcrypto>=1.5.7
+certifi>=2026.10.19
+
+# Dev tooling (pytest output highlighting); advisory fixed in 2.20.0
+pygments>=2.20.0

@@ -1,10 +1,10 @@
 {% extends "admin/change_form.html" %}
 {% block object-tools-items %}
   {% if original.pk %}
-  <li><a href="{% url 'admin:asetlahan_assetvaluation_add' %}?asset={{ original.pk }}">Tambah penilaian</a></li>
-  <li><a href="{% url 'admin:asetlahan_task_add' %}?asset={{ original.pk }}">Buat tugas</a></li>
-  <li><a href="{% url 'admin:asetlahan_surveyrequest_add' %}?asset={{ original.pk }}">Ajukan survei</a></li>
-  <li><a href="{% url 'admin:asetlahan_encroachmentcase_add' %}?asset={{ original.pk }}">Catat okupasi</a></li>
+  {% if perms.asetlahan.add_assetvaluation %}<li><a href="{% url 'admin:asetlahan_assetvaluation_add' %}?asset={{ original.pk }}">Tambah penilaian</a></li>{% endif %}
+  {% if perms.asetlahan.add_task %}<li><a href="{% url 'admin:asetlahan_task_add' %}?asset={{ original.pk }}">Buat tugas</a></li>{% endif %}
+  {% if perms.asetlahan.add_surveyrequest %}<li><a href="{% url 'admin:asetlahan_surveyrequest_add' %}?asset={{ original.pk }}">Ajukan survei</a></li>{% endif %}
+  {% if perms.asetlahan.add_encroachmentcase %}<li><a href="{% url 'admin:asetlahan_encroachmentcase_add' %}?asset={{ original.pk }}">Catat okupasi</a></li>{% endif %}
   {% endif %}
   {{ block.super }}
 {% endblock %}

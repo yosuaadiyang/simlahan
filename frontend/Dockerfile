@@ -43,7 +43,7 @@ RUN yarn build
 # Nginx non-root: kontainer tidak berjalan sebagai root. Template & envsubst
 # tetap didukung; port internal 8080 (non-root tak boleh memakai port < 1024),
 # dipetakan compose ke HTTP_PORT.
-FROM nginxinc/nginx-unprivileged:1.27-alpine AS production
+FROM nginxinc/nginx-unprivileged:1.30-alpine AS production
 USER nginx
 COPY --chown=nginx:nginx docker/nginx.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=build --chown=nginx:nginx /app/dist /usr/share/nginx/html

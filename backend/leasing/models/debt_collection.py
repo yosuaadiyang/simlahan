@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
 from docxtpl import DocxTemplate
 from enumfields import EnumField
+from jinja2.sandbox import SandboxedEnvironment
 
 from field_permissions.registry import field_permissions
 from file_operations.private_files import PrivateFileField
@@ -13,6 +14,22 @@ from file_operations.viewsets.mixins import FileScanMixin
 from leasing.enums import CollectionStage
 from leasing.models.mixins import TimeStampedSafeDeleteModel
 from users.models import User
+
+
+def render_docx_template(source, data) -> bytes:
+    """Render a Word template uploaded by officers.
+
+    The template is Jinja code written by a user, so it runs in a sandbox:
+    a plain environment lets ``{{ ''.__class__.__mro__ ... }}`` execute
+    arbitrary Python on the server. No autoescape, because the context
+    deliberately carries ``<w:br/>`` line breaks.
+    """
+    doc = DocxTemplate(source)
+    doc.render(data, jinja_env=SandboxedEnvironment())
+    output = io.BytesIO()
+    doc.save(output)
+
+    return output.getvalue()
 
 
 def get_collection_letter_file_upload_to(instance, filename):
@@ -79,12 +96,7 @@ class CollectionLetterTemplate(TimeStampedSafeDeleteModel):
         return self.name
 
     def render_document(self, data):
-        doc = DocxTemplate(self.file.path)
-        doc.render(data)
-        output = io.BytesIO()
-        doc.save(output)
-
-        return output.getvalue()
+        return render_docx_template(self.file.path, data)
 
 
 class CollectionNote(TimeStampedSafeDeleteModel):

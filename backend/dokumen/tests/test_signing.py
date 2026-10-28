@@ -5,6 +5,7 @@ import re
 import pytest
 from django.core import mail
 from django.core.exceptions import ValidationError
+from django.test import Client
 from django.urls import reverse
 from PIL import Image
 
@@ -315,6 +316,23 @@ def test_sign_page_external_otp_flow(client, draft, officer):
     code = re.search(r"\b(\d{6})\b", mail.outbox[-1].body).group(1)
     response = client.post(url, {"aksi": "cek_kode", "code": code})
     assert response.status_code == 302
+    # Kode yang sudah dimasukkan hanya berlaku di peramban itu: pemegang
+    # tautan lain (mis. surel yang diteruskan) tetap harus memasukkan kode.
+    other = Client()
+    response = other.get(url)
+    assert b"kirim_kode" in response.content
+    assert draft.body.encode()[:40] not in response.content
+    other.post(
+        url,
+        {
+            "aksi": "tanda_tangan",
+            "name": "Penyusup",
+            "signature": signature_png(),
+            "agree": "on",
+        },
+    )
+    external.refresh_from_db()
+    assert external.status != enums.RecipientStatus.DONE
     response = client.post(
         url,
         {
