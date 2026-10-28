@@ -39,3 +39,6 @@ pyjwt>=2.15.0
 oauthlib>=4.0.0
 jwcrypto>=1.5.7
 certifi>=2026.10.19
+
+# Dev tooling (pytest output highlighting); advisory fixed in 2.20.0
+pygments>=2.20.0
