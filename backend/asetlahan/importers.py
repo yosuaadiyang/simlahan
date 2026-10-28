@@ -27,6 +27,8 @@ from utils.geometry import (
 )
 
 MAX_FEATURES = 5000
+# Batas isi ZIP setelah diekstrak: arsip kecil bisa memuat gigabita data (zip bomb).
+MAX_UNCOMPRESSED_BYTES = 200 * 1024 * 1024
 MAX_OVERLAY_FEATURES = 20000
 NAME_FIELDS = ("nama", "name", "namobj", "remark", "keterangan", "label", "wadmkd")
 
@@ -130,6 +132,8 @@ def _extract_shapefile(data: bytes, directory: str) -> str:
     ]
     if not shapefiles:
         raise AssetImportError("ZIP tidak berisi berkas .shp.")
+    if sum(info.file_size for info in archive.infolist()) > MAX_UNCOMPRESSED_BYTES:
+        raise AssetImportError("Isi ZIP terlalu besar (maksimal 200 MB).")
     for name in archive.namelist():
         target = os.path.realpath(os.path.join(directory, name))
         if not target.startswith(os.path.realpath(directory) + os.sep):

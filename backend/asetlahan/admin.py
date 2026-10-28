@@ -58,6 +58,7 @@ from asetlahan.models import (
     ValuationItem,
 )
 from file_operations.private_files import PrivateFileField
+from utils.admin_links import current_request
 from utils.group_permissions import UserGroup
 
 
@@ -1394,7 +1395,11 @@ class EncroachmentCaseAdmin(AsetGISAdmin):
 
     @admin.display(description=_("Bandingkan citra"))
     def compare_link(self, obj):
-        if not obj.pk:
+        request = current_request.get()
+        if not obj.pk or (
+            request is not None
+            and not request.user.has_perm("asetlahan.view_satelliteimage")
+        ):
             return "–"
         url = reverse("asetlahan-imagery-compare") + f"?okupasi={obj.pk}"
         return format_html(

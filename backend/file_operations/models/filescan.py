@@ -182,6 +182,9 @@ def _scan_file_task(scan_status_id: int) -> FileScanStatus | None:
             response = requests.post(
                 settings.FILE_SCAN_SERVICE_URL,
                 files={"FILES": (obfuscated_filename, file)},
+                # Di bawah batas waktu tugas django-q (90 detik): layanan
+                # pemindai yang macet tidak menahan pekerja sampai dibunuh.
+                timeout=60,
             )
             if not response.status_code == http_status.HTTP_200_OK:
                 _handle_error(

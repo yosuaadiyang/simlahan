@@ -151,6 +151,35 @@ if env("DATABASE_PASSWORD"):
 
 CACHES = {"default": env.cache()}
 
+# Tanpa konfigurasi ini, saat DEBUG=0 Django hanya mengirim traceback galat 500
+# lewat surel ke ADMINS (biasanya kosong), sehingga galat produksi hilang tanpa
+# jejak bila Sentry tidak dipasang. Tulis ke stdout agar terbaca di
+# `docker compose logs`. Halaman 404 tidak dicatat (bising oleh pemindai bot).
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "filters": {
+        "require_debug_false": {"()": "django.utils.log.RequireDebugFalse"},
+    },
+    "formatters": {
+        "plain": {"format": "%(asctime)s %(levelname)s %(name)s: %(message)s"},
+    },
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "formatter": "plain"},
+        "mail_admins": {
+            "level": "ERROR",
+            "filters": ["require_debug_false"],
+            "class": "django.utils.log.AdminEmailHandler",
+        },
+    },
+    "root": {"handlers": ["console"], "level": "INFO"},
+    "loggers": {
+        # Diteruskan ke root (console); surel ke ADMINS tetap bila diisi.
+        "django": {"handlers": ["mail_admins"], "level": "INFO"},
+        "django.request": {"level": "ERROR"},
+    },
+}
+
 if env("SENTRY_DSN"):
     sentry_sdk.init(
         dsn=env("SENTRY_DSN"),
@@ -328,6 +357,8 @@ if TRUST_PROXY_HEADERS:
 if not DEBUG:
     SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", default=True)
     CSRF_COOKIE_SECURE = env.bool("CSRF_COOKIE_SECURE", default=True)
+# HSTS hanya dikirim pada permintaan HTTPS; 0 = mati (atur di reverse proxy).
+SECURE_HSTS_SECONDS = env.int("SECURE_HSTS_SECONDS", default=0)
 CORS_EXPOSE_HEADERS = ["Content-Disposition"]
 
 Q_CLUSTER = {

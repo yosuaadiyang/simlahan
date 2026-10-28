@@ -121,3 +121,16 @@ def test_import_json_error_message_is_indonesian(seeded):
     with pytest.raises(importers.AssetImportError) as excinfo:
         importers.import_assets(b"bukan json", filename="a.geojson")
     assert str(excinfo.value) == "Berkas bukan GeoJSON yang valid (baris 1, kolom 1)."
+
+
+def test_import_rejects_zip_bomb(seeded, monkeypatch):
+    import io
+    import zipfile
+
+    monkeypatch.setattr(importers, "MAX_UNCOMPRESSED_BYTES", 1000)
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr("bidang.shp", b"\0" * 2000)
+    with pytest.raises(importers.AssetImportError) as excinfo:
+        importers.import_assets(buffer.getvalue(), filename="bidang.zip")
+    assert "terlalu besar" in str(excinfo.value)

@@ -120,6 +120,22 @@ def test_session_login_is_throttled(path):
     assert response.status_code == 429
 
 
+@pytest.mark.parametrize("path", ["/admin/login/", "/auth/login/", "/portal/masuk/"])
+def test_session_login_is_throttled_per_account_across_addresses(path):
+    # Tebakan terdistribusi lintas IP terhadap satu akun tetap tertahan,
+    # termasuk lewat portal pemohon (yang menerima nama akun berupa surel).
+    username = f"sasaran{abs(hash(path))}@contoh.invalid"
+    for attempt in range(10):
+        response = Client(REMOTE_ADDR=f"10.0.0.{attempt + 1}").post(
+            path, {"username": username, "password": "salah"}
+        )
+        assert response.status_code != 429
+    response = Client(REMOTE_ADDR="10.0.1.1").post(
+        path, {"username": username, "password": "salah"}
+    )
+    assert response.status_code == 429
+
+
 def test_throttle_ignores_spoofed_forwarded_for(settings):
     from rest_framework.settings import api_settings
 

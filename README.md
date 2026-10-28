@@ -87,16 +87,23 @@ latar), `batchrun` (penjadwal), `frontend` (nginx + SPA, sekaligus reverse proxy
 ### Produksi
 
 1. Pasang di belakang HTTPS (mis. Caddy/Traefik/nginx di depan port `HTTP_PORT`),
-   lalu set `SESSION_COOKIE_SECURE=1`, `CSRF_COOKIE_SECURE=1`,
-   `CSRF_TRUSTED_ORIGINS=https://domain-anda`, `OFFICER_UI_URL=https://domain-anda`,
-   dan `TRUSTED_PROXY_COUNT=2`.
+   lalu set `HTTP_PORT=127.0.0.1:8080`, `SESSION_COOKIE_SECURE=1`,
+   `CSRF_COOKIE_SECURE=1`, `CSRF_TRUSTED_ORIGINS=https://domain-anda`,
+   `OFFICER_UI_URL=https://domain-anda`, dan `TRUSTED_PROXY_COUNT=2`.
+   **Wajib** ikat port ke `127.0.0.1`: nilai bawaan `8080` membuka port di
+   semua antarmuka (Docker melewati firewall `ufw`), sehingga situs juga dapat
+   diakses lewat HTTP biasa tanpa TLS dan header `X-Forwarded-*` dapat
+   dipalsukan untuk mengelak dari pembatasan percobaan masuk. Setelah HTTPS
+   berjalan stabil, aktifkan HSTS di reverse proxy atau lewat
+   `SECURE_HSTS_SECONDS` (mis. `31536000`).
 2. **Cadangkan `FIELD_ENCRYPTION_KEY`** di tempat aman. NIK, nomor rekening,
    dan nomor KK dienkripsi di basis data; tanpa kunci ini data tersebut tidak
    dapat dibaca kembali.
 3. Isi `EMAIL_URL` (SMTP) agar pengingat tenggat & laporan terkirim.
 4. Cadangkan volume `db_data`, `private_files`, dan `media` (unggahan pengguna)
    secara berkala, mis.
-   `docker compose exec db pg_dump -U simlahan simlahan > cadangan.sql`.
+   `docker compose exec -T db pg_dump -U simlahan simlahan > cadangan.sql`
+   (`-T` wajib: tanpa itu keluaran melewati TTY dan berkas cadangan bisa rusak).
 5. Perbarui daftar hari libur setiap tahun di **Pengadaan Tanah → Kalender &
    aturan tenggat** sesuai SKB 3 Menteri.
 
@@ -221,6 +228,8 @@ pelepasan hak hanya bisa dicatat setelah ganti kerugian lunas atau dititipkan.
 | `EMAIL_URL`, `DEFAULT_FROM_EMAIL` | Surel keluar (wajib untuk aktivasi akun pemohon) |
 | `OFFICER_UI_URL` | Alamat publik, mis. `https://domain-anda`; dipakai untuk tautan surel portal dan kode QR KPT/PPT |
 | `JWT_ACCESS_TOKEN_MINUTES`, `JWT_REFRESH_TOKEN_HOURS` | Masa berlaku sesi |
+| `SECURE_HSTS_SECONDS` | HSTS (detik) bila HTTPS tidak mengaturnya sendiri; bawaan `0` (mati). Aktifkan hanya bila seluruh situs sudah lewat HTTPS |
+| `FLAG_FILE_SCAN`, `FILE_SCAN_SERVICE_URL` | Pindai virus berkas unggahan (termasuk unggahan publik portal) lewat layanan REST ClamAV; berkas terinfeksi dihapus dan unduhan ditahan sampai lolos pindai. Bawaan mati — disarankan aktif di produksi |
 | `OFFICER_OTP_REQUIRED` | `1` = petugas wajib memasukkan kode OTP surel setiap masuk |
 | `MAP_EXTRA_BASEMAPS` | Peta dasar tambahan (JSON), mis. citra berlisensi milik instansi |
 | `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL` | Asisten AI & pembacaan dokumen pindaian (opsional) |
