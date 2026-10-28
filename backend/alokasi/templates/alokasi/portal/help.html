@@ -29,6 +29,16 @@
       <h2>Kontak layanan</h2>
       <div class="prose small">{{ config.contact_info|default:"Hubungi " }}{% if not config.contact_info %}{{ config.authority_name }}.{% endif %}</div>
     </section>
+    <section class="card" id="investor">
+      <h2>Panduan investor</h2>
+      <ol class="small">
+        <li><a href="{% url 'portal:investor_register' %}">Daftar sebagai investor</a> dan pilih sektor usaha yang diminati, lalu aktifkan akun lewat surel.</li>
+        <li>Jelajahi <a href="{% url 'portal:investment_map' %}">peta investasi</a>; simpan dan bandingkan lahan.</li>
+        <li>Ajukan minat sewa, alokasi, atau kerja sama: pilih lahan atau gambar usulan lokasi.</li>
+        <li>Pantau <strong>Akun Saya</strong> (dasbor investor): jadwal konsultasi, pesan petugas, dan penawaran yang perlu dijawab.</li>
+        <li>Setelah penawaran diterima, petugas meneruskan ke kontrak sewa/kerja sama atau draf permohonan alokasi; dokumen perizinan muncul di <a href="{% url 'dokumen_portal:index' %}">Dokumen &amp; perizinan</a>.</li>
+      </ol>
+    </section>
     <section class="card">
       <h2>Panduan cepat</h2>
       <ul class="small">

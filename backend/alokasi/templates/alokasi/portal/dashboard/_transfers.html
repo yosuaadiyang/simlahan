@@ -1,0 +1,8 @@
+{% load alokasi_tags %}{% if incoming_transfers %}
+<section class="card">
+  <h2>Peralihan hak kepada saya</h2>
+  <ul>{% for app in incoming_transfers %}
+    <li><a href="{% url 'portal:application_detail' app.number %}">{{ app.number }}</a> – {{ app.source_allocation.kpt_number }} dari {{ app.applicant.name }} <span class="badge badge-{{ app.status }}">{{ app.get_status_display }}</span></li>
+  {% endfor %}</ul>
+</section>
+{% endif %}

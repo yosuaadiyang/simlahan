@@ -501,8 +501,8 @@ APPLICANT_GUIDE = RoleGuide(
     name="Pemohon portal",
     sample="pemohon@contoh.simlahan.invalid",
     summary=(
-        "Badan usaha, investor, atau perorangan yang mengajukan alokasi, sewa, "
-        "atau investasi lahan."
+        "Badan usaha, instansi, atau perorangan yang mengajukan alokasi, sewa, "
+        "atau layanan pertanahan lain."
     ),
     login=(
         "Portal (`/portal/masuk/`) dengan alamat surel; daftar sendiri di "
@@ -535,6 +535,50 @@ APPLICANT_GUIDE = RoleGuide(
         "Tidak bisa masuk ke aplikasi petugas, panel admin, pusat komando, atau API.",
     ),
 )
+
+INVESTOR_GUIDE = RoleGuide(
+    name="Investor",
+    sample="investor@contoh.simlahan.invalid",
+    summary=(
+        "Akun pemohon portal dengan profil investor: mencari lahan, mengajukan "
+        "minat sewa/alokasi/kerja sama, dan menanggapi penawaran petugas."
+    ),
+    login=(
+        "Portal (`/portal/masuk/`) dengan alamat surel; daftar sendiri di "
+        "`/portal/investasi/daftar/`. Pemohon yang mengajukan minat investasi "
+        "pertamanya otomatis menjadi investor."
+    ),
+    home="Portal → Akun saya (dasbor investor).",
+    menus=(
+        "Portal: Investasi (beranda peluang, peta, kawasan, bandingkan, ajukan "
+        "minat), Peta Lahan, Layanan, Informasi, Bantuan → Panduan investor",
+        "Dasbor investor: penawaran menunggu jawaban, jadwal konsultasi, "
+        "permintaan aktif dengan langkah berikutnya, lahan tersimpan, lahan "
+        "sesuai sektor minat, dokumen & perizinan",
+        "Akun saya → Ubah profil (profil investor: sektor minat, asal modal, "
+        "negara asal, situs web), Ubah kata sandi",
+    ),
+    can=(
+        "Semua yang bisa dilakukan pemohon portal.",
+        "Menyimpan dan membandingkan hingga 4 lahan, mengunduh profil lahan "
+        "(PDF), dan menghitung simulasi biaya.",
+        "Mengajukan minat dengan memilih lahan atau menggambar usulan lokasi; "
+        "formulir terisi otomatis dari profil investor.",
+        "Berkirim pesan dan lampiran dengan petugas, menerima atau menolak "
+        "penawaran, serta membatalkan permintaan sebelum penawaran diterima.",
+        "Setelah selesai: melengkapi draf permohonan alokasi atau mengelola "
+        "dokumen perizinan kontrak sewa/kerja sama.",
+    ),
+    limits=(
+        "Hanya melihat permintaan, pesan, lampiran, dan lahan tersimpan miliknya "
+        "sendiri; nomor milik investor lain tidak ditemukan.",
+        "Tidak melihat catatan internal petugas dan tidak bisa mengubah status "
+        "selain menerima/menolak penawaran atau membatalkan.",
+        "Tidak bisa masuk ke aplikasi petugas, panel admin, pusat komando, atau API.",
+    ),
+)
+
+PORTAL_GUIDES = (APPLICANT_GUIDE, INVESTOR_GUIDE)
 
 GENERAL_STEPS = (
     (
@@ -601,7 +645,7 @@ def sees_all(user) -> bool:
 def guides_for(user) -> list[RoleGuide]:
     """Panduan yang ditampilkan: superuser dan Administrator melihat semua."""
     if sees_all(user):
-        return list(ROLE_GUIDES.values()) + [APPLICANT_GUIDE]
+        return list(ROLE_GUIDES.values()) + list(PORTAL_GUIDES)
     group_ids = set(user.groups.values_list("pk", flat=True))
     return [guide for group, guide in ROLE_GUIDES.items() if group in group_ids]
 
@@ -623,7 +667,7 @@ def render_markdown() -> str:
         "| Peran | Tugas | Masuk & halaman awal | Akun contoh |",
         "|---|---|---|---|",
     ]
-    guides = list(ROLE_GUIDES.values()) + [APPLICANT_GUIDE]
+    guides = list(ROLE_GUIDES.values()) + list(PORTAL_GUIDES)
     for guide in guides:
         lines.append(
             f"| {guide.name} | {guide.summary} | {guide.home} | `{guide.sample}` |"

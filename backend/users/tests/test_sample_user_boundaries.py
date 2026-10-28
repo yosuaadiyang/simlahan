@@ -6,11 +6,16 @@ from django.core.cache import cache
 from django.test import Client
 
 from pengadaan.models import AcquisitionProject
-from users.management.commands.pengguna_contoh import APPLICANT_EMAIL, OFFICERS
+from users.management.commands.pengguna_contoh import (
+    APPLICANT_EMAIL,
+    INVESTOR_EMAIL,
+    OFFICERS,
+)
 
 from .test_sample_users import run
 
-ROLES = [username.split(".", 1)[1] for username, *_rest in OFFICERS] + ["pemohon"]
+PORTAL = {"pemohon", "investor"}
+ROLES = [username.split(".", 1)[1] for username, *_rest in OFFICERS] + sorted(PORTAL)
 LEASING = {"penelusur", "penyusun", "kontrak", "operator", "ahlihukum", "penagihan"}
 ACQUISITION = {"pelaksana", "satgas", "penilai", "instansi"}
 PANEL = {
@@ -47,7 +52,12 @@ ALLOWED = {
     "/v1/invoice/": (LEASING - {"penelusur"}) | {"administrator"},
     "/v1/pengadaan/project/": LEASING | ACQUISITION | {"administrator"},
     "/v1/aset/asset/": {"administrator", "aset", "hukum", "lapangan", "korwil"},
-    "/portal/akun/": {"pemohon"},
+    "/portal/akun/": PORTAL,
+    "/portal/akun/profil/": PORTAL,
+    "/portal/investasi/permintaan/": PORTAL,
+    "/portal/investasi/tersimpan/": PORTAL,
+    "/portal/investasi/ajukan/": PORTAL,
+    "/portal/dokumen/": PORTAL,
 }
 
 
@@ -55,8 +65,9 @@ ALLOWED = {
 def accounts(samples):
     run()
     users = {u.username: u for u in get_user_model().objects.all()}
-    accounts = {role: users[f"contoh.{role}"] for role in ROLES if role != "pemohon"}
+    accounts = {role: users[f"contoh.{role}"] for role in ROLES if role not in PORTAL}
     accounts["pemohon"] = users[APPLICANT_EMAIL]
+    accounts["investor"] = users[INVESTOR_EMAIL]
     return accounts
 
 
@@ -96,10 +107,11 @@ def test_appraiser_and_agency_only_see_assigned_projects(accounts, samples):
         assert project.name in names
 
 
-def test_applicant_cannot_use_officer_login(accounts):
-    response = Client().post(
-        "/v1/auth/login/",
-        {"username": APPLICANT_EMAIL, "password": "x"},
-        content_type="application/json",
-    )
-    assert response.status_code in (401, 403)
+def test_portal_accounts_cannot_use_officer_login(accounts):
+    for email in (APPLICANT_EMAIL, INVESTOR_EMAIL):
+        response = Client().post(
+            "/v1/auth/login/",
+            {"username": email, "password": "x"},
+            content_type="application/json",
+        )
+        assert response.status_code in (401, 403)

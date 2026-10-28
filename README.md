@@ -23,7 +23,10 @@ SimLahan adalah aplikasi web untuk instansi pengelola lahan di Indonesia:
   simulasi biaya sewa & UWT, profil lahan PDF ber-QR, lahan tersimpan, serta
   permintaan investasi (sewa, alokasi, atau kerja sama; pilih lahan atau
   gambar usulan lokasi) dengan pesan dua arah, jadwal konsultasi, penawaran
-  daring, dan penerusan ke kontrak sewa atau permohonan alokasi.
+  daring, dan penerusan ke kontrak sewa atau permohonan alokasi. Akun
+  investor (`/portal/investasi/daftar/`) punya profil investor (sektor minat,
+  asal modal) dan dasbor investor: penawaran & jadwal konsultasi, langkah
+  berikutnya per permintaan, lahan tersimpan, dan lahan sesuai sektor minat.
 - **Dokumen & perizinan** (`/admin/dokumen/`, `/portal/dokumen/`): daftar
   dokumen perizinan wajib per pemanfaatan lahan beserta statusnya, versi &
   masa berlaku, impor templat (DOCX/HTML/PDF/ZIP) dengan isian otomatis,
@@ -207,7 +210,7 @@ kehilangan status itu saat dikeluarkan dari grup terakhirnya.
 ### Akun contoh per peran
 
 Untuk mencoba menu dan batas hak akses setiap peran, buat satu akun per grup
-ditambah satu pemohon portal:
+ditambah satu pemohon portal dan satu investor:
 
 ```sh
 docker compose exec backend python manage.py pengguna_contoh               # buat; sandi acak ditampilkan sekali
@@ -215,12 +218,16 @@ docker compose exec backend python manage.py pengguna_contoh --sandi-baru  # bua
 docker compose exec backend python manage.py pengguna_contoh --hapus       # hapus semua akun contoh
 ```
 
-Nama pengguna `contoh.<peran>` (mis. `contoh.penilai`, `contoh.korwil`) dan
-pemohon `pemohon@contoh.simlahan.invalid`. Semua petugas masuk di `/` dan
+Nama pengguna `contoh.<peran>` (mis. `contoh.penilai`, `contoh.korwil`),
+pemohon `pemohon@contoh.simlahan.invalid`, dan investor
+`investor@contoh.simlahan.invalid`. Semua petugas masuk di `/` dan
 langsung dibawa ke halaman kerjanya (aplikasi petugas, panel admin, pusat
-komando, atau aplikasi lapangan); pemohon masuk di `/portal/masuk/`. Jalankan
-data contoh pengadaan dan pusat komando lebih dahulu agar Penilai/Instansi
-ditugaskan ke proyek contoh dan Koordinator/Petugas Lapangan punya Korwil A.
+komando, atau aplikasi lapangan); pemohon dan investor masuk di
+`/portal/masuk/`. Jalankan data contoh pengadaan, alokasi, dan pusat komando
+lebih dahulu agar Penilai/Instansi ditugaskan ke proyek contoh,
+Koordinator/Petugas Lapangan punya Korwil A, dan investor contoh punya lahan
+tersimpan serta tiga permintaan investasi (diajukan, konsultasi terjadwal,
+penawaran menunggu jawaban; dibuat tanpa mengirim surel).
 Akun contoh yang sudah dipakai bekerja dinonaktifkan oleh `--hapus` (bukan
 dihapus) agar riwayat kerjanya tetap utuh.
 

@@ -13,119 +13,23 @@
   </div>
 </div>
 
-{% for a in allocations %}{% if a.report_due or a.is_idle %}
-<div class="alert {% if a.is_idle %}alert-danger{% else %}alert-warn{% endif %}">
-  {% if a.is_idle %}<strong>Peringatan lahan tidur:</strong> pembangunan di lahan {{ a.plot.code }} ({{ a.kpt_number }}) belum dimulai melewati batas {{ a.idle_deadline|tanggal }}.
-  {% else %}<strong>Laporan jatuh tempo:</strong> kirim laporan progres untuk {{ a.kpt_number }}.{% endif %}
-  <a href="{% url 'portal:allocation_detail' a.pk %}">Buka</a>
-</div>
-{% endif %}{% endfor %}
+{% include "alokasi/portal/dashboard/_alerts.html" %}
 
-{% for r in pending_offers %}
-<div class="alert alert-info"><strong>Penawaran menunggu jawaban:</strong> {{ r.number }} ({{ r.project_name }}){% if r.offer_valid_until %}, berlaku s.d. {{ r.offer_valid_until|tanggal }}{% endif %}. <a href="{% url 'portal:investment_request' r.number %}#penawaran">Tinjau penawaran</a></div>
-{% endfor %}
+{% include "alokasi/portal/dashboard/_offers.html" %}
 
-{% if dokumen.tasks %}<div class="alert alert-info"><strong>{{ dokumen.tasks }} dokumen menunggu tanda tangan Anda.</strong> <a href="{% url 'dokumen_portal:index' %}">Buka dokumen</a></div>{% endif %}
-{% if dokumen.revision or dokumen.expired %}<div class="alert alert-warn"><strong>Dokumen perizinan perlu tindakan:</strong>{% if dokumen.revision %} {{ dokumen.revision }} perlu perbaikan{% endif %}{% if dokumen.revision and dokumen.expired %},{% endif %}{% if dokumen.expired %} {{ dokumen.expired }} kedaluwarsa{% endif %}. <a href="{% url 'dokumen_portal:index' %}">Perbarui dokumen</a></div>{% endif %}
+{% include "alokasi/portal/dashboard/_dokumen_alerts.html" %}
 
-<section class="card">
-  <div class="actions-row" style="justify-content:space-between"><h2 style="margin:0">Dokumen &amp; perizinan</h2><a class="small" href="{% url 'dokumen_portal:index' %}">Buka ›</a></div>
-  {% if dokumen.land_uses %}
-  <p class="small" style="margin:8px 0 0">{{ dokumen.land_uses }} pemanfaatan lahan{% if dokumen.missing %} · {{ dokumen.missing }} dokumen wajib belum diunggah{% endif %}{% if dokumen.downloads_ready %} · {{ dokumen.downloads_ready }} unduhan siap{% endif %}. Pantau status, unggah dokumen, tanda tangani dokumen elektronik, dan ajukan izin unduh.</p>
-  {% else %}
-  <p class="small muted" style="margin:8px 0 0">Daftar dokumen perizinan muncul otomatis setelah alokasi lahan terbit atau kontrak sewa/kerja sama dicatat.</p>
-  {% endif %}
-</section>
+{% include "alokasi/portal/dashboard/_dokumen.html" %}
 
-{% if open_invoices %}
-<section class="card">
-  <h2>Tagihan belum lunas</h2>
-  <div class="table-wrap"><table class="data">
-    <thead><tr><th>Nomor</th><th>Permohonan</th><th>Jenis</th><th>Jumlah</th><th>Jatuh tempo</th><th>Status</th></tr></thead>
-    <tbody>{% for inv in open_invoices %}
-      <tr>
-        <td>{{ inv.number }}</td>
-        <td><a href="{% url 'portal:application_detail' inv.application.number %}#tagihan">{{ inv.application.number }}</a></td>
-        <td>{{ inv.get_kind_display }}</td>
-        <td>{{ inv.amount|rupiah|patah }}</td>
-        <td>{{ inv.due_date|tanggal }}{% if inv.is_overdue %} <span class="badge badge-ditolak">Lewat</span>{% endif %}</td>
-        <td><span class="badge badge-{{ inv.status }}">{{ inv.get_status_display }}</span></td>
-      </tr>{% endfor %}
-    </tbody>
-  </table></div>
-</section>
-{% endif %}
+{% include "alokasi/portal/dashboard/_invoices.html" %}
 
-<section class="card">
-  <h2>Alokasi lahan saya</h2>
-  {% if allocations %}
-  <div class="table-wrap"><table class="data">
-    <thead><tr><th>KPT</th><th>Lahan</th><th>Luas</th><th>Berlaku s.d.</th><th>Progres</th><th>Status</th></tr></thead>
-    <tbody>{% for a in allocations %}
-      <tr>
-        <td><a href="{% url 'portal:allocation_detail' a.pk %}">{{ a.kpt_number }}</a></td>
-        <td>{{ a.plot.code }} {{ a.plot.name }}</td>
-        <td>{{ a.area_m2|angka:0|patah }} m²</td>
-        <td>{{ a.end_date|tanggal }}</td>
-        <td style="min-width:120px"><div class="progress" title="{{ a.latest_progress }}%"><span style="width:{{ a.latest_progress }}%"></span></div><span class="small">{{ a.latest_progress }}%</span></td>
-        <td><span class="badge badge-{{ a.status }}">{{ a.get_status_display }}</span></td>
-      </tr>{% endfor %}
-    </tbody>
-  </table></div>
-  {% else %}<p class="muted">Belum ada alokasi.</p>{% endif %}
-</section>
+{% include "alokasi/portal/dashboard/_allocations.html" %}
 
-<section class="card">
-  <h2>Permohonan saya</h2>
-  {% if applications %}
-  <div class="table-wrap"><table class="data">
-    <thead><tr><th>Nomor</th><th>Layanan</th><th>Objek</th><th>Diajukan</th><th>Status</th></tr></thead>
-    <tbody>{% for app in applications %}
-      <tr>
-        <td><a href="{% url 'portal:application_detail' app.number %}">{{ app.number }}</a></td>
-        <td>{{ app.get_service_type_display }}</td>
-        <td>{% if app.is_allocation %}{{ app.plot.code }} {{ app.plot.name }}{% else %}{{ app.source_allocation.kpt_number }}{% endif %}</td>
-        <td>{{ app.submitted_at|tanggal }}</td>
-        <td><span class="badge badge-{{ app.status }}">{{ app.get_status_display }}</span></td>
-      </tr>{% endfor %}
-    </tbody>
-  </table></div>
-  {% else %}<p class="muted">Belum ada permohonan. <a href="{% url 'portal:plot_list' %}">Cari lahan</a> untuk memulai.</p>{% endif %}
-</section>
+{% include "alokasi/portal/dashboard/_applications.html" %}
 
-<section class="card">
-  <div class="actions-row" style="justify-content:space-between"><h2 style="margin:0">Permintaan investasi saya</h2><a class="small" href="{% url 'portal:investment_requests' %}">Semua ›</a></div>
-  {% if investment_requests %}
-  <div class="table-wrap" style="margin-top:12px"><table class="data">
-    <thead><tr><th>Nomor</th><th>Proyek</th><th>Skema</th><th>Lahan</th><th>Status</th></tr></thead>
-    <tbody>{% for r in investment_requests %}
-      <tr>
-        <td><a href="{% url 'portal:investment_request' r.number %}">{{ r.number }}</a></td>
-        <td>{{ r.project_name }}</td>
-        <td>{{ r.get_scheme_display }}</td>
-        <td>{% for p in r.plots.all %}{{ p.code }}{% if not forloop.last %}, {% endif %}{% empty %}{% if r.requested_area_m2 %}{{ r.requested_area_m2|hektare }}{% else %}Usulan lokasi{% endif %}{% endfor %}</td>
-        <td><span class="badge badge-{{ r.status }}">{{ r.get_status_display }}</span></td>
-      </tr>{% endfor %}
-    </tbody>
-  </table></div>
-  {% else %}<p class="muted">Belum ada permintaan investasi. <a href="{% url 'portal:investment_home' %}">Lihat peluang investasi</a>.</p>{% endif %}
-</section>
+{% include "alokasi/portal/dashboard/_investments.html" %}
 
-{% if saved_plots %}
-<section class="card">
-  <div class="actions-row" style="justify-content:space-between"><h2 style="margin:0">Lahan tersimpan</h2><a class="small" href="{% url 'portal:investment_saved' %}">Semua ›</a></div>
-  <ul style="margin-top:12px">{% for item in saved_plots %}
-    <li><a href="{% url 'portal:plot_detail' item.plot.code %}">{{ item.plot.code }}</a> {{ item.plot.name }} · {{ item.plot.area_m2|hektare }} <span class="badge badge-{{ item.plot.status }}">{{ item.plot.get_status_display }}</span></li>
-  {% endfor %}</ul>
-</section>
-{% endif %}
+{% include "alokasi/portal/dashboard/_saved.html" %}
 
-{% if incoming_transfers %}
-<section class="card">
-  <h2>Peralihan hak kepada saya</h2>
-  <ul>{% for app in incoming_transfers %}
-    <li><a href="{% url 'portal:application_detail' app.number %}">{{ app.number }}</a> – {{ app.source_allocation.kpt_number }} dari {{ app.applicant.name }} <span class="badge badge-{{ app.status }}">{{ app.get_status_display }}</span></li>
-  {% endfor %}</ul>
-</section>
-{% endif %}
+{% include "alokasi/portal/dashboard/_transfers.html" %}
 {% endblock %}

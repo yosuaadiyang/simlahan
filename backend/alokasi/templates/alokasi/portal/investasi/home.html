@@ -17,6 +17,7 @@
       <a href="{% url 'portal:investment_map' %}?skema=alokasi">Lahan alokasi (UWT)</a>
       <a href="{% url 'portal:investment_map' %}?siap=1">Siap bangun</a>
       <a href="{% url 'portal:investment_request_create' %}">Ajukan minat investasi</a>
+      {% if portal_applicant %}<a href="{% url 'portal:dashboard' %}">Dasbor saya</a>{% else %}<a href="{% url 'portal:investor_register' %}">Daftar sebagai investor</a>{% endif %}
     </div>
   </div>
 </section>
@@ -117,7 +118,7 @@
   </div>
   <div class="actions-row">
     <a class="btn btn-accent" href="{% url 'portal:investment_request_create' %}">Ajukan minat investasi</a>
-    {% if not portal_applicant %}<a class="btn btn-outline" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.5)" href="{% url 'portal:register' %}">Daftar akun</a>{% endif %}
+    {% if not portal_applicant %}<a class="btn btn-outline" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.5)" href="{% url 'portal:investor_register' %}">Daftar sebagai investor</a>{% endif %}
   </div>
 </section>
 {% include "alokasi/portal/investasi/_compare_bar.html" %}

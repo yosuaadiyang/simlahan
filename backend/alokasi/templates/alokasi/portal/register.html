@@ -1,11 +1,16 @@
 {% extends "alokasi/portal/base.html" %}
-{% block title %}Daftar Akun Pemohon{% endblock %}
+{% block title %}{% if investor %}Daftar Akun Investor{% else %}Daftar Akun Pemohon{% endif %}{% endblock %}
 {% block content %}
+{% if investor %}
+<h1>Daftar akun investor</h1>
+<p class="muted">Untuk badan usaha atau perorangan yang ingin menyewa, memperoleh alokasi, atau bekerja sama memanfaatkan lahan. Setelah aktif, dasbor investor menampilkan lahan sesuai sektor pilihan Anda, permintaan investasi, jadwal konsultasi, dan penawaran dari petugas.</p>
+{% else %}
 <h1>Daftar akun pemohon</h1>
-<p class="muted">Satu akun untuk satu pemohon (perorangan, badan usaha, atau instansi). Data dapat diubah kemudian di menu profil.</p>
+<p class="muted">Satu akun untuk satu pemohon (perorangan, badan usaha, atau instansi). Data dapat diubah kemudian di menu profil. Calon investor dapat <a href="{% url 'portal:investor_register' %}">mendaftar sebagai investor</a>.</p>
+{% endif %}
 <form method="post" class="card" novalidate>{% csrf_token %}
   {% include "alokasi/portal/_form.html" %}
-  <button class="btn btn-accent" type="submit">Daftar</button>
+  <button class="btn btn-accent" type="submit">{% if investor %}Daftar sebagai investor{% else %}Daftar{% endif %}</button>
   <p class="small">Sudah punya akun? <a href="{% url 'portal:login' %}">Masuk</a> · Belum menerima surel aktivasi? <a href="{% url 'portal:resend_activation' %}">Kirim ulang</a></p>
 </form>
 {% endblock %}

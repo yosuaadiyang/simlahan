@@ -1,0 +1,8 @@
+{% load alokasi_tags %}{% if saved_plots %}
+<section class="card">
+  <div class="actions-row" style="justify-content:space-between"><h2 style="margin:0">Lahan tersimpan</h2><a class="small" href="{% url 'portal:investment_saved' %}">Semua ›</a></div>
+  <ul style="margin-top:12px">{% for item in saved_plots %}
+    <li><a href="{% url 'portal:plot_detail' item.plot.code %}">{{ item.plot.code }}</a> {{ item.plot.name }} · {{ item.plot.area_m2|hektare }} <span class="badge badge-{{ item.plot.status }}">{{ item.plot.get_status_display }}</span></li>
+  {% endfor %}</ul>
+</section>
+{% endif %}

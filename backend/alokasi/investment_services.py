@@ -136,8 +136,24 @@ def submit_request(applicant: Applicant, form) -> InvestmentRequest:
     InvestmentEvent.objects.create(
         request=investment, status=S.SUBMITTED, actor=applicant.user
     )
+    _become_investor(applicant, investment)
     transaction.on_commit(lambda: _after_submit(investment.pk))
     return investment
+
+
+def _become_investor(applicant: Applicant, investment: InvestmentRequest) -> None:
+    """Pengajuan minat pertama menjadikan akun pemohon akun investor; profil
+    investornya diisi dari permintaan itu."""
+    if applicant.is_investor:
+        return
+    applicant.is_investor = True
+    applicant.capital_origin = investment.capital_origin
+    applicant.origin_country = investment.origin_country
+    applicant.save(
+        update_fields=["is_investor", "capital_origin", "origin_country", "modified_at"]
+    )
+    if investment.sector_id and not applicant.interest_sectors.exists():
+        applicant.interest_sectors.add(investment.sector_id)
 
 
 def _after_submit(pk: int) -> None:

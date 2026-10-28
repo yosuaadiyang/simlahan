@@ -28,6 +28,7 @@ urlpatterns = [
         name="investment_zone_photo",
     ),
     path("investasi/bandingkan/", iv.compare, name="investment_compare"),
+    path("investasi/daftar/", iv.investor_register, name="investor_register"),
     path("investasi/ajukan/", iv.request_create, name="investment_request_create"),
     path("investasi/tersimpan/", iv.saved_list, name="investment_saved"),
     path("investasi/permintaan/", iv.request_list, name="investment_requests"),

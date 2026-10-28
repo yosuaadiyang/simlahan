@@ -1,0 +1,18 @@
+{% load alokasi_tags %}<section class="card">
+  <div class="actions-row" style="justify-content:space-between"><h2 style="margin:0">Permintaan investasi saya</h2><a class="small" href="{% url 'portal:investment_requests' %}">Semua ›</a></div>
+  {% if investment_requests %}
+  <div class="table-wrap" style="margin-top:12px"><table class="data">
+    <thead><tr><th>Nomor</th><th>Proyek</th><th>Skema</th><th>Lahan</th><th>Status</th>{% if investor %}<th>Langkah berikutnya</th>{% endif %}</tr></thead>
+    <tbody>{% for r in investment_requests %}
+      <tr>
+        <td><a href="{% url 'portal:investment_request' r.number %}">{{ r.number }}</a></td>
+        <td>{{ r.project_name }}</td>
+        <td>{{ r.get_scheme_display }}</td>
+        <td>{% for p in r.plots.all %}{{ p.code }}{% if not forloop.last %}, {% endif %}{% empty %}{% if r.requested_area_m2 %}{{ r.requested_area_m2|hektare }}{% else %}Usulan lokasi{% endif %}{% endfor %}</td>
+        <td><span class="badge badge-{{ r.status }}">{{ r.get_status_display }}</span></td>
+        {% if investor %}<td class="small">{% include "alokasi/portal/dashboard/_next_step.html" %}</td>{% endif %}
+      </tr>{% endfor %}
+    </tbody>
+  </table></div>
+  {% else %}<p class="muted">Belum ada permintaan investasi. <a href="{% url 'portal:investment_home' %}">Lihat peluang investasi</a>{% if investor %} lalu tekan <strong>Ajukan minat</strong> pada lahan yang cocok{% endif %}.</p>{% endif %}
+</section>

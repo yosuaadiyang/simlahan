@@ -2,13 +2,15 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand
 
 # Urutan penting: data yang merujuk lahan/akun contoh dihapus lebih dahulu.
+# Akun contoh (beserta permintaan investasi investor contoh) dihapus sebelum
+# lahan contoh, karena permintaan itu merujuk lahan contoh.
 SAMPLE_COMMANDS = (
     "dokumen_contoh_rempang",
     "operasi_contoh_rempang",
     "asetlahan_contoh_rempang",
     "pengadaan_contoh_rempang",
-    "alokasi_contoh_rempang",
     "pengguna_contoh",
+    "alokasi_contoh_rempang",
 )
 
 

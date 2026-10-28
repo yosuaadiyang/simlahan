@@ -25,7 +25,8 @@ Panduan yang sama tersedia di aplikasi (`/akun/panduan/`) dan hanya menampilkan 
 | Petugas Hukum | Menangani perkara dan sidang terkait aset lahan. | Panel admin → Perkara. | `contoh.hukum` |
 | Petugas Lapangan | Bekerja di lapangan untuk Korwil tempatnya menjadi anggota. | Pusat komando (`/komando/`). | `contoh.lapangan` |
 | Koordinator Wilayah | Memimpin tim lapangan di Korwil yang dipimpinnya. | Pusat komando (`/komando/`). | `contoh.korwil` |
-| Pemohon portal | Badan usaha, investor, atau perorangan yang mengajukan alokasi, sewa, atau investasi lahan. | Portal → Akun saya. | `pemohon@contoh.simlahan.invalid` |
+| Pemohon portal | Badan usaha, instansi, atau perorangan yang mengajukan alokasi, sewa, atau layanan pertanahan lain. | Portal → Akun saya. | `pemohon@contoh.simlahan.invalid` |
+| Investor | Akun pemohon portal dengan profil investor: mencari lahan, mengajukan minat sewa/alokasi/kerja sama, dan menanggapi penawaran petugas. | Portal → Akun saya (dasbor investor). | `investor@contoh.simlahan.invalid` |
 
 ## Dasar penggunaan
 
@@ -524,7 +525,7 @@ Memimpin tim lapangan di Korwil yang dipimpinnya.
 
 ## Pemohon portal
 
-Badan usaha, investor, atau perorangan yang mengajukan alokasi, sewa, atau investasi lahan.
+Badan usaha, instansi, atau perorangan yang mengajukan alokasi, sewa, atau layanan pertanahan lain.
 
 - **Masuk:** Portal (`/portal/masuk/`) dengan alamat surel; daftar sendiri di `/portal/daftar/`.
 - **Halaman awal:** Portal → Akun saya.
@@ -545,4 +546,32 @@ Badan usaha, investor, atau perorangan yang mengajukan alokasi, sewa, atau inves
 
 **Batas akses**
 
+- Tidak bisa masuk ke aplikasi petugas, panel admin, pusat komando, atau API.
+
+## Investor
+
+Akun pemohon portal dengan profil investor: mencari lahan, mengajukan minat sewa/alokasi/kerja sama, dan menanggapi penawaran petugas.
+
+- **Masuk:** Portal (`/portal/masuk/`) dengan alamat surel; daftar sendiri di `/portal/investasi/daftar/`. Pemohon yang mengajukan minat investasi pertamanya otomatis menjadi investor.
+- **Halaman awal:** Portal → Akun saya (dasbor investor).
+- **Akun contoh:** `investor@contoh.simlahan.invalid`
+
+**Menu**
+
+- Portal: Investasi (beranda peluang, peta, kawasan, bandingkan, ajukan minat), Peta Lahan, Layanan, Informasi, Bantuan → Panduan investor
+- Dasbor investor: penawaran menunggu jawaban, jadwal konsultasi, permintaan aktif dengan langkah berikutnya, lahan tersimpan, lahan sesuai sektor minat, dokumen & perizinan
+- Akun saya → Ubah profil (profil investor: sektor minat, asal modal, negara asal, situs web), Ubah kata sandi
+
+**Yang bisa dilakukan**
+
+- Semua yang bisa dilakukan pemohon portal.
+- Menyimpan dan membandingkan hingga 4 lahan, mengunduh profil lahan (PDF), dan menghitung simulasi biaya.
+- Mengajukan minat dengan memilih lahan atau menggambar usulan lokasi; formulir terisi otomatis dari profil investor.
+- Berkirim pesan dan lampiran dengan petugas, menerima atau menolak penawaran, serta membatalkan permintaan sebelum penawaran diterima.
+- Setelah selesai: melengkapi draf permohonan alokasi atau mengelola dokumen perizinan kontrak sewa/kerja sama.
+
+**Batas akses**
+
+- Hanya melihat permintaan, pesan, lampiran, dan lahan tersimpan miliknya sendiri; nomor milik investor lain tidak ditemukan.
+- Tidak melihat catatan internal petugas dan tidak bisa mengubah status selain menerima/menolak penawaran atau membatalkan.
 - Tidak bisa masuk ke aplikasi petugas, panel admin, pusat komando, atau API.

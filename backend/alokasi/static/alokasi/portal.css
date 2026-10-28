@@ -213,6 +213,11 @@ form.inline { display: inline; }
 .field label { display: block; font-weight: 600; font-size: .9rem; margin-bottom: 6px; color: var(--sl-gray-800); }
 .field.required > label::after { content: " *"; color: var(--danger); }
 .field.checkbox label { display: flex; gap: 10px; font-weight: 400; align-items: flex-start; }
+.field.choice-chips > div { display: flex; flex-wrap: wrap; gap: 8px; }
+.field.choice-chips > div > div { display: contents; }
+.field.choice-chips > div label { display: inline-flex; gap: 8px; align-items: center; margin: 0; padding: 7px 12px; border: 1px solid var(--border); border-radius: 999px; background: var(--card); font-weight: 500; cursor: pointer; }
+.field.choice-chips > div label:has(input:checked) { border-color: var(--primary); background: var(--sl-primary-soft); color: var(--sl-primary-strong); }
+.field.choice-chips > div input { margin: 0 !important; }
 .field input:not([type=checkbox]):not([type=radio]), .field select, .field textarea, .filters input, .filters select {
   width: 100%;
   min-height: 44px;

@@ -598,10 +598,10 @@ def _send_activation(request, user) -> None:
     )
 
 
-def register(request):
+def register(request, investor=False):
     if request.user.is_authenticated and hasattr(request.user, "pemohon"):
         return redirect("portal:dashboard")
-    form = RegistrationForm(request.POST or None)
+    form = RegistrationForm(request.POST or None, investor=investor)
     if request.method == "POST":
         if _throttled(request, "register", limit=5, window=300):
             return _too_many(request)
@@ -618,12 +618,16 @@ def register(request):
                 user.save()
                 applicant = form.save(commit=False)
                 applicant.user = user
+                applicant.is_investor = investor
                 applicant.save()
+                form.save_m2m()
             _send_activation(request, user)
             return render(
                 request, "alokasi/portal/register_done.html", {"email": user.email}
             )
-    return render(request, "alokasi/portal/register.html", {"form": form})
+    return render(
+        request, "alokasi/portal/register.html", {"form": form, "investor": investor}
+    )
 
 
 def activate(request, uidb64, token):
@@ -754,7 +758,7 @@ def _report_due(allocation: Allocation, config: AllocationSettings) -> bool:
 
 @applicant_required
 def dashboard(request):
-    from alokasi.investment_views import investment_summary
+    from alokasi.investment_views import investment_summary, recommended_plots
     from dokumen.views import portal_summary
 
     applicant = request.applicant
@@ -781,6 +785,10 @@ def dashboard(request):
         **investment_summary(applicant),
         "dokumen": portal_summary(applicant, request.user),
     }
+    if applicant.is_investor:
+        context["recommended"] = recommended_plots(applicant, context["saved_codes"])
+        context["interest_sectors"] = applicant.interest_sectors.filter(is_active=True)
+        return render(request, "alokasi/portal/dashboard_investor.html", context)
     return render(request, "alokasi/portal/dashboard.html", context)
 
 

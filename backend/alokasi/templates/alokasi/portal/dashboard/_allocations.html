@@ -1,0 +1,18 @@
+{% load alokasi_tags %}<section class="card">
+  <h2>Alokasi lahan saya</h2>
+  {% if allocations %}
+  <div class="table-wrap"><table class="data">
+    <thead><tr><th>KPT</th><th>Lahan</th><th>Luas</th><th>Berlaku s.d.</th><th>Progres</th><th>Status</th></tr></thead>
+    <tbody>{% for a in allocations %}
+      <tr>
+        <td><a href="{% url 'portal:allocation_detail' a.pk %}">{{ a.kpt_number }}</a></td>
+        <td>{{ a.plot.code }} {{ a.plot.name }}</td>
+        <td>{{ a.area_m2|angka:0|patah }} m²</td>
+        <td>{{ a.end_date|tanggal }}</td>
+        <td style="min-width:120px"><div class="progress" title="{{ a.latest_progress }}%"><span style="width:{{ a.latest_progress }}%"></span></div><span class="small">{{ a.latest_progress }}%</span></td>
+        <td><span class="badge badge-{{ a.status }}">{{ a.get_status_display }}</span></td>
+      </tr>{% endfor %}
+    </tbody>
+  </table></div>
+  {% else %}<p class="muted">Belum ada alokasi.</p>{% endif %}
+</section>

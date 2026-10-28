@@ -1,7 +1,7 @@
 {% extends "alokasi/portal/base.html" %}
-{% block title %}Profil Pemohon{% endblock %}
+{% block title %}{% if request.applicant.is_investor %}Profil Investor{% else %}Profil Pemohon{% endif %}{% endblock %}
 {% block content %}
-<h1>Profil pemohon</h1>
+<h1>{% if request.applicant.is_investor %}Profil investor{% else %}Profil pemohon{% endif %}</h1>
 <form method="post" class="card">{% csrf_token %}
   <p class="muted small">Surel akun: {{ request.user.email }}</p>
   {% include "alokasi/portal/_form.html" %}

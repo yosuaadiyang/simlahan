@@ -33,7 +33,7 @@ def test_creates_one_account_per_role_with_scopes(samples):
     output = run()
 
     users = {user.username: user for user in sample_users()}
-    assert len(users) == len(OFFICERS) + 1
+    assert len(users) == len(OFFICERS) + 2
     for username, group, _role, _where in OFFICERS:
         user = users[username]
         assert [g.pk for g in user.groups.all()] == [group]
@@ -84,7 +84,7 @@ def test_without_sample_data_explains_missing_scopes(groups, unit):
     output = run()
     assert "pengadaan_contoh_rempang" in output
     assert "operasi_contoh_rempang" in output
-    assert sample_users().count() == len(OFFICERS) + 1
+    assert sample_users().count() == len(OFFICERS) + 2
 
 
 def test_rejects_weak_password_and_missing_groups(groups, unit):
