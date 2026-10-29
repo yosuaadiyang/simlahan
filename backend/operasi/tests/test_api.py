@@ -60,7 +60,8 @@ def test_page_renders_with_config(field, korwil):
 
 def test_page_requires_login_and_permission(seeded, units):
     response = Client().get(BASE)
-    assert response.status_code == 302 and "/admin/login/" in response["Location"]
+    assert response.status_code == 302
+    assert response["Location"] == "/komando/masuk/?next=/komando/"
     plain = make_user("staf", units=[units[0]])
     response = login(plain).get(BASE)
     assert response.status_code == 403

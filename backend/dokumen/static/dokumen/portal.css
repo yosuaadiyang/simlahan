@@ -23,7 +23,7 @@
 .dk-form-grid { display: grid; gap: 10px; }
 .dk-steps { margin: 0; padding-left: 20px; }
 .dk-step { padding: 6px 0; overflow-wrap: anywhere; }
-.dk-step-selesai::marker { color: #047857; }
+.dk-step-selesai::marker { color: #1f7a00; }
 .dk-step-ditolak::marker { color: #b91c1c; }
 .dk-comment { padding: 8px 12px; margin-bottom: 8px; border-radius: var(--sl-radius); background: var(--sl-gray-50); overflow-wrap: anywhere; }
 .dk-timeline { list-style: none; margin: 0; padding: 0; }

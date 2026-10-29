@@ -532,7 +532,7 @@ def test_service_worker_does_not_keep_personal_data(field, korwil):
             "</script>"
         )[0]
     )
-    assert config["urls"]["logout"] == reverse("admin:logout")
+    assert config["urls"]["logout"] == reverse("operasi-logout")
     assert 'id="keluar"' in page
     from django.contrib.staticfiles import finders
 

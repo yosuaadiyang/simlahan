@@ -2,10 +2,12 @@
 
 from django.urls import path
 
-from operasi import views
+from operasi import auth_views, views
 
 urlpatterns = [
     path("", views.command_center, name="operasi-command"),
+    path("masuk/", auth_views.CommandLoginView.as_view(), name="operasi-login"),
+    path("keluar/", auth_views.command_logout, name="operasi-logout"),
     path("manifest.webmanifest", views.manifest, name="operasi-manifest"),
     path("sw.js", views.service_worker, name="operasi-sw"),
     path("berkas/<str:kind>/<int:pk>/", views.private_file, name="operasi-file"),

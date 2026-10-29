@@ -12,7 +12,6 @@ import uuid
 from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 
 from django.conf import settings
-from django.contrib.admin.views.decorators import staff_member_required
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, transaction
@@ -32,6 +31,7 @@ from asetlahan import scope as aset_scope
 from asetlahan.field_views import _parse_captured_at, _parse_location
 from asetlahan.geo import collection, feature
 from operasi import enums, geo, satellite, services
+from operasi.auth_views import command_login_required, forbidden, main_app_url
 from operasi.models import (
     MAX_LAND_AREA_M2,
     RELEASED_PARCEL_STATUSES,
@@ -313,17 +313,18 @@ def _config(request) -> dict:
             "scope": reverse("operasi-command"),
             "admin": reverse("admin:index"),
             "adminKorwil": reverse("admin:app_list", args=["operasi"]),
-            "login": reverse("admin:login") + "?next=" + reverse("operasi-command"),
-            "logout": reverse("admin:logout"),
+            "main": main_app_url(user),
+            "login": reverse("operasi-login") + "?next=" + reverse("operasi-command"),
+            "logout": reverse("operasi-logout"),
         },
     }
 
 
 @never_cache
-@staff_member_required
+@command_login_required
 def command_center(request):
     if not request.user.has_perm("operasi.view_korwil"):
-        return render(request, "operasi/forbidden.html", status=403)
+        return forbidden(request)
     return render(request, "operasi/komando.html", {"komando_config": _config(request)})
 
 
@@ -346,8 +347,8 @@ def manifest(request):
         "scope": start,
         "display": "standalone",
         "orientation": "portrait",
-        "background_color": "#0a0f1a",
-        "theme_color": "#10b981",
+        "background_color": "#f7faff",
+        "theme_color": "#1d82f5",
         "lang": "id",
         "categories": ["business", "productivity", "utilities"],
         "icons": [
@@ -438,7 +439,7 @@ def file_url(kind: str, obj) -> str:
     return reverse("operasi-file", args=[kind, obj.pk])
 
 
-@staff_member_required
+@command_login_required
 def private_file(request, kind, pk):
     from alokasi.views import serve_file
 

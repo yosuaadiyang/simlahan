@@ -1,12 +1,12 @@
 // Modul pengadaan tanah
 // Warna mengikuti token design system (styles/_tokens.scss).
-$acq-green: #0d7e74;
-$acq-green-dark: #0f665f;
-$acq-border: #e2e8f0;
-$acq-muted: #475569;
+$acq-green: #1d82f5;
+$acq-green-dark: #0b5fcc;
+$acq-border: #e8eef3;
+$acq-muted: #45505e;
 $acq-danger: #b91c1c;
 $acq-warning: #b45309;
-$acq-success: #047857;
+$acq-success: #1f7a00;
 $acq-shadow:
   0 1px 3px rgba(15, 23, 42, 0.08),
   0 1px 2px rgba(15, 23, 42, 0.04);
@@ -187,14 +187,14 @@ $acq-shadow:
 
 .acq-progress {
   position: relative;
-  background: #eef2f6;
+  background: #f1f4f8;
   border-radius: 999px;
   height: 1.4rem;
   min-width: 120px;
   overflow: hidden;
 
   &__bar {
-    background: linear-gradient(90deg, #149d8f, $acq-green);
+    background: linear-gradient(90deg, #3893f6, $acq-green);
     border-radius: 999px;
     height: 100%;
     transition: width 0.3s ease;
@@ -211,7 +211,7 @@ $acq-shadow:
     padding: 0 0.5rem;
     font-size: 0.8rem;
     font-weight: 600;
-    color: #0f172a;
+    color: #28313c;
     text-shadow:
       0 0 3px #fff,
       0 0 3px #fff;
@@ -240,8 +240,8 @@ $acq-shadow:
   font-size: 0.8rem;
   font-weight: 600;
   white-space: nowrap;
-  background: #eef2f6;
-  color: #334155;
+  background: #f1f4f8;
+  color: #45505e;
 
   &--success {
     background: #d1fae5;
@@ -293,7 +293,7 @@ $acq-shadow:
     &:hover,
     &:focus-visible {
       color: $acq-green-dark;
-      background: #effcf9;
+      background: #e9f2fe;
     }
 
     &.is-active {
@@ -350,7 +350,7 @@ $acq-shadow:
     cursor: pointer;
 
     &:hover td {
-      background: #effcf9;
+      background: #e9f2fe;
     }
   }
 
@@ -394,7 +394,7 @@ $acq-shadow:
 
   &:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(20, 157, 143, 0.35);
+    box-shadow: 0 0 0 3px rgba(29, 130, 245, 0.35);
   }
 
   &:hover,
@@ -411,14 +411,14 @@ $acq-shadow:
 
   &--secondary {
     background: #fff;
-    border-color: #cbd5e1;
-    color: #0f172a;
+    border-color: #d3dbe4;
+    color: #28313c;
 
     &:hover,
     &:focus-visible {
       background: #f8fafc;
-      border-color: #94a3b8;
-      color: #0f172a;
+      border-color: #99a5b5;
+      color: #28313c;
     }
   }
 
@@ -591,7 +591,7 @@ $acq-shadow:
       width: 0.8rem;
       height: 0.8rem;
       display: inline-block;
-      border: 1px solid #334155;
+      border: 1px solid #45505e;
       border-radius: 3px;
     }
   }

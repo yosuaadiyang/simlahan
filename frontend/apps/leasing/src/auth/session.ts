@@ -227,6 +227,47 @@ export const restoreSession = async (): Promise<AuthUser | null> => {
   }
 };
 
+const readCsrfToken = (): string | null => {
+  try {
+    const match = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/);
+    return match ? decodeURIComponent(match[1]) : null;
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * Peramban mungkin sudah masuk lewat halaman server (pusat komando, panel
+ * admin): sesi itu bisa ditukar dengan token aplikasi ini tanpa login ulang.
+ */
+export const hasBrowserSession = (): boolean => Boolean(readCsrfToken());
+
+/** Tukar sesi peramban dengan token aplikasi petugas; null bila tidak ada sesi. */
+export const restoreFromBrowserSession = async (): Promise<AuthUser | null> => {
+  const csrfToken = readCsrfToken();
+  if (!csrfToken) return null;
+  try {
+    const response = await fetch(
+      new Request(createUrl("auth/session/"), {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept-Language": UI_ACCEPT_LANGUAGE_VALUE,
+          "X-CSRFToken": csrfToken,
+        },
+        body: "{}",
+      }),
+    );
+    if (!response.ok) return null;
+    const data = await response.json();
+    if (!data.access || !data.user) return null;
+    return completeLogin(data);
+  } catch {
+    return null;
+  }
+};
+
 /**
  * Hapus data pusat komando (/komando/) yang tersimpan di perangkat: cache
  * halaman & lapisan peta serta antrean laporan luring. Tanpa ini data warga

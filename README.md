@@ -222,7 +222,8 @@ Nama pengguna `contoh.<peran>` (mis. `contoh.penilai`, `contoh.korwil`),
 pemohon `pemohon@contoh.simlahan.invalid`, dan investor
 `investor@contoh.simlahan.invalid`. Semua petugas masuk di `/` dan
 langsung dibawa ke halaman kerjanya (aplikasi petugas, panel admin, pusat
-komando, atau aplikasi lapangan); pemohon dan investor masuk di
+komando, atau aplikasi lapangan); petugas lapangan dan koordinator wilayah
+juga bisa masuk langsung di `/komando/masuk/`; pemohon dan investor masuk di
 `/portal/masuk/`. Jalankan data contoh pengadaan, alokasi, dan pusat komando
 lebih dahulu agar Penilai/Instansi ditugaskan ke proyek contoh,
 Koordinator/Petugas Lapangan punya Korwil A, dan investor contoh punya lahan
@@ -429,9 +430,12 @@ docker compose exec backend python manage.py asetlahan_contoh_rempang --hapus  #
 
 ## Pusat komando operasi lapangan
 
-Buka `/komando/` (juga menu **Pusat Komando** di aplikasi petugas); dapat
-dipasang di ponsel dan tetap bisa mencatat saat luring (data dikirim otomatis
-ketika sinyal kembali). Pintasan: `/komando/?tab=absen`, `?tab=korwil` (lapor),
+Pusat komando adalah aplikasi tersendiri dengan halaman masuk sendiri
+(`/komando/masuk/`, seperti portal); dapat dipasang di ponsel dan tetap bisa
+mencatat saat luring (data dikirim otomatis ketika sinyal kembali). Pindah
+tanpa masuk ulang: tombol **Pusat Komando** di bilah atas aplikasi petugas dan
+panel admin, dan tombol **⇄ Utama** di bilah atas pusat komando (ke aplikasi
+petugas, atau ke panel admin bagi peran yang tidak punya halaman di sana). Pintasan: `/komando/?tab=absen`, `?tab=korwil` (lapor),
 `?tab=perf` (kinerja), `?tab=tasks` (tugas). Tekan `Ctrl+K` atau `/` untuk
 pencarian & Power Mode.
 
@@ -447,7 +451,8 @@ Izin, sakit, cuti, dan dinas luar baru dihitung pada KPI setelah disetujui
 koordinator Korwil (tab Absen → Persetujuan izin tim) atau Administrator
 (panel Absensi → tindakan Setujui/Tolak); penerima tugas tidak dapat
 membatalkan tugasnya sendiri. Tombol **Keluar** di pusat komando menghapus
-lapisan peta tersimpan dan antrean luring dari perangkat.
+lapisan peta tersimpan dan antrean luring dari perangkat, dan juga
+mengeluarkan aplikasi petugas di perangkat itu.
 
 | Kebutuhan | Tempat |
 |---|---|

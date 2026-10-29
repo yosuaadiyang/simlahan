@@ -75,7 +75,7 @@ html[data-theme="light"],
     --primary: var(--sl-brand-400);
     --secondary: var(--sl-brand-500);
     --accent: var(--sl-brand-300);
-    --primary-fg: #04201e;
+    --primary-fg: #061a36;
 
     --body-fg: #e2e8f0;
     --body-bg: #111827;
@@ -106,9 +106,9 @@ html[data-theme="light"],
 
     --darkened-bg: #0f172a;
     --selected-bg: #1e293b;
-    --selected-row: #0b3330;
+    --selected-row: #0c2340;
 
-    --button-fg: #04201e;
+    --button-fg: #061a36;
     --button-bg: var(--sl-brand-400);
     --button-hover-bg: var(--sl-brand-300);
     --default-button-bg: var(--sl-brand-400);
@@ -125,7 +125,7 @@ html[data-theme="light"],
     --sl-admin-page-bg: #0b1120;
     --sl-admin-card: #111827;
     --sl-admin-card-border: #1f2a3b;
-    --sl-admin-soft: #0b3330;
+    --sl-admin-soft: #0c2340;
     --sl-admin-soft-fg: var(--sl-brand-200);
     --sl-admin-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 
@@ -137,7 +137,7 @@ html[data-theme="dark"] {
   --primary: var(--sl-brand-400);
   --secondary: var(--sl-brand-500);
   --accent: var(--sl-brand-300);
-  --primary-fg: #04201e;
+  --primary-fg: #061a36;
 
   --body-fg: #e2e8f0;
   --body-bg: #111827;
@@ -168,9 +168,9 @@ html[data-theme="dark"] {
 
   --darkened-bg: #0f172a;
   --selected-bg: #1e293b;
-  --selected-row: #0b3330;
+  --selected-row: #0c2340;
 
-  --button-fg: #04201e;
+  --button-fg: #061a36;
   --button-bg: var(--sl-brand-400);
   --button-hover-bg: var(--sl-brand-300);
   --default-button-bg: var(--sl-brand-400);
@@ -187,7 +187,7 @@ html[data-theme="dark"] {
   --sl-admin-page-bg: #0b1120;
   --sl-admin-card: #111827;
   --sl-admin-card-border: #1f2a3b;
-  --sl-admin-soft: #0b3330;
+  --sl-admin-soft: #0c2340;
   --sl-admin-soft-fg: var(--sl-brand-200);
   --sl-admin-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 
@@ -339,6 +339,19 @@ a:focus {
 #logout-form button:focus {
   background: var(--darkened-bg);
   color: var(--body-loud-color) !important;
+}
+
+/* Tombol pindah ke pusat komando (aplikasi terpisah di /komando/). */
+#user-tools a.sl-switch {
+  border: 1px solid var(--border-color);
+  color: var(--link-fg) !important;
+  font-weight: 600;
+}
+
+#user-tools a.sl-switch:hover,
+#user-tools a.sl-switch:focus {
+  border-color: var(--primary);
+  background: var(--selected-row);
 }
 
 #logout-form {
@@ -1360,8 +1373,8 @@ ul.messagelist li.error {
 
 /* ===================================================== Halaman masuk */
 body.login {
-  background: radial-gradient(120% 80% at 0% 0%, rgba(87, 213, 195, 0.18) 0%, transparent 55%),
-    radial-gradient(90% 70% at 100% 100%, rgba(245, 158, 11, 0.1) 0%, transparent 60%), var(--sl-admin-page-bg);
+  background: radial-gradient(120% 80% at 0% 0%, rgba(29, 130, 245, 0.18) 0%, transparent 55%),
+    radial-gradient(90% 70% at 100% 100%, rgba(252, 189, 1, 0.1) 0%, transparent 60%), var(--sl-admin-page-bg);
 }
 
 .login #container {

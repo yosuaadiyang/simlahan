@@ -24,6 +24,9 @@ EXEMPT_PREFIXES = (
     "/admin/logout/",
     "/admin/otp/",
     "/admin/jsi18n/",
+    # Pintu masuk pusat komando: superuser dapat masuk lalu menonaktifkan kunci.
+    "/komando/masuk/",
+    "/komando/keluar/",
     # Masuk (termasuk OTP), perpanjang token, dan keluar aplikasi petugas agar
     # superuser tetap dapat masuk. Profil (/me/) dan ganti sandi ikut terkunci;
     # superuser melewatinya dengan token JWT-nya.

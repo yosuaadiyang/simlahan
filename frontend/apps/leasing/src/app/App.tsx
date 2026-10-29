@@ -26,12 +26,16 @@ import {
   getUserGroups,
   getUserActiveServiceUnit,
   getUserServiceUnits,
+  getUsersPermissions,
 } from "@/usersPermissions/selectors";
+import { UsersPermissions as Permissions } from "@/usersPermissions/enums";
+import { hasPermissions } from "@/util/helpers";
 import type { ApiError } from "@/api/types";
 import type {
   UserGroups,
   UserServiceUnit,
   UserServiceUnits,
+  UsersPermissions as UsersPermissionsType,
 } from "@/usersPermissions/types";
 import type { RootState } from "@/root/types";
 import "@/main.scss";
@@ -50,6 +54,7 @@ type Props = OwnProps & {
   showSearch?: boolean;
   user?: Record<string, any>;
   userGroups?: UserGroups;
+  usersPermissions?: UsersPermissionsType;
 };
 type State = {
   displaySideMenu: boolean;
@@ -103,7 +108,14 @@ const App: React.FC<Props> = (props) => {
     userGroups,
     userActiveServiceUnit,
     userServiceUnits,
+    usersPermissions,
   } = props;
+
+  // Pusat komando punya pintu masuk sendiri (/komando/); dari sini hanya ada
+  // tombol pindah bagi pengguna yang berhak.
+  const showCommandCenter =
+    !!usersPermissions &&
+    hasPermissions(usersPermissions, Permissions.VIEW_KORWIL);
 
   const appStyle = IS_DEVELOPMENT_URL ? "app-dev" : "app";
 
@@ -173,6 +185,7 @@ const App: React.FC<Props> = (props) => {
 
               <TopNavigation
                 isMenuOpen={displaySideMenu}
+                showCommandCenter={showCommandCenter}
                 linkUrl={linkUrl}
                 onLogout={logOut}
                 pageTitle={pageTitle}
@@ -260,6 +273,7 @@ const mapStateToProps = (state: RootState) => {
     pageTitle: getPageTitle(state),
     showSearch: getShowSearch(state),
     userGroups: getUserGroups(state),
+    usersPermissions: getUsersPermissions(state),
     userServiceUnits: getUserServiceUnits(state),
     userActiveServiceUnit: getUserActiveServiceUnit(state),
   };

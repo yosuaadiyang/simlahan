@@ -31,6 +31,7 @@ Panduan yang sama tersedia di aplikasi (`/akun/panduan/`) dan hanya menampilkan 
 ## Dasar penggunaan
 
 - **Masuk.** Buka alamat SimLahan, isi nama pengguna dan sandi. Anda langsung dibawa ke halaman kerja peran Anda. Satu kali masuk berlaku juga untuk panel admin, pusat komando, dan aplikasi lapangan sesuai hak Anda.
+- **Pusat komando.** Pusat komando adalah aplikasi tersendiri dengan halaman masuk sendiri di `/komando/masuk/` (seperti portal). Pindah tanpa masuk ulang: tombol **Pusat Komando** di bilah atas aplikasi utama dan panel admin, dan tombol **⇄ Utama** di bilah atas pusat komando. **Keluar** di salah satunya mengakhiri keduanya di perangkat itu.
 - **Kode OTP.** Bila instansi mengaktifkan OTP, masukkan kode yang dikirim ke surel Anda setiap kali masuk.
 - **Menu sesuai peran.** Menu hanya menampilkan halaman yang boleh Anda buka. Membuka alamat lain secara langsung akan ditolak.
 - **Unit layanan.** Data sewa dan aset dibatasi per unit layanan. Bila Anda punya lebih dari satu unit, pilih unit aktif di bilah atas atau menu nama Anda.
@@ -252,7 +253,7 @@ Mengelola seluruh modul dan data master SimLahan.
 - Pengadaan Tanah: Dasbor & tenggat, Proyek pengadaan, Kalender & aturan tenggat
 - Alokasi Lahan: Permohonan & verifikasi, Tagihan & pembayaran, Alokasi & lahan tidur, Data lahan, Portal investasi (permintaan investasi, sektor, kawasan), Portal publik
 - Manajemen Aset Lahan: Dasbor aset, Data aset & peta, Perkara & sidang, Okupasi & perambahan, Pengaduan masyarakat, Lelang & seleksi lahan, Laporan & asisten AI, Aplikasi lapangan
-- Pusat Komando: Peta operasi & PWA, Absen, Lapor kegiatan, Tugas, Kinerja (KPI), Korwil, warga & laporan
+- Pusat Komando: Buka Pusat Komando (aplikasi tersendiri, juga lewat tombol **Pusat Komando** di bilah atas), Korwil, warga & laporan
 - Dokumen & Perizinan: Dasbor dokumen, Pemanfaatan lahan, Dokumen perizinan, Dokumen tanda tangan, Templat dokumen, Permintaan unduh
 - Kontak
 - Catatan area
@@ -434,7 +435,7 @@ Mengelola seluruh data aset lahan unit layanannya.
 
 - Panel admin, Manajemen aset lahan: dasbor, peta tematik, data aset, keuangan (penilaian, pajak, transaksi), okupasi, permukiman kembali, pengaduan, lelang, dokumen, peta berbagi, laporan & asisten AI
 - Aplikasi lapangan (`/aset/lapangan/`)
-- Pusat komando sebagai pengawas: Peta, Absen, Lapor (hanya Laporan saya/tim), Warga, Tugas, Kinerja, Chat
+- Pusat komando (`/komando/`, tombol **Pusat Komando** di panel admin) sebagai pengawas: Peta, Absen, Lapor (hanya Laporan saya/tim), Warga, Tugas, Kinerja, Chat
 
 **Yang bisa dilakukan**
 
@@ -479,13 +480,13 @@ Menangani perkara dan sidang terkait aset lahan.
 
 Bekerja di lapangan untuk Korwil tempatnya menjadi anggota.
 
-- **Masuk:** Alamat utama SimLahan (`/`) atau langsung di panel admin (`/admin/`); satu kali masuk berlaku untuk keduanya.
+- **Masuk:** Langsung di pusat komando (`/komando/masuk/`), atau di alamat utama SimLahan (`/`) lalu tombol **Pusat Komando**; satu kali masuk berlaku untuk keduanya.
 - **Halaman awal:** Pusat komando (`/komando/`).
 - **Akun contoh:** `contoh.lapangan`
 
 **Menu**
 
-- Pusat komando (`/komando/`): Peta, Absen, Lapor (kegiatan, uji tanah, laporan saya), Warga, Tugas, Kinerja, Chat; Menu: Peringkat tim, Struktur tim, Feed aktivitas, Asisten AI
+- Pusat komando (`/komando/`): Peta, Absen, Lapor (kegiatan, uji tanah, laporan saya), Warga, Tugas, Kinerja, Chat; Menu: Peringkat tim, Struktur tim, Feed aktivitas, Asisten AI, Aplikasi utama; tombol **⇄ Utama** di bilah atas
 - Aplikasi lapangan (`/aset/lapangan/`): laporan & foto lapangan
 - Panel admin: okupasi, pengaduan, survei, tugas, Korwil, warga, kegiatan, uji tanah
 
@@ -504,13 +505,13 @@ Bekerja di lapangan untuk Korwil tempatnya menjadi anggota.
 
 Memimpin tim lapangan di Korwil yang dipimpinnya.
 
-- **Masuk:** Alamat utama SimLahan (`/`) atau langsung di panel admin (`/admin/`); satu kali masuk berlaku untuk keduanya.
+- **Masuk:** Langsung di pusat komando (`/komando/masuk/`), atau di alamat utama SimLahan (`/`) lalu tombol **Pusat Komando**; satu kali masuk berlaku untuk keduanya.
 - **Halaman awal:** Pusat komando (`/komando/`).
 - **Akun contoh:** `contoh.korwil`
 
 **Menu**
 
-- Pusat komando (`/komando/`): Peta, Absen, Lapor (kegiatan, uji tanah, laporan saya), Warga, Tugas, Kinerja, Chat; Menu: Peringkat tim, Struktur tim, Feed aktivitas, Asisten AI
+- Pusat komando (`/komando/`): Peta, Absen, Lapor (kegiatan, uji tanah, laporan saya), Warga, Tugas, Kinerja, Chat; Menu: Peringkat tim, Struktur tim, Feed aktivitas, Asisten AI, Aplikasi utama; tombol **⇄ Utama** di bilah atas
 - Panel admin: Korwil, warga, kegiatan, uji tanah, SOS, tugas
 
 **Yang bisa dilakukan**

@@ -3,4 +3,4 @@
 {% block code %}403{% endblock %}
 {% block heading %}Tidak berhak{% endblock %}
 {% block message %}Akun Anda belum diberi akses ke pusat komando. Minta administrator menambahkan Anda ke grup Petugas Lapangan, Koordinator Wilayah, atau Petugas Aset.{% endblock %}
-{% block actions %}<a href="{% url 'admin:index' %}">Kembali ke panel petugas</a>{% endblock %}
+{% block actions %}<a href="{{ main_url|default:'/' }}">⇄ Aplikasi utama</a><form method="post" action="{% url 'operasi-logout' %}">{% csrf_token %}<button type="submit">Masuk dengan akun lain</button></form>{% endblock %}

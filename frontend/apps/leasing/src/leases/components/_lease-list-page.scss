@@ -73,14 +73,14 @@
 // regardless of production stylesheet order.
 .search__container .hds-input-with-value {
   // TextInput, DateInput
-  --input-background-default: #effcf9;
+  --input-background-default: #e9f2fe;
   // Select
-  --dropdown-background-default: #effcf9;
+  --dropdown-background-default: #e9f2fe;
 }
 
 #lease-list-table tbody tr:hover td,
 #lease-list-table tbody tr:focus-within td {
-  background-color: #effcf9;
+  background-color: #e9f2fe;
   transition: background-color 120ms ease-in-out;
 }
 

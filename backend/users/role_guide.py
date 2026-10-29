@@ -27,6 +27,11 @@ PANEL = (
     "Alamat utama SimLahan (`/`) atau langsung di panel admin (`/admin/`); "
     "satu kali masuk berlaku untuk keduanya."
 )
+COMMAND = (
+    "Langsung di pusat komando (`/komando/masuk/`), atau di alamat utama "
+    "SimLahan (`/`) lalu tombol **Pusat Komando**; satu kali masuk berlaku "
+    "untuk keduanya."
+)
 ACQUISITION_MENU = (
     "Pengadaan Tanah: Dasbor & tenggat, Proyek pengadaan, Kalender & aturan tenggat"
 )
@@ -60,7 +65,8 @@ DOWNLOAD_RULE = (
 COMMAND_TABS = (
     "Pusat komando (`/komando/`): Peta, Absen, Lapor (kegiatan, uji tanah, "
     "laporan saya), Warga, Tugas, Kinerja, Chat; Menu: Peringkat tim, Struktur "
-    "tim, Feed aktivitas, Asisten AI"
+    "tim, Feed aktivitas, Asisten AI, Aplikasi utama; tombol **⇄ Utama** di "
+    "bilah atas"
 )
 
 ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
@@ -227,8 +233,8 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "Manajemen Aset Lahan: Dasbor aset, Data aset & peta, Perkara & "
             "sidang, Okupasi & perambahan, Pengaduan masyarakat, Lelang & seleksi "
             "lahan, Laporan & asisten AI, Aplikasi lapangan",
-            "Pusat Komando: Peta operasi & PWA, Absen, Lapor kegiatan, Tugas, "
-            "Kinerja (KPI), Korwil, warga & laporan",
+            "Pusat Komando: Buka Pusat Komando (aplikasi tersendiri, juga lewat "
+            "tombol **Pusat Komando** di bilah atas), Korwil, warga & laporan",
             DOCUMENTS_MENU,
             "Kontak",
             "Catatan area",
@@ -405,7 +411,8 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "keuangan (penilaian, pajak, transaksi), okupasi, permukiman kembali, "
             "pengaduan, lelang, dokumen, peta berbagi, laporan & asisten AI",
             "Aplikasi lapangan (`/aset/lapangan/`)",
-            "Pusat komando sebagai pengawas: Peta, Absen, Lapor (hanya Laporan "
+            "Pusat komando (`/komando/`, tombol **Pusat Komando** di panel "
+            "admin) sebagai pengawas: Peta, Absen, Lapor (hanya Laporan "
             "saya/tim), Warga, Tugas, Kinerja, Chat",
         ),
         can=(
@@ -452,7 +459,7 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
         name="Petugas Lapangan",
         sample="contoh.lapangan",
         summary="Bekerja di lapangan untuk Korwil tempatnya menjadi anggota.",
-        login=PANEL,
+        login=COMMAND,
         home="Pusat komando (`/komando/`).",
         menus=(
             COMMAND_TABS,
@@ -478,7 +485,7 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
         name="Koordinator Wilayah",
         sample="contoh.korwil",
         summary="Memimpin tim lapangan di Korwil yang dipimpinnya.",
-        login=PANEL,
+        login=COMMAND,
         home="Pusat komando (`/komando/`).",
         menus=(
             COMMAND_TABS,
@@ -586,6 +593,14 @@ GENERAL_STEPS = (
         "Buka alamat SimLahan, isi nama pengguna dan sandi. Anda langsung dibawa "
         "ke halaman kerja peran Anda. Satu kali masuk berlaku juga untuk panel "
         "admin, pusat komando, dan aplikasi lapangan sesuai hak Anda.",
+    ),
+    (
+        "Pusat komando",
+        "Pusat komando adalah aplikasi tersendiri dengan halaman masuk sendiri di "
+        "`/komando/masuk/` (seperti portal). Pindah tanpa masuk ulang: tombol "
+        "**Pusat Komando** di bilah atas aplikasi utama dan panel admin, dan "
+        "tombol **⇄ Utama** di bilah atas pusat komando. **Keluar** di salah "
+        "satunya mengakhiri keduanya di perangkat itu.",
     ),
     (
         "Kode OTP",
