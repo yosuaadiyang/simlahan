@@ -200,6 +200,13 @@ class LoginOTPView(APIView):
         return token_response(request, challenge.user)
 
 
+class _SessionAuthentication(SessionAuthentication):
+    """Tanpa sesi -> 401 (bukan 403), sama dengan titik akhir API lain."""
+
+    def authenticate_header(self, request):
+        return "Session"
+
+
 class SessionTokenView(APIView):
     """Tukar sesi peramban (pusat komando, panel admin) dengan token aplikasi
     petugas agar tombol pindah ke aplikasi utama tidak meminta login kedua kali.
@@ -209,7 +216,7 @@ class SessionTokenView(APIView):
     """
 
     permission_classes = (IsAuthenticated,)
-    authentication_classes = (SessionAuthentication,)
+    authentication_classes = (_SessionAuthentication,)
 
     def get_view_name(self):
         return _("Session login")

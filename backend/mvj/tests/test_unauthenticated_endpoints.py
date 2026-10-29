@@ -58,6 +58,8 @@ PUBLIC_SESSION_PAGES = (
         r"|dokumen/ttd/[^/]+/|dokumen/ttd/[^/]+/pdf/|dokumen/verifikasi/|dokumen/verifikasi/[^/]+/"
         r")$"
     ),
+    # Halaman masuk/keluar pusat komando (keluar hanya lewat POST + CSRF).
+    re.compile(r"^/komando/(masuk|keluar)/$"),
     # Peta berbagi baca-saja; akses dikendalikan token di URL.
     re.compile(r"^/aset/peta/[^/]+/$"),
     # Titik akhir protokol OAuth2; klien diautentikasi oleh protokolnya sendiri.
