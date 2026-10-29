@@ -141,6 +141,7 @@ from users.auth_views import (
     LogoutView,
     MeView,
     PasswordChangeView,
+    SessionTokenView,
     TokenRefreshView,
 )
 from users.otp_views import officer_otp
@@ -387,6 +388,7 @@ auth_api_urls = [
     path("auth/login/", LoginView.as_view(), name="auth-login"),
     path("auth/login/otp/", LoginOTPView.as_view(), name="auth-login-otp"),
     path("auth/refresh/", TokenRefreshView.as_view(), name="auth-refresh"),
+    path("auth/session/", SessionTokenView.as_view(), name="auth-session"),
     path("auth/logout/", LogoutView.as_view(), name="auth-logout"),
     path("auth/me/", MeView.as_view(), name="auth-me"),
     path("auth/password/", PasswordChangeView.as_view(), name="auth-password"),

@@ -6,6 +6,9 @@ Alur:
                                                          bila OFFICER_OTP_REQUIRED aktif
   POST /v1/auth/login/otp/ {otp_token, code}          -> {access, refresh, user}
   POST /v1/auth/refresh/   {refresh}                  -> {access, refresh}
+  POST /v1/auth/session/                              -> {access, refresh, user} dari sesi
+                                                         peramban yang sudah masuk (mis. lewat
+                                                         /komando/masuk/ atau /admin/login/)
   POST /v1/auth/logout/    {refresh}                  -> 204 (refresh token di-blacklist)
   GET  /v1/auth/me/                                   -> profil pengguna aktif
   POST /v1/auth/password/  {old_password, new_password} -> 204
@@ -24,6 +27,7 @@ from django.contrib.auth import (
 )
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers, status
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
@@ -194,6 +198,37 @@ class LoginOTPView(APIView):
                 status=status.HTTP_401_UNAUTHORIZED,
             )
         return token_response(request, challenge.user)
+
+
+class SessionTokenView(APIView):
+    """Tukar sesi peramban (pusat komando, panel admin) dengan token aplikasi
+    petugas agar tombol pindah ke aplikasi utama tidak meminta login kedua kali.
+
+    Hanya sesi (dengan token CSRF) yang diterima: token JWT tidak bisa dipakai
+    untuk mencetak token baru. OTP sesi sudah ditegakkan OfficerOTPMiddleware.
+    """
+
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (SessionAuthentication,)
+
+    def get_view_name(self):
+        return _("Session login")
+
+    def post(self, request, format=None):
+        user = request.user
+        if hasattr(user, "pemohon"):
+            return Response(
+                {"detail": _("Applicant accounts can only sign in at /portal/.")},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        refresh = RefreshToken.for_user(user)
+        return Response(
+            {
+                "access": str(refresh.access_token),
+                "refresh": str(refresh),
+                "user": serialize_user(user),
+            }
+        )
 
 
 class TokenRefreshView(BaseTokenRefreshView):

@@ -470,48 +470,17 @@ class SideMenu extends Component<Props & WithRouterProps, State> {
                       UsersPermissions.VIEW_KORWIL,
                     )}
                   >
+                    {/* Pusat komando adalah aplikasi terpisah dengan pintu
+                        masuknya sendiri (/komando/), seperti portal publik;
+                        menu di sini hanya pintasan ke sana dan ke data induk. */}
                     <SubMenu
                       header="Pusat Komando"
                       isOpen={subMenuKey === "command"}
                       items={[
                         {
                           allow: true,
-                          text: "Peta operasi & PWA",
+                          text: "Buka Pusat Komando",
                           href: "/komando/",
-                        },
-                        {
-                          allow: hasPermissions(
-                            usersPermissions,
-                            UsersPermissions.ADD_ATTENDANCE,
-                          ),
-                          text: "Absen",
-                          href: "/komando/?tab=absen",
-                        },
-                        {
-                          allow:
-                            hasPermissions(
-                              usersPermissions,
-                              UsersPermissions.ADD_ACTIVITY,
-                            ) ||
-                            hasPermissions(
-                              usersPermissions,
-                              UsersPermissions.VIEW_ACTIVITY,
-                            ),
-                          text: "Lapor kegiatan",
-                          href: "/komando/?tab=korwil",
-                        },
-                        {
-                          allow: hasPermissions(
-                            usersPermissions,
-                            UsersPermissions.VIEW_TASK,
-                          ),
-                          text: "Tugas",
-                          href: "/komando/?tab=tasks",
-                        },
-                        {
-                          allow: true,
-                          text: "Kinerja (KPI)",
-                          href: "/komando/?tab=perf",
                         },
                         {
                           allow: true,

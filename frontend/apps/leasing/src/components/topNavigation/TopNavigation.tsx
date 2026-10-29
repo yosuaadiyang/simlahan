@@ -38,6 +38,7 @@ type Props = {
   linkUrl: string;
   onLogout: (...args: Array<any>) => any;
   pageTitle: string;
+  showCommandCenter?: boolean;
   showSearch: boolean;
   toggleSideMenu: (...args: Array<any>) => any;
   toggleDisplayUserGroups: () => void;
@@ -102,6 +103,7 @@ class TopNavigation extends Component<Props & WithRouterProps, State> {
       isMenuOpen,
       linkUrl,
       pageTitle,
+      showCommandCenter,
       showSearch,
       toggleSideMenu,
       toggleDisplayUserGroups,
@@ -159,6 +161,27 @@ class TopNavigation extends Component<Props & WithRouterProps, State> {
             } else {
               this.moveSearchPage();
             }
+          };
+
+          // Halaman di luar aplikasi ini: minta konfirmasi bila ada perubahan
+          // yang belum disimpan, sama seperti tautan di dalam aplikasi.
+          const handleExternalLinkClick = (e: any) => {
+            if (!hasAnyPageDirtyForms()) return;
+            const href = e.currentTarget.href;
+            e.preventDefault();
+            modalDispatch({
+              type: ActionTypes.SHOW_CONFIRMATION_MODAL,
+              confirmationFunction: () => {
+                window.location.assign(href);
+              },
+              confirmationModalButtonClassName: ButtonColors.ALERT,
+              confirmationModalButtonText:
+                ConfirmationModalTexts.CANCEL_CHANGES.BUTTON,
+              confirmationModalLabel:
+                ConfirmationModalTexts.CANCEL_CHANGES.LABEL,
+              confirmationModalTitle:
+                ConfirmationModalTexts.CANCEL_CHANGES.TITLE,
+            });
           };
 
           const handleSearchKeyUp = (e: any) => {
@@ -267,6 +290,27 @@ class TopNavigation extends Component<Props & WithRouterProps, State> {
                       </div>
                     )}
                   </div>
+                )}
+
+                {!!showCommandCenter && (
+                  <a
+                    className="app-switch"
+                    href="/komando/"
+                    onClick={handleExternalLinkClick}
+                    title="Pindah ke Pusat Komando"
+                    aria-label="Pindah ke Pusat Komando"
+                  >
+                    <svg
+                      className="app-switch__icon"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <circle cx="12" cy="12" r="8" />
+                      <circle cx="12" cy="12" r="2.5" />
+                      <path d="M12 1.5v4M12 18.5v4M1.5 12h4M18.5 12h4" />
+                    </svg>
+                    <span className="app-switch__label">Pusat Komando</span>
+                  </a>
                 )}
 
                 <div className="username-wrapper">

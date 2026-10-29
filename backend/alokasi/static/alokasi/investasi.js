@@ -374,9 +374,9 @@
     }
 
     function styleFor(p, highlighted) {
-      var color = p.available ? p.color : "#94a3b8";
+      var color = p.available ? p.color : "#99a5b5";
       return {
-        color: highlighted ? "#0f172a" : color,
+        color: highlighted ? "#28313c" : color,
         weight: highlighted ? 4 : 2,
         fillColor: color,
         fillOpacity: highlighted ? 0.55 : (p.available ? 0.38 : 0.18),
@@ -438,7 +438,7 @@
         listEl.innerHTML = shown.map(function (feature) {
           var p = feature.properties;
           return '<li><div class="result' + (p.available ? "" : " unavailable") + (p.code === state.selected ? " active" : "") +
-            '" role="button" tabindex="0" data-code="' + escapeHtml(p.code) + '" style="--c:' + escapeHtml(p.available ? p.color : "#94a3b8") + '">' +
+            '" role="button" tabindex="0" data-code="' + escapeHtml(p.code) + '" style="--c:' + escapeHtml(p.available ? p.color : "#99a5b5") + '">' +
             '<div class="r-top"><div><div class="r-code">' + escapeHtml(p.code) + "</div>" +
             '<div class="r-name">' + escapeHtml(p.name) + '</div></div><span class="dot" aria-hidden="true"></span></div>' +
             chips(p) +
@@ -467,7 +467,7 @@
           html += '<span style="--c:' + escapeHtml(p.color) + '">' + escapeHtml(p.sector_name) + "</span>";
         }
       });
-      html += '<span style="--c:#94a3b8">Sudah terikat / belum ditawarkan</span>';
+      html += '<span style="--c:#99a5b5">Sudah terikat / belum ditawarkan</span>';
       if (zonesCount) { html += '<span class="zone">Batas kawasan</span>'; }
       $("#map-legend").innerHTML = html;
       var box = $("#map-legend-box");
@@ -559,7 +559,7 @@
       features = (data.plots && data.plots.features) || [];
       var zones = (data.zones && data.zones.features) || [];
       L.geoJSON(zones, {
-        style: function () { return { color: "#0f172a", weight: 2, dashArray: "6 6", fill: true, fillOpacity: 0.03, interactive: true }; },
+        style: function () { return { color: "#28313c", weight: 2, dashArray: "6 6", fill: true, fillOpacity: 0.03, interactive: true }; },
         onEachFeature: function (feature, layer) {
           var z = feature.properties;
           layer.bindTooltip(escapeHtml(z.name), { permanent: true, direction: "center", className: "zone-label" });
@@ -590,7 +590,7 @@
     if (el.dataset.geometry) {
       try {
         L.geoJSON(JSON.parse(el.dataset.geometry), {
-          style: { color: "#0f172a", weight: 2, dashArray: "6 6", fillOpacity: 0.04 }
+          style: { color: "#28313c", weight: 2, dashArray: "6 6", fillOpacity: 0.04 }
         }).eachLayer(function (layer) { layer.addTo(group); });
       } catch (e) { /* batas tidak valid */ }
     }
@@ -599,7 +599,7 @@
       (data.plots.features || []).forEach(function (feature) {
         var p = feature.properties;
         if (p.zone !== zone || !feature.geometry) { return; }
-        var color = p.available ? p.color : "#94a3b8";
+        var color = p.available ? p.color : "#99a5b5";
         L.geoJSON(feature, { style: { color: color, weight: 2, fillColor: color, fillOpacity: 0.4 } })
           .bindTooltip(escapeHtml(p.code + " · " + p.name), { sticky: true })
           .on("click", function () { window.location.href = p.url; })
@@ -761,7 +761,7 @@
         (data.plots.features || []).forEach(function (feature) {
           var p = feature.properties;
           if (!feature.geometry) { return; }
-          var color = p.available ? p.color : "#94a3b8";
+          var color = p.available ? p.color : "#99a5b5";
           L.geoJSON(feature, { style: { color: color, weight: 1.5, fillColor: color, fillOpacity: 0.25 } })
             .bindTooltip(escapeHtml(p.code + " · " + p.name + (p.available ? "" : " (" + p.status_label + ")")), { sticky: true })
             .on("click", function (event) {

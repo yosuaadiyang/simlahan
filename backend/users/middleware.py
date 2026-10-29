@@ -16,6 +16,7 @@ from users import otp
 EXEMPT_PREFIXES = (
     "/admin/otp/",
     "/admin/logout/",
+    "/komando/keluar/",
     # Login/logout aplikasi petugas tidak memakai sesi; jangan diblokir oleh
     # sesi lama yang belum lolos OTP.
     "/v1/auth/login/",
@@ -56,11 +57,17 @@ class OfficerOTPMiddleware:
         return request.session.get(otp.SESSION_KEY) != user.pk
 
 
-# Halaman login sesi (panel admin, API yang dapat dijelajah, portal pemohon).
+# Halaman login sesi (panel admin, API yang dapat dijelajah, portal pemohon,
+# pusat komando).
 # Login JWT /v1/auth/login/ sudah dibatasi oleh ScopedRateThrottle DRF. Portal
 # ikut dibatasi per akun: formulirnya baru menolak akun petugas setelah sandi
 # terbukti benar, jadi tanpa batas ini sandi petugas bisa ditebak lewat portal.
-SESSION_LOGIN_PATHS = ("/admin/login/", "/auth/login/", "/portal/masuk/")
+SESSION_LOGIN_PATHS = (
+    "/admin/login/",
+    "/auth/login/",
+    "/portal/masuk/",
+    "/komando/masuk/",
+)
 
 
 class LoginThrottleMiddleware:

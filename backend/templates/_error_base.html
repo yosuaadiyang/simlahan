@@ -9,33 +9,34 @@
     /* Mandiri (tanpa file statis) agar tetap tampil saat server bermasalah. */
     :root { color-scheme: light dark; }
     body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 16px; box-sizing: border-box;
-      font: 16px/1.6 "Inter Variable", Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #0f172a;
-      background: radial-gradient(120% 80% at 0% 0%, rgba(87, 213, 195, .18) 0%, transparent 55%), #f4f6f9; }
-    main { max-width: 520px; width: 100%; box-sizing: border-box; background: #fff; border: 1px solid #e2e8f0; border-radius: 20px;
+      font: 16px/1.6 "Inter Variable", Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #28313c;
+      background: radial-gradient(120% 80% at 0% 0%, rgba(29, 130, 245, .12) 0%, transparent 55%), #f7faff; }
+    main { max-width: 520px; width: 100%; box-sizing: border-box; background: #fff; border: 1px solid #e8eef3; border-radius: 20px;
       padding: 32px 28px; box-shadow: 0 4px 12px -2px rgba(15, 23, 42, .1), 0 2px 4px -2px rgba(15, 23, 42, .06); }
     .logo { display: block; width: 40px; height: 40px; margin-bottom: 20px; }
-    .code { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #0d7e74; margin: 0 0 6px; }
+    .code { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #1d82f5; margin: 0 0 6px; }
     h1 { font-size: clamp(22px, 5vw, 28px); line-height: 1.25; letter-spacing: -.02em; margin: 0 0 10px; }
-    p { margin: 0 0 20px; color: #475569; }
+    p { margin: 0 0 20px; color: #616e80; }
     .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-    .actions a { display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px; border-radius: 8px; border: 1px solid #cbd5e1;
-      color: #0f172a; font-weight: 600; font-size: 15px; text-decoration: none; background: #fff; }
-    .actions a:first-child { background: #0d7e74; border-color: #0d7e74; color: #fff; }
-    .actions a:hover { border-color: #94a3b8; }
-    .actions a:focus-visible { outline: 2px solid #0d7e74; outline-offset: 2px; }
-    @media (max-width: 480px) { main { padding: 24px 20px; } .actions a { flex: 1 1 auto; justify-content: center; } }
+    .actions form { display: contents; }
+    .actions a, .actions button { display: inline-flex; font-family: inherit; cursor: pointer; align-items: center; min-height: 40px; padding: 0 16px; border-radius: 8px; border: 1px solid #d3dbe4;
+      color: #28313c; font-weight: 600; font-size: 15px; text-decoration: none; background: #fff; }
+    .actions > :first-child { background: #1d82f5; border-color: #1d82f5; color: #fff; }
+    .actions a:hover, .actions button:hover { border-color: #99a5b5; }
+    .actions a:focus-visible, .actions button:focus-visible { outline: 2px solid #1d82f5; outline-offset: 2px; }
+    @media (max-width: 480px) { main { padding: 24px 20px; } .actions a, .actions button { flex: 1 1 auto; justify-content: center; } }
     @media (prefers-color-scheme: dark) {
-      body { background: radial-gradient(120% 80% at 0% 0%, rgba(20, 157, 143, .2) 0%, transparent 55%), #0b1120; color: #e2e8f0; }
+      body { background: radial-gradient(120% 80% at 0% 0%, rgba(29, 130, 245, .2) 0%, transparent 55%), #0b1120; color: #e2e8f0; }
       main { background: #111827; border-color: #1f2a3b; box-shadow: none; }
-      p { color: #94a3b8; } .code { color: #57d5c3; }
-      .actions a { background: #111827; border-color: #334155; color: #e2e8f0; }
-      .actions a:first-child { background: #2bbaa9; border-color: #2bbaa9; color: #04201e; }
+      p { color: #94a3b8; } .code { color: #8ac0fa; }
+      .actions a, .actions button { background: #111827; border-color: #334155; color: #e2e8f0; }
+      .actions > :first-child { background: #5aa5f8; border-color: #5aa5f8; color: #061a36; }
     }
   </style>
 </head>
 <body>
   <main>
-    <svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#0d7e74"/><path d="M6.5 21.5 14.5 7.5l10.5 3 1.5 13-13 2.5Z" fill="#fff"/><path d="M14.5 7.5l2 12 10 4M16.5 19.5l-10 2" fill="none" stroke="#0d7e74" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>
+    <svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#1d82f5"/><path d="M6.5 21.5 14.5 7.5l10.5 3 1.5 13-13 2.5Z" fill="#fff"/><path d="M14.5 7.5l2 12 10 4M16.5 19.5l-10 2" fill="none" stroke="#1d82f5" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>
     <p class="code">{% block code %}{% endblock %} · {{ app_name|default:"SimLahan" }}</p>
     <h1>{% block heading %}{% endblock %}</h1>
     <p>{% block message %}{% endblock %}</p>

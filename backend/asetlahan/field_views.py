@@ -230,7 +230,7 @@ def field_manifest(request):
         "display": "standalone",
         "orientation": "portrait",
         "background_color": "#ffffff",
-        "theme_color": "#0d7e74",
+        "theme_color": "#1d82f5",
         "lang": "id",
         "icons": [
             {

@@ -10,8 +10,10 @@ import {
   OtpRequiredError,
   clearKomandoDeviceData,
   getTokenExpiry,
+  hasBrowserSession,
   login,
   normalizeUser,
+  restoreFromBrowserSession,
   verifyOtp,
 } from "./session";
 import type { AuthUser } from "./types";
@@ -137,6 +139,59 @@ describe("Auth", () => {
       );
       vi.unstubAllGlobals();
     });
+  });
+});
+
+describe("Masuk dari sesi peramban (pusat komando / panel admin)", () => {
+  const setCookie = (value: string) =>
+    Object.defineProperty(document, "cookie", {
+      configurable: true,
+      get: () => value,
+    });
+
+  it("tanpa cookie CSRF tidak meminta apa pun", async () => {
+    setCookie("lain=1");
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    expect(hasBrowserSession()).toBe(false);
+    await expect(restoreFromBrowserSession()).resolves.toBe(null);
+    expect(fetchMock).not.toHaveBeenCalled();
+    vi.unstubAllGlobals();
+  });
+
+  it("menukar sesi dengan token memakai header CSRF", async () => {
+    setCookie("lain=1; csrftoken=abc%20123");
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          access: makeJwt({ exp: 1893456000 }),
+          refresh: "refresh-token",
+          user: getMockUser(),
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    expect(hasBrowserSession()).toBe(true);
+    const user = await restoreFromBrowserSession();
+    expect(user?.username).toBe("petugas");
+    const request = fetchMock.mock.calls[0][0] as Request;
+    expect(request.url).toContain("/auth/session/");
+    expect(request.method).toBe("POST");
+    expect(request.headers.get("X-CSRFToken")).toBe("abc 123");
+    vi.unstubAllGlobals();
+  });
+
+  it("sesi tidak ada / ditolak: tetap di halaman masuk", async () => {
+    setCookie("csrftoken=abc");
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(new Response("{}", { status: 403 })),
+    );
+    await expect(restoreFromBrowserSession()).resolves.toBe(null);
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("luring")));
+    await expect(restoreFromBrowserSession()).resolves.toBe(null);
+    vi.unstubAllGlobals();
   });
 });
 

@@ -127,8 +127,8 @@ main { padding: 28px 0 56px; min-height: 60vh; }
   color: #fff;
   padding: clamp(40px, 7vw, 80px) 0;
   background:
-    radial-gradient(110% 90% at 0% 0%, rgba(87, 213, 195, .35) 0%, transparent 55%),
-    radial-gradient(80% 80% at 100% 100%, rgba(245, 158, 11, .2) 0%, transparent 60%),
+    radial-gradient(110% 90% at 0% 0%, rgba(29, 130, 245, .35) 0%, transparent 55%),
+    radial-gradient(80% 80% at 100% 100%, rgba(252, 189, 1, .2) 0%, transparent 60%),
     linear-gradient(150deg, var(--sl-brand-700) 0%, var(--sl-brand-800) 50%, var(--sl-brand-950) 100%);
 }
 .hero::after {
@@ -251,7 +251,7 @@ form.inline { display: inline; }
 /* ------------------------------------------------------------ Pesan & lencana */
 .messages { list-style: none; padding: 0; margin: 0 0 20px; }
 .messages li { padding: 12px 16px; border-radius: var(--sl-radius); margin-bottom: 8px; border: 1px solid; font-weight: 500; }
-.messages .success { background: var(--sl-success-50); border-color: #a7f3d0; color: #065f46; }
+.messages .success { background: var(--sl-success-50); border-color: #c4e8b5; color: #1a6600; }
 .messages .error { background: var(--sl-danger-50); border-color: #fecaca; color: #991b1b; }
 .messages .warning { background: var(--sl-warning-50); border-color: #fde68a; color: #92400e; }
 .messages .info { background: var(--sl-info-50); border-color: #bfdbfe; color: #1e40af; }
@@ -259,20 +259,20 @@ form.inline { display: inline; }
 .alert-warn { background: var(--sl-warning-50); border-color: #fde68a; color: #78350f; }
 .alert-danger { background: var(--sl-danger-50); border-color: #fecaca; color: #7f1d1d; }
 .alert-info { background: var(--sl-info-50); border-color: #bfdbfe; color: #1e3a8a; }
-.alert-ok { background: var(--sl-success-50); border-color: #a7f3d0; color: #064e3b; }
+.alert-ok { background: var(--sl-success-50); border-color: #c4e8b5; color: #1a6600; }
 .alert a { color: inherit; font-weight: 600; }
 .badge { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 999px; font-size: .75rem; font-weight: 600; line-height: 1.6; background: var(--sl-gray-100); color: var(--sl-gray-700); white-space: nowrap; box-shadow: inset 0 0 0 1px rgba(15, 23, 42, .06); }
-.badge-tersedia, .badge-terbit, .badge-lunas, .badge-aktif { background: var(--sl-success-100); color: #065f46; }
+.badge-tersedia, .badge-terbit, .badge-lunas, .badge-aktif { background: var(--sl-success-100); color: #1a6600; }
 .badge-dipesan, .badge-verifikasi, .badge-diajukan, .badge-menunggu_verifikasi, .badge-disetujui, .badge-proses { background: var(--sl-info-100); color: #1e40af; }
 .badge-perbaikan, .badge-belum_bayar, .badge-belum { background: var(--sl-warning-100); color: #92400e; }
 .badge-dialokasikan, .badge-dialihkan, .badge-berakhir { background: #ede9fe; color: #5b21b6; }
 .badge-ditolak, .badge-dibatalkan, .badge-dicabut, .badge-batal, .badge-ditutup { background: var(--sl-danger-100); color: #991b1b; }
 .badge-ditinjau, .badge-konsultasi { background: var(--sl-info-100); color: #1e40af; }
 .badge-ditawarkan { background: var(--sl-warning-100); color: #92400e; }
-.badge-diterima, .badge-selesai { background: var(--sl-success-100); color: #065f46; }
+.badge-diterima, .badge-selesai { background: var(--sl-success-100); color: #1a6600; }
 .badge-disewa { background: #fce7f3; color: #9d174d; }
 /* Dokumen & perizinan */
-.badge-terverifikasi { background: var(--sl-success-100); color: #065f46; }
+.badge-terverifikasi { background: var(--sl-success-100); color: #1a6600; }
 .badge-kedaluwarsa { background: var(--sl-danger-100); color: #991b1b; }
 .badge-tidak_wajib, .badge-draf { background: var(--sl-gray-100); color: var(--sl-gray-700); }
 .badge-menunggu_persetujuan { background: #ede9fe; color: #5b21b6; }

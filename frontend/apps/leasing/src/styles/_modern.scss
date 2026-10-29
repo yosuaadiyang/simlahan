@@ -12,11 +12,11 @@ html:root {
   // Komponen Helsinki Design System memakai variabel warna ini.
   --color-bus: #{variables.$blue};
   --color-bus-dark: #{variables.$blue-hover};
-  --color-bus-medium-light: #94e9da;
-  --color-bus-light: #c9f5ec;
+  --color-bus-medium-light: #b3d4fc;
+  --color-bus-light: #cfe4fd;
   --color-coat-of-arms: #{variables.$blue};
   --color-coat-of-arms-dark: #{variables.$blue-hover};
-  --color-coat-of-arms-light: #c9f5ec;
+  --color-coat-of-arms-light: #cfe4fd;
   --focus-outline-color: #{variables.$blue};
   --color-focus-outline: #{variables.$blue};
   --font-default: var(--sl-font);
@@ -36,7 +36,7 @@ body,
 }
 
 ::selection {
-  background: #c9f5ec;
+  background: #cfe4fd;
   color: variables.$black;
 }
 

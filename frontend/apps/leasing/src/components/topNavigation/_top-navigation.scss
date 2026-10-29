@@ -249,7 +249,7 @@
       width: rem-calc(32px);
       height: rem-calc(32px);
       border-radius: 50%;
-      background: linear-gradient(135deg, #149d8f, #0f665f);
+      background: linear-gradient(135deg, #3893f6, #0b5fcc);
       color: variables.$white;
       font-size: rem-calc(13px);
       font-weight: 700;
@@ -321,6 +321,46 @@
         box-shadow: variables.$ring;
       }
     }
+
+    // Tombol pindah ke pusat komando (aplikasi terpisah di /komando/).
+    .app-switch {
+      display: inline-flex;
+      flex: 0 0 auto;
+      align-items: center;
+      gap: rem-calc(6px);
+      height: rem-calc(36px);
+      padding: 0 rem-calc(12px);
+      border: 1px solid variables.$border-strong;
+      border-radius: variables.$radius-sm;
+      background: variables.$white;
+      color: variables.$blue-hover;
+      font-weight: 600;
+      font-size: rem-calc(14px);
+      text-decoration: none;
+      white-space: nowrap;
+      transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease;
+
+      &__icon {
+        width: rem-calc(18px);
+        height: rem-calc(18px);
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+      }
+
+      &:hover {
+        background-color: variables.$light-blue;
+        border-color: variables.$blue;
+      }
+
+      &:focus-visible {
+        outline: none;
+        box-shadow: variables.$ring;
+      }
+    }
   }
 
   // Tablet: persempit pilihan unit layanan agar judul halaman tetap terbaca.
@@ -343,6 +383,14 @@
 
       .user-group-button {
         padding: rem-calc(4px);
+      }
+
+      .app-switch {
+        padding: 0 rem-calc(9px);
+      }
+
+      .app-switch__label {
+        display: none;
       }
     }
   }
@@ -371,7 +419,8 @@
     }
 
     .username-wrapper,
-    .user-group-button {
+    .user-group-button,
+    .app-switch {
       flex-shrink: 0;
     }
 

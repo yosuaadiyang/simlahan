@@ -46,7 +46,7 @@
 .dk-panel textarea { width: 100%; max-width: 80ch; box-sizing: border-box; display: block; margin: 4px 0 8px; }
 .dk-panel .form-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .dk-check { display: inline-flex; gap: 6px; align-items: center; margin: 0 12px 8px 0; font-weight: normal; }
-.dk-comment { padding: 8px 12px; margin: 0 0 8px; border-radius: 8px; background: var(--darkened-bg, #f6f8fa); max-width: 80ch; }
+.dk-comment { padding: 8px 12px; margin: 0 0 8px; border-radius: 8px; background: var(--darkened-bg, #f8fafc); max-width: 80ch; }
 .dk-comment.internal { border-left: 3px solid #8250df; }
 .dk-tool-btn { border: 0; cursor: pointer; font: inherit; }
 .object-tools form { display: inline; margin: 0; }
@@ -57,7 +57,7 @@
 .dk-small { padding: 3px 8px !important; font-size: .75rem !important; }
 .dk-danger, input.dk-danger { background: #cf222e !important; color: #fff !important; }
 .dk-decide { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
-.dk-reason { padding: 8px 12px; margin: 6px 0 10px; border-radius: 6px; background: var(--darkened-bg, #f6f8fa); max-width: 80ch; }
+.dk-reason { padding: 8px 12px; margin: 6px 0 10px; border-radius: 6px; background: var(--darkened-bg, #f8fafc); max-width: 80ch; }
 .dk-primary-link { display: inline-block; }
 .dk-inline-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
 .dk-inline-form .select2-container { min-width: min(320px, 100%); }

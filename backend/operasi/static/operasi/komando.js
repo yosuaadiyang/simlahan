@@ -12,6 +12,8 @@
   var STORE = "antrean";
   var MAX_PHOTO_SIDE = 1600;
   var STORAGE_PREFIX = "komando:";
+  // Kunci refresh token aplikasi utama (frontend/apps/leasing/src/auth/constants.ts).
+  var MAIN_REFRESH_TOKEN_KEY = "simlahan.refreshToken";
 
   // ================================================================ Utilitas
 
@@ -399,7 +401,7 @@
   }
 
   function korwilColor(props) {
-    if (modes.korwil === "color") { return props.color || "#10b981"; }
+    if (modes.korwil === "color") { return props.color || "#1d82f5"; }
     return rampColor((props.stats || {})[modes.korwil]);
   }
 
@@ -767,7 +769,7 @@
     event.preventDefault();
     aiStart = aiPointer(event);
     if (aiRect) { map.removeLayer(aiRect); }
-    aiRect = L.rectangle([aiStart, aiStart], { color: "#10b981", weight: 2, dashArray: "4 4", fillOpacity: 0.1 }).addTo(map);
+    aiRect = L.rectangle([aiStart, aiStart], { color: "#1d82f5", weight: 2, dashArray: "4 4", fillOpacity: 0.1 }).addTo(map);
     map.getContainer().setPointerCapture && map.getContainer().setPointerCapture(event.pointerId);
   }
 
@@ -1057,16 +1059,19 @@
 
   function drawFrame(ctx, width, height, header, footer, unit, korwilId, paper, zoom, bounds, entries) {
     var korwil = config.korwils.filter(function (k) { return String(k.id) === korwilId; })[0];
-    ctx.fillStyle = "#0a0f1a";
+    ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, width, header);
     ctx.fillRect(0, height - footer, width, footer);
-    ctx.fillStyle = "#10b981";
+    ctx.fillStyle = "#e8eef3";
+    ctx.fillRect(0, header - 2 * unit, width, 2 * unit);
+    ctx.fillRect(0, height - footer, width, 2 * unit);
+    ctx.fillStyle = "#1d82f5";
     ctx.font = "bold " + Math.round(30 * unit) + "px sans-serif";
     ctx.textAlign = "left";
     ctx.textBaseline = "middle";
     ctx.fillText(config.appName + " · Peta " + (korwil ? "Korwil " + korwil.code + " – " + korwil.name : "Seluruh Korwil"), 24 * unit, header / 2);
     ctx.textAlign = "right";
-    ctx.fillStyle = "#e6edf3";
+    ctx.fillStyle = "#28313c";
     ctx.font = Math.round(16 * unit) + "px sans-serif";
     ctx.fillText("Dicetak " + fmtDate(new Date().toISOString(), true) + " · Kertas " + paper + " · oleh " + config.user.name, width - 24 * unit, header / 2);
     // Skala
@@ -1080,7 +1085,7 @@
     }, 0) || target;
     var barPx = nice / metersPerPx;
     var by = height - footer / 2;
-    ctx.fillStyle = "#fff";
+    ctx.fillStyle = "#28313c";
     ctx.fillRect(24 * unit, by, barPx, 6 * unit);
     ctx.textAlign = "left";
     ctx.font = Math.round(14 * unit) + "px sans-serif";
@@ -1115,10 +1120,10 @@
       var ey = y + (index % rows) * 22 * unit;
       ctx.fillStyle = entry.color;
       ctx.fillRect(ex, ey - 7 * unit, 14 * unit, 14 * unit);
-      ctx.fillStyle = "#e6edf3";
+      ctx.fillStyle = "#28313c";
       ctx.fillText(fitText(ctx, entry.label, textWidth, unit), ex + 20 * unit, ey);
     });
-    ctx.fillStyle = "#8b949e";
+    ctx.fillStyle = "#616e80";
     ctx.font = Math.round(11 * unit) + "px sans-serif";
     ctx.textAlign = "right";
     var attribution = (config.basemaps[currentBase].attribution || "").replace(/<[^>]+>/g, "").replace(/&copy;/g, "©");
@@ -1228,7 +1233,7 @@
     if (!live || !lastFix) { return; }
     var latlng = [lastFix.lat, lastFix.lng];
     if (!liveMarker) {
-      liveMarker = L.circleMarker(latlng, { radius: 9, color: "#fff", weight: 3, fillColor: "#10b981", fillOpacity: 1 }).addTo(map);
+      liveMarker = L.circleMarker(latlng, { radius: 9, color: "#fff", weight: 3, fillColor: "#1d82f5", fillOpacity: 1 }).addTo(map);
     } else { liveMarker.setLatLng(latlng); }
     if (follow) { map.panTo(latlng); }
     var moved = lastSentFix ? map.distance(latlng, [lastSentFix.lat, lastSentFix.lng]) : Infinity;
@@ -2270,15 +2275,24 @@
     myQueue().catch(function () { return []; }).then(function (items) {
       if (items.length && !window.confirm(items.length + " laporan di antrean belum terkirim dan akan dihapus dari perangkat. Tetap keluar?")) { return; }
       Promise.all([purgeOfflineData(true), queueClear()]).then(function () {
-        try { localStorage.removeItem(STORAGE_PREFIX + "pengguna"); } catch (e) { /* abaikan */ }
+        // Keluar di sini juga mengakhiri aplikasi utama di perangkat ini: token
+        // tersimpannya dikirim untuk dicabut lalu dihapus.
+        var mainToken = "";
+        try {
+          mainToken = localStorage.getItem(MAIN_REFRESH_TOKEN_KEY) || "";
+          localStorage.removeItem(STORAGE_PREFIX + "pengguna");
+          localStorage.removeItem(MAIN_REFRESH_TOKEN_KEY);
+        } catch (e) { /* abaikan */ }
         var logout = document.createElement("form");
         logout.method = "post";
         logout.action = urls.logout;
-        var token = document.createElement("input");
-        token.type = "hidden";
-        token.name = "csrfmiddlewaretoken";
-        token.value = csrf();
-        logout.appendChild(token);
+        [["csrfmiddlewaretoken", csrf()], ["refresh", mainToken]].forEach(function (pair) {
+          var input = document.createElement("input");
+          input.type = "hidden";
+          input.name = pair[0];
+          input.value = pair[1];
+          logout.appendChild(input);
+        });
         document.body.appendChild(logout);
         logout.submit();
       });

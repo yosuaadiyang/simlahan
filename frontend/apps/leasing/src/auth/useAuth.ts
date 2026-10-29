@@ -2,24 +2,33 @@ import { useCallback, useEffect, useState } from "react";
 import { useAppSelector } from "@/root/hooks";
 import { getApiToken, getLoggedInUser } from "./selectors";
 import {
+  hasBrowserSession,
   hasStoredSession,
   login as loginRequest,
   logout as logoutRequest,
+  restoreFromBrowserSession,
   restoreSession,
 } from "./session";
+
+const canRestore = () => hasStoredSession() || hasBrowserSession();
+
+/** Token tersimpan dulu; bila tidak ada/kedaluwarsa, sesi peramban. */
+const restore = async () =>
+  (hasStoredSession() ? await restoreSession() : null) ||
+  restoreFromBrowserSession();
 
 const useAuth = () => {
   const user = useAppSelector(getLoggedInUser);
   const apiToken = useAppSelector(getApiToken);
   const [isRestoring, setIsRestoring] = useState<boolean>(
-    () => !user && hasStoredSession(),
+    () => !user && canRestore(),
   );
 
   useEffect(() => {
     let cancelled = false;
-    if (!user && hasStoredSession()) {
+    if (!user && canRestore()) {
       setIsRestoring(true);
-      restoreSession().finally(() => {
+      restore().finally(() => {
         if (!cancelled) setIsRestoring(false);
       });
     }

@@ -160,7 +160,7 @@ def _plot_feature(plot: LandPlot) -> dict:
             "sector": sector.slug if sector and sector.is_active else "",
             "sector_name": sector.name if sector and sector.is_active else "",
             "sector_icon": sector.icon if sector and sector.is_active else "",
-            "color": sector.color if sector and sector.is_active else "#64748b",
+            "color": sector.color if sector and sector.is_active else "#616e80",
             "zone": plot.zone.slug if plot.zone and plot.zone.is_published else "",
             "zone_name": plot.zone.name if plot.zone and plot.zone.is_published else "",
             "district": plot.district,
