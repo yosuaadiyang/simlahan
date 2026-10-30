@@ -111,6 +111,11 @@ a { color: var(--sl-link, #0b5fcc); }
 .ring .s { bottom: 1px; left: 50%; transform: translateX(-50%); }
 .ring .e { right: 4px; top: 50%; transform: translateY(-50%); }
 .ring .w { left: 4px; top: 50%; transform: translateY(-50%); }
+.ring .ne, .ring .se, .ring .sw, .ring .nw { font-size: 7px; font-weight: 600; transform: translate(-50%, -50%); }
+.ring .ne { left: 76%; top: 24%; }
+.ring .se { left: 76%; top: 76%; }
+.ring .sw { left: 24%; top: 76%; }
+.ring .nw { left: 24%; top: 24%; }
 .needle { position: absolute; left: 50%; top: 10px; width: 4px; height: 22px; margin-left: -2px; background: var(--danger); border-radius: 2px; }
 .live { border: 1px solid var(--line); background: var(--panel-2); border-radius: 8px; font-size: 11px; padding: 2px 6px; cursor: pointer; }
 .live[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }

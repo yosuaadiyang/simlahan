@@ -1198,7 +1198,7 @@
     if (value === null) { return; }
     heading = Math.round(value);
     $("kompas-cincin").style.transform = "rotate(" + (-heading) + "deg)";
-    var dirs = ["U", "TL", "T", "TG", "S", "BD", "B", "BL"];
+    var dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
     $("kompas-derajat").textContent = heading + "° " + dirs[Math.round(heading / 45) % 8];
   }
 
