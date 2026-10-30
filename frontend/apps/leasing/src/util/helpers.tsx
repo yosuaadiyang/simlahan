@@ -13,6 +13,8 @@ import type {
 } from "@/types";
 import type { UsersPermissions } from "@/usersPermissions/types";
 
+const APP_NAME = import.meta.env.VITE_APP_NAME || "SimLahan";
+
 /**
  * Compose page title
  * @param {string} title
@@ -24,7 +26,7 @@ export const composePageTitle = (
   prepend: boolean = true,
 ): string => {
   return prepend
-    ? `${title ? `${title} | ` : ""}SimLahan | Sistem Informasi Manajemen Lahan`
+    ? `${title ? `${title} | ` : ""}${APP_NAME} | Sistem Informasi Manajemen Lahan`
     : title;
 };
 
