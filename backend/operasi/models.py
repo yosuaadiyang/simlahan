@@ -15,6 +15,8 @@ from auditlog.registry import auditlog
 from django.conf import settings
 from django.contrib.auth.hashers import check_password, make_password
 from django.contrib.gis.db import models as gmodels
+from django.contrib.gis.geos import Point
+from django.contrib.postgres.fields import ArrayField
 from django.core.cache import cache
 from django.core.validators import (
     FileExtensionValidator,
@@ -69,6 +71,7 @@ upload_attendance = _upload_to("upload_attendance", "absen")
 upload_activity = _upload_to("upload_activity", "kegiatan")
 upload_soil = _upload_to("upload_soil", "uji-tanah")
 upload_analysis = _upload_to("upload_analysis", "ai-satelit")
+upload_patrol = _upload_to("upload_patrol", "patroli")
 
 
 def next_number(prefix: str) -> str:
@@ -142,6 +145,85 @@ class CommandSettings(models.Model):
         _("Bobot tugas pada skor kinerja (%)"),
         default=25,
         validators=[MaxValueValidator(100)],
+    )
+    scoring_mode = models.CharField(
+        _("Cara menghitung kegiatan pada KPI"),
+        max_length=8,
+        choices=enums.ScoringMode.choices,
+        default=enums.ScoringMode.EFFORT,
+    )
+    effort_target_multiplier = models.DecimalField(
+        _("Target poin usaha = target kegiatan × angka ini"),
+        max_digits=4,
+        decimal_places=1,
+        default=Decimal("6"),
+        validators=[MinValueValidator(Decimal("0.1"))],
+    )
+    effort_base_default = models.DecimalField(
+        _("Poin dasar jenis yang belum diberi bobot"),
+        max_digits=4,
+        decimal_places=1,
+        default=Decimal("4"),
+        validators=[MinValueValidator(0)],
+    )
+    effort_per_finding = models.DecimalField(
+        _("Bonus per temuan"),
+        max_digits=4,
+        decimal_places=1,
+        default=Decimal("1"),
+        validators=[MinValueValidator(0)],
+    )
+    effort_finding_max = models.DecimalField(
+        _("Bonus temuan maksimal"),
+        max_digits=4,
+        decimal_places=1,
+        default=Decimal("5"),
+        validators=[MinValueValidator(0)],
+    )
+    effort_per_photo = models.DecimalField(
+        _("Bonus per foto"),
+        max_digits=4,
+        decimal_places=1,
+        default=Decimal("0.5"),
+        validators=[MinValueValidator(0)],
+    )
+    effort_photo_max = models.DecimalField(
+        _("Bonus foto maksimal"),
+        max_digits=4,
+        decimal_places=1,
+        default=Decimal("3"),
+        validators=[MinValueValidator(0)],
+    )
+    effort_narrative_bonus = models.DecimalField(
+        _("Bonus narasi lengkap"),
+        max_digits=4,
+        decimal_places=1,
+        default=Decimal("2"),
+        validators=[MinValueValidator(0)],
+    )
+    effort_narrative_min_chars = models.PositiveSmallIntegerField(
+        _("Narasi dianggap lengkap mulai (karakter)"), default=100
+    )
+    effort_per_km = models.DecimalField(
+        _("Bonus per km jarak tempuh"),
+        max_digits=4,
+        decimal_places=1,
+        default=Decimal("1"),
+        validators=[MinValueValidator(0)],
+    )
+    effort_km_max = models.DecimalField(
+        _("Bonus jarak maksimal"),
+        max_digits=4,
+        decimal_places=1,
+        default=Decimal("4"),
+        validators=[MinValueValidator(0)],
+    )
+    effort_geotag_bonus = models.DecimalField(
+        _("Bonus lokasi GPS (geotag)"),
+        max_digits=4,
+        decimal_places=1,
+        default=Decimal("1"),
+        validators=[MinValueValidator(0)],
     )
     online_minutes = models.PositiveSmallIntegerField(
         _("Petugas dianggap daring bila lokasi terakhir dalam (menit)"), default=10
@@ -373,6 +455,22 @@ class Resident(TimeStampedModel):
     child_count = models.PositiveSmallIntegerField(
         _("Jumlah anak"), null=True, blank=True
     )
+    residency_status = models.CharField(
+        _("Status responden"),
+        max_length=16,
+        choices=enums.ResidencyStatus.choices,
+        blank=True,
+        default="",
+    )
+    spouse_occupation = models.CharField(
+        _("Pekerjaan pasangan"), max_length=128, blank=True, default=""
+    )
+    children_detail = models.TextField(
+        _("Data anak"),
+        blank=True,
+        default="",
+        help_text=_("Mis. Anak 1 = …; Anak 2 = …"),
+    )
     land_area_m2 = models.DecimalField(
         _("Luas lahan yang dikuasai (m²)"),
         max_digits=16,
@@ -462,6 +560,16 @@ class Resident(TimeStampedModel):
         help_text=_("Diperbarui otomatis dari laporan kegiatan."),
     )
     created_by = _user_field(_("Didata oleh"))
+    registered_activity = models.ForeignKey(
+        "operasi.Activity",
+        verbose_name=_("Didata pertama kali pada kegiatan"),
+        related_name="registered_residents",
+        null=True,
+        blank=True,
+        editable=False,
+        on_delete=models.SET_NULL,
+        help_text=_("Komsos baru: warga didata pertama kali lewat laporan ini."),
+    )
     note = models.TextField(_("Catatan"), blank=True, default="")
 
     class Meta:
@@ -572,7 +680,13 @@ class Activity(TimeStampedModel):
         default=enums.ActivityType.VISIT,
     )
     title = models.CharField(_("Judul"), max_length=255)
-    description = models.TextField(_("Uraian"), blank=True, default="")
+    description = models.TextField(_("Uraian / narasi"), blank=True, default="")
+    companion = models.CharField(
+        _("Personil pendamping"), max_length=255, blank=True, default=""
+    )
+    location_name = models.CharField(
+        _("Nama lokasi"), max_length=255, blank=True, default=""
+    )
     started_at = models.DateTimeField(_("Waktu kegiatan"), default=timezone.now)
     duration_minutes = models.PositiveIntegerField(
         _("Durasi (menit)"), null=True, blank=True
@@ -580,6 +694,9 @@ class Activity(TimeStampedModel):
     location = gmodels.PointField(_("Lokasi GPS"), srid=4326, null=True, blank=True)
     accuracy_m = models.DecimalField(
         _("Akurasi GPS (m)"), max_digits=8, decimal_places=1, null=True, blank=True
+    )
+    distance_m = models.PositiveIntegerField(
+        _("Jarak tempuh (m)"), null=True, blank=True
     )
     participants_count = models.PositiveIntegerField(
         _("Jumlah warga hadir / ditemui"), null=True, blank=True
@@ -612,6 +729,50 @@ class Activity(TimeStampedModel):
     verified = models.BooleanField(_("Diverifikasi koordinator"), default=False)
     verified_by = _user_field(_("Diverifikasi oleh"))
     verified_at = models.DateTimeField(_("Diverifikasi pada"), null=True, blank=True)
+    # --- Kegiatan lainnya: penilaian dampak (poin dari substansi, bukan foto) ---
+    impact_scope = models.PositiveSmallIntegerField(
+        _("Cakupan / siapa terdampak"),
+        choices=enums.ImpactScope.choices,
+        null=True,
+        blank=True,
+    )
+    impact_risk = models.PositiveSmallIntegerField(
+        _("Risiko / urgensi bila tidak dilakukan"),
+        choices=enums.ImpactRisk.choices,
+        null=True,
+        blank=True,
+    )
+    impact_result = models.PositiveSmallIntegerField(
+        _("Hasil konkret"),
+        choices=enums.ImpactResult.choices,
+        null=True,
+        blank=True,
+    )
+    impact_confirmed = models.BooleanField(
+        _("Dampak tinggi dikonfirmasi atasan"), default=False
+    )
+    impact_confirmed_by = _user_field(_("Dampak dikonfirmasi oleh"))
+    impact_confirmed_at = models.DateTimeField(
+        _("Dampak dikonfirmasi pada"), null=True, blank=True
+    )
+    ai_stance = models.CharField(
+        _("Sikap menurut AI (dari narasi)"),
+        max_length=16,
+        choices=enums.Stance.choices,
+        blank=True,
+        default="",
+    )
+    effort_points = models.DecimalField(
+        _("Poin usaha"),
+        max_digits=6,
+        decimal_places=1,
+        default=Decimal("0"),
+        editable=False,
+        help_text=_(
+            "Dihitung otomatis: bobot jenis + bonus temuan, foto, narasi, "
+            "jarak, dan lokasi GPS."
+        ),
+    )
 
     class Meta:
         verbose_name = _("Laporan kegiatan")
@@ -630,6 +791,14 @@ class Activity(TimeStampedModel):
             raise ValidationError(
                 {"started_at": _("Waktu kegiatan tidak boleh di masa depan.")}
             )
+        if (
+            self._state.adding
+            and self.activity_type == enums.ActivityType.OTHER
+            and None in (self.impact_scope, self.impact_risk, self.impact_result)
+        ):
+            raise ValidationError(
+                _("Kegiatan lainnya wajib dinilai dampaknya (cakupan, risiko, hasil).")
+            )
 
     def save(self, *args, **kwargs):
         from operasi import geo
@@ -644,6 +813,35 @@ class Activity(TimeStampedModel):
             self.verified_at = None
             self.verified_by = None
         super().save(*args, **kwargs)
+        self.refresh_effort()
+
+    @property
+    def impact_score(self) -> int | None:
+        values = (self.impact_scope, self.impact_risk, self.impact_result)
+        return None if None in values else sum(values)
+
+    @property
+    def impact_tier(self) -> str:
+        score = self.impact_score
+        return "" if score is None else enums.impact_tier(score)
+
+    @property
+    def needs_impact_confirmation(self) -> bool:
+        return (
+            self.activity_type == enums.ActivityType.OTHER
+            and self.impact_tier in enums.HIGH_IMPACT_TIERS
+            and not self.impact_confirmed
+        )
+
+    def refresh_effort(self, config=None, weights=None) -> None:
+        """Hitung ulang poin usaha (setelah foto/temuan tersimpan) tanpa memicu save()."""
+        from operasi import services
+
+        points = services.effort_points(self, config, weights)
+        if points != self.effort_points:
+            self.effort_points = points
+            if self.pk:
+                Activity.objects.filter(pk=self.pk).update(effort_points=points)
 
     def touch_residents(self):
         day = timezone.localtime(self.started_at).date()
@@ -666,6 +864,17 @@ class ActivityPhoto(models.Model):
         validators=IMAGE_VALIDATORS,
     )
     caption = models.CharField(_("Keterangan"), max_length=255, blank=True, default="")
+    location = gmodels.PointField(
+        _("Lokasi foto (geotag)"), srid=4326, null=True, blank=True
+    )
+    hunting_finding = models.ForeignKey(
+        "operasi.HuntingParkFinding",
+        verbose_name=_("Bukti temuan patroli"),
+        related_name="photos",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
     uploaded_at = models.DateTimeField(_("Diunggah"), auto_now_add=True)
 
     class Meta:
@@ -705,6 +914,402 @@ class ActivityWeight(models.Model):
     @classmethod
     def points_map(cls) -> dict[str, int]:
         return dict(cls.objects.values_list("activity_type", "points"))
+
+
+# --------------------------------------------------------------------------
+# Temuan ilegal & patroli Taman Buru
+# --------------------------------------------------------------------------
+
+
+class IllegalFinding(TimeStampedModel):
+    """Profil temuan aktivitas ilegal (tetap); tiap kunjungan dicatat sebagai kegiatan."""
+
+    number = models.CharField(_("Nomor"), max_length=32, unique=True, editable=False)
+    korwil = _korwil_field("illegal_findings")
+    activity_kind = models.CharField(
+        _("Aktivitas"),
+        max_length=16,
+        choices=enums.IllegalActivityKind.choices,
+        default=enums.IllegalActivityKind.OTHER,
+    )
+    location_name = models.CharField(
+        _("Lokasi"), max_length=255, help_text=_("Mis. Hutan Pos 500, Sembulang.")
+    )
+    location = gmodels.PointField(_("Titik temuan"), srid=4326, null=True, blank=True)
+    owner_name = models.CharField(_("Pemilik"), max_length=255, blank=True, default="")
+    owner_phone = models.CharField(
+        _("No. HP pemilik"), max_length=32, blank=True, default=""
+    )
+    owner_domicile = models.CharField(
+        _("Domisili pemilik"), max_length=255, blank=True, default=""
+    )
+    manager_name = models.CharField(
+        _("Pengurus"), max_length=255, blank=True, default=""
+    )
+    manager_phone = models.CharField(
+        _("No. HP pengurus"), max_length=32, blank=True, default=""
+    )
+    area_ha = models.DecimalField(
+        _("Luas lahan (ha)"),
+        max_digits=12,
+        decimal_places=4,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0)],
+    )
+    forest_status = models.CharField(
+        _("Status hutan"),
+        max_length=128,
+        blank=True,
+        default="",
+        help_text=_("Mis. Hutan Produksi / kawasan APL."),
+    )
+    business_started = models.CharField(
+        _("Mulai usaha berjalan"), max_length=128, blank=True, default=""
+    )
+    created_by = _user_field(_("Dicatat oleh"))
+    note = models.TextField(_("Catatan"), blank=True, default="")
+
+    class Meta:
+        verbose_name = _("Temuan ilegal")
+        verbose_name_plural = _("Temuan ilegal")
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return (
+            f"{self.number} {self.get_activity_kind_display()} – {self.location_name}"
+        )
+
+    def save(self, *args, **kwargs):
+        from operasi import geo
+
+        if not self.number:
+            self.number = next_number("TIL")
+        if self.korwil_id is None and not getattr(self, "_korwil_resolved", False):
+            self.korwil = geo.korwil_for(self.location, self.created_by)
+        super().save(*args, **kwargs)
+
+
+class IllegalFindingVisit(models.Model):
+    """Data satu kunjungan ke lokasi temuan ilegal (bagian dari laporan kegiatan)."""
+
+    activity = models.OneToOneField(
+        Activity,
+        verbose_name=_("Kegiatan"),
+        related_name="illegal_visit",
+        on_delete=models.CASCADE,
+    )
+    finding = models.ForeignKey(
+        IllegalFinding,
+        verbose_name=_("Temuan"),
+        related_name="visits",
+        on_delete=models.CASCADE,
+    )
+    is_new = models.BooleanField(
+        _("Temuan baru"), default=True, help_text=_("Tidak dicentang = berulang.")
+    )
+    permit = models.CharField(
+        _("Izin usaha"),
+        max_length=8,
+        choices=enums.PermitStatus.choices,
+        blank=True,
+        default="",
+    )
+    business_activity = models.CharField(
+        _("Kegiatan usaha"),
+        max_length=8,
+        choices=enums.BusinessActivity.choices,
+        blank=True,
+        default="",
+    )
+    persons_involved = models.TextField(
+        _("Oknum yang terlibat"), blank=True, default=""
+    )
+    equipment = models.TextField(_("Peralatan usaha"), blank=True, default="")
+    buildings = models.TextField(_("Bangunan"), blank=True, default="")
+    follow_up = models.TextField(_("Tindak lanjut"), blank=True, default="")
+
+    class Meta:
+        verbose_name = _("Kunjungan temuan ilegal")
+        verbose_name_plural = _("Kunjungan temuan ilegal")
+        ordering = ["-activity__started_at"]
+
+    def __str__(self):
+        return f"{self.finding.number} – {self.activity.number}"
+
+    @property
+    def filled_count(self) -> int:
+        return sum(
+            1
+            for value in (
+                self.permit,
+                self.business_activity,
+                self.persons_involved,
+                self.equipment,
+                self.buildings,
+                self.follow_up,
+            )
+            if str(value).strip()
+        )
+
+
+class HuntingParkPatrol(models.Model):
+    """Laporan patroli Taman Buru (rute, temuan, bibit, kondisi tim)."""
+
+    activity = models.OneToOneField(
+        Activity,
+        verbose_name=_("Kegiatan"),
+        related_name="patrol_report",
+        on_delete=models.CASCADE,
+    )
+    input_mode = models.CharField(
+        _("Cara isi"),
+        max_length=8,
+        choices=enums.PatrolInput.choices,
+        default=enums.PatrolInput.MANUAL,
+    )
+    grid = models.CharField(
+        _("Nomor grid"),
+        max_length=255,
+        blank=True,
+        default="",
+        help_text=_("Mis. TBPR29, TBPR65."),
+    )
+    routes = ArrayField(
+        models.CharField(max_length=16, choices=enums.PatrolRoute.choices),
+        verbose_name=_("Cakupan patroli"),
+        default=list,
+        blank=True,
+    )
+    objective = models.CharField(
+        _("Objektif patroli"), max_length=255, blank=True, default=""
+    )
+    team_leader = models.CharField(
+        _("Ketua tim"), max_length=255, blank=True, default=""
+    )
+    team = models.CharField(_("Tim / regu"), max_length=255, blank=True, default="")
+    station = models.CharField(
+        _("Stasiun / pos"), max_length=255, blank=True, default=""
+    )
+    transport = models.CharField(
+        _("Transportasi"), max_length=128, blank=True, default=""
+    )
+    patrol_started_at = models.DateTimeField(_("Waktu mulai"), null=True, blank=True)
+    patrol_ended_at = models.DateTimeField(_("Waktu selesai"), null=True, blank=True)
+    situation = models.CharField(
+        _("Situasi"),
+        max_length=16,
+        choices=enums.PatrolSituation.choices,
+        blank=True,
+        default="",
+    )
+    personnel_condition = models.CharField(
+        _("Kondisi personil"),
+        max_length=8,
+        choices=enums.PersonnelCondition.choices,
+        blank=True,
+        default="",
+    )
+    materiel_condition = models.CharField(
+        _("Kondisi materiil"),
+        max_length=8,
+        choices=enums.MaterielCondition.choices,
+        blank=True,
+        default="",
+    )
+    weather_morning = models.CharField(
+        _("Cuaca pagi"),
+        max_length=8,
+        choices=enums.Weather.choices,
+        blank=True,
+        default="",
+    )
+    weather_noon = models.CharField(
+        _("Cuaca siang"),
+        max_length=8,
+        choices=enums.Weather.choices,
+        blank=True,
+        default="",
+    )
+    weather_afternoon = models.CharField(
+        _("Cuaca sore"),
+        max_length=8,
+        choices=enums.Weather.choices,
+        blank=True,
+        default="",
+    )
+    obstacles = models.TextField(_("Kendala / hambatan"), blank=True, default="")
+    suggestions = models.TextField(_("Saran"), blank=True, default="")
+
+    class Meta:
+        verbose_name = _("Laporan patroli Taman Buru")
+        verbose_name_plural = _("Laporan patroli Taman Buru")
+        ordering = ["-activity__started_at"]
+
+    def __str__(self):
+        return f"{self.activity.number} {self.activity.location_name}"
+
+    def seedling_total(self, kind: str) -> int:
+        return sum(s.quantity or 0 for s in self.seedlings.all() if s.kind == kind)
+
+
+class HuntingParkFinding(models.Model):
+    patrol = models.ForeignKey(
+        HuntingParkPatrol,
+        verbose_name=_("Patroli"),
+        related_name="findings",
+        on_delete=models.CASCADE,
+    )
+    category = models.CharField(
+        _("Kategori"),
+        max_length=16,
+        choices=enums.FindingCategory.choices,
+        default=enums.FindingCategory.OTHER,
+    )
+    description = models.CharField(_("Deskripsi"), max_length=500)
+    quantity = models.PositiveIntegerField(_("Jumlah"), null=True, blank=True)
+    forest_status = models.CharField(
+        _("Status hutan"), max_length=128, blank=True, default=""
+    )
+    new_activity = models.BooleanField(
+        _("Aktivitas baru"), null=True, blank=True, help_text=_("Ada / tidak ada.")
+    )
+    note = models.CharField(_("Keterangan"), max_length=500, blank=True, default="")
+    location = gmodels.PointField(_("Titik temuan"), srid=4326, null=True, blank=True)
+
+    class Meta:
+        verbose_name = _("Temuan patroli")
+        verbose_name_plural = _("Temuan patroli")
+        ordering = ["pk"]
+
+    def __str__(self):
+        return f"{self.get_category_display()}: {self.description[:60]}"
+
+
+class Seedling(models.Model):
+    patrol = models.ForeignKey(
+        HuntingParkPatrol,
+        verbose_name=_("Patroli"),
+        related_name="seedlings",
+        on_delete=models.CASCADE,
+    )
+    kind = models.CharField(
+        _("Jenis catatan"), max_length=16, choices=enums.SeedlingKind.choices
+    )
+    species = models.CharField(_("Jenis bibit"), max_length=128)
+    quantity = models.PositiveIntegerField(_("Jumlah bibit"))
+
+    class Meta:
+        verbose_name = _("Bibit Taman Buru")
+        verbose_name_plural = _("Bibit Taman Buru")
+        ordering = ["kind", "pk"]
+
+    def __str__(self):
+        return f"{self.get_kind_display()}: {self.species} ({self.quantity})"
+
+
+class PatrolSession(TimeStampedModel):
+    """Jejak patroli hasil impor ekspor SMART Mobile / CyberTracker (GeoJSON)."""
+
+    number = models.CharField(_("Nomor"), max_length=32, unique=True, editable=False)
+    activity = models.ForeignKey(
+        Activity,
+        verbose_name=_("Laporan kegiatan"),
+        related_name="patrol_sessions",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+    )
+    korwil = _korwil_field("patrol_sessions")
+    smart_patrol_id = models.CharField(
+        _("ID patroli SMART"), max_length=128, blank=True, default=""
+    )
+    name = models.CharField(_("Nama / objektif"), max_length=255)
+    started_at = models.DateTimeField(_("Mulai"), null=True, blank=True)
+    ended_at = models.DateTimeField(_("Selesai"), null=True, blank=True)
+    leader = models.CharField(_("Ketua tim"), max_length=255, blank=True, default="")
+    team = models.CharField(_("Tim"), max_length=255, blank=True, default="")
+    station = models.CharField(_("Stasiun"), max_length=255, blank=True, default="")
+    transport = models.CharField(
+        _("Transportasi"), max_length=128, blank=True, default=""
+    )
+    comments = models.TextField(_("Catatan patroli"), blank=True, default="")
+    distance_m = models.PositiveIntegerField(_("Jarak tempuh (m)"), default=0)
+    track = gmodels.LineStringField(_("Jalur"), srid=4326, null=True, blank=True)
+    source_name = models.CharField(
+        _("Nama berkas"), max_length=255, blank=True, default=""
+    )
+    uploaded_by = _user_field(_("Diunggah oleh"))
+
+    class Meta:
+        verbose_name = _("Jejak patroli SMART")
+        verbose_name_plural = _("Jejak patroli SMART")
+        ordering = ["-started_at", "-pk"]
+
+    def __str__(self):
+        return f"{self.number} {self.name}"
+
+    def save(self, *args, **kwargs):
+        from operasi import geo
+
+        if not self.number:
+            self.number = next_number("PTR")
+        if self.korwil_id is None and not getattr(self, "_korwil_resolved", False):
+            start = Point(*self.track.coords[0], srid=4326) if self.track else None
+            self.korwil = geo.korwil_for(start, self.uploaded_by)
+        super().save(*args, **kwargs)
+
+
+class PatrolObservation(models.Model):
+    session = models.ForeignKey(
+        PatrolSession,
+        verbose_name=_("Patroli"),
+        related_name="observations",
+        on_delete=models.CASCADE,
+    )
+    seq = models.PositiveIntegerField(_("Urutan"))
+    kind = models.CharField(_("Tipe"), max_length=64, default="Observation")
+    location = gmodels.PointField(_("Lokasi"), srid=4326)
+    observed_at = models.DateTimeField(_("Waktu"), null=True, blank=True)
+    comment = models.TextField(_("Catatan"), blank=True, default="")
+    leg_distance_m = models.DecimalField(
+        _("Jarak dari titik sebelumnya (m)"),
+        max_digits=10,
+        decimal_places=1,
+        null=True,
+        blank=True,
+    )
+
+    class Meta:
+        verbose_name = _("Observasi patroli")
+        verbose_name_plural = _("Observasi patroli")
+        ordering = ["session", "seq"]
+
+    def __str__(self):
+        return f"{self.session.number} #{self.seq} {self.kind}"
+
+
+class PatrolPhoto(models.Model):
+    observation = models.ForeignKey(
+        PatrolObservation,
+        verbose_name=_("Observasi"),
+        related_name="photos",
+        on_delete=models.CASCADE,
+    )
+    photo = PrivateFileField(
+        verbose_name=_("Foto"),
+        upload_to=upload_patrol,
+        max_length=255,
+        validators=IMAGE_VALIDATORS,
+    )
+
+    class Meta:
+        verbose_name = _("Foto observasi patroli")
+        verbose_name_plural = _("Foto observasi patroli")
+        ordering = ["pk"]
+
+    def __str__(self):
+        return self.photo.name.rsplit("/", 1)[-1]
 
 
 class SoilTest(TimeStampedModel):
@@ -1070,6 +1675,11 @@ for _model in (
     Korwil,
     Activity,
     ActivityPhoto,
+    IllegalFindingVisit,
+    HuntingParkPatrol,
+    HuntingParkFinding,
+    Seedling,
+    PatrolSession,
     SoilTest,
     Attendance,
     SosAlert,
@@ -1078,6 +1688,7 @@ for _model in (
 
 # Kode rahasia & data pribadi tidak boleh tersimpan apa adanya di log audit.
 auditlog.register(SystemLock, exclude_fields=["passcode_hash"])
+auditlog.register(IllegalFinding, mask_fields=["owner_phone", "manager_phone"])
 auditlog.register(
     Resident,
     exclude_fields=["nik_fingerprint"],

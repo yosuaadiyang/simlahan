@@ -30,9 +30,16 @@ from operasi.models import (
     Attendance,
     ChatMessage,
     CommandSettings,
+    HuntingParkFinding,
+    HuntingParkPatrol,
+    IllegalFinding,
+    IllegalFindingVisit,
     Korwil,
     OfficerPosition,
+    PatrolObservation,
+    PatrolSession,
     Resident,
+    Seedling,
     SoilTest,
     SosAlert,
     StanceChange,
@@ -214,10 +221,37 @@ class CommandSettingsAdmin(SingletonAdmin):
             },
         ),
         (
+            _("Poin usaha kegiatan"),
+            {
+                "fields": (
+                    "scoring_mode",
+                    "effort_target_multiplier",
+                    "effort_base_default",
+                    ("effort_per_finding", "effort_finding_max"),
+                    ("effort_per_photo", "effort_photo_max"),
+                    ("effort_narrative_bonus", "effort_narrative_min_chars"),
+                    ("effort_per_km", "effort_km_max"),
+                    "effort_geotag_bonus",
+                ),
+                "description": _(
+                    "Poin usaha = poin dasar jenis (Bobot kegiatan KPI; Komsos per "
+                    "warga yang ditemui; Kegiatan lainnya dari rubrik dampak 3/6/9/12) "
+                    "+ bonus temuan, foto, narasi lengkap, jarak tempuh, dan lokasi "
+                    "GPS. Klaim dampak Signifikan/Kritis dihitung 6 poin sampai "
+                    "dikonfirmasi atasan."
+                ),
+            },
+        ),
+        (
             _("Peta, Live & SOS"),
             {"fields": ("online_minutes", "sos_emails", "satellite_tile_url")},
         ),
     )
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        if {f for f in form.changed_data if f.startswith("effort_")}:
+            services.recompute_effort()
 
 
 class SystemLockForm(forms.ModelForm):
@@ -539,7 +573,13 @@ class ResidentAdmin(OperasiGISAdmin):
     )
     search_fields = ("number", "head_name", "village", "address", "phone")
     raw_id_fields = ("pengadaan_household", "pengadaan_parcel", "land_asset")
-    readonly_fields = ("number", "last_visited_on", "created_by", "visits")
+    readonly_fields = (
+        "number",
+        "last_visited_on",
+        "created_by",
+        "registered_activity",
+        "visits",
+    )
     inlines = (StanceChangeInline,)
     actions = ("export_csv",)
     change_list_template = "admin/operasi/resident/change_list.html"
@@ -580,8 +620,11 @@ class ResidentAdmin(OperasiGISAdmin):
                     "occupation",
                     "origin",
                     "years_living",
+                    "residency_status",
                     "spouse_name",
+                    "spouse_occupation",
                     "child_count",
+                    "children_detail",
                     "land_area_m2",
                     "cultivation_status",
                     "land_condition",
@@ -592,7 +635,18 @@ class ResidentAdmin(OperasiGISAdmin):
             _("Keterkaitan modul lain"),
             {"fields": ("pengadaan_household", "pengadaan_parcel", "land_asset")},
         ),
-        (_("Riwayat"), {"fields": ("last_visited_on", "visits", "created_by", "note")}),
+        (
+            _("Riwayat"),
+            {
+                "fields": (
+                    "last_visited_on",
+                    "visits",
+                    "created_by",
+                    "registered_activity",
+                    "note",
+                )
+            },
+        ),
     )
 
     @admin.display(description=_("Sikap"), ordering="stance")
@@ -804,6 +858,17 @@ class ActivityWeightAdmin(admin.ModelAdmin):
     list_display = ("activity_type", "points")
     list_editable = ("points",)
 
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        services.recompute_effort(
+            Activity.objects.filter(activity_type=obj.activity_type)
+        )
+
+    def delete_model(self, request, obj):
+        activity_type = obj.activity_type
+        super().delete_model(request, obj)
+        services.recompute_effort(Activity.objects.filter(activity_type=activity_type))
+
     def has_add_permission(self, request):
         return request.user.has_perm("operasi.change_commandsettings")
 
@@ -823,10 +888,18 @@ class ActivityAdmin(OperasiGISAdmin):
         "reported_by",
         "participants_count",
         "photo_count",
+        "effort_points",
+        "impact_badge",
         "verified",
     )
     list_display_links = ("number", "title")
-    list_filter = ("activity_type", "korwil", "verified", "started_at")
+    list_filter = (
+        "activity_type",
+        "korwil",
+        "verified",
+        "impact_confirmed",
+        "started_at",
+    )
     date_hierarchy = "started_at"
     search_fields = ("number", "title", "description", "outcome")
     autocomplete_fields = ("residents", "task")
@@ -836,10 +909,17 @@ class ActivityAdmin(OperasiGISAdmin):
         "reported_by",
         "verified_by",
         "verified_at",
+        "effort_points",
+        "impact_summary",
+        "impact_confirmed",
+        "impact_confirmed_by",
+        "impact_confirmed_at",
+        "ai_stance",
+        "special_parts",
     )
     inlines = (ActivityPhotoInline,)
     file_kinds = {"voice_note": "kegiatan-suara"}
-    actions = ("mark_verified", "export_csv")
+    actions = ("mark_verified", "confirm_impact", "export_csv")
     fieldsets = (
         (
             None,
@@ -852,10 +932,29 @@ class ActivityAdmin(OperasiGISAdmin):
                     "started_at",
                     "duration_minutes",
                     "korwil",
+                    "companion",
                 )
             },
         ),
-        (_("Lokasi"), {"fields": ("location", "accuracy_m")}),
+        (
+            _("Lokasi"),
+            {"fields": ("location_name", "location", "accuracy_m", "distance_m")},
+        ),
+        (
+            _("Penilaian dampak (Kegiatan lainnya)"),
+            {
+                "fields": (
+                    "impact_scope",
+                    "impact_risk",
+                    "impact_result",
+                    "impact_summary",
+                    "impact_confirmed",
+                    "impact_confirmed_by",
+                    "impact_confirmed_at",
+                ),
+                "classes": ("collapse",),
+            },
+        ),
         (
             _("Hasil"),
             {
@@ -865,6 +964,9 @@ class ActivityAdmin(OperasiGISAdmin):
                     "outcome",
                     "voice_note",
                     "task",
+                    "ai_stance",
+                    "special_parts",
+                    "effort_points",
                 )
             },
         ),
@@ -894,6 +996,70 @@ class ActivityAdmin(OperasiGISAdmin):
     def photo_count(self, obj):
         return obj._photos
 
+    @admin.display(description=_("Dampak"))
+    def impact_badge(self, obj):
+        if not obj.impact_tier:
+            return "–"
+        label = enums.ImpactTier(obj.impact_tier).label
+        if obj.needs_impact_confirmation:
+            return badge("#bf8700", _("%s (menunggu konfirmasi)") % label)
+        return badge("#1a7f37", label)
+
+    @admin.display(description=_("Tingkat dampak"))
+    def impact_summary(self, obj):
+        if not obj.impact_tier:
+            return "–"
+        tier = enums.ImpactTier(obj.impact_tier)
+        text = _("%(label)s (skor %(score)s, %(points)s poin)") % {
+            "label": tier.label,
+            "score": obj.impact_score,
+            "points": enums.IMPACT_POINTS[tier],
+        }
+        if obj.needs_impact_confirmation:
+            text += " – " + str(_("sementara dihitung 6 poin sampai dikonfirmasi"))
+        return text
+
+    @admin.display(description=_("Bagian khusus"))
+    def special_parts(self, obj):
+        if not obj.pk:
+            return "–"
+        links = []
+        visit = IllegalFindingVisit.objects.filter(activity=obj).first()
+        if visit is not None:
+            links.append(
+                (
+                    reverse(
+                        "admin:operasi_illegalfinding_change", args=[visit.finding_id]
+                    ),
+                    _("Temuan ilegal %s") % visit.finding.number,
+                )
+            )
+        report = HuntingParkPatrol.objects.filter(activity=obj).first()
+        if report is not None:
+            links.append(
+                (
+                    reverse("admin:operasi_huntingparkpatrol_change", args=[report.pk]),
+                    _("Laporan patroli Taman Buru"),
+                )
+            )
+        for session in obj.patrol_sessions.all():
+            links.append(
+                (
+                    reverse("admin:operasi_patrolsession_change", args=[session.pk]),
+                    _("Jejak SMART %s") % session.number,
+                )
+            )
+        for resident in obj.registered_residents.all():
+            links.append(
+                (
+                    reverse("admin:operasi_resident_change", args=[resident.pk]),
+                    _("Warga baru %s") % resident,
+                )
+            )
+        if not links:
+            return "–"
+        return format_html_join(format_html("<br>"), '<a href="{}">{}</a>', links)
+
     def get_readonly_fields(self, request, obj=None):
         fields = super().get_readonly_fields(request, obj)
         if aset_scope.sees_all(request.user):
@@ -912,6 +1078,29 @@ class ActivityAdmin(OperasiGISAdmin):
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)
         form.instance.touch_residents()
+        form.instance.refresh_effort()
+
+    @admin.action(
+        description=_("Konfirmasi dampak tinggi (Kegiatan lainnya)"),
+        permissions=["change"],
+    )
+    def confirm_impact(self, request, queryset):
+        if not aset_scope.sees_all(request.user):
+            queryset = queryset.filter(korwil__coordinator=request.user)
+        count = 0
+        # Pelapor tidak boleh mengonfirmasi klaim dampaknya sendiri.
+        for activity in queryset.exclude(reported_by=request.user).filter(
+            activity_type=enums.ActivityType.OTHER, impact_confirmed=False
+        ):
+            if not activity.needs_impact_confirmation:
+                continue
+            activity.impact_confirmed = True
+            activity.impact_confirmed_by = request.user
+            activity.impact_confirmed_at = timezone.now()
+            activity.save()
+            activity.refresh_effort()
+            count += 1
+        messages.success(request, _("%d klaim dampak dikonfirmasi.") % count)
 
     @admin.action(description=_("Tandai sudah diverifikasi"), permissions=["change"])
     def mark_verified(self, request, queryset):
@@ -945,6 +1134,9 @@ class ActivityAdmin(OperasiGISAdmin):
                 a.location.y if a.location else "",
                 a.location.x if a.location else "",
                 a.outcome,
+                a.location_name,
+                a.effort_points,
+                enums.ImpactTier(a.impact_tier).label if a.impact_tier else "",
                 _("Ya") if a.verified else _("Belum"),
             )
             for a in queryset.select_related("korwil", "reported_by")
@@ -961,9 +1153,422 @@ class ActivityAdmin(OperasiGISAdmin):
             _("Lintang"),
             _("Bujur"),
             _("Hasil"),
+            _("Nama lokasi"),
+            _("Poin usaha"),
+            _("Tingkat dampak"),
             _("Diverifikasi"),
         ]
         return csv_response("kegiatan.csv", header, rows)
+
+
+# --------------------------------------------------------------------------
+# Temuan ilegal & patroli Taman Buru
+# --------------------------------------------------------------------------
+
+
+class IllegalFindingVisitInline(admin.TabularInline):
+    model = IllegalFindingVisit
+    extra = 0
+    can_delete = False
+    fields = (
+        "activity_link",
+        "is_new",
+        "permit",
+        "business_activity",
+        "persons_involved",
+        "equipment",
+        "buildings",
+        "follow_up",
+    )
+    readonly_fields = fields
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    @admin.display(description=_("Kegiatan"))
+    def activity_link(self, obj):
+        return format_html(
+            '<a href="{}">{}</a> {}',
+            reverse("admin:operasi_activity_change", args=[obj.activity_id]),
+            obj.activity.number,
+            _local(obj.activity.started_at),
+        )
+
+
+@admin.register(IllegalFinding)
+class IllegalFindingAdmin(OperasiGISAdmin):
+    owner_field = "created_by"
+    list_select_related = ("korwil",)
+    list_display = (
+        "number",
+        "kind_badge",
+        "location_name",
+        "korwil",
+        "owner_name",
+        "area_ha",
+        "visit_count",
+        "created_at",
+    )
+    list_display_links = ("number", "location_name")
+    list_filter = ("activity_kind", "korwil")
+    search_fields = ("number", "location_name", "owner_name", "manager_name")
+    readonly_fields = ("number", "created_by")
+    inlines = (IllegalFindingVisitInline,)
+    actions = ("export_csv",)
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    "number",
+                    "activity_kind",
+                    "location_name",
+                    "korwil",
+                    "location",
+                )
+            },
+        ),
+        (
+            _("Pemilik & pengurus"),
+            {
+                "fields": (
+                    "owner_name",
+                    "owner_phone",
+                    "owner_domicile",
+                    "manager_name",
+                    "manager_phone",
+                )
+            },
+        ),
+        (
+            _("Lahan & usaha"),
+            {"fields": ("area_ha", "forest_status", "business_started")},
+        ),
+        (_("Catatan"), {"fields": ("note", "created_by")}),
+    )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).annotate(_visits=Count("visits"))
+
+    @admin.display(description=_("Aktivitas"), ordering="activity_kind")
+    def kind_badge(self, obj):
+        return badge(
+            enums.ILLEGAL_COLORS.get(obj.activity_kind, "#57606a"),
+            obj.get_activity_kind_display(),
+        )
+
+    @admin.display(description=_("Kunjungan"), ordering="_visits")
+    def visit_count(self, obj):
+        return obj._visits
+
+    def save_model(self, request, obj, form, change):
+        if not change and obj.created_by_id is None:
+            obj.created_by = request.user
+        geo.assign_korwil(obj, request.user, strict=False)
+        super().save_model(request, obj, form, change)
+
+    @admin.action(description=_("Ekspor CSV"), permissions=["view"])
+    def export_csv(self, request, queryset):
+        rows = (
+            (
+                f.number,
+                f.get_activity_kind_display(),
+                f.location_name,
+                f.korwil.code if f.korwil_id else "",
+                f.owner_name,
+                f.owner_phone,
+                f.owner_domicile,
+                f.manager_name,
+                f.manager_phone,
+                f.area_ha if f.area_ha is not None else "",
+                f.forest_status,
+                f.business_started,
+                f.location.y if f.location else "",
+                f.location.x if f.location else "",
+                f.visits.count(),
+            )
+            for f in queryset.select_related("korwil")
+        )
+        header = [
+            _("Nomor"),
+            _("Aktivitas"),
+            _("Lokasi"),
+            _("Korwil"),
+            _("Pemilik"),
+            _("No. HP pemilik"),
+            _("Domisili pemilik"),
+            _("Pengurus"),
+            _("No. HP pengurus"),
+            _("Luas (ha)"),
+            _("Status hutan"),
+            _("Mulai usaha"),
+            _("Lintang"),
+            _("Bujur"),
+            _("Kunjungan"),
+        ]
+        return csv_response("temuan-ilegal.csv", header, rows)
+
+
+class HuntingParkFindingInline(admin.TabularInline):
+    model = HuntingParkFinding
+    extra = 0
+    fields = (
+        "category",
+        "description",
+        "quantity",
+        "forest_status",
+        "new_activity",
+        "note",
+    )
+
+
+class SeedlingInline(admin.TabularInline):
+    model = Seedling
+    extra = 0
+    fields = ("kind", "species", "quantity")
+
+
+@admin.register(HuntingParkPatrol)
+class HuntingParkPatrolAdmin(OperasiModelAdmin):
+    scope_prefix = "activity__korwil"
+    list_select_related = ("activity", "activity__korwil", "activity__reported_by")
+    list_display = (
+        "activity_link",
+        "location",
+        "korwil",
+        "grid",
+        "situation",
+        "finding_count",
+        "tended",
+        "produced",
+    )
+    list_filter = ("situation", "activity__korwil", "activity__started_at")
+    search_fields = ("activity__number", "activity__location_name", "grid", "team")
+    readonly_fields = ("activity_link",)
+    inlines = (HuntingParkFindingInline, SeedlingInline)
+    fieldsets = (
+        (None, {"fields": ("activity_link", "input_mode", "grid", "routes")}),
+        (
+            _("Tim"),
+            {
+                "fields": (
+                    "objective",
+                    "team_leader",
+                    "team",
+                    "station",
+                    "transport",
+                    "patrol_started_at",
+                    "patrol_ended_at",
+                )
+            },
+        ),
+        (
+            _("Kondisi"),
+            {
+                "fields": (
+                    "situation",
+                    "personnel_condition",
+                    "materiel_condition",
+                    ("weather_morning", "weather_noon", "weather_afternoon"),
+                    "obstacles",
+                    "suggestions",
+                )
+            },
+        ),
+    )
+
+    def has_add_permission(self, request):
+        # Dibuat dari laporan Taman Buru di pusat komando.
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        if not super().has_change_permission(request, obj):
+            return False
+        if obj is None or geo.is_supervisor(request.user):
+            return True
+        activity = obj.activity
+        return activity.reported_by_id == request.user.pk or bool(
+            activity.korwil_id and activity.korwil.coordinator_id == request.user.pk
+        )
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .annotate(_findings=Count("findings", distinct=True))
+            .prefetch_related("seedlings")
+        )
+
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+        form.instance.activity.refresh_effort()
+
+    @admin.display(description=_("Kegiatan"), ordering="activity__started_at")
+    def activity_link(self, obj):
+        return format_html(
+            '<a href="{}">{}</a> {}',
+            reverse("admin:operasi_activity_change", args=[obj.activity_id]),
+            obj.activity.number,
+            _local(obj.activity.started_at),
+        )
+
+    @admin.display(description=_("Lokasi"))
+    def location(self, obj):
+        return obj.activity.location_name
+
+    @admin.display(description=_("Korwil"))
+    def korwil(self, obj):
+        return obj.activity.korwil or "–"
+
+    @admin.display(description=_("Temuan"), ordering="_findings")
+    def finding_count(self, obj):
+        return obj._findings
+
+    @admin.display(description=_("Bibit dirawat"))
+    def tended(self, obj):
+        return obj.seedling_total(enums.SeedlingKind.TENDED)
+
+    @admin.display(description=_("Bibit diproduksi"))
+    def produced(self, obj):
+        return obj.seedling_total(enums.SeedlingKind.PRODUCED)
+
+
+class PatrolObservationInline(admin.TabularInline):
+    model = PatrolObservation
+    extra = 0
+    can_delete = False
+    fields = ("seq", "kind", "observed_at", "comment", "photo_links")
+    readonly_fields = fields
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    @admin.display(description=_("Foto"))
+    def photo_links(self, obj):
+        photos = list(obj.photos.all())
+        if not photos:
+            return "–"
+        return format_html_join(
+            " ",
+            '<a href="{}" target="_blank" rel="noopener">📷</a>',
+            (
+                (reverse("operasi-file", args=["patroli-foto", p.pk]) + "?lihat=1",)
+                for p in photos
+            ),
+        )
+
+
+@admin.register(PatrolSession)
+class PatrolSessionAdmin(ReadOnlyAdminMixin, OperasiGISAdmin):
+    list_select_related = ("korwil", "activity", "uploaded_by")
+    list_display = (
+        "number",
+        "name",
+        "korwil",
+        "started_at",
+        "leader",
+        "distance_m",
+        "obs_count",
+        "activity",
+    )
+    list_display_links = ("number", "name")
+    list_filter = ("korwil", "started_at")
+    search_fields = ("number", "name", "leader", "team", "smart_patrol_id")
+    inlines = (PatrolObservationInline,)
+    change_list_template = "admin/operasi/patrolsession/change_list.html"
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    "number",
+                    "name",
+                    "korwil",
+                    "activity",
+                    "smart_patrol_id",
+                    "source_name",
+                    "uploaded_by",
+                )
+            },
+        ),
+        (
+            _("Patroli"),
+            {
+                "fields": (
+                    "started_at",
+                    "ended_at",
+                    "leader",
+                    "team",
+                    "station",
+                    "transport",
+                    "distance_m",
+                    "comments",
+                    "track",
+                )
+            },
+        ),
+    )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).annotate(_obs=Count("observations"))
+
+    @admin.display(description=_("Observasi"), ordering="_obs")
+    def obs_count(self, obj):
+        return obj._obs
+
+    def get_urls(self):
+        return [
+            path(
+                "impor/",
+                self.admin_site.admin_view(self.import_view),
+                name="operasi_patrolsession_import",
+            ),
+        ] + super().get_urls()
+
+    def import_view(self, request):
+        if not request.user.has_perm("operasi.add_patrolsession"):
+            raise PermissionDenied
+        form = ImportForm(request.POST or None, request.FILES or None)
+        if request.method == "POST" and form.is_valid():
+            from django.core.exceptions import ValidationError
+
+            from operasi import patrol
+
+            upload = form.cleaned_data["file"]
+            try:
+                if upload.size > patrol.MAX_FILE_BYTES:
+                    raise ValidationError(_("Berkas SMART maksimal 15 MB."))
+                session = patrol.save_session(
+                    patrol.parse(upload.read()), request.user, None, upload.name
+                )
+            except ValidationError as error:
+                messages.error(request, " ".join(error.messages))
+            else:
+                messages.success(
+                    request,
+                    _("Jejak patroli %(n)s tersimpan (%(o)d observasi).")
+                    % {"n": session.number, "o": session.observations.count()},
+                )
+                return HttpResponseRedirect(
+                    reverse("admin:operasi_patrolsession_change", args=[session.pk])
+                )
+        return _import_page(
+            self,
+            request,
+            form,
+            _("Impor patroli SMART"),
+            _(
+                "Berkas <code>.json</code> (GeoJSON) hasil ekspor SMART Mobile / "
+                "CyberTracker. Jalur, observasi, dan foto disimpan dan tampil di "
+                "lapisan <b>Patroli SMART</b> pusat komando. Maksimal 15 MB."
+            ),
+        )
 
 
 @admin.register(SoilTest)

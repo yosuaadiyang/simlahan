@@ -11,6 +11,8 @@ from django.utils import timezone
 from operasi.models import (
     Activity,
     Attendance,
+    HuntingParkPatrol,
+    IllegalFinding,
     Korwil,
     Resident,
     SoilTest,
@@ -344,7 +346,10 @@ def test_resident_import_errors_name_the_line(admin_user, korwil):
 def test_sample_data_command(admin_user):
     call_command("operasi_contoh_rempang", stdout=io.StringIO())
     assert Korwil.objects.count() == 11
-    assert Resident.objects.count() >= 88 and Activity.objects.count() == 33
+    # 33 kegiatan dasar + 11 Komsos + 6 kunjungan temuan ilegal + 2 patroli + 2 lainnya.
+    assert Resident.objects.count() >= 88 and Activity.objects.count() == 54
+    assert IllegalFinding.objects.count() == 3 and HuntingParkPatrol.objects.count() == 2
+    assert not Activity.objects.filter(effort_points=0).exists()
     assert all(r.korwil_id for r in Resident.objects.all())
     out = io.StringIO()
     call_command("operasi_contoh_rempang", stdout=out)
@@ -354,6 +359,7 @@ def test_sample_data_command(admin_user):
     call_command("operasi_contoh_rempang", "--hapus", stdout=io.StringIO())
     assert not Korwil.objects.exists() and not Resident.objects.exists()
     assert not Activity.objects.exists() and not SoilTest.objects.exists()
+    assert not IllegalFinding.objects.exists()
 
 
 def test_korwil_import_from_kmz(admin_user, make_kmz):

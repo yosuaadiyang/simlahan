@@ -387,7 +387,9 @@
     { key: "kegiatan", name: "Kegiatan (90 hari)", perm: perms.kegiatan },
     { key: "tanah", name: "Uji tanah", perm: perms.tanah },
     { key: "petugas", name: "Petugas Live", perm: perms.lihatPetugas },
-    { key: "sos", name: "SOS aktif", perm: perms.lihatSos }
+    { key: "sos", name: "SOS aktif", perm: perms.lihatSos },
+    { key: "temuan", name: "Temuan ilegal", perm: perms.temuan },
+    { key: "patroli", name: "Patroli SMART", perm: perms.patroli }
   ].filter(function (spec) { return spec.perm; });
 
   function rampColor(value) {
@@ -417,6 +419,7 @@
       html += '<br><button type="button" class="btn-small" data-warga="' + props.id + '">Buka data warga</button>';
     }
     if (props.url) { html += '<br><a href="' + encodeURI(props.url) + '" target="_blank" rel="noopener">Buka data</a>'; }
+    (props.photos || []).forEach(function (url) { html += ' <a href="' + encodeURI(url) + '" target="_blank" rel="noopener">📷</a>'; });
     return html;
   }
 
@@ -450,6 +453,7 @@
       });
     }
     return L.geoJSON(data, {
+      style: function (f) { return { color: f.properties.color || "#06b6d4", weight: 3, opacity: 0.85 }; },
       pointToLayer: function (f, latlng) {
         var color = key === "warga" ? wargaColor(f.properties) : f.properties.color;
         var radius = key === "warga" ? 5 : key === "tanah" ? 6 : 5;
@@ -530,6 +534,17 @@
       Object.keys(config.colors.soil).forEach(function (key) {
         entries.push({ color: config.colors.soil[key], label: "Uji tanah: " + choiceLabel("suitability", key), round: true });
       });
+    }
+    if (layerState.temuan) {
+      Object.keys(config.colors.illegal).forEach(function (key) {
+        entries.push({ color: config.colors.illegal[key], label: "Temuan: " + choiceLabel("illegalKind", key), round: true });
+      });
+    }
+    if (layerState.patroli) {
+      entries.push({ color: "#06b6d4", label: "Jalur patroli SMART" });
+      entries.push({ color: "#10b981", label: "Mulai patroli", round: true });
+      entries.push({ color: "#f59e0b", label: "Observasi patroli", round: true });
+      entries.push({ color: "#ef4444", label: "Selesai patroli", round: true });
     }
     if (layerState.kegiatan) {
       Object.keys(config.colors.activity).forEach(function (key) {
@@ -1478,11 +1493,393 @@
     renderChosen();
   });
 
-  function reportPoint(useTap) {
+  // ================================================================ Bagian laporan per jenis
+
+  var TYPE_ICONS = { komsos: "💬", topografi: "📐", temuan_ilegal: "⚠️", taman_buru: "🌲", lainnya: "📋" };
+  var AUTO_TITLE = ["komsos", "topografi", "temuan_ilegal", "taman_buru"];
+  var MAX_NEW_RESIDENTS = 10;
+  var newResidents = [];
+  var patrolFindings = [];
+  var findingFiles = [];
+  var seedlings = [];
+  var smartFile = null;
+  var smartPoint = null;
+  var tiMode = "baru";
+  var tiFound = {};
+
+  function renderTypeCards() {
+    var current = $("kg-jenis").value;
+    $("kg-kartu").innerHTML = config.choices.fieldTypes.map(function (value) {
+      return '<button type="button" role="radio" data-kartu="' + escapeHtml(value) + '" aria-checked="' + (current === value) + '"' +
+        (current === value ? ' class="active"' : "") + '><span aria-hidden="true">' + (TYPE_ICONS[value] || "📋") + "</span>" +
+        escapeHtml(choiceLabel("activityType", value)) + "</button>";
+    }).join("");
+  }
+
+  function applyActivityType() {
+    var type = $("kg-jenis").value;
+    document.querySelectorAll("#form-kegiatan .jenis-part").forEach(function (part) {
+      part.hidden = part.getAttribute("data-jenis") !== type;
+    });
+    var auto = AUTO_TITLE.indexOf(type) !== -1;
+    $("kg-judul-label").textContent = type === "lainnya" ? "Nama kegiatan" : auto ? "Judul (opsional, dibuat otomatis)" : "Judul";
+    $("kg-uraian-label").textContent = type === "komsos" ? "Narasi hasil komsos" : "Uraian / narasi";
+    $("kg-lokasi").required = type === "taman_buru";
+    renderTypeCards();
+    updateImpact();
+  }
+
+  $("kg-kartu").addEventListener("click", function (event) {
+    var button = event.target.closest("[data-kartu]");
+    if (!button) { return; }
+    $("kg-jenis").value = button.getAttribute("data-kartu");
+    applyActivityType();
+  });
+  $("kg-jenis").addEventListener("change", applyActivityType);
+
+  // --- Komsos: warga baru ---
+
+  function newResidentInputs() { return document.querySelectorAll("#kg-warga-baru-form [data-wb]"); }
+
+  function closeNewResident() {
+    newResidentInputs().forEach(function (input) { input.value = ""; });
+    document.querySelectorAll("#kg-warga-baru-form .pilih-sikap").forEach(function (sel) { sel.value = "belum"; });
+    $("kg-warga-baru-form").hidden = true;
+    $("kg-warga-baru-buka").hidden = !perms.tambahWarga;
+  }
+
+  function renderNewResidents() {
+    $("kg-warga-baru").innerHTML = newResidents.map(function (person, index) {
+      var info = [choiceLabel("residency", person.status_warga || ""), person.kampung].filter(Boolean).join(" · ");
+      return "<li>🆕 " + escapeHtml(person.nama) + (info ? ' <span class="muted small">' + escapeHtml(info) + "</span>" : "") +
+        ' <button type="button" class="close" data-hapus-wb="' + index + '" aria-label="Hapus">✕</button></li>';
+    }).join("");
+  }
+
+  $("kg-warga-baru-buka").addEventListener("click", function () {
+    if (newResidents.length >= MAX_NEW_RESIDENTS) { toast("Paling banyak " + MAX_NEW_RESIDENTS + " warga baru per laporan.", "error"); return; }
+    $("kg-warga-baru-form").hidden = false;
+    this.hidden = true;
+  });
+  $("kg-warga-baru-batal").addEventListener("click", closeNewResident);
+  $("kg-warga-baru-simpan").addEventListener("click", function () {
+    var person = {};
+    newResidentInputs().forEach(function (input) {
+      var value = (input.value || "").trim();
+      if (value) { person[input.getAttribute("data-wb")] = value; }
+    });
+    if (!person.nama) { toast("Nama warga wajib diisi.", "error"); return; }
+    newResidents.push(person);
+    renderNewResidents();
+    closeNewResident();
+  });
+  $("kg-warga-baru").addEventListener("click", function (event) {
+    var index = event.target.getAttribute("data-hapus-wb");
+    if (index !== null) { newResidents.splice(parseInt(index, 10), 1); renderNewResidents(); }
+  });
+
+  // --- Temuan ilegal: baru / berulang ---
+
+  var TI_PROFILE = { ti_aktivitas: "kind", ti_lokasi: "location_name", ti_pemilik: "owner_name", ti_pemilik_hp: "owner_phone",
+    ti_domisili: "owner_domicile", ti_pengurus: "manager_name", ti_pengurus_hp: "manager_phone", ti_luas: "area_ha",
+    ti_status_hutan: "forest_status", ti_mulai: "business_started" };
+
+  function tiInput(name) { return document.querySelector('#form-kegiatan [name="' + name + '"]'); }
+
+  function clearTiProfile() {
+    Object.keys(TI_PROFILE).forEach(function (name) { tiInput(name).value = ""; });
+    $("ti-aktivitas").value = (config.choices.illegalKind[0] || {}).value || "";
+  }
+
+  function setTiMode(mode) {
+    tiMode = mode;
+    document.querySelectorAll("#ti-mode [data-ti-mode]").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-ti-mode") === mode); });
+    $("ti-berulang").hidden = mode !== "berulang";
+    $("ti-id").value = "";
+    $("ti-terpilih").textContent = mode === "berulang" ? "Belum ada temuan dipilih." : "";
+    $("ti-saran").innerHTML = "";
+    $("ti-cari").value = "";
+    clearTiProfile();
+  }
+
+  $("ti-mode").addEventListener("click", function (event) {
+    var button = event.target.closest("[data-ti-mode]");
+    if (button && !button.hidden) { setTiMode(button.getAttribute("data-ti-mode")); }
+  });
+
+  var tiTimer = null;
+  $("ti-cari").addEventListener("input", function () {
+    var q = this.value.trim();
+    clearTimeout(tiTimer);
+    if (q.length < 2) { $("ti-saran").innerHTML = ""; return; }
+    tiTimer = setTimeout(function () {
+      request(urls.illegalFindings + "?q=" + encodeURIComponent(q)).then(function (data) {
+        tiFound = {};
+        $("ti-saran").innerHTML = data.results.map(function (f) {
+          tiFound[f.id] = f;
+          return '<li data-id="' + f.id + '">' + escapeHtml(f.location_name) + ' <span class="muted small">' +
+            escapeHtml(f.number + " · " + f.kind_label + (f.owner_name ? " · " + f.owner_name : "")) + "</span></li>";
+        }).join("") || "<li class='muted'>Tidak ditemukan.</li>";
+      }).catch(function () { $("ti-saran").innerHTML = ""; });
+    }, 300);
+  });
+  $("ti-saran").addEventListener("click", function (event) {
+    var li = event.target.closest("li[data-id]");
+    var found = li && tiFound[li.getAttribute("data-id")];
+    if (!found) { return; }
+    $("ti-id").value = found.id;
+    Object.keys(TI_PROFILE).forEach(function (name) { tiInput(name).value = found[TI_PROFILE[name]] || ""; });
+    $("ti-terpilih").textContent = "Dipilih: " + found.number + " – " + found.location_name + ". Isian profil yang diubah ikut diperbarui.";
+    $("ti-saran").innerHTML = "";
+    if (found.lat !== null && !$("kg-titik").checked) { smartPoint = null; }
+  });
+
+  // --- Patroli Taman Buru ---
+
+  function renderRoutes() {
+    $("tb-rute").innerHTML = config.choices.patrolRoute.map(function (c) {
+      return '<label class="check"><input type="checkbox" value="' + escapeHtml(c.value) + '"> ' + escapeHtml(c.label) + "</label>";
+    }).join("");
+  }
+
+  function optionsHtml(kind, current, placeholder) {
+    return (placeholder ? '<option value="">' + escapeHtml(placeholder) + "</option>" : "") + config.choices[kind].map(function (c) {
+      return '<option value="' + escapeHtml(c.value) + '"' + (String(c.value) === String(current) ? " selected" : "") + ">" + escapeHtml(c.label) + "</option>";
+    }).join("");
+  }
+
+  function renderPatrolFindings() {
+    $("tb-temuan").innerHTML = patrolFindings.map(function (f, i) {
+      var files = findingFiles[i] || [];
+      return '<div class="card mini" data-tf-row="' + i + '"><div class="row"><b>Temuan ' + (i + 1) + "</b>" +
+        '<button type="button" class="close" data-tf-hapus="' + i + '" aria-label="Hapus temuan">✕</button></div>' +
+        '<div class="grid2"><label class="field">Kategori <select data-tf="' + i + ':kategori">' + optionsHtml("findingCategory", f.kategori, "—") + "</select></label>" +
+        '<label class="field">Jumlah <input type="number" min="0" data-tf="' + i + ':jumlah" value="' + escapeHtml(f.jumlah == null ? "" : f.jumlah) + '"></label>' +
+        '<label class="field">Status hutan <input maxlength="128" data-tf="' + i + ':status_hutan" value="' + escapeHtml(f.status_hutan || "") + '"></label>' +
+        '<label class="field">Aktivitas baru? <select data-tf="' + i + ':aktivitas_baru"><option value="">—</option><option value="ada"' + (f.aktivitas_baru === "ada" ? " selected" : "") + '>Ada</option><option value="tidak"' + (f.aktivitas_baru === "tidak" ? " selected" : "") + ">Tidak ada</option></select></label></div>" +
+        '<label class="field">Deskripsi <input maxlength="500" data-tf="' + i + ':deskripsi" value="' + escapeHtml(f.deskripsi || "") + '" placeholder="Mis. Hamparan pohon meranti"></label>' +
+        '<label class="field">Keterangan <input maxlength="500" data-tf="' + i + ':keterangan" value="' + escapeHtml(f.keterangan || "") + '"></label>' +
+        '<label class="field">Foto bukti (maks 3) <span class="muted small" data-tf-jumlah="' + i + '">' + (files.length ? files.length + " foto dipilih" : "") + "</span>" +
+        ' <input type="file" accept="image/*" capture="environment" multiple data-tf-foto="' + i + '"></label>' +
+        (f.foto_smart ? '<p class="small muted">' + f.foto_smart + " foto dari berkas SMART tersimpan di jejak patroli.</p>" : "") + "</div>";
+    }).join("");
+  }
+
+  function renderSeedlings() {
+    $("tb-bibit").innerHTML = seedlings.map(function (b, i) {
+      return '<div class="row wrap"><span class="pill">' + escapeHtml(choiceLabel("seedling", b.jenis)) + "</span>" +
+        '<input maxlength="128" placeholder="Jenis bibit" data-bb="' + i + ':nama" value="' + escapeHtml(b.nama || "") + '">' +
+        '<input type="number" min="0" placeholder="Jumlah" data-bb="' + i + ':jumlah" value="' + escapeHtml(b.jumlah || "") + '" style="max-width:110px">' +
+        '<button type="button" class="close" data-bb-hapus="' + i + '" aria-label="Hapus bibit">✕</button></div>';
+    }).join("");
+  }
+
+  $("tb-temuan-tambah").addEventListener("click", function () {
+    if (patrolFindings.length >= 50) { toast("Paling banyak 50 temuan.", "error"); return; }
+    patrolFindings.push({ kategori: "", deskripsi: "", jumlah: "", status_hutan: "", aktivitas_baru: "", keterangan: "" });
+    findingFiles.push([]);
+    renderPatrolFindings();
+  });
+  $("tb-temuan").addEventListener("input", function (event) {
+    var key = event.target.getAttribute("data-tf");
+    if (!key) { return; }
+    var parts = key.split(":");
+    patrolFindings[parseInt(parts[0], 10)][parts[1]] = event.target.value;
+  });
+  $("tb-temuan").addEventListener("change", function (event) {
+    var key = event.target.getAttribute("data-tf");
+    if (key) { var parts = key.split(":"); patrolFindings[parseInt(parts[0], 10)][parts[1]] = event.target.value; return; }
+    var index = event.target.getAttribute("data-tf-foto");
+    if (index !== null) {
+      findingFiles[parseInt(index, 10)] = Array.prototype.slice.call(event.target.files, 0, 3);
+      var count = document.querySelector('[data-tf-jumlah="' + index + '"]');
+      if (count) { count.textContent = findingFiles[parseInt(index, 10)].length + " foto dipilih"; }
+      if (event.target.files.length > 3) { toast("Hanya 3 foto pertama yang dipakai.", "error"); }
+    }
+  });
+  $("tb-temuan").addEventListener("click", function (event) {
+    var index = event.target.getAttribute("data-tf-hapus");
+    if (index === null) { return; }
+    patrolFindings.splice(parseInt(index, 10), 1);
+    findingFiles.splice(parseInt(index, 10), 1);
+    renderPatrolFindings();
+  });
+  document.querySelectorAll("[data-bibit]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      if (seedlings.length >= 50) { toast("Paling banyak 50 baris bibit.", "error"); return; }
+      seedlings.push({ jenis: button.getAttribute("data-bibit"), nama: "", jumlah: "" });
+      renderSeedlings();
+    });
+  });
+  $("tb-bibit").addEventListener("input", function (event) {
+    var key = event.target.getAttribute("data-bb");
+    if (!key) { return; }
+    var parts = key.split(":");
+    seedlings[parseInt(parts[0], 10)][parts[1]] = event.target.value;
+  });
+  $("tb-bibit").addEventListener("click", function (event) {
+    var index = event.target.getAttribute("data-bb-hapus");
+    if (index !== null) { seedlings.splice(parseInt(index, 10), 1); renderSeedlings(); }
+  });
+
+  $("tb-mode").addEventListener("change", function () {
+    $("tb-smart").hidden = this.value === "manual";
+    if (this.value === "manual") { smartFile = null; smartPoint = null; $("tb-smart-file").value = ""; }
+  });
+
+  function toLocalInput(iso) {
+    var date = iso ? new Date(iso) : null;
+    return date && !isNaN(date.getTime()) ? localInputValue(date) : "";
+  }
+
+  function applySmart(data) {
+    var form = $("form-kegiatan");
+    var set = function (name, value) { var el = form.querySelector('[name="' + name + '"]'); if (el && value) { el.value = value; } };
+    set("lokasi", data.location_name);
+    set("tb_grid", data.grid);
+    set("tb_objektif", data.objective);
+    set("tb_ketua", data.team_leader);
+    set("tb_regu", data.team);
+    set("tb_stasiun", data.station);
+    set("tb_transport", data.transport);
+    set("tb_mulai", toLocalInput(data.started));
+    set("tb_selesai", toLocalInput(data.ended));
+    if (data.distance_m) { $("tb-jarak").value = (data.distance_m / 1000).toFixed(2); }
+    var narrative = form.querySelector('[name="uraian"]');
+    if (!narrative.value.trim()) { narrative.value = data.narrative || ""; }
+    smartPoint = data.lat !== null && data.lng !== null ? { lat: data.lat, lng: data.lng, accuracy: "" } : null;
+    if ($("tb-mode").value === "smart") { patrolFindings = []; findingFiles = []; }
+    (data.findings || []).forEach(function (f) {
+      patrolFindings.push({ kategori: f.category, deskripsi: f.description, jumlah: f.quantity === null ? "" : f.quantity,
+        status_hutan: f.forest_status, aktivitas_baru: "", keterangan: f.note, lat: f.lat, lng: f.lng, foto_smart: f.photos });
+      findingFiles.push([]);
+    });
+    renderPatrolFindings();
+    $("tb-smart-info").textContent = data.counts.observations + " observasi · " + data.counts.track + " titik jalur · " +
+      data.counts.photos + " foto terbaca. Periksa & lengkapi, lalu simpan.";
+  }
+
+  $("tb-smart-file").addEventListener("change", function () {
+    smartFile = this.files && this.files[0] ? this.files[0] : null;
+    smartPoint = null;
+    if (!smartFile) { return; }
+    if (smartFile.size > 15 * 1024 * 1024) { toast("Berkas SMART maksimal 15 MB.", "error"); smartFile = null; this.value = ""; return; }
+    if (!navigator.onLine) {
+      $("tb-smart-info").textContent = "Tanpa sinyal: pratinjau belum bisa dibuat, berkas tetap dikirim bersama laporan.";
+      return;
+    }
+    var data = new FormData();
+    data.append("smart", smartFile, smartFile.name);
+    $("tb-smart-info").textContent = "Memproses berkas SMART…";
+    request(urls.patrolPreview, { method: "POST", body: data }).then(applySmart).catch(function (error) {
+      $("tb-smart-info").textContent = error.message || "Berkas SMART tidak dikenali.";
+      smartFile = null;
+      $("tb-smart-file").value = "";
+    });
+  });
+
+  // --- Kegiatan lainnya: tingkat dampak ---
+
+  function impactTier(score) {
+    if (score <= 1) { return "rutin"; }
+    if (score <= 3) { return "operasional"; }
+    if (score <= 5) { return "signifikan"; }
+    return "kritis";
+  }
+
+  function updateImpact() {
+    var form = $("form-kegiatan");
+    var values = ["dampak_cakupan", "dampak_risiko", "dampak_hasil"].map(function (name) { return form.querySelector('[name="' + name + '"]').value; });
+    var box = $("kg-dampak");
+    if ($("kg-jenis").value !== "lainnya" || values.indexOf("") !== -1) { box.hidden = true; return; }
+    var tier = impactTier(values.reduce(function (sum, v) { return sum + parseInt(v, 10); }, 0));
+    var points = config.impactPoints[tier];
+    var high = tier === "signifikan" || tier === "kritis";
+    box.hidden = false;
+    box.className = "impact-box" + (high ? " high" : "");
+    box.textContent = "Tingkat: " + choiceLabel("impactTier", tier) + " – " + (high
+      ? "dihitung " + config.impactPoints.operasional + " poin sementara; " + points + " poin setelah dikonfirmasi atasan."
+      : points + " poin.");
+  }
+  document.querySelectorAll('#form-kegiatan [data-jenis="lainnya"] select').forEach(function (sel) { sel.addEventListener("change", updateImpact); });
+
+  function typeFields(type) {
+    var form = $("form-kegiatan");
+    var fields = {};
+    var files = [];
+    var part = form.querySelector('.jenis-part[data-jenis="' + type + '"]');
+    if (part) {
+      part.querySelectorAll("[name]").forEach(function (input) {
+        if (input.type === "file") { return; }
+        fields[input.name] = input.value;
+      });
+    }
+    if (type === "komsos" && newResidents.length) {
+      fields.warga_baru = JSON.stringify(newResidents);
+    }
+    if (type === "temuan_ilegal" && tiMode === "baru") { delete fields.temuan_id; }
+    if (type === "taman_buru") {
+      fields.tb_rute = Array.prototype.map.call($("tb-rute").querySelectorAll("input:checked"), function (i) { return i.value; }).join(",");
+      ["tb_mulai", "tb_selesai"].forEach(function (name) { fields[name] = fields[name] ? new Date(fields[name]).toISOString() : ""; });
+      var km = parseFloat($("tb-jarak").value);
+      if (!isNaN(km) && km >= 0) { fields.jarak_m = Math.round(km * 1000); }
+      fields.temuan_patroli = JSON.stringify(patrolFindings.map(function (f) {
+        return { kategori: f.kategori, deskripsi: f.deskripsi, jumlah: f.jumlah, status_hutan: f.status_hutan,
+          aktivitas_baru: f.aktivitas_baru, keterangan: f.keterangan, lat: f.lat, lng: f.lng };
+      }));
+      fields.bibit = JSON.stringify(seedlings);
+      if (smartFile && fields.tb_mode !== "manual") { files.push({ field: "smart", blob: smartFile, name: smartFile.name }); }
+    }
+    return { fields: fields, files: files };
+  }
+
+  function checkTypeFields(type, fields) {
+    if (type === "lainnya" && (!fields.dampak_cakupan || !fields.dampak_risiko || !fields.dampak_hasil)) {
+      return "Nilai dampak kegiatan (cakupan, risiko, hasil) wajib dipilih.";
+    }
+    if (type === "temuan_ilegal") {
+      if (tiMode === "berulang" && !fields.temuan_id) { return "Pilih temuan yang dikunjungi ulang."; }
+      if (!(fields.ti_lokasi || "").trim()) { return "Lokasi temuan wajib diisi."; }
+    }
+    if (type === "taman_buru") {
+      if (patrolFindings.some(function (f) { return !(f.deskripsi || "").trim(); })) { return "Deskripsi tiap temuan wajib diisi."; }
+      if (seedlings.some(function (b) { return !(b.nama || "").trim() || !/^\d+$/.test(String(b.jumlah)); })) { return "Isi jenis dan jumlah tiap bibit."; }
+    }
+    return "";
+  }
+
+  function findingPhotoFiles() {
+    var jobs = findingFiles.map(function (list, index) {
+      return Promise.all(list.map(function (file) {
+        return compress(file).then(function (blob) { return { field: "foto_temuan_" + index, blob: blob, name: file.name.replace(/\.[^.]+$/, "") + ".jpg" }; });
+      }));
+    });
+    return Promise.all(jobs).then(function (groups) { return [].concat.apply([], groups); });
+  }
+
+  function resetTypeParts() {
+    newResidents = [];
+    patrolFindings = [];
+    findingFiles = [];
+    seedlings = [];
+    smartFile = null;
+    smartPoint = null;
+    renderNewResidents();
+    renderPatrolFindings();
+    renderSeedlings();
+    closeNewResident();
+    setTiMode(perms.tambahTemuan ? "baru" : "berulang");
+    $("tb-smart").hidden = true;
+    $("tb-smart-info").textContent = "Jalur, observasi, foto, dan data tim diisi otomatis; periksa lalu simpan.";
+    applyActivityType();
+  }
+
+  function reportPoint(useTap, preferred) {
     if (useTap) {
       if (!tappedPoint) { return Promise.reject(new ApiError("Ketuk titik di peta terlebih dahulu.", 0)); }
       return Promise.resolve({ lat: tappedPoint.lat, lng: tappedPoint.lng, accuracy: "" });
     }
+    if (preferred) { return Promise.resolve(preferred); }
     return currentPosition(10000);
   }
 
@@ -1491,31 +1888,46 @@
     if (!perms.lapor) { toast("Anda tidak berhak melapor kegiatan.", "error"); return; }
     var formEl = this;
     var data = new FormData(formEl);
+    var type = data.get("jenis");
     var fields = {
-      jenis: data.get("jenis"), judul: (data.get("judul") || "").trim(), uraian: data.get("uraian"),
+      jenis: type, judul: (data.get("judul") || "").trim(), uraian: data.get("uraian"),
       waktu: data.get("waktu") ? new Date(data.get("waktu")).toISOString() : new Date().toISOString(),
       durasi: data.get("durasi"), peserta: data.get("peserta"), hasil: data.get("hasil"),
       korwil: data.get("korwil"), tugas: data.get("tugas"),
+      pendamping: (data.get("pendamping") || "").trim(), lokasi: (data.get("lokasi") || "").trim(),
       warga: Object.keys(chosenResidents).join(",")
     };
     var stances = {};
     Object.keys(chosenResidents).forEach(function (id) { if (chosenResidents[id].newStance) { stances[id] = chosenResidents[id].newStance; } });
     if (Object.keys(stances).length) { fields.sikap = JSON.stringify(stances); }
-    if (!fields.judul) { toast("Judul wajib diisi.", "error"); return; }
+    if (!fields.judul && AUTO_TITLE.indexOf(type) === -1) { toast(type === "lainnya" ? "Nama kegiatan wajib diisi." : "Judul wajib diisi.", "error"); return; }
+    if (type === "taman_buru" && !fields.lokasi) { toast("Nama lokasi patroli wajib diisi.", "error"); return; }
+    var extra = typeFields(type);
+    Object.keys(extra.fields).forEach(function (key) { fields[key] = extra.fields[key]; });
+    var problem = checkTypeFields(type, fields);
+    if (problem) { toast(problem, "error"); return; }
+    var label = fields.judul || choiceLabel("activityType", type) + (fields.lokasi ? " – " + fields.lokasi : "");
     var voiceInput = formEl.querySelector('[name="suara"]');
     var voice = voiceInput && voiceInput.files && voiceInput.files[0];
     if (voice && voice.size > 10 * 1024 * 1024) { toast("Rekaman suara maksimal 10 MB.", "error"); return; }
     if (voice && !/\.(m4a|mp3|wav|ogg|webm)$/i.test(voice.name)) { toast("Rekaman suara harus M4A, MP3, WAV, OGG, atau WEBM.", "error"); return; }
-    reportPoint($("kg-titik").checked).then(function (point) {
+    var preferred = type === "taman_buru" && fields.tb_mode !== "manual" ? smartPoint : null;
+    reportPoint($("kg-titik").checked, preferred).then(function (point) {
       if (point) { fields.lat = point.lat; fields.lng = point.lng; fields.accuracy = point.accuracy; }
-      return photoFiles(formEl.querySelector('[name="foto"]'), "foto", 5);
-    }).then(function (files) {
+      if ((type === "temuan_ilegal" && tiMode === "baru") || (type === "taman_buru" && !smartFile)) {
+        if (!point) { throw new ApiError("Lokasi GPS wajib untuk jenis ini. Ketuk peta bila GPS tidak tersedia.", 0); }
+      }
+      return Promise.all([photoFiles(formEl.querySelector('[name="foto"]'), "foto", 5), findingPhotoFiles()]);
+    }).then(function (groups) {
+      var files = groups[0].concat(groups[1], extra.files);
       if (voice) { files.push({ field: "suara", blob: voice, name: voice.name }); }
-      return enqueue(urls.activities, "Kegiatan: " + fields.judul, fields, files);
+      return enqueue(urls.activities, "Kegiatan: " + label, fields, files);
     }).then(function () {
       formEl.reset();
       chosenResidents = {};
       renderChosen();
+      $("kg-jenis").value = type;
+      resetTypeParts();
       $("kg-waktu").value = localInputValue();
       toast(navigator.onLine ? "Laporan disimpan, mengirim…" : "Tanpa sinyal: laporan disimpan di perangkat dan dikirim otomatis nanti.", "ok");
       sync(false);
@@ -1548,11 +1960,11 @@
     }).catch(function (error) { toast(error.message || "Gagal menyimpan uji tanah.", "error"); });
   });
 
-  document.querySelectorAll(".segmented button").forEach(function (button) {
+  document.querySelectorAll(".segmented button[data-sub]").forEach(function (button) {
     button.addEventListener("click", function () {
       if (button.hidden) { return; }
       var sub = button.getAttribute("data-sub");
-      document.querySelectorAll(".segmented button").forEach(function (b) { b.classList.toggle("active", b === button); });
+      document.querySelectorAll(".segmented button[data-sub]").forEach(function (b) { b.classList.toggle("active", b === button); });
       document.querySelectorAll("[data-sub-view]").forEach(function (view) { view.hidden = view.getAttribute("data-sub-view") !== sub; });
       if (sub === "riwayat") { loadMyReports(); }
     });
@@ -1564,8 +1976,20 @@
     var scope = $("riwayat-lingkup").value;
     request(urls.activities + (scope ? "?lingkup=" + scope : "")).then(function (data) {
       $("daftar-kegiatan").innerHTML = data.results.map(function (a) {
+        var extras = [];
+        if (a.location_name) { extras.push("📍 " + a.location_name); }
+        extras.push(a.points + " poin");
+        if (a.impact_label) { extras.push("Dampak " + a.impact_label + (a.impact_pending ? " (menunggu konfirmasi)" : "")); }
+        if (a.ai_stance) { extras.push("AI: " + choiceLabel("stance", a.ai_stance)); }
+        if (a.temuan) { extras.push("⚠️ " + a.temuan.number + " " + a.temuan.kind + (a.temuan.is_new ? " (baru)" : " (kunjungan ke-" + a.temuan.visits + ")")); }
+        if (a.patroli) {
+          extras.push("🌲 " + a.patroli.findings + " temuan · bibit dirawat " + a.patroli.tended + " · diproduksi " + a.patroli.produced +
+            (a.patroli.smart ? " · jejak SMART" : ""));
+        }
         return "<li><div class='title'>" + escapeHtml(a.title) + (a.verified ? " ✅" : "") + "</div><div class='sub'>" + escapeHtml(a.number + " · " + a.type_label + " · " + fmtDate(a.started_at, true) +
           (a.korwil ? " · Korwil " + a.korwil : "") + " · " + a.reporter) + "</div>" +
+          "<div class='sub'>" + escapeHtml(extras.join(" · ")) + "</div>" +
+          (a.can_confirm ? "<div class='row'><button type='button' class='btn-small' data-konfirmasi='" + a.id + "'>Konfirmasi dampak " + escapeHtml(a.impact_label) + "</button></div>" : "") +
           (a.photos.length ? "<div class='row wrap'>" + a.photos.map(function (url) { return "<a href='" + escapeHtml(url) + "' target='_blank' rel='noopener'>📷</a>"; }).join(" ") + "</div>" : "") +
           (a.voice ? "<div class='row wrap'><audio controls preload='none' src='" + escapeHtml(a.voice) + "'></audio><a class='small' href='" + escapeHtml(a.voice) + "'>🎙️ Unduh rekaman</a></div>" : "") +
           (perms.verifikasi && !a.verified ? "<div class='row'><button type='button' class='btn-small' data-verifikasi='" + a.id + "'>Verifikasi</button></div>" : "") +
@@ -1575,6 +1999,13 @@
   }
   $("riwayat-lingkup").addEventListener("change", loadMyReports);
   $("daftar-kegiatan").addEventListener("click", function (event) {
+    var confirmId = event.target.getAttribute("data-konfirmasi");
+    if (confirmId) {
+      request(urls.impactConfirm.replace("/0/", "/" + confirmId + "/"), { method: "POST", body: form({}) })
+        .then(function () { toast("Dampak dikonfirmasi; poin penuh berlaku.", "ok"); loadMyReports(); })
+        .catch(function (error) { toast(error.message, "error"); });
+      return;
+    }
     var id = event.target.getAttribute("data-verifikasi");
     if (id) {
       request(urls.verify.replace("/0/", "/" + id + "/"), { method: "POST", body: form({ verified: "1" }) })
@@ -1675,13 +2106,16 @@
 
   function dossierHtml(r) {
     var rows = [
+      ["Status responden", r.residency ? choiceLabel("residency", r.residency) : ""],
       ["Jenis kelamin", r.gender ? choiceLabel("gender", r.gender) : ""],
       ["Umur", r.age !== null ? r.age + " tahun" : ""],
       ["Pekerjaan", r.occupation],
       ["Asal daerah", r.origin],
       ["Lama menetap", r.years_living !== null ? r.years_living + " tahun" : ""],
       ["Nama pasangan", r.spouse_name],
+      ["Pekerjaan pasangan", r.spouse_occupation],
       ["Jumlah anak", r.child_count !== null ? String(r.child_count) : ""],
+      ["Data anak", r.children_detail],
       ["Luas lahan", r.land_area_m2 !== null ? r.land_area_m2 + " m²" : ""],
       ["Penggarapan", r.cultivation ? choiceLabel("cultivation", r.cultivation) : ""],
       ["Zona RTRW", choiceLabel("zone", r.zone)],
@@ -1709,13 +2143,16 @@
         "<label class='field'>Zona RTRW " + selectHtml("zona", "zone", r.zone) + "</label>" +
         "<label class='field'>Pilihan " + selectHtml("pilihan", "relocation", r.relocation) + "</label>" +
         "<label class='field'>Penggarapan lahan " + selectHtml("penggarapan", "cultivation", r.cultivation) + "</label>" +
+        "<label class='field'>Status responden " + selectHtml("status_warga", "residency", r.residency) + "</label>" +
         "<label class='field'>Jenis kelamin " + selectHtml("gender", "gender", r.gender) + "</label>" +
         "<label class='field'>Umur <input type='number' name='umur' min='0' max='130' inputmode='numeric' value='" + numberValue(r.age) + "'></label>" +
         "<label class='field'>Pekerjaan <input name='pekerjaan' maxlength='128' value='" + escapeHtml(r.occupation) + "'></label>" +
         "<label class='field'>Asal daerah <input name='asal' maxlength='128' value='" + escapeHtml(r.origin) + "'></label>" +
         "<label class='field'>Lama menetap (tahun) <input type='number' name='menetap' min='0' max='130' inputmode='numeric' value='" + numberValue(r.years_living) + "'></label>" +
         "<label class='field'>Nama pasangan <input name='pasangan' maxlength='255' value='" + escapeHtml(r.spouse_name) + "'></label>" +
+        "<label class='field'>Pekerjaan pasangan <input name='pekerjaan_pasangan' maxlength='128' value='" + escapeHtml(r.spouse_occupation) + "'></label>" +
         "<label class='field'>Jumlah anak <input type='number' name='anak' min='0' max='50' inputmode='numeric' value='" + numberValue(r.child_count) + "'></label>" +
+        "<label class='field'>Data anak <textarea name='data_anak' rows='2' maxlength='2000' placeholder='Nama, umur, sekolah/pekerjaan'>" + escapeHtml(r.children_detail) + "</textarea></label>" +
         "<label class='field'>Luas lahan (m²) <input type='number' step='0.01' min='0' name='luas_lahan' inputmode='decimal' value='" + numberValue(r.land_area_m2) + "'></label>" +
         "<label class='field'>Kondisi lahan <textarea name='kondisi_lahan' rows='2' maxlength='2000'>" + escapeHtml(r.land_condition) + "</textarea></label>" +
         "<label class='field'>Catatan baru <input name='catatan' maxlength='2000'></label></div>" +
@@ -1777,8 +2214,9 @@
         chosenResidents = {};
         chosenResidents[r.id] = { name: r.name, newStance: "" };
         renderChosen();
-        $("kg-jenis").value = "kunjungan";
-        document.querySelector('#form-kegiatan [name="judul"]').value = "Kunjungan ke " + r.name;
+        $("kg-jenis").value = "komsos";
+        applyActivityType();
+        document.querySelector('#form-kegiatan [name="judul"]').value = "";
         showTab("korwil");
       });
     }
@@ -2311,6 +2749,23 @@
 
   function init() {
     fillSelect($("kg-jenis"), config.choices.activityType);
+    fillSelect($("ti-aktivitas"), config.choices.illegalKind);
+    // "Belum diketahui" di depan supaya warga baru tidak otomatis tercatat "Tempatan".
+    var residency = config.choices.residency.filter(function (c) { return !c.value; }).concat(config.choices.residency.filter(function (c) { return c.value; }));
+    document.querySelectorAll(".pilih-residency").forEach(function (s) { fillSelect(s, residency); });
+    document.querySelectorAll(".pilih-permit").forEach(function (s) { fillSelect(s, config.choices.permit); });
+    document.querySelectorAll(".pilih-business").forEach(function (s) { fillSelect(s, config.choices.business); });
+    document.querySelectorAll(".pilih-patrol-input").forEach(function (s) { fillSelect(s, config.choices.patrolInput); });
+    document.querySelectorAll(".pilih-situation").forEach(function (s) { fillSelect(s, config.choices.situation); });
+    document.querySelectorAll(".pilih-personnel").forEach(function (s) { fillSelect(s, config.choices.personnel); });
+    document.querySelectorAll(".pilih-materiel").forEach(function (s) { fillSelect(s, config.choices.materiel); });
+    document.querySelectorAll(".pilih-weather").forEach(function (s) { fillSelect(s, config.choices.weather); });
+    document.querySelectorAll(".pilih-impact-scope").forEach(function (s) { fillSelect(s, config.choices.impactScope, "— pilih —"); });
+    document.querySelectorAll(".pilih-impact-risk").forEach(function (s) { fillSelect(s, config.choices.impactRisk, "— pilih —"); });
+    document.querySelectorAll(".pilih-impact-result").forEach(function (s) { fillSelect(s, config.choices.impactResult, "— pilih —"); });
+    renderRoutes();
+    document.querySelector('#ti-mode [data-ti-mode="baru"]').hidden = !perms.tambahTemuan;
+    document.querySelector('#ti-mode [data-ti-mode="berulang"]').hidden = !perms.temuan;
     fillSelect($("kg-korwil"), config.korwils.map(function (k) { return { value: k.id, label: "Korwil " + k.code + " – " + k.name }; }), "Otomatis dari lokasi");
     if (config.myKorwils.length === 1) { $("kg-korwil").value = String(config.myKorwils[0]); }
     fillSelect($("tn-tekstur"), config.choices.texture, "—");
@@ -2332,6 +2787,7 @@
     $("chat-kanal").value = config.korwils.some(function (k) { return String(k.id) === String(chatChannel); }) ? chatChannel : "umum";
     chatChannel = $("chat-kanal").value;
     $("kg-waktu").value = localInputValue();
+    resetTypeParts();
     $("foto-wajib").textContent = config.settings.requirePhoto ? "(wajib)" : "(opsional)";
     $("form-chat").hidden = !perms.kirimChat;
     $("sos-tombol").hidden = !perms.sos;

@@ -1,10 +1,14 @@
 """Logika pusat komando: ringkasan, absensi, kinerja (KPI), SOS, dan pencarian."""
 
 import datetime
+import logging
 import math
+import threading
+from decimal import ROUND_HALF_UP, Decimal
 
 from django.core.exceptions import ValidationError
-from django.db.models import Count, F, Q
+from django.db import close_old_connections, transaction
+from django.db.models import Count, F, Q, Sum
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext as _
@@ -20,14 +24,18 @@ from operasi.models import (
     Attendance,
     ChatMessage,
     CommandSettings,
+    HuntingParkFinding,
     Korwil,
     OfficerPosition,
+    PatrolSession,
     Resident,
     SoilTest,
     SosAlert,
 )
 from pengadaan.workdays import is_workday
 from utils.group_permissions import UserGroup
+
+LOG = logging.getLogger(__name__)
 
 
 def pct(part: int, whole: int) -> int | None:
@@ -508,14 +516,22 @@ def performance(
     activities = Activity.objects.filter(
         reported_by=user, started_at__date__gte=start, started_at__date__lte=end
     )
-    # Bobot USAHA: kegiatan bernilai poin per jenisnya (default 1).
-    if weights is None:
-        weights = ActivityWeight.points_map()
-    activity_count = sum(
-        weights.get(a, 1) for a in activities.values_list("activity_type", flat=True)
-    )
+    rows = list(activities.values_list("activity_type", "effort_points"))
+    effort = config.scoring_mode == enums.ScoringMode.EFFORT
+    if effort:
+        # Poin USAHA: bobot jenis + bonus kelengkapan (dihitung saat lapor).
+        activity_count = float(sum((p for _t, p in rows), Decimal("0")))
+        multiplier = float(config.effort_target_multiplier)
+    else:
+        # Jumlah kegiatan × bobot jenis (default 1).
+        if weights is None:
+            weights = ActivityWeight.points_map()
+        activity_count = sum(weights.get(t, 1) for t, _p in rows)
+        multiplier = 1
     activity_target = (
-        max(math.ceil(config.weekly_activity_target * len(workdays) / 5), 1)
+        max(
+            math.ceil(config.weekly_activity_target * multiplier * len(workdays) / 5), 1
+        )
         if workdays and config.weekly_activity_target
         else 0
     )
@@ -574,8 +590,10 @@ def performance(
         "excused_days": excused,
         "attendance_pct": round(attendance_rate * 100),
         "on_time_pct": round(on_time_rate * 100) if on_time_rate is not None else None,
-        "activities": activity_count,
+        "activities": round(activity_count, 1),
+        "activity_count": len(rows),
         "activity_target": activity_target,
+        "scoring": config.scoring_mode,
         "activity_pct": round(activity_rate * 100),
         "residents_visited": visited,
         "tasks_due": due_count,
@@ -587,6 +605,168 @@ def performance(
         "grade": grade(score),
         "days": days,
     }
+
+
+# --------------------------------------------------------------------------
+# Poin usaha kegiatan & klasifikasi sikap AI
+# --------------------------------------------------------------------------
+
+
+def base_points(activity, config, weights) -> Decimal:
+    kind = activity.activity_type
+    if kind == enums.ActivityType.OTHER and activity.impact_tier:
+        tier = activity.impact_tier
+        if tier in enums.HIGH_IMPACT_TIERS and not activity.impact_confirmed:
+            tier = enums.ImpactTier.OPERATIONAL
+        return Decimal(enums.IMPACT_POINTS[tier])
+    if kind in weights:
+        return Decimal(weights[kind])
+    if kind in enums.EFFORT_BASE_POINTS:
+        return Decimal(enums.EFFORT_BASE_POINTS[kind])
+    return config.effort_base_default
+
+
+def effort_points(activity, config=None, weights=None) -> Decimal:
+    """Poin usaha satu kegiatan (transparan & dapat diaudit).
+
+    Poin dasar per jenis (Komsos dikali jumlah warga yang ditemui, Kegiatan
+    lainnya dari rubrik dampak) ditambah bonus temuan, foto, narasi lengkap,
+    jarak tempuh, dan lokasi GPS sesuai Pengaturan pusat komando.
+    """
+    config = config or CommandSettings.load()
+    if weights is None:
+        weights = ActivityWeight.points_map()
+    points = base_points(activity, config, weights)
+    photos = findings = 0
+    distance = activity.distance_m
+    if activity.pk:
+        if activity.activity_type == enums.ActivityType.KOMSOS:
+            persons = activity.residents.count()
+            points *= max(1, min(persons, enums.KOMSOS_MAX_PERSONS))
+        photos = activity.photos.count()
+        findings = HuntingParkFinding.objects.filter(patrol__activity=activity).count()
+        if distance is None:
+            distance = (
+                PatrolSession.objects.filter(activity=activity).aggregate(
+                    total=Sum("distance_m")
+                )["total"]
+                or None
+            )
+    if findings:
+        points += min(findings * config.effort_per_finding, config.effort_finding_max)
+    if photos:
+        points += min(photos * config.effort_per_photo, config.effort_photo_max)
+    narrative = len((activity.description or "").strip()) + len(
+        (activity.outcome or "").strip()
+    )
+    if narrative and narrative >= config.effort_narrative_min_chars:
+        points += config.effort_narrative_bonus
+    if distance:
+        km = Decimal(distance) / 1000
+        points += min(km * config.effort_per_km, config.effort_km_max)
+    if activity.location is not None:
+        points += config.effort_geotag_bonus
+    return points.quantize(Decimal("0.1"), rounding=ROUND_HALF_UP)
+
+
+def recompute_effort(queryset=None) -> int:
+    """Hitung ulang poin usaha (setelah pengaturan/bobot berubah)."""
+    config = CommandSettings.load()
+    weights = ActivityWeight.points_map()
+    queryset = Activity.objects.all() if queryset is None else queryset
+    count = 0
+    for activity in queryset.iterator(chunk_size=500):
+        activity.refresh_effort(config, weights)
+        count += 1
+    return count
+
+
+STANCE_PROMPT = (
+    "Klasifikasikan sikap warga terhadap program pembangunan dan relokasi "
+    "berdasarkan narasi hasil komunikasi sosial. Jawab HANYA satu kata: Pro, "
+    "Netral, atau Kontra.\n"
+    "PRO = mendukung pembangunan ATAU bersedia pindah/relokasi (termasuk yang "
+    "terkendala administrasi tetapi tetap bersedia).\n"
+    "NETRAL = belum bersedia pindah karena pertimbangan tertentu, ATAU tidak "
+    "menghalangi pembangunan meski tidak bisa pindah.\n"
+    "KONTRA = tidak mendukung pembangunan dalam bentuk apa pun, menolak pindah, "
+    "atau cenderung menghalangi dan memprovokasi."
+)
+
+
+def classify_stance(narrative: str) -> str:
+    """Sikap (enums.Stance) dari narasi Komsos menurut AI; kosong bila tidak bisa."""
+    from asetlahan import ai
+
+    text = (narrative or "").strip()
+    if len(text) < 12 or not ai.enabled():
+        return ""
+    try:
+        response = ai.create(
+            max_tokens=16,
+            system=STANCE_PROMPT,
+            messages=[
+                {
+                    "role": "user",
+                    "content": f'Narasi komsos:\n"{text[:6000]}"\n\n'
+                    "Sikap warga (Pro / Netral / Kontra):",
+                }
+            ],
+        )
+    except ai.AIError as error:
+        LOG.warning("Klasifikasi sikap AI gagal: %s", error)
+        return ""
+    answer = ai.text_of(response).lower()
+    if "kontra" in answer:
+        return enums.Stance.OPPOSE
+    if "netral" in answer:
+        return enums.Stance.NEUTRAL
+    if "pro" in answer:
+        return enums.Stance.SUPPORT
+    return ""
+
+
+def apply_ai_stance(activity_id: int) -> str:
+    """Simpan sikap AI pada kegiatan dan pada warga terkait yang sikapnya belum diketahui.
+
+    Sikap yang sudah dipilih petugas tidak pernah ditimpa AI.
+    """
+    activity = Activity.objects.filter(pk=activity_id).first()
+    if activity is None:
+        return ""
+    stance = classify_stance(f"{activity.description}\n{activity.outcome}")
+    if not stance:
+        return ""
+    Activity.objects.filter(pk=activity.pk).update(ai_stance=stance)
+    for resident in activity.residents.filter(stance=enums.Stance.UNKNOWN):
+        resident.stance = stance
+        resident._activity = activity
+        resident.save()
+    return stance
+
+
+def _ai_stance_worker(activity_id: int) -> None:
+    try:
+        apply_ai_stance(activity_id)
+    except Exception:  # noqa: BLE001 - utas latar tidak boleh menjatuhkan aplikasi
+        LOG.exception("Klasifikasi sikap AI kegiatan %s gagal", activity_id)
+    finally:
+        close_old_connections()
+
+
+def schedule_ai_stance(activity) -> None:
+    """Klasifikasi sikap Komsos di latar setelah laporan tersimpan (bila AI aktif)."""
+    from asetlahan import ai
+
+    if not ai.enabled() or activity.activity_type != enums.ActivityType.KOMSOS:
+        return
+    if len((activity.description or "").strip()) < 12:
+        return
+    transaction.on_commit(
+        lambda: threading.Thread(
+            target=_ai_stance_worker, args=(activity.pk,), daemon=True
+        ).start()
+    )
 
 
 def team_users(user):

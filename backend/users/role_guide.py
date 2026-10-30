@@ -63,7 +63,9 @@ DOWNLOAD_RULE = (
     "setiap unduhan diberi tanda air dan tercatat."
 )
 COMMAND_TABS = (
-    "Pusat komando (`/komando/`): Peta, Absen, Lapor (kegiatan, uji tanah, "
+    "Pusat komando (`/komando/`): Peta (termasuk lapisan Temuan ilegal dan "
+    "Patroli SMART), Absen, Lapor (Komsos, Topografi, Temuan ilegal, Patroli "
+    "Taman Buru dengan impor SMART, Kegiatan lainnya, jenis lain, uji tanah, "
     "laporan saya), Warga, Tugas, Kinerja, Chat; Menu: Peringkat tim, Struktur "
     "tim, Feed aktivitas, Asisten AI, Aplikasi utama; tombol **⇄ Utama** di "
     "bilah atas"
@@ -234,7 +236,9 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "sidang, Okupasi & perambahan, Pengaduan masyarakat, Lelang & seleksi "
             "lahan, Laporan & asisten AI, Aplikasi lapangan",
             "Pusat Komando: Buka Pusat Komando (aplikasi tersendiri, juga lewat "
-            "tombol **Pusat Komando** di bilah atas), Korwil, warga & laporan",
+            "tombol **Pusat Komando** di bilah atas), Korwil, warga & laporan, "
+            "temuan ilegal, patroli Taman Buru, jejak patroli SMART (impor .json), "
+            "pengaturan poin usaha",
             DOCUMENTS_MENU,
             "Kontak",
             "Catatan area",
@@ -465,11 +469,15 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             COMMAND_TABS,
             "Aplikasi lapangan (`/aset/lapangan/`): laporan & foto lapangan",
             "Panel admin: okupasi, pengaduan, survei, tugas, Korwil, warga, "
-            "kegiatan, uji tanah",
+            "kegiatan, temuan ilegal, patroli Taman Buru, jejak patroli SMART, "
+            "uji tanah",
         ),
         can=(
             "Absen, melapor kegiatan dan uji tanah, mendata warga, chat, dan SOS "
             "di pusat komando.",
+            "Komsos dengan beberapa warga baru sekaligus; mencatat temuan ilegal "
+            "(baru atau kunjungan berulang) dan patroli Taman Buru (temuan, bibit, "
+            "impor berkas SMART); menilai dampak Kegiatan lainnya.",
             "Membuat laporan lapangan, okupasi dan tindakan teguran; "
             "menindaklanjuti pengaduan dan survei; memperbarui status tugas "
             "sendiri.",
@@ -479,6 +487,8 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "Hanya Korwil tempatnya menjadi anggota (diatur di data Korwil).",
             "Tidak memverifikasi laporan, tidak melihat NIK warga, dan tidak "
             "membuka modul lain.",
+            "Klaim dampak Signifikan/Kritis dihitung 6 poin sampai dikonfirmasi "
+            "atasan.",
         ),
     ),
     UserGroup.KOORDINATOR_WILAYAH: RoleGuide(
@@ -495,6 +505,8 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "Semua hak petugas lapangan di pusat komando.",
             "Memverifikasi laporan, menangani SOS, menyetujui izin anggota, "
             "melihat KPI anggota, dan membuat tugas wilayah.",
+            "Mengonfirmasi klaim dampak tinggi Kegiatan lainnya milik anggota "
+            "(bukan milik sendiri).",
         ),
         limits=(
             "Hanya Korwil yang dipimpinnya dan tugas Korwil yang " "dipimpin/diikuti.",
