@@ -348,7 +348,9 @@ def test_sample_data_command(admin_user):
     assert Korwil.objects.count() == 11
     # 33 kegiatan dasar + 11 Komsos + 6 kunjungan temuan ilegal + 2 patroli + 2 lainnya.
     assert Resident.objects.count() >= 88 and Activity.objects.count() == 54
-    assert IllegalFinding.objects.count() == 3 and HuntingParkPatrol.objects.count() == 2
+    assert (
+        IllegalFinding.objects.count() == 3 and HuntingParkPatrol.objects.count() == 2
+    )
     assert not Activity.objects.filter(effort_points=0).exists()
     assert all(r.korwil_id for r in Resident.objects.all())
     out = io.StringIO()
