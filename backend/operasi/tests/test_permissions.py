@@ -394,25 +394,19 @@ def test_assignee_cannot_cancel_task(field, coordinator, korwil):
         due_date=timezone.localdate() - datetime.timedelta(days=2),
     )
     data = login(field).get(api("tugas/")).json()["results"]
-    assert data[0]["can_cancel"] is False
-    response = login(field).post(
-        api(f"tugas/{task.pk}/"), {"status": aset_enums.TaskStatus.CANCELLED}
-    )
+    assert data[0]["can_cancel"] is False and "batal" not in data[0]["actions"]
+    response = login(field).post(api(f"tugas/{task.pk}/"), {"aksi": "batal"})
     assert response.status_code == 403
     task.refresh_from_db()
     assert task.status == aset_enums.TaskStatus.NEW
     assert (
-        login(field)
-        .post(api(f"tugas/{task.pk}/"), {"status": aset_enums.TaskStatus.IN_PROGRESS})
-        .status_code
+        login(field).post(api(f"tugas/{task.pk}/"), {"aksi": "mulai"}).status_code
         == 200
     )
     # Koordinator Korwil tempat penerima tugas bertugas boleh membatalkan.
     task.korwil = korwil
     task.save()
-    response = login(coordinator).post(
-        api(f"tugas/{task.pk}/"), {"status": aset_enums.TaskStatus.CANCELLED}
-    )
+    response = login(coordinator).post(api(f"tugas/{task.pk}/"), {"aksi": "batal"})
     assert response.status_code == 200, response.content
     task.refresh_from_db()
     assert task.status == aset_enums.TaskStatus.CANCELLED

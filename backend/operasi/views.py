@@ -30,7 +30,17 @@ from asetlahan import enums as aset_enums
 from asetlahan import scope as aset_scope
 from asetlahan.field_views import _parse_captured_at, _parse_location
 from asetlahan.geo import collection, feature
-from operasi import enums, geo, patrol, reports, satellite, services
+from operasi import (
+    approvals,
+    daily_reports,
+    enums,
+    geo,
+    patrol,
+    reports,
+    satellite,
+    services,
+    task_flow,
+)
 from operasi.auth_views import command_login_required, forbidden, main_app_url
 from operasi.models import (
     MAX_LAND_AREA_M2,
@@ -41,6 +51,7 @@ from operasi.models import (
     Attendance,
     ChatMessage,
     CommandSettings,
+    DailyReportAttachment,
     IllegalFinding,
     Korwil,
     OfficerPosition,
@@ -51,6 +62,7 @@ from operasi.models import (
     SosAlert,
     StanceChange,
     SystemLock,
+    TaskEvent,
 )
 from utils.pwa import shell_version
 
@@ -230,6 +242,10 @@ def _config(request) -> dict:
         "aiSatelit": user.has_perm("operasi.add_areaanalysis"),
         "tugas": user.has_perm("asetlahan.view_task"),
         "ubahTugas": user.has_perm("asetlahan.change_task"),
+        "buatTugas": user.has_perm("asetlahan.add_task"),
+        "laporanHarian": user.has_perm("operasi.view_dailyreport"),
+        "kirimLaporan": user.has_perm("operasi.add_dailyreport"),
+        "rekap": user.has_perm("operasi.view_activity"),
         "tim": services.team_users(user).exclude(pk=user.pk).exists(),
         "setujuiIzin": services.leave_deciders_q(user) is not None,
         "kunci": user.is_superuser,
@@ -245,7 +261,18 @@ def _config(request) -> dict:
         "extraLayers": _extra_layers(request),
         "initialTab": (
             tab
-            if tab in ("peta", "absen", "korwil", "perf", "tasks", "warga", "chat")
+            if tab
+            in (
+                "peta",
+                "absen",
+                "korwil",
+                "perf",
+                "tasks",
+                "warga",
+                "chat",
+                "laporan",
+                "persetujuan",
+            )
             else "peta"
         ),
         "user": {"id": user.pk, "name": _name(user)},
@@ -291,6 +318,7 @@ def _config(request) -> dict:
                 ]
             ),
             "taskStatus": _choices(aset_enums.TaskStatus.choices),
+            "priority": _choices(aset_enums.Priority.choices),
         },
         "colors": {
             "stance": {str(k): v for k, v in enums.STANCE_COLORS.items()},
@@ -325,6 +353,18 @@ def _config(request) -> dict:
             "resident": reverse("operasi-resident", args=[0]),
             "tasks": reverse("operasi-tasks"),
             "task": reverse("operasi-task", args=[0]),
+            "taskAssignees": reverse("operasi-task-assignees"),
+            "dailyReports": reverse("operasi-daily-reports"),
+            "dailyReportCompose": reverse("operasi-daily-report-compose"),
+            "dailyReportFinish": reverse("operasi-daily-report-finish"),
+            "dailyReportTrace": reverse("operasi-daily-report-trace"),
+            "dailyReport": reverse("operasi-daily-report", args=[0]),
+            "dailyReportAction": reverse(
+                "operasi-daily-report-action", args=[0, "__aksi__"]
+            ),
+            "approvals": reverse("operasi-approvals"),
+            "badges": reverse("operasi-badges"),
+            "recap": reverse("operasi-recap"),
             "performance": reverse("operasi-performance"),
             "leaderboard": reverse("operasi-leaderboard"),
             "structure": reverse("operasi-structure"),
@@ -450,6 +490,13 @@ FILE_KINDS = {
         "operasi.view_patrolsession",
         "observation__session__korwil",
     ),
+    "tugas-foto": (TaskEvent, "photo", "asetlahan.view_task", ""),
+    "laporan-lampiran": (
+        DailyReportAttachment,
+        "file",
+        "operasi.view_dailyreport",
+        "",
+    ),
 }
 
 
@@ -486,6 +533,14 @@ def private_file(request, kind, pk):
         queryset = attendance_queryset(request.user)
     elif model is AreaAnalysis:
         queryset = analysis_queryset(request.user)
+    elif model is TaskEvent:
+        queryset = TaskEvent.objects.filter(
+            task__in=task_flow.visible_tasks(request.user)
+        )
+    elif model is DailyReportAttachment:
+        queryset = DailyReportAttachment.objects.filter(
+            report__in=daily_reports.visible_reports(request.user)
+        )
     elif lookup:
         queryset = geo.scoped(model.objects.all(), request.user, lookup)
     else:
@@ -964,13 +1019,7 @@ def leave_decision(request, pk):
 
 
 def _can_confirm_impact(user, activity) -> bool:
-    """Klaim dampak tinggi dikonfirmasi atasan (koordinator Korwil / pengawas), bukan pelapor."""
-    if not activity.needs_impact_confirmation or activity.reported_by_id == user.pk:
-        return False
-    if not user.has_perm("operasi.change_activity"):
-        return False
-    leads = activity.korwil_id and activity.korwil.coordinator_id == user.pk
-    return bool(leads or aset_scope.sees_all(user))
+    return approvals.can_confirm_impact(user, activity)
 
 
 def _activity_json(activity, user=None) -> dict:
@@ -1559,105 +1608,6 @@ def resident_detail(request, pk):
         {"number": a.number, "title": a.title, "at": _local(a.started_at)}
         for a in resident.activities.order_by("-started_at")[:20]
     ]
-    return JsonResponse(data)
-
-
-# --------------------------------------------------------------------------
-# Tugas (modul aset lahan) untuk petugas
-# --------------------------------------------------------------------------
-
-
-def _task_json(task) -> dict:
-    return {
-        "id": task.pk,
-        "number": task.number,
-        "title": task.title,
-        "description": task.description,
-        "status": task.status,
-        "status_label": task.get_status_display(),
-        "priority": task.priority,
-        "priority_label": task.get_priority_display(),
-        "due_date": task.due_date.isoformat() if task.due_date else "",
-        "progress": task.progress,
-        "overdue": task.is_overdue,
-        "korwil": task.korwil.code if task.korwil_id else "",
-        "assignee": _name(task.assignee) if task.assignee_id else "",
-        "mine": task.assignee_id is not None,
-        "can_cancel": False,
-    }
-
-
-def _can_cancel_task(user, task) -> bool:
-    """Batal hanya oleh pembuat tugas, koordinator Korwil terkait, atau Administrator."""
-    if aset_scope.sees_all(user):
-        return True
-    if task.created_by_id == user.pk and task.assignee_id != user.pk:
-        return True
-    led = Korwil.objects.filter(coordinator=user, is_active=True)
-    if task.korwil_id and led.filter(pk=task.korwil_id).exists():
-        return True
-    return bool(
-        task.assignee_id
-        and task.assignee_id != user.pk
-        and led.filter(members=task.assignee_id).exists()
-    )
-
-
-def _tasks_for(user):
-    from asetlahan.models import Task
-
-    led = Korwil.objects.filter(coordinator=user)
-    return aset_scope.scoped(
-        Task.objects.filter(Q(assignee=user) | Q(korwil__in=led)), user
-    ).select_related("assignee", "korwil")
-
-
-@api(permission="asetlahan.view_task")
-def tasks(request):
-    queryset = _tasks_for(request.user)
-    if request.GET.get("status") != "semua":
-        queryset = queryset.filter(status__in=aset_enums.OPEN_TASK_STATUSES)
-    results = []
-    for task in queryset[:200]:
-        item = _task_json(task)
-        item["mine"] = task.assignee_id == request.user.pk
-        item["can_cancel"] = _can_cancel_task(request.user, task)
-        results.append(item)
-    return JsonResponse({"results": results})
-
-
-@api(permission="asetlahan.change_task", methods=("POST",))
-def task_update(request, pk):
-    task = get_object_or_404(_tasks_for(request.user), pk=pk)
-    status = request.POST.get("status")
-    if status:
-        if status not in aset_enums.TaskStatus.values:
-            raise ValidationError({"status": [_("Status tidak sah.")]})
-        cancelling = (
-            status == aset_enums.TaskStatus.CANCELLED
-            and task.status != aset_enums.TaskStatus.CANCELLED
-        )
-        if cancelling and not _can_cancel_task(request.user, task):
-            return JsonResponse(
-                {
-                    "error": _(
-                        "Tugas hanya dapat dibatalkan oleh pembuat tugas, koordinator "
-                        "Korwil, atau Administrator."
-                    )
-                },
-                status=403,
-            )
-        task.status = status
-    if "progress" in request.POST:
-        progress = _int_or_none(request.POST.get("progress"), 0, 100)
-        if progress is None:
-            raise ValidationError({"progress": [_("Progres harus 0–100.")]})
-        task.progress = progress
-    task.full_clean()
-    task.save()
-    data = _task_json(task)
-    data["mine"] = task.assignee_id == request.user.pk
-    data["can_cancel"] = _can_cancel_task(request.user, task)
     return JsonResponse(data)
 
 

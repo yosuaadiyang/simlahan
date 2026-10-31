@@ -327,17 +327,35 @@ def test_resident_create_update_and_scope(field, other_field, korwil, korwil_b):
 def test_tasks_for_assignee_and_coordinator(field, coordinator, korwil):
     mine = Task.objects.create(title="Pendataan RT 01", assignee=field)
     area = Task.objects.create(title="Tugas wilayah A", korwil=korwil)
-    Task.objects.create(title="Tugas orang lain")
+    other = Task.objects.create(title="Tugas orang lain")
     titles = {t["title"] for t in login(field).get(api("tugas/")).json()["results"]}
     assert titles == {mine.title}
     titles = {
         t["title"] for t in login(coordinator).get(api("tugas/")).json()["results"]
     }
     assert titles == {area.title}
-    response = login(field).post(
-        api(f"tugas/{mine.pk}/"), {"status": aset_enums.TaskStatus.DONE}
+    # Daftar tim berisi juga tugas anggota Korwil yang dipimpin.
+    titles = {
+        t["title"]
+        for t in login(coordinator).get(api("tugas/?filter=tim")).json()["results"]
+    }
+    assert titles == {mine.title, area.title}
+    assert other.title not in {
+        t["title"]
+        for t in login(coordinator).get(api("tugas/?filter=semua")).json()["results"]
+    }
+    client = login(field)
+    assert client.post(api(f"tugas/{mine.pk}/"), {"aksi": "mulai"}).status_code == 200
+    response = client.post(api(f"tugas/{mine.pk}/"), {"aksi": "lapor", "catatan": "OK"})
+    assert response.status_code == 200 and response.json()["stage"] == "dilaporkan"
+    mine.refresh_from_db()
+    assert mine.status == aset_enums.TaskStatus.REPORTED and mine.progress == 90
+    # Petugas tidak bisa memverifikasi tugasnya sendiri.
+    assert (
+        client.post(api(f"tugas/{mine.pk}/"), {"aksi": "verifikasi"}).status_code == 403
     )
-    assert response.status_code == 200
+    response = login(coordinator).post(api(f"tugas/{mine.pk}/"), {"aksi": "verifikasi"})
+    assert response.status_code == 200, response.content
     mine.refresh_from_db()
     assert mine.status == aset_enums.TaskStatus.DONE and mine.progress == 100
     assert (

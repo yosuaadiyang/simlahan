@@ -13,7 +13,9 @@ menerima surel) sehingga --hapus hanya mengenai akun contoh.
 Agar pembatasan data terlihat, Penilai dan Instansi ditugaskan ke proyek contoh
 ``pengadaan_contoh_rempang``, Koordinator Wilayah memimpin Korwil A dan Petugas
 Lapangan menjadi anggota Korwil A dari ``operasi_contoh_rempang`` (jalankan
-perintah data contoh itu lebih dahulu, lalu perintah ini sekali lagi).
+perintah data contoh itu lebih dahulu, lalu perintah ini sekali lagi). Di pusat
+komando, Petugas Lapangan melapor ke Koordinator Wilayah dan Koordinator Wilayah
+ke Administrator, lengkap dengan tugas berpoin dan laporan harian berjenjang contoh.
 
 Investor contoh (``investor@contoh.simlahan.invalid``) mendapat lahan tersimpan
 dan tiga permintaan investasi contoh (diajukan, konsultasi terjadwal, penawaran
@@ -48,6 +50,10 @@ from alokasi.models import (
 )
 from leasing.models import ServiceUnit
 from operasi.management.commands.operasi_contoh_rempang import MARK as KORWIL_MARK
+from operasi.management.commands.operasi_contoh_rempang import (
+    delete_komando_demo,
+    komando_demo,
+)
 from operasi.models import Korwil
 from pengadaan.management.commands.pengadaan_contoh_rempang import (
     SAMPLE_PROJECT_NAME,
@@ -105,6 +111,7 @@ DISPOSABLE_MODELS = {
     "token_blacklist.outstandingtoken",
     "token_blacklist.blacklistedtoken",
     "alokasi.applicant",
+    "operasi.officerprofile",
 }
 
 
@@ -479,6 +486,7 @@ class Command(BaseCommand):
                     "contoh.instansi",
                     "contoh.korwil",
                     "contoh.lapangan",
+                    "contoh.administrator",
                 ]
             )
         }
@@ -501,6 +509,12 @@ class Command(BaseCommand):
                 korwil.coordinator = users["contoh.korwil"]
                 korwil.save(update_fields=["coordinator"])
             korwil.members.add(users["contoh.lapangan"])
+            komando_demo(
+                users["contoh.administrator"],
+                users["contoh.korwil"],
+                users["contoh.lapangan"],
+                korwil,
+            )
         else:
             self.stdout.write(
                 "Korwil contoh belum ada: Koordinator Wilayah dan Petugas Lapangan "
@@ -525,6 +539,7 @@ class Command(BaseCommand):
     # ------------------------------------------------------------------
 
     def _delete(self):
+        delete_komando_demo()
         removed = self._delete_investment_samples()
         if removed:
             self.stdout.write(f"{removed} permintaan investasi akun contoh dihapus.")

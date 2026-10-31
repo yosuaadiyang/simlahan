@@ -7,6 +7,9 @@ Membuat 11 Korwil (A–K) dengan batas wilayah, warga terdata (sikap, status
 lahan, kesesuaian RTRW, pilihan penyelesaian), laporan kegiatan, uji tanah,
 tugas wilayah, Komsos, temuan ilegal, patroli Taman Buru (temuan & bibit),
 dan kegiatan lainnya dengan penilaian dampak. Semua nama fiktif; tidak ada NIK.
+
+Rantai komando contoh (tugas berpoin dan laporan harian berjenjang) dibuat oleh
+``pengguna_contoh`` lewat :func:`komando_demo` karena memerlukan akun contoh.
 """
 
 import datetime
@@ -20,18 +23,22 @@ from django.utils import timezone
 
 from asetlahan import enums as aset_enums
 from asetlahan.models import Task
-from operasi import enums
+from operasi import enums, task_flow
 from operasi.models import (
     Activity,
+    DailyReport,
+    DailyReportEvent,
     HuntingParkFinding,
     HuntingParkPatrol,
     IllegalFinding,
     IllegalFindingVisit,
     Korwil,
+    OfficerProfile,
     Resident,
     Seedling,
     SoilTest,
     StanceChange,
+    TaskEvent,
 )
 
 MARK = "[contoh]"
@@ -163,6 +170,7 @@ class Command(BaseCommand):
 
     def _delete(self):
         korwils = Korwil.objects.filter(note__startswith=MARK)
+        delete_komando_demo()
         Task.objects.filter(title__startswith=MARK).delete()
         Activity.objects.filter(description__startswith=MARK).delete()
         IllegalFinding.objects.filter(note__startswith=MARK).delete()
@@ -419,3 +427,176 @@ class Command(BaseCommand):
             impact_result=enums.ImpactResult.OUTPUT,
             reported_by=user,
         )
+
+
+# --------------------------------------------------------------------------
+# Rantai komando contoh: petugas lapangan -> koordinator Korwil -> pimpinan
+# --------------------------------------------------------------------------
+
+# (judul, jenis kegiatan, poin, tenggat (hari), urutan peristiwa)
+DEMO_TASKS = [
+    (
+        "Sosialisasi jadwal pengukuran RT 02",
+        enums.ActivityType.SOCIALIZATION,
+        10,
+        3,
+        [],
+    ),
+    (
+        "Pendataan ulang KK Pasir Panjang",
+        enums.ActivityType.CENSUS,
+        15,
+        5,
+        ["mulai"],
+    ),
+    (
+        "Dokumentasi kondisi jalan kampung",
+        enums.ActivityType.MAPPING,
+        10,
+        2,
+        ["mulai", "lapor"],
+    ),
+    (
+        "Patroli batas wilayah Korwil A",
+        enums.ActivityType.PATROL,
+        20,
+        1,
+        ["mulai", "lapor", "verifikasi"],
+    ),
+]
+DEMO_EVENTS = {
+    "mulai": (aset_enums.TaskStatus.IN_PROGRESS, enums.TaskEventKind.STARTED, ""),
+    "lapor": (
+        aset_enums.TaskStatus.REPORTED,
+        enums.TaskEventKind.SUBMITTED,
+        "Selesai dikerjakan; foto dan catatan lapangan terlampir di laporan harian.",
+    ),
+    "verifikasi": (
+        aset_enums.TaskStatus.DONE,
+        enums.TaskEventKind.VERIFIED,
+        "Hasil sesuai.",
+    ),
+}
+
+
+def delete_komando_demo():
+    """Hapus tugas & laporan harian contoh (dipanggil sebelum akun contoh dihapus)."""
+    reports = DailyReport.objects.filter(content__startswith=MARK)
+    DailyReport.objects.filter(consolidated_into__in=reports).update(
+        consolidated_into=None
+    )
+    Activity.objects.filter(daily_report__in=reports).update(daily_report=None)
+    reports.delete()
+    Task.objects.filter(title__startswith=MARK).filter(
+        komando_events__isnull=False
+    ).delete()
+
+
+def komando_demo(leader, coordinator, officer, korwil):
+    """Profil jabatan, tugas berpoin, dan laporan harian contoh (idempoten)."""
+    OfficerProfile.objects.update_or_create(
+        user=coordinator,
+        defaults={
+            "position": f"Koordinator Korwil {korwil.code}",
+            "supervisor": leader,
+        },
+    )
+    OfficerProfile.objects.update_or_create(
+        user=officer,
+        defaults={
+            "position": f"Petugas Lapangan Korwil {korwil.code}",
+            "supervisor": coordinator,
+        },
+    )
+    OfficerProfile.objects.get_or_create(user=leader, defaults={"position": "Pimpinan"})
+    if Task.objects.filter(title__startswith=MARK, assignee=officer).exists():
+        return
+    now = timezone.now()
+    today = timezone.localdate()
+    for title, kind, points, due, steps in DEMO_TASKS:
+        task = Task.objects.create(
+            title=f"{MARK} {title}",
+            description="Tugas contoh rantai komando.",
+            assignee=officer,
+            korwil=korwil,
+            activity_type=kind,
+            point_value=points,
+            priority=aset_enums.Priority.NORMAL,
+            start_date=today,
+            due_date=today + datetime.timedelta(days=due),
+            created_by=coordinator,
+        )
+        TaskEvent.objects.create(
+            task=task,
+            kind=enums.TaskEventKind.CREATED,
+            actor=coordinator,
+            note=f"Untuk {officer.get_full_name() or officer}",
+        )
+        for step in steps:
+            status, event_kind, note = DEMO_EVENTS[step]
+            actor = coordinator if step == "verifikasi" else officer
+            TaskEvent.objects.create(task=task, kind=event_kind, actor=actor, note=note)
+            task.status = status
+        if steps:
+            task.progress = {1: 40, 2: 90, 3: 100}[len(steps)]
+            if task.status == aset_enums.TaskStatus.DONE:
+                task.completed_date = today
+            task.save()
+            if task.status == aset_enums.TaskStatus.DONE:
+                task_flow.award_points(task)
+    # Laporan petugas kemarin sudah dirangkum koordinator dan menunggu pimpinan;
+    # laporan hari ini masih di kotak masuk koordinator.
+    yesterday = now - datetime.timedelta(days=1)
+    summary = _demo_report(
+        coordinator,
+        leader,
+        korwil,
+        yesterday,
+        "Rangkuman Korwil: pendataan berjalan, satu jalan kampung rusak "
+        "didokumentasikan, patroli batas wilayah selesai tanpa temuan baru.",
+    )
+    source = _demo_report(
+        officer,
+        coordinator,
+        korwil,
+        yesterday - datetime.timedelta(hours=2),
+        "Patroli batas wilayah selesai; pendataan 6 KK; dokumentasi jalan kampung.",
+    )
+    source.consolidated_into = summary
+    source.status = enums.DailyReportStatus.FORWARDED
+    source.save(update_fields=["consolidated_into", "status"])
+    DailyReportEvent.objects.create(
+        report=source,
+        action=enums.DailyReportAction.FORWARDED,
+        actor=coordinator,
+        target=leader,
+        created_at=yesterday,
+    )
+    _demo_report(
+        officer,
+        coordinator,
+        korwil,
+        now - datetime.timedelta(hours=1),
+        "Sosialisasi jadwal pengukuran disiapkan; pendataan ulang KK berlanjut.",
+    )
+
+
+def _demo_report(author, recipient, korwil, sent_at, text):
+    position = getattr(getattr(author, "komando_profile", None), "position", "")
+    report = DailyReport.objects.create(
+        author=author,
+        author_position=position,
+        recipient=recipient,
+        korwil=korwil,
+        report_date=timezone.localtime(sent_at).date(),
+        sent_at=sent_at,
+        content=f"{MARK} {text}",
+    )
+    DailyReportEvent.objects.create(
+        report=report,
+        action=enums.DailyReportAction.SENT,
+        actor=author,
+        target=recipient,
+        created_at=sent_at,
+    )
+    return report

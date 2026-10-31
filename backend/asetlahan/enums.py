@@ -409,12 +409,18 @@ class Priority(models.TextChoices):
 class TaskStatus(models.TextChoices):
     NEW = "baru", _("Baru")
     IN_PROGRESS = "dikerjakan", _("Dikerjakan")
+    REPORTED = "dilaporkan", _("Menunggu verifikasi")
     WAITING = "menunggu", _("Menunggu pihak lain")
     DONE = "selesai", _("Selesai")
     CANCELLED = "batal", _("Batal")
 
 
-OPEN_TASK_STATUSES = [TaskStatus.NEW, TaskStatus.IN_PROGRESS, TaskStatus.WAITING]
+OPEN_TASK_STATUSES = [
+    TaskStatus.NEW,
+    TaskStatus.IN_PROGRESS,
+    TaskStatus.REPORTED,
+    TaskStatus.WAITING,
+]
 
 
 class GrievanceChannel(models.TextChoices):

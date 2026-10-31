@@ -336,3 +336,67 @@ class SosStatus(models.TextChoices):
 
 
 OPEN_SOS_STATUSES = [SosStatus.ACTIVE, SosStatus.ACKNOWLEDGED]
+
+
+# --------------------------------------------------------------------------
+# Siklus tugas komando, laporan harian berjenjang
+# --------------------------------------------------------------------------
+
+
+class TaskStage(models.TextChoices):
+    """Tahap tugas yang dilihat petugas (turunan status + riwayat)."""
+
+    ASSIGNED = "ditugaskan", _("Ditugaskan")
+    WORKING = "dikerjakan", _("Sedang dikerjakan")
+    REPORTED = "dilaporkan", _("Menunggu verifikasi")
+    BLOCKED = "terkendala", _("Terkendala")
+    REVISION = "revisi", _("Perlu revisi")
+    DONE = "selesai", _("Selesai (terverifikasi)")
+    CANCELLED = "dibatalkan", _("Dibatalkan")
+
+
+TASK_STAGE_COLORS = {
+    TaskStage.ASSIGNED: "#57606a",
+    TaskStage.WORKING: "#1a7f37",
+    TaskStage.REPORTED: "#0b5fcc",
+    TaskStage.BLOCKED: "#bf8700",
+    TaskStage.REVISION: "#bf8700",
+    TaskStage.DONE: "#1d82f5",
+    TaskStage.CANCELLED: "#cf222e",
+}
+
+
+class TaskEventKind(models.TextChoices):
+    CREATED = "dibuat", _("Ditugaskan")
+    STARTED = "mulai", _("Mulai dikerjakan")
+    SUBMITTED = "dilaporkan", _("Dilaporkan selesai")
+    BLOCKED = "terkendala", _("Ditandai terkendala")
+    RESUMED = "dilanjutkan", _("Dilanjutkan kembali")
+    VERIFIED = "diverifikasi", _("Diverifikasi selesai")
+    REJECTED = "dikembalikan", _("Dikembalikan untuk revisi")
+    CANCELLED = "dibatalkan", _("Dibatalkan")
+
+
+class TaskPointRole(models.TextChoices):
+    ASSIGNEE = "penerima", _("Penerima utama")
+    CONTRIBUTOR = "kontributor", _("Kontributor lapangan")
+    GIVER = "pemberi", _("Pemberi tugas")
+
+
+class DailyReportStatus(models.TextChoices):
+    SENT = "terkirim", _("Terkirim, menunggu atasan")
+    FORWARDED = "diteruskan", _("Sudah dirangkum ke atas")
+    REVIEWED = "selesai", _("Selesai ditinjau")
+    RETURNED = "dikembalikan", _("Dikembalikan untuk revisi")
+    CLOSED = "ditutup", _("Ditutup")
+
+
+class DailyReportAction(models.TextChoices):
+    SENT = "dikirim", _("Dikirim ke atasan")
+    FORWARDED = "dirangkum", _("Dirangkum ke laporan atasan")
+    REVIEWED = "ditinjau", _("Selesai ditinjau")
+    RETURNED = "dikembalikan", _("Dikembalikan untuk revisi")
+    DELEGATED = "diteruskan_bawah", _("Diteruskan ke bawahan untuk diperbaiki")
+    REVISED = "diperbaiki", _("Diperbaiki")
+    RESUBMITTED = "dikirim_ulang", _("Dikirim ulang ke peminta revisi")
+    CLOSED = "ditutup", _("Ditutup, sumber dilepas")

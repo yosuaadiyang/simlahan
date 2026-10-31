@@ -27,6 +27,7 @@ from sequences import get_next_value
 from asetlahan import enums
 from file_operations.private_files import PrivateFileField
 from leasing.models.mixins import TimeStampedModel
+from operasi import enums as operasi_enums
 
 MONEY = {"max_digits": 20, "decimal_places": 2}
 AREA = {"max_digits": 16, "decimal_places": 2}
@@ -1711,6 +1712,32 @@ class Task(TimeStampedModel):
         blank=True,
         on_delete=models.SET_NULL,
         help_text=_("Tugas wilayah tampil bagi koordinator Korwil di pusat komando."),
+    )
+    contributors = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Kontributor lapangan"),
+        related_name="asetlahan_task_contributions",
+        blank=True,
+        help_text=_(
+            "Ikut mengerjakan di lapangan dan ikut menerima poin KPI; yang "
+            "melapor di sistem tetap penerima utama."
+        ),
+    )
+    activity_type = models.CharField(
+        _("Jenis kegiatan"),
+        max_length=32,
+        choices=operasi_enums.ActivityType.choices,
+        blank=True,
+        default="",
+    )
+    point_value = models.PositiveSmallIntegerField(
+        _("Nilai poin KPI"),
+        default=0,
+        validators=[MaxValueValidator(100)],
+        help_text=_(
+            "Diberikan ke penerima, kontributor, dan pemberi tugas setelah tugas "
+            "diverifikasi selesai."
+        ),
     )
     created_by = _user_field(_("Dibuat oleh"))
     service_unit = _service_unit_field()

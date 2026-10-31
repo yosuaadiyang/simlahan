@@ -2,7 +2,7 @@
 
 from django.urls import path
 
-from operasi import auth_views, views
+from operasi import auth_views, views, views_flow
 
 urlpatterns = [
     path("", views.command_center, name="operasi-command"),
@@ -49,8 +49,46 @@ urlpatterns = [
     path("api/tanah/", views.soil_tests, name="operasi-soil"),
     path("api/warga/", views.residents, name="operasi-residents"),
     path("api/warga/<int:pk>/", views.resident_detail, name="operasi-resident"),
-    path("api/tugas/", views.tasks, name="operasi-tasks"),
-    path("api/tugas/<int:pk>/", views.task_update, name="operasi-task"),
+    path("api/tugas/", views_flow.tasks, name="operasi-tasks"),
+    path(
+        "api/tugas/penerima/",
+        views_flow.task_assignees,
+        name="operasi-task-assignees",
+    ),
+    path("api/tugas/<int:pk>/", views_flow.task_detail, name="operasi-task"),
+    path(
+        "api/laporan-harian/",
+        views_flow.daily_report_home,
+        name="operasi-daily-reports",
+    ),
+    path(
+        "api/laporan-harian/susun/",
+        views_flow.daily_report_compose,
+        name="operasi-daily-report-compose",
+    ),
+    path(
+        "api/laporan-harian/selesai/",
+        views_flow.daily_report_finish,
+        name="operasi-daily-report-finish",
+    ),
+    path(
+        "api/laporan-harian/lacak/",
+        views_flow.daily_report_trace,
+        name="operasi-daily-report-trace",
+    ),
+    path(
+        "api/laporan-harian/<int:pk>/",
+        views_flow.daily_report_detail,
+        name="operasi-daily-report",
+    ),
+    path(
+        "api/laporan-harian/<int:pk>/<str:action>/",
+        views_flow.daily_report_detail,
+        name="operasi-daily-report-action",
+    ),
+    path("api/persetujuan/", views_flow.approval_queue, name="operasi-approvals"),
+    path("api/lencana/", views_flow.badges, name="operasi-badges"),
+    path("api/rekap/", views_flow.recap_excel, name="operasi-recap"),
     path("api/kinerja/", views.performance, name="operasi-performance"),
     path("api/peringkat/", views.leaderboard, name="operasi-leaderboard"),
     path("api/struktur/", views.structure, name="operasi-structure"),
