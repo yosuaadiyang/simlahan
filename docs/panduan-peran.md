@@ -253,7 +253,7 @@ Mengelola seluruh modul dan data master SimLahan.
 - Pengadaan Tanah: Dasbor & tenggat, Proyek pengadaan, Kalender & aturan tenggat
 - Alokasi Lahan: Permohonan & verifikasi, Tagihan & pembayaran, Alokasi & lahan tidur, Data lahan, Portal investasi (permintaan investasi, sektor, kawasan), Portal publik
 - Manajemen Aset Lahan: Dasbor aset, Data aset & peta, Perkara & sidang, Okupasi & perambahan, Pengaduan masyarakat, Lelang & seleksi lahan, Laporan & asisten AI, Aplikasi lapangan
-- Pusat Komando: Buka Pusat Komando (aplikasi tersendiri, juga lewat tombol **Pusat Komando** di bilah atas), Korwil, warga & laporan, temuan ilegal, patroli Taman Buru, jejak patroli SMART (impor .json), pengaturan poin usaha, jabatan & atasan petugas, riwayat & poin tugas, laporan harian berjenjang, bidang penguasaan lahan, zona ancaman, foto situs 360°, jejak GPS petugas
+- Pusat Komando: Buka Pusat Komando (aplikasi tersendiri, juga lewat tombol **Pusat Komando** di bilah atas), Korwil, warga & laporan, temuan ilegal, patroli Taman Buru, jejak patroli SMART (impor .json), pengaturan poin usaha, jabatan & atasan petugas, riwayat & poin tugas, laporan harian berjenjang, bidang penguasaan lahan, zona ancaman, foto situs 360°, jejak GPS petugas, tiket & masukan (arsip), uji tanah PLTS (titik, foto, riwayat, unduh Excel)
 - Dokumen & Perizinan: Dasbor dokumen, Pemanfaatan lahan, Dokumen perizinan, Dokumen tanda tangan, Templat dokumen, Permintaan unduh
 - Kontak
 - Catatan area
@@ -272,6 +272,7 @@ Mengelola seluruh modul dan data master SimLahan.
 - Mengatur data master (jenis, kategori, tarif, aturan tenggat, konten portal) dan pengaturan modul di panel admin.
 - Dokumen & perizinan: mengatur jenis dokumen wajib, templat, dan pengaturan modul; menyetujui dokumen tanda tangan sebelum dikirim; menyetujui permintaan unduh, termasuk dokumen rahasia.
 - Melihat daftar pengguna.
+- Menangani tiket & masukan di pusat komando (Menu → Alat & tiket): memproses, menyelesaikan (poin untuk pengirim), atau menolak dengan alasan; menjalankan audit data seluruh wilayah.
 
 **Batas akses**
 
@@ -436,7 +437,7 @@ Mengelola seluruh data aset lahan unit layanannya.
 
 - Panel admin, Manajemen aset lahan: dasbor, peta tematik, data aset, keuangan (penilaian, pajak, transaksi), okupasi, permukiman kembali, pengaduan, lelang, dokumen, peta berbagi, laporan & asisten AI
 - Aplikasi lapangan (`/aset/lapangan/`)
-- Pusat komando (`/komando/`, tombol **Pusat Komando** di panel admin) sebagai pengawas: Peta, Absen, Lapor (hanya Laporan saya/tim), Warga, Tugas, Kinerja, Chat; Menu: Beranda, Peta & spasial, Persetujuan, Laporan harian (termasuk rekap Excel), Peringkat tim, Historis
+- Pusat komando (`/komando/`, tombol **Pusat Komando** di panel admin) sebagai pengawas: Peta, Absen, Lapor (hanya Laporan saya/tim), Warga, Tugas, Kinerja, Chat; Menu: Beranda, Peta & spasial, Persetujuan, Laporan harian (termasuk rekap Excel), Peringkat tim, Historis, Uji tanah PLTS (baca & unduh Excel), Alat & tiket
 
 **Yang bisa dilakukan**
 
@@ -444,11 +445,13 @@ Mengelola seluruh data aset lahan unit layanannya.
 - Membaca perkara hukum.
 - Memantau petugas dan Korwil di unit layanannya di pusat komando.
 - Menandai zona ancaman; membaca bidang penguasaan lahan, foto 360°, tumpang tindih lapisan, dan audit RTRW (tidak mengubah status bidang).
+- Mengirim tiket & masukan; memakai OCR, AI dokumen → laporan, AI foto lapangan, dan sinkron Excel.
 
 **Batas akses**
 
 - Hanya data unit layanannya (data tanpa unit layanan terlihat semua).
 - Tidak melapor kegiatan/uji tanah di pusat komando dan tidak melihat NIK warga.
+- Tidak mengubah titik uji tanah PLTS dan tidak menjalankan audit data.
 - Tidak membuka modul sewa, pengadaan, atau alokasi.
 
 ## Petugas Hukum
@@ -488,9 +491,9 @@ Bekerja di lapangan untuk Korwil tempatnya menjadi anggota.
 
 **Menu**
 
-- Pusat komando (`/komando/`): Peta (termasuk lapisan Temuan ilegal, Patroli SMART, Penguasaan lahan, Zona ancaman, Foto situs 360°, lapisan referensi seperti RTRW/hutan/kawasan proyek, dan gaya peta taktis), Absen, Lapor (Komsos, Topografi, Temuan ilegal, Patroli Taman Buru dengan impor SMART, Kegiatan lainnya, jenis lain, uji tanah, laporan saya), Warga, Tugas (saya, tim, verifikasi, terlambat, semua; tombol Beri tugas bagi koordinator), Kinerja (grafik harian/mingguan, radar, kalender 90 hari, sebaran titik kerja di peta, wawasan), Chat; Menu: Beranda (anomali & peringatan, skor risiko Korwil, ringkasan sikap, tren dukungan, detail Korwil), Peta & spasial (penguasaan lahan dengan skor prioritas dan impor KML/KMZ, tumpang tindih lapisan, audit RTRW, peta panas, jejak GPS bagi pimpinan, zona ancaman, foto 360°), Persetujuan, Laporan harian (buat, masuk, lacak, rekap Excel), Peringkat tim (periode, Korwil, tingkat, 10 teratas/terbawah, lencana, Excel, wawasan), Struktur tim, Historis (bagi koordinator dan atasan: komsos, perubahan sikap, luas lahan), Feed aktivitas, Asisten AI, Aplikasi utama; tombol **⇄ Utama** di bilah atas
+- Pusat komando (`/komando/`): Peta (termasuk lapisan Temuan ilegal, Patroli SMART, Penguasaan lahan, Zona ancaman, Foto situs 360°, lapisan referensi seperti RTRW/hutan/kawasan proyek, dan gaya peta taktis), Absen, Lapor (Komsos, Topografi, Temuan ilegal, Patroli Taman Buru dengan impor SMART, Kegiatan lainnya, jenis lain, uji tanah, laporan saya), Warga, Tugas (saya, tim, verifikasi, terlambat, semua; tombol Beri tugas bagi koordinator), Kinerja (grafik harian/mingguan, radar, kalender 90 hari, sebaran titik kerja di peta, wawasan), Chat; Menu: Beranda (anomali & peringatan, skor risiko Korwil, ringkasan sikap, tren dukungan, detail Korwil), Peta & spasial (penguasaan lahan dengan skor prioritas dan impor KML/KMZ, tumpang tindih lapisan, audit RTRW, peta panas, jejak GPS bagi pimpinan, zona ancaman, foto 360°), Persetujuan, Laporan harian (buat, masuk, lacak, rekap Excel), Peringkat tim (periode, Korwil, tingkat, 10 teratas/terbawah, lencana, Excel, wawasan), Struktur tim, Historis (bagi koordinator dan atasan: komsos, perubahan sikap, luas lahan), Feed aktivitas, Asisten AI, Uji tanah PLTS (progres titik bor/sumur uji/resistivitas/sondir/termal, aksi cepat, foto, riwayat, impor & unduh Excel), Alat & tiket (tiket & masukan, OCR dokumen, AI dokumen → laporan, AI foto lapangan, audit data bagi koordinator, cek perangkat, sinkron Excel), Aplikasi utama; tombol **⇄ Utama** di bilah atas
 - Aplikasi lapangan (`/aset/lapangan/`): laporan & foto lapangan
-- Panel admin: okupasi, pengaduan, survei, tugas, Korwil, warga, kegiatan, temuan ilegal, patroli Taman Buru, jejak patroli SMART, uji tanah, jabatan & atasan petugas, riwayat & poin tugas, laporan harian berjenjang (baca saja)
+- Panel admin: okupasi, pengaduan, survei, tugas, Korwil, warga, kegiatan, temuan ilegal, patroli Taman Buru, jejak patroli SMART, uji tanah, uji tanah PLTS, jabatan & atasan petugas, riwayat & poin tugas, laporan harian berjenjang (baca saja), tiket saya
 
 **Yang bisa dilakukan**
 
@@ -501,6 +504,8 @@ Bekerja di lapangan untuk Korwil tempatnya menjadi anggota.
 - Mengirim laporan harian ke atasan langsung (bisa disusun otomatis dari kegiatan yang belum dilaporkan, dengan lampiran), memperbaiki laporan yang dikembalikan, melacak posisinya, dan mengunduh rekap Excel.
 - Mengimpor bidang dari KML/KMZ/GeoJSON (bidang baru atau hasil penguasaan yang dicocokkan otomatis) dan memperbarui status penguasaan bidang di Korwilnya; mengunggah foto situs 360°.
 - Melihat zona ancaman, tumpang tindih lapisan, audit RTRW, dan peta panas di Menu → Peta & spasial.
+- Memperbarui progres titik uji tanah PLTS di Korwilnya (aksi cepat, formulir, foto, impor Excel untuk titik terdaftar).
+- Mengirim tiket & masukan (poin bila selesai ditangani); memakai OCR, AI dokumen → laporan, AI foto lapangan, cek perangkat, dan sinkron Excel.
 - Bekerja luring; data terkirim otomatis saat ada sinyal.
 
 **Batas akses**
@@ -511,6 +516,7 @@ Bekerja di lapangan untuk Korwil tempatnya menjadi anggota.
 - Tidak bisa memverifikasi tugasnya sendiri; tugas yang dilaporkan selesai menunggu verifikasi pemberi tugas atau atasan.
 - Peringkat dan detail Korwil hanya menampilkan skor dirinya sendiri; Historis tidak tersedia kecuali ia menjadi atasan petugas lain.
 - Tidak menandai zona ancaman, tidak menghapus foto 360°, dan tidak melihat jejak GPS petugas.
+- Tidak menambah titik uji tanah PLTS baru dan tidak menjalankan audit data; hanya melihat tiket miliknya.
 
 ## Koordinator Wilayah
 
@@ -522,8 +528,8 @@ Memimpin tim lapangan di Korwil yang dipimpinnya.
 
 **Menu**
 
-- Pusat komando (`/komando/`): Peta (termasuk lapisan Temuan ilegal, Patroli SMART, Penguasaan lahan, Zona ancaman, Foto situs 360°, lapisan referensi seperti RTRW/hutan/kawasan proyek, dan gaya peta taktis), Absen, Lapor (Komsos, Topografi, Temuan ilegal, Patroli Taman Buru dengan impor SMART, Kegiatan lainnya, jenis lain, uji tanah, laporan saya), Warga, Tugas (saya, tim, verifikasi, terlambat, semua; tombol Beri tugas bagi koordinator), Kinerja (grafik harian/mingguan, radar, kalender 90 hari, sebaran titik kerja di peta, wawasan), Chat; Menu: Beranda (anomali & peringatan, skor risiko Korwil, ringkasan sikap, tren dukungan, detail Korwil), Peta & spasial (penguasaan lahan dengan skor prioritas dan impor KML/KMZ, tumpang tindih lapisan, audit RTRW, peta panas, jejak GPS bagi pimpinan, zona ancaman, foto 360°), Persetujuan, Laporan harian (buat, masuk, lacak, rekap Excel), Peringkat tim (periode, Korwil, tingkat, 10 teratas/terbawah, lencana, Excel, wawasan), Struktur tim, Historis (bagi koordinator dan atasan: komsos, perubahan sikap, luas lahan), Feed aktivitas, Asisten AI, Aplikasi utama; tombol **⇄ Utama** di bilah atas
-- Panel admin: Korwil, warga, kegiatan, uji tanah, SOS, tugas, jabatan & atasan petugas, riwayat & poin tugas, laporan harian berjenjang (baca saja)
+- Pusat komando (`/komando/`): Peta (termasuk lapisan Temuan ilegal, Patroli SMART, Penguasaan lahan, Zona ancaman, Foto situs 360°, lapisan referensi seperti RTRW/hutan/kawasan proyek, dan gaya peta taktis), Absen, Lapor (Komsos, Topografi, Temuan ilegal, Patroli Taman Buru dengan impor SMART, Kegiatan lainnya, jenis lain, uji tanah, laporan saya), Warga, Tugas (saya, tim, verifikasi, terlambat, semua; tombol Beri tugas bagi koordinator), Kinerja (grafik harian/mingguan, radar, kalender 90 hari, sebaran titik kerja di peta, wawasan), Chat; Menu: Beranda (anomali & peringatan, skor risiko Korwil, ringkasan sikap, tren dukungan, detail Korwil), Peta & spasial (penguasaan lahan dengan skor prioritas dan impor KML/KMZ, tumpang tindih lapisan, audit RTRW, peta panas, jejak GPS bagi pimpinan, zona ancaman, foto 360°), Persetujuan, Laporan harian (buat, masuk, lacak, rekap Excel), Peringkat tim (periode, Korwil, tingkat, 10 teratas/terbawah, lencana, Excel, wawasan), Struktur tim, Historis (bagi koordinator dan atasan: komsos, perubahan sikap, luas lahan), Feed aktivitas, Asisten AI, Uji tanah PLTS (progres titik bor/sumur uji/resistivitas/sondir/termal, aksi cepat, foto, riwayat, impor & unduh Excel), Alat & tiket (tiket & masukan, OCR dokumen, AI dokumen → laporan, AI foto lapangan, audit data bagi koordinator, cek perangkat, sinkron Excel), Aplikasi utama; tombol **⇄ Utama** di bilah atas
+- Panel admin: Korwil, warga, kegiatan, uji tanah, uji tanah PLTS, SOS, tugas, jabatan & atasan petugas, riwayat & poin tugas, laporan harian berjenjang (baca saja), tiket saya
 
 **Yang bisa dilakukan**
 
@@ -534,11 +540,13 @@ Memimpin tim lapangan di Korwil yang dipimpinnya.
 - Mengonfirmasi klaim dampak tinggi Kegiatan lainnya milik anggota (bukan milik sendiri).
 - Melihat Historis wilayahnya: komsos per petugas (warga baru dan kunjungan berulang), perubahan sikap warga, dan perubahan luas lahan.
 - Menandai dan menonaktifkan zona ancaman di wilayahnya, menghapus foto 360° wilayahnya, dan melihat jejak GPS anggota (disimpan 60 hari).
+- Menambah titik uji tanah PLTS (formulir atau impor Excel), menghapus foto titik, dan menjalankan audit data wilayahnya (bisa diringkas AI).
 
 **Batas akses**
 
 - Hanya Korwil yang dipimpinnya dan tugas Korwil yang dipimpin/diikuti.
 - Tidak membuka aplikasi lapangan aset atau modul lain; tidak melihat NIK warga.
+- Tidak menangani tiket orang lain (hanya melihat tiket miliknya).
 
 ## Pemohon portal
 

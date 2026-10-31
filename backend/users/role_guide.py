@@ -78,7 +78,11 @@ COMMAND_TABS = (
     "harian (buat, masuk, lacak, rekap Excel), Peringkat tim (periode, Korwil, "
     "tingkat, 10 teratas/terbawah, lencana, Excel, wawasan), Struktur tim, Historis "
     "(bagi koordinator dan atasan: komsos, perubahan sikap, luas lahan), Feed "
-    "aktivitas, Asisten AI, Aplikasi utama; tombol **⇄ Utama** di bilah atas"
+    "aktivitas, Asisten AI, Uji tanah PLTS (progres titik bor/sumur "
+    "uji/resistivitas/sondir/termal, aksi cepat, foto, riwayat, impor & unduh "
+    "Excel), Alat & tiket (tiket & masukan, OCR dokumen, AI dokumen → laporan, "
+    "AI foto lapangan, audit data bagi koordinator, cek perangkat, sinkron "
+    "Excel), Aplikasi utama; tombol **⇄ Utama** di bilah atas"
 )
 
 ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
@@ -250,7 +254,8 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "temuan ilegal, patroli Taman Buru, jejak patroli SMART (impor .json), "
             "pengaturan poin usaha, jabatan & atasan petugas, riwayat & poin "
             "tugas, laporan harian berjenjang, bidang penguasaan lahan, zona "
-            "ancaman, foto situs 360°, jejak GPS petugas",
+            "ancaman, foto situs 360°, jejak GPS petugas, tiket & masukan (arsip), "
+            "uji tanah PLTS (titik, foto, riwayat, unduh Excel)",
             DOCUMENTS_MENU,
             "Kontak",
             "Catatan area",
@@ -277,6 +282,9 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "pengaturan modul; menyetujui dokumen tanda tangan sebelum dikirim; "
             "menyetujui permintaan unduh, termasuk dokumen rahasia.",
             "Melihat daftar pengguna.",
+            "Menangani tiket & masukan di pusat komando (Menu → Alat & tiket): "
+            "memproses, menyelesaikan (poin untuk pengirim), atau menolak dengan "
+            "alasan; menjalankan audit data seluruh wilayah.",
         ),
         limits=(
             "Menambah pengguna, mengatur grup, dan mengganti sandi orang lain hanya "
@@ -435,7 +443,8 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "admin) sebagai pengawas: Peta, Absen, Lapor (hanya Laporan "
             "saya/tim), Warga, Tugas, Kinerja, Chat; Menu: Beranda, Peta & "
             "spasial, Persetujuan, Laporan harian (termasuk rekap Excel), "
-            "Peringkat tim, Historis",
+            "Peringkat tim, Historis, Uji tanah PLTS (baca & unduh Excel), Alat & "
+            "tiket",
         ),
         can=(
             "Membuat dan mengubah aset, penilaian, pajak, transaksi, okupasi, "
@@ -444,11 +453,14 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "Memantau petugas dan Korwil di unit layanannya di pusat komando.",
             "Menandai zona ancaman; membaca bidang penguasaan lahan, foto 360°, "
             "tumpang tindih lapisan, dan audit RTRW (tidak mengubah status bidang).",
+            "Mengirim tiket & masukan; memakai OCR, AI dokumen → laporan, AI foto "
+            "lapangan, dan sinkron Excel.",
         ),
         limits=(
             "Hanya data unit layanannya (data tanpa unit layanan terlihat semua).",
             "Tidak melapor kegiatan/uji tanah di pusat komando dan tidak melihat "
             "NIK warga.",
+            "Tidak mengubah titik uji tanah PLTS dan tidak menjalankan audit data.",
             "Tidak membuka modul sewa, pengadaan, atau alokasi.",
         ),
     ),
@@ -490,8 +502,8 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "Aplikasi lapangan (`/aset/lapangan/`): laporan & foto lapangan",
             "Panel admin: okupasi, pengaduan, survei, tugas, Korwil, warga, "
             "kegiatan, temuan ilegal, patroli Taman Buru, jejak patroli SMART, "
-            "uji tanah, jabatan & atasan petugas, riwayat & poin tugas, laporan "
-            "harian berjenjang (baca saja)",
+            "uji tanah, uji tanah PLTS, jabatan & atasan petugas, riwayat & poin "
+            "tugas, laporan harian berjenjang (baca saja), tiket saya",
         ),
         can=(
             "Absen, melapor kegiatan dan uji tanah, mendata warga, chat, dan SOS "
@@ -513,6 +525,11 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "penguasaan bidang di Korwilnya; mengunggah foto situs 360°.",
             "Melihat zona ancaman, tumpang tindih lapisan, audit RTRW, dan peta "
             "panas di Menu → Peta & spasial.",
+            "Memperbarui progres titik uji tanah PLTS di Korwilnya (aksi cepat, "
+            "formulir, foto, impor Excel untuk titik terdaftar).",
+            "Mengirim tiket & masukan (poin bila selesai ditangani); memakai OCR, "
+            "AI dokumen → laporan, AI foto lapangan, cek perangkat, dan sinkron "
+            "Excel.",
             "Bekerja luring; data terkirim otomatis saat ada sinyal.",
         ),
         limits=(
@@ -527,6 +544,8 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "Historis tidak tersedia kecuali ia menjadi atasan petugas lain.",
             "Tidak menandai zona ancaman, tidak menghapus foto 360°, dan tidak "
             "melihat jejak GPS petugas.",
+            "Tidak menambah titik uji tanah PLTS baru dan tidak menjalankan audit "
+            "data; hanya melihat tiket miliknya.",
         ),
     ),
     UserGroup.KOORDINATOR_WILAYAH: RoleGuide(
@@ -537,9 +556,9 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
         home="Pusat komando (`/komando/`).",
         menus=(
             COMMAND_TABS,
-            "Panel admin: Korwil, warga, kegiatan, uji tanah, SOS, tugas, jabatan "
-            "& atasan petugas, riwayat & poin tugas, laporan harian berjenjang "
-            "(baca saja)",
+            "Panel admin: Korwil, warga, kegiatan, uji tanah, uji tanah PLTS, SOS, "
+            "tugas, jabatan & atasan petugas, riwayat & poin tugas, laporan harian "
+            "berjenjang (baca saja), tiket saya",
         ),
         can=(
             "Semua hak petugas lapangan di pusat komando.",
@@ -556,11 +575,14 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "kunjungan berulang), perubahan sikap warga, dan perubahan luas lahan.",
             "Menandai dan menonaktifkan zona ancaman di wilayahnya, menghapus foto "
             "360° wilayahnya, dan melihat jejak GPS anggota (disimpan 60 hari).",
+            "Menambah titik uji tanah PLTS (formulir atau impor Excel), menghapus "
+            "foto titik, dan menjalankan audit data wilayahnya (bisa diringkas AI).",
         ),
         limits=(
             "Hanya Korwil yang dipimpinnya dan tugas Korwil yang " "dipimpin/diikuti.",
             "Tidak membuka aplikasi lapangan aset atau modul lain; tidak melihat "
             "NIK warga.",
+            "Tidak menangani tiket orang lain (hanya melihat tiket miliknya).",
         ),
     ),
 }

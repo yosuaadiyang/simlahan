@@ -2,7 +2,14 @@
 
 from django.urls import path
 
-from operasi import auth_views, views, views_dashboard, views_flow, views_spatial
+from operasi import (
+    auth_views,
+    views,
+    views_dashboard,
+    views_flow,
+    views_spatial,
+    views_tools,
+)
 
 urlpatterns = [
     path("", views.command_center, name="operasi-command"),
@@ -141,5 +148,49 @@ urlpatterns = [
         "api/foto-360/<int:pk>/hapus/",
         views_spatial.site_photo_delete,
         name="operasi-site-photo-delete",
+    ),
+    # Alat
+    path("api/tiket/", views_tools.tickets, name="operasi-tickets"),
+    path("api/tiket/excel/", views_tools.tickets_excel, name="operasi-tickets-excel"),
+    path(
+        "api/tiket/<int:pk>/status/",
+        views_tools.ticket_action,
+        name="operasi-ticket-action",
+    ),
+    path("api/alat/ocr/", views_tools.ocr, name="operasi-ocr"),
+    path("api/alat/dokumen-ai/", views_tools.document_ai, name="operasi-document-ai"),
+    path(
+        "api/alat/foto-lapangan-ai/",
+        views_tools.field_photo_ai,
+        name="operasi-field-photo-ai",
+    ),
+    path("api/alat/audit-data/", views_tools.data_audit, name="operasi-data-audit"),
+    path("api/alat/sinkron-excel/", views_tools.sync_excel, name="operasi-sync-excel"),
+    path("api/uji-plts/", views_tools.geotech_points, name="operasi-geotech"),
+    path(
+        "api/uji-plts/excel/", views_tools.geotech_excel, name="operasi-geotech-excel"
+    ),
+    path(
+        "api/uji-plts/impor/", views_tools.geotech_import, name="operasi-geotech-import"
+    ),
+    path(
+        "api/uji-plts/<int:pk>/",
+        views_tools.geotech_point,
+        name="operasi-geotech-point",
+    ),
+    path(
+        "api/uji-plts/<int:pk>/foto/",
+        views_tools.geotech_photo,
+        name="operasi-geotech-photo",
+    ),
+    path(
+        "api/uji-plts/<int:pk>/<str:action>/",
+        views_tools.geotech_action,
+        name="operasi-geotech-action",
+    ),
+    path(
+        "api/uji-plts/foto/<int:pk>/hapus/",
+        views_tools.geotech_photo_delete,
+        name="operasi-geotech-photo-delete",
     ),
 ]
