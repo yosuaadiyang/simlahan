@@ -30,7 +30,7 @@ from asetlahan import enums as aset_enums
 from asetlahan import scope as aset_scope
 from asetlahan.field_views import _parse_captured_at, _parse_location
 from asetlahan.geo import collection, feature
-from operasi import enums, geo, satellite, services
+from operasi import enums, geo, patrol, reports, satellite, services
 from operasi.auth_views import command_login_required, forbidden, main_app_url
 from operasi.models import (
     MAX_LAND_AREA_M2,
@@ -41,8 +41,11 @@ from operasi.models import (
     Attendance,
     ChatMessage,
     CommandSettings,
+    IllegalFinding,
     Korwil,
     OfficerPosition,
+    PatrolPhoto,
+    PatrolSession,
     Resident,
     SoilTest,
     SosAlert,
@@ -211,6 +214,9 @@ def _config(request) -> dict:
         "kegiatan": user.has_perm("operasi.view_activity"),
         "lapor": user.has_perm("operasi.add_activity"),
         "verifikasi": user.has_perm("operasi.change_activity"),
+        "temuan": user.has_perm("operasi.view_illegalfinding"),
+        "tambahTemuan": user.has_perm("operasi.add_illegalfinding"),
+        "patroli": user.has_perm("operasi.view_patrolsession"),
         "tanah": user.has_perm("operasi.view_soiltest"),
         "tambahTanah": user.has_perm("operasi.add_soiltest"),
         "absen": user.has_perm("operasi.add_attendance"),
@@ -258,6 +264,23 @@ def _config(request) -> dict:
             "gender": _choices(enums.Gender.choices),
             "cultivation": _choices(enums.CultivationStatus.choices),
             "activityType": _choices(enums.ActivityType.choices),
+            "fieldTypes": [str(t) for t in enums.FIELD_ACTIVITY_TYPES],
+            "residency": _choices(enums.ResidencyStatus.choices),
+            "impactScope": _choices(enums.ImpactScope.choices),
+            "impactRisk": _choices(enums.ImpactRisk.choices),
+            "impactResult": _choices(enums.ImpactResult.choices),
+            "impactTier": _choices(enums.ImpactTier.choices),
+            "illegalKind": _choices(enums.IllegalActivityKind.choices),
+            "permit": _choices(enums.PermitStatus.choices),
+            "business": _choices(enums.BusinessActivity.choices),
+            "patrolRoute": _choices(enums.PatrolRoute.choices),
+            "patrolInput": _choices(enums.PatrolInput.choices),
+            "situation": _choices(enums.PatrolSituation.choices),
+            "personnel": _choices(enums.PersonnelCondition.choices),
+            "materiel": _choices(enums.MaterielCondition.choices),
+            "weather": _choices(enums.Weather.choices),
+            "findingCategory": _choices(enums.FindingCategory.choices),
+            "seedling": _choices(enums.SeedlingKind.choices),
             "texture": _choices(enums.SoilTexture.choices),
             "suitability": _choices(enums.SoilSuitability.choices),
             "leave": _choices(
@@ -275,7 +298,9 @@ def _config(request) -> dict:
             "rtrw": {str(k): v for k, v in enums.RTRW_COLORS.items()},
             "activity": {str(k): v for k, v in enums.ACTIVITY_COLORS.items()},
             "soil": {str(k): v for k, v in enums.SOIL_COLORS.items()},
+            "illegal": {str(k): v for k, v in enums.ILLEGAL_COLORS.items()},
         },
+        "impactPoints": {str(k): v for k, v in enums.IMPACT_POINTS.items()},
         "settings": {
             "requirePhoto": config.require_attendance_photo,
             "workStart": config.work_start.strftime("%H:%M"),
@@ -292,6 +317,9 @@ def _config(request) -> dict:
             "leaveDecision": reverse("operasi-leave-decision", args=[0]),
             "activities": reverse("operasi-activities"),
             "verify": reverse("operasi-activity-verify", args=[0]),
+            "impactConfirm": reverse("operasi-activity-impact", args=[0]),
+            "illegalFindings": reverse("operasi-illegal-findings"),
+            "patrolPreview": reverse("operasi-patrol-preview"),
             "soil": reverse("operasi-soil"),
             "residents": reverse("operasi-residents"),
             "resident": reverse("operasi-resident", args=[0]),
@@ -416,6 +444,12 @@ FILE_KINDS = {
     "absen-pulang": (Attendance, "check_out_photo", "operasi.view_attendance", ""),
     "absen-lampiran": (Attendance, "attachment", "operasi.view_attendance", ""),
     "citra": (AreaAnalysis, "image", "operasi.view_areaanalysis", ""),
+    "patroli-foto": (
+        PatrolPhoto,
+        "photo",
+        "operasi.view_patrolsession",
+        "observation__session__korwil",
+    ),
 }
 
 
@@ -699,6 +733,92 @@ def _sos_features(request):
         )
 
 
+def _illegal_features(request):
+    queryset = geo.scoped(
+        IllegalFinding.objects.exclude(location__isnull=True).annotate(
+            n_visits=Count("visits")
+        ),
+        request.user,
+    )
+    for finding in queryset[:MAX_FEATURES]:
+        yield feature(
+            finding.location,
+            {
+                "id": finding.pk,
+                "kind": "temuan",
+                "title": f"⚠ {finding.number}",
+                "color": enums.ILLEGAL_COLORS.get(finding.activity_kind, "#cf222e"),
+                "rows": [
+                    [_("Aktivitas"), finding.get_activity_kind_display()],
+                    [_("Lokasi"), finding.location_name],
+                    [_("Pemilik"), finding.owner_name or "-"],
+                    [
+                        _("Luas"),
+                        f"{angka(finding.area_ha)} ha" if finding.area_ha else "-",
+                    ],
+                    [_("Kunjungan"), finding.n_visits],
+                ],
+            },
+        )
+
+
+def _patrol_features(request):
+    queryset = geo.scoped(
+        PatrolSession.objects.prefetch_related("observations__photos"), request.user
+    )
+    for session in queryset[:500]:
+        started = (
+            timezone.localtime(session.started_at).strftime("%d-%m-%Y %H:%M")
+            if session.started_at
+            else "-"
+        )
+        rows = [
+            [_("Mulai"), started],
+            [_("Ketua tim"), session.leader or "-"],
+            [_("Jarak"), f"{angka(session.distance_m)} m"],
+        ]
+        if session.track is not None:
+            yield feature(
+                session.track,
+                {
+                    "id": session.pk,
+                    "kind": "patroli",
+                    "title": f"{session.number} {session.name}",
+                    "color": "#06b6d4",
+                    "rows": rows,
+                },
+            )
+        for obs in session.observations.all():
+            yield feature(
+                obs.location,
+                {
+                    "id": obs.pk,
+                    "kind": "patroli",
+                    "title": f"{session.number} · {obs.kind}",
+                    "color": {"NewPatrol": "#10b981", "StopPatrol": "#ef4444"}.get(
+                        obs.kind, "#f59e0b"
+                    ),
+                    "rows": [
+                        [
+                            _("Waktu"),
+                            (
+                                timezone.localtime(obs.observed_at).strftime(
+                                    "%d-%m-%Y %H:%M"
+                                )
+                                if obs.observed_at
+                                else "-"
+                            ),
+                        ],
+                        [_("Catatan"), obs.comment[:300] or "-"],
+                    ],
+                    "photos": [
+                        file_url("patroli-foto", photo) + "?lihat=1"
+                        for photo in obs.photos.all()
+                    ],
+                },
+            )
+
+
 LAYERS = {
     "korwil": ("operasi.view_korwil", _korwil_features),
     "warga": ("operasi.view_resident", _resident_features),
@@ -706,6 +826,8 @@ LAYERS = {
     "tanah": ("operasi.view_soiltest", _soil_features),
     "petugas": ("operasi.view_officerposition", _officer_features),
     "sos": ("operasi.view_sosalert", _sos_features),
+    "temuan": ("operasi.view_illegalfinding", _illegal_features),
+    "patroli": ("operasi.view_patrolsession", _patrol_features),
 }
 
 
@@ -841,8 +963,19 @@ def leave_decision(request, pk):
 # --------------------------------------------------------------------------
 
 
-def _activity_json(activity) -> dict:
+def _can_confirm_impact(user, activity) -> bool:
+    """Klaim dampak tinggi dikonfirmasi atasan (koordinator Korwil / pengawas), bukan pelapor."""
+    if not activity.needs_impact_confirmation or activity.reported_by_id == user.pk:
+        return False
+    if not user.has_perm("operasi.change_activity"):
+        return False
+    leads = activity.korwil_id and activity.korwil.coordinator_id == user.pk
+    return bool(leads or aset_scope.sees_all(user))
+
+
+def _activity_json(activity, user=None) -> dict:
     return {
+        **reports.describe(activity),
         "id": activity.pk,
         "number": activity.number,
         "client_id": str(activity.client_id),
@@ -857,6 +990,17 @@ def _activity_json(activity) -> dict:
         "voice": file_url("kegiatan-suara", activity) if activity.voice_note else "",
         "reporter": _name(activity.reported_by),
         "verified": activity.verified,
+        "location_name": activity.location_name,
+        "companion": activity.companion,
+        "points": float(activity.effort_points),
+        "impact": activity.impact_tier,
+        "impact_label": (
+            enums.ImpactTier(activity.impact_tier).label if activity.impact_tier else ""
+        ),
+        "impact_pending": activity.needs_impact_confirmation,
+        "can_confirm": bool(user and _can_confirm_impact(user, activity)),
+        "ai_stance": activity.ai_stance,
+        "residents": activity.residents.count(),
         "lat": activity.location.y if activity.location else None,
         "lng": activity.location.x if activity.location else None,
         "photos": [file_url("kegiatan", p) + "?lihat=1" for p in activity.photos.all()],
@@ -918,7 +1062,10 @@ def _list_activities(request):
         queryset = queryset.filter(korwil__in=korwils)
     elif scope != "semua":
         queryset = queryset.filter(reported_by=user)
-    return JsonResponse({"results": [_activity_json(a) for a in queryset[:50]]})
+    queryset = queryset.select_related(
+        "illegal_visit__finding", "patrol_report"
+    ).prefetch_related("patrol_report__seedlings")
+    return JsonResponse({"results": [_activity_json(a, user) for a in queryset[:50]]})
 
 
 def _activity_relations(activity, data, user):
@@ -934,13 +1081,23 @@ def _activity_relations(activity, data, user):
         )
 
 
-def _save_activity(activity, residents, photo_objects, stance_updates, user):
+def photo_object(upload, location=None) -> ActivityPhoto:
+    item = ActivityPhoto(photo=upload, location=location)
+    item.full_clean(exclude=["activity", "hunting_finding"])
+    return item
+
+
+def _save_activity(
+    activity, residents, photo_objects, stance_updates, user, parts=None
+):
     with transaction.atomic():
         activity.save()
         activity.residents.set(residents)
         for item in photo_objects:
             item.activity = activity
             item.save()
+        if parts is not None:
+            reports.commit(parts, activity, user)
         for resident in residents:
             new = stance_updates.get(resident.pk)
             if new and new != resident.stance:
@@ -949,6 +1106,8 @@ def _save_activity(activity, residents, photo_objects, stance_updates, user):
                 resident._activity = activity
                 resident.save()
         activity.touch_residents()
+        activity.refresh_effort()
+        services.schedule_ai_stance(activity)
 
 
 def _create_activity(request):
@@ -968,6 +1127,12 @@ def _create_activity(request):
         activity_type=data.get("jenis") or enums.ActivityType.VISIT,
         title=(data.get("judul") or "").strip()[:255],
         description=(data.get("uraian") or "")[:10000],
+        companion=(data.get("pendamping") or "").strip()[:255],
+        location_name=(data.get("lokasi") or "").strip()[:255],
+        distance_m=_int_or_none(data.get("jarak_m"), 0, 10_000_000),
+        impact_scope=_int_or_none(data.get("dampak_cakupan"), 0, 9),
+        impact_risk=_int_or_none(data.get("dampak_risiko"), 0, 9),
+        impact_result=_int_or_none(data.get("dampak_hasil"), 0, 9),
         started_at=_parse_captured_at(data.get("waktu")),
         duration_minutes=_int_or_none(data.get("durasi"), 0, 100_000),
         location=_parse_location(data),
@@ -979,6 +1144,11 @@ def _create_activity(request):
     )
     _activity_relations(activity, data, user)
     geo.assign_korwil(activity, user)
+    if activity.activity_type not in enums.ActivityType.values:
+        raise ValidationError({"jenis": [_("Pilihan tidak sah.")]})
+    parts = reports.prepare(activity, data, request.FILES, user)
+    if not activity.title and activity.activity_type in AUTO_TITLE_TYPES:
+        activity.title = _default_title(activity, parts)
     activity.full_clean(
         exclude=["number", "korwil", "task", "reported_by", "verified_by"],
         validate_unique=False,
@@ -989,13 +1159,9 @@ def _create_activity(request):
         raise ValidationError({"warga": [_("Sebagian warga tidak ditemukan.")]})
     if stance_updates and not user.has_perm("operasi.change_resident"):
         raise PermissionDenied
-    photo_objects = []
-    for photo in photos:
-        item = ActivityPhoto(photo=photo)
-        item.full_clean(exclude=["activity"])
-        photo_objects.append(item)
+    photo_objects = [photo_object(photo, activity.location) for photo in photos]
     try:
-        _save_activity(activity, residents, photo_objects, stance_updates, user)
+        _save_activity(activity, residents, photo_objects, stance_updates, user, parts)
     except IntegrityError:
         return _duplicate(Activity.objects.get(client_id=client_id))
     return JsonResponse(
@@ -1009,6 +1175,95 @@ def _create_activity(request):
     )
 
 
+# Jenis yang judulnya boleh kosong (dibuat otomatis); Kegiatan lainnya wajib bernama.
+AUTO_TITLE_TYPES = (
+    enums.ActivityType.KOMSOS,
+    enums.ActivityType.TOPOGRAPHY,
+    enums.ActivityType.ILLEGAL,
+    enums.ActivityType.HUNTING_PARK,
+)
+
+
+def _default_title(activity, parts) -> str:
+    """Judul otomatis bila petugas tidak mengisi (Komsos, Topografi, dst.)."""
+    label = activity.get_activity_type_display()
+    names = [r.head_name for r in parts.residents]
+    if activity.activity_type == enums.ActivityType.KOMSOS and names:
+        return f"{label}: {', '.join(names)}"[:255]
+    if activity.location_name:
+        return f"{label} – {activity.location_name}"[:255]
+    return label
+
+
+@api(permission="operasi.change_activity", methods=("POST",))
+def confirm_impact(request, pk):
+    activity = get_object_or_404(
+        geo.scoped(Activity.objects.select_related("korwil"), request.user), pk=pk
+    )
+    if not _can_confirm_impact(request.user, activity):
+        raise PermissionDenied
+    activity.impact_confirmed = True
+    activity.impact_confirmed_by = request.user
+    activity.impact_confirmed_at = timezone.now()
+    activity.save(
+        update_fields=[
+            "impact_confirmed",
+            "impact_confirmed_by",
+            "impact_confirmed_at",
+            "modified_at",
+        ]
+    )
+    activity.refresh_effort()
+    return JsonResponse(_activity_json(activity, request.user))
+
+
+def _finding_json(finding) -> dict:
+    return {
+        "id": finding.pk,
+        "number": finding.number,
+        "kind": finding.activity_kind,
+        "kind_label": finding.get_activity_kind_display(),
+        "location_name": finding.location_name,
+        "owner_name": finding.owner_name,
+        "owner_phone": finding.owner_phone,
+        "owner_domicile": finding.owner_domicile,
+        "manager_name": finding.manager_name,
+        "manager_phone": finding.manager_phone,
+        "area_ha": str(finding.area_ha) if finding.area_ha is not None else "",
+        "forest_status": finding.forest_status,
+        "business_started": finding.business_started,
+        "korwil": finding.korwil.code if finding.korwil_id else "",
+        "lat": finding.location.y if finding.location else None,
+        "lng": finding.location.x if finding.location else None,
+    }
+
+
+@api(permission="operasi.view_illegalfinding")
+def illegal_findings(request):
+    """Cari temuan ilegal yang sudah tercatat (untuk kunjungan berulang)."""
+    query = (request.GET.get("q") or "").strip()[:100]
+    queryset = geo.scoped(IllegalFinding.objects.select_related("korwil"), request.user)
+    if len(query) >= 2:
+        queryset = queryset.filter(
+            Q(location_name__icontains=query)
+            | Q(number__icontains=query)
+            | Q(owner_name__icontains=query)
+            | Q(manager_name__icontains=query)
+        )
+    return JsonResponse({"results": [_finding_json(f) for f in queryset[:15]]})
+
+
+@api(permission="operasi.add_activity", methods=("POST",))
+def patrol_preview(request):
+    """Baca berkas SMART dan kembalikan isian laporan Taman Buru (tanpa menyimpan)."""
+    upload = request.FILES.get("smart")
+    if upload is None:
+        raise ValidationError({"smart": [_("Pilih berkas SMART (.json).")]})
+    if upload.size > patrol.MAX_FILE_BYTES:
+        raise ValidationError({"smart": [_("Berkas SMART maksimal 15 MB.")]})
+    return JsonResponse(patrol.prefill(patrol.parse(upload.read())))
+
+
 @api(permission="operasi.change_activity", methods=("POST",))
 def verify_activity(request, pk):
     activity = get_object_or_404(
@@ -1020,7 +1275,7 @@ def verify_activity(request, pk):
     activity.verified = request.POST.get("verified", "1") == "1"
     activity.verified_by = request.user if activity.verified else None
     activity.save()
-    return JsonResponse(_activity_json(activity))
+    return JsonResponse(_activity_json(activity, request.user))
 
 
 def _soil_json(test) -> dict:
@@ -1119,6 +1374,9 @@ def _resident_json(resident) -> dict:
         "years_living": resident.years_living,
         "spouse_name": resident.spouse_name,
         "child_count": resident.child_count,
+        "residency": resident.residency_status,
+        "spouse_occupation": resident.spouse_occupation,
+        "children_detail": resident.children_detail,
         "land_area_m2": str(resident.land_area_m2) if resident.land_area_m2 else None,
         "cultivation": resident.cultivation_status,
         "land_condition": resident.land_condition,
@@ -1174,6 +1432,7 @@ def _apply_resident_fields(resident, data):
         ("pilihan", "relocation_choice", enums.RelocationChoice.values),
         ("gender", "gender", enums.Gender.values),
         ("penggarapan", "cultivation_status", enums.CultivationStatus.values),
+        ("status_warga", "residency_status", enums.ResidencyStatus.values),
     ):
         value = data.get(key)
         # Pilihan opsional ("" = belum diketahui) boleh dikosongkan kembali.
@@ -1190,6 +1449,8 @@ def _apply_resident_fields(resident, data):
         ("asal", "origin", 128),
         ("pasangan", "spouse_name", 255),
         ("kondisi_lahan", "land_condition", 2000),
+        ("pekerjaan_pasangan", "spouse_occupation", 128),
+        ("data_anak", "children_detail", 2000),
     ):
         if key in data:
             setattr(resident, field, data.get(key, "").strip()[:size])

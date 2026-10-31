@@ -253,7 +253,7 @@ Mengelola seluruh modul dan data master SimLahan.
 - Pengadaan Tanah: Dasbor & tenggat, Proyek pengadaan, Kalender & aturan tenggat
 - Alokasi Lahan: Permohonan & verifikasi, Tagihan & pembayaran, Alokasi & lahan tidur, Data lahan, Portal investasi (permintaan investasi, sektor, kawasan), Portal publik
 - Manajemen Aset Lahan: Dasbor aset, Data aset & peta, Perkara & sidang, Okupasi & perambahan, Pengaduan masyarakat, Lelang & seleksi lahan, Laporan & asisten AI, Aplikasi lapangan
-- Pusat Komando: Buka Pusat Komando (aplikasi tersendiri, juga lewat tombol **Pusat Komando** di bilah atas), Korwil, warga & laporan
+- Pusat Komando: Buka Pusat Komando (aplikasi tersendiri, juga lewat tombol **Pusat Komando** di bilah atas), Korwil, warga & laporan, temuan ilegal, patroli Taman Buru, jejak patroli SMART (impor .json), pengaturan poin usaha
 - Dokumen & Perizinan: Dasbor dokumen, Pemanfaatan lahan, Dokumen perizinan, Dokumen tanda tangan, Templat dokumen, Permintaan unduh
 - Kontak
 - Catatan area
@@ -486,13 +486,14 @@ Bekerja di lapangan untuk Korwil tempatnya menjadi anggota.
 
 **Menu**
 
-- Pusat komando (`/komando/`): Peta, Absen, Lapor (kegiatan, uji tanah, laporan saya), Warga, Tugas, Kinerja, Chat; Menu: Peringkat tim, Struktur tim, Feed aktivitas, Asisten AI, Aplikasi utama; tombol **⇄ Utama** di bilah atas
+- Pusat komando (`/komando/`): Peta (termasuk lapisan Temuan ilegal dan Patroli SMART), Absen, Lapor (Komsos, Topografi, Temuan ilegal, Patroli Taman Buru dengan impor SMART, Kegiatan lainnya, jenis lain, uji tanah, laporan saya), Warga, Tugas, Kinerja, Chat; Menu: Peringkat tim, Struktur tim, Feed aktivitas, Asisten AI, Aplikasi utama; tombol **⇄ Utama** di bilah atas
 - Aplikasi lapangan (`/aset/lapangan/`): laporan & foto lapangan
-- Panel admin: okupasi, pengaduan, survei, tugas, Korwil, warga, kegiatan, uji tanah
+- Panel admin: okupasi, pengaduan, survei, tugas, Korwil, warga, kegiatan, temuan ilegal, patroli Taman Buru, jejak patroli SMART, uji tanah
 
 **Yang bisa dilakukan**
 
 - Absen, melapor kegiatan dan uji tanah, mendata warga, chat, dan SOS di pusat komando.
+- Komsos dengan beberapa warga baru sekaligus; mencatat temuan ilegal (baru atau kunjungan berulang) dan patroli Taman Buru (temuan, bibit, impor berkas SMART); menilai dampak Kegiatan lainnya.
 - Membuat laporan lapangan, okupasi dan tindakan teguran; menindaklanjuti pengaduan dan survei; memperbarui status tugas sendiri.
 - Bekerja luring; data terkirim otomatis saat ada sinyal.
 
@@ -500,6 +501,7 @@ Bekerja di lapangan untuk Korwil tempatnya menjadi anggota.
 
 - Hanya Korwil tempatnya menjadi anggota (diatur di data Korwil).
 - Tidak memverifikasi laporan, tidak melihat NIK warga, dan tidak membuka modul lain.
+- Klaim dampak Signifikan/Kritis dihitung 6 poin sampai dikonfirmasi atasan.
 
 ## Koordinator Wilayah
 
@@ -511,13 +513,14 @@ Memimpin tim lapangan di Korwil yang dipimpinnya.
 
 **Menu**
 
-- Pusat komando (`/komando/`): Peta, Absen, Lapor (kegiatan, uji tanah, laporan saya), Warga, Tugas, Kinerja, Chat; Menu: Peringkat tim, Struktur tim, Feed aktivitas, Asisten AI, Aplikasi utama; tombol **⇄ Utama** di bilah atas
+- Pusat komando (`/komando/`): Peta (termasuk lapisan Temuan ilegal dan Patroli SMART), Absen, Lapor (Komsos, Topografi, Temuan ilegal, Patroli Taman Buru dengan impor SMART, Kegiatan lainnya, jenis lain, uji tanah, laporan saya), Warga, Tugas, Kinerja, Chat; Menu: Peringkat tim, Struktur tim, Feed aktivitas, Asisten AI, Aplikasi utama; tombol **⇄ Utama** di bilah atas
 - Panel admin: Korwil, warga, kegiatan, uji tanah, SOS, tugas
 
 **Yang bisa dilakukan**
 
 - Semua hak petugas lapangan di pusat komando.
 - Memverifikasi laporan, menangani SOS, menyetujui izin anggota, melihat KPI anggota, dan membuat tugas wilayah.
+- Mengonfirmasi klaim dampak tinggi Kegiatan lainnya milik anggota (bukan milik sendiri).
 
 **Batas akses**
 

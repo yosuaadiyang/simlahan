@@ -31,6 +31,21 @@ urlpatterns = [
         views.verify_activity,
         name="operasi-activity-verify",
     ),
+    path(
+        "api/kegiatan/<int:pk>/konfirmasi-dampak/",
+        views.confirm_impact,
+        name="operasi-activity-impact",
+    ),
+    path(
+        "api/temuan-ilegal/",
+        views.illegal_findings,
+        name="operasi-illegal-findings",
+    ),
+    path(
+        "api/patroli/pratinjau/",
+        views.patrol_preview,
+        name="operasi-patrol-preview",
+    ),
     path("api/tanah/", views.soil_tests, name="operasi-soil"),
     path("api/warga/", views.residents, name="operasi-residents"),
     path("api/warga/<int:pk>/", views.resident_detail, name="operasi-resident"),

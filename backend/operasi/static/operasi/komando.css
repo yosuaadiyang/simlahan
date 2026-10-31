@@ -338,3 +338,19 @@ dialog h3 { margin: 0; }
 /* Tombol pindah ke aplikasi utama di bilah atas. */
 .btn-small.switch { color: var(--accent-2); border-color: var(--line-strong); text-decoration: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; }
 .btn-small.switch:hover { background: var(--accent-soft); border-color: var(--accent); }
+
+/* Lapor kegiatan per jenis (Komsos, Topografi, Temuan ilegal, Taman Buru, Kegiatan lainnya) */
+.type-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 6px; }
+.type-cards button { display: flex; align-items: center; gap: 8px; text-align: left; padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); color: var(--text); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.type-cards button span { font-size: 18px; }
+.type-cards button.active { border-color: var(--accent); background: var(--accent-soft); }
+.jenis-part { border: 1px solid var(--line); }
+.jenis-part legend { font-weight: 700; padding: 0 4px; }
+.jenis-part h4 { margin: 10px 0 4px; font-size: 13px; }
+.card.mini { padding: 8px; margin: 0; }
+.card.mini .row { justify-content: space-between; }
+.check-list { display: grid; gap: 4px; margin-top: 4px; }
+.segmented.small-seg button { padding: 6px; font-size: 12px; }
+.btn-small.ghost { background: transparent; }
+.impact-box { margin: 4px 0 0; padding: 8px 10px; border-radius: 8px; font-size: 13px; font-weight: 600; background: var(--sl-success-100, #e7f6e2); color: var(--sl-success-700, #1f7a00); }
+.impact-box.high { background: var(--sl-warning-100, #fff6da); color: var(--sl-warning-700, #92400e); }

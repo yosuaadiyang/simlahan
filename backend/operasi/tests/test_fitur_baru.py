@@ -201,7 +201,15 @@ def test_activity_weight_counts_in_performance(coordinator, field, korwil):
     start = datetime.date(2026, 10, 19)
     end = datetime.date(2026, 10, 25)
     row = services.performance(field, start, end)
-    assert row["activities"] == 5  # satu patroli bernilai 5 poin
+    # Poin usaha: bobot patroli 5 + bonus lokasi GPS 1.
+    assert row["activities"] == 6 and row["activity_count"] == 1
+    from operasi.models import CommandSettings
+
+    config = CommandSettings.load()
+    config.scoring_mode = enums.ScoringMode.COUNT
+    config.save()
+    row = services.performance(field, start, end)
+    assert row["activities"] == 5  # mode jumlah: satu patroli bernilai 5
 
 
 # --------------------------------------------------------------------------

@@ -5,7 +5,8 @@ python manage.py operasi_contoh_rempang --hapus  # hapus seluruh data contoh
 
 Membuat 11 Korwil (A–K) dengan batas wilayah, warga terdata (sikap, status
 lahan, kesesuaian RTRW, pilihan penyelesaian), laporan kegiatan, uji tanah,
-dan tugas wilayah. Semua nama fiktif; tidak ada NIK.
+tugas wilayah, Komsos, temuan ilegal, patroli Taman Buru (temuan & bibit),
+dan kegiatan lainnya dengan penilaian dampak. Semua nama fiktif; tidak ada NIK.
 """
 
 import datetime
@@ -20,7 +21,18 @@ from django.utils import timezone
 from asetlahan import enums as aset_enums
 from asetlahan.models import Task
 from operasi import enums
-from operasi.models import Activity, Korwil, Resident, SoilTest, StanceChange
+from operasi.models import (
+    Activity,
+    HuntingParkFinding,
+    HuntingParkPatrol,
+    IllegalFinding,
+    IllegalFindingVisit,
+    Korwil,
+    Resident,
+    Seedling,
+    SoilTest,
+    StanceChange,
+)
 
 MARK = "[contoh]"
 
@@ -89,6 +101,14 @@ ACTIVITIES = [
     (enums.ActivityType.MEETING, "Rapat koordinasi tokoh masyarakat"),
 ]
 
+# Korwil yang diberi contoh temuan ilegal / patroli Taman Buru.
+ILLEGAL_KORWILS = {
+    "B": (enums.IllegalActivityKind.LOGGING, "Hutan Pos 500"),
+    "D": (enums.IllegalActivityKind.CLEARING, "Bukit Monggak"),
+    "H": (enums.IllegalActivityKind.MINING, "Bekas galian Pasir Merah"),
+}
+PATROL_KORWILS = {"C": "Seranggong", "G": "Hutan Blongkeng"}
+
 
 def _cell(index: int) -> MultiPolygon:
     row, col = divmod(index, 3)
@@ -145,6 +165,7 @@ class Command(BaseCommand):
         korwils = Korwil.objects.filter(note__startswith=MARK)
         Task.objects.filter(title__startswith=MARK).delete()
         Activity.objects.filter(description__startswith=MARK).delete()
+        IllegalFinding.objects.filter(note__startswith=MARK).delete()
         SoilTest.objects.filter(note__startswith=MARK).delete()
         residents = Resident.objects.filter(note__startswith=MARK)
         StanceChange.objects.filter(resident__in=residents).delete()
@@ -228,6 +249,12 @@ class Command(BaseCommand):
                 )
                 activity.residents.set(rng.sample(residents, min(3, len(residents))))
                 activity.touch_residents()
+                activity.refresh_effort()
+            self._komsos(rng, korwil, residents, user, now)
+            if code in ILLEGAL_KORWILS:
+                self._illegal(rng, korwil, user, now, *ILLEGAL_KORWILS[code])
+            if code in PATROL_KORWILS:
+                self._patrol(rng, korwil, user, now, PATROL_KORWILS[code])
             for _test in range(rng.randint(1, 2)):
                 suitability = _pick(
                     rng,
@@ -265,3 +292,130 @@ class Command(BaseCommand):
                 korwil=korwil,
                 created_by=user,
             )
+
+    def _komsos(self, rng, korwil, residents, user, now):
+        activity = Activity.objects.create(
+            korwil=korwil,
+            activity_type=enums.ActivityType.KOMSOS,
+            title=f"Komsos – Korwil {korwil.code}",
+            description=f"{MARK} Komsos contoh: warga menanyakan jadwal hunian baru "
+            "dan bersedia hadir pada pertemuan berikutnya.",
+            started_at=now - datetime.timedelta(days=rng.randint(1, 10)),
+            location=_random_point(rng, korwil.geometry),
+            companion="Petugas pendamping contoh",
+            reported_by=user,
+        )
+        activity.residents.set(rng.sample(residents, min(2, len(residents))))
+        activity.touch_residents()
+        activity.refresh_effort()
+
+    def _illegal(self, rng, korwil, user, now, kind, place):
+        point = _random_point(rng, korwil.geometry)
+        finding = IllegalFinding.objects.create(
+            korwil=korwil,
+            activity_kind=kind,
+            location_name=place,
+            location=point,
+            owner_name=f"Bpk {rng.choice(LAST_NAMES)}",
+            manager_name=f"Sdr. {rng.choice(FIRST_NAMES)}",
+            area_ha=round(rng.uniform(0.5, 6), 2),
+            forest_status="Hutan produksi",
+            business_started="Sekitar pertengahan 2025",
+            created_by=user,
+            note=f"{MARK} Temuan fiktif.",
+        )
+        for visit in range(2):
+            activity = Activity.objects.create(
+                korwil=korwil,
+                activity_type=enums.ActivityType.ILLEGAL,
+                title=f"Temuan ilegal – {place}",
+                location_name=place,
+                description=f"{MARK} Pemeriksaan lokasi temuan.",
+                started_at=now - datetime.timedelta(days=12 - visit * 6),
+                location=point,
+                reported_by=user,
+            )
+            IllegalFindingVisit.objects.create(
+                activity=activity,
+                finding=finding,
+                is_new=visit == 0,
+                permit=enums.PermitStatus.NO,
+                business_activity=(
+                    enums.BusinessActivity.ACTIVE
+                    if visit == 0
+                    else enums.BusinessActivity.INACTIVE
+                ),
+                equipment="1 unit gergaji mesin" if visit == 0 else "",
+                follow_up=(
+                    "Dilaporkan ke pihak terkait; dipasang papan peringatan."
+                    if visit == 0
+                    else "Kegiatan sudah berhenti; pemantauan lanjutan."
+                ),
+            )
+            activity.refresh_effort()
+
+    def _patrol(self, rng, korwil, user, now, place):
+        activity = Activity.objects.create(
+            korwil=korwil,
+            activity_type=enums.ActivityType.HUNTING_PARK,
+            title=f"Patroli Taman Buru – {place}",
+            location_name=place,
+            description=f"{MARK} Patroli rutin kawasan; jalur aman, ada jejak satwa.",
+            started_at=now - datetime.timedelta(days=rng.randint(1, 7)),
+            location=_random_point(rng, korwil.geometry),
+            distance_m=rng.randint(2500, 6000),
+            reported_by=user,
+        )
+        report = HuntingParkPatrol.objects.create(
+            activity=activity,
+            grid=f"TBPR{rng.randint(10, 99)}",
+            routes=[enums.PatrolRoute.LOGGING_PATH, enums.PatrolRoute.POACHING],
+            objective="Patroli rutin kawasan",
+            team_leader=f"{rng.choice(FIRST_NAMES)} {rng.choice(LAST_NAMES)}",
+            team="Regu A",
+            situation=enums.PatrolSituation.CONDUCIVE,
+            personnel_condition=enums.PersonnelCondition.HEALTHY,
+            materiel_condition=enums.MaterielCondition.SAFE,
+            weather_morning=enums.Weather.CLEAR,
+            weather_noon=enums.Weather.CLOUDY,
+            weather_afternoon=enums.Weather.RAIN,
+        )
+        HuntingParkFinding.objects.create(
+            patrol=report,
+            category=enums.FindingCategory.FAUNA,
+            description="Jejak babi hutan di tepi sungai",
+            quantity=3,
+            forest_status="Sekunder",
+        )
+        HuntingParkFinding.objects.create(
+            patrol=report,
+            category=enums.FindingCategory.FLORA,
+            description="Hamparan pohon meranti",
+            quantity=10,
+            forest_status="Sekunder",
+        )
+        Seedling.objects.create(
+            patrol=report,
+            kind=enums.SeedlingKind.TENDED,
+            species="Meranti",
+            quantity=rng.randint(20, 80),
+        )
+        Seedling.objects.create(
+            patrol=report,
+            kind=enums.SeedlingKind.PRODUCED,
+            species="Pulai",
+            quantity=rng.randint(10, 40),
+        )
+        activity.refresh_effort()
+        Activity.objects.create(
+            korwil=korwil,
+            activity_type=enums.ActivityType.OTHER,
+            title=f"Koordinasi aparat kampung – Korwil {korwil.code}",
+            description=f"{MARK} Koordinasi pengamanan kawasan bersama aparat kampung.",
+            started_at=now - datetime.timedelta(days=rng.randint(1, 7)),
+            location=_random_point(rng, korwil.geometry),
+            impact_scope=enums.ImpactScope.KORWIL,
+            impact_risk=enums.ImpactRisk.HIGH,
+            impact_result=enums.ImpactResult.OUTPUT,
+            reported_by=user,
+        )

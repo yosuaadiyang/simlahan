@@ -169,14 +169,139 @@
       <button type="button" data-sub="riwayat">Laporan saya</button>
     </div>
     <form id="form-kegiatan" class="stack sub-view" data-sub-view="kegiatan" autocomplete="off">
+      <div class="type-cards" id="kg-kartu" role="radiogroup" aria-label="Pilih kegiatan"></div>
       <label class="field">Jenis kegiatan <select name="jenis" id="kg-jenis"></select></label>
-      <label class="field">Judul <input name="judul" required maxlength="255" placeholder="Mis. Sosialisasi RT 02 Kampung Pasir Panjang"></label>
-      <label class="field">Uraian <textarea name="uraian" rows="3"></textarea></label>
+      <label class="field"><span id="kg-judul-label">Judul</span> <input name="judul" id="kg-judul" maxlength="255" placeholder="Mis. Sosialisasi RT 02 Kampung Pasir Panjang"></label>
       <div class="grid2">
         <label class="field">Waktu <input type="datetime-local" name="waktu" id="kg-waktu"></label>
+        <label class="field">Korwil <select name="korwil" id="kg-korwil"></select></label>
+        <label class="field">Personil pendamping <input name="pendamping" maxlength="255" placeholder="Opsional"></label>
+        <label class="field">Nama lokasi <input name="lokasi" id="kg-lokasi" maxlength="255" placeholder="Mis. Seranggong"></label>
+      </div>
+
+      <fieldset class="jenis-part card" data-jenis="komsos" hidden>
+        <legend>Komsos: warga yang ditemui</legend>
+        <p class="muted small">Warga <b>berulang</b>: cari di "Warga terkait" di bawah. Warga <b>baru</b>: tambahkan di sini (bisa beberapa orang sekaligus). Sikap yang belum diketahui diklasifikasi AI dari narasi setelah laporan tersimpan (bila AI aktif).</p>
+        <ul class="chips" id="kg-warga-baru"></ul>
+        <button type="button" class="btn-small" id="kg-warga-baru-buka">＋ Warga baru</button>
+        <div class="stack" id="kg-warga-baru-form" hidden>
+          <div class="grid2">
+            <label class="field">Status responden <select data-wb="status_warga" class="pilih-residency"></select></label>
+            <label class="field">Nama <input data-wb="nama" maxlength="255"></label>
+            <label class="field">Jenis kelamin <select data-wb="gender" class="pilih-gender"></select></label>
+            <label class="field">Pekerjaan <input data-wb="pekerjaan" maxlength="128" placeholder="Petani, nelayan, …"></label>
+            <label class="field">Umur <input type="number" data-wb="umur" min="0" max="130" inputmode="numeric"></label>
+            <label class="field">No. kontak <input data-wb="telepon" inputmode="tel" maxlength="32"></label>
+            <label class="field">Alamat <input data-wb="alamat" maxlength="255" placeholder="RT/RW, dusun"></label>
+            <label class="field">Kampung <input data-wb="kampung" maxlength="128"></label>
+            <label class="field">Asal <input data-wb="asal" maxlength="128" placeholder="Daerah / suku asal"></label>
+            <label class="field">Lama menetap (tahun) <input type="number" data-wb="menetap" min="0" max="130" inputmode="numeric"></label>
+            <label class="field">Sikap <select data-wb="sikap" class="pilih-sikap"></select></label>
+          </div>
+          <details>
+            <summary>Data tambahan (poin lebih)</summary>
+            <div class="grid2">
+              <label class="field">Nama pasangan <input data-wb="pasangan" maxlength="255"></label>
+              <label class="field">Pekerjaan pasangan <input data-wb="pekerjaan_pasangan" maxlength="128"></label>
+              <label class="field">Jumlah anak <input type="number" data-wb="anak" min="0" max="50" inputmode="numeric"></label>
+              <label class="field">Luas lahan (m²) <input type="number" data-wb="luas_lahan" min="0" step="0.01" inputmode="decimal"></label>
+              <label class="field">Status penggarapan <select data-wb="penggarapan" class="pilih-penggarapan"></select></label>
+            </div>
+            <label class="field">Data anak <textarea data-wb="data_anak" rows="2" placeholder="Anak 1 = …; Anak 2 = …"></textarea></label>
+            <label class="field">Kondisi lahan <textarea data-wb="kondisi_lahan" rows="2" placeholder="Kondisi & tanaman di lahan"></textarea></label>
+          </details>
+          <div class="row"><button type="button" class="btn-small" id="kg-warga-baru-simpan">Tambahkan ke laporan</button> <button type="button" class="btn-small ghost" id="kg-warga-baru-batal">Batal</button></div>
+        </div>
+      </fieldset>
+
+      <fieldset class="jenis-part card" data-jenis="temuan_ilegal" hidden>
+        <legend>Temuan ilegal</legend>
+        <div class="segmented small-seg" id="ti-mode">
+          <button type="button" class="active" data-ti-mode="baru">Temuan baru</button>
+          <button type="button" data-ti-mode="berulang">Kunjungan berulang</button>
+        </div>
+        <div id="ti-berulang" hidden>
+          <input type="search" id="ti-cari" placeholder="Cari lokasi / nomor / pemilik temuan…" autocomplete="off">
+          <ul class="suggest" id="ti-saran"></ul>
+          <p class="small" id="ti-terpilih"></p>
+          <input type="hidden" name="temuan_id" id="ti-id">
+        </div>
+        <div class="grid2">
+          <label class="field">Aktivitas <select name="ti_aktivitas" id="ti-aktivitas"></select></label>
+          <label class="field">Lokasi temuan <input name="ti_lokasi" maxlength="255" placeholder="Mis. Hutan Pos 500"></label>
+          <label class="field">Pemilik <input name="ti_pemilik" maxlength="255"></label>
+          <label class="field">No. HP pemilik <input name="ti_pemilik_hp" inputmode="tel" maxlength="32"></label>
+          <label class="field">Domisili pemilik <input name="ti_domisili" maxlength="255"></label>
+          <label class="field">Pengurus <input name="ti_pengurus" maxlength="255"></label>
+          <label class="field">No. HP pengurus <input name="ti_pengurus_hp" inputmode="tel" maxlength="32"></label>
+          <label class="field">Luas lahan (ha) <input type="number" name="ti_luas" min="0" step="0.0001" inputmode="decimal"></label>
+          <label class="field">Status hutan <input name="ti_status_hutan" maxlength="128" placeholder="Hutan produksi / APL"></label>
+          <label class="field">Mulai usaha berjalan <input name="ti_mulai" maxlength="128" placeholder="Mis. pertengahan 2023"></label>
+        </div>
+        <h4>Data kunjungan ini</h4>
+        <div class="grid2">
+          <label class="field">Izin usaha <select name="ti_izin" class="pilih-permit"></select></label>
+          <label class="field">Kegiatan usaha <select name="ti_usaha" class="pilih-business"></select></label>
+        </div>
+        <label class="field">Oknum yang terlibat <textarea name="ti_oknum" rows="2"></textarea></label>
+        <label class="field">Peralatan usaha <textarea name="ti_peralatan" rows="2" placeholder="Mis. 2 unit ekskavator, chainsaw"></textarea></label>
+        <label class="field">Bangunan <textarea name="ti_bangunan" rows="2" placeholder="Mis. 1 pondok kayu"></textarea></label>
+        <label class="field">Tindak lanjut <textarea name="ti_tindak" rows="2"></textarea></label>
+      </fieldset>
+
+      <fieldset class="jenis-part card" data-jenis="taman_buru" hidden>
+        <legend>Patroli Taman Buru</legend>
+        <label class="field">Cara isi <select name="tb_mode" id="tb-mode" class="pilih-patrol-input"></select></label>
+        <div id="tb-smart" hidden>
+          <label class="field">Berkas SMART Mobile / CyberTracker (.json) <input type="file" id="tb-smart-file" accept=".json,application/json"></label>
+          <p class="small muted" id="tb-smart-info">Jalur, observasi, foto, dan data tim diisi otomatis; periksa lalu simpan.</p>
+        </div>
+        <div class="grid2">
+          <label class="field">Grid <input name="tb_grid" maxlength="255" placeholder="Mis. TBPR29, TBPR65"></label>
+          <label class="field">Jarak tempuh (km) <input type="number" id="tb-jarak" min="0" step="0.01" inputmode="decimal"></label>
+        </div>
+        <div class="field">Cakupan patroli <div class="check-list" id="tb-rute"></div></div>
+        <h4>Hasil temuan</h4>
+        <div id="tb-temuan" class="stack"></div>
+        <button type="button" class="btn-small" id="tb-temuan-tambah">＋ Temuan</button>
+        <h4>Bibit</h4>
+        <div id="tb-bibit" class="stack"></div>
+        <div class="row"><button type="button" class="btn-small" data-bibit="dirawat">＋ Bibit dirawat</button> <button type="button" class="btn-small" data-bibit="diproduksi">＋ Bibit diproduksi</button></div>
+        <details>
+          <summary>Data tambahan (poin lebih)</summary>
+          <div class="grid2">
+            <label class="field">Situasi <select name="tb_situasi" class="pilih-situation"></select></label>
+            <label class="field">Kondisi personil <select name="tb_personil" class="pilih-personnel"></select></label>
+            <label class="field">Kondisi materiil <select name="tb_materiil" class="pilih-materiel"></select></label>
+            <label class="field">Cuaca pagi <select name="tb_cuaca_pagi" class="pilih-weather"></select></label>
+            <label class="field">Cuaca siang <select name="tb_cuaca_siang" class="pilih-weather"></select></label>
+            <label class="field">Cuaca sore <select name="tb_cuaca_sore" class="pilih-weather"></select></label>
+            <label class="field">Objektif patroli <input name="tb_objektif" maxlength="255"></label>
+            <label class="field">Ketua tim <input name="tb_ketua" maxlength="255"></label>
+            <label class="field">Tim / regu <input name="tb_regu" maxlength="255"></label>
+            <label class="field">Stasiun / pos <input name="tb_stasiun" maxlength="255"></label>
+            <label class="field">Transportasi <input name="tb_transport" maxlength="128"></label>
+            <label class="field">Waktu mulai <input type="datetime-local" name="tb_mulai"></label>
+            <label class="field">Waktu selesai <input type="datetime-local" name="tb_selesai"></label>
+          </div>
+          <label class="field">Kendala / hambatan <textarea name="tb_kendala" rows="2"></textarea></label>
+          <label class="field">Saran <textarea name="tb_saran" rows="2"></textarea></label>
+        </details>
+      </fieldset>
+
+      <fieldset class="jenis-part card" data-jenis="lainnya" hidden>
+        <legend>Penilaian dampak</legend>
+        <p class="muted small">Poin ditentukan dari substansi kegiatan, bukan dari foto. Penilaian tercatat atas nama Anda; klaim Signifikan/Kritis ditinjau atasan.</p>
+        <label class="field">Cakupan / siapa terdampak <select name="dampak_cakupan" class="pilih-impact-scope"></select></label>
+        <label class="field">Risiko / urgensi bila tidak dilakukan <select name="dampak_risiko" class="pilih-impact-risk"></select></label>
+        <label class="field">Hasil konkret <select name="dampak_hasil" class="pilih-impact-result"></select></label>
+        <p class="impact-box" id="kg-dampak" hidden></p>
+      </fieldset>
+
+      <label class="field"><span id="kg-uraian-label">Uraian / narasi</span> <textarea name="uraian" rows="3"></textarea></label>
+      <div class="grid2 generic-part">
         <label class="field">Durasi (menit) <input type="number" name="durasi" min="0" inputmode="numeric"></label>
         <label class="field">Warga hadir / ditemui <input type="number" name="peserta" min="0" inputmode="numeric"></label>
-        <label class="field">Korwil <select name="korwil" id="kg-korwil"></select></label>
       </div>
       <label class="field">Hasil & tindak lanjut <textarea name="hasil" rows="2"></textarea></label>
       <label class="field">Tugas terkait <select name="tugas" id="kg-tugas"><option value="">—</option></select></label>
@@ -191,6 +316,7 @@
       <label class="field">Rekaman suara (opsional, maks 10 MB)
         <input type="file" name="suara" id="kg-suara" accept=".m4a,.mp3,.wav,.ogg,.webm,audio/*">
       </label>
+      <p class="small muted" id="kg-poin"></p>
       <button type="submit" class="btn primary">Simpan laporan</button>
     </form>
     <form id="form-tanah" class="stack sub-view" data-sub-view="tanah" hidden autocomplete="off">
@@ -251,15 +377,18 @@
         <label class="field">Penggarapan lahan <select name="penggarapan" class="pilih-penggarapan"></select></label>
       </div>
       <div class="grid2">
+        <label class="field">Status responden <select name="status_warga" class="pilih-residency"></select></label>
         <label class="field">Jenis kelamin <select name="gender" class="pilih-gender"></select></label>
         <label class="field">Umur <input type="number" name="umur" min="0" max="130" inputmode="numeric"></label>
         <label class="field">Pekerjaan <input name="pekerjaan" maxlength="128"></label>
         <label class="field">Asal daerah <input name="asal" maxlength="128"></label>
         <label class="field">Lama menetap (tahun) <input type="number" name="menetap" min="0" max="130" inputmode="numeric"></label>
         <label class="field">Nama pasangan <input name="pasangan" maxlength="255"></label>
+        <label class="field">Pekerjaan pasangan <input name="pekerjaan_pasangan" maxlength="128"></label>
         <label class="field">Jumlah anak <input type="number" name="anak" min="0" max="50" inputmode="numeric"></label>
         <label class="field">Luas lahan (m²) <input type="number" step="0.01" name="luas_lahan" min="0" inputmode="decimal"></label>
       </div>
+      <label class="field">Data anak <textarea name="data_anak" rows="2" maxlength="2000" placeholder="Nama, umur, sekolah/pekerjaan"></textarea></label>
       <label class="field">Kondisi lahan <textarea name="kondisi_lahan" rows="2" maxlength="2000"></textarea></label>
       <label class="check"><input type="checkbox" name="pakai_gps" checked> Simpan lokasi GPS saat ini sebagai lokasi rumah</label>
       <div class="row"><button type="submit" class="btn primary">Simpan warga</button><button type="button" class="btn" id="warga-tambah-batal">Batal</button></div>
