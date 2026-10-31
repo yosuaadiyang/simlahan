@@ -13,12 +13,16 @@ from operasi.models import (
     Attendance,
     ChatMessage,
     CommandSettings,
+    DailyReport,
+    DailyReportAttachment,
+    DailyReportEvent,
     HuntingParkFinding,
     HuntingParkPatrol,
     IllegalFinding,
     IllegalFindingVisit,
     Korwil,
     OfficerPosition,
+    OfficerProfile,
     PatrolObservation,
     PatrolPhoto,
     PatrolSession,
@@ -28,6 +32,8 @@ from operasi.models import (
     SosAlert,
     StanceChange,
     SystemLock,
+    TaskEvent,
+    TaskPoint,
 )
 from utils.group_permissions import UG, GroupModelPermissions
 
@@ -76,4 +82,12 @@ OPERASI_GROUP_MODEL_PERMISSIONS: GroupModelPermissions = {
     SosAlert: _perms(ALL, VAC, VA, VA),
     OfficerPosition: _perms(VAD, VA, VA, VA),
     AreaAnalysis: _perms(VAD, VA, VA, VA),
+    # Atasan langsung diatur Administrator; semua petugas boleh melihat strukturnya.
+    OfficerProfile: _perms(ALL, V, V, V),
+    TaskEvent: _perms(ALL, VA, VA, VA),
+    TaskPoint: _perms(ALL, V, V, V),
+    # Laporan harian berjenjang: semua tingkat menyusun, mengirim, dan merevisi.
+    DailyReport: _perms(ALL, VAC, VAC, VAC),
+    DailyReportEvent: _perms(ALL, VA, VA, VA),
+    DailyReportAttachment: _perms(ALL, VA, VA, VA),
 }

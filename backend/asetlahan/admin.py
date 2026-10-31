@@ -1623,7 +1623,18 @@ class TaskAdmin(AsetModelAdmin):
         ),
         (
             _("Penugasan"),
-            {"fields": ("assignee", "team", "korwil", "service_unit", "created_by")},
+            {
+                "fields": (
+                    "assignee",
+                    "contributors",
+                    "team",
+                    "korwil",
+                    "activity_type",
+                    "point_value",
+                    "service_unit",
+                    "created_by",
+                )
+            },
         ),
         (
             _("Jadwal"),
@@ -1635,8 +1646,18 @@ class TaskAdmin(AsetModelAdmin):
         ),
     )
 
+    filter_horizontal = ("contributors",)
+
     # Petugas lapangan hanya memperbarui kemajuan tugasnya sendiri.
     FIELD_EDITABLE = ("status", "progress")
+
+    def save_related(self, request, form, formsets, change):
+        from operasi import task_flow
+
+        super().save_related(request, form, formsets, change)
+        # Setelah kontributor tersimpan: poin dibagikan sekali saat selesai.
+        if form.instance.status == enums.TaskStatus.DONE:
+            task_flow.award_points(form.instance)
 
     @admin.display(boolean=True, description=_("Terlambat"))
     def overdue(self, obj):
@@ -1706,9 +1727,57 @@ class TaskAdmin(AsetModelAdmin):
             kwargs["queryset"] = self._user_korwils(request.user)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
+    def _lifecycle_status(self, request, obj, form, change):
+        """Penerima tugas tidak menutup tugasnya sendiri: "Selesai" darinya
+        menjadi "Menunggu verifikasi" sampai pemberi tugas memverifikasi."""
+        from operasi import task_flow
+
+        if not change or "status" not in form.changed_data:
+            return None
+        previous = Task.objects.filter(pk=obj.pk).values_list("status", flat=True)
+        previous = previous.first()
+        if (
+            obj.status == enums.TaskStatus.DONE
+            and self.task_role(request) != "full"
+            and task_flow.worker_id(obj) == request.user.pk
+        ):
+            obj.status = enums.TaskStatus.REPORTED
+            self.message_user(
+                request,
+                _(
+                    "%(task)s dilaporkan selesai dan menunggu verifikasi pemberi "
+                    "tugas."
+                )
+                % {"task": obj.number},
+                messages.WARNING,
+            )
+        return previous
+
     def save_model(self, request, obj, form, change):
+        from operasi.enums import TaskEventKind
+        from operasi.models import TaskEvent
+
         notify = obj.assignee_id and (not change or "assignee" in form.changed_data)
+        previous = self._lifecycle_status(request, obj, form, change)
         super().save_model(request, obj, form, change)
+        kinds = {
+            enums.TaskStatus.IN_PROGRESS: TaskEventKind.STARTED,
+            enums.TaskStatus.REPORTED: TaskEventKind.SUBMITTED,
+            enums.TaskStatus.WAITING: TaskEventKind.BLOCKED,
+            enums.TaskStatus.DONE: TaskEventKind.VERIFIED,
+            enums.TaskStatus.CANCELLED: TaskEventKind.CANCELLED,
+        }
+        if not change:
+            TaskEvent.objects.create(
+                task=obj, kind=TaskEventKind.CREATED, actor=request.user
+            )
+        elif previous is not None and previous != obj.status and obj.status in kinds:
+            TaskEvent.objects.create(
+                task=obj,
+                kind=kinds[obj.status],
+                actor=request.user,
+                note=_("Diubah lewat panel admin."),
+            )
         if notify and obj.assignee.email and obj.assignee_id != request.user.pk:
             services.send_email(
                 [obj.assignee.email],

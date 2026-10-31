@@ -397,9 +397,81 @@
   </section>
 
   <section id="tab-tasks" class="tab-view sheet" aria-label="Tugas" hidden>
-    <h2>Tugas</h2>
-    <div class="row"><select id="tugas-filter"><option value="">Belum selesai</option><option value="semua">Semua</option></select></div>
+    <div class="panel-head"><h2>Tugas</h2><button type="button" class="btn primary btn-small" id="tugas-baru-buka" hidden>＋ Beri tugas</button></div>
+    <div class="segmented small-seg" id="tugas-filter">
+      <button type="button" class="active" data-filter="saya">Saya</button>
+      <button type="button" data-filter="tim">Tim</button>
+      <button type="button" data-filter="verifikasi">Verifikasi<span class="count" id="tugas-verifikasi-n"></span></button>
+      <button type="button" data-filter="terlambat">Terlambat</button>
+      <button type="button" data-filter="semua">Semua</button>
+    </div>
     <ul class="list" id="tugas-daftar"></ul>
+  </section>
+
+  <section id="tab-laporan" class="tab-view sheet" aria-label="Laporan harian" hidden>
+    <h2>Laporan Harian Berjenjang</h2>
+    <div id="lh-atasan" class="small muted">Memuat…</div>
+    <div class="segmented small-seg" id="lh-seg">
+      <button type="button" class="active" data-lh="buat">Buat</button>
+      <button type="button" data-lh="masuk">Masuk<span class="count" id="lh-masuk-n"></span></button>
+      <button type="button" data-lh="lacak">Lacak</button>
+      <button type="button" data-lh="rekap">Rekap Excel</button>
+    </div>
+    <div data-lh-view="buat" class="stack">
+      <div id="lh-revisi-wrap" class="stack" hidden>
+        <h3>Perlu revisi dari Anda</h3>
+        <ul class="list" id="lh-revisi"></ul>
+      </div>
+      <form id="form-lh" class="stack" autocomplete="off">
+        <div class="row wrap">
+          <strong class="grow">Kegiatan belum dilaporkan</strong>
+          <select id="lh-hari" aria-label="Rentang kegiatan">
+            <option value="1">Hari ini</option><option value="3">3 hari</option><option value="7" selected>7 hari</option><option value="14">14 hari</option><option value="31">31 hari</option>
+          </select>
+        </div>
+        <div class="check-list" id="lh-kegiatan"></div>
+        <div id="lh-sumber-wrap" class="stack" hidden>
+          <strong>Laporan bawahan yang dirangkum</strong>
+          <ul class="list" id="lh-sumber"></ul>
+        </div>
+        <div class="row wrap"><button type="button" class="btn" id="lh-susun">✨ Susun otomatis</button><span class="small muted" id="lh-susun-info"></span></div>
+        <label class="field">Isi laporan <textarea name="isi" id="lh-isi" rows="10" maxlength="20000" required placeholder="Ringkasan kegiatan, temuan, kendala, dan rencana besok"></textarea></label>
+        <label class="field">Lampiran (maks. 10 berkas) <input type="file" name="lampiran" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"></label>
+        <div class="row"><button type="submit" class="btn primary" id="lh-kirim">📤 Kirim ke atasan</button></div>
+      </form>
+    </div>
+    <div data-lh-view="masuk" class="stack" hidden>
+      <p class="small muted" id="lh-masuk-info"></p>
+      <ul class="list" id="lh-masuk"></ul>
+      <div class="row"><button type="button" class="btn" id="lh-selesai" hidden>✔ Tandai terpilih selesai ditinjau</button></div>
+    </div>
+    <div data-lh-view="lacak" class="stack" hidden>
+      <p class="small muted">Posisi laporan Anda dan bawahan Anda 14 hari terakhir.</p>
+      <ul class="list" id="lh-lacak"></ul>
+    </div>
+    <div data-lh-view="rekap" class="stack" hidden>
+      <form id="form-rekap" class="stack">
+        <label class="field">Periode
+          <select name="periode" id="rekap-periode"><option value="hari">Hari ini</option><option value="minggu">7 hari terakhir</option><option value="bulan">Bulan ini</option><option value="rentang">Rentang tanggal</option></select>
+        </label>
+        <div class="row" id="rekap-rentang" hidden>
+          <label class="field grow">Dari <input type="date" name="dari"></label>
+          <label class="field grow">Sampai <input type="date" name="sampai"></label>
+        </div>
+        <label class="field">Korwil <select name="korwil" id="rekap-korwil"></select></label>
+        <label class="field">Jenis kegiatan <select name="jenis" id="rekap-jenis"></select></label>
+        <p class="small muted">Berisi lembar rekap kegiatan, ringkasan per Korwil/jenis/petugas, absensi, dan tugas sesuai hak akses Anda.</p>
+        <div class="row"><button type="submit" class="btn primary">⬇ Unduh Excel</button></div>
+      </form>
+    </div>
+  </section>
+
+  <section id="tab-persetujuan" class="tab-view sheet" aria-label="Persetujuan" hidden>
+    <h2>Persetujuan</h2>
+    <p class="small muted">Semua yang menunggu keputusan Anda: izin, konfirmasi dampak, verifikasi tugas, dan laporan harian.</p>
+    <ul class="list" id="setuju-daftar"></ul>
+    <h3>Riwayat keputusan (30 hari)</h3>
+    <ul class="list" id="setuju-riwayat"></ul>
   </section>
 
   <section id="tab-perf" class="tab-view sheet" aria-label="Kinerja" hidden>
@@ -418,6 +490,8 @@
   <section id="tab-lainnya" class="tab-view sheet" aria-label="Menu lainnya" hidden>
     <h2>Menu lainnya</h2>
     <div class="more-menu">
+      <button type="button" class="btn" data-buka="persetujuan">🗳️<span>Persetujuan<i class="count" id="menu-persetujuan-n"></i></span></button>
+      <button type="button" class="btn" data-buka="laporan">🗂️<span>Laporan harian<i class="count" id="menu-laporan-n"></i></span></button>
       <button type="button" class="btn" data-buka="peringkat">🏆<span>Peringkat tim</span></button>
       <button type="button" class="btn" data-buka="struktur">🕸️<span>Struktur tim</span></button>
       <button type="button" class="btn" data-buka="feed">📰<span>Feed aktivitas</span></button>
@@ -480,7 +554,7 @@
   <button type="button" data-tab="tasks">✅<span>Tugas</span></button>
   <button type="button" data-tab="perf">📈<span>Kinerja</span></button>
   <button type="button" data-tab="chat">💬<span>Chat</span><i class="dot" id="tab-chat-dot" hidden></i></button>
-  <button type="button" data-tab="lainnya" aria-label="Menu lainnya">☰<span>Menu</span></button>
+  <button type="button" data-tab="lainnya" aria-label="Menu lainnya">☰<span>Menu</span><i class="dot" id="tab-menu-dot" hidden></i></button>
 </nav>
 
 <!-- Dialog -->
@@ -532,6 +606,40 @@
   <form method="dialog" class="stack">
     <div class="panel-head"><h3 id="wd-judul">Warga</h3><button value="tutup" class="close">✕</button></div>
     <div id="wd-isi"></div>
+  </form>
+</dialog>
+
+<dialog id="dlg-tugas" class="wide">
+  <form method="dialog" class="stack">
+    <div class="panel-head"><h3 id="td-judul">Tugas</h3><button value="tutup" class="close">✕</button></div>
+    <div id="td-isi"></div>
+  </form>
+</dialog>
+
+<dialog id="dlg-tugas-baru" class="wide">
+  <form class="stack" id="form-tugas-baru" autocomplete="off">
+    <div class="panel-head"><h3>＋ Beri tugas</h3><button type="button" class="close" data-tutup>✕</button></div>
+    <label class="field">Judul tugas <input name="judul" maxlength="255" required></label>
+    <label class="field">Uraian / instruksi <textarea name="uraian" rows="3" maxlength="2000"></textarea></label>
+    <label class="field">Penerima utama <select name="penerima" id="tb-penerima" required></select></label>
+    <div class="field">Kontributor (opsional, ikut mendapat poin)
+      <div class="check-list scroll" id="tb-kontributor"></div>
+    </div>
+    <div class="grid2">
+      <label class="field">Jenis kegiatan <select name="jenis" id="tb-jenis"></select></label>
+      <label class="field">Prioritas <select name="prioritas" id="tb-prioritas"></select></label>
+      <label class="field">Tenggat <input type="date" name="tenggat"></label>
+      <label class="field">Nilai poin (0–100) <input type="number" name="poin" min="0" max="100" value="0" inputmode="numeric"></label>
+      <label class="field">Korwil <select name="korwil" id="tb-korwil"></select></label>
+    </div>
+    <div class="row"><button type="submit" class="btn primary">Kirim tugas</button><button type="button" class="btn" data-tutup>Batal</button></div>
+  </form>
+</dialog>
+
+<dialog id="dlg-laporan" class="wide">
+  <form method="dialog" class="stack">
+    <div class="panel-head"><h3 id="ld-judul">Laporan harian</h3><button value="tutup" class="close">✕</button></div>
+    <div id="ld-isi"></div>
   </form>
 </dialog>
 

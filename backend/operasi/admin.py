@@ -21,7 +21,7 @@ from django.utils.translation import gettext_lazy as _
 
 from asetlahan import scope as aset_scope
 from file_operations.private_files import PrivateFileField
-from operasi import enums, geo, services
+from operasi import daily_reports, enums, geo, hierarchy, services
 from operasi.models import (
     Activity,
     ActivityPhoto,
@@ -30,12 +30,16 @@ from operasi.models import (
     Attendance,
     ChatMessage,
     CommandSettings,
+    DailyReport,
+    DailyReportAttachment,
+    DailyReportEvent,
     HuntingParkFinding,
     HuntingParkPatrol,
     IllegalFinding,
     IllegalFindingVisit,
     Korwil,
     OfficerPosition,
+    OfficerProfile,
     PatrolObservation,
     PatrolSession,
     Resident,
@@ -44,6 +48,8 @@ from operasi.models import (
     SosAlert,
     StanceChange,
     SystemLock,
+    TaskEvent,
+    TaskPoint,
 )
 
 
@@ -2075,4 +2081,167 @@ class AreaAnalysisAdmin(ReadOnlyAdminMixin, OperasiGISAdmin):
             format_html_join(
                 "", "<li>{}</li>", ((t,) for t in result.get("rekomendasi", []))
             ),
+        )
+
+
+# --------------------------------------------------------------------------
+# Struktur atasan, riwayat & poin tugas, laporan harian berjenjang
+# --------------------------------------------------------------------------
+
+
+@admin.register(OfficerProfile)
+class OfficerProfileAdmin(admin.ModelAdmin):
+    list_display = ("user", "position", "supervisor", "effective_supervisor")
+    search_fields = (
+        "user__username",
+        "user__first_name",
+        "user__last_name",
+        "position",
+    )
+    autocomplete_fields = ("user", "supervisor")
+    list_select_related = ("user", "supervisor")
+
+    @admin.display(description=_("Laporan dikirim ke"))
+    def effective_supervisor(self, obj):
+        boss = hierarchy.supervisor_of(obj.user)
+        if boss is None:
+            return _("— (pimpinan tertinggi)")
+        return boss.get_full_name() or boss.get_username()
+
+
+@admin.register(TaskEvent)
+class TaskEventAdmin(ReadOnlyAdminMixin, OperasiGISAdmin):
+    scope_prefix = "task__korwil"
+    list_display = ("created_at", "task", "kind", "actor", "note_short")
+    list_filter = ("kind",)
+    search_fields = ("task__number", "task__title", "note")
+    list_select_related = ("task", "actor")
+    file_kinds = {"photo": "tugas-foto"}
+    readonly_fields = (
+        "task",
+        "kind",
+        "actor",
+        "note",
+        "photo",
+        "location",
+        "created_at",
+    )
+
+    @admin.display(description=_("Catatan"))
+    def note_short(self, obj):
+        return (obj.note or "")[:80]
+
+    def get_queryset(self, request):
+        from operasi import task_flow
+
+        return (
+            super()
+            .get_queryset(request)
+            .filter(task__in=task_flow.visible_tasks(request.user).values("pk"))
+        )
+
+
+@admin.register(TaskPoint)
+class TaskPointAdmin(ReadOnlyAdminMixin, OperasiModelAdmin):
+    scope_prefix = "task__korwil"
+    list_display = ("awarded_at", "user", "points", "role", "task")
+    list_filter = ("role",)
+    search_fields = (
+        "task__number",
+        "user__username",
+        "user__first_name",
+        "user__last_name",
+    )
+    list_select_related = ("task", "user")
+    readonly_fields = ("task", "user", "role", "points", "awarded_at")
+
+    def get_queryset(self, request):
+        from operasi import task_flow
+
+        queryset = super().get_queryset(request)
+        if aset_scope.sees_all(request.user):
+            return queryset
+        return queryset.filter(
+            Q(user=request.user)
+            | Q(task__in=task_flow.visible_tasks(request.user).values("pk"))
+        )
+
+
+class DailyReportEventInline(admin.TabularInline):
+    model = DailyReportEvent
+    extra = 0
+    can_delete = False
+    fields = ("created_at", "action", "actor", "target", "note")
+    readonly_fields = fields
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
+class DailyReportAttachmentInline(admin.TabularInline):
+    model = DailyReportAttachment
+    extra = 0
+    can_delete = False
+    fields = ("name", "file", "uploaded_by", "uploaded_at")
+    readonly_fields = fields
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        if db_field.name == "file":
+            kwargs["widget"] = PrivateFileWidget("laporan-lampiran")
+        return super().formfield_for_dbfield(db_field, request, **kwargs)
+
+
+@admin.register(DailyReport)
+class DailyReportAdmin(ReadOnlyAdminMixin, OperasiModelAdmin):
+    """Laporan harian dikirim, direvisi, dan dirangkum dari pusat komando."""
+
+    scope_prefix = None
+    list_display = (
+        "number",
+        "report_date",
+        "author",
+        "recipient",
+        "korwil",
+        "status",
+        "revision_owner",
+    )
+    list_filter = ("status", "korwil", "report_date", "ai_generated")
+    search_fields = (
+        "number",
+        "content",
+        "author__username",
+        "author__first_name",
+        "author__last_name",
+    )
+    list_select_related = ("author", "recipient", "korwil", "revision_owner")
+    date_hierarchy = "report_date"
+    inlines = (DailyReportAttachmentInline, DailyReportEventInline)
+    fields = (
+        "number",
+        "report_date",
+        "author",
+        "author_position",
+        "recipient",
+        "korwil",
+        "status",
+        "consolidated_into",
+        "revision_owner",
+        "return_note",
+        "returned_by",
+        "returned_at",
+        "reviewed_by",
+        "reviewed_at",
+        "ai_generated",
+        "sent_at",
+        "content",
+    )
+    readonly_fields = fields
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        return queryset.filter(
+            pk__in=daily_reports.visible_reports(request.user).values("pk")
         )

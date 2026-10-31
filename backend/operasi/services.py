@@ -31,6 +31,7 @@ from operasi.models import (
     Resident,
     SoilTest,
     SosAlert,
+    TaskPoint,
 )
 from pengadaan.workdays import is_workday
 from utils.group_permissions import UserGroup
@@ -528,6 +529,15 @@ def performance(
             weights = ActivityWeight.points_map()
         activity_count = sum(weights.get(t, 1) for t, _p in rows)
         multiplier = 1
+    # Poin tugas yang diverifikasi selesai ikut menambah volume kerja (mode usaha).
+    task_points = (
+        TaskPoint.objects.filter(
+            user=user, awarded_at__date__gte=start, awarded_at__date__lte=end
+        ).aggregate(total=Sum("points"))["total"]
+        or 0
+    )
+    if effort:
+        activity_count += task_points
     activity_target = (
         max(
             math.ceil(config.weekly_activity_target * multiplier * len(workdays) / 5), 1
@@ -592,6 +602,7 @@ def performance(
         "on_time_pct": round(on_time_rate * 100) if on_time_rate is not None else None,
         "activities": round(activity_count, 1),
         "activity_count": len(rows),
+        "task_points": task_points,
         "activity_target": activity_target,
         "scoring": config.scoring_mode,
         "activity_pct": round(activity_rate * 100),

@@ -1293,13 +1293,14 @@
 
   var currentTab = "peta";
   // Tab di balik tombol "Lainnya" agar bilah tab muat di layar ponsel.
-  var MORE_TABS = ["peringkat", "struktur", "feed", "ai"];
+  var MORE_TABS = ["persetujuan", "laporan", "peringkat", "struktur", "feed", "ai"];
   // Tab dan sub-tab yang tidak bisa dipakai peran pengguna tidak ditampilkan.
   var TAB_ALLOWED = {
     absen: perms.absen,
     korwil: perms.lapor || perms.tambahTanah || perms.kegiatan,
     warga: perms.warga,
     tasks: perms.tugas,
+    laporan: perms.laporanHarian,
     chat: perms.chat
   };
   var SUB_ALLOWED = { kegiatan: perms.lapor, tanah: perms.tambahTanah, riwayat: perms.kegiatan };
@@ -1307,6 +1308,8 @@
     Object.keys(TAB_ALLOWED).forEach(function (name) {
       var button = document.querySelector('.tabbar button[data-tab="' + name + '"]');
       if (button) { button.hidden = !TAB_ALLOWED[name]; }
+      var entry = document.querySelector('.more-menu button[data-buka="' + name + '"]');
+      if (entry) { entry.hidden = !TAB_ALLOWED[name]; }
     });
     var firstSub = null;
     document.querySelectorAll(".segmented button[data-sub]").forEach(function (button) {
@@ -1314,7 +1317,7 @@
       button.hidden = SUB_ALLOWED[sub] === false;
       if (!button.hidden && !firstSub) { firstSub = button; }
     });
-    var active = document.querySelector(".segmented button.active");
+    var active = document.querySelector(".segmented button[data-sub].active");
     if (firstSub && active && active.hidden) { firstSub.click(); }
   }
   function showTab(name) {
@@ -1332,6 +1335,8 @@
     if (name === "korwil") { loadMyReports(); loadTaskOptions(); }
     if (name === "warga") { loadResidents(); }
     if (name === "tasks") { loadTasks(); }
+    if (name === "laporan") { loadReports(); }
+    if (name === "persetujuan") { loadApprovals(); }
     if (name === "perf") { loadPerformance(); }
     if (name === "peringkat") { loadLeaderboard(); }
     if (name === "struktur") { loadStructure(); }
@@ -2224,50 +2229,502 @@
 
   // ================================================================ Tugas
 
+  var OPEN_TASK = ["baru", "dikerjakan", "menunggu", "dilaporkan"];
+  var TASK_ACTIONS = {
+    mulai: { label: "▶ Mulai kerjakan", cls: "primary" },
+    lapor: { label: "📤 Laporkan selesai", cls: "primary" },
+    kendala: { label: "⚠ Ada kendala", cls: "", note: true },
+    lanjut: { label: "▶ Lanjutkan", cls: "primary" },
+    verifikasi: { label: "✔ Verifikasi selesai", cls: "primary" },
+    kembalikan: { label: "↩ Kembalikan untuk revisi", cls: "", note: true },
+    batal: { label: "✕ Batalkan tugas", cls: "danger" }
+  };
+  var taskFilter = "saya";
+  var openTaskId = null;
+
+  function stageBadge(t) {
+    return "<span class='badge' style='background:" + escapeHtml(t.stage_color) + "'>" + escapeHtml(t.stage_label) + "</span>";
+  }
+
+  function taskMeta(t) {
+    return [t.number, t.priority_label, t.activity_label, t.due_date ? "tenggat " + fmtDate(t.due_date) : "",
+      t.korwil ? "Korwil " + t.korwil : "", t.mine ? (t.giver && !t.given ? "dari " + t.giver : "") : (t.assignee ? "untuk " + t.assignee : ""),
+      t.points ? t.points + " poin" : ""].filter(Boolean).join(" · ");
+  }
+
   function loadTasks() {
     if (!perms.tugas) { $("tugas-daftar").innerHTML = "<li class='muted'>Anda tidak berhak melihat tugas.</li>"; return; }
-    request(urls.tasks + ($("tugas-filter").value ? "?status=semua" : "")).then(function (data) {
+    request(urls.tasks + "?filter=" + taskFilter).then(function (data) {
+      $("tugas-baru-buka").hidden = !data.can_create;
       $("tugas-daftar").innerHTML = data.results.map(function (t) {
-        var statusChoices = config.choices.taskStatus.filter(function (c) { return c.value !== "batal" || t.can_cancel || t.status === "batal"; });
-        var statusSelect = perms.ubahTugas ? '<select data-status="' + t.id + '">' + statusChoices.map(function (c) {
-          return '<option value="' + escapeHtml(c.value) + '"' + (c.value === t.status ? " selected" : "") + ">" + escapeHtml(c.label) + "</option>";
-        }).join("") + "</select>" : "<span class='badge'>" + escapeHtml(t.status_label) + "</span>";
-        return "<li><div class='title'>" + escapeHtml(t.title) + (t.overdue ? " <span class='badge' style='background:#cf222e'>terlambat</span>" : "") + "</div>" +
-          "<div class='sub'>" + escapeHtml([t.number, t.priority_label, t.due_date ? "tenggat " + fmtDate(t.due_date) : "", t.korwil ? "Korwil " + t.korwil : "", t.mine ? "" : t.assignee].filter(Boolean).join(" · ")) + "</div>" +
-          (t.description ? "<p class='small'>" + escapeHtml(t.description) + "</p>" : "") +
+        return "<li class='clickable' data-tugas='" + t.id + "'><div class='title'>" + escapeHtml(t.title) + " " + stageBadge(t) +
+          (t.overdue ? " <span class='badge' style='background:#cf222e'>terlambat</span>" : "") + "</div>" +
+          "<div class='sub'>" + escapeHtml(taskMeta(t)) + "</div>" +
           "<div class='progress'><i style='width:" + t.progress + "%'></i></div>" +
-          "<div class='row wrap'>" + statusSelect +
-          (perms.ubahTugas ? "<input type='range' min='0' max='100' step='10' value='" + t.progress + "' data-progres='" + t.id + "' aria-label='Progres'><span class='small' id='pg-" + t.id + "'>" + t.progress + "%</span>" +
-            "<button type='button' class='btn-small' data-simpan-tugas='" + t.id + "'>Simpan</button>" : "") +
-          (perms.lapor ? "<button type='button' class='btn-small' data-lapor-tugas='" + t.id + "' data-judul='" + escapeHtml(t.title) + "'>📝 Lapor</button>" : "") + "</div></li>";
-      }).join("") || "<li class='muted'>Tidak ada tugas.</li>";
+          (perms.lapor && t.mine && OPEN_TASK.indexOf(t.status) !== -1 && t.status !== "dilaporkan"
+            ? "<div class='row'><button type='button' class='btn-small' data-lapor-tugas='" + t.id + "' data-judul='" + escapeHtml(t.title) + "'>📝 Lapor kegiatan</button></div>" : "") +
+          "</li>";
+      }).join("") || "<li class='muted'>Tidak ada tugas di daftar ini.</li>";
     }).catch(function (error) { toast(error.message, "error"); });
   }
 
-  $("tugas-filter").addEventListener("change", loadTasks);
-  $("tugas-daftar").addEventListener("input", function (event) {
-    var id = event.target.getAttribute("data-progres");
-    if (id) { $("pg-" + id).textContent = event.target.value + "%"; }
+  $("tugas-filter").addEventListener("click", function (event) {
+    var button = event.target.closest("button[data-filter]");
+    if (!button) { return; }
+    taskFilter = button.getAttribute("data-filter");
+    $("tugas-filter").querySelectorAll("button").forEach(function (b) { b.classList.toggle("active", b === button); });
+    loadTasks();
   });
+
   $("tugas-daftar").addEventListener("click", function (event) {
-    var id = event.target.getAttribute("data-simpan-tugas");
-    if (id) {
-      var data = form({
-        status: document.querySelector('[data-status="' + id + '"]').value,
-        progress: document.querySelector('[data-progres="' + id + '"]').value
-      });
-      request(urls.task.replace("/0/", "/" + id + "/"), { method: "POST", body: data })
-        .then(function () { toast("Tugas diperbarui.", "ok"); loadTasks(); })
-        .catch(function (error) { toast(error.message, "error"); });
-    }
     var lapor = event.target.getAttribute("data-lapor-tugas");
     if (lapor) {
       loadTaskOptions();
       showTab("korwil");
       setTimeout(function () { $("kg-tugas").value = lapor; }, 400);
       document.querySelector('#form-kegiatan [name="judul"]').value = event.target.getAttribute("data-judul");
+      return;
+    }
+    var li = event.target.closest("[data-tugas]");
+    if (li) { openTask(parseInt(li.getAttribute("data-tugas"), 10)); }
+  });
+
+  function openTask(id) {
+    openTaskId = id;
+    $("td-judul").textContent = "Memuat…";
+    $("td-isi").innerHTML = "";
+    if (!$("dlg-tugas").open) { $("dlg-tugas").showModal(); }
+    request(urls.task.replace("/0/", "/" + id + "/")).then(renderTask).catch(function (error) {
+      $("td-isi").innerHTML = "<p class='danger-text'>" + escapeHtml(error.message) + "</p>";
+    });
+  }
+
+  function renderTask(t) {
+    $("td-judul").innerHTML = escapeHtml(t.number + " " + t.title) + " " + stageBadge(t);
+    var rows = [
+      ["Penerima utama", t.assignee], ["Pemberi tugas", t.giver], ["Kontributor", t.contributors.join(", ")],
+      ["Jenis kegiatan", t.activity_label], ["Prioritas", t.priority_label], ["Tenggat", t.due_date ? fmtDate(t.due_date) + (t.overdue ? " (terlambat)" : "") : ""],
+      ["Korwil", t.korwil], ["Nilai poin", t.points ? t.points + " poin per orang" : ""], ["Status", t.status_label]
+    ].filter(function (r) { return r[1]; });
+    var html = (t.description ? "<p class='pre'>" + escapeHtml(t.description) + "</p>" : "") +
+      "<table class='table kv'><tbody>" + rows.map(function (r) { return "<tr><th>" + escapeHtml(r[0]) + "</th><td>" + escapeHtml(r[1]) + "</td></tr>"; }).join("") + "</tbody></table>";
+    var canProgress = t.mine && t.status === "dikerjakan";
+    html += "<div class='stack'><div class='row'><span class='small'>Progres</span>" +
+      (canProgress ? "<input type='range' min='0' max='100' step='10' value='" + t.progress + "' id='td-progres' aria-label='Progres'><span class='small' id='td-progres-n'>" + t.progress + "%</span>" +
+        "<button type='button' class='btn-small' id='td-progres-simpan'>Simpan</button>"
+        : "<div class='progress grow'><i style='width:" + t.progress + "%'></i></div><span class='small'>" + t.progress + "%</span>") + "</div></div>";
+    if (t.actions.length) {
+      var reporting = t.actions.indexOf("lapor") !== -1;
+      html += "<div class='stack card-box'><label class='field'>Catatan" + (reporting ? " / ringkasan hasil" : "") +
+        " <textarea id='td-catatan' rows='3' maxlength='2000' placeholder='Wajib untuk kendala dan pengembalian'></textarea></label>" +
+        (reporting ? "<label class='field'>Foto bukti (opsional) <input type='file' id='td-foto' accept='image/*' capture='environment'></label>" +
+          "<label class='check'><input type='checkbox' id='td-gps' checked> Sertakan lokasi GPS saat ini</label>" : "") +
+        "<div class='row wrap'>" + t.actions.map(function (a) {
+          var spec = TASK_ACTIONS[a] || { label: a, cls: "" };
+          return "<button type='button' class='btn " + spec.cls + "' data-aksi='" + a + "'>" + escapeHtml(spec.label) + "</button>";
+        }).join("") + "</div></div>";
+    }
+    if (t.points_awarded.length) {
+      html += "<h3>Poin diberikan</h3><ul class='list compact'>" + t.points_awarded.map(function (p) {
+        return "<li>" + escapeHtml(p.name) + " · " + escapeHtml(p.role) + " · <b>" + p.points + " poin</b></li>";
+      }).join("") + "</ul>";
+    }
+    html += "<h3>Riwayat</h3><ul class='timeline'>" + (t.events.map(function (e) {
+      return "<li><div><b>" + escapeHtml(e.label) + "</b> · " + escapeHtml(e.by) + " · <span class='muted small'>" + fmtDate(e.at, true) + "</span></div>" +
+        (e.note ? "<div class='small pre'>" + escapeHtml(e.note) + "</div>" : "") +
+        (e.photo ? "<a href='" + escapeHtml(e.photo) + "' target='_blank' rel='noopener'><img class='thumb' src='" + escapeHtml(e.photo) + "' alt='Foto bukti' loading='lazy'></a>" : "") +
+        (e.lat !== null ? " <button type='button' class='btn-small' data-lihat='" + e.lat + "," + e.lng + "'>📍 Lokasi</button>" : "") + "</li>";
+    }).join("") || "<li class='muted'>Belum ada riwayat.</li>") + "</ul>";
+    $("td-isi").innerHTML = html;
+  }
+
+  $("td-isi").addEventListener("input", function (event) {
+    if (event.target.id === "td-progres") { $("td-progres-n").textContent = event.target.value + "%"; }
+  });
+
+  $("td-isi").addEventListener("click", function (event) {
+    if (event.target.getAttribute("data-lihat")) { $("dlg-tugas").close(); flyFromButton(event); return; }
+    if (event.target.id === "td-progres-simpan") {
+      request(urls.task.replace("/0/", "/" + openTaskId + "/"), { method: "POST", body: form({ progress: $("td-progres").value }) })
+        .then(function (t) { toast("Progres disimpan.", "ok"); renderTask(t); loadTasks(); })
+        .catch(function (error) { toast(error.message, "error"); });
+      return;
+    }
+    var action = event.target.getAttribute("data-aksi");
+    if (!action) { return; }
+    event.preventDefault();
+    var note = ($("td-catatan") || {}).value || "";
+    if (TASK_ACTIONS[action] && TASK_ACTIONS[action].note && !note.trim()) { toast("Isi catatan terlebih dahulu.", "error"); $("td-catatan").focus(); return; }
+    if (action === "batal" && !window.confirm("Batalkan tugas ini?")) { return; }
+    var button = event.target;
+    button.disabled = true;
+    var useGps = action === "lapor" && $("td-gps") && $("td-gps").checked;
+    var photoInput = action === "lapor" ? $("td-foto") : null;
+    Promise.all([useGps ? currentPosition(10000) : Promise.resolve(null), photoInput ? photoFiles(photoInput, "foto", 1) : Promise.resolve([])])
+      .then(function (results) {
+        var fix = results[0];
+        var data = form({ aksi: action, catatan: note.trim(), lat: fix ? fix.lat : "", lng: fix ? fix.lng : "" });
+        results[1].forEach(function (f) { data.append(f.field, f.blob, f.name); });
+        return request(urls.task.replace("/0/", "/" + openTaskId + "/"), { method: "POST", body: data });
+      }).then(function (t) {
+        toast("Tugas: " + t.stage_label + ".", "ok");
+        renderTask(t);
+        loadTasks();
+        loadBadges();
+      }).catch(function (error) {
+        button.disabled = false;
+        toast(error.message, "error");
+      });
+  });
+
+  var assigneesLoaded = false;
+  $("tugas-baru-buka").addEventListener("click", function () {
+    var dialog = $("dlg-tugas-baru");
+    $("form-tugas-baru").reset();
+    if (!assigneesLoaded) {
+      fillSelect($("tb-jenis"), config.choices.activityType, "— tanpa jenis —");
+      fillSelect($("tb-prioritas"), config.choices.priority);
+      $("tb-prioritas").value = "normal";
+      fillSelect($("tb-korwil"), config.korwils.map(function (k) { return { value: k.id, label: "Korwil " + k.code + " · " + k.name }; }), "Ikuti Korwil penerima");
+    }
+    request(urls.taskAssignees).then(function (data) {
+      assigneesLoaded = true;
+      var people = data.results.map(function (p) { return { value: p.id, label: p.name + (p.position ? " · " + p.position : "") }; });
+      fillSelect($("tb-penerima"), people, "— pilih —");
+      $("tb-kontributor").innerHTML = people.map(function (p) {
+        return "<label class='check'><input type='checkbox' value='" + escapeHtml(p.value) + "'> " + escapeHtml(p.label) + "</label>";
+      }).join("") || "<span class='muted small'>Tidak ada bawahan.</span>";
+      dialog.showModal();
+    }).catch(function (error) { toast(error.message, "error"); });
+  });
+  $("dlg-tugas-baru").addEventListener("click", function (event) {
+    if (event.target.hasAttribute("data-tutup")) { $("dlg-tugas-baru").close(); }
+  });
+  $("form-tugas-baru").addEventListener("submit", function (event) {
+    event.preventDefault();
+    var data = new FormData(this);
+    var contributors = Array.prototype.map.call($("tb-kontributor").querySelectorAll("input:checked"), function (i) { return i.value; });
+    data.append("kontributor", contributors.join(","));
+    request(urls.tasks, { method: "POST", body: data }).then(function (t) {
+      toast("Tugas " + t.number + " dikirim ke " + t.assignee + ".", "ok");
+      $("dlg-tugas-baru").close();
+      loadTasks();
+    }).catch(function (error) { toast(error.message, "error"); });
+  });
+
+  // ================================================================ Laporan harian berjenjang
+
+  var reportHome = null;
+  var openReportId = null;
+  var reportAi = false;
+
+  function reportItem(r, checkbox) {
+    return "<li" + (checkbox ? "" : " class='clickable' data-laporan='" + r.id + "'") + ">" +
+      (checkbox ? "<label class='check'><input type='checkbox' value='" + r.id + "' " + (checkbox === "checked" ? "checked" : "") + "> " : "") +
+      "<span><span class='title'>" + escapeHtml(r.number + " · " + r.author) + "</span>" +
+      " <span class='badge'>" + escapeHtml(r.status_label) + "</span>" +
+      "<div class='sub'>" + escapeHtml([fmtDate(r.date), r.author_position, r.korwil ? "Korwil " + r.korwil : ""].filter(Boolean).join(" · ")) + "</div>" +
+      (r.return_note ? "<div class='sub danger-text'>Catatan " + escapeHtml(r.returned_by) + ": " + escapeHtml(r.return_note) + "</div>" : "") +
+      (r.excerpt && !r.return_note ? "<div class='sub clamp'>" + escapeHtml(r.excerpt) + "</div>" : "") +
+      "</span>" + (checkbox ? "</label> <button type='button' class='btn-small' data-laporan='" + r.id + "'>Buka</button>" : "") + "</li>";
+  }
+
+  function showReportView(name) {
+    $("lh-seg").querySelectorAll("button").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-lh") === name); });
+    document.querySelectorAll("[data-lh-view]").forEach(function (view) { view.hidden = view.getAttribute("data-lh-view") !== name; });
+    if (name === "lacak") { loadTrace(); }
+    if (name === "rekap") { prepareRecap(); }
+  }
+
+  $("lh-seg").addEventListener("click", function (event) {
+    var button = event.target.closest("button[data-lh]");
+    if (button) { showReportView(button.getAttribute("data-lh")); }
+  });
+
+  function loadReports() {
+    if (!perms.laporanHarian) { $("lh-atasan").textContent = "Anda tidak berhak memakai laporan harian."; return; }
+    request(urls.dailyReports + "?hari=" + $("lh-hari").value).then(function (data) {
+      reportHome = data;
+      $("lh-atasan").innerHTML = (data.position ? "Posisi Anda: <b>" + escapeHtml(data.position) + "</b>. " : "") +
+        (data.supervisor ? "Laporan dikirim ke <b>" + escapeHtml(data.supervisor.name) + "</b>" + (data.supervisor.position ? " (" + escapeHtml(data.supervisor.position) + ")" : "") + "."
+          : "Anda di puncak rantai laporan: tinjau dan tandai laporan masuk selesai.");
+      $("lh-kegiatan").innerHTML = data.activities.map(function (a) {
+        return "<label class='check'><input type='checkbox' value='" + a.id + "' checked> " +
+          escapeHtml(fmtDate(a.at, true) + " · " + a.type_label + " · " + a.title + (a.korwil ? " · Korwil " + a.korwil : "") + " · " + a.points + " poin") + "</label>";
+      }).join("") || "<span class='muted small'>Tidak ada kegiatan yang belum dilaporkan.</span>";
+      $("lh-sumber-wrap").hidden = !data.inbox.length || !data.can_send;
+      $("lh-sumber").innerHTML = data.inbox.map(function (r) { return reportItem(r, "checked"); }).join("");
+      $("lh-revisi-wrap").hidden = !data.revisions.length;
+      $("lh-revisi").innerHTML = data.revisions.map(function (r) { return reportItem(r); }).join("");
+      $("form-lh").hidden = !data.can_send;
+      var inboxCount = data.inbox.length;
+      $("lh-masuk-n").textContent = inboxCount || "";
+      $("lh-masuk-info").textContent = data.can_finish
+        ? "Anda di puncak rantai: centang laporan lalu tandai selesai ditinjau, atau kembalikan untuk revisi."
+        : "Laporan masuk ikut dirangkum saat Anda mengirim laporan ke atasan (tab Buat), atau kembalikan untuk revisi.";
+      $("lh-masuk").innerHTML = data.inbox.map(function (r) { return data.can_finish ? reportItem(r, "plain") : reportItem(r); }).join("") ||
+        "<li class='muted'>Tidak ada laporan masuk.</li>";
+      $("lh-selesai").hidden = !(data.can_finish && inboxCount);
+    }).catch(function (error) { $("lh-atasan").textContent = error.message; });
+  }
+
+  function checkedIds(container) {
+    return Array.prototype.map.call(container.querySelectorAll("input[type=checkbox]:checked"), function (i) { return i.value; }).join(",");
+  }
+
+  $("lh-hari").addEventListener("change", loadReports);
+  $("lh-isi").addEventListener("input", function () { reportAi = false; $("lh-susun-info").textContent = ""; });
+  $("lh-susun").addEventListener("click", function () {
+    var button = this;
+    button.disabled = true;
+    $("lh-susun-info").textContent = "Menyusun…";
+    request(urls.dailyReportCompose, { method: "POST", body: form({ kegiatan: checkedIds($("lh-kegiatan")), laporan: checkedIds($("lh-sumber")) }) })
+      .then(function (data) {
+        $("lh-isi").value = data.content;
+        reportAi = data.ai;
+        $("lh-susun-info").textContent = data.ai ? "Disusun AI dari kegiatan terpilih; periksa sebelum dikirim." : "Disusun dari templat; lengkapi sebelum dikirim.";
+      }).catch(function (error) { $("lh-susun-info").textContent = ""; toast(error.message, "error"); })
+      .then(function () { button.disabled = false; });
+  });
+  $("form-lh").addEventListener("submit", function (event) {
+    event.preventDefault();
+    var formEl = this;
+    var data = new FormData(formEl);
+    data.append("kegiatan", checkedIds($("lh-kegiatan")));
+    data.append("laporan", checkedIds($("lh-sumber")));
+    if (reportAi) { data.append("ai", "1"); }
+    $("lh-kirim").disabled = true;
+    request(urls.dailyReports, { method: "POST", body: data }).then(function (r) {
+      toast("Laporan " + r.number + " terkirim ke " + r.recipient + ".", "ok");
+      formEl.reset();
+      reportAi = false;
+      $("lh-susun-info").textContent = "";
+      loadReports();
+      loadBadges();
+    }).catch(function (error) { toast(error.message, "error"); })
+      .then(function () { $("lh-kirim").disabled = false; });
+  });
+  $("lh-selesai").addEventListener("click", function () {
+    var ids = checkedIds($("lh-masuk"));
+    if (!ids) { toast("Centang laporan yang sudah ditinjau.", "error"); return; }
+    request(urls.dailyReportFinish, { method: "POST", body: form({ laporan: ids }) }).then(function (data) {
+      toast(data.reviewed + " laporan ditandai selesai ditinjau.", "ok");
+      loadReports();
+      loadBadges();
+    }).catch(function (error) { toast(error.message, "error"); });
+  });
+
+  function openReportFrom(event) {
+    var target = event.target.closest("[data-laporan]");
+    if (!target || event.target.matches("input")) { return; }
+    event.preventDefault();
+    openReport(parseInt(target.getAttribute("data-laporan"), 10));
+  }
+  ["lh-revisi", "lh-sumber", "lh-masuk", "lh-lacak"].forEach(function (id) { $(id).addEventListener("click", openReportFrom); });
+
+  function openReport(id) {
+    openReportId = id;
+    $("ld-judul").textContent = "Memuat…";
+    $("ld-isi").innerHTML = "";
+    if (!$("dlg-laporan").open) { $("dlg-laporan").showModal(); }
+    request(urls.dailyReport.replace("/0/", "/" + id + "/")).then(renderReport).catch(function (error) {
+      $("ld-isi").innerHTML = "<p class='danger-text'>" + escapeHtml(error.message) + "</p>";
+    });
+  }
+
+  function renderReport(r) {
+    $("ld-judul").innerHTML = escapeHtml(r.number + " · " + r.author) + " <span class='badge'>" + escapeHtml(r.status_label) + "</span>";
+    var html = "<p class='small muted'>" + escapeHtml([fmtDate(r.date), r.author_position, r.korwil ? "Korwil " + r.korwil : "",
+      r.recipient ? "kepada " + r.recipient : "", r.ai_generated ? "disusun dengan bantuan AI" : ""].filter(Boolean).join(" · ")) + "</p>" +
+      "<p class='small'>📍 " + escapeHtml(r.position) + "</p>";
+    if (r.return_note) { html += "<p class='small danger-text'>Catatan pengembalian dari " + escapeHtml(r.returned_by) + ": " + escapeHtml(r.return_note) + "</p>"; }
+    if (r.revision_owner) {
+      html += "<div class='stack card-box'><label class='field'>Perbaiki isi laporan <textarea id='ld-isi-baru' rows='10' maxlength='20000'>" + escapeHtml(r.content) + "</textarea></label>" +
+        "<label class='field'>Tambah lampiran <input type='file' id='ld-lampiran' multiple></label>" +
+        "<div class='row wrap'><button type='button' class='btn primary' data-aksi-laporan='perbaiki'>💾 Simpan perbaikan &amp; kirim balik</button>" +
+        (r.can_close ? "<button type='button' class='btn danger' data-aksi-laporan='tutup'>Tutup laporan</button>" : "") + "</div>" +
+        (reportHome && reportHome.subordinates.length
+          ? "<div class='row wrap'><select id='ld-bawahan' aria-label='Bawahan'>" + reportHome.subordinates.map(function (p) {
+            return "<option value='" + p.id + "'>" + escapeHtml(p.name + (p.position ? " · " + p.position : "")) + "</option>";
+          }).join("") + "</select><input id='ld-catatan-teruskan' maxlength='2000' placeholder='Catatan untuk bawahan'>" +
+            "<button type='button' class='btn' data-aksi-laporan='teruskan'>⤵ Teruskan revisi ke bawahan</button></div>" : "") + "</div>";
+    } else {
+      html += "<div class='report-body'>" + escapeHtml(r.content) + "</div>";
+    }
+    if (r.in_inbox) {
+      html += "<div class='stack card-box'><label class='field'>Catatan pengembalian <textarea id='ld-catatan' rows='2' maxlength='2000' placeholder='Apa yang perlu diperbaiki'></textarea></label>" +
+        "<div class='row wrap'><button type='button' class='btn' data-aksi-laporan='kembalikan'>↩ Kembalikan untuk revisi</button>" +
+        (reportHome && reportHome.can_finish ? "<button type='button' class='btn primary' data-aksi-laporan='selesai'>✔ Selesai ditinjau</button>" : "") + "</div></div>";
+    }
+    if (r.attachments.length) {
+      html += "<h3>Lampiran</h3><div class='row wrap'>" + r.attachments.map(function (a) {
+        return "<a class='btn-small' href='" + escapeHtml(a.url) + "' target='_blank' rel='noopener'>📎 " + escapeHtml(a.name) + "</a>";
+      }).join("") + "</div>";
+    }
+    if (r.sources.length) {
+      html += "<h3>Laporan bawahan yang dirangkum</h3><ul class='list compact'>" + r.sources.map(function (s) { return reportItem(s); }).join("") + "</ul>";
+    }
+    if (r.activities.length) {
+      html += "<h3>Kegiatan</h3><ul class='list compact'>" + r.activities.map(function (a) {
+        return "<li>" + escapeHtml(a.number + " · " + a.type_label + " · " + a.title + " · " + fmtDate(a.at, true)) + "</li>";
+      }).join("") + "</ul>";
+    }
+    html += "<h3>Riwayat</h3><ul class='timeline'>" + r.events.map(function (e) {
+      return "<li><div><b>" + escapeHtml(e.label) + "</b> · " + escapeHtml(e.by) + (e.to ? " → " + escapeHtml(e.to) : "") +
+        " · <span class='muted small'>" + fmtDate(e.at, true) + "</span></div>" + (e.note ? "<div class='small pre'>" + escapeHtml(e.note) + "</div>" : "") + "</li>";
+    }).join("") + "</ul>";
+    $("ld-isi").innerHTML = html;
+  }
+
+  $("ld-isi").addEventListener("click", function (event) {
+    var nested = event.target.closest("[data-laporan]");
+    if (nested) { event.preventDefault(); openReport(parseInt(nested.getAttribute("data-laporan"), 10)); return; }
+    var action = event.target.getAttribute("data-aksi-laporan");
+    if (!action) { return; }
+    event.preventDefault();
+    var url = urls.dailyReportAction.replace("/0/", "/" + openReportId + "/");
+    var body;
+    if (action === "selesai") {
+      request(urls.dailyReportFinish, { method: "POST", body: form({ laporan: openReportId }) }).then(function () {
+        toast("Laporan ditandai selesai ditinjau.", "ok");
+        afterReportChange(openReportId);
+      }).catch(function (error) { toast(error.message, "error"); });
+      return;
+    }
+    if (action === "kembalikan") {
+      if (!$("ld-catatan").value.trim()) { toast("Isi catatan pengembalian.", "error"); $("ld-catatan").focus(); return; }
+      body = form({ catatan: $("ld-catatan").value.trim() });
+    } else if (action === "teruskan") {
+      if (!$("ld-catatan-teruskan").value.trim()) { toast("Isi catatan untuk bawahan.", "error"); $("ld-catatan-teruskan").focus(); return; }
+      body = form({ bawahan: $("ld-bawahan").value, catatan: $("ld-catatan-teruskan").value.trim() });
+    } else if (action === "perbaiki") {
+      body = form({ isi: $("ld-isi-baru").value });
+      Array.prototype.forEach.call($("ld-lampiran").files || [], function (file) { body.append("lampiran", file, file.name); });
+    } else if (action === "tutup") {
+      if (!window.confirm("Tutup laporan ini? Kegiatan dan laporan bawahan di dalamnya dilepas agar bisa dilaporkan ulang.")) { return; }
+      body = form({});
+    }
+    request(url.replace("__aksi__", action), { method: "POST", body: body }).then(function (r) {
+      toast({ kembalikan: "Laporan dikembalikan ke " + r.author + ".", teruskan: "Revisi diteruskan ke bawahan.", perbaiki: "Perbaikan terkirim.", tutup: "Laporan ditutup." }[action], "ok");
+      renderReport(r);
+      afterReportChange();
+    }).catch(function (error) { toast(error.message, "error"); });
+  });
+
+  function afterReportChange(reopen) {
+    loadReports();
+    loadBadges();
+    if (currentTab === "persetujuan") { loadApprovals(); }
+    if (reopen) { openReport(reopen); }
+  }
+
+  function loadTrace() {
+    request(urls.dailyReportTrace).then(function (data) {
+      $("lh-lacak").innerHTML = data.results.map(function (r) {
+        return "<li class='clickable' data-laporan='" + r.id + "'><div class='title'>" + escapeHtml(r.number + " · " + r.author) +
+          (r.done ? " ✅" : "") + "</div><div class='sub'>" + escapeHtml(fmtDate(r.date) + (r.korwil ? " · Korwil " + r.korwil : "")) + "</div>" +
+          "<div class='steps'>" + r.steps.map(function (s) { return "<span>" + escapeHtml(s) + "</span>"; }).join("") + "</div>" +
+          "<div class='sub'>" + escapeHtml(r.position) + "</div></li>";
+      }).join("") || "<li class='muted'>Belum ada laporan terkirim 14 hari terakhir.</li>";
+    }).catch(function (error) { toast(error.message, "error"); });
+  }
+
+  function prepareRecap() {
+    if ($("rekap-korwil").options.length) { return; }
+    fillSelect($("rekap-korwil"), config.korwils.map(function (k) { return { value: k.id, label: "Korwil " + k.code + " · " + k.name }; }), "Semua Korwil");
+    fillSelect($("rekap-jenis"), config.choices.activityType, "Semua jenis");
+  }
+  $("rekap-periode").addEventListener("change", function () { $("rekap-rentang").hidden = this.value !== "rentang"; });
+  $("form-rekap").addEventListener("submit", function (event) {
+    event.preventDefault();
+    var params = new URLSearchParams();
+    new FormData(this).forEach(function (value, key) {
+      if (value && (key !== "dari" && key !== "sampai" || $("rekap-periode").value === "rentang")) { params.append(key, value); }
+    });
+    var button = this.querySelector("[type=submit]");
+    button.disabled = true;
+    // Unduh lewat fetch agar galat (mis. rentang tidak sah) tampil sebagai pesan, bukan halaman JSON.
+    fetch(urls.recap + "?" + params.toString(), { credentials: "same-origin" }).then(function (response) {
+      if (!response.ok) {
+        return response.json().catch(function () { return null; }).then(function (data) {
+          throw new ApiError(errorText(data, "Gagal membuat rekap (" + response.status + ")."), response.status, data);
+        });
+      }
+      var match = /filename="([^"]+)"/.exec(response.headers.get("Content-Disposition") || "");
+      return response.blob().then(function (blob) {
+        var link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = match ? match[1] : "rekap-komando.xlsx";
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(function () { URL.revokeObjectURL(link.href); link.remove(); }, 1000);
+        toast("Rekap Excel diunduh.", "ok");
+      });
+    }).catch(function (error) { toast(error.message || "Rekap butuh koneksi internet.", "error"); })
+      .then(function () { button.disabled = false; });
+  });
+
+  // ================================================================ Persetujuan
+
+  var APPROVAL_COLORS = { izin: "#9a6700", dampak: "#cf222e", tugas: "#0b5fcc", laporan: "#1f7a00", revisi: "#8250df" };
+
+  function loadApprovals() {
+    request(urls.approvals).then(function (data) {
+      $("setuju-daftar").innerHTML = data.pending.map(function (item) {
+        var actions = "";
+        if (item.kind === "izin") {
+          actions = "<button type='button' class='btn-small' data-izin-ok='" + item.id + "' data-keputusan='setuju'>Setujui</button>" +
+            "<button type='button' class='btn-small' data-izin-ok='" + item.id + "' data-keputusan='tolak'>Tolak</button>";
+        } else if (item.kind === "dampak") {
+          actions = "<button type='button' class='btn-small' data-dampak='" + item.id + "'>Konfirmasi dampak</button>";
+        } else if (item.kind === "tugas") {
+          actions = "<button type='button' class='btn-small' data-buka-tugas='" + item.id + "'>Periksa &amp; verifikasi</button>";
+        } else {
+          actions = "<button type='button' class='btn-small' data-laporan='" + item.id + "'>" + (item.kind === "revisi" ? "Perbaiki" : "Tinjau") + "</button>";
+        }
+        return "<li><div class='title'><span class='badge' style='background:" + (APPROVAL_COLORS[item.kind] || "#57606a") + "'>" + escapeHtml(item.kind_label) + "</span> " + escapeHtml(item.title) + "</div>" +
+          "<div class='sub'>" + escapeHtml([item.sub, item.at ? fmtDate(item.at, true) : ""].filter(Boolean).join(" · ")) + "</div>" +
+          "<div class='row wrap'>" + actions + "</div></li>";
+      }).join("") || "<li class='muted'>Tidak ada yang menunggu keputusan Anda. 🎉</li>";
+      $("setuju-riwayat").innerHTML = data.history.map(function (row) {
+        return "<li><div class='title'>" + (row.approved ? "✅ " : "↩ ") + escapeHtml(row.decision + " · " + row.title) + "</div>" +
+          "<div class='sub'>" + escapeHtml([fmtDate(row.at, true), row.note].filter(Boolean).join(" · ")) + "</div></li>";
+      }).join("") || "<li class='muted'>Belum ada keputusan 30 hari terakhir.</li>";
+    }).catch(function (error) { $("setuju-daftar").innerHTML = "<li class='muted'>" + escapeHtml(error.message) + "</li>"; });
+  }
+
+  $("setuju-daftar").addEventListener("click", function (event) {
+    var target = event.target;
+    var done = function (text) { toast(text, "ok"); loadApprovals(); loadBadges(); };
+    var fail = function (error) { toast(error.message, "error"); };
+    if (target.getAttribute("data-izin-ok")) {
+      var decision = target.getAttribute("data-keputusan");
+      request(urls.leaveDecision.replace("/0/", "/" + target.getAttribute("data-izin-ok") + "/"), { method: "POST", body: form({ keputusan: decision }) })
+        .then(function () { done(decision === "setuju" ? "Pengajuan disetujui." : "Pengajuan ditolak."); }).catch(fail);
+    } else if (target.getAttribute("data-dampak")) {
+      request(urls.impactConfirm.replace("/0/", "/" + target.getAttribute("data-dampak") + "/"), { method: "POST", body: form({}) })
+        .then(function () { done("Dampak dikonfirmasi; poin penuh berlaku."); }).catch(fail);
+    } else if (target.getAttribute("data-buka-tugas")) {
+      openTask(parseInt(target.getAttribute("data-buka-tugas"), 10));
+    } else if (target.getAttribute("data-laporan")) {
+      if (!reportHome && perms.laporanHarian) { loadReports(); }
+      openReport(parseInt(target.getAttribute("data-laporan"), 10));
     }
   });
+
+  $("dlg-tugas").addEventListener("close", function () { if (currentTab === "persetujuan") { loadApprovals(); } });
+
+  function loadBadges() {
+    if (!navigator.onLine) { return; }
+    request(urls.badges).then(function (data) {
+      var approvals = data.persetujuan || 0;
+      var reports = data.laporan || 0;
+      $("menu-persetujuan-n").textContent = approvals || "";
+      $("menu-laporan-n").textContent = reports || "";
+      $("tugas-verifikasi-n").textContent = data.tugas || "";
+      $("tab-menu-dot").hidden = !(approvals || reports);
+    }).catch(function () {});
+  }
 
   // ================================================================ Kinerja
 
@@ -2802,6 +3259,8 @@
     loadSos();
     loadChat(true);
     setInterval(loadSummary, 60000);
+    loadBadges();
+    setInterval(loadBadges, 60000);
     setInterval(loadSos, 20000);
     setInterval(function () { loadChat(false); }, 10000);
     setInterval(function () { if (layerState.petugas) { loadLayer("petugas"); } }, 30000);

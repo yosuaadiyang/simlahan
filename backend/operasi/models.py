@@ -72,6 +72,8 @@ upload_activity = _upload_to("upload_activity", "kegiatan")
 upload_soil = _upload_to("upload_soil", "uji-tanah")
 upload_analysis = _upload_to("upload_analysis", "ai-satelit")
 upload_patrol = _upload_to("upload_patrol", "patroli")
+upload_task = _upload_to("upload_task", "tugas")
+upload_daily_report = _upload_to("upload_daily_report", "laporan-harian")
 
 
 def next_number(prefix: str) -> str:
@@ -772,6 +774,15 @@ class Activity(TimeStampedModel):
             "Dihitung otomatis: bobot jenis + bonus temuan, foto, narasi, "
             "jarak, dan lokasi GPS."
         ),
+    )
+    daily_report = models.ForeignKey(
+        "operasi.DailyReport",
+        verbose_name=_("Masuk laporan harian"),
+        related_name="activities",
+        null=True,
+        blank=True,
+        editable=False,
+        on_delete=models.SET_NULL,
     )
 
     class Meta:
@@ -1670,6 +1681,272 @@ class AreaAnalysis(models.Model):
         return f"{_('Analisis')} #{self.pk} {self.created_at:%d-%m-%Y %H:%M}"
 
 
+# --------------------------------------------------------------------------
+# Struktur atasan, siklus tugas, laporan harian berjenjang
+# --------------------------------------------------------------------------
+
+
+class OfficerProfile(models.Model):
+    """Jabatan dan atasan langsung petugas di pusat komando.
+
+    Atasan menentukan ke mana laporan harian dikirim dan siapa yang boleh
+    memberi tugas. Tanpa atasan yang diatur, atasan petugas Korwil adalah
+    koordinator Korwil-nya.
+    """
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Petugas"),
+        related_name="komando_profile",
+        on_delete=models.CASCADE,
+    )
+    position = models.CharField(
+        _("Jabatan"),
+        max_length=128,
+        blank=True,
+        default="",
+        help_text=_("Mis. Koordinator Korwil A, Staf manajemen, Penyelia, Pimpinan."),
+    )
+    supervisor = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Atasan langsung"),
+        related_name="komando_subordinate_profiles",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        help_text=_(
+            "Kosong = koordinator Korwil tempat petugas bertugas. Pimpinan "
+            "tertinggi tidak punya atasan."
+        ),
+    )
+
+    class Meta:
+        verbose_name = _("Jabatan & atasan petugas")
+        verbose_name_plural = _("Jabatan & atasan petugas")
+        ordering = ["user__first_name", "user__username"]
+
+    def __str__(self):
+        return f"{self.user} – {self.position or _('tanpa jabatan')}"
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+
+        if not self.supervisor_id:
+            return
+        if self.supervisor_id == self.user_id:
+            raise ValidationError(
+                {"supervisor": _("Petugas tidak boleh menjadi atasan dirinya sendiri.")}
+            )
+        seen = {self.user_id}
+        current = self.supervisor_id
+        for _step in range(50):
+            if current in seen:
+                raise ValidationError(
+                    {"supervisor": _("Rantai atasan tidak boleh melingkar.")}
+                )
+            seen.add(current)
+            current = (
+                OfficerProfile.objects.filter(user_id=current)
+                .values_list("supervisor_id", flat=True)
+                .first()
+            )
+            if not current:
+                return
+
+
+class TaskEvent(models.Model):
+    """Riwayat siklus tugas komando: penugasan, laporan, verifikasi, revisi."""
+
+    task = models.ForeignKey(
+        "asetlahan.Task",
+        verbose_name=_("Tugas"),
+        related_name="komando_events",
+        on_delete=models.CASCADE,
+    )
+    kind = models.CharField(
+        _("Peristiwa"), max_length=16, choices=enums.TaskEventKind.choices
+    )
+    actor = _user_field(_("Oleh"))
+    note = models.TextField(_("Catatan"), blank=True, default="")
+    photo = PrivateFileField(
+        verbose_name=_("Foto bukti"),
+        upload_to=upload_task,
+        max_length=255,
+        blank=True,
+        validators=IMAGE_VALIDATORS,
+    )
+    location = gmodels.PointField(_("Lokasi"), srid=4326, null=True, blank=True)
+    created_at = models.DateTimeField(_("Waktu"), default=timezone.now)
+
+    class Meta:
+        verbose_name = _("Riwayat tugas")
+        verbose_name_plural = _("Riwayat tugas")
+        ordering = ["-created_at", "-pk"]
+
+    def __str__(self):
+        return f"{self.task} – {self.get_kind_display()}"
+
+
+class TaskPoint(models.Model):
+    """Poin KPI dari tugas yang diverifikasi selesai."""
+
+    task = models.ForeignKey(
+        "asetlahan.Task",
+        verbose_name=_("Tugas"),
+        related_name="komando_points",
+        on_delete=models.CASCADE,
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Petugas"),
+        related_name="komando_task_points",
+        on_delete=models.CASCADE,
+    )
+    role = models.CharField(
+        _("Peran"), max_length=16, choices=enums.TaskPointRole.choices
+    )
+    points = models.PositiveSmallIntegerField(_("Poin"))
+    awarded_at = models.DateTimeField(_("Diberikan pada"), default=timezone.now)
+
+    class Meta:
+        verbose_name = _("Poin tugas")
+        verbose_name_plural = _("Poin tugas")
+        ordering = ["-awarded_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["task", "user"], name="operasi_taskpoint_unique_user"
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.user} +{self.points} ({self.task})"
+
+
+class DailyReport(TimeStampedModel):
+    """Laporan harian yang naik berjenjang dari petugas ke atasan langsung.
+
+    Atasan merangkum laporan masuk (dan kegiatannya sendiri) menjadi laporan
+    baru untuk atasannya; laporan sumber lalu tercatat ``diteruskan``.
+    Laporan bisa dikembalikan untuk revisi dan diteruskan ke bawahan
+    (``revision_stack`` mencatat ke mana laporan kembali setelah diperbaiki).
+    """
+
+    number = models.CharField(_("Nomor"), max_length=32, unique=True, editable=False)
+    report_date = models.DateField(_("Tanggal laporan"), default=timezone.localdate)
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Pembuat"),
+        related_name="komando_daily_reports",
+        on_delete=models.PROTECT,
+    )
+    author_position = models.CharField(
+        _("Jabatan pembuat"), max_length=128, blank=True, default=""
+    )
+    recipient = _user_field(_("Dikirim kepada"), related_name="komando_report_inbox")
+    korwil = _korwil_field("daily_reports")
+    content = models.TextField(_("Isi laporan"))
+    ai_generated = models.BooleanField(_("Disusun dengan AI"), default=False)
+    status = models.CharField(
+        _("Status"),
+        max_length=16,
+        choices=enums.DailyReportStatus.choices,
+        default=enums.DailyReportStatus.SENT,
+    )
+    consolidated_into = models.ForeignKey(
+        "self",
+        verbose_name=_("Dirangkum ke laporan"),
+        related_name="sources",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    revision_owner = _user_field(
+        _("Menunggu revisi oleh"), related_name="komando_report_revisions"
+    )
+    revision_stack = ArrayField(
+        models.PositiveIntegerField(),
+        verbose_name=_("Rantai pengembalian"),
+        default=list,
+        blank=True,
+    )
+    return_note = models.TextField(_("Catatan revisi"), blank=True, default="")
+    returned_by = _user_field(_("Dikembalikan oleh"))
+    returned_at = models.DateTimeField(_("Dikembalikan pada"), null=True, blank=True)
+    sent_at = models.DateTimeField(_("Dikirim pada"), default=timezone.now)
+    reviewed_by = _user_field(_("Ditinjau oleh"))
+    reviewed_at = models.DateTimeField(_("Ditinjau pada"), null=True, blank=True)
+
+    class Meta:
+        verbose_name = _("Laporan harian berjenjang")
+        verbose_name_plural = _("Laporan harian berjenjang")
+        ordering = ["-sent_at", "-pk"]
+
+    def __str__(self):
+        return f"{self.number} {self.author} {self.report_date:%d-%m-%Y}"
+
+    def save(self, *args, **kwargs):
+        if not self.number:
+            self.number = next_number("LHR")
+        super().save(*args, **kwargs)
+
+    @property
+    def in_inbox(self) -> bool:
+        return (
+            self.status == enums.DailyReportStatus.SENT
+            and self.consolidated_into_id is None
+        )
+
+
+class DailyReportEvent(models.Model):
+    report = models.ForeignKey(
+        DailyReport,
+        verbose_name=_("Laporan"),
+        related_name="events",
+        on_delete=models.CASCADE,
+    )
+    action = models.CharField(
+        _("Tindakan"), max_length=20, choices=enums.DailyReportAction.choices
+    )
+    actor = _user_field(_("Oleh"))
+    target = _user_field(_("Kepada"))
+    note = models.TextField(_("Catatan"), blank=True, default="")
+    created_at = models.DateTimeField(_("Waktu"), default=timezone.now)
+
+    class Meta:
+        verbose_name = _("Riwayat laporan harian")
+        verbose_name_plural = _("Riwayat laporan harian")
+        ordering = ["created_at", "pk"]
+
+    def __str__(self):
+        return f"{self.report} – {self.get_action_display()}"
+
+
+class DailyReportAttachment(models.Model):
+    report = models.ForeignKey(
+        DailyReport,
+        verbose_name=_("Laporan"),
+        related_name="attachments",
+        on_delete=models.CASCADE,
+    )
+    file = PrivateFileField(
+        verbose_name=_("Berkas"),
+        upload_to=upload_daily_report,
+        max_length=255,
+        validators=DOCUMENT_VALIDATORS,
+    )
+    name = models.CharField(_("Nama berkas"), max_length=255, blank=True, default="")
+    uploaded_by = _user_field(_("Diunggah oleh"))
+    uploaded_at = models.DateTimeField(_("Diunggah pada"), default=timezone.now)
+
+    class Meta:
+        verbose_name = _("Lampiran laporan harian")
+        verbose_name_plural = _("Lampiran laporan harian")
+        ordering = ["uploaded_at", "pk"]
+
+    def __str__(self):
+        return self.name or str(self.pk)
+
+
 for _model in (
     CommandSettings,
     Korwil,
@@ -1683,6 +1960,9 @@ for _model in (
     SoilTest,
     Attendance,
     SosAlert,
+    OfficerProfile,
+    TaskPoint,
+    DailyReport,
 ):
     auditlog.register(_model)
 

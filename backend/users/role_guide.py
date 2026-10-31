@@ -66,9 +66,10 @@ COMMAND_TABS = (
     "Pusat komando (`/komando/`): Peta (termasuk lapisan Temuan ilegal dan "
     "Patroli SMART), Absen, Lapor (Komsos, Topografi, Temuan ilegal, Patroli "
     "Taman Buru dengan impor SMART, Kegiatan lainnya, jenis lain, uji tanah, "
-    "laporan saya), Warga, Tugas, Kinerja, Chat; Menu: Peringkat tim, Struktur "
-    "tim, Feed aktivitas, Asisten AI, Aplikasi utama; tombol **⇄ Utama** di "
-    "bilah atas"
+    "laporan saya), Warga, Tugas (saya, tim, verifikasi, terlambat, semua; "
+    "tombol Beri tugas bagi koordinator), Kinerja, Chat; Menu: Persetujuan, Laporan "
+    "harian (buat, masuk, lacak, rekap Excel), Peringkat tim, Struktur tim, Feed "
+    "aktivitas, Asisten AI, Aplikasi utama; tombol **⇄ Utama** di bilah atas"
 )
 
 ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
@@ -238,7 +239,8 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "Pusat Komando: Buka Pusat Komando (aplikasi tersendiri, juga lewat "
             "tombol **Pusat Komando** di bilah atas), Korwil, warga & laporan, "
             "temuan ilegal, patroli Taman Buru, jejak patroli SMART (impor .json), "
-            "pengaturan poin usaha",
+            "pengaturan poin usaha, jabatan & atasan petugas, riwayat & poin "
+            "tugas, laporan harian berjenjang",
             DOCUMENTS_MENU,
             "Kontak",
             "Catatan area",
@@ -255,6 +257,10 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "Membuat, mengubah, dan menghapus data di semua modul, termasuk "
             "validasi ganti kerugian dan data pribadi (NIK/rekening).",
             "Melihat data semua unit layanan dan semua Korwil, termasuk NIK warga.",
+            "Mengatur jabatan dan atasan langsung petugas pusat komando (menentukan "
+            "ke mana laporan harian dikirim dan siapa boleh memberi tugas); "
+            "memverifikasi tugas mana pun dan menandai laporan harian selesai "
+            "ditinjau.",
             "Mengatur data master (jenis, kategori, tarif, aturan tenggat, konten "
             "portal) dan pengaturan modul di panel admin.",
             "Dokumen & perizinan: mengatur jenis dokumen wajib, templat, dan "
@@ -417,7 +423,8 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "Aplikasi lapangan (`/aset/lapangan/`)",
             "Pusat komando (`/komando/`, tombol **Pusat Komando** di panel "
             "admin) sebagai pengawas: Peta, Absen, Lapor (hanya Laporan "
-            "saya/tim), Warga, Tugas, Kinerja, Chat",
+            "saya/tim), Warga, Tugas, Kinerja, Chat; Menu: Persetujuan, Laporan "
+            "harian (termasuk rekap Excel)",
         ),
         can=(
             "Membuat dan mengubah aset, penilaian, pajak, transaksi, okupasi, "
@@ -470,7 +477,8 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "Aplikasi lapangan (`/aset/lapangan/`): laporan & foto lapangan",
             "Panel admin: okupasi, pengaduan, survei, tugas, Korwil, warga, "
             "kegiatan, temuan ilegal, patroli Taman Buru, jejak patroli SMART, "
-            "uji tanah",
+            "uji tanah, jabatan & atasan petugas, riwayat & poin tugas, laporan "
+            "harian berjenjang (baca saja)",
         ),
         can=(
             "Absen, melapor kegiatan dan uji tanah, mendata warga, chat, dan SOS "
@@ -479,8 +487,14 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "(baru atau kunjungan berulang) dan patroli Taman Buru (temuan, bibit, "
             "impor berkas SMART); menilai dampak Kegiatan lainnya.",
             "Membuat laporan lapangan, okupasi dan tindakan teguran; "
-            "menindaklanjuti pengaduan dan survei; memperbarui status tugas "
-            "sendiri.",
+            "menindaklanjuti pengaduan dan survei.",
+            "Mengerjakan tugas: mulai, laporkan selesai (catatan, foto bukti, "
+            "GPS), atau tandai ada kendala; poin tugas yang diverifikasi masuk KPI "
+            "penerima, kontributor, dan pemberi tugas.",
+            "Mengirim laporan harian ke atasan langsung (bisa disusun otomatis "
+            "dari kegiatan yang belum dilaporkan, dengan lampiran), memperbaiki "
+            "laporan yang dikembalikan, melacak posisinya, dan mengunduh rekap "
+            "Excel.",
             "Bekerja luring; data terkirim otomatis saat ada sinyal.",
         ),
         limits=(
@@ -489,6 +503,8 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "membuka modul lain.",
             "Klaim dampak Signifikan/Kritis dihitung 6 poin sampai dikonfirmasi "
             "atasan.",
+            "Tidak bisa memverifikasi tugasnya sendiri; tugas yang dilaporkan "
+            "selesai menunggu verifikasi pemberi tugas atau atasan.",
         ),
     ),
     UserGroup.KOORDINATOR_WILAYAH: RoleGuide(
@@ -499,12 +515,19 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
         home="Pusat komando (`/komando/`).",
         menus=(
             COMMAND_TABS,
-            "Panel admin: Korwil, warga, kegiatan, uji tanah, SOS, tugas",
+            "Panel admin: Korwil, warga, kegiatan, uji tanah, SOS, tugas, jabatan "
+            "& atasan petugas, riwayat & poin tugas, laporan harian berjenjang "
+            "(baca saja)",
         ),
         can=(
             "Semua hak petugas lapangan di pusat komando.",
             "Memverifikasi laporan, menangani SOS, menyetujui izin anggota, "
             "melihat KPI anggota, dan membuat tugas wilayah.",
+            "Memberi tugas berpoin kepada anggota (penerima utama dan kontributor), "
+            "lalu memverifikasi atau mengembalikan tugas yang dilaporkan selesai.",
+            "Menerima laporan harian anggota: mengembalikannya untuk revisi, atau "
+            "merangkumnya ke laporan sendiri untuk atasan. Semua yang menunggu "
+            "keputusan ada di Menu → Persetujuan.",
             "Mengonfirmasi klaim dampak tinggi Kegiatan lainnya milik anggota "
             "(bukan milik sendiri).",
         ),
