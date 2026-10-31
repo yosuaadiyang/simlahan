@@ -452,3 +452,85 @@ THREAT_COLORS = {
     ThreatLevel.HIGH: "#ef4444",
     ThreatLevel.CRITICAL: "#7f1d1d",
 }
+
+
+# --------------------------------------------------------------------------
+# Alat: tiket & uji tanah PLTS
+# --------------------------------------------------------------------------
+
+
+class TicketCategory(models.TextChoices):
+    BUG = "bug", _("Bug / galat aplikasi")
+    OUTAGE = "gangguan", _("Gangguan layanan")
+    SUGGESTION = "saran", _("Saran fitur")
+    REVIEW = "ulasan", _("Ulasan / masukan")
+    OTHER = "lainnya", _("Lainnya")
+
+
+class TicketPriority(models.TextChoices):
+    NORMAL = "normal", _("Normal")
+    HIGH = "tinggi", _("Tinggi")
+    CRITICAL = "kritis", _("Kritis")
+
+
+class TicketStatus(models.TextChoices):
+    NEW = "baru", _("Baru")
+    IN_PROGRESS = "diproses", _("Diproses")
+    DONE = "selesai", _("Selesai")
+    REJECTED = "ditolak", _("Ditolak")
+
+
+TICKET_COLORS = {
+    TicketStatus.NEW: "#2563eb",
+    TicketStatus.IN_PROGRESS: "#f59e0b",
+    TicketStatus.DONE: "#10b981",
+    TicketStatus.REJECTED: "#6b7280",
+}
+
+
+class GeotechMethod(models.TextChoices):
+    """Metode penyelidikan tanah untuk desain PLTS."""
+
+    BOREHOLE = "borehole", _("Bor dalam (borehole)")
+    TEST_PIT = "test_pit", _("Sumur uji (test pit)")
+    RESISTIVITY = "resistivitas", _("Resistivitas (ERT)")
+    SONDIR = "sondir", _("Sondir (CPT)")
+    THERMAL = "termal", _("Resistivitas termal")
+    OTHER = "lainnya", _("Lainnya")
+
+
+class GeotechSegment(models.TextChoices):
+    """Bagian proyek PLTS tempat titik uji berada."""
+
+    PV = "pv", _("Area panel surya (PV)")
+    TRANSMISSION = "tl", _("Jalur transmisi (TL)")
+    SUBSTATION = "gi", _("Gardu / pooling substation")
+    JOINT_BAY = "tjb", _("Transition joint bay")
+    OTHER = "lainnya", _("Lainnya")
+
+
+class SurveyStatus(models.TextChoices):
+    PENDING = "belum", _("Belum disurvei")
+    DONE = "selesai", _("Sudah disurvei")
+
+
+class SocialCondition(models.TextChoices):
+    UNCHECKED = "belum_dicek", _("Belum dicek")
+    CONDUCIVE = "kondusif", _("Kondusif")
+    NOT_CONDUCIVE = "belum_kondusif", _("Belum kondusif")
+    PROBLEM = "bermasalah", _("Bermasalah")
+
+
+class GeotechWorkStatus(models.TextChoices):
+    NOT_STARTED = "belum_mulai", _("Belum mulai")
+    IN_PROGRESS = "proses", _("Dalam proses")
+    STOPPED = "terhenti", _("Terhenti")
+    DONE = "selesai", _("Selesai")
+
+
+GEOTECH_COLORS = {
+    GeotechWorkStatus.NOT_STARTED: "#94a3b8",
+    GeotechWorkStatus.IN_PROGRESS: "#f59e0b",
+    GeotechWorkStatus.STOPPED: "#ef4444",
+    GeotechWorkStatus.DONE: "#10b981",
+}

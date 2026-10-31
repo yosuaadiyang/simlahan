@@ -16,6 +16,9 @@ from operasi.models import (
     DailyReport,
     DailyReportAttachment,
     DailyReportEvent,
+    GeotechChange,
+    GeotechPhoto,
+    GeotechPoint,
     HuntingParkFinding,
     HuntingParkPatrol,
     IllegalFinding,
@@ -40,6 +43,7 @@ from operasi.models import (
     TaskEvent,
     TaskPoint,
     ThreatZone,
+    Ticket,
 )
 from utils.group_permissions import UG, GroupModelPermissions
 
@@ -52,6 +56,8 @@ VAD = ("view", "add", "delete")
 ALL = ("view", "add", "change", "delete")
 # NIK & nomor KK warga hanya untuk Administrator.
 NIK = "view_resident_nik"
+# Audit data pusat komando: Administrator dan koordinator (cakupan Korwil sendiri).
+AUDIT = "run_data_audit"
 
 
 def _perms(admin, coordinator=None, field=None, asset=None):
@@ -65,7 +71,7 @@ def _perms(admin, coordinator=None, field=None, asset=None):
 
 
 OPERASI_GROUP_MODEL_PERMISSIONS: GroupModelPermissions = {
-    CommandSettings: _perms(VC),
+    CommandSettings: _perms(VC + (AUDIT,), (AUDIT,)),
     SystemLock: _perms(None),
     Korwil: _perms(ALL, V, V, V),
     Resident: _perms(ALL + (NIK,), VAC, VAC, V),
@@ -104,4 +110,10 @@ OPERASI_GROUP_MODEL_PERMISSIONS: GroupModelPermissions = {
     # Jejak GPS hanya untuk pimpinan; cakupan dibatasi ``visible_officers``.
     OfficerTrackPoint: _perms(V, V),
     SitePhoto360: _perms(ALL, VAD, VA, V),
+    # Alat: semua petugas boleh mengirim tiket; hanya Administrator menanganinya.
+    Ticket: _perms(ALL, VA, VA, VA),
+    # Uji tanah PLTS: progres diperbarui petugas lapangan & koordinator Korwil.
+    GeotechPoint: _perms(ALL, VAC, VC, V),
+    GeotechPhoto: _perms(ALL, VAD, VA, V),
+    GeotechChange: _perms(V, V, V, V),
 }

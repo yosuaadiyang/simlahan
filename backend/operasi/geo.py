@@ -82,6 +82,8 @@ OWNER_FIELDS = {
     "landplot": "created_by",
     "threatzone": "created_by",
     "sitephoto360": "uploaded_by",
+    "geotechpoint": "created_by",
+    "geotechphoto": "point__created_by",
 }
 _AUTO = object()
 

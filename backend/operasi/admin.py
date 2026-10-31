@@ -33,6 +33,9 @@ from operasi.models import (
     DailyReport,
     DailyReportAttachment,
     DailyReportEvent,
+    GeotechChange,
+    GeotechPhoto,
+    GeotechPoint,
     HuntingParkFinding,
     HuntingParkPatrol,
     IllegalFinding,
@@ -56,6 +59,7 @@ from operasi.models import (
     TaskEvent,
     TaskPoint,
     ThreatZone,
+    Ticket,
 )
 
 
@@ -2460,3 +2464,203 @@ class OfficerTrackPointAdmin(ReadOnlyAdminMixin, OperasiGISAdmin):
             .filter(user__in=services.visible_officers(request.user))
             .select_related("user")
         )
+
+
+# --------------------------------------------------------------------------
+# Alat: tiket & uji tanah PLTS
+# --------------------------------------------------------------------------
+
+
+@admin.register(Ticket)
+class TicketAdmin(ReadOnlyAdminMixin, OperasiModelAdmin):
+    """Arsip tiket. Penanganan (status, poin) di /komando/ → Alat & tiket."""
+
+    scope_prefix = None
+    file_kinds = {"attachment": "tiket"}
+    list_select_related = ("created_by", "resolved_by")
+    list_display = (
+        "number",
+        "title",
+        "category",
+        "priority",
+        "status_badge",
+        "created_by",
+        "created_at",
+        "points",
+    )
+    list_filter = ("status", "category", "priority", "created_at")
+    date_hierarchy = "created_at"
+    search_fields = ("number", "title", "description", "handler_note")
+    fields = (
+        "number",
+        "category",
+        "priority",
+        "status",
+        "title",
+        "description",
+        "attachment",
+        "created_by",
+        "created_at",
+        "handler_note",
+        "resolved_by",
+        "resolved_at",
+        "resolution_hours",
+        "points",
+    )
+    readonly_fields = fields
+
+    def get_queryset(self, request):
+        from operasi import tools
+
+        return (
+            super()
+            .get_queryset(request)
+            .filter(pk__in=tools.visible_tickets(request.user).values("pk"))
+        )
+
+    @admin.display(description=_("Status"), ordering="status")
+    def status_badge(self, obj):
+        return badge(
+            enums.TICKET_COLORS.get(obj.status, "#57606a"), obj.get_status_display()
+        )
+
+
+class GeotechPhotoInline(admin.TabularInline):
+    model = GeotechPhoto
+    extra = 0
+    fields = ("image", "caption", "uploaded_by", "created_at")
+    readonly_fields = ("uploaded_by", "created_at")
+
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        if isinstance(db_field, PrivateFileField):
+            kwargs["widget"] = PrivateFileWidget("uji-plts")
+        return super().formfield_for_dbfield(db_field, request, **kwargs)
+
+
+class GeotechChangeInline(admin.TabularInline):
+    model = GeotechChange
+    extra = 0
+    can_delete = False
+    fields = ("created_at", "field", "old_value", "new_value", "changed_by", "source")
+    readonly_fields = fields
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(GeotechPoint)
+class GeotechPointAdmin(OperasiGISAdmin):
+    owner_field = "created_by"
+    list_select_related = ("korwil",)
+    list_display = (
+        "code",
+        "method",
+        "segment",
+        "area_name",
+        "batch",
+        "korwil",
+        "survey_status",
+        "social_condition",
+        "status_badge",
+        "progress_pct",
+    )
+    list_filter = (
+        "work_status",
+        "survey_status",
+        "social_condition",
+        "segment",
+        "method",
+        "batch",
+        "korwil",
+    )
+    search_fields = ("code", "area_name", "zone_name", "landowner", "obstacle")
+    readonly_fields = ("created_by", "updated_by")
+    autocomplete_fields = ("soil_test",)
+    inlines = (GeotechPhotoInline, GeotechChangeInline)
+    actions = ("export_excel",)
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    "code",
+                    "method",
+                    "segment",
+                    "area_name",
+                    "zone_name",
+                    "batch",
+                    "korwil",
+                    "location",
+                    "landowner",
+                )
+            },
+        ),
+        (
+            _("Progres"),
+            {
+                "fields": (
+                    "survey_status",
+                    "social_condition",
+                    "work_status",
+                    "progress_pct",
+                    "started_on",
+                    "finished_on",
+                    "obstacle",
+                    "access",
+                )
+            },
+        ),
+        (
+            _("Catatan"),
+            {
+                "fields": (
+                    "survey_note",
+                    "work_note",
+                    "recommendation",
+                    "soil_test",
+                    "created_by",
+                    "updated_by",
+                )
+            },
+        ),
+    )
+
+    @admin.display(description=_("Status pekerjaan"), ordering="work_status")
+    def status_badge(self, obj):
+        return badge(
+            enums.GEOTECH_COLORS.get(obj.work_status, "#57606a"),
+            obj.get_work_status_display(),
+        )
+
+    def save_model(self, request, obj, form, change):
+        from operasi import geotech
+
+        before = None
+        if change:
+            before = geotech.snapshot(GeotechPoint.objects.get(pk=obj.pk))
+        else:
+            obj.created_by = request.user
+            geo.assign_korwil(obj, request.user, strict=False)
+        geotech.save_with_history(
+            obj, request.user, source=str(_("Panel admin")), before=before
+        )
+
+    def save_formset(self, request, form, formset, change):
+        instances = formset.save(commit=False)
+        for instance in instances:
+            if isinstance(instance, GeotechPhoto) and instance.uploaded_by_id is None:
+                instance.uploaded_by = request.user
+        formset.save()
+
+    @admin.action(description=_("Unduh Excel"), permissions=["view"])
+    def export_excel(self, request, queryset):
+        from operasi import geotech
+
+        response = HttpResponse(
+            geotech.workbook(queryset.order_by("batch", "code")),
+            content_type=(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            ),
+        )
+        response["Content-Disposition"] = 'attachment; filename="uji-tanah-plts.xlsx"'
+        return response

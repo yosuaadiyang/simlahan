@@ -353,6 +353,12 @@ def test_sample_data_command(admin_user):
     )
     assert not Activity.objects.filter(effort_points=0).exists()
     assert all(r.korwil_id for r in Resident.objects.all())
+    from operasi.models import GeotechPoint, Ticket
+
+    assert GeotechPoint.objects.count() == 24
+    assert not GeotechPoint.objects.filter(korwil__isnull=True).exists()
+    assert GeotechPoint.objects.filter(korwil__code="A").count() == 9
+    assert Ticket.objects.filter(status="selesai", points__gt=0).count() == 1
     out = io.StringIO()
     call_command("operasi_contoh_rempang", stdout=out)
     assert "dilewati" in out.getvalue()
@@ -362,6 +368,7 @@ def test_sample_data_command(admin_user):
     assert not Korwil.objects.exists() and not Resident.objects.exists()
     assert not Activity.objects.exists() and not SoilTest.objects.exists()
     assert not IllegalFinding.objects.exists()
+    assert not GeotechPoint.objects.exists() and not Ticket.objects.exists()
 
 
 def test_korwil_import_from_kmz(admin_user, make_kmz):

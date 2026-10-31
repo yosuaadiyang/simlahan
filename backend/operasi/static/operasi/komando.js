@@ -392,7 +392,8 @@
     { key: "patroli", name: "Patroli SMART", perm: perms.patroli },
     { key: "bidang", name: "Penguasaan lahan", perm: perms.bidang },
     { key: "ancaman", name: "Zona ancaman", perm: perms.ancaman },
-    { key: "foto360", name: "Foto situs 360°", perm: perms.foto360 }
+    { key: "foto360", name: "Foto situs 360°", perm: perms.foto360 },
+    { key: "uji-plts", name: "Uji tanah PLTS", perm: perms.ujiPlts }
   ].concat((config.commandLayers || []).map(function (l) {
     return { key: l.key, name: l.name + " (" + l.kind + ")", perm: true, ref: true, color: l.color, zoned: l.zoned, def: l.visible };
   })).filter(function (spec) { return spec.perm; });
@@ -426,6 +427,9 @@
     (props.rows || []).forEach(function (row) { html += "<br>" + escapeHtml(row[0]) + ": " + escapeHtml(row[1]); });
     if (props.kind === "warga") {
       html += '<br><button type="button" class="btn-small" data-warga="' + props.id + '">Buka data warga</button>';
+    }
+    if (props.kind === "uji-plts") {
+      html += '<br><button type="button" class="btn-small" data-uji="' + props.id + '">Detail titik</button>';
     }
     if (props.kind === "bidang") {
       html += '<br><button type="button" class="btn-small" data-bidang="' + props.id + '">Detail bidang</button>';
@@ -477,6 +481,14 @@
         },
         pointToLayer: function (f, latlng) {
           return L.circleMarker(latlng, { radius: 5, color: "#fff", weight: 1, fillColor: f.properties.color || "#0969da", fillOpacity: 0.9 });
+        },
+        onEachFeature: function (f, layer) { layer.bindPopup(popupHtml(f.properties)); }
+      });
+    }
+    if (key === "uji-plts") {
+      return L.geoJSON(data, {
+        pointToLayer: function (f, latlng) {
+          return L.circleMarker(latlng, { radius: 6, color: "#0f172a", weight: 2, fillColor: f.properties.color, fillOpacity: 0.95 });
         },
         onEachFeature: function (f, layer) { layer.bindPopup(popupHtml(f.properties)); }
       });
@@ -599,6 +611,11 @@
       });
     }
     if (layerState.foto360 && perms.foto360) { entries.push({ color: "#0ea5e9", label: "Foto situs 360°", round: true }); }
+    if (layerState["uji-plts"] && perms.ujiPlts) {
+      Object.keys(config.colors.geotech).forEach(function (key) {
+        entries.push({ color: config.colors.geotech[key], label: "Uji PLTS: " + choiceLabel("geoStatus", key), round: true });
+      });
+    }
     LAYER_SPECS.forEach(function (spec) {
       if (!spec.ref || !layerState[spec.key]) { return; }
       if (spec.zoned) {
@@ -662,6 +679,8 @@
     if (plot) { plot.addEventListener("click", function () { openPlot(plot.getAttribute("data-bidang")); }); }
     var pano = element.querySelector("[data-foto360]");
     if (pano) { pano.addEventListener("click", function () { openPano(pano.getAttribute("data-foto360"), pano.getAttribute("data-judul")); }); }
+    var point = element.querySelector("[data-uji]");
+    if (point) { point.addEventListener("click", function () { openPoint(point.getAttribute("data-uji")); }); }
   });
 
   // ---------------------------------------------------------------- Info Korwil
@@ -1357,7 +1376,7 @@
 
   var currentTab = "peta";
   // Tab di balik tombol "Lainnya" agar bilah tab muat di layar ponsel.
-  var MORE_TABS = ["beranda", "spasial", "persetujuan", "laporan", "peringkat", "struktur", "historis", "feed", "ai"];
+  var MORE_TABS = ["beranda", "spasial", "persetujuan", "laporan", "peringkat", "struktur", "historis", "feed", "ai", "ujiplts", "alat"];
   // Tab dan sub-tab yang tidak bisa dipakai peran pengguna tidak ditampilkan.
   var TAB_ALLOWED = {
     absen: perms.absen,
@@ -1366,7 +1385,9 @@
     tasks: perms.tugas,
     laporan: perms.laporanHarian,
     historis: perms.historis,
-    chat: perms.chat
+    chat: perms.chat,
+    ujiplts: perms.ujiPlts,
+    alat: perms.tiket
   };
   var SUB_ALLOWED = { kegiatan: perms.lapor, tanah: perms.tambahTanah, riwayat: perms.kegiatan };
   function applyTabPermissions() {
@@ -1408,6 +1429,8 @@
     if (name === "perf") { loadPerformance(); }
     if (name === "peringkat") { loadLeaderboard(); }
     if (name === "struktur") { loadStructure(); }
+    if (name === "ujiplts") { loadGeotech(); }
+    if (name === "alat") { loadTools(); }
     if (name === "feed") {
       if ($("feed-korwil").options.length <= 1) {
         fillSelect($("feed-korwil"), config.korwils.map(function (k) { return { value: k.id, label: "Korwil " + k.code }; }), "Semua Korwil");
@@ -4497,6 +4520,608 @@
       });
     });
   });
+
+  // ================================================================ Uji tanah PLTS
+
+  var geoReady = false;
+  var geoTimer = null;
+  var currentPoint = null;
+  var formPoint = null;
+  var UJI_ACTIONS = [
+    { key: "survei", label: "✔ Survei selesai", show: function (p) { return p.survey !== "selesai"; } },
+    { key: "kondusif", label: "🤝 Sosial kondusif", show: function (p) { return p.social !== "kondusif"; } },
+    { key: "proses", label: "▶ Mulai / lanjut", show: function (p) { return p.status === "belum_mulai" || p.status === "terhenti"; } },
+    { key: "terhenti", label: "⏸ Terhenti", show: function (p) { return p.status === "proses" || p.status === "belum_mulai"; } },
+    { key: "selesai", label: "✅ Selesai", show: function (p) { return p.status !== "selesai"; } }
+  ];
+
+  function geoUrl(base, id) { return base.replace("/0/", "/" + id + "/"); }
+
+  function prepareGeotech() {
+    if (geoReady) { return; }
+    geoReady = true;
+    fillSelect($("up-korwil"), korwilOptions(), "Semua Korwil");
+    fillSelect($("up-status"), config.choices.geoStatus, "Semua status");
+    fillSelect($("up-bagian"), config.choices.geoSegment, "Semua bagian");
+    fillSelect($("up-metode"), config.choices.geoMethod, "Semua metode");
+    $("up-tambah").hidden = !perms.tambahUjiPlts;
+    $("up-impor").hidden = !perms.ubahUjiPlts;
+    document.querySelector('#iu-mode [data-mode="lengkap"]').hidden = !perms.tambahUjiPlts;
+  }
+
+  function geoParams() {
+    var params = [];
+    [["korwil", "up-korwil"], ["status", "up-status"], ["bagian", "up-bagian"], ["metode", "up-metode"], ["batch", "up-batch"]].forEach(function (pair) {
+      if ($(pair[1]).value) { params.push(pair[0] + "=" + encodeURIComponent($(pair[1]).value)); }
+    });
+    if ($("up-cari").value.trim()) { params.push("q=" + encodeURIComponent($("up-cari").value.trim())); }
+    return params.length ? "?" + params.join("&") : "";
+  }
+
+  function loadGeotech() {
+    prepareGeotech();
+    $("up-daftar").innerHTML = "<li class='muted'>Memuat…</li>";
+    request(urls.geotech + geoParams()).then(function (data) {
+      var batch = $("up-batch").value;
+      fillSelect($("up-batch"), data.batches.map(function (b) { return { value: String(b), label: "Batch " + b }; }), "Semua batch");
+      $("up-batch").value = batch;
+      var s = data.summary;
+      var count = function (value) { return (s.status.filter(function (x) { return x.value === value; })[0] || { count: 0 }).count; };
+      $("up-ringkas").innerHTML =
+        "<div class='metric'><b>" + fmtNum(s.total) + "</b><span>Titik · " + fmtNum(s.surveyed) + " disurvei</span></div>" +
+        "<div class='metric'><b style='color:" + config.colors.geotech.selesai + "'>" + s.done_pct + "%</b><span>Selesai (" + fmtNum(count("selesai")) + ") · rata-rata progres " + fmtNum(s.avg_progress, 1) + "%</span></div>" +
+        "<div class='metric'><b style='color:" + config.colors.geotech.terhenti + "'>" + fmtNum(count("terhenti")) + "</b><span>Terhenti · " + fmtNum(s.social_issue) + " kendala sosial</span></div>" +
+        "<div class='metric'><b>" + fmtNum(s.no_location) + "</b><span>Tanpa koordinat</span></div>";
+      $("up-bar").hidden = !s.total;
+      $("up-bar").innerHTML = s.status.map(function (x) {
+        return x.count ? "<span style='flex:" + x.count + ";background:" + escapeHtml(x.color) + "' title='" + escapeHtml(x.label + ": " + x.count) + "'></span>" : "";
+      }).join("");
+      var legend = s.status.map(function (x) { return "<span class='legend-dot' style='--c:" + escapeHtml(x.color) + "'>" + escapeHtml(x.label) + " " + x.count + "</span>"; }).join(" ");
+      var groups = s.segments.map(function (g) {
+        var pct = g.total ? Math.round(g.done * 100 / g.total) : 0;
+        return "<div class='hbar'><span title='" + escapeHtml(g.label) + "'>" + escapeHtml(g.label) + "</span><i style='width:" + Math.max(pct, 1) + "%;background:" + config.colors.geotech.selesai + "'></i><b>" + g.done + "/" + g.total + "</b></div>";
+      }).concat(s.batches.length > 1 ? s.batches.map(function (b) {
+        var pct = b.total ? Math.round(b.done * 100 / b.total) : 0;
+        return "<div class='hbar'><span>Batch " + b.batch + "</span><i style='width:" + Math.max(pct, 1) + "%;background:#0b5fcc'></i><b>" + b.done + "/" + b.total + "</b></div>";
+      }) : []).join("");
+      $("up-segmen").innerHTML = s.total ? "<p class='small'>" + legend + "</p>" + groups : "";
+      $("up-daftar").innerHTML = data.rows.map(function (r) {
+        return "<li class='clickable' data-uji='" + r.id + "'><div class='row' style='justify-content:space-between;gap:8px'><b>" + escapeHtml(r.code) + "</b>" +
+          "<span class='badge' style='background:" + escapeHtml(r.color) + "'>" + escapeHtml(r.status_label) + " · " + r.progress + "%</span></div>" +
+          "<div class='progress'><i style='width:" + r.progress + "%;background:" + escapeHtml(r.color) + "'></i></div>" +
+          "<div class='sub'>" + escapeHtml([r.method_label.split(" (")[0], r.area, r.zone, "Batch " + r.batch, r.korwil ? "Korwil " + r.korwil : "", r.survey_label, r.social_label].filter(Boolean).join(" · ")) + "</div>" +
+          (r.obstacle ? "<div class='sub danger-text'>Kendala: " + escapeHtml(r.obstacle) + "</div>" : "") +
+          (r.system.length ? "<div class='sub'>💡 " + escapeHtml(r.system[0]) + (r.system.length > 1 ? " (+" + (r.system.length - 1) + ")" : "") + "</div>" : "") + "</li>";
+      }).join("") || "<li class='muted'>Belum ada titik uji." + (perms.ubahUjiPlts ? " Impor berkas Excel progres titik untuk mulai." : "") + "</li>";
+      if (data.truncated) { $("up-daftar").insertAdjacentHTML("beforeend", "<li class='muted small'>Menampilkan 3.000 dari " + fmtNum(data.total) + " titik. Persempit dengan filter.</li>"); }
+    }).catch(function (error) { $("up-daftar").innerHTML = "<li class='muted'>" + escapeHtml(error.message) + "</li>"; });
+  }
+
+  ["up-korwil", "up-status", "up-bagian", "up-metode", "up-batch"].forEach(function (id) { $(id).addEventListener("change", loadGeotech); });
+  $("up-cari").addEventListener("input", function () { clearTimeout(geoTimer); geoTimer = setTimeout(loadGeotech, 300); });
+  $("up-daftar").addEventListener("click", function (event) {
+    var row = event.target.closest("[data-uji]");
+    if (row) { openPoint(row.getAttribute("data-uji")); }
+  });
+  $("up-excel").addEventListener("click", function () { download(urls.geotechExcel + geoParams(), "uji-tanah-plts.xlsx", "Excel uji tanah PLTS diunduh."); });
+  $("up-peta").addEventListener("click", function () {
+    layerState["uji-plts"] = true;
+    store("lapisan", layerState);
+    renderLayerList();
+    showTab("peta");
+    loadLayer("uji-plts").then(function () {
+      var layer = layers["uji-plts"];
+      if (layer && layer.getLayers().length) { map.fitBounds(layer.getBounds(), { padding: [30, 30], maxZoom: 16 }); } else if (layer) { toast("Belum ada titik uji yang berkoordinat.", "error"); }
+    });
+  });
+  $("up-tambah").addEventListener("click", function () { renderPointForm(null); });
+
+  function openPoint(id) {
+    $("ujd-judul").textContent = "Titik uji";
+    $("ujd-isi").innerHTML = "<p class='muted'>Memuat…</p>";
+    if (!$("dlg-uji").open) { $("dlg-uji").showModal(); }
+    request(geoUrl(urls.geotechPoint, id)).then(renderPoint).catch(function (error) { $("ujd-isi").textContent = error.message; });
+  }
+
+  function optionsHtml(items, current, placeholder) {
+    return (placeholder !== undefined ? "<option value=''>" + escapeHtml(placeholder) + "</option>" : "") + items.map(function (c) {
+      return "<option value='" + escapeHtml(c.value) + "'" + (String(c.value) === String(current) ? " selected" : "") + ">" + escapeHtml(c.label) + "</option>";
+    }).join("");
+  }
+
+  function renderPoint(p) {
+    currentPoint = p;
+    $("ujd-judul").innerHTML = escapeHtml(p.code) + " <span class='badge' style='background:" + escapeHtml(p.color) + "'>" + escapeHtml(p.status_label) + "</span>";
+    var info = [
+      ["Metode", p.method_label], ["Bagian proyek", p.segment_label], ["Area / paket", p.area], ["Zona", p.zone], ["Batch", String(p.batch)],
+      ["Korwil", p.korwil], ["Status survei", p.survey_label], ["Kondisi sosial", p.social_label], ["Pemilik lahan", p.landowner],
+      ["Kendala", p.obstacle], ["Akses lokasi", p.access], ["Mulai", p.started_on ? fmtDate(p.started_on) : ""], ["Selesai", p.finished_on ? fmtDate(p.finished_on) : ""],
+      ["Hasil uji lab", p.soil_test], ["Catatan survei", p.survey_note], ["Catatan pekerjaan", p.work_note], ["Rekomendasi tindak lanjut", p.recommendation],
+      ["Koordinat", p.lat !== null ? fmtNum(p.lat, 6) + ", " + fmtNum(p.lng, 6) : ""]
+    ].filter(function (r) { return r[1]; });
+    var html = "<div class='progress big'><i style='width:" + p.progress + "%;background:" + escapeHtml(p.color) + "'></i><span>" + p.progress + "%</span></div>";
+    if (p.system.length) {
+      html += "<div class='notice'><b>💡 Rekomendasi sistem</b><ul>" + p.system.map(function (t) { return "<li>" + escapeHtml(t) + "</li>"; }).join("") + "</ul></div>";
+    }
+    if (p.can_change) {
+      var quick = UJI_ACTIONS.filter(function (a) { return a.show(p); });
+      if (quick.length) {
+        html += "<div class='stack card-form'><b>Aksi cepat</b><input id='ujd-catatan' maxlength='255' placeholder='Catatan / kendala (wajib bila terhenti)' aria-label='Catatan'>" +
+          "<div class='row wrap'>" + quick.map(function (a) { return "<button type='button' class='btn-small' data-aksi='" + a.key + "'>" + escapeHtml(a.label) + "</button>"; }).join("") + "</div></div>";
+      }
+    }
+    html += "<table class='table'><tbody>" + info.map(function (r) { return "<tr><td class='muted'>" + escapeHtml(r[0]) + "</td><td style='white-space:pre-line'>" + escapeHtml(r[1]) + "</td></tr>"; }).join("") + "</tbody></table>";
+    html += "<h3>Foto (" + p.photos.length + "/6)</h3><div class='thumbs'>" + (p.photos.map(function (f) {
+      return "<figure><a href='" + encodeURI(f.url) + "' target='_blank' rel='noopener'><img src='" + encodeURI(f.url) + "' alt='" + escapeHtml(f.caption || p.code) + "' loading='lazy'></a>" +
+        "<figcaption>" + escapeHtml(f.caption || fmtDate(f.at)) + (f.can_delete ? " <button type='button' class='btn-small danger' data-hapus-foto='" + f.id + "' aria-label='Hapus foto'>✕</button>" : "") + "</figcaption></figure>";
+    }).join("") || "<p class='muted small'>Belum ada foto.</p>") + "</div>";
+    if (p.can_photo) {
+      html += "<div class='row wrap'><input type='file' id='ujd-foto' accept='image/*' capture='environment' aria-label='Foto'><input id='ujd-foto-ket' maxlength='255' placeholder='Keterangan foto'><button type='button' class='btn-small' id='ujd-unggah'>⬆ Unggah foto</button></div>";
+    }
+    html += "<h3>Riwayat</h3><ul class='list compact'>" + (p.history.map(function (h) {
+      return "<li><b>" + escapeHtml(h.field) + ":</b> " + escapeHtml((h.old ? h.old + " → " : "") + h.new) + "<div class='sub'>" + escapeHtml([h.by, fmtDate(h.at, true), h.source, h.note].filter(Boolean).join(" · ")) + "</div></li>";
+    }).join("") || "<li class='muted'>Belum ada riwayat.</li>") + "</ul>";
+    html += "<div class='row wrap'>" + (p.lat !== null ? "<button type='button' class='btn' id='ujd-peta'>🗺️ Lihat di peta</button>" : "") +
+      (p.can_change ? "<button type='button' class='btn' id='ujd-ubah'>✏️ Ubah data</button>" : "") + "</div>";
+    $("ujd-isi").innerHTML = html;
+  }
+
+  function renderPointForm(p) {
+    formPoint = p;
+    var v = p || { code: "", method: "borehole", segment: "", area: "", zone: "", batch: 1, korwil_id: "", survey: "belum", social: "belum_dicek", status: "belum_mulai", progress: 0, landowner: "", obstacle: "", access: "", started_on: "", finished_on: "", survey_note: "", work_note: "", recommendation: "", lat: null, lng: null, soil_test: "" };
+    $("ujd-judul").textContent = p ? "Ubah " + p.code : "Titik uji baru";
+    $("ujd-isi").innerHTML = "<div class='stack' id='ujd-form'><div class='grid2'>" +
+      "<label class='field'>Kode titik <input data-f='kode' maxlength='64' required value='" + escapeHtml(v.code) + "'></label>" +
+      "<label class='field'>Metode <select data-f='metode'>" + optionsHtml(config.choices.geoMethod, v.method) + "</select></label>" +
+      "<label class='field'>Bagian proyek <select data-f='bagian'>" + optionsHtml(config.choices.geoSegment, v.segment, "Otomatis dari kode") + "</select></label>" +
+      "<label class='field'>Area / paket <input data-f='area' maxlength='128' value='" + escapeHtml(v.area) + "'></label>" +
+      "<label class='field'>Zona <input data-f='zona' maxlength='128' value='" + escapeHtml(v.zone) + "'></label>" +
+      "<label class='field'>Batch <input type='number' data-f='batch' min='1' max='99' value='" + escapeHtml(v.batch) + "'></label>" +
+      "<label class='field'>Korwil <select data-f='korwil'>" + optionsHtml(korwilOptions(), v.korwil_id || "", "Otomatis dari lokasi") + "</select></label>" +
+      "<label class='field'>Pemilik lahan <input data-f='pemilik' maxlength='255' value='" + escapeHtml(v.landowner) + "'></label>" +
+      "<label class='field'>Status survei <select data-f='survei'>" + optionsHtml(config.choices.geoSurvey, v.survey) + "</select></label>" +
+      "<label class='field'>Kondisi sosial <select data-f='sosial'>" + optionsHtml(config.choices.geoSocial, v.social) + "</select></label>" +
+      "<label class='field'>Status pekerjaan <select data-f='status'>" + optionsHtml(config.choices.geoStatus, v.status) + "</select></label>" +
+      "<label class='field'>Progres % <input type='number' data-f='progres' min='0' max='100' value='" + escapeHtml(v.progress) + "'></label>" +
+      "<label class='field'>Tanggal mulai <input type='date' data-f='mulai' value='" + escapeHtml(v.started_on) + "'></label>" +
+      "<label class='field'>Tanggal selesai <input type='date' data-f='selesai' value='" + escapeHtml(v.finished_on) + "'></label>" +
+      "<label class='field'>Lintang <input type='number' step='any' data-f='lat' value='" + (v.lat === null ? "" : v.lat) + "'></label>" +
+      "<label class='field'>Bujur <input type='number' step='any' data-f='lng' value='" + (v.lng === null ? "" : v.lng) + "'></label>" +
+      "<label class='field'>Kendala <input data-f='kendala' maxlength='255' value='" + escapeHtml(v.obstacle) + "'></label>" +
+      "<label class='field'>Akses lokasi <input data-f='akses' maxlength='255' value='" + escapeHtml(v.access) + "'></label>" +
+      "<label class='field'>No. uji tanah lab (opsional) <input data-f='uji_lab' maxlength='32' value='" + escapeHtml(v.soil_test) + "'></label></div>" +
+      "<label class='field'>Catatan survei <textarea data-f='catatan_survei' rows='2'>" + escapeHtml(v.survey_note) + "</textarea></label>" +
+      "<label class='field'>Catatan pekerjaan <textarea data-f='catatan_kerja' rows='2'>" + escapeHtml(v.work_note) + "</textarea></label>" +
+      "<label class='field'>Rekomendasi tindak lanjut <textarea data-f='rekomendasi' rows='2'>" + escapeHtml(v.recommendation) + "</textarea></label>" +
+      "<div class='row wrap'><button type='button' class='btn' id='ujd-pakai-gps'>📍 Pakai GPS saya</button><button type='button' class='btn primary' id='ujd-simpan'>Simpan</button>" +
+      (p ? "<button type='button' class='btn' id='ujd-batal'>Batal</button>" : "") + "</div></div>";
+    if (!$("dlg-uji").open) { $("dlg-uji").showModal(); }
+  }
+
+  function savePoint(button) {
+    var data = new FormData();
+    document.querySelectorAll("#ujd-form [data-f]").forEach(function (input) { data.append(input.getAttribute("data-f"), input.value.trim()); });
+    if (!data.get("kode")) { toast("Kode titik wajib diisi.", "error"); return; }
+    if (!data.get("korwil")) { data.delete("korwil"); }
+    button.disabled = true;
+    var editing = formPoint;
+    var url = editing ? geoUrl(urls.geotechPoint, editing.id) : urls.geotech;
+    request(url, { method: "POST", body: data }).then(function (point) {
+      toast("Titik uji " + point.code + " disimpan.", "ok");
+      if (editing) { renderPoint(point); } else { openPoint(point.id); }
+      loadGeotech();
+      if (layers["uji-plts"]) { loadLayer("uji-plts"); }
+    }).catch(function (error) { toast(error.message, "error"); button.disabled = false; });
+  }
+
+  $("ujd-isi").addEventListener("keydown", function (event) {
+    // Enter di kolom isian tidak boleh mengirim form dialog (menutup dialog).
+    if (event.key === "Enter" && event.target.tagName === "INPUT") { event.preventDefault(); }
+  });
+  $("ujd-isi").addEventListener("click", function (event) {
+    var target = event.target;
+    var action = target.getAttribute("data-aksi");
+    if (action && currentPoint) {
+      target.disabled = true;
+      request(geoUrl(urls.geotechAction, currentPoint.id).replace("__aksi__", action), { method: "POST", body: form({ catatan: ($("ujd-catatan") || {}).value || "" }) }).then(function (point) {
+        toast(point.code + ": " + point.status_label + " · " + point.progress + "%", "ok");
+        renderPoint(point);
+        loadGeotech();
+        if (layers["uji-plts"]) { loadLayer("uji-plts"); }
+      }).catch(function (error) { toast(error.message, "error"); target.disabled = false; });
+      return;
+    }
+    var removePhoto = target.getAttribute("data-hapus-foto");
+    if (removePhoto) {
+      target.disabled = true;
+      request(urls.geotechPhotoDelete.replace("/0/", "/" + removePhoto + "/"), { method: "POST" }).then(renderPoint)
+        .catch(function (error) { toast(error.message, "error"); target.disabled = false; });
+      return;
+    }
+    if (target.id === "ujd-unggah" && currentPoint) {
+      var file = $("ujd-foto").files[0];
+      if (!file) { toast("Pilih foto terlebih dahulu.", "error"); return; }
+      target.disabled = true;
+      var data = form({ keterangan: $("ujd-foto-ket").value.trim() });
+      data.append("foto", file);
+      request(geoUrl(urls.geotechPhoto, currentPoint.id), { method: "POST", body: data }).then(function (point) { toast("Foto diunggah.", "ok"); renderPoint(point); })
+        .catch(function (error) { toast(error.message, "error"); target.disabled = false; });
+      return;
+    }
+    if (target.id === "ujd-peta" && currentPoint) {
+      $("dlg-uji").close();
+      ensureLayer("uji-plts");
+      var marker = L.circleMarker([currentPoint.lat, currentPoint.lng], { radius: 14, color: "#f59e0b", weight: 4, fill: false });
+      showAnalysis(marker, L.latLngBounds([[currentPoint.lat, currentPoint.lng], [currentPoint.lat, currentPoint.lng]]).pad(0.002));
+      return;
+    }
+    if (target.id === "ujd-ubah" && currentPoint) { renderPointForm(currentPoint); return; }
+    if (target.id === "ujd-batal" && currentPoint) { renderPoint(currentPoint); return; }
+    if (target.id === "ujd-simpan") { savePoint(target); return; }
+    if (target.id === "ujd-pakai-gps") {
+      if (!navigator.geolocation) { toast("GPS tidak tersedia.", "error"); return; }
+      navigator.geolocation.getCurrentPosition(function (pos) {
+        document.querySelector("#ujd-form [data-f='lat']").value = pos.coords.latitude.toFixed(7);
+        document.querySelector("#ujd-form [data-f='lng']").value = pos.coords.longitude.toFixed(7);
+      }, function () { toast("Lokasi GPS tidak didapat.", "error"); }, { enableHighAccuracy: true, timeout: 15000 });
+    }
+  });
+
+  // Impor Excel progres titik
+  var geoImportMode = "perbarui";
+  var GEO_IMPORT_COLORS = { ubah: "#1a7f37", sama: "#57606a", baru: "#0b5fcc", tak_dikenal: "#9a6700", luar: "#8250df", galat: "#cf222e" };
+
+  function setGeoImportMode(mode) {
+    geoImportMode = mode;
+    document.querySelectorAll("#iu-mode button").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-mode") === mode); });
+    $("iu-hasil").innerHTML = "";
+    $("iu-terapkan").disabled = true;
+  }
+
+  function openGeoImport() {
+    $("form-impor-uji").reset();
+    setGeoImportMode("perbarui");
+    $("dlg-impor-uji").showModal();
+  }
+
+  function geoImportData(stage) {
+    var data = new FormData($("form-impor-uji"));
+    data.set("mode", geoImportMode);
+    data.set("tahap", stage);
+    return data;
+  }
+
+  $("up-impor").addEventListener("click", openGeoImport);
+  $("iu-mode").addEventListener("click", function (event) {
+    var button = event.target.closest("button[data-mode]");
+    if (button) { setGeoImportMode(button.getAttribute("data-mode")); }
+  });
+  $("iu-berkas").addEventListener("change", function () { $("iu-hasil").innerHTML = ""; $("iu-terapkan").disabled = true; });
+  $("form-impor-uji").addEventListener("click", function (event) {
+    if (event.target.hasAttribute("data-tutup")) { $("dlg-impor-uji").close(); }
+  });
+  $("iu-pratinjau").addEventListener("click", function () {
+    var file = $("iu-berkas").files[0];
+    if (!file) { toast("Pilih berkas terlebih dahulu.", "error"); return; }
+    if (file.size > 20 * 1024 * 1024) { toast("Berkas maksimal 20 MB.", "error"); return; }
+    var button = this;
+    button.disabled = true;
+    $("iu-hasil").innerHTML = "<p class='muted'>Membaca berkas…</p>";
+    request(urls.geotechImport, { method: "POST", body: geoImportData("pratinjau") }).then(function (data) {
+      var counts = Object.keys(data.counts).map(function (k) {
+        return "<span class='badge' style='background:" + (GEO_IMPORT_COLORS[k] || "#57606a") + "'>" + escapeHtml(data.labels[k] || k) + ": " + data.counts[k] + "</span>";
+      }).join(" ");
+      var selectable = function (i) { return i.action === "ubah" || i.action === "baru"; };
+      $("iu-hasil").innerHTML = "<p class='small'>" + data.items.length + " baris di " + escapeHtml(data.file) + ". " + counts + "</p>" +
+        "<label class='check'><input type='checkbox' id='iu-semua' checked> Pilih / lepas semua</label>" +
+        "<div class='table-wrap'><table class='table'><thead><tr><th></th><th>Baris</th><th>Kode</th><th>Hasil</th></tr></thead><tbody>" +
+        data.items.map(function (i) {
+          var detail = i.errors.length ? "<div class='small danger-text'>" + escapeHtml(i.errors.join(" · ")) + "</div>" : (i.changes.length ? "<div class='small muted'>" + escapeHtml(i.changes.join(" · ")) + "</div>" : "");
+          return "<tr><td><input type='checkbox' data-index='" + i.index + "'" + (selectable(i) ? " checked" : " disabled") + " aria-label='Pilih'></td><td>" + i.row + "</td><td><b>" + escapeHtml(i.code) + "</b></td>" +
+            "<td><span class='badge' style='background:" + (GEO_IMPORT_COLORS[i.action] || "#57606a") + "'>" + escapeHtml(data.labels[i.action] || i.action) + "</span>" + detail + "</td></tr>";
+        }).join("") + "</tbody></table></div>";
+      $("iu-terapkan").disabled = !data.items.some(selectable);
+    }).catch(function (error) { $("iu-hasil").innerHTML = "<p class='danger-text'>" + escapeHtml(error.message) + "</p>"; })
+      .then(function () { button.disabled = false; });
+  });
+  $("iu-hasil").addEventListener("change", function (event) {
+    if (event.target.id === "iu-semua") {
+      var on = event.target.checked;
+      this.querySelectorAll("input[data-index]:not(:disabled)").forEach(function (box) { box.checked = on; });
+    }
+  });
+  $("form-impor-uji").addEventListener("submit", function (event) {
+    event.preventDefault();
+    var chosen = [];
+    $("iu-hasil").querySelectorAll("input[data-index]:checked").forEach(function (box) { chosen.push(box.getAttribute("data-index")); });
+    if (!chosen.length) { toast("Pilih minimal satu baris.", "error"); return; }
+    var data = geoImportData("terapkan");
+    data.set("pilih", chosen.join(","));
+    var button = $("iu-terapkan");
+    button.disabled = true;
+    request(urls.geotechImport, { method: "POST", body: data }).then(function (result) {
+      var text = result.updated + " titik diperbarui, " + result.created + " titik baru.";
+      if (result.errors.length) {
+        $("iu-hasil").innerHTML = "<p class='small'>" + escapeHtml(text) + "</p><ul class='list compact'>" + result.errors.map(function (e) {
+          return "<li class='danger-text small'>Baris " + e.row + " (" + escapeHtml(e.code) + "): " + escapeHtml(e.errors.join(" · ")) + "</li>";
+        }).join("") + "</ul>";
+        toast(text + " " + result.errors.length + " baris gagal.", "error");
+      } else {
+        toast(text, "ok");
+        $("dlg-impor-uji").close();
+      }
+      loadGeotech();
+      if (layers["uji-plts"]) { loadLayer("uji-plts"); }
+    }).catch(function (error) { toast(error.message, "error"); button.disabled = false; });
+  });
+
+  // ================================================================ Alat & tiket
+
+  var toolPart = "tiket";
+  var toolsReady = false;
+  var ticketTimer = null;
+  var TOOL_ALLOWED = { tiket: perms.tiket, ocr: true, dokumen: true, foto: config.ai, audit: perms.auditData, sinkron: true };
+
+  function prepareTools() {
+    if (toolsReady) { return; }
+    toolsReady = true;
+    document.querySelectorAll("#alat-bagian button").forEach(function (button) { button.hidden = !TOOL_ALLOWED[button.getAttribute("data-alat")]; });
+    if (!TOOL_ALLOWED[toolPart]) { toolPart = Object.keys(TOOL_ALLOWED).filter(function (k) { return TOOL_ALLOWED[k]; })[0]; }
+    fillSelect($("tk-kategori"), config.choices.ticketCategory);
+    fillSelect($("tk-prioritas"), config.choices.ticketPriority);
+    fillSelect($("tk-status"), config.choices.ticketStatus, "Semua status");
+    $("form-tiket").hidden = !perms.kirimTiket;
+    $("sk-impor").hidden = !perms.ubahUjiPlts;
+    $("sk-catatan").textContent = perms.tanganiTiket ? "Termasuk lembar Tiket (Anda pengelola tiket)." : "";
+  }
+
+  function loadTools() {
+    prepareTools();
+    showToolPart(toolPart);
+  }
+
+  function showToolPart(name) {
+    toolPart = name;
+    document.querySelectorAll("#alat-bagian button").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-alat") === name); });
+    document.querySelectorAll("#tab-alat [data-alat-panel]").forEach(function (panel) { panel.hidden = panel.getAttribute("data-alat-panel") !== name; });
+    if (name === "tiket") { loadTickets(); }
+  }
+
+  $("alat-bagian").addEventListener("click", function (event) {
+    var button = event.target.closest("button[data-alat]");
+    if (button) { showToolPart(button.getAttribute("data-alat")); }
+  });
+
+  function loadTickets() {
+    var params = [];
+    if ($("tk-status").value) { params.push("status=" + $("tk-status").value); }
+    if ($("tk-cari").value.trim()) { params.push("q=" + encodeURIComponent($("tk-cari").value.trim())); }
+    $("tk-daftar").innerHTML = "<li class='muted'>Memuat…</li>";
+    request(urls.tickets + (params.length ? "?" + params.join("&") : "")).then(function (data) {
+      $("tk-ringkas").innerHTML = data.summary.status.map(function (x) {
+        return "<div class='metric'><b style='color:" + escapeHtml(x.color) + "'>" + fmtNum(x.count) + "</b><span>" + escapeHtml(x.label) + "</span></div>";
+      }).join("");
+      $("tk-daftar").innerHTML = data.rows.map(function (t) {
+        var handle = data.can_handle;
+        return "<li><div class='row' style='justify-content:space-between;gap:8px'><b>" + escapeHtml(t.number + " – " + t.title) + "</b><span class='badge' style='background:" + escapeHtml(t.color) + "'>" + escapeHtml(t.status_label) + "</span></div>" +
+          "<div class='sub'>" + escapeHtml([t.category_label, "prioritas " + t.priority_label.toLowerCase(), t.sender, fmtDate(t.created_at, true)].join(" · ")) + "</div>" +
+          "<div class='small' style='white-space:pre-line'>" + escapeHtml(t.description) + "</div>" +
+          (t.attachment ? "<div class='small'><a href='" + encodeURI(t.attachment) + "?lihat=1' target='_blank' rel='noopener'>📎 Tangkapan layar</a></div>" : "") +
+          (t.note ? "<div class='small'><b>Pengelola:</b> " + escapeHtml(t.note) + "</div>" : "") +
+          (t.points ? "<div class='small ok-text'>+" + t.points + " poin" + (t.hours !== null ? " · ditangani " + fmtNum(t.hours, 1) + " jam" : "") + "</div>" : "") +
+          (handle ? "<div class='row wrap' data-tiket='" + t.id + "'><input data-catatan maxlength='5000' placeholder='Catatan pengelola' value='" + escapeHtml(t.note) + "' aria-label='Catatan'>" +
+            "<select data-prioritas aria-label='Prioritas'>" + optionsHtml(config.choices.ticketPriority, t.priority) + "</select>" +
+            config.choices.ticketStatus.filter(function (s) { return s.value !== t.status; }).map(function (s) {
+              return "<button type='button' class='btn-small' data-status='" + s.value + "'>" + escapeHtml(s.label) + "</button>";
+            }).join("") + "</div>" : "") + "</li>";
+      }).join("") || "<li class='muted'>Belum ada tiket.</li>";
+      $("tk-peringkat").innerHTML = data.leaderboard.map(function (r) {
+        return "<li><b>" + escapeHtml(r.name) + "</b> · " + fmtNum(r.points) + " poin<div class='sub'>" + r.sent + " tiket · " + r.done + " selesai</div></li>";
+      }).join("") || "<li class='muted'>Belum ada poin.</li>";
+    }).catch(function (error) { $("tk-daftar").innerHTML = "<li class='muted'>" + escapeHtml(error.message) + "</li>"; });
+  }
+
+  $("tk-status").addEventListener("change", loadTickets);
+  $("tk-cari").addEventListener("input", function () { clearTimeout(ticketTimer); ticketTimer = setTimeout(loadTickets, 300); });
+  $("tk-excel").addEventListener("click", function () { download(urls.ticketsExcel, "tiket.xlsx", "Excel tiket diunduh."); });
+  $("form-tiket").addEventListener("submit", function (event) {
+    event.preventDefault();
+    var formEl = this;
+    var file = formEl.querySelector("[name=lampiran]").files[0];
+    if (file && file.size > 10 * 1024 * 1024) { toast("Tangkapan layar maksimal 10 MB.", "error"); return; }
+    var data = new FormData(formEl);
+    if (!file) { data.delete("lampiran"); }
+    var button = formEl.querySelector("[type=submit]");
+    button.disabled = true;
+    request(urls.tickets, { method: "POST", body: data }).then(function (ticket) {
+      toast("Tiket " + ticket.number + " terkirim. Terima kasih!", "ok");
+      formEl.reset();
+      loadTickets();
+    }).catch(function (error) { toast(error.message, "error"); }).then(function () { button.disabled = false; });
+  });
+  $("tk-daftar").addEventListener("click", function (event) {
+    var button = event.target.closest("button[data-status]");
+    if (!button) { return; }
+    var box = button.closest("[data-tiket]");
+    var status = button.getAttribute("data-status");
+    var note = box.querySelector("[data-catatan]").value.trim();
+    if (status === "ditolak" && !note) { toast("Tuliskan alasan penolakan.", "error"); return; }
+    button.disabled = true;
+    request(urls.ticketAction.replace("/0/", "/" + box.getAttribute("data-tiket") + "/"), {
+      method: "POST", body: form({ status: status, catatan: note, prioritas: box.querySelector("[data-prioritas]").value })
+    }).then(function (t) {
+      toast(t.number + ": " + t.status_label + (t.points ? " · +" + t.points + " poin untuk pengirim" : ""), "ok");
+      loadTickets();
+    }).catch(function (error) { toast(error.message, "error"); button.disabled = false; });
+  });
+
+  function busy(formEl, on, text) {
+    var button = formEl.querySelector("[type=submit]");
+    button.disabled = on;
+    if (on) { button.setAttribute("data-teks", button.textContent); button.textContent = text; } else if (button.getAttribute("data-teks")) { button.textContent = button.getAttribute("data-teks"); }
+  }
+
+  function uploadTool(formEl, url, out, text, render) {
+    var file = formEl.querySelector("[name=berkas]").files[0];
+    if (!file) { toast("Pilih berkas terlebih dahulu.", "error"); return; }
+    if (file.size > 20 * 1024 * 1024) { toast("Berkas maksimal 20 MB.", "error"); return; }
+    busy(formEl, true, text);
+    $(out).innerHTML = "<p class='muted'>" + escapeHtml(text) + "</p>";
+    request(url, { method: "POST", body: new FormData(formEl) }).then(function (data) { render(data, file); })
+      .catch(function (error) { $(out).innerHTML = "<p class='danger-text'>" + escapeHtml(error.message) + "</p>"; })
+      .then(function () { busy(formEl, false); });
+  }
+
+  function copyButton(id) { return "<button type='button' class='btn-small' data-salin='" + id + "'>📋 Salin</button>"; }
+  function saveTextButton(id, name) { return "<button type='button' class='btn-small' data-simpan-teks='" + id + "' data-nama='" + escapeHtml(name) + "'>⬇ Unduh .txt</button>"; }
+
+  document.getElementById("tab-alat").addEventListener("click", function (event) {
+    var copy = event.target.getAttribute("data-salin");
+    var save = event.target.getAttribute("data-simpan-teks");
+    var id = copy || save;
+    if (!id) { return; }
+    var text = $(id).innerText || $(id).textContent;
+    if (copy) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { toast("Teks disalin.", "ok"); }, function () { toast("Gagal menyalin.", "error"); });
+      } else { toast("Peramban tidak mendukung salin otomatis.", "error"); }
+      return;
+    }
+    var link = document.createElement("a");
+    link.href = URL.createObjectURL(new Blob([text], { type: "text/plain;charset=utf-8" }));
+    link.download = event.target.getAttribute("data-nama") || "hasil.txt";
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(function () { URL.revokeObjectURL(link.href); link.remove(); }, 1000);
+  });
+
+  $("form-ocr").addEventListener("submit", function (event) {
+    event.preventDefault();
+    uploadTool(this, urls.ocr, "ocr-hasil", "Membaca teks…", function (data) {
+      $("ocr-hasil").innerHTML = "<p class='small'><span class='badge' style='background:" + (data.source === "ai" ? "#8250df" : "#57606a") + "'>" + (data.source === "ai" ? "AI" : "OCR Tesseract") + "</span> " + escapeHtml(data.type || "") + "</p>" +
+        (data.fields.length ? "<table class='table'><tbody>" + data.fields.map(function (f) { return "<tr><td class='muted'>" + escapeHtml(f.label) + "</td><td>" + escapeHtml(f.nilai) + "</td></tr>"; }).join("") + "</tbody></table>" : "") +
+        "<pre class='textbox' id='ocr-teks'>" + escapeHtml(data.text || "(tidak ada teks terbaca)") + "</pre><div class='row'>" + copyButton("ocr-teks") + saveTextButton("ocr-teks", "hasil-ocr.txt") + "</div>";
+    });
+  });
+
+  function profileHtml(profile) {
+    if (!profile) { return ""; }
+    if (profile.columns) {
+      return "<p class='small'>" + fmtNum(profile.rows) + " baris data · " + profile.columns.length + " kolom</p><div class='table-wrap'><table class='table'><thead><tr><th>Kolom</th><th>Terisi</th><th>Ringkasan</th></tr></thead><tbody>" +
+        profile.columns.map(function (c) {
+          var info = c.kind === "angka" ? "Σ " + fmtNum(c.total, 2) + " · rata-rata " + fmtNum(c.mean, 2) + " · " + fmtNum(c.min, 2) + "–" + fmtNum(c.max, 2)
+            : c.top.map(function (t) { return t.value + " (" + t.count + ")"; }).join(", ");
+          return "<tr><td>" + escapeHtml(c.name) + "</td><td>" + fmtNum(c.filled) + "</td><td>" + escapeHtml(info) + "</td></tr>";
+        }).join("") + "</tbody></table></div>";
+    }
+    return "<p class='small'>" + fmtNum(profile.words) + " kata</p><pre class='textbox'>" + escapeHtml(profile.preview) + "</pre>";
+  }
+
+  $("form-dokumen").addEventListener("submit", function (event) {
+    event.preventDefault();
+    uploadTool(this, urls.documentAi, "dok-hasil", "Menganalisis dokumen…", function (data) {
+      var html = "";
+      if (data.report) {
+        var r = data.report;
+        html += "<div class='card-form stack' id='dok-laporan'><h3>" + escapeHtml(r.judul) + "</h3><p>" + escapeHtml(r.ringkasan) + "</p>" +
+          (r.temuan_utama.length ? "<b>Temuan utama</b><ul>" + r.temuan_utama.map(function (t) { return "<li>" + escapeHtml(t) + "</li>"; }).join("") + "</ul>" : "") +
+          (r.data_kunci.length ? "<b>Data kunci</b><table class='table'><tbody>" + r.data_kunci.map(function (d) { return "<tr><td class='muted'>" + escapeHtml(d.label) + "</td><td>" + escapeHtml(d.nilai) + "</td></tr>"; }).join("") + "</tbody></table>" : "") +
+          (r.rekomendasi.length ? "<b>Rekomendasi</b><ol>" + r.rekomendasi.map(function (t) { return "<li>" + escapeHtml(t) + "</li>"; }).join("") + "</ol>" : "") +
+          "<p class='muted small'>Dibuat AI dari " + escapeHtml(data.file) + ". Periksa kembali sebelum dikirim.</p></div>" +
+          "<div class='row'>" + copyButton("dok-laporan") + saveTextButton("dok-laporan", "laporan-" + data.file.replace(/\.[^.]+$/, "") + ".txt") + "</div>";
+      }
+      if (data.message) { html += "<p class='small muted'>" + escapeHtml(data.message) + "</p>"; }
+      if (data.profile) { html += "<details" + (data.report ? "" : " open") + "><summary>Profil data</summary>" + profileHtml(data.profile) + "</details>"; }
+      $("dok-hasil").innerHTML = html || "<p class='muted'>Tidak ada hasil.</p>";
+    });
+  });
+
+  $("form-foto-ai").addEventListener("submit", function (event) {
+    event.preventDefault();
+    uploadTool(this, urls.fieldPhotoAi, "foto-hasil", "AI mengamati foto…", function (data, file) {
+      var url = URL.createObjectURL(file);
+      var boxes = data.findings.map(function (f, i) {
+        var b = f.box;
+        return "<div class='finding-box' style='left:" + (b[0] * 100) + "%;top:" + (b[1] * 100) + "%;width:" + Math.max((b[2] - b[0]) * 100, 2) + "%;height:" + Math.max((b[3] - b[1]) * 100, 2) + "%;--c:" + escapeHtml(f.color) + "'><span>" + (i + 1) + "</span></div>";
+      }).join("");
+      $("foto-hasil").innerHTML = "<div class='finding-photo'><img src='" + url + "' alt='Foto yang dianalisis'>" + boxes + "</div>" +
+        "<div class='card-form stack' id='foto-laporan'><p><b>Ringkasan:</b> " + escapeHtml(data.summary) + "</p><ol class='list compact'>" + data.findings.map(function (f) {
+          return "<li><span class='badge' style='background:" + escapeHtml(f.color) + "'>" + escapeHtml(f.category) + "</span> <b>" + escapeHtml(f.label) + "</b> <span class='muted small'>keyakinan " + escapeHtml(f.confidence) + "</span>" + (f.note ? "<div class='sub'>" + escapeHtml(f.note) + "</div>" : "") + "</li>";
+        }).join("") + "</ol>" + (data.recommendations.length ? "<b>Rekomendasi</b><ul>" + data.recommendations.map(function (t) { return "<li>" + escapeHtml(t) + "</li>"; }).join("") + "</ul>" : "") + "</div>" +
+        "<div class='row'>" + copyButton("foto-laporan") + "</div>";
+    });
+  });
+
+  var lastAudit = null;
+  var AUDIT_COLORS = { tindakan: "#cf222e", perhatian: "#bf8700", cek: "#0b5fcc", sehat: "#1a7f37" };
+
+  function renderAudit(data) {
+    lastAudit = data;
+    $("au-data-ai").hidden = !data.ai_available;
+    var html = "<div class='risk' style='--c:" + AUDIT_COLORS[data.status] + ";cursor:default'><b>" + escapeHtml(data.status_label) + "</b>" +
+      fmtNum(data.critical) + " kritis · " + fmtNum(data.attention) + " perlu perhatian · diperiksa " + fmtDate(data.checked_at, true) + "</div>";
+    if (!data.work_area) { html += "<p class='muted small'>Batas Korwil belum dipetakan, sehingga pemeriksaan \"di luar wilayah kerja\" dilewati.</p>"; }
+    html += "<ul class='list compact'>" + (data.groups.map(function (g) {
+      return "<li class='anomaly'><div class='row' style='justify-content:space-between;gap:8px'><b>" + escapeHtml(g.label) + "</b><span class='badge' style='background:" + (g.severity === "kritis" ? "#cf222e" : "#bf8700") + "'>" + fmtNum(g.count) + "</span></div>" +
+        (g.sample.length ? "<div class='sub'>Contoh: " + escapeHtml(g.sample.join(", ")) + "</div>" : "") +
+        (g.link ? "<div class='sub'><a href='" + encodeURI(g.link) + "' target='_blank' rel='noopener'>Buka di panel admin</a></div>" : "") + "</li>";
+    }).join("") || "<li class='ok-text'>Tidak ada masalah ditemukan. 👍</li>") + "</ul>";
+    if (data.summary) { html += "<div class='card-form' id='au-data-ringkas' style='white-space:pre-line'><b>Ringkasan AI</b>\n" + escapeHtml(data.summary) + "</div>"; }
+    $("au-data-hasil").innerHTML = html;
+  }
+
+  $("au-data-jalankan").addEventListener("click", function () {
+    var button = this;
+    button.disabled = true;
+    $("au-data-hasil").innerHTML = "<p class='muted'>Memeriksa data…</p>";
+    request(urls.dataAudit).then(renderAudit).catch(function (error) { $("au-data-hasil").innerHTML = "<p class='danger-text'>" + escapeHtml(error.message) + "</p>"; })
+      .then(function () { button.disabled = false; });
+  });
+  $("au-data-ai").addEventListener("click", function () {
+    var button = this;
+    button.disabled = true;
+    toast("AI merangkum temuan…", "ok");
+    request(urls.dataAudit, { method: "POST" }).then(renderAudit).catch(function (error) { toast(error.message, "error"); })
+      .then(function () { button.disabled = false; });
+  });
+
+  $("cek-perangkat").addEventListener("click", function () {
+    var out = $("cek-perangkat-hasil");
+    var items = [];
+    function line(ok, text) { items.push("<li class='" + (ok === true ? "ok-text" : ok === false ? "danger-text" : "") + "'>" + (ok === true ? "✔ " : ok === false ? "✖ " : "• ") + escapeHtml(text) + "</li>"); }
+    line(navigator.onLine, navigator.onLine ? "Terhubung ke internet." : "Sedang luring: laporan disimpan di antrean perangkat.");
+    var checks = [
+      myQueue().then(function (queue) {
+        var failed = queue.filter(function (q) { return q.error; }).length;
+        line(queue.length === 0 ? true : null, queue.length ? queue.length + " laporan di antrean luring" + (failed ? " (" + failed + " gagal dikirim, buka antrean untuk memperbaiki)" : "") + "." : "Antrean luring kosong.");
+        if (queue.length && navigator.onLine) { return sync(true).then(function () { line(null, "Sinkronisasi antrean dijalankan."); }); }
+      }).catch(function () { line(false, "Penyimpanan luring (IndexedDB) tidak tersedia — mode privat?"); }),
+      ("serviceWorker" in navigator ? navigator.serviceWorker.getRegistrations().then(function (regs) {
+        if (regs.length) { line(true, "Mode aplikasi (service worker) aktif."); return; }
+        return navigator.serviceWorker.register(urls.serviceWorker, { scope: urls.scope }).then(function () { line(true, "Service worker didaftarkan ulang."); }, function () { line(false, "Service worker tidak aktif (butuh HTTPS)."); });
+      }) : Promise.resolve(line(false, "Peramban tidak mendukung mode aplikasi luring."))),
+      (navigator.permissions && navigator.permissions.query ? navigator.permissions.query({ name: "geolocation" }).then(function (r) {
+        line(r.state === "denied" ? false : r.state === "granted" ? true : null, r.state === "granted" ? "Izin lokasi GPS diberikan." : r.state === "denied" ? "Izin lokasi GPS ditolak: aktifkan di pengaturan situs." : "Izin lokasi GPS akan diminta saat dipakai.");
+      }).catch(function () { /* abaikan */ }) : Promise.resolve()),
+      (navigator.storage && navigator.storage.estimate ? navigator.storage.estimate().then(function (e) {
+        if (e.quota) { line(e.usage / e.quota < 0.9, "Penyimpanan terpakai " + fmtNum(e.usage / 1048576, 1) + " MB dari " + fmtNum(e.quota / 1048576, 0) + " MB."); }
+      }).catch(function () { /* abaikan */ }) : Promise.resolve())
+    ];
+    out.innerHTML = "<li class='muted'>Memeriksa…</li>";
+    Promise.all(checks).then(function () {
+      var layerCount = Object.keys(layers).filter(function (k) { return layerState[k] && map.hasLayer(layers[k]); }).length;
+      line(true, layerCount + " lapisan peta aktif.");
+      out.innerHTML = items.join("");
+    });
+  });
+
+  $("sk-unduh").addEventListener("click", function () {
+    var button = this;
+    button.disabled = true;
+    download(urls.syncExcel, "sinkron-komando.xlsx", "Excel lengkap diunduh.").then(function () { button.disabled = false; });
+  });
+  $("sk-impor").addEventListener("click", function () { showTab("ujiplts"); openGeoImport(); });
+
 
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register(urls.serviceWorker, { scope: urls.scope }).catch(function () { /* HTTP biasa / mode privat */ });

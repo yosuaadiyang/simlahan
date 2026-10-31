@@ -54,6 +54,7 @@ from operasi.models import (
     ChatMessage,
     CommandSettings,
     DailyReportAttachment,
+    GeotechPhoto,
     IllegalFinding,
     Korwil,
     OfficerPosition,
@@ -66,6 +67,7 @@ from operasi.models import (
     StanceChange,
     SystemLock,
     TaskEvent,
+    Ticket,
 )
 from utils.pwa import shell_version
 
@@ -236,9 +238,14 @@ def _config(request) -> dict:
 
 
 def _spatial_config(user) -> dict:
-    from operasi import views_spatial
+    from operasi import views_spatial, views_tools
 
-    return views_spatial.config(user)
+    data = views_spatial.config(user)
+    extra = views_tools.config(user)
+    for key in ("perms", "urls", "choices", "colors"):
+        data[key].update(extra.pop(key))
+    data.update(extra)
+    return data
 
 
 def _base_config(request) -> dict:
@@ -304,6 +311,8 @@ def _base_config(request) -> dict:
                 "historis",
                 "peringkat",
                 "spasial",
+                "alat",
+                "ujiplts",
             )
             else "peta"
         ),
@@ -536,6 +545,8 @@ FILE_KINDS = {
         "",
     ),
     "foto-360": (SitePhoto360, "image", "operasi.view_sitephoto360", "korwil"),
+    "tiket": (Ticket, "attachment", "operasi.view_ticket", ""),
+    "uji-plts": (GeotechPhoto, "image", "operasi.view_geotechpoint", "point__korwil"),
 }
 
 
@@ -576,6 +587,10 @@ def private_file(request, kind, pk):
         queryset = TaskEvent.objects.filter(
             task__in=task_flow.visible_tasks(request.user)
         )
+    elif model is Ticket:
+        from operasi import tools
+
+        queryset = tools.visible_tickets(request.user)
     elif model is DailyReportAttachment:
         queryset = DailyReportAttachment.objects.filter(
             report__in=daily_reports.visible_reports(request.user)
@@ -927,11 +942,11 @@ LAYERS = {
 
 @api(permission=None)
 def layer(request, key):
-    from operasi import views_spatial
+    from operasi import views_spatial, views_tools
 
     if key.startswith("ref-") and key[4:].isdigit():
         return JsonResponse(collection(views_spatial.overlay_features(int(key[4:]))))
-    layers = {**LAYERS, **views_spatial.LAYERS}
+    layers = {**LAYERS, **views_spatial.LAYERS, **views_tools.LAYERS}
     if key not in layers:
         raise Http404
     permission, builder = layers[key]

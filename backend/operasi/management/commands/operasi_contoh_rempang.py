@@ -7,8 +7,8 @@ Membuat 11 Korwil (A–K) dengan batas wilayah, warga terdata (sikap, status
 lahan, kesesuaian RTRW, pilihan penyelesaian), laporan kegiatan, uji tanah,
 tugas wilayah, Komsos, temuan ilegal, patroli Taman Buru (temuan & bibit),
 kegiatan lainnya dengan penilaian dampak, bidang penguasaan lahan, zona
-ancaman, dan lapisan RTRW contoh untuk pusat komando. Semua nama fiktif;
-tidak ada NIK.
+ancaman, lapisan RTRW contoh, titik uji tanah PLTS, dan tiket masukan untuk
+pusat komando. Semua nama dan kode fiktif; tidak ada NIK.
 
 Rantai komando contoh (tugas berpoin dan laporan harian berjenjang) dibuat oleh
 ``pengguna_contoh`` lewat :func:`komando_demo` karena memerlukan akun contoh.
@@ -25,11 +25,12 @@ from django.utils import timezone
 
 from asetlahan import enums as aset_enums
 from asetlahan.models import MapOverlay, MapOverlayFeature, Task
-from operasi import enums, spatial, task_flow
+from operasi import enums, geotech, spatial, task_flow, tools
 from operasi.models import (
     Activity,
     DailyReport,
     DailyReportEvent,
+    GeotechPoint,
     HuntingParkFinding,
     HuntingParkPatrol,
     IllegalFinding,
@@ -44,6 +45,7 @@ from operasi.models import (
     StanceChange,
     TaskEvent,
     ThreatZone,
+    Ticket,
 )
 
 MARK = "[contoh]"
@@ -176,6 +178,8 @@ class Command(BaseCommand):
     def _delete(self):
         korwils = Korwil.objects.filter(note__startswith=MARK)
         delete_komando_demo()
+        GeotechPoint.objects.filter(survey_note__startswith=MARK).delete()
+        Ticket.objects.filter(title__startswith=MARK).delete()
         LandPlot.objects.filter(note__startswith=MARK).delete()
         ThreatZone.objects.filter(note__startswith=MARK).delete()
         MapOverlay.objects.filter(note__startswith=MARK).delete()
@@ -309,6 +313,116 @@ class Command(BaseCommand):
                 created_by=user,
             )
         self._spatial(user)
+        self._tools(user)
+
+    def _tools(self, user):
+        """Titik uji tanah PLTS dan tiket masukan (fiktif)."""
+        rng = random.Random(20261101)
+        today = timezone.localdate()
+        W = enums.GeotechWorkStatus
+        plan = (
+            ("A", "PV", "Blok surya contoh 1", 9),
+            ("E", "PV", "Blok surya contoh 2", 7),
+            ("E", "TL", "Jalur transmisi contoh", 5),
+            ("G", "GI", "Gardu contoh", 3),
+        )
+        methods = (
+            enums.GeotechMethod.BOREHOLE,
+            enums.GeotechMethod.TEST_PIT,
+            enums.GeotechMethod.RESISTIVITY,
+            enums.GeotechMethod.SONDIR,
+            enums.GeotechMethod.THERMAL,
+        )
+        statuses = (
+            (W.DONE, 4),
+            (W.IN_PROGRESS, 3),
+            (W.NOT_STARTED, 3),
+            (W.STOPPED, 1),
+        )
+        korwils = {k.code: k for k in Korwil.objects.filter(note__startswith=MARK)}
+        for code, prefix, area, count in plan:
+            korwil = korwils.get(code)
+            if korwil is None:
+                continue
+            for number in range(1, count + 1):
+                status = _pick(rng, statuses)
+                method = methods[number % len(methods)]
+                started = today - datetime.timedelta(days=rng.randint(5, 40))
+                point = GeotechPoint(
+                    code=f"{prefix}-CTH{code}-{number:02d}",
+                    method=method,
+                    area_name=area,
+                    zone_name=f"Zona {1 + number % 3}",
+                    batch=1 + (number - 1) // 4,
+                    korwil=korwil,
+                    location=_random_point(rng, korwil.geometry),
+                    landowner=f"{rng.choice(FIRST_NAMES)} {rng.choice(LAST_NAMES)}",
+                    work_status=status,
+                    progress_pct=rng.randint(20, 80),
+                    social_condition=(
+                        enums.SocialCondition.NOT_CONDUCIVE
+                        if status == W.STOPPED
+                        else enums.SocialCondition.CONDUCIVE
+                    ),
+                    survey_status=(
+                        enums.SurveyStatus.DONE
+                        if status != W.NOT_STARTED or rng.random() < 0.4
+                        else enums.SurveyStatus.PENDING
+                    ),
+                    obstacle=(
+                        "Pemilik lahan belum mengizinkan akses (contoh)"
+                        if status == W.STOPPED
+                        else ""
+                    ),
+                    started_on=started if status != W.NOT_STARTED else None,
+                    finished_on=(
+                        started + datetime.timedelta(days=rng.randint(1, 4))
+                        if status == W.DONE
+                        else None
+                    ),
+                    survey_note=f"{MARK} Titik uji fiktif.",
+                    created_by=user,
+                    updated_by=user,
+                )
+                point._korwil_resolved = True
+                geotech.save_with_history(point, user)
+        if user is None:
+            return
+        now = timezone.now()
+        samples = (
+            (
+                enums.TicketCategory.BUG,
+                enums.TicketPriority.HIGH,
+                "Foto laporan tidak muncul di riwayat",
+                enums.TicketStatus.NEW,
+            ),
+            (
+                enums.TicketCategory.OUTAGE,
+                enums.TicketPriority.CRITICAL,
+                "Peta lambat dimuat saat sinyal lemah",
+                enums.TicketStatus.IN_PROGRESS,
+            ),
+            (
+                enums.TicketCategory.SUGGESTION,
+                enums.TicketPriority.NORMAL,
+                "Tambah filter tanggal di daftar warga",
+                enums.TicketStatus.DONE,
+            ),
+        )
+        for index, (category, priority, title, status) in enumerate(samples):
+            ticket = Ticket.objects.create(
+                category=category,
+                priority=priority,
+                title=f"{MARK} {title}",
+                description="Tiket contoh untuk uji coba alur masukan.",
+                created_by=user,
+            )
+            if status != enums.TicketStatus.NEW:
+                Ticket.objects.filter(pk=ticket.pk).update(
+                    created_at=now - datetime.timedelta(hours=30 + index * 10)
+                )
+                ticket.refresh_from_db()
+                tools.set_ticket_status(ticket, user, status, note="Contoh tanggapan.")
 
     def _spatial(self, user):
         """Lapisan RTRW contoh, bidang penguasaan, dan zona ancaman (fiktif)."""

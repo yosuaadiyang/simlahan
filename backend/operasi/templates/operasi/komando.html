@@ -499,6 +499,8 @@
     <div class="more-menu">
       <button type="button" class="btn" data-buka="beranda">📊<span>Beranda</span></button>
       <button type="button" class="btn" data-buka="spasial">🗺️<span>Peta &amp; spasial</span></button>
+      <button type="button" class="btn" data-buka="ujiplts">🧪<span>Uji tanah PLTS</span></button>
+      <button type="button" class="btn" data-buka="alat">🧰<span>Alat &amp; tiket</span></button>
       <button type="button" class="btn" data-buka="persetujuan">🗳️<span>Persetujuan<i class="count" id="menu-persetujuan-n"></i></span></button>
       <button type="button" class="btn" data-buka="laporan">🗂️<span>Laporan harian<i class="count" id="menu-laporan-n"></i></span></button>
       <button type="button" class="btn" data-buka="peringkat">🏆<span>Peringkat tim</span></button>
@@ -555,6 +557,111 @@
     <div class="grid2 split">
       <div><h3>Kegiatan 7 hari</h3><div id="beranda-kegiatan" class="stack"></div></div>
       <div><h3>Uji tanah</h3><div id="beranda-tanah" class="stack"></div></div>
+    </div>
+  </section>
+
+  <section id="tab-ujiplts" class="tab-view sheet" aria-label="Uji tanah PLTS" hidden>
+    <h2>Uji tanah PLTS</h2>
+    <p class="muted small">Progres penyelidikan tanah (bor, sumur uji, resistivitas, sondir, termal) per titik untuk perencanaan PLTS. Kode titik dicocokkan tanpa memedulikan spasi/tanda hubung.</p>
+    <div class="row wrap">
+      <select id="up-korwil" aria-label="Korwil"><option value="">Semua Korwil</option></select>
+      <select id="up-status" aria-label="Status pekerjaan"><option value="">Semua status</option></select>
+      <select id="up-bagian" aria-label="Bagian proyek"><option value="">Semua bagian</option></select>
+      <select id="up-metode" aria-label="Metode"><option value="">Semua metode</option></select>
+      <select id="up-batch" aria-label="Batch"><option value="">Semua batch</option></select>
+    </div>
+    <div class="row wrap">
+      <input type="search" id="up-cari" placeholder="Cari kode, area, pemilik…" aria-label="Cari titik">
+      <button type="button" class="btn-small" id="up-tambah" hidden>＋ Titik</button>
+      <button type="button" class="btn-small" id="up-impor" hidden>⬆ Impor Excel</button>
+      <button type="button" class="btn-small" id="up-excel">⬇ Excel</button>
+      <button type="button" class="btn-small" id="up-peta">🗺️ Peta</button>
+    </div>
+    <div class="metrics four" id="up-ringkas"></div>
+    <div class="stack-bar" id="up-bar" aria-label="Komposisi status" hidden></div>
+    <div id="up-segmen" class="stack"></div>
+    <ul class="list compact" id="up-daftar"></ul>
+  </section>
+
+  <section id="tab-alat" class="tab-view sheet" aria-label="Alat dan tiket" hidden>
+    <h2>Alat &amp; tiket</h2>
+    <div class="pills" id="alat-bagian" role="group" aria-label="Alat">
+      <button type="button" data-alat="tiket" class="active">Tiket &amp; masukan</button>
+      <button type="button" data-alat="ocr">OCR dokumen</button>
+      <button type="button" data-alat="dokumen">AI dokumen → laporan</button>
+      <button type="button" data-alat="foto">AI foto lapangan</button>
+      <button type="button" data-alat="audit">Audit data</button>
+      <button type="button" data-alat="sinkron">Sinkron Excel</button>
+    </div>
+
+    <div data-alat-panel="tiket" class="stack">
+      <form class="stack card-form" id="form-tiket">
+        <p class="muted small">Laporkan galat aplikasi, gangguan, atau usulan. Pengelola sistem menindaklanjuti; tiket yang selesai memberi poin untuk pengirim.</p>
+        <div class="grid2">
+          <label class="field">Kategori <select name="kategori" id="tk-kategori"></select></label>
+          <label class="field">Prioritas <select name="prioritas" id="tk-prioritas"></select></label>
+        </div>
+        <label class="field">Judul <input name="judul" maxlength="200" required></label>
+        <label class="field">Deskripsi <textarea name="deskripsi" rows="3" maxlength="10000" required placeholder="Apa yang terjadi, di menu mana, langkah untuk mengulanginya"></textarea></label>
+        <label class="field">Tangkapan layar (opsional, maks. 10 MB) <input type="file" name="lampiran" accept="image/*"></label>
+        <div class="row"><button type="submit" class="btn primary">Kirim tiket</button></div>
+      </form>
+      <div class="row wrap">
+        <select id="tk-status" aria-label="Status"><option value="">Semua status</option></select>
+        <input type="search" id="tk-cari" placeholder="Cari tiket…" aria-label="Cari tiket">
+        <button type="button" class="btn-small" id="tk-excel">⬇ Excel</button>
+      </div>
+      <div class="metrics four" id="tk-ringkas"></div>
+      <ul class="list compact" id="tk-daftar"></ul>
+      <h3>Pengirim masukan teratas</h3>
+      <ol class="list compact" id="tk-peringkat"></ol>
+    </div>
+
+    <div data-alat-panel="ocr" class="stack" hidden>
+      <p class="muted small">Foto atau PDF dokumen (nota, kuitansi, surat, papan nama) diubah menjadi teks yang bisa disalin. Memakai AI bila tersedia, atau OCR Tesseract di server.</p>
+      <form class="stack card-form" id="form-ocr">
+        <label class="field">Foto / PDF (maks. 20 MB) <input type="file" name="berkas" accept="image/*,.pdf" capture="environment" required></label>
+        <div class="row"><button type="submit" class="btn primary">Baca teks</button></div>
+      </form>
+      <div id="ocr-hasil" class="stack"></div>
+    </div>
+
+    <div data-alat-panel="dokumen" class="stack" hidden>
+      <p class="muted small">Unggah dokumen (PDF, Word, Excel, CSV, TXT, atau foto). AI menyusun laporan: ringkasan, temuan utama, data kunci, dan rekomendasi. Tanpa AI ditampilkan profil data (jumlah baris, total kolom angka).</p>
+      <form class="stack card-form" id="form-dokumen">
+        <label class="field">Dokumen (maks. 20 MB) <input type="file" name="berkas" accept=".pdf,.docx,.xlsx,.xlsm,.csv,.tsv,.txt,.md,image/*" required></label>
+        <label class="field">Fokus analisis (opsional) <input name="fokus" maxlength="300" placeholder="mis. capaian per Korwil, kendala utama"></label>
+        <div class="row"><button type="submit" class="btn primary">Analisis</button></div>
+      </form>
+      <div id="dok-hasil" class="stack"></div>
+    </div>
+
+    <div data-alat-panel="foto" class="stack" hidden>
+      <p class="muted small">AI mengamati foto lapangan atau drone: pembukaan lahan, bangunan, kebun, air, akses, alat berat — ditandai kotak di foto, lengkap dengan rekomendasi. Wajah/identitas orang tidak dianalisis.</p>
+      <form class="stack card-form" id="form-foto-ai">
+        <label class="field">Foto lapangan (maks. 20 MB) <input type="file" name="berkas" accept="image/*" capture="environment" required></label>
+        <label class="field">Konteks (opsional) <input name="konteks" maxlength="300" placeholder="mis. patroli Korwil C, laporan pembukaan lahan baru"></label>
+        <div class="row"><button type="submit" class="btn primary">Analisis foto</button></div>
+      </form>
+      <div id="foto-hasil" class="stack"></div>
+    </div>
+
+    <div data-alat-panel="audit" class="stack" hidden>
+      <p class="muted small">Pemeriksaan kelengkapan &amp; kewajaran data dalam cakupan Anda: titik tanpa koordinat atau di luar wilayah kerja, bidang ganda, warga tanpa lokasi, kegiatan tanpa GPS, petugas tanpa Korwil.</p>
+      <div class="row wrap"><button type="button" class="btn primary" id="au-data-jalankan">Jalankan audit data</button><button type="button" class="btn-small" id="au-data-ai" hidden>✨ Ringkas dengan AI</button></div>
+      <div id="au-data-hasil" class="stack"></div>
+      <h3>Cek perangkat ini</h3>
+      <div class="row wrap"><button type="button" class="btn" id="cek-perangkat">Periksa perangkat</button></div>
+      <ul class="list compact" id="cek-perangkat-hasil"></ul>
+    </div>
+
+    <div data-alat-panel="sinkron" class="stack" hidden>
+      <p class="muted small">Unduh satu berkas Excel berisi ringkasan per Korwil, bidang lahan, titik uji tanah PLTS, dan tiket (khusus pengelola) sesuai cakupan Anda. Lembar "Uji tanah PLTS" dapat diedit lalu diimpor kembali untuk memperbarui progres.</p>
+      <div class="row wrap">
+        <button type="button" class="btn primary" id="sk-unduh">⬇ Unduh Excel lengkap</button>
+        <button type="button" class="btn" id="sk-impor" hidden>⬆ Impor progres uji PLTS</button>
+      </div>
+      <p class="muted small" id="sk-catatan"></p>
     </div>
   </section>
 
@@ -833,6 +940,27 @@
     </div>
     <div class="row"><button type="button" class="btn" id="ib-pratinjau">Pratinjau</button><button type="submit" class="btn primary" id="ib-terapkan" disabled>Terapkan pilihan</button></div>
     <div id="ib-hasil" class="stack"></div>
+  </form>
+</dialog>
+
+<dialog id="dlg-uji" class="wide">
+  <form method="dialog" class="stack">
+    <div class="panel-head"><h3 id="ujd-judul">Titik uji</h3><button value="tutup" class="close">✕</button></div>
+    <div id="ujd-isi" class="stack"></div>
+  </form>
+</dialog>
+
+<dialog id="dlg-impor-uji" class="wide">
+  <form class="stack" id="form-impor-uji">
+    <div class="panel-head"><h3>Impor progres uji tanah PLTS</h3><button type="button" class="close" data-tutup>✕</button></div>
+    <div class="segmented small-seg" id="iu-mode" role="group" aria-label="Mode impor">
+      <button type="button" data-mode="perbarui" class="active">Perbarui titik terdaftar</button>
+      <button type="button" data-mode="lengkap">Perbarui + tambah titik baru</button>
+    </div>
+    <p class="muted small">Berkas Excel (.xlsx) atau CSV. Baris judul dicari otomatis di 15 baris pertama; kolom yang dikenali antara lain Kode titik, Metode/Jenis, Area/Paket, Batch, Korwil, Status survei, Kondisi sosial, Status pekerjaan, Progres, Kendala, Tanggal mulai/selesai, Lintang/Bujur. Sel kosong tidak mengubah data. Berkas hasil "⬇ Excel" bisa langsung diedit lalu diimpor.</p>
+    <label class="field">Berkas (maks. 20 MB) <input type="file" name="berkas" id="iu-berkas" accept=".xlsx,.xlsm,.csv,.tsv,.txt" required></label>
+    <div class="row"><button type="button" class="btn" id="iu-pratinjau">Pratinjau</button><button type="submit" class="btn primary" id="iu-terapkan" disabled>Terapkan pilihan</button></div>
+    <div id="iu-hasil" class="stack"></div>
   </form>
 </dialog>
 

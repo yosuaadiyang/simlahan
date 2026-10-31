@@ -105,7 +105,7 @@ def _sample_data() -> list[Finding]:
     from alokasi.models import LandPlot
     from asetlahan.models import LandAsset, MapOverlay
     from dokumen.models import LandUse
-    from operasi.models import Korwil
+    from operasi.models import Korwil, Ticket
     from pengadaan.models import AcquisitionProject
 
     found = []
@@ -139,6 +139,11 @@ def _sample_data() -> list[Finding]:
             WARN,
             Korwil.objects.filter(note__startswith="[contoh]"),
             "Korwil contoh",
+        ),
+        (
+            WARN,
+            Ticket.objects.filter(title__startswith="[contoh]"),
+            "tiket contoh",
         ),
         (
             WARN,

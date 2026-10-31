@@ -75,6 +75,8 @@ upload_patrol = _upload_to("upload_patrol", "patroli")
 upload_task = _upload_to("upload_task", "tugas")
 upload_daily_report = _upload_to("upload_daily_report", "laporan-harian")
 upload_site_photo = _upload_to("upload_site_photo", "foto-360")
+upload_ticket = _upload_to("upload_ticket", "tiket")
+upload_geotech = _upload_to("upload_geotech", "uji-plts")
 
 
 def next_number(prefix: str) -> str:
@@ -250,6 +252,9 @@ class CommandSettings(models.Model):
     class Meta:
         verbose_name = _("Pengaturan pusat komando")
         verbose_name_plural = _("Pengaturan pusat komando")
+        permissions = [
+            ("run_data_audit", _("Dapat menjalankan audit data pusat komando")),
+        ]
 
     def __str__(self):
         return str(self._meta.verbose_name)
@@ -2222,6 +2227,286 @@ class SitePhoto360(TimeStampedModel):
         return self.title
 
 
+# --------------------------------------------------------------------------
+# Alat: tiket & masukan, uji tanah PLTS
+# --------------------------------------------------------------------------
+
+
+class Ticket(TimeStampedModel):
+    """Tiket galat, gangguan, atau masukan dari petugas untuk pengelola sistem."""
+
+    number = models.CharField(_("Nomor"), max_length=32, unique=True, editable=False)
+    category = models.CharField(
+        _("Kategori"),
+        max_length=16,
+        choices=enums.TicketCategory.choices,
+        default=enums.TicketCategory.BUG,
+    )
+    priority = models.CharField(
+        _("Prioritas"),
+        max_length=16,
+        choices=enums.TicketPriority.choices,
+        default=enums.TicketPriority.NORMAL,
+    )
+    status = models.CharField(
+        _("Status"),
+        max_length=16,
+        choices=enums.TicketStatus.choices,
+        default=enums.TicketStatus.NEW,
+    )
+    title = models.CharField(_("Judul"), max_length=200)
+    description = models.TextField(_("Deskripsi"))
+    attachment = PrivateFileField(
+        verbose_name=_("Tangkapan layar"),
+        upload_to=upload_ticket,
+        max_length=255,
+        blank=True,
+        validators=IMAGE_VALIDATORS,
+    )
+    created_by = _user_field(_("Pengirim"), related_name="operasi_tickets")
+    handler_note = models.TextField(_("Catatan pengelola"), blank=True, default="")
+    resolved_by = _user_field(_("Ditangani oleh"))
+    resolved_at = models.DateTimeField(_("Waktu selesai"), null=True, blank=True)
+    resolution_hours = models.DecimalField(
+        _("Lama penanganan (jam)"),
+        max_digits=8,
+        decimal_places=1,
+        null=True,
+        blank=True,
+    )
+    points = models.PositiveSmallIntegerField(_("Poin pengirim"), default=0)
+
+    class Meta:
+        verbose_name = _("Tiket & masukan")
+        verbose_name_plural = _("Tiket & masukan")
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.number} – {self.title}" if self.number else self.title
+
+    def save(self, *args, **kwargs):
+        if not self.number:
+            self.number = next_number("TKT")
+        super().save(*args, **kwargs)
+
+
+def geotech_key(code: str) -> str:
+    """Kode titik kanonik: hanya huruf & angka, huruf besar (PV-BH 01 = PVBH01)."""
+    return "".join(ch for ch in str(code or "") if ch.isalnum()).upper()
+
+
+def geotech_segment(code: str) -> str:
+    key = geotech_key(code)
+    for prefix, segment in (
+        ("TJB", enums.GeotechSegment.JOINT_BAY),
+        ("PV", enums.GeotechSegment.PV),
+        ("TL", enums.GeotechSegment.TRANSMISSION),
+        ("SS", enums.GeotechSegment.SUBSTATION),
+        ("GI", enums.GeotechSegment.SUBSTATION),
+    ):
+        if key.startswith(prefix):
+            return segment
+    return enums.GeotechSegment.OTHER
+
+
+class GeotechPoint(TimeStampedModel):
+    """Titik penyelidikan tanah (geoteknik) untuk perencanaan PLTS."""
+
+    code = models.CharField(_("Kode titik"), max_length=64, unique=True)
+    code_key = models.CharField(
+        _("Kode kanonik"), max_length=64, unique=True, editable=False
+    )
+    method = models.CharField(
+        _("Metode"),
+        max_length=16,
+        choices=enums.GeotechMethod.choices,
+        default=enums.GeotechMethod.BOREHOLE,
+    )
+    segment = models.CharField(
+        _("Bagian proyek"),
+        max_length=16,
+        choices=enums.GeotechSegment.choices,
+        blank=True,
+        default="",
+        help_text=_("Kosongkan agar ditentukan dari awalan kode (PV, TL, SS, TJB)."),
+    )
+    area_name = models.CharField(_("Area / paket"), max_length=128, blank=True)
+    zone_name = models.CharField(_("Zona"), max_length=128, blank=True, default="")
+    batch = models.PositiveSmallIntegerField(
+        _("Batch"), default=1, validators=[MinValueValidator(1), MaxValueValidator(99)]
+    )
+    korwil = _korwil_field("geotech_points")
+    location = gmodels.PointField(_("Titik"), srid=4326, null=True, blank=True)
+    landowner = models.CharField(
+        _("Pemilik / penggarap lahan"), max_length=255, blank=True, default=""
+    )
+    survey_status = models.CharField(
+        _("Status survei"),
+        max_length=16,
+        choices=enums.SurveyStatus.choices,
+        default=enums.SurveyStatus.PENDING,
+    )
+    social_condition = models.CharField(
+        _("Kondisi sosial"),
+        max_length=16,
+        choices=enums.SocialCondition.choices,
+        default=enums.SocialCondition.UNCHECKED,
+    )
+    work_status = models.CharField(
+        _("Status pekerjaan"),
+        max_length=16,
+        choices=enums.GeotechWorkStatus.choices,
+        default=enums.GeotechWorkStatus.NOT_STARTED,
+    )
+    progress_pct = models.PositiveSmallIntegerField(
+        _("Progres (%)"), default=0, validators=[MaxValueValidator(100)]
+    )
+    obstacle = models.CharField(_("Kendala"), max_length=255, blank=True, default="")
+    access = models.CharField(_("Akses lokasi"), max_length=255, blank=True)
+    survey_note = models.TextField(_("Catatan survei"), blank=True, default="")
+    work_note = models.TextField(_("Catatan pekerjaan"), blank=True, default="")
+    recommendation = models.TextField(
+        _("Rekomendasi tindak lanjut"), blank=True, default=""
+    )
+    started_on = models.DateField(_("Tanggal mulai"), null=True, blank=True)
+    finished_on = models.DateField(_("Tanggal selesai"), null=True, blank=True)
+    soil_test = models.ForeignKey(
+        SoilTest,
+        verbose_name=_("Hasil uji laboratorium"),
+        related_name="geotech_points",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    created_by = _user_field(_("Dibuat oleh"))
+    updated_by = _user_field(_("Diubah oleh"))
+
+    class Meta:
+        verbose_name = _("Titik uji tanah PLTS")
+        verbose_name_plural = _("Titik uji tanah PLTS")
+        ordering = ["batch", "code"]
+
+    def __str__(self):
+        return self.code
+
+    def normalize(self):
+        """Selaraskan status, progres, dan tanggal agar tidak saling bertentangan."""
+        W = enums.GeotechWorkStatus
+        self.code = " ".join(str(self.code or "").split())
+        self.code_key = geotech_key(self.code)
+        if not self.segment:
+            self.segment = geotech_segment(self.code)
+        if self.work_status == W.DONE:
+            self.progress_pct = 100
+            self.survey_status = enums.SurveyStatus.DONE
+            if self.finished_on is None:
+                self.finished_on = timezone.localdate()
+        elif self.work_status == W.NOT_STARTED:
+            self.progress_pct = 0
+        else:
+            self.progress_pct = min(max(int(self.progress_pct or 0), 1), 99)
+        if self.work_status in (W.IN_PROGRESS, W.STOPPED, W.DONE):
+            self.survey_status = enums.SurveyStatus.DONE
+            if self.started_on is None:
+                self.started_on = self.finished_on or timezone.localdate()
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+
+        super().clean()
+        self.normalize()
+        if not self.code_key:
+            raise ValidationError({"code": [_("Kode titik wajib diisi.")]})
+        twin = (
+            GeotechPoint.objects.filter(code_key=self.code_key)
+            .exclude(pk=self.pk)
+            .values_list("code", flat=True)
+            .first()
+        )
+        if twin:
+            raise ValidationError(
+                {"code": [_("Kode sama dengan titik %(code)s.") % {"code": twin}]}
+            )
+        if self.started_on and self.finished_on and self.finished_on < self.started_on:
+            raise ValidationError(
+                {"finished_on": [_("Tanggal selesai sebelum tanggal mulai.")]}
+            )
+
+    def save(self, *args, **kwargs):
+        from operasi import geo
+
+        self.normalize()
+        if (
+            self.korwil_id is None
+            and self.location is not None
+            and not getattr(self, "_korwil_resolved", False)
+        ):
+            self.korwil = geo.korwil_at(self.location)
+        update_fields = kwargs.get("update_fields")
+        if update_fields is not None:
+            kwargs["update_fields"] = set(update_fields) | {
+                "code",
+                "code_key",
+                "segment",
+                "progress_pct",
+                "survey_status",
+                "started_on",
+                "finished_on",
+                "korwil",
+            }
+        super().save(*args, **kwargs)
+
+
+class GeotechPhoto(TimeStampedModel):
+    point = models.ForeignKey(
+        GeotechPoint,
+        verbose_name=_("Titik uji"),
+        related_name="photos",
+        on_delete=models.CASCADE,
+    )
+    image = PrivateFileField(
+        verbose_name=_("Foto"),
+        upload_to=upload_geotech,
+        max_length=255,
+        validators=IMAGE_VALIDATORS,
+    )
+    caption = models.CharField(_("Keterangan"), max_length=255, blank=True)
+    uploaded_by = _user_field(_("Diunggah oleh"))
+
+    class Meta:
+        verbose_name = _("Foto titik uji PLTS")
+        verbose_name_plural = _("Foto titik uji PLTS")
+        ordering = ["created_at"]
+
+    def __str__(self):
+        return self.image.name.rsplit("/", 1)[-1]
+
+
+class GeotechChange(TimeStampedModel):
+    """Riwayat perubahan status titik uji PLTS."""
+
+    point = models.ForeignKey(
+        GeotechPoint,
+        verbose_name=_("Titik uji"),
+        related_name="changes",
+        on_delete=models.CASCADE,
+    )
+    field = models.CharField(_("Data"), max_length=64)
+    old_value = models.CharField(_("Sebelumnya"), max_length=255, blank=True)
+    new_value = models.CharField(_("Menjadi"), max_length=255, blank=True)
+    note = models.CharField(_("Catatan"), max_length=255, blank=True, default="")
+    source = models.CharField(_("Sumber"), max_length=64, blank=True, default="")
+    changed_by = _user_field(_("Diubah oleh"))
+
+    class Meta:
+        verbose_name = _("Riwayat titik uji PLTS")
+        verbose_name_plural = _("Riwayat titik uji PLTS")
+        ordering = ["-created_at", "-pk"]
+
+    def __str__(self):
+        return f"{self.point} · {self.field}"
+
+
 for _model in (
     CommandSettings,
     Korwil,
@@ -2241,6 +2526,8 @@ for _model in (
     LandPlot,
     ThreatZone,
     SitePhoto360,
+    Ticket,
+    GeotechPoint,
 ):
     auditlog.register(_model)
 
