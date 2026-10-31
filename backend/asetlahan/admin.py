@@ -2374,9 +2374,10 @@ class MapOverlayAdmin(AsetModelAdmin):
         "feature_count",
         "is_active",
         "show_by_default",
+        "show_in_command",
         "modified_at",
     )
-    list_filter = ("kind", "is_active")
+    list_filter = ("kind", "is_active", "show_in_command")
     search_fields = ("name", "source", "note")
     readonly_fields = ("feature_count",)
     fields = (
@@ -2386,6 +2387,7 @@ class MapOverlayAdmin(AsetModelAdmin):
         "source",
         "is_active",
         "show_by_default",
+        "show_in_command",
         "import_file",
         "feature_count",
         "note",

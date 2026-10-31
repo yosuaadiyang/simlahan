@@ -389,8 +389,17 @@
     { key: "petugas", name: "Petugas Live", perm: perms.lihatPetugas },
     { key: "sos", name: "SOS aktif", perm: perms.lihatSos },
     { key: "temuan", name: "Temuan ilegal", perm: perms.temuan },
-    { key: "patroli", name: "Patroli SMART", perm: perms.patroli }
-  ].filter(function (spec) { return spec.perm; });
+    { key: "patroli", name: "Patroli SMART", perm: perms.patroli },
+    { key: "bidang", name: "Penguasaan lahan", perm: perms.bidang },
+    { key: "ancaman", name: "Zona ancaman", perm: perms.ancaman },
+    { key: "foto360", name: "Foto situs 360°", perm: perms.foto360 }
+  ].concat((config.commandLayers || []).map(function (l) {
+    return { key: l.key, name: l.name + " (" + l.kind + ")", perm: true, ref: true, color: l.color, zoned: l.zoned, def: l.visible };
+  })).filter(function (spec) { return spec.perm; });
+  // Lapisan referensi baru mengikuti setelan "Tampil saat peta dibuka".
+  LAYER_SPECS.forEach(function (spec) {
+    if (spec.ref && !Object.prototype.hasOwnProperty.call(layerState, spec.key)) { layerState[spec.key] = !!spec.def; }
+  });
 
   function rampColor(value) {
     if (value === null || value === undefined) { return "#6e7781"; }
@@ -417,6 +426,12 @@
     (props.rows || []).forEach(function (row) { html += "<br>" + escapeHtml(row[0]) + ": " + escapeHtml(row[1]); });
     if (props.kind === "warga") {
       html += '<br><button type="button" class="btn-small" data-warga="' + props.id + '">Buka data warga</button>';
+    }
+    if (props.kind === "bidang") {
+      html += '<br><button type="button" class="btn-small" data-bidang="' + props.id + '">Detail bidang</button>';
+    }
+    if (props.photo360) {
+      html += '<br><button type="button" class="btn-small" data-foto360="' + escapeHtml(props.photo360) + '" data-judul="' + escapeHtml(props.title) + '">Lihat 360°</button>';
     }
     if (props.url) { html += '<br><a href="' + encodeURI(props.url) + '" target="_blank" rel="noopener">Buka data</a>'; }
     (props.photos || []).forEach(function (url) { html += ' <a href="' + encodeURI(url) + '" target="_blank" rel="noopener">📷</a>'; });
@@ -448,6 +463,28 @@
             ? L.divIcon({ className: "sos-icon", html: "🆘", iconSize: [30, 30] })
             : L.divIcon({ className: "officer-icon", html: f.properties.self ? "🟢" : "👮", iconSize: [26, 26] });
           return L.marker(latlng, { icon: icon, zIndexOffset: key === "sos" ? 1000 : 500 });
+        },
+        onEachFeature: function (f, layer) { layer.bindPopup(popupHtml(f.properties)); }
+      });
+    }
+    if (key === "bidang" || key === "ancaman" || key.indexOf("ref-") === 0) {
+      return L.geoJSON(data, {
+        style: function (f) {
+          var c = f.properties.color || "#0969da";
+          if (key === "ancaman") { return { color: c, weight: 2, dashArray: "6 4", fillColor: c, fillOpacity: 0.25 }; }
+          if (key === "bidang") { return { color: c, weight: 2, fillColor: c, fillOpacity: 0.35 }; }
+          return { color: c, weight: 1.5, fillColor: c, fillOpacity: 0.18 };
+        },
+        pointToLayer: function (f, latlng) {
+          return L.circleMarker(latlng, { radius: 5, color: "#fff", weight: 1, fillColor: f.properties.color || "#0969da", fillOpacity: 0.9 });
+        },
+        onEachFeature: function (f, layer) { layer.bindPopup(popupHtml(f.properties)); }
+      });
+    }
+    if (key === "foto360") {
+      return L.geoJSON(data, {
+        pointToLayer: function (f, latlng) {
+          return L.marker(latlng, { icon: L.divIcon({ className: "pano-icon", html: "◉", iconSize: [26, 26] }), title: f.properties.title });
         },
         onEachFeature: function (f, layer) { layer.bindPopup(popupHtml(f.properties)); }
       });
@@ -551,6 +588,26 @@
         entries.push({ color: config.colors.activity[key], label: "Kegiatan: " + choiceLabel("activityType", key), round: true });
       });
     }
+    if (layerState.bidang && perms.bidang) {
+      Object.keys(config.colors.control).forEach(function (key) {
+        entries.push({ color: config.colors.control[key], label: "Bidang: " + choiceLabel("control", key) });
+      });
+    }
+    if (layerState.ancaman && perms.ancaman) {
+      Object.keys(config.colors.threat).forEach(function (key) {
+        entries.push({ color: config.colors.threat[key], label: "Zona ancaman " + choiceLabel("threat", key).toLowerCase() });
+      });
+    }
+    if (layerState.foto360 && perms.foto360) { entries.push({ color: "#0ea5e9", label: "Foto situs 360°", round: true }); }
+    LAYER_SPECS.forEach(function (spec) {
+      if (!spec.ref || !layerState[spec.key]) { return; }
+      if (spec.zoned) {
+        Object.keys(config.colors.zone).forEach(function (key) {
+          entries.push({ color: config.colors.zone[key], label: spec.name.split(" (")[0] + ": " + choiceLabel("zone", key) });
+        });
+      }
+      entries.push({ color: spec.color, label: spec.name + (spec.zoned ? " – lainnya" : "") });
+    });
     return entries;
   }
 
@@ -598,8 +655,13 @@
   $("mode-korwil").addEventListener("change", function () { modes.korwil = this.value; store("modeKorwil", modes.korwil); restyle("korwil"); });
 
   map.on("popupopen", function (event) {
-    var button = event.popup.getElement().querySelector("[data-warga]");
+    var element = event.popup.getElement();
+    var button = element.querySelector("[data-warga]");
     if (button) { button.addEventListener("click", function () { openResident(parseInt(button.getAttribute("data-warga"), 10)); }); }
+    var plot = element.querySelector("[data-bidang]");
+    if (plot) { plot.addEventListener("click", function () { openPlot(plot.getAttribute("data-bidang")); }); }
+    var pano = element.querySelector("[data-foto360]");
+    if (pano) { pano.addEventListener("click", function () { openPano(pano.getAttribute("data-foto360"), pano.getAttribute("data-judul")); }); }
   });
 
   // ---------------------------------------------------------------- Info Korwil
@@ -757,6 +819,8 @@
       if (toolMode === "measure") { $("ukur-tutup").click(); } else { setTool("measure"); $("ukur").hidden = false; }
     }
     else if (tool === "satellite") { setBase(currentBase === satelliteIndex ? 0 : satelliteIndex); renderLayerList(); }
+    else if (tool === "tactical") { setTactical(!map.getContainer().classList.contains("tactical")); }
+    else if (tool === "clear-analysis") { clearAnalysis(); }
     else if (tool === "ai") { showTab("peta"); startAi(); }
     else if (tool === "print") { openPrint(selectedKorwil); }
     else if (tool === "voice") { startVoice(); }
@@ -1293,7 +1357,7 @@
 
   var currentTab = "peta";
   // Tab di balik tombol "Lainnya" agar bilah tab muat di layar ponsel.
-  var MORE_TABS = ["beranda", "persetujuan", "laporan", "peringkat", "struktur", "historis", "feed", "ai"];
+  var MORE_TABS = ["beranda", "spasial", "persetujuan", "laporan", "peringkat", "struktur", "historis", "feed", "ai"];
   // Tab dan sub-tab yang tidak bisa dipakai peran pengguna tidak ditampilkan.
   var TAB_ALLOWED = {
     absen: perms.absen,
@@ -1339,6 +1403,7 @@
     if (name === "laporan") { loadReports(); }
     if (name === "persetujuan") { loadApprovals(); }
     if (name === "beranda") { loadHome(); }
+    if (name === "spasial") { loadSpatial(); }
     if (name === "historis") { loadHistory(); }
     if (name === "perf") { loadPerformance(); }
     if (name === "peringkat") { loadLeaderboard(); }
@@ -3104,6 +3169,7 @@
   }
 
   function loadHome() {
+    loadAnomalies();
     $("beranda-angka").innerHTML = "<p class='muted'>Memuat…</p>";
     request(urls.home).then(function (data) {
       var c = data.counts;
@@ -3201,6 +3267,777 @@
       openPerformance(officer.getAttribute("data-petugas"));
     }
   });
+
+  // ================================================================ Anomali & risiko
+
+  var LEVEL_COLORS = { kritis: "#7f1d1d", tinggi: "#ef4444", sedang: "#f59e0b", rendah: "#10b981", "": "#8c959f" };
+  var LEVEL_LABELS = { kritis: "Kritis", tinggi: "Tinggi", sedang: "Sedang", rendah: "Rendah", "": "Data kurang" };
+
+  function levelBadge(level) {
+    return "<span class='badge' style='background:" + (LEVEL_COLORS[level] || "#8c959f") + "'>" + escapeHtml(LEVEL_LABELS[level] || level) + "</span>";
+  }
+
+  function loadAnomalies() {
+    request(urls.anomalies).then(function (data) {
+      $("beranda-anomali").innerHTML = data.anomalies.map(function (a) {
+        return "<details class='anomaly' style='--c:" + (LEVEL_COLORS[a.level] || "#8c959f") + "'" + (a.level === "kritis" ? " open" : "") + "><summary>" + levelBadge(a.level) + " " + escapeHtml(a.title) +
+          " <span class='muted small'>(" + a.items.length + ")</span></summary><ul class='list compact'>" + a.items.map(function (i) {
+            var go = i.center ? " class='clickable' data-lat='" + i.center[0] + "' data-lng='" + i.center[1] + "'" : "";
+            return "<li" + go + "><b>" + escapeHtml(i.label) + "</b>" + (i.center ? " 📍" : "") + "<div class='sub'>" + escapeHtml(i.detail) + "</div></li>";
+          }).join("") + "</ul></details>";
+      }).join("") || "<p class='small ok-text'>✓ Tidak ada anomali saat ini.</p>";
+      $("beranda-risiko").innerHTML = data.risks.map(function (r) {
+        return "<button type='button' class='risk' data-korwil-detail='" + r.id + "' style='--c:" + (LEVEL_COLORS[r.level] || "#8c959f") + "'><b>" + escapeHtml(r.code) + " · " + pctText(r.contra_pct) + "</b>" +
+          "<span>" + escapeHtml(LEVEL_LABELS[r.level] || "") + " · " + r.contra + " kontra / " + r.known + "</span></button>";
+      }).join("") || "<p class='muted small'>Belum ada Korwil.</p>";
+    }).catch(function (error) { $("beranda-anomali").textContent = error.message; });
+  }
+
+  $("beranda-anomali").addEventListener("click", function (event) {
+    var item = event.target.closest("[data-lat]");
+    if (!item) { return; }
+    showTab("peta");
+    map.setView([parseFloat(item.getAttribute("data-lat")), parseFloat(item.getAttribute("data-lng"))], 16);
+  });
+  $("beranda-risiko").addEventListener("click", function (event) {
+    var button = event.target.closest("[data-korwil-detail]");
+    if (button) { openKorwil(button.getAttribute("data-korwil-detail")); }
+  });
+
+  // ================================================================ Peta & spasial
+
+  var analysisLayer = L.layerGroup().addTo(map);
+
+  function narrow() { return window.matchMedia("(max-width: 640px)").matches; }
+
+  function showAnalysis(layer, bounds) {
+    analysisLayer.clearLayers();
+    analysisLayer.addLayer(layer);
+    document.querySelector('[data-tool="clear-analysis"]').hidden = false;
+    if (narrow()) { showTab("peta"); }
+    if (bounds && bounds.isValid && bounds.isValid()) {
+      // Panel samping menutupi ±440 px kanan peta di layar lebar.
+      var side = !narrow() && document.querySelector(".tab-view.sheet:not([hidden])") ? 470 : 30;
+      setTimeout(function () { map.fitBounds(bounds, { paddingTopLeft: [30, 30], paddingBottomRight: [side, 30], maxZoom: 17 }); }, narrow() ? 80 : 0);
+    }
+  }
+
+  function clearAnalysis() {
+    analysisLayer.clearLayers();
+    document.querySelector('[data-tool="clear-analysis"]').hidden = true;
+  }
+
+  function setTactical(on) {
+    map.getContainer().classList.toggle("tactical", on);
+    document.querySelector('[data-tool="tactical"]').classList.toggle("active", on);
+    store("taktis", on);
+  }
+
+  function ensureLayer(key) {
+    if (!LAYER_SPECS.some(function (s) { return s.key === key; })) { return; }
+    layerState[key] = true;
+    store("lapisan", layerState);
+    loadLayer(key);
+    renderLayerList();
+  }
+
+  var spatialPart = "bidang";
+  var spatialReady = false;
+  var HEAT_SOURCES = [
+    { value: "kegiatan", label: "Sebaran kegiatan", perm: perms.kegiatan },
+    { value: "posisi", label: "Jejak GPS petugas", perm: perms.jejak },
+    { value: "warga", label: "Sebaran warga terdata", perm: perms.warga }
+  ].filter(function (s) { return s.perm; });
+  var SPATIAL_ALLOWED = {
+    bidang: perms.bidang, tumpang: true, audit: perms.warga, panas: HEAT_SOURCES.length > 0,
+    jejak: perms.jejak, ancaman: perms.ancaman, foto: perms.foto360
+  };
+
+  function korwilOptions() {
+    return config.korwils.map(function (k) { return { value: k.id, label: "Korwil " + k.code + " – " + k.name }; });
+  }
+
+  function prepareSpatial() {
+    if (spatialReady) { return; }
+    spatialReady = true;
+    document.querySelectorAll("#spasial-bagian button").forEach(function (button) {
+      button.hidden = !SPATIAL_ALLOWED[button.getAttribute("data-bagian")];
+    });
+    if (!SPATIAL_ALLOWED[spatialPart]) {
+      spatialPart = Object.keys(SPATIAL_ALLOWED).filter(function (k) { return SPATIAL_ALLOWED[k]; })[0];
+    }
+    ["bd-korwil", "au-korwil"].forEach(function (id) { fillSelect($(id), korwilOptions(), "Semua Korwil"); });
+    ["ib-korwil", "za-korwil"].forEach(function (id) { fillSelect($(id), korwilOptions(), "Otomatis dari lokasi"); });
+    fillSelect($("bd-status"), config.choices.control, "Semua status");
+    fillSelect($("ib-urgensi"), config.choices.urgency);
+    fillSelect($("za-level"), config.choices.threat);
+    $("za-level").value = "sedang";
+    fillSelect($("ph-sumber"), HEAT_SOURCES);
+    $("jj-tanggal").value = localInputValue().slice(0, 10);
+    $("bd-impor").hidden = !perms.tambahBidang;
+    document.querySelector('#ib-mode [data-mode="penguasaan"]').hidden = !perms.ubahBidang;
+    $("form-ancaman").hidden = !perms.tambahAncaman;
+    $("form-foto360").hidden = !perms.tambahFoto360;
+  }
+
+  function loadSpatial() {
+    prepareSpatial();
+    showSpatialPart(spatialPart);
+  }
+
+  function showSpatialPart(name) {
+    spatialPart = name;
+    document.querySelectorAll("#spasial-bagian button").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-bagian") === name); });
+    document.querySelectorAll("#tab-spasial [data-panel]").forEach(function (panel) { panel.hidden = panel.getAttribute("data-panel") !== name; });
+    if (name === "bidang") { loadPlots(); }
+    if (name === "tumpang") { loadOverlapSources(); }
+    if (name === "jejak") { loadTrackOfficers(); }
+    if (name === "ancaman") { loadThreatZones(); }
+    if (name === "foto") { loadSitePhotos(); }
+  }
+
+  $("spasial-bagian").addEventListener("click", function (event) {
+    var button = event.target.closest("button[data-bagian]");
+    if (button) { showSpatialPart(button.getAttribute("data-bagian")); }
+  });
+
+  // ---------------------------------------------------------------- Penguasaan lahan
+
+  var plotTimer = null;
+
+  function haText(value) { return fmtNum(value, 2) + " ha"; }
+  function pct1(value) { return value === null || value === undefined ? "–" : fmtNum(value, 1) + "%"; }
+
+  function loadPlots() {
+    var params = ["urut=" + $("bd-urut").value];
+    if ($("bd-korwil").value) { params.push("korwil=" + $("bd-korwil").value); }
+    if ($("bd-status").value) { params.push("status=" + $("bd-status").value); }
+    if ($("bd-cari").value.trim()) { params.push("q=" + encodeURIComponent($("bd-cari").value.trim())); }
+    $("bd-daftar").innerHTML = "<li class='muted'>Memuat…</li>";
+    request(urls.plots + "?" + params.join("&")).then(function (data) {
+      var s = data.summary;
+      $("bd-ringkas").innerHTML =
+        "<div class='metric'><b>" + fmtNum(s.total) + "</b><span>Bidang · " + haText(s.area_ha) + "</span></div>" +
+        "<div class='metric'><b style='color:" + config.colors.control.sudah + "'>" + fmtNum(s.controlled) + "</b><span>Sudah dikuasai · " + haText(s.controlled_ha) + "</span></div>" +
+        "<div class='metric'><b style='color:" + config.colors.control.belum + "'>" + fmtNum(s.pending) + "</b><span>Belum dikuasai · " + haText(s.pending_ha) + "</span></div>" +
+        "<div class='metric'><b>" + pctText(s.controlled_pct) + "</b><span>Dikuasai · skor sisa " + fmtNum(s.score_pending, 1) + "</span></div>";
+      $("bd-daftar").innerHTML = data.rows.map(function (r) {
+        return "<li class='clickable' data-bidang='" + r.id + "'><div class='row' style='justify-content:space-between;gap:8px'><b>" + escapeHtml(r.number + (r.name ? " – " + r.name : "")) + "</b>" +
+          "<b title='Skor prioritas'>" + fmtNum(r.score, 1) + "</b></div>" +
+          "<div class='sub'><span class='badge' style='background:" + escapeHtml(r.color) + "'>" + escapeHtml(r.status_label) + "</span> " +
+          escapeHtml([r.owner, r.korwil ? "Korwil " + r.korwil : "", haText(r.area_ha), r.zone_label.split(" (")[0], "urgensi " + r.urgency_label.toLowerCase()].filter(Boolean).join(" · ")) + "</div></li>";
+      }).join("") || "<li class='muted'>Belum ada bidang." + (perms.tambahBidang ? " Impor berkas KML/KMZ hasil pemetaan untuk mulai." : "") + "</li>";
+      if (data.truncated) { $("bd-daftar").insertAdjacentHTML("beforeend", "<li class='muted small'>Menampilkan 2.000 dari " + fmtNum(data.total) + " bidang. Persempit dengan filter.</li>"); }
+    }).catch(function (error) { $("bd-daftar").innerHTML = "<li class='muted'>" + escapeHtml(error.message) + "</li>"; });
+  }
+
+  ["bd-korwil", "bd-status", "bd-urut"].forEach(function (id) { $(id).addEventListener("change", loadPlots); });
+  $("bd-cari").addEventListener("input", function () { clearTimeout(plotTimer); plotTimer = setTimeout(loadPlots, 300); });
+  $("bd-daftar").addEventListener("click", function (event) {
+    var row = event.target.closest("[data-bidang]");
+    if (row) { openPlot(row.getAttribute("data-bidang")); }
+  });
+
+  function plotUrl(id) { return urls.plot.replace("/0/", "/" + id + "/"); }
+
+  function openPlot(id) {
+    var dialog = $("dlg-bidang");
+    $("bdd-judul").textContent = "Bidang";
+    $("bdd-isi").innerHTML = "<p class='muted'>Memuat…</p>";
+    if (!dialog.open) { dialog.showModal(); }
+    request(plotUrl(id)).then(renderPlot).catch(function (error) { $("bdd-isi").textContent = error.message; });
+  }
+
+  var currentPlot = null;
+
+  function renderPlot(p) {
+    currentPlot = p;
+    $("bdd-judul").innerHTML = escapeHtml(p.number + (p.name ? " – " + p.name : "")) + " <span class='badge' style='background:" + escapeHtml(p.color) + "'>" + escapeHtml(p.status_label) + "</span>";
+    var info = [
+      ["Pemilik", p.owner], ["Penjaga lahan", p.guard], ["Korwil", p.korwil], ["Tanggal dikuasai", p.controlled_on ? fmtDate(p.controlled_on) : ""],
+      ["Tim penguasaan", p.team], ["Lapisan", p.layers.join(", ")], ["Sumber data", p.source], ["Catatan", p.note]
+    ].filter(function (r) { return r[1]; });
+    var html = "<div class='metrics four'>" +
+      "<div class='metric'><b>" + haText(p.area_ha) + "</b><span>" + (p.official_ha !== null ? "Luas resmi · terukur " + haText(p.measured_ha || 0) : "Luas terukur") + "</span></div>" +
+      "<div class='metric'><b>" + escapeHtml(p.zone_label.split(" (")[0]) + "</b><span>Zona</span></div>" +
+      "<div class='metric'><b>" + escapeHtml(p.urgency_label) + "</b><span>Urgensi</span></div>" +
+      "<div class='metric'><b>" + fmtNum(p.score, 1) + "</b><span>Skor prioritas</span></div></div>" +
+      "<table class='table'><tbody>" + info.map(function (r) { return "<tr><td class='muted'>" + escapeHtml(r[0]) + "</td><td>" + escapeHtml(r[1]) + "</td></tr>"; }).join("") +
+      (p.resident_id ? "<tr><td class='muted'>Warga</td><td><a href='#' data-warga='" + p.resident_id + "'>" + escapeHtml(p.resident) + "</a></td></tr>" : "") + "</tbody></table>";
+    if (p.overlaps.length) {
+      html += "<h3>Masuk lapisan referensi</h3><div class='stack'>" + p.overlaps.map(function (o) {
+        return "<div class='hbar'><span title='" + escapeHtml(o.layer) + "'>" + escapeHtml(o.layer) + "</span><i style='width:" + Math.max(o.pct, 1) + "%;background:#c026d3'></i><b>" + fmtNum(o.pct, 1) + "%</b></div>";
+      }).join("") + "</div>";
+    }
+    if (p.can_change) {
+      html += "<h3>Perbarui penguasaan</h3><div class='stack card-form' id='bdd-form'><div class='grid2'>" +
+        "<label class='field'>Status <select data-f='status'>" + config.choices.control.map(function (c) { return "<option value='" + c.value + "'" + (c.value === p.status ? " selected" : "") + ">" + escapeHtml(c.label) + "</option>"; }).join("") + "</select></label>" +
+        "<label class='field'>Urgensi <select data-f='urgensi'>" + config.choices.urgency.map(function (c) { return "<option value='" + c.value + "'" + (c.value === p.urgency ? " selected" : "") + ">" + escapeHtml(c.label) + "</option>"; }).join("") + "</select></label>" +
+        "<label class='field'>Tanggal dikuasai <input type='date' data-f='tanggal' value='" + escapeHtml(p.controlled_on) + "'></label>" +
+        "<label class='field'>Tim penguasaan <input data-f='tim' maxlength='255' value='" + escapeHtml(p.team) + "'></label></div>" +
+        "<label class='field'>Catatan perubahan <input data-f='catatan' maxlength='255'></label>" +
+        "<div class='row'><button type='button' class='btn primary' id='bdd-simpan'>Simpan</button></div></div>";
+    }
+    html += "<h3>Riwayat status</h3><ul class='list compact'>" + (p.history.map(function (h) {
+      return "<li><b>" + escapeHtml((h.old ? h.old + " → " : "") + h.new) + "</b><div class='sub'>" + escapeHtml(h.by) + " · " + fmtDate(h.time, true) + (h.note ? " · " + escapeHtml(h.note) : "") + "</div></li>";
+    }).join("") || "<li class='muted'>Belum ada riwayat.</li>") + "</ul>" +
+      "<div class='row'><button type='button' class='btn' id='bdd-peta'>🗺️ Lihat di peta</button>" + (p.admin ? "<a class='btn' href='" + encodeURI(p.admin) + "'>Ubah batas di panel admin</a>" : "") + "</div>";
+    $("bdd-isi").innerHTML = html;
+  }
+
+  $("bdd-isi").addEventListener("click", function (event) {
+    var resident = event.target.closest("[data-warga]");
+    if (resident) { event.preventDefault(); openResident(parseInt(resident.getAttribute("data-warga"), 10)); return; }
+    if (event.target.id === "bdd-peta" && currentPlot) {
+      var shape = L.geoJSON(currentPlot.geometry, { style: { color: "#f59e0b", weight: 4, fillOpacity: 0.1 } });
+      $("dlg-bidang").close();
+      showAnalysis(shape, shape.getBounds());
+      return;
+    }
+    if (event.target.id === "bdd-simpan" && currentPlot) {
+      var fields = {};
+      document.querySelectorAll("#bdd-form [data-f]").forEach(function (input) { fields[input.getAttribute("data-f")] = input.value; });
+      var controlChanged = fields.status !== currentPlot.status || fields.tanggal !== (currentPlot.controlled_on || "") || fields.tim !== (currentPlot.team || "");
+      if (!controlChanged) { delete fields.status; delete fields.tanggal; delete fields.tim; }
+      if (fields.urgensi === currentPlot.urgency) { delete fields.urgensi; }
+      if (!fields.status && !fields.urgensi) { toast("Tidak ada perubahan.", "error"); return; }
+      var data = form(fields);
+      if (fields.status && fields.tim === "") { data.append("tim", ""); }
+      event.target.disabled = true;
+      request(plotUrl(currentPlot.id), { method: "POST", body: data }).then(function (plot) {
+        toast("Bidang diperbarui.", "ok");
+        renderPlot(plot);
+        loadPlots();
+        if (layers.bidang) { loadLayer("bidang"); }
+      }).catch(function (error) { toast(error.message, "error"); event.target.disabled = false; });
+    }
+  });
+
+  var importMode = "baru";
+  var IMPORT_HELP = {
+    baru: "Setiap poligon menjadi bidang baru berstatus Belum dikuasai. Objek yang mirip bidang tercatat (titik tengah ≤200 m dan luas mirip) tidak dicentang.",
+    penguasaan: "Poligon dicocokkan ke bidang terdekat (titik tengah ≤200 m; selisih luas ≤35% atau nama pemilik sama). Bidang yang cocok ditandai Sudah dikuasai; poligon tanpa pasangan dibuat sebagai bidang baru yang sudah dikuasai."
+  };
+  var MATCH_COLORS = { match: "#1a7f37", weak: "#bf8700", already: "#57606a", nomatch: "#0b5fcc", "new": "#0b5fcc", duplicate: "#9a6700" };
+
+  function setImportMode(mode) {
+    importMode = mode;
+    document.querySelectorAll("#ib-mode button").forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-mode") === mode); });
+    document.querySelectorAll("#form-impor-bidang [data-penguasaan]").forEach(function (el) { el.hidden = mode !== "penguasaan"; });
+    $("ib-bantuan").textContent = IMPORT_HELP[mode];
+    resetImport();
+  }
+
+  function resetImport() {
+    $("ib-hasil").innerHTML = "";
+    $("ib-terapkan").disabled = true;
+  }
+
+  function importData(stage) {
+    var formEl = $("form-impor-bidang");
+    var data = new FormData(formEl);
+    data.set("mode", importMode);
+    data.set("tahap", stage);
+    if (!data.get("korwil")) { data.delete("korwil"); }
+    return data;
+  }
+
+  $("bd-impor").addEventListener("click", function () {
+    $("form-impor-bidang").reset();
+    setImportMode("baru");
+    $("dlg-impor-bidang").showModal();
+  });
+  $("ib-mode").addEventListener("click", function (event) {
+    var button = event.target.closest("button[data-mode]");
+    if (button) { setImportMode(button.getAttribute("data-mode")); }
+  });
+  $("ib-berkas").addEventListener("change", resetImport);
+  $("form-impor-bidang").addEventListener("click", function (event) {
+    if (event.target.hasAttribute("data-tutup")) { $("dlg-impor-bidang").close(); }
+  });
+  $("ib-pratinjau").addEventListener("click", function () {
+    var file = $("ib-berkas").files[0];
+    if (!file) { toast("Pilih berkas terlebih dahulu.", "error"); return; }
+    if (file.size > 20 * 1024 * 1024) { toast("Berkas maksimal 20 MB.", "error"); return; }
+    var button = this;
+    button.disabled = true;
+    $("ib-hasil").innerHTML = "<p class='muted'>Membaca berkas…</p>";
+    request(urls.plotImport, { method: "POST", body: importData("pratinjau") }).then(function (data) {
+      var counts = Object.keys(data.counts).map(function (k) {
+        var label = (data.rows.filter(function (r) { return r.match === k; })[0] || {}).match_label || k;
+        return "<span class='badge' style='background:" + (MATCH_COLORS[k] || "#57606a") + "'>" + escapeHtml(label) + ": " + data.counts[k] + "</span>";
+      }).join(" ");
+      $("ib-hasil").innerHTML = "<p class='small'>" + data.rows.length + " poligon di " + escapeHtml(data.file) + ". " + counts + "</p>" +
+        "<label class='check'><input type='checkbox' id='ib-semua'> Pilih / lepas semua</label>" +
+        "<div class='table-wrap'><table class='table'><thead><tr><th></th><th>Objek</th><th>Luas</th><th>Hasil</th></tr></thead><tbody>" +
+        data.rows.map(function (r) {
+          var checked = ["already", "duplicate"].indexOf(r.match) === -1;
+          return "<tr><td><input type='checkbox' data-index='" + r.index + "'" + (checked ? " checked" : "") + (r.match === "already" ? " disabled" : "") + " aria-label='Pilih'></td>" +
+            "<td><b>" + escapeHtml(r.name || "Objek " + (r.index + 1)) + "</b>" + (r.owner ? "<div class='small muted'>" + escapeHtml(r.owner) + "</div>" : "") + "</td>" +
+            "<td>" + haText(r.area_ha) + "</td><td><span class='badge' style='background:" + (MATCH_COLORS[r.match] || "#57606a") + "'>" + escapeHtml(r.match_label) + "</span>" +
+            (r.plot ? "<div class='small muted'>" + escapeHtml(r.plot.number + (r.plot.name ? " – " + r.plot.name : "")) + " · " + r.plot.distance_m + " m · selisih luas " + r.plot.area_diff_pct + "%</div>" : "") + "</td></tr>";
+        }).join("") + "</tbody></table></div>";
+      $("ib-terapkan").disabled = false;
+    }).catch(function (error) { $("ib-hasil").innerHTML = "<p class='danger-text'>" + escapeHtml(error.message) + "</p>"; })
+      .then(function () { button.disabled = false; });
+  });
+  $("ib-hasil").addEventListener("change", function (event) {
+    if (event.target.id === "ib-semua") {
+      var on = event.target.checked;
+      this.querySelectorAll("input[data-index]:not(:disabled)").forEach(function (box) { box.checked = on; });
+    }
+  });
+  $("form-impor-bidang").addEventListener("submit", function (event) {
+    event.preventDefault();
+    var chosen = [];
+    $("ib-hasil").querySelectorAll("input[data-index]:checked").forEach(function (box) { chosen.push(box.getAttribute("data-index")); });
+    if (!chosen.length) { toast("Pilih minimal satu objek.", "error"); return; }
+    var data = importData("terapkan");
+    data.set("pilih", chosen.join(","));
+    var button = $("ib-terapkan");
+    button.disabled = true;
+    request(urls.plotImport, { method: "POST", body: data }).then(function (result) {
+      toast(result.created + " bidang dibuat, " + result.updated + " diperbarui" + (result.skipped ? ", " + result.skipped + " dilewati" : "") + ".", "ok");
+      $("dlg-impor-bidang").close();
+      loadPlots();
+      ensureLayer("bidang");
+    }).catch(function (error) { toast(error.message, "error"); button.disabled = false; });
+  });
+
+  // ---------------------------------------------------------------- Tumpang tindih
+
+  var overlapSources = null;
+  var overlapResult = null;
+
+  function loadOverlapSources() {
+    if (overlapSources) { return; }
+    request(urls.overlap).then(function (data) {
+      overlapSources = data.sources;
+      if (!overlapSources.length) {
+        $("tt-hasil").innerHTML = "<p class='muted small'>Belum ada lapisan untuk dianalisis. Administrator dapat mencentang \"Tampil di pusat komando\" pada Lapisan peta referensi.</p>";
+        $("tt-jalankan").disabled = true;
+        return;
+      }
+      var items = overlapSources.map(function (s) { return { value: s.key, label: s.name }; });
+      fillSelect($("tt-a"), items);
+      fillSelect($("tt-b"), items);
+      var refs = overlapSources.filter(function (s) { return s.key.indexOf("ref-") === 0; });
+      $("tt-a").value = (refs[0] || overlapSources[0]).key;
+      $("tt-b").value = (refs[1] || overlapSources.filter(function (s) { return s.key !== $("tt-a").value; })[0] || overlapSources[0]).key;
+    }).catch(function (error) { $("tt-hasil").textContent = error.message; });
+  }
+
+  function overlapQuery() { return "?a=" + encodeURIComponent($("tt-a").value) + "&b=" + encodeURIComponent($("tt-b").value); }
+
+  $("tt-jalankan").addEventListener("click", function () {
+    var button = this;
+    button.disabled = true;
+    $("tt-csv").hidden = true;
+    $("tt-hasil").innerHTML = "<p class='muted'>Menghitung…</p>";
+    request(urls.overlap + overlapQuery()).then(function (d) {
+      overlapResult = d;
+      var html = "<div class='metrics four'>" +
+        "<div class='metric'><b>" + haText(d.overlap_ha) + "</b><span>Tumpang tindih</span></div>" +
+        "<div class='metric'><b>" + pct1(d.pct_a) + "</b><span>dari " + escapeHtml(d.a.name) + " (" + haText(d.a.area_ha) + ")</span></div>" +
+        "<div class='metric'><b>" + pct1(d.pct_b) + "</b><span>dari " + escapeHtml(d.b.name) + " (" + haText(d.b.area_ha) + ")</span></div>" +
+        "<div class='metric'><b>" + fmtNum(d.pairs.length) + "</b><span>Pasangan objek beririsan</span></div></div>";
+      if (d.pairs.length) {
+        html += "<div class='row'><button type='button' class='btn' id='tt-peta'>🗺️ Tampilkan irisan di peta</button></div>" +
+          "<div class='table-wrap'><table class='table'><thead><tr><th>" + escapeHtml(d.a.name) + "</th><th>" + escapeHtml(d.b.name) + "</th><th>Irisan</th></tr></thead><tbody>" +
+          d.pairs.slice(0, 50).map(function (p) { return "<tr><td>" + escapeHtml(p.a) + "</td><td>" + escapeHtml(p.b) + "</td><td>" + haText(p.area_ha) + "</td></tr>"; }).join("") + "</tbody></table></div>" +
+          (d.pairs.length > 50 ? "<p class='small muted'>50 irisan terbesar ditampilkan; unduh CSV untuk semuanya.</p>" : "");
+      } else {
+        html += "<p class='muted small'>Tidak ada irisan antara kedua lapisan.</p>";
+      }
+      if (d.truncated) { html += "<p class='small muted'>Dibatasi 5.000 irisan terbesar.</p>"; }
+      $("tt-hasil").innerHTML = html;
+      $("tt-csv").hidden = !d.pairs.length;
+    }).catch(function (error) { $("tt-hasil").innerHTML = "<p class='danger-text'>" + escapeHtml(error.message) + "</p>"; })
+      .then(function () { button.disabled = false; });
+  });
+  $("tt-hasil").addEventListener("click", function (event) {
+    if (event.target.id !== "tt-peta" || !overlapResult) { return; }
+    var shapes = L.geoJSON({ type: "FeatureCollection", features: overlapResult.pairs.map(function (p) {
+      return { type: "Feature", geometry: p.geometry, properties: p };
+    }) }, {
+      style: { color: "#dc2626", weight: 2, fillColor: "#dc2626", fillOpacity: 0.45 },
+      onEachFeature: function (f, layer) { layer.bindPopup("<strong>" + escapeHtml(f.properties.a) + "</strong><br>∩ " + escapeHtml(f.properties.b) + "<br>" + haText(f.properties.area_ha)); }
+    });
+    showAnalysis(shapes, shapes.getBounds());
+  });
+  $("tt-csv").addEventListener("click", function () { download(urls.overlap + overlapQuery() + "&format=csv", "tumpang-tindih.csv", "CSV tumpang tindih diunduh."); });
+
+  // ---------------------------------------------------------------- Audit RTRW
+
+  var AUDIT_COLORS = { sesuai: "#1a7f37", beda: "#cf222e", belum_dinilai: "#bf8700", tak_dikenali: "#8250df", di_luar: "#57606a", tanpa_lokasi: "#8c959f" };
+  var auditResult = null;
+
+  function auditQuery() { return $("au-korwil").value ? "?korwil=" + $("au-korwil").value : ""; }
+
+  $("au-jalankan").addEventListener("click", function () {
+    var button = this;
+    button.disabled = true;
+    $("au-csv").hidden = true;
+    $("au-hasil").innerHTML = "<p class='muted'>Mengaudit…</p>";
+    request(urls.rtrwAudit + auditQuery()).then(function (d) {
+      auditResult = d;
+      var keys = Object.keys(d.labels);
+      var html = d.layers.length
+        ? "<p class='small muted'>Lapisan: " + escapeHtml(d.layers.join(", ")) + ". Kesesuaian (dari yang dinilai): <b>" + pctText(d.conform_pct) + "</b></p>"
+        : "<p class='small muted'>Belum ada lapisan tata ruang, hutan, atau kawasan proyek yang ditandai tampil di pusat komando; semua warga terhitung di luar lapisan.</p>";
+      html += "<div class='stance-cards'>" + keys.map(function (k) {
+        return "<div class='stance-card' style='--c:" + AUDIT_COLORS[k] + "'><b>" + fmtNum(d.counts[k]) + "</b><span>" + escapeHtml(d.labels[k]) + "</span></div>";
+      }).join("") + "</div>";
+      if (d.korwils.length) {
+        html += "<h3>Per Korwil</h3><div class='table-wrap'><table class='table'><thead><tr><th>Korwil</th><th>Sesuai</th><th>Tidak sesuai</th><th>Belum dinilai</th><th>Di luar</th></tr></thead><tbody>" +
+          d.korwils.map(function (r) { return "<tr><td>" + escapeHtml(r.code) + "</td><td>" + r.sesuai + "</td><td><b style='color:" + AUDIT_COLORS.beda + "'>" + r.beda + "</b></td><td>" + r.belum_dinilai + "</td><td>" + r.di_luar + "</td></tr>"; }).join("") + "</tbody></table></div>";
+      }
+      var flagged = d.rows.filter(function (r) { return ["beda", "belum_dinilai", "tak_dikenali"].indexOf(r.category) !== -1; });
+      html += "<div class='row'><button type='button' class='btn' id='au-peta'>🗺️ Tampilkan hasil di peta</button></div>";
+      html += "<h3>Perlu ditindaklanjuti (" + flagged.length + ")</h3><ul class='list compact'>" + (flagged.slice(0, 100).map(function (r) {
+        return "<li class='clickable' data-warga='" + r.id + "'><b>" + escapeHtml(r.name) + "</b> <span class='badge' style='background:" + AUDIT_COLORS[r.category] + "'>" + escapeHtml(r.category_label) + "</span>" +
+          "<div class='sub'>" + escapeHtml([r.number, "Korwil " + r.korwil, "tercatat: " + r.recorded, r.detected ? "peta: " + r.detected : ""].filter(Boolean).join(" · ")) + "</div></li>";
+      }).join("") || "<li class='muted'>Tidak ada.</li>") + "</ul>";
+      if (d.truncated) { html += "<p class='small muted'>Audit dibatasi 5.000 warga pertama; pilih Korwil untuk mempersempit.</p>"; }
+      $("au-hasil").innerHTML = html;
+      $("au-csv").hidden = false;
+    }).catch(function (error) { $("au-hasil").innerHTML = "<p class='danger-text'>" + escapeHtml(error.message) + "</p>"; })
+      .then(function () { button.disabled = false; });
+  });
+  $("au-hasil").addEventListener("click", function (event) {
+    var resident = event.target.closest("[data-warga]");
+    if (resident) { openResident(parseInt(resident.getAttribute("data-warga"), 10)); return; }
+    if (event.target.id !== "au-peta" || !auditResult) { return; }
+    var group = L.featureGroup(auditResult.rows.filter(function (r) { return r.center; }).map(function (r) {
+      return L.circleMarker(r.center, { radius: 6, color: "#fff", weight: 1, fillColor: AUDIT_COLORS[r.category], fillOpacity: 0.95 })
+        .bindPopup("<strong>" + escapeHtml(r.name) + "</strong><br>" + escapeHtml(r.category_label) + "<br>Tercatat: " + escapeHtml(r.recorded) + (r.detected ? "<br>Peta: " + escapeHtml(r.detected) : ""));
+    }));
+    showAnalysis(group, group.getBounds());
+  });
+  $("au-csv").addEventListener("click", function () { download(urls.rtrwAudit + (auditQuery() ? auditQuery() + "&" : "?") + "format=csv", "audit-rtrw.csv", "CSV audit RTRW diunduh."); });
+
+  // ---------------------------------------------------------------- Peta panas
+
+  function heatColor(t) {
+    var stops = [[255, 237, 160], [254, 178, 76], [240, 59, 32], [128, 0, 38]];
+    var x = Math.min(Math.max(t, 0), 1) * (stops.length - 1);
+    var i = Math.min(Math.floor(x), stops.length - 2);
+    var f = x - i;
+    return "rgb(" + stops[i].map(function (c, j) { return Math.round(c + (stops[i + 1][j] - c) * f); }).join(",") + ")";
+  }
+
+  $("ph-tampil").addEventListener("click", function () {
+    var button = this;
+    button.disabled = true;
+    request(urls.heatmap + "?sumber=" + $("ph-sumber").value + "&periode=" + $("ph-periode").value).then(function (d) {
+      var half = d.size / 2;
+      var group = L.featureGroup(d.cells.map(function (c) {
+        var t = d.max > 1 ? 0.3 + 0.7 * Math.log(c[2]) / Math.log(d.max) : 1;
+        return L.rectangle([[c[0] - half, c[1] - half], [c[0] + half, c[1] + half]], { color: heatColor(t), weight: 1, opacity: 0.9, fillColor: heatColor(t), fillOpacity: 0.45 + 0.4 * t })
+          .bindTooltip(c[2] + " data");
+      }));
+      $("ph-hasil").textContent = d.cells.length
+        ? fmtNum(d.total) + " data di " + fmtNum(d.cells.length) + " sel (terpadat " + d.max + "), " + fmtDate(d.start) + " – " + fmtDate(d.end) + "."
+        : "Tidak ada data pada periode ini.";
+      if (d.cells.length) { showAnalysis(group, group.getBounds()); }
+    }).catch(function (error) { $("ph-hasil").textContent = error.message; })
+      .then(function () { button.disabled = false; });
+  });
+
+  // ---------------------------------------------------------------- Jejak GPS
+
+  function loadTrackOfficers() {
+    if (!perms.jejak) { return; }
+    var current = $("jj-petugas").value;
+    request(urls.track + "?tanggal=" + $("jj-tanggal").value).then(function (d) {
+      fillSelect($("jj-petugas"), d.officers.map(function (o) { return { value: o.id, label: o.name }; }), d.officers.length ? "Pilih petugas…" : "Tidak ada jejak pada tanggal ini");
+      if (d.officers.some(function (o) { return String(o.id) === current; })) { $("jj-petugas").value = current; }
+    }).catch(function (error) { $("jj-hasil").textContent = error.message; });
+  }
+
+  $("jj-tanggal").addEventListener("change", loadTrackOfficers);
+  $("jj-tampil").addEventListener("click", function () {
+    if (!$("jj-petugas").value) { toast("Pilih petugas terlebih dahulu.", "error"); return; }
+    var button = this;
+    button.disabled = true;
+    request(urls.track + "?tanggal=" + $("jj-tanggal").value + "&petugas=" + $("jj-petugas").value).then(function (d) {
+      if (!d.points.length) { $("jj-hasil").textContent = "Tidak ada titik jejak."; return; }
+      var latlngs = d.points.map(function (p) { return [p.lat, p.lng]; });
+      var group = L.featureGroup([L.polyline(latlngs, { color: "#7c3aed", weight: 4, opacity: 0.85 })]);
+      d.points.forEach(function (p, i) {
+        if (i === 0 || i === d.points.length - 1) { return; }
+        group.addLayer(L.circleMarker([p.lat, p.lng], { radius: 3, color: "#7c3aed", weight: 1, fillOpacity: 0.8 }).bindTooltip(p.time));
+      });
+      group.addLayer(L.circleMarker(latlngs[0], { radius: 7, color: "#fff", weight: 2, fillColor: "#10b981", fillOpacity: 1 }).bindTooltip("Mulai " + d.points[0].time));
+      group.addLayer(L.circleMarker(latlngs[latlngs.length - 1], { radius: 7, color: "#fff", weight: 2, fillColor: "#ef4444", fillOpacity: 1 }).bindTooltip("Akhir " + d.points[d.points.length - 1].time));
+      $("jj-hasil").innerHTML = "<b>" + escapeHtml(d.officer.name) + "</b>: " + fmtNum(d.distance_km, 2) + " km, " + d.points.length + " titik, " + escapeHtml(d.start) + "–" + escapeHtml(d.end) + ".";
+      showAnalysis(group, group.getBounds());
+    }).catch(function (error) { $("jj-hasil").textContent = error.message; })
+      .then(function () { button.disabled = false; });
+  });
+
+  // ---------------------------------------------------------------- Zona ancaman
+
+  function loadThreatZones() {
+    $("za-daftar").innerHTML = "<li class='muted'>Memuat…</li>";
+    request(urls.threatZones + ($("za-semua").checked ? "?semua=1" : "")).then(function (d) {
+      $("za-daftar").innerHTML = d.zones.map(function (z) {
+        return "<li" + (z.active ? "" : " class='inactive'") + "><div class='row' style='justify-content:space-between;gap:8px'><b>" + escapeHtml(z.name) + "</b>" +
+          "<span class='badge' style='background:" + escapeHtml(z.color) + "'>" + escapeHtml(z.level_label) + "</span></div>" +
+          "<div class='sub'>" + escapeHtml([z.korwil ? "Korwil " + z.korwil : "", haText(z.area_ha), z.by, fmtDate(z.created_at), z.active ? "" : "nonaktif"].filter(Boolean).join(" · ")) + "</div>" +
+          (z.note ? "<div class='small'>" + escapeHtml(z.note) + "</div>" : "") +
+          "<div class='row'><button type='button' class='btn-small' data-za-fokus='" + z.center.join(",") + "'>📍 Fokus</button>" +
+          (z.can_change ? "<button type='button' class='btn-small' data-za-aksi='" + (z.active ? "nonaktif" : "aktif") + "' data-id='" + z.id + "'>" + (z.active ? "Nonaktifkan" : "Aktifkan") + "</button>" : "") +
+          (z.can_delete ? "<button type='button' class='btn-small danger' data-za-aksi='hapus' data-id='" + z.id + "'>Hapus</button>" : "") + "</div></li>";
+      }).join("") || "<li class='muted'>Belum ada zona ancaman.</li>";
+    }).catch(function (error) { $("za-daftar").innerHTML = "<li class='muted'>" + escapeHtml(error.message) + "</li>"; });
+  }
+
+  $("za-semua").addEventListener("change", loadThreatZones);
+  $("za-daftar").addEventListener("click", function (event) {
+    var focus = event.target.closest("[data-za-fokus]");
+    if (focus) {
+      ensureLayer("ancaman");
+      showTab("peta");
+      map.setView(focus.getAttribute("data-za-fokus").split(",").map(parseFloat), 15);
+      return;
+    }
+    var button = event.target.closest("[data-za-aksi]");
+    if (!button) { return; }
+    var action = button.getAttribute("data-za-aksi");
+    if (action === "hapus" && !window.confirm("Hapus zona ancaman ini?")) { return; }
+    button.disabled = true;
+    request(urls.threatZoneAction.replace("/0/", "/" + button.getAttribute("data-id") + "/").replace("__aksi__", action), { method: "POST", body: form({}) }).then(function () {
+      toast(action === "hapus" ? "Zona dihapus." : "Zona diperbarui.", "ok");
+      loadThreatZones();
+      if (layers.ancaman) { loadLayer("ancaman"); }
+    }).catch(function (error) { toast(error.message, "error"); button.disabled = false; });
+  });
+  $("form-ancaman").addEventListener("submit", function (event) {
+    event.preventDefault();
+    var formEl = this;
+    var data = new FormData(formEl);
+    var submit = formEl.querySelector("[type=submit]");
+    submit.disabled = true;
+    reportPoint($("za-titik").checked).then(function (point) {
+      if (!point) { throw new ApiError("Lokasi tidak tersedia. Ketuk titik di peta lalu centang \"Pakai titik\".", 0); }
+      var fields = { name: data.get("name"), level: data.get("level"), radius: data.get("radius"), korwil: data.get("korwil"), note: data.get("note"), lat: point.lat, lng: point.lng };
+      return request(urls.threatZones, { method: "POST", body: form(fields) });
+    }).then(function () {
+      toast("Zona ancaman disimpan.", "ok");
+      formEl.reset();
+      $("za-level").value = "sedang";
+      loadThreatZones();
+      ensureLayer("ancaman");
+    }).catch(function (error) { toast(error.message, "error"); })
+      .then(function () { submit.disabled = false; });
+  });
+
+  // ---------------------------------------------------------------- Foto 360°
+
+  function loadSitePhotos() {
+    $("f3-daftar").innerHTML = "<li class='muted'>Memuat…</li>";
+    request(urls.sitePhotos).then(function (d) {
+      $("f3-daftar").innerHTML = d.photos.map(function (p) {
+        return "<li><b>" + escapeHtml(p.title) + "</b><div class='sub'>" + escapeHtml([p.korwil ? "Korwil " + p.korwil : "", p.captured_on ? fmtDate(p.captured_on) : "", p.uploaded_by].filter(Boolean).join(" · ")) + "</div>" +
+          (p.note ? "<div class='small'>" + escapeHtml(p.note) + "</div>" : "") +
+          "<div class='row'><button type='button' class='btn-small' data-f3-lihat='" + escapeHtml(p.url) + "' data-judul='" + escapeHtml(p.title) + "'>◉ Lihat 360°</button>" +
+          "<button type='button' class='btn-small' data-f3-fokus='" + p.lat + "," + p.lng + "'>📍 Fokus</button>" +
+          (p.can_delete ? "<button type='button' class='btn-small danger' data-f3-hapus='" + p.id + "'>Hapus</button>" : "") + "</div></li>";
+      }).join("") || "<li class='muted'>Belum ada foto 360°.</li>";
+    }).catch(function (error) { $("f3-daftar").innerHTML = "<li class='muted'>" + escapeHtml(error.message) + "</li>"; });
+  }
+
+  $("f3-daftar").addEventListener("click", function (event) {
+    var view = event.target.closest("[data-f3-lihat]");
+    if (view) { openPano(view.getAttribute("data-f3-lihat"), view.getAttribute("data-judul")); return; }
+    var focus = event.target.closest("[data-f3-fokus]");
+    if (focus) {
+      ensureLayer("foto360");
+      showTab("peta");
+      map.setView(focus.getAttribute("data-f3-fokus").split(",").map(parseFloat), 17);
+      return;
+    }
+    var remove = event.target.closest("[data-f3-hapus]");
+    if (remove && window.confirm("Hapus foto 360° ini?")) {
+      remove.disabled = true;
+      request(urls.sitePhotoDelete.replace("/0/", "/" + remove.getAttribute("data-f3-hapus") + "/"), { method: "POST", body: form({}) }).then(function () {
+        toast("Foto dihapus.", "ok");
+        loadSitePhotos();
+        if (layers.foto360) { loadLayer("foto360"); }
+      }).catch(function (error) { toast(error.message, "error"); remove.disabled = false; });
+    }
+  });
+  $("form-foto360").addEventListener("submit", function (event) {
+    event.preventDefault();
+    var formEl = this;
+    var data = new FormData(formEl);
+    var file = data.get("foto");
+    if (!file || !file.size) { toast("Pilih foto 360°.", "error"); return; }
+    if (file.size > 20 * 1024 * 1024) { toast("Foto maksimal 20 MB.", "error"); return; }
+    var submit = formEl.querySelector("[type=submit]");
+    submit.disabled = true;
+    reportPoint($("f3-titik").checked).then(function (point) {
+      if (!point) { throw new ApiError("Lokasi tidak tersedia. Ketuk titik di peta lalu centang \"Pakai titik\".", 0); }
+      data.set("lat", point.lat);
+      data.set("lng", point.lng);
+      if (!data.get("tanggal")) { data.delete("tanggal"); }
+      return request(urls.sitePhotos, { method: "POST", body: data });
+    }).then(function () {
+      toast("Foto 360° diunggah.", "ok");
+      formEl.reset();
+      loadSitePhotos();
+      ensureLayer("foto360");
+    }).catch(function (error) { toast(error.message, "error"); })
+      .then(function () { submit.disabled = false; });
+  });
+
+  // ---------------------------------------------------------------- Penampil 360°
+  // Proyeksi equirectangular → perspektif di kanvas, tanpa pustaka tambahan.
+
+  var pano = { pixels: null, width: 0, height: 0, yaw: 0, pitch: 0, fov: 90, frame: null, drag: null, pinch: null };
+
+  function openPano(url, title) {
+    $("v360-judul").textContent = title || "Foto 360°";
+    $("v360-asli").href = url;
+    var dialog = $("dlg-360");
+    if (!dialog.open) { dialog.showModal(); }
+    pano.pixels = null;
+    pano.yaw = 0; pano.pitch = 0; pano.fov = 90;
+    var canvas = $("v360-kanvas");
+    var ctx = canvas.getContext("2d");
+    sizePano();
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#fff";
+    ctx.font = "14px sans-serif";
+    ctx.fillText("Memuat foto…", 16, 28);
+    var image = new Image();
+    image.onload = function () {
+      // Dibatasi 4096 px agar memori ponsel aman.
+      var scale = Math.min(1, 4096 / image.naturalWidth);
+      var w = Math.max(1, Math.round(image.naturalWidth * scale));
+      var h = Math.max(1, Math.round(image.naturalHeight * scale));
+      var source = document.createElement("canvas");
+      source.width = w; source.height = h;
+      var sctx = source.getContext("2d");
+      sctx.drawImage(image, 0, 0, w, h);
+      pano.pixels = sctx.getImageData(0, 0, w, h).data;
+      pano.width = w; pano.height = h;
+      drawPano(false);
+    };
+    image.onerror = function () { ctx.fillText("Foto tidak dapat dimuat.", 16, 52); };
+    image.src = url;
+  }
+
+  function sizePano() {
+    var canvas = $("v360-kanvas");
+    var box = $("v360").getBoundingClientRect();
+    canvas.width = Math.max(200, Math.round(box.width));
+    canvas.height = Math.max(120, Math.round(box.height));
+  }
+
+  function drawPano(fast) {
+    if (!pano.pixels) { return; }
+    var canvas = $("v360-kanvas");
+    var step = fast ? 2 : 1;
+    var W = Math.ceil(canvas.width / step), H = Math.ceil(canvas.height / step);
+    var ctx = canvas.getContext("2d");
+    var out = ctx.createImageData(W, H);
+    var data = out.data, src = pano.pixels, sw = pano.width, sh = pano.height;
+    var t = Math.tan(pano.fov * Math.PI / 360);
+    var cy = Math.cos(pano.yaw), sy = Math.sin(pano.yaw), cp = Math.cos(pano.pitch), sp = Math.sin(pano.pitch);
+    var aspect = H / W;
+    for (var j = 0; j < H; j += 1) {
+      var y = (1 - 2 * (j + 0.5) / H) * t * aspect;
+      for (var i = 0; i < W; i += 1) {
+        var x = (2 * (i + 0.5) / W - 1) * t;
+        var y1 = y * cp + sp, z1 = -y * sp + cp;
+        var x2 = x * cy + z1 * sy, z2 = -x * sy + z1 * cy;
+        var lon = Math.atan2(x2, z2), lat = Math.atan2(y1, Math.sqrt(x2 * x2 + z2 * z2));
+        var u = Math.floor((lon / (2 * Math.PI) + 0.5) * sw) % sw;
+        var v = Math.min(sh - 1, Math.max(0, Math.floor((0.5 - lat / Math.PI) * sh)));
+        var s = (v * sw + (u < 0 ? u + sw : u)) * 4, d = (j * W + i) * 4;
+        data[d] = src[s]; data[d + 1] = src[s + 1]; data[d + 2] = src[s + 2]; data[d + 3] = 255;
+      }
+    }
+    if (step === 1) {
+      ctx.putImageData(out, 0, 0);
+    } else {
+      var tmp = document.createElement("canvas");
+      tmp.width = W; tmp.height = H;
+      tmp.getContext("2d").putImageData(out, 0, 0);
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(tmp, 0, 0, canvas.width, canvas.height);
+    }
+  }
+
+  function schedulePano(fast) {
+    if (pano.frame) { cancelAnimationFrame(pano.frame); }
+    pano.frame = requestAnimationFrame(function () { pano.frame = null; drawPano(fast); });
+  }
+
+  function turnPano(dx, dy) {
+    var canvas = $("v360-kanvas");
+    var perPixel = (pano.fov * Math.PI / 180) / Math.max(canvas.width, 1);
+    pano.yaw -= dx * perPixel;
+    pano.pitch = Math.max(-Math.PI / 2 + 0.01, Math.min(Math.PI / 2 - 0.01, pano.pitch + dy * perPixel));
+  }
+
+  function zoomPano(factor) { pano.fov = Math.max(30, Math.min(110, pano.fov * factor)); }
+
+  (function () {
+    var box = $("v360");
+    var pointers = {};
+    box.addEventListener("pointerdown", function (event) {
+      box.setPointerCapture(event.pointerId);
+      pointers[event.pointerId] = { x: event.clientX, y: event.clientY };
+      pano.drag = Object.keys(pointers).length === 1 ? { x: event.clientX, y: event.clientY } : null;
+      box.style.cursor = "grabbing";
+    });
+    box.addEventListener("pointermove", function (event) {
+      if (!pointers[event.pointerId]) { return; }
+      var ids = Object.keys(pointers);
+      if (ids.length === 2) {
+        var other = pointers[ids[0] === String(event.pointerId) ? ids[1] : ids[0]];
+        var before = Math.hypot(pointers[event.pointerId].x - other.x, pointers[event.pointerId].y - other.y);
+        var after = Math.hypot(event.clientX - other.x, event.clientY - other.y);
+        if (before > 0 && after > 0) { zoomPano(before / after); }
+      } else if (pano.drag) {
+        turnPano(event.clientX - pano.drag.x, event.clientY - pano.drag.y);
+        pano.drag = { x: event.clientX, y: event.clientY };
+      }
+      pointers[event.pointerId] = { x: event.clientX, y: event.clientY };
+      schedulePano(true);
+    });
+    function release(event) {
+      delete pointers[event.pointerId];
+      pano.drag = null;
+      box.style.cursor = "";
+      schedulePano(false);
+    }
+    box.addEventListener("pointerup", release);
+    box.addEventListener("pointercancel", release);
+    box.addEventListener("wheel", function (event) {
+      event.preventDefault();
+      zoomPano(event.deltaY > 0 ? 1.1 : 0.9);
+      schedulePano(false);
+    }, { passive: false });
+    box.addEventListener("keydown", function (event) {
+      var keys = { ArrowLeft: [-40, 0], ArrowRight: [40, 0], ArrowUp: [0, -40], ArrowDown: [0, 40] };
+      if (keys[event.key]) {
+        event.preventDefault();
+        turnPano(keys[event.key][0], keys[event.key][1]);
+        schedulePano(false);
+      } else if (event.key === "+" || event.key === "-") {
+        zoomPano(event.key === "+" ? 0.9 : 1.1);
+        schedulePano(false);
+      }
+    });
+    window.addEventListener("resize", function () { if ($("dlg-360").open) { sizePano(); drawPano(false); } });
+    $("dlg-360").addEventListener("close", function () { pano.pixels = null; });
+  })();
+
 
   // ================================================================ Historis
 
@@ -3716,6 +4553,7 @@
     $("form-chat").hidden = !perms.kirimChat;
     $("sos-tombol").hidden = !perms.sos;
     document.querySelector('[data-tool="ai"]').hidden = !perms.aiSatelit;
+    setTactical(store("taktis") === true);
     renderLayerList();
     renderLegend();
     updateNetwork();

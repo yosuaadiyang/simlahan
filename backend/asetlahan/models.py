@@ -2270,6 +2270,14 @@ class MapOverlay(TimeStampedModel):
     source = models.CharField(_("Sumber data"), max_length=255, blank=True, default="")
     is_active = models.BooleanField(_("Aktif"), default=True)
     show_by_default = models.BooleanField(_("Tampil saat peta dibuka"), default=False)
+    show_in_command = models.BooleanField(
+        _("Tampil di pusat komando"),
+        default=False,
+        help_text=_(
+            "Lapisan dapat dibuka semua petugas pusat komando dan dipakai untuk "
+            "analisis tumpang tindih, audit RTRW, dan skor prioritas bidang."
+        ),
+    )
     note = models.TextField(_("Catatan"), blank=True, default="")
 
     class Meta:

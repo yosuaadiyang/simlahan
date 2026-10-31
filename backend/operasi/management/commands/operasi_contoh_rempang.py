@@ -6,7 +6,9 @@ python manage.py operasi_contoh_rempang --hapus  # hapus seluruh data contoh
 Membuat 11 Korwil (A–K) dengan batas wilayah, warga terdata (sikap, status
 lahan, kesesuaian RTRW, pilihan penyelesaian), laporan kegiatan, uji tanah,
 tugas wilayah, Komsos, temuan ilegal, patroli Taman Buru (temuan & bibit),
-dan kegiatan lainnya dengan penilaian dampak. Semua nama fiktif; tidak ada NIK.
+kegiatan lainnya dengan penilaian dampak, bidang penguasaan lahan, zona
+ancaman, dan lapisan RTRW contoh untuk pusat komando. Semua nama fiktif;
+tidak ada NIK.
 
 Rantai komando contoh (tugas berpoin dan laporan harian berjenjang) dibuat oleh
 ``pengguna_contoh`` lewat :func:`komando_demo` karena memerlukan akun contoh.
@@ -22,8 +24,8 @@ from django.db import transaction
 from django.utils import timezone
 
 from asetlahan import enums as aset_enums
-from asetlahan.models import Task
-from operasi import enums, task_flow
+from asetlahan.models import MapOverlay, MapOverlayFeature, Task
+from operasi import enums, spatial, task_flow
 from operasi.models import (
     Activity,
     DailyReport,
@@ -33,12 +35,15 @@ from operasi.models import (
     IllegalFinding,
     IllegalFindingVisit,
     Korwil,
+    LandPlot,
+    LandPlotChange,
     OfficerProfile,
     Resident,
     Seedling,
     SoilTest,
     StanceChange,
     TaskEvent,
+    ThreatZone,
 )
 
 MARK = "[contoh]"
@@ -171,6 +176,9 @@ class Command(BaseCommand):
     def _delete(self):
         korwils = Korwil.objects.filter(note__startswith=MARK)
         delete_komando_demo()
+        LandPlot.objects.filter(note__startswith=MARK).delete()
+        ThreatZone.objects.filter(note__startswith=MARK).delete()
+        MapOverlay.objects.filter(note__startswith=MARK).delete()
         Task.objects.filter(title__startswith=MARK).delete()
         Activity.objects.filter(description__startswith=MARK).delete()
         IllegalFinding.objects.filter(note__startswith=MARK).delete()
@@ -300,6 +308,85 @@ class Command(BaseCommand):
                 korwil=korwil,
                 created_by=user,
             )
+        self._spatial(user)
+
+    def _spatial(self, user):
+        """Lapisan RTRW contoh, bidang penguasaan, dan zona ancaman (fiktif)."""
+        rng = random.Random(20261031)
+        today = timezone.localdate()
+        overlay = MapOverlay.objects.create(
+            name="RTRW contoh Rempang (fiktif)",
+            kind=aset_enums.OverlayKind.SPATIAL_PLAN,
+            show_in_command=True,
+            source="Data contoh",
+            note=f"{MARK} Lapisan fiktif untuk uji coba pusat komando.",
+        )
+        zones = ("Zona Khusus", "Zona Budi Daya", "Zona Lindung")
+        korwils = Korwil.objects.filter(note__startswith=MARK).order_by("code")
+        for index, korwil in enumerate(korwils):
+            xmin, ymin, xmax, ymax = korwil.geometry.extent
+            zone = zones[index % len(zones)]
+            MapOverlayFeature.objects.create(
+                overlay=overlay,
+                name=zone,
+                geometry=Polygon.from_bbox((xmin, ymin, (xmin + xmax) / 2, ymax)),
+                properties={"zona": zone},
+            )
+            for number in range(1, 4):
+                center = _random_point(rng, korwil.geometry)
+                half = rng.uniform(0.0004, 0.0015)
+                controlled = rng.random() < 0.4
+                plot = LandPlot.objects.create(
+                    name=f"Bidang {korwil.code}-{number}",
+                    owner_name=f"{rng.choice(FIRST_NAMES)} {rng.choice(LAST_NAMES)}",
+                    korwil=korwil,
+                    geometry=MultiPolygon(
+                        Polygon.from_bbox(
+                            (
+                                center.x - half,
+                                center.y - half,
+                                center.x + half,
+                                center.y + half,
+                            )
+                        ),
+                        srid=4326,
+                    ),
+                    control_status=(
+                        enums.ControlStatus.CONTROLLED
+                        if controlled
+                        else enums.ControlStatus.PENDING
+                    ),
+                    controlled_on=(
+                        today - datetime.timedelta(days=rng.randint(1, 60))
+                        if controlled
+                        else None
+                    ),
+                    control_team="Tim contoh" if controlled else "",
+                    urgency=rng.choice(enums.PlotUrgency.values),
+                    source="Data contoh",
+                    created_by=user,
+                    note=f"{MARK} Bidang fiktif.",
+                )
+                LandPlotChange.objects.create(
+                    plot=plot,
+                    new_status=plot.control_status,
+                    changed_by=user,
+                    note="Data contoh",
+                )
+            if korwil.code in ("D", "H"):
+                center = _random_point(rng, korwil.geometry)
+                ThreatZone.objects.create(
+                    name=f"Zona rawan contoh Korwil {korwil.code}",
+                    level=(
+                        enums.ThreatLevel.HIGH
+                        if korwil.code == "D"
+                        else enums.ThreatLevel.MEDIUM
+                    ),
+                    geometry=spatial.circle(center.y, center.x, 400),
+                    korwil=korwil,
+                    created_by=user,
+                    note=f"{MARK} Zona fiktif.",
+                )
 
     def _komsos(self, rng, korwil, residents, user, now):
         activity = Activity.objects.create(

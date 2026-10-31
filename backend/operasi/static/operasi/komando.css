@@ -431,8 +431,36 @@ dialog h3 { margin: 0; }
 details.group { border: 1px solid var(--line); border-radius: 10px; padding: 6px 10px; background: var(--panel); margin-bottom: 6px; }
 details.group summary { cursor: pointer; font-weight: 600; }
 details.group .list { margin-top: 6px; }
-#kd-isi > * + * { margin-top: 10px; }
-#kd-isi h3 { margin-top: 16px; margin-bottom: 6px; }
+#kd-isi > * + *, #bdd-isi > * + * { margin-top: 10px; }
+#kd-isi h3, #bdd-isi h3 { margin-top: 16px; margin-bottom: 6px; }
 #tab-peringkat .row.wrap > select, #tab-historis .row.wrap > select { flex: 1 1 10em; }
 #peringkat-tampilan { margin-bottom: 0; flex: 1 1 auto; }
 #peringkat-tampilan button, #historis-bagian button { white-space: nowrap; }
+/* Peta & spasial */
+.pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.pills button { border: 1px solid var(--line); background: var(--panel); color: var(--text); border-radius: 99px; padding: 6px 12px; font-size: 13px; cursor: pointer; white-space: nowrap; }
+.pills button.active { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); font-weight: 700; }
+#tab-spasial .row.wrap > select, #tab-spasial .row.wrap > input { flex: 1 1 10em; min-width: 0; }
+#tab-spasial .row > input[type="search"] { flex: 1 1 auto; min-width: 0; }
+.card-form { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px; }
+.card-form h3 { margin: 0; }
+.list li.inactive { opacity: .6; }
+.risk-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.risk { text-align: left; border: 1px solid var(--line); border-left: 4px solid var(--c); border-radius: 10px; background: var(--panel); padding: 6px 10px; cursor: pointer; color: var(--text); font-size: 11px; }
+.risk:hover { background: var(--accent-soft); }
+.risk b { display: block; font-size: 14px; color: var(--c); }
+.risk span { color: var(--muted); }
+.anomaly { border: 1px solid var(--line); border-left: 4px solid var(--c); border-radius: 10px; background: var(--panel); padding: 6px 10px; }
+.anomaly summary { cursor: pointer; font-weight: 600; }
+.anomaly .list { margin-top: 6px; }
+.pano-icon { font-size: 20px; line-height: 26px; text-align: center; color: #0ea5e9; text-shadow: 0 0 3px #fff, 0 0 2px #fff; }
+.tactical .leaflet-tile-pane { filter: grayscale(.85) invert(.9) hue-rotate(180deg) brightness(.9) contrast(1.15) sepia(.25); }
+.leaflet-container.tactical { background: #0b1220; }
+dialog.viewer360 { width: min(1000px, calc(100% - 24px)); }
+.pano { position: relative; width: 100%; aspect-ratio: 16 / 9; max-height: 70vh; background: #000; border-radius: 10px; overflow: hidden; touch-action: none; cursor: grab; }
+.pano canvas { display: block; width: 100%; height: 100%; }
+#ib-hasil .table td:first-child { width: 28px; }
+.btn-small.danger { color: var(--danger); border-color: var(--danger); }
+.ok-text { color: #1a7f37; }
+#ib-hasil .table td:nth-child(3) { white-space: nowrap; }
+#tt-hasil .table td:last-child, #tt-hasil .table th:last-child { white-space: nowrap; }

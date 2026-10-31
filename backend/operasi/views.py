@@ -40,6 +40,7 @@ from operasi import (
     reports,
     satellite,
     services,
+    spatial,
     task_flow,
 )
 from operasi.auth_views import command_login_required, forbidden, main_app_url
@@ -59,6 +60,7 @@ from operasi.models import (
     PatrolPhoto,
     PatrolSession,
     Resident,
+    SitePhoto360,
     SoilTest,
     SosAlert,
     StanceChange,
@@ -209,13 +211,37 @@ def _extra_layers(request) -> list[dict]:
         "asetlahan.view_landasset"
     ) and not request.user.has_perm("pengadaan.view_acquisitionparcel"):
         return []
-    layers = _map_layers(request)
+    from asetlahan.models import MapOverlay
+
+    # Lapisan "Tampil di pusat komando" sudah ada di daftar lapisan komando.
+    shared = {
+        f"ref-{pk}"
+        for pk in MapOverlay.objects.filter(show_in_command=True).values_list(
+            "pk", flat=True
+        )
+    }
+    layers = [layer for layer in _map_layers(request) if layer["key"] not in shared]
     for layer in layers:
         layer["visible"] = False
     return layers
 
 
 def _config(request) -> dict:
+    data = _base_config(request)
+    extra = _spatial_config(request.user)
+    for key in ("perms", "urls", "choices", "colors"):
+        data[key].update(extra.pop(key))
+    data.update(extra)
+    return data
+
+
+def _spatial_config(user) -> dict:
+    from operasi import views_spatial
+
+    return views_spatial.config(user)
+
+
+def _base_config(request) -> dict:
     user = request.user
     config = CommandSettings.load()
     lock = SystemLock.state()
@@ -277,6 +303,7 @@ def _config(request) -> dict:
                 "beranda",
                 "historis",
                 "peringkat",
+                "spasial",
             )
             else "peta"
         ),
@@ -508,6 +535,7 @@ FILE_KINDS = {
         "operasi.view_dailyreport",
         "",
     ),
+    "foto-360": (SitePhoto360, "image", "operasi.view_sitephoto360", "korwil"),
 }
 
 
@@ -899,9 +927,14 @@ LAYERS = {
 
 @api(permission=None)
 def layer(request, key):
-    if key not in LAYERS:
+    from operasi import views_spatial
+
+    if key.startswith("ref-") and key[4:].isdigit():
+        return JsonResponse(collection(views_spatial.overlay_features(int(key[4:]))))
+    layers = {**LAYERS, **views_spatial.LAYERS}
+    if key not in layers:
         raise Http404
-    permission, builder = LAYERS[key]
+    permission, builder = layers[key]
     if not request.user.has_perm(permission):
         raise PermissionDenied
     return JsonResponse(collection(builder(request)))
@@ -1785,11 +1818,16 @@ def position(request):
     location = _parse_location(request.POST)
     if location is None:
         raise ValidationError({"location": [_("Lokasi GPS tidak sah.")]})
+    accuracy = _accuracy(request.POST.get("accuracy"))
+    spatial.record_track(request.user, location, accuracy)
+    # Jejak lama dibersihkan sekali sehari.
+    if cache.add(f"operasi:jejak-bersih:{timezone.localdate()}", 1, 86400):
+        spatial.prune_tracks()
     OfficerPosition.objects.update_or_create(
         user=request.user,
         defaults={
             "location": location,
-            "accuracy_m": _accuracy(request.POST.get("accuracy")),
+            "accuracy_m": accuracy,
             "heading": _decimal_or_none(request.POST.get("heading"), 0, 360, places=1),
             "speed_mps": _decimal_or_none(request.POST.get("speed"), 0, 9999),
             "battery_pct": _int_or_none(request.POST.get("battery"), 0, 100),

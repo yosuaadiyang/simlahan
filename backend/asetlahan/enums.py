@@ -319,6 +319,7 @@ class OverlayKind(models.TextChoices):
     ROAD = "jalan", _("Jalan")
     RAILWAY = "rel", _("Jalur kereta api")
     FOREST = "hutan", _("Kawasan hutan")
+    PROJECT = "proyek", _("Kawasan proyek / rencana kegiatan")
     SPATIAL_PLAN = "tata_ruang", _("Rencana tata ruang (RTRW/RDTR)")
     UTILITY = "utilitas", _("Jaringan utilitas")
     OTHER = "lainnya", _("Lainnya")
@@ -332,6 +333,7 @@ OVERLAY_COLORS = {
     OverlayKind.ROAD: "#cf222e",
     OverlayKind.RAILWAY: "#24292f",
     OverlayKind.FOREST: "#1a7f37",
+    OverlayKind.PROJECT: "#c026d3",
     OverlayKind.SPATIAL_PLAN: "#bf8700",
     OverlayKind.UTILITY: "#8250df",
     OverlayKind.OTHER: "#6e7781",

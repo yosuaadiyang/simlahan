@@ -63,13 +63,18 @@ DOWNLOAD_RULE = (
     "setiap unduhan diberi tanda air dan tercatat."
 )
 COMMAND_TABS = (
-    "Pusat komando (`/komando/`): Peta (termasuk lapisan Temuan ilegal dan "
-    "Patroli SMART), Absen, Lapor (Komsos, Topografi, Temuan ilegal, Patroli "
+    "Pusat komando (`/komando/`): Peta (termasuk lapisan Temuan ilegal, "
+    "Patroli SMART, Penguasaan lahan, Zona ancaman, Foto situs 360°, lapisan "
+    "referensi seperti RTRW/hutan/kawasan proyek, dan gaya peta taktis), "
+    "Absen, Lapor (Komsos, Topografi, Temuan ilegal, Patroli "
     "Taman Buru dengan impor SMART, Kegiatan lainnya, jenis lain, uji tanah, "
     "laporan saya), Warga, Tugas (saya, tim, verifikasi, terlambat, semua; "
     "tombol Beri tugas bagi koordinator), Kinerja (grafik harian/mingguan, "
     "radar, kalender 90 hari, sebaran titik kerja di peta, wawasan), Chat; Menu: "
-    "Beranda (ringkasan sikap, tren dukungan, detail Korwil), Persetujuan, Laporan "
+    "Beranda (anomali & peringatan, skor risiko Korwil, ringkasan sikap, tren "
+    "dukungan, detail Korwil), Peta & spasial (penguasaan lahan dengan skor "
+    "prioritas dan impor KML/KMZ, tumpang tindih lapisan, audit RTRW, peta panas, "
+    "jejak GPS bagi pimpinan, zona ancaman, foto 360°), Persetujuan, Laporan "
     "harian (buat, masuk, lacak, rekap Excel), Peringkat tim (periode, Korwil, "
     "tingkat, 10 teratas/terbawah, lencana, Excel, wawasan), Struktur tim, Historis "
     "(bagi koordinator dan atasan: komsos, perubahan sikap, luas lahan), Feed "
@@ -244,7 +249,8 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "tombol **Pusat Komando** di bilah atas), Korwil, warga & laporan, "
             "temuan ilegal, patroli Taman Buru, jejak patroli SMART (impor .json), "
             "pengaturan poin usaha, jabatan & atasan petugas, riwayat & poin "
-            "tugas, laporan harian berjenjang",
+            "tugas, laporan harian berjenjang, bidang penguasaan lahan, zona "
+            "ancaman, foto situs 360°, jejak GPS petugas",
             DOCUMENTS_MENU,
             "Kontak",
             "Catatan area",
@@ -427,14 +433,17 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "Aplikasi lapangan (`/aset/lapangan/`)",
             "Pusat komando (`/komando/`, tombol **Pusat Komando** di panel "
             "admin) sebagai pengawas: Peta, Absen, Lapor (hanya Laporan "
-            "saya/tim), Warga, Tugas, Kinerja, Chat; Menu: Beranda, Persetujuan, "
-            "Laporan harian (termasuk rekap Excel), Peringkat tim, Historis",
+            "saya/tim), Warga, Tugas, Kinerja, Chat; Menu: Beranda, Peta & "
+            "spasial, Persetujuan, Laporan harian (termasuk rekap Excel), "
+            "Peringkat tim, Historis",
         ),
         can=(
             "Membuat dan mengubah aset, penilaian, pajak, transaksi, okupasi, "
             "permukiman kembali, pengaduan, lelang, dokumen, dan tugas.",
             "Membaca perkara hukum.",
             "Memantau petugas dan Korwil di unit layanannya di pusat komando.",
+            "Menandai zona ancaman; membaca bidang penguasaan lahan, foto 360°, "
+            "tumpang tindih lapisan, dan audit RTRW (tidak mengubah status bidang).",
         ),
         limits=(
             "Hanya data unit layanannya (data tanpa unit layanan terlihat semua).",
@@ -499,6 +508,11 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "dari kegiatan yang belum dilaporkan, dengan lampiran), memperbaiki "
             "laporan yang dikembalikan, melacak posisinya, dan mengunduh rekap "
             "Excel.",
+            "Mengimpor bidang dari KML/KMZ/GeoJSON (bidang baru atau hasil "
+            "penguasaan yang dicocokkan otomatis) dan memperbarui status "
+            "penguasaan bidang di Korwilnya; mengunggah foto situs 360°.",
+            "Melihat zona ancaman, tumpang tindih lapisan, audit RTRW, dan peta "
+            "panas di Menu → Peta & spasial.",
             "Bekerja luring; data terkirim otomatis saat ada sinyal.",
         ),
         limits=(
@@ -511,6 +525,8 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "selesai menunggu verifikasi pemberi tugas atau atasan.",
             "Peringkat dan detail Korwil hanya menampilkan skor dirinya sendiri; "
             "Historis tidak tersedia kecuali ia menjadi atasan petugas lain.",
+            "Tidak menandai zona ancaman, tidak menghapus foto 360°, dan tidak "
+            "melihat jejak GPS petugas.",
         ),
     ),
     UserGroup.KOORDINATOR_WILAYAH: RoleGuide(
@@ -538,6 +554,8 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "(bukan milik sendiri).",
             "Melihat Historis wilayahnya: komsos per petugas (warga baru dan "
             "kunjungan berulang), perubahan sikap warga, dan perubahan luas lahan.",
+            "Menandai dan menonaktifkan zona ancaman di wilayahnya, menghapus foto "
+            "360° wilayahnya, dan melihat jejak GPS anggota (disimpan 60 hari).",
         ),
         limits=(
             "Hanya Korwil yang dipimpinnya dan tugas Korwil yang " "dipimpin/diikuti.",
