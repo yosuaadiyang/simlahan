@@ -63,12 +63,14 @@
       <button type="button" data-tool="locate" title="Lokasi saya">📍</button>
       <button type="button" data-tool="measure" title="Ukur jarak">📏</button>
       <button type="button" data-tool="satellite" title="Citra satelit">🛰️</button>
+      <button type="button" data-tool="tactical" title="Gaya peta taktis">🎯</button>
       <button type="button" data-tool="ai" title="AI Satelit: analisis area">🤖</button>
       <button type="button" data-tool="print" title="Cetak / export peta">🖨️</button>
       <button type="button" data-tool="voice" title="Perintah suara">🎙️</button>
       <button type="button" data-tool="chat" title="Chat internal">💬<span class="dot" id="chat-dot" hidden></span></button>
       <button type="button" data-tool="legend" title="Legenda & lapisan">📜</button>
       <button type="button" data-tool="search" title="Cari (Ctrl+K)">🔍</button>
+      <button type="button" data-tool="clear-analysis" title="Hapus hasil analisis dari peta" hidden>🧹</button>
     </div>
 
     <div class="compass" id="kompas" title="Kompas">
@@ -496,6 +498,7 @@
     <h2>Menu lainnya</h2>
     <div class="more-menu">
       <button type="button" class="btn" data-buka="beranda">📊<span>Beranda</span></button>
+      <button type="button" class="btn" data-buka="spasial">🗺️<span>Peta &amp; spasial</span></button>
       <button type="button" class="btn" data-buka="persetujuan">🗳️<span>Persetujuan<i class="count" id="menu-persetujuan-n"></i></span></button>
       <button type="button" class="btn" data-buka="laporan">🗂️<span>Laporan harian<i class="count" id="menu-laporan-n"></i></span></button>
       <button type="button" class="btn" data-buka="peringkat">🏆<span>Peringkat tim</span></button>
@@ -537,6 +540,11 @@
     <div class="row" style="justify-content:space-between"><h2>Beranda</h2><button type="button" class="btn-small" id="beranda-muat">↻ Muat ulang</button></div>
     <p class="muted small" id="beranda-waktu"></p>
     <div class="metrics four" id="beranda-angka"></div>
+    <h3>Anomali &amp; peringatan</h3>
+    <div id="beranda-anomali" class="stack"><p class="muted small">Memuat…</p></div>
+    <h3>Skor risiko Korwil</h3>
+    <p class="muted small">Dari persentase warga kontra (minimal 5 warga bersikap): ≥60% kritis, ≥40% tinggi, ≥20% sedang.</p>
+    <div id="beranda-risiko" class="risk-row"></div>
     <h3>Sikap warga</h3>
     <div class="stance-cards" id="beranda-sikap"></div>
     <h3>Tren dukungan (12 pekan)</h3>
@@ -547,6 +555,103 @@
     <div class="grid2 split">
       <div><h3>Kegiatan 7 hari</h3><div id="beranda-kegiatan" class="stack"></div></div>
       <div><h3>Uji tanah</h3><div id="beranda-tanah" class="stack"></div></div>
+    </div>
+  </section>
+
+  <section id="tab-spasial" class="tab-view sheet" aria-label="Peta dan spasial" hidden>
+    <h2>Peta &amp; Spasial</h2>
+    <div class="pills" id="spasial-bagian" role="group" aria-label="Bagian">
+      <button type="button" data-bagian="bidang" class="active">Penguasaan lahan</button>
+      <button type="button" data-bagian="tumpang">Tumpang tindih</button>
+      <button type="button" data-bagian="audit">Audit RTRW</button>
+      <button type="button" data-bagian="panas">Peta panas</button>
+      <button type="button" data-bagian="jejak">Jejak GPS</button>
+      <button type="button" data-bagian="ancaman">Zona ancaman</button>
+      <button type="button" data-bagian="foto">Foto 360°</button>
+    </div>
+
+    <div data-panel="bidang" class="stack">
+      <div class="row wrap">
+        <select id="bd-korwil" aria-label="Korwil"><option value="">Semua Korwil</option></select>
+        <select id="bd-status" aria-label="Status"><option value="">Semua status</option></select>
+        <select id="bd-urut" aria-label="Urutan"><option value="skor">Prioritas tertinggi</option><option value="luas">Terluas</option><option value="nomor">Nomor</option></select>
+      </div>
+      <div class="row"><input type="search" id="bd-cari" placeholder="Cari nomor, nama, pemilik…" aria-label="Cari bidang"><button type="button" class="btn-small" id="bd-impor" hidden>⬆ Impor KML/KMZ</button></div>
+      <div class="metrics four" id="bd-ringkas"></div>
+      <p class="muted small">Skor prioritas = 10 poin/ha × luas efektif (di atas 5 ha dihitung akar) × bobot zona (inti 1,5 · penyangga 1,2 · luar 1,0) × bobot urgensi (1,0–2,0). Zona dari lapisan referensi yang ditandai tampil di pusat komando.</p>
+      <ul class="list compact" id="bd-daftar"></ul>
+    </div>
+
+    <div data-panel="tumpang" class="stack" hidden>
+      <p class="muted small">Hitung luas irisan dua lapisan (mis. kawasan proyek ∩ hutan lindung, atau bidang ∩ rencana tata ruang). Pilih lapisan yang sama untuk mencari bidang yang saling tumpang tindih.</p>
+      <div class="grid2">
+        <label class="field">Lapisan A <select id="tt-a"></select></label>
+        <label class="field">Lapisan B <select id="tt-b"></select></label>
+      </div>
+      <div class="row"><button type="button" class="btn primary" id="tt-jalankan">Analisis</button><button type="button" class="btn-small" id="tt-csv" hidden>⬇ CSV</button></div>
+      <div id="tt-hasil" class="stack"></div>
+    </div>
+
+    <div data-panel="audit" class="stack" hidden>
+      <p class="muted small">Mencocokkan titik warga dengan lapisan rencana tata ruang, kawasan hutan, dan kawasan proyek: apakah zona yang tercatat sama dengan zona di peta.</p>
+      <div class="row wrap">
+        <select id="au-korwil" aria-label="Korwil"><option value="">Semua Korwil</option></select>
+        <button type="button" class="btn primary" id="au-jalankan">Jalankan audit</button>
+        <button type="button" class="btn-small" id="au-csv" hidden>⬇ CSV</button>
+      </div>
+      <div id="au-hasil" class="stack"></div>
+    </div>
+
+    <div data-panel="panas" class="stack" hidden>
+      <div class="row wrap">
+        <select id="ph-sumber" aria-label="Sumber"></select>
+        <select id="ph-periode" aria-label="Periode"><option value="minggu">Minggu ini</option><option value="bulan" selected>Bulan ini</option><option value="bulan-lalu">Bulan lalu</option><option value="kuartal">Kuartal ini</option><option value="tahun">Tahun ini</option></select>
+        <button type="button" class="btn primary" id="ph-tampil">Tampilkan di peta</button>
+      </div>
+      <p class="muted small">Sel ±250 m; makin pekat makin banyak data. Warga tidak dibatasi periode.</p>
+      <div id="ph-hasil" class="small"></div>
+    </div>
+
+    <div data-panel="jejak" class="stack" hidden>
+      <p class="muted small">Jejak tersimpan dari mode Live (titik tiap ±1 menit atau 25 m), disimpan 60 hari.</p>
+      <div class="row wrap">
+        <input type="date" id="jj-tanggal" aria-label="Tanggal">
+        <select id="jj-petugas" aria-label="Petugas"><option value="">Pilih petugas…</option></select>
+        <button type="button" class="btn primary" id="jj-tampil">Tampilkan</button>
+      </div>
+      <div id="jj-hasil" class="small"></div>
+    </div>
+
+    <div data-panel="ancaman" class="stack" hidden>
+      <form id="form-ancaman" class="stack card-form" hidden>
+        <h3>Tandai zona ancaman</h3>
+        <div class="grid2">
+          <label class="field">Nama zona <input name="name" maxlength="255" required></label>
+          <label class="field">Tingkat <select name="level" id="za-level"></select></label>
+          <label class="field">Radius (m) <input name="radius" type="number" min="10" max="20000" value="500" inputmode="numeric"></label>
+          <label class="field">Korwil <select name="korwil" id="za-korwil"><option value="">Otomatis dari lokasi</option></select></label>
+        </div>
+        <label class="check"><input type="checkbox" id="za-titik"> Pakai titik yang diketuk di peta (bila tidak, GPS saya)</label>
+        <label class="field">Keterangan <textarea name="note" rows="2" maxlength="2000"></textarea></label>
+        <div class="row"><button type="submit" class="btn primary">Simpan zona</button></div>
+      </form>
+      <label class="check"><input type="checkbox" id="za-semua"> Tampilkan juga zona nonaktif</label>
+      <ul class="list compact" id="za-daftar"></ul>
+    </div>
+
+    <div data-panel="foto" class="stack" hidden>
+      <form id="form-foto360" class="stack card-form" hidden>
+        <h3>Unggah foto 360°</h3>
+        <div class="grid2">
+          <label class="field">Judul <input name="title" maxlength="255" required></label>
+          <label class="field">Tanggal pengambilan <input name="tanggal" type="date"></label>
+        </div>
+        <label class="field">Foto equirectangular (JPG/PNG, maks. 20 MB) <input name="foto" type="file" accept="image/jpeg,image/png" required></label>
+        <label class="check"><input type="checkbox" id="f3-titik"> Pakai titik yang diketuk di peta (bila tidak, GPS saya)</label>
+        <label class="field">Keterangan <textarea name="note" rows="2" maxlength="2000"></textarea></label>
+        <div class="row"><button type="submit" class="btn primary">Unggah</button></div>
+      </form>
+      <ul class="list compact" id="f3-daftar"></ul>
     </div>
   </section>
 
@@ -701,6 +806,41 @@
   <form method="dialog" class="stack">
     <div class="panel-head"><h3 id="ld-judul">Laporan harian</h3><button value="tutup" class="close">✕</button></div>
     <div id="ld-isi"></div>
+  </form>
+</dialog>
+
+<dialog id="dlg-bidang" class="wide">
+  <form method="dialog" class="stack">
+    <div class="panel-head"><h3 id="bdd-judul">Bidang</h3><button value="tutup" class="close">✕</button></div>
+    <div id="bdd-isi"></div>
+  </form>
+</dialog>
+
+<dialog id="dlg-impor-bidang" class="wide">
+  <form class="stack" id="form-impor-bidang">
+    <div class="panel-head"><h3>Impor bidang dari berkas peta</h3><button type="button" class="close" data-tutup>✕</button></div>
+    <div class="segmented small-seg" id="ib-mode" role="group" aria-label="Mode impor">
+      <button type="button" data-mode="baru" class="active">Bidang baru (belum dikuasai)</button>
+      <button type="button" data-mode="penguasaan">Hasil penguasaan</button>
+    </div>
+    <p class="muted small" id="ib-bantuan"></p>
+    <label class="field">Berkas KML, KMZ, GeoJSON, GeoPackage, atau Shapefile (ZIP), maks. 20 MB <input type="file" name="berkas" id="ib-berkas" accept=".kml,.kmz,.geojson,.json,.gpkg,.zip" required></label>
+    <div class="grid2">
+      <label class="field">Korwil <select name="korwil" id="ib-korwil"><option value="">Otomatis dari lokasi</option></select></label>
+      <label class="field">Urgensi bidang baru <select name="urgensi" id="ib-urgensi"></select></label>
+      <label class="field" data-penguasaan>Tanggal dikuasai <input type="date" name="tanggal"></label>
+      <label class="field" data-penguasaan>Tim penguasaan <input name="tim" maxlength="255"></label>
+    </div>
+    <div class="row"><button type="button" class="btn" id="ib-pratinjau">Pratinjau</button><button type="submit" class="btn primary" id="ib-terapkan" disabled>Terapkan pilihan</button></div>
+    <div id="ib-hasil" class="stack"></div>
+  </form>
+</dialog>
+
+<dialog id="dlg-360" class="wide viewer360">
+  <form method="dialog" class="stack">
+    <div class="panel-head"><h3 id="v360-judul">Foto 360°</h3><button value="tutup" class="close">✕</button></div>
+    <div class="pano" id="v360" tabindex="0" aria-label="Foto 360°, geser untuk melihat sekeliling"><canvas id="v360-kanvas"></canvas></div>
+    <p class="muted small">Geser (atau tombol panah) untuk berputar, cubit / gulir untuk memperbesar. <a id="v360-asli" target="_blank" rel="noopener">Buka berkas asli</a></p>
   </form>
 </dialog>
 

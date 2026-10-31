@@ -103,7 +103,7 @@ def _config() -> list[Finding]:
 
 def _sample_data() -> list[Finding]:
     from alokasi.models import LandPlot
-    from asetlahan.models import LandAsset
+    from asetlahan.models import LandAsset, MapOverlay
     from dokumen.models import LandUse
     from operasi.models import Korwil
     from pengadaan.models import AcquisitionProject
@@ -144,6 +144,11 @@ def _sample_data() -> list[Finding]:
             WARN,
             LandUse.objects.filter(reference__startswith="CONTOH-DOK-"),
             "pemanfaatan lahan contoh",
+        ),
+        (
+            WARN,
+            MapOverlay.objects.filter(note__startswith="[contoh]"),
+            "lapisan referensi contoh",
         ),
     )
     for level, queryset, label in checks:

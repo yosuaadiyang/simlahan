@@ -79,6 +79,9 @@ OWNER_FIELDS = {
     "soiltest": "sampled_by",
     "sosalert": "raised_by",
     "attendance": "user",
+    "landplot": "created_by",
+    "threatzone": "created_by",
+    "sitephoto360": "uploaded_by",
 }
 _AUTO = object()
 

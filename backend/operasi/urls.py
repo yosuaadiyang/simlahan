@@ -2,7 +2,7 @@
 
 from django.urls import path
 
-from operasi import auth_views, views, views_dashboard, views_flow
+from operasi import auth_views, views, views_dashboard, views_flow, views_spatial
 
 urlpatterns = [
     path("", views.command_center, name="operasi-command"),
@@ -122,4 +122,24 @@ urlpatterns = [
     path("api/posisi/", views.position, name="operasi-position"),
     path("api/ai-satelit/", views.satellite_analysis, name="operasi-satellite"),
     path("api/kunci/", views.system_lock, name="operasi-lock"),
+    path("api/bidang/", views_spatial.plots, name="operasi-plots"),
+    path("api/bidang/impor/", views_spatial.plot_import, name="operasi-plot-import"),
+    path("api/bidang/<int:pk>/", views_spatial.plot_detail, name="operasi-plot"),
+    path("api/tumpang-tindih/", views_spatial.overlap, name="operasi-overlap"),
+    path("api/audit-rtrw/", views_spatial.rtrw_audit, name="operasi-rtrw-audit"),
+    path("api/anomali/", views_spatial.anomalies, name="operasi-anomalies"),
+    path("api/peta-panas/", views_spatial.heatmap, name="operasi-heatmap"),
+    path("api/jejak/", views_spatial.track, name="operasi-track"),
+    path("api/zona-ancaman/", views_spatial.threat_zones, name="operasi-threat-zones"),
+    path(
+        "api/zona-ancaman/<int:pk>/<str:action>/",
+        views_spatial.threat_zone_action,
+        name="operasi-threat-zone-action",
+    ),
+    path("api/foto-360/", views_spatial.site_photos, name="operasi-site-photos"),
+    path(
+        "api/foto-360/<int:pk>/hapus/",
+        views_spatial.site_photo_delete,
+        name="operasi-site-photo-delete",
+    ),
 ]

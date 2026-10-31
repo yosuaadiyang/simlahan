@@ -46,6 +46,13 @@ class RtrwZone(models.TextChoices):
     UNASSESSED = "belum", _("Belum diketahui")
 
 
+RTRW_ZONE_COLORS = {
+    RtrwZone.SPECIAL: "#c026d3",
+    RtrwZone.PROTECTED: "#15803d",
+    RtrwZone.CULTIVATION: "#ca8a04",
+}
+
+
 class Gender(models.TextChoices):
     MALE = "L", _("Laki-laki")
     FEMALE = "P", _("Perempuan")
@@ -400,3 +407,48 @@ class DailyReportAction(models.TextChoices):
     REVISED = "diperbaiki", _("Diperbaiki")
     RESUBMITTED = "dikirim_ulang", _("Dikirim ulang ke peminta revisi")
     CLOSED = "ditutup", _("Ditutup, sumber dilepas")
+
+
+# --------------------------------------------------------------------------
+# Peta & spasial
+# --------------------------------------------------------------------------
+
+
+class ControlStatus(models.TextChoices):
+    """Status penguasaan bidang lahan di lapangan."""
+
+    PENDING = "belum", _("Belum dikuasai")
+    CONTROLLED = "sudah", _("Sudah dikuasai")
+
+
+CONTROL_COLORS = {ControlStatus.PENDING: "#2563eb", ControlStatus.CONTROLLED: "#c026d3"}
+
+
+class PlotUrgency(models.TextChoices):
+    LOW = "rendah", _("Rendah")
+    MEDIUM = "sedang", _("Sedang")
+    HIGH = "tinggi", _("Tinggi")
+    URGENT = "mendesak", _("Mendesak")
+
+
+class PlotZone(models.TextChoices):
+    """Kelas zona bidang untuk skor prioritas."""
+
+    CORE = "inti", _("Inti (kawasan proyek / zona khusus)")
+    BUFFER = "penyangga", _("Penyangga (hutan, zona lindung / budi daya)")
+    OUTSIDE = "luar", _("Di luar zona")
+
+
+class ThreatLevel(models.TextChoices):
+    LOW = "rendah", _("Rendah")
+    MEDIUM = "sedang", _("Sedang")
+    HIGH = "tinggi", _("Tinggi")
+    CRITICAL = "kritis", _("Kritis")
+
+
+THREAT_COLORS = {
+    ThreatLevel.LOW: "#10b981",
+    ThreatLevel.MEDIUM: "#f59e0b",
+    ThreatLevel.HIGH: "#ef4444",
+    ThreatLevel.CRITICAL: "#7f1d1d",
+}

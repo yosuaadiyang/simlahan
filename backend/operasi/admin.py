@@ -39,18 +39,23 @@ from operasi.models import (
     IllegalFindingVisit,
     Korwil,
     LandAreaChange,
+    LandPlot,
+    LandPlotChange,
     OfficerPosition,
     OfficerProfile,
+    OfficerTrackPoint,
     PatrolObservation,
     PatrolSession,
     Resident,
     Seedling,
+    SitePhoto360,
     SoilTest,
     SosAlert,
     StanceChange,
     SystemLock,
     TaskEvent,
     TaskPoint,
+    ThreatZone,
 )
 
 
@@ -2251,4 +2256,207 @@ class DailyReportAdmin(ReadOnlyAdminMixin, OperasiModelAdmin):
         queryset = super().get_queryset(request)
         return queryset.filter(
             pk__in=daily_reports.visible_reports(request.user).values("pk")
+        )
+
+
+# --------------------------------------------------------------------------
+# Peta & spasial
+# --------------------------------------------------------------------------
+
+
+class LandPlotChangeInline(admin.TabularInline):
+    model = LandPlotChange
+    extra = 0
+    can_delete = False
+    fields = ("changed_at", "old_status", "new_status", "changed_by", "note")
+    readonly_fields = fields
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(LandPlot)
+class LandPlotAdmin(OperasiGISAdmin):
+    owner_field = "created_by"
+    list_select_related = ("korwil", "resident")
+    list_display = (
+        "number",
+        "name",
+        "owner_name",
+        "korwil",
+        "area_display",
+        "status_badge",
+        "urgency",
+        "controlled_on",
+    )
+    list_filter = ("control_status", "urgency", "korwil")
+    search_fields = ("number", "name", "owner_name", "guard_name", "control_team")
+    readonly_fields = ("number", "measured_area_ha", "created_by")
+    autocomplete_fields = ("resident",)
+    inlines = (LandPlotChangeInline,)
+    actions = ("export_csv",)
+    fieldsets = (
+        (None, {"fields": ("number", "name", "owner_name", "guard_name", "korwil")}),
+        (
+            _("Penguasaan"),
+            {
+                "fields": (
+                    "control_status",
+                    "controlled_on",
+                    "control_team",
+                    "urgency",
+                    "resident",
+                )
+            },
+        ),
+        (
+            _("Batas & luas"),
+            {"fields": ("geometry", "official_area_ha", "measured_area_ha")},
+        ),
+        (_("Lainnya"), {"fields": ("source", "note", "created_by")}),
+    )
+
+    @admin.display(description=_("Luas (ha)"))
+    def area_display(self, obj):
+        return obj.area_ha
+
+    @admin.display(description=_("Status"), ordering="control_status")
+    def status_badge(self, obj):
+        return badge(
+            enums.CONTROL_COLORS.get(obj.control_status, "#57606a"),
+            obj.get_control_status_display(),
+        )
+
+    def save_model(self, request, obj, form, change):
+        old = ""
+        if change:
+            old = (
+                LandPlot.objects.filter(pk=obj.pk)
+                .values_list("control_status", flat=True)
+                .first()
+                or ""
+            )
+        else:
+            obj.created_by = request.user
+        if obj.control_status != enums.ControlStatus.CONTROLLED:
+            obj.controlled_on = None
+        elif obj.controlled_on is None:
+            obj.controlled_on = timezone.localdate()
+        if obj.korwil_id is None and obj.geometry is not None:
+            obj.korwil = geo.korwil_for_write(
+                request.user, obj.geometry.point_on_surface, strict=False
+            )
+        super().save_model(request, obj, form, change)
+        if old != obj.control_status:
+            LandPlotChange.objects.create(
+                plot=obj,
+                old_status=old,
+                new_status=obj.control_status,
+                changed_by=request.user,
+                note=_("Diubah di panel admin"),
+            )
+
+    @admin.action(description=_("Ekspor CSV"), permissions=["view"])
+    def export_csv(self, request, queryset):
+        rows = (
+            (
+                p.number,
+                p.name,
+                p.owner_name,
+                p.guard_name,
+                p.korwil.code if p.korwil_id else "",
+                p.get_control_status_display(),
+                p.controlled_on or "",
+                p.control_team,
+                p.get_urgency_display(),
+                p.official_area_ha if p.official_area_ha is not None else "",
+                p.measured_area_ha if p.measured_area_ha is not None else "",
+                p.source,
+            )
+            for p in queryset.select_related("korwil")
+        )
+        header = [
+            _("Nomor"),
+            _("Nama / titik bidang"),
+            _("Pemilik"),
+            _("Penjaga lahan"),
+            _("Korwil"),
+            _("Status penguasaan"),
+            _("Tanggal dikuasai"),
+            _("Tim penguasaan"),
+            _("Urgensi"),
+            _("Luas resmi (ha)"),
+            _("Luas terukur (ha)"),
+            _("Sumber data"),
+        ]
+        return csv_response("bidang-penguasaan.csv", header, rows)
+
+
+@admin.register(ThreatZone)
+class ThreatZoneAdmin(OperasiGISAdmin):
+    owner_field = "created_by"
+    list_select_related = ("korwil", "created_by")
+    list_display = ("name", "level_badge", "korwil", "is_active", "created_by")
+    list_filter = ("level", "is_active", "korwil")
+    search_fields = ("name", "note")
+    readonly_fields = ("created_by",)
+    fields = ("name", "level", "korwil", "is_active", "geometry", "note", "created_by")
+
+    @admin.display(description=_("Tingkat"), ordering="level")
+    def level_badge(self, obj):
+        return badge(
+            enums.THREAT_COLORS.get(obj.level, "#57606a"), obj.get_level_display()
+        )
+
+    def save_model(self, request, obj, form, change):
+        if not change:
+            obj.created_by = request.user
+        if obj.korwil_id is None and obj.geometry is not None:
+            obj.korwil = geo.korwil_for_write(
+                request.user, obj.geometry.point_on_surface, strict=False
+            )
+        super().save_model(request, obj, form, change)
+
+
+@admin.register(SitePhoto360)
+class SitePhoto360Admin(OperasiGISAdmin):
+    owner_field = "uploaded_by"
+    file_kinds = {"image": "foto-360"}
+    list_select_related = ("korwil", "uploaded_by")
+    list_display = ("title", "korwil", "captured_on", "uploaded_by", "created_at")
+    list_filter = ("korwil", "captured_on")
+    search_fields = ("title", "note")
+    readonly_fields = ("uploaded_by",)
+    fields = (
+        "title",
+        "korwil",
+        "captured_on",
+        "location",
+        "image",
+        "note",
+        "uploaded_by",
+    )
+
+    def save_model(self, request, obj, form, change):
+        if not change:
+            obj.uploaded_by = request.user
+        geo.assign_korwil(obj, request.user, strict=False)
+        super().save_model(request, obj, form, change)
+
+
+@admin.register(OfficerTrackPoint)
+class OfficerTrackPointAdmin(ReadOnlyAdminMixin, OperasiGISAdmin):
+    scope_prefix = None
+    list_display = ("user", "recorded_at", "accuracy_m")
+    list_filter = ("recorded_at",)
+    date_hierarchy = "recorded_at"
+    search_fields = ("user__username", "user__first_name", "user__last_name")
+    readonly_fields = ("user", "location", "accuracy_m", "recorded_at")
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .filter(user__in=services.visible_officers(request.user))
+            .select_related("user")
         )

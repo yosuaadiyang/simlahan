@@ -22,19 +22,24 @@ from operasi.models import (
     IllegalFindingVisit,
     Korwil,
     LandAreaChange,
+    LandPlot,
+    LandPlotChange,
     OfficerPosition,
     OfficerProfile,
+    OfficerTrackPoint,
     PatrolObservation,
     PatrolPhoto,
     PatrolSession,
     Resident,
     Seedling,
+    SitePhoto360,
     SoilTest,
     SosAlert,
     StanceChange,
     SystemLock,
     TaskEvent,
     TaskPoint,
+    ThreatZone,
 )
 from utils.group_permissions import UG, GroupModelPermissions
 
@@ -92,4 +97,11 @@ OPERASI_GROUP_MODEL_PERMISSIONS: GroupModelPermissions = {
     DailyReport: _perms(ALL, VAC, VAC, VAC),
     DailyReportEvent: _perms(ALL, VA, VA, VA),
     DailyReportAttachment: _perms(ALL, VA, VA, VA),
+    # Peta & spasial: penguasaan lahan dicatat petugas lapangan dan koordinator.
+    LandPlot: _perms(ALL, VAC, VAC, V),
+    LandPlotChange: _perms(V, V, V, V),
+    ThreatZone: _perms(ALL, VAC, V, VAC),
+    # Jejak GPS hanya untuk pimpinan; cakupan dibatasi ``visible_officers``.
+    OfficerTrackPoint: _perms(V, V),
+    SitePhoto360: _perms(ALL, VAD, VA, V),
 }

@@ -74,6 +74,7 @@ upload_analysis = _upload_to("upload_analysis", "ai-satelit")
 upload_patrol = _upload_to("upload_patrol", "patroli")
 upload_task = _upload_to("upload_task", "tugas")
 upload_daily_report = _upload_to("upload_daily_report", "laporan-harian")
+upload_site_photo = _upload_to("upload_site_photo", "foto-360")
 
 
 def next_number(prefix: str) -> str:
@@ -2016,6 +2017,211 @@ class DailyReportAttachment(models.Model):
         return self.name or str(self.pk)
 
 
+# --------------------------------------------------------------------------
+# Peta & spasial: penguasaan lahan, zona ancaman, jejak GPS, foto 360°
+# --------------------------------------------------------------------------
+
+
+class LandPlot(TimeStampedModel):
+    """Bidang lahan hasil pemetaan lapangan beserta status penguasaannya."""
+
+    number = models.CharField(_("Nomor"), max_length=32, unique=True, editable=False)
+    name = models.CharField(
+        _("Nama / titik bidang"), max_length=255, blank=True, default=""
+    )
+    owner_name = models.CharField(_("Pemilik"), max_length=255, blank=True, default="")
+    guard_name = models.CharField(
+        _("Penjaga lahan"), max_length=255, blank=True, default=""
+    )
+    korwil = _korwil_field("land_plots")
+    resident = models.ForeignKey(
+        Resident,
+        verbose_name=_("Warga"),
+        related_name="land_plots",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    geometry = gmodels.MultiPolygonField(_("Batas bidang"), srid=4326)
+    official_area_ha = models.DecimalField(
+        _("Luas resmi (ha)"),
+        max_digits=12,
+        decimal_places=4,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0)],
+        help_text=_("Kosongkan untuk memakai luas dari batas bidang."),
+    )
+    measured_area_ha = models.DecimalField(
+        _("Luas terukur (ha)"),
+        max_digits=12,
+        decimal_places=4,
+        null=True,
+        blank=True,
+        editable=False,
+    )
+    control_status = models.CharField(
+        _("Status penguasaan"),
+        max_length=8,
+        choices=enums.ControlStatus.choices,
+        default=enums.ControlStatus.PENDING,
+    )
+    controlled_on = models.DateField(_("Tanggal dikuasai"), null=True, blank=True)
+    control_team = models.CharField(
+        _("Tim penguasaan"), max_length=255, blank=True, default=""
+    )
+    urgency = models.CharField(
+        _("Urgensi"),
+        max_length=8,
+        choices=enums.PlotUrgency.choices,
+        default=enums.PlotUrgency.LOW,
+    )
+    source = models.CharField(_("Sumber data"), max_length=255, blank=True, default="")
+    created_by = _user_field(_("Dicatat oleh"))
+    note = models.TextField(_("Catatan"), blank=True, default="")
+
+    class Meta:
+        verbose_name = _("Bidang lahan (penguasaan)")
+        verbose_name_plural = _("Bidang lahan (penguasaan)")
+        ordering = ["number"]
+
+    def __str__(self):
+        label = self.name or self.owner_name
+        return f"{self.number} – {label}" if label else self.number
+
+    @property
+    def area_ha(self) -> Decimal:
+        value = self.official_area_ha
+        if value is None:
+            value = self.measured_area_ha
+        return value if value is not None else Decimal("0")
+
+    def save(self, *args, **kwargs):
+        from asetlahan import geo as aset_geo
+
+        if not self.number:
+            self.number = next_number("BDG")
+        if self.geometry is not None and not self.geometry.empty:
+            area = aset_geo.area_m2(self.geometry)
+            self.measured_area_ha = (
+                (area / Decimal("10000")).quantize(Decimal("0.0001"))
+                if area is not None
+                else None
+            )
+            if "update_fields" in kwargs and kwargs["update_fields"] is not None:
+                kwargs["update_fields"] = set(kwargs["update_fields"]) | {
+                    "measured_area_ha"
+                }
+        super().save(*args, **kwargs)
+
+
+class LandPlotChange(models.Model):
+    """Riwayat perubahan status penguasaan bidang."""
+
+    plot = models.ForeignKey(
+        LandPlot,
+        verbose_name=_("Bidang"),
+        related_name="changes",
+        on_delete=models.CASCADE,
+    )
+    old_status = models.CharField(
+        _("Status sebelumnya"),
+        max_length=8,
+        choices=enums.ControlStatus.choices,
+        blank=True,
+        default="",
+    )
+    new_status = models.CharField(
+        _("Status baru"), max_length=8, choices=enums.ControlStatus.choices
+    )
+    changed_by = _user_field(_("Diubah oleh"))
+    changed_at = models.DateTimeField(_("Waktu"), auto_now_add=True)
+    note = models.CharField(_("Catatan"), max_length=255, blank=True, default="")
+
+    class Meta:
+        verbose_name = _("Riwayat penguasaan bidang")
+        verbose_name_plural = _("Riwayat penguasaan bidang")
+        ordering = ["-changed_at", "-pk"]
+
+    def __str__(self):
+        return f"{self.plot} {self.old_status or '-'} → {self.new_status}"
+
+
+class ThreatZone(TimeStampedModel):
+    """Zona rawan/ancaman yang ditandai pimpinan di peta."""
+
+    name = models.CharField(_("Nama zona"), max_length=255)
+    level = models.CharField(
+        _("Tingkat ancaman"),
+        max_length=8,
+        choices=enums.ThreatLevel.choices,
+        default=enums.ThreatLevel.MEDIUM,
+    )
+    geometry = gmodels.MultiPolygonField(_("Area"), srid=4326)
+    korwil = _korwil_field("threat_zones")
+    is_active = models.BooleanField(_("Aktif"), default=True)
+    note = models.TextField(_("Keterangan"), blank=True, default="")
+    created_by = _user_field(_("Ditandai oleh"))
+
+    class Meta:
+        verbose_name = _("Zona ancaman")
+        verbose_name_plural = _("Zona ancaman")
+        ordering = ["-is_active", "-created_at"]
+
+    def __str__(self):
+        return f"{self.name} ({self.get_level_display()})"
+
+
+class OfficerTrackPoint(models.Model):
+    """Riwayat titik Live petugas untuk jejak GPS dan peta panas."""
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Petugas"),
+        related_name="operasi_track",
+        on_delete=models.CASCADE,
+    )
+    location = gmodels.PointField(_("Lokasi"), srid=4326)
+    accuracy_m = models.DecimalField(
+        _("Akurasi (m)"), max_digits=8, decimal_places=1, null=True, blank=True
+    )
+    recorded_at = models.DateTimeField(_("Waktu"))
+
+    class Meta:
+        verbose_name = _("Titik jejak GPS")
+        verbose_name_plural = _("Jejak GPS petugas")
+        ordering = ["-recorded_at"]
+        indexes = [models.Index(fields=["user", "recorded_at"])]
+
+    def __str__(self):
+        return f"{self.user} {self.recorded_at:%d-%m-%Y %H:%M}"
+
+
+class SitePhoto360(TimeStampedModel):
+    """Foto situs 360° (equirectangular) bertitik lokasi."""
+
+    title = models.CharField(_("Judul"), max_length=255)
+    korwil = _korwil_field("site_photos")
+    location = gmodels.PointField(_("Lokasi"), srid=4326)
+    captured_on = models.DateField(_("Tanggal pengambilan"), null=True, blank=True)
+    image = PrivateFileField(
+        verbose_name=_("Foto 360°"),
+        upload_to=upload_site_photo,
+        max_length=255,
+        validators=IMAGE_VALIDATORS,
+    )
+    uploaded_by = _user_field(_("Diunggah oleh"))
+    note = models.TextField(_("Keterangan"), blank=True, default="")
+
+    class Meta:
+        verbose_name = _("Foto situs 360°")
+        verbose_name_plural = _("Foto situs 360°")
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.title
+
+
 for _model in (
     CommandSettings,
     Korwil,
@@ -2032,6 +2238,9 @@ for _model in (
     OfficerProfile,
     TaskPoint,
     DailyReport,
+    LandPlot,
+    ThreatZone,
+    SitePhoto360,
 ):
     auditlog.register(_model)
 
