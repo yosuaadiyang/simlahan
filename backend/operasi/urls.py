@@ -2,7 +2,7 @@
 
 from django.urls import path
 
-from operasi import auth_views, views, views_flow
+from operasi import auth_views, views, views_dashboard, views_flow
 
 urlpatterns = [
     path("", views.command_center, name="operasi-command"),
@@ -89,8 +89,30 @@ urlpatterns = [
     path("api/persetujuan/", views_flow.approval_queue, name="operasi-approvals"),
     path("api/lencana/", views_flow.badges, name="operasi-badges"),
     path("api/rekap/", views_flow.recap_excel, name="operasi-recap"),
-    path("api/kinerja/", views.performance, name="operasi-performance"),
-    path("api/peringkat/", views.leaderboard, name="operasi-leaderboard"),
+    path("api/beranda/", views_dashboard.home, name="operasi-home"),
+    path(
+        "api/korwil/<int:pk>/",
+        views_dashboard.korwil_detail,
+        name="operasi-korwil-detail",
+    ),
+    path("api/historis/", views_dashboard.history, name="operasi-history"),
+    path("api/kinerja/", views_dashboard.performance, name="operasi-performance"),
+    path(
+        "api/kinerja/wawasan/",
+        views_dashboard.performance_insight,
+        name="operasi-performance-insight",
+    ),
+    path("api/peringkat/", views_dashboard.leaderboard, name="operasi-leaderboard"),
+    path(
+        "api/peringkat/excel/",
+        views_dashboard.leaderboard_excel,
+        name="operasi-leaderboard-excel",
+    ),
+    path(
+        "api/peringkat/wawasan/",
+        views_dashboard.leaderboard_insight,
+        name="operasi-leaderboard-insight",
+    ),
     path("api/struktur/", views.structure, name="operasi-structure"),
     path("api/feed/", views.feed, name="operasi-feed"),
     path("api/ai-chat/", views.ai_chat, name="operasi-ai-chat"),

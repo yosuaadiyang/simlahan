@@ -38,6 +38,7 @@ from operasi.models import (
     IllegalFinding,
     IllegalFindingVisit,
     Korwil,
+    LandAreaChange,
     OfficerPosition,
     OfficerProfile,
     PatrolObservation,
@@ -546,6 +547,12 @@ class StanceChangeInline(admin.TabularInline):
         return False
 
 
+class LandAreaChangeInline(StanceChangeInline):
+    model = LandAreaChange
+    fields = ("changed_at", "old_area_m2", "new_area_m2", "changed_by", "activity")
+    readonly_fields = fields
+
+
 NIK_FIELDS = ("nik", "family_card_number")
 
 
@@ -586,7 +593,7 @@ class ResidentAdmin(OperasiGISAdmin):
         "registered_activity",
         "visits",
     )
-    inlines = (StanceChangeInline,)
+    inlines = (StanceChangeInline, LandAreaChangeInline)
     actions = ("export_csv",)
     change_list_template = "admin/operasi/resident/change_list.html"
     fieldsets = (

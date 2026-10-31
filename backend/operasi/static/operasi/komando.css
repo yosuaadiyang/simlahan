@@ -379,3 +379,60 @@ dialog h3 { margin: 0; }
 .more-menu .btn[hidden] { display: none; }
 #tugas-filter, #lh-seg { overflow-x: auto; }
 #tugas-filter button, #lh-seg button { white-space: nowrap; }
+
+/* Beranda, detail Korwil, historis, peringkat, rincian kinerja */
+.metrics.four { grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 641px) { .metrics.four { grid-template-columns: repeat(4, 1fr); } }
+.metric.grades { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.metric.grades span:last-child { flex-basis: 100%; }
+.metric.grades .badge { display: inline-block; color: #fff; font-size: 12px; font-weight: 600; }
+/* Panel samping sempit di layar lebar juga: grafik selalu satu kolom agar terbaca. */
+.grid2.split { grid-template-columns: 1fr; gap: 4px; }
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table td { vertical-align: top; }
+.clickable { cursor: pointer; }
+#struktur-isi .card { margin: 0; gap: 4px; }
+.card.clickable:hover, .rank-row.clickable:hover, .table tr.clickable:hover { background: var(--accent-soft); }
+.chart { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 8px; }
+.svg-chart { display: block; width: 100%; height: auto; overflow: visible; }
+.svg-chart text { font-size: 9px; fill: var(--muted); }
+.svg-chart .grid { stroke: var(--line-strong); stroke-width: .6; }
+.svg-chart.radar { max-width: 320px; margin: 0 auto; }
+.svg-chart .val { font-weight: 700; fill: var(--text); }
+.chart { max-width: 560px; }
+.legend-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; font-size: 11px; color: var(--muted); margin-top: 4px; }
+.legend-row i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+.stance-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+@media (min-width: 641px) { .stance-cards { grid-template-columns: repeat(4, 1fr); } }
+.stance-card { text-align: left; border: 1px solid var(--line); border-left: 4px solid var(--c); border-radius: 10px; background: var(--panel); padding: 8px 10px; cursor: pointer; }
+.stance-card:disabled { cursor: default; }
+.stance-card:not(:disabled):hover { background: var(--accent-soft); }
+.stance-card b { display: block; font-size: 18px; color: var(--c); }
+.stance-card span { font-size: 11px; color: var(--muted); }
+.stack-bar { display: flex; height: 10px; border-radius: 5px; overflow: hidden; background: var(--panel-2); }
+.stack-bar span { display: block; height: 100%; }
+.hbar { display: grid; grid-template-columns: minmax(0, 9em) 1fr auto; gap: 6px; align-items: center; font-size: 12px; }
+.hbar span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hbar i { display: block; height: 10px; border-radius: 5px; min-width: 2px; }
+.heat { display: grid; grid-template-rows: repeat(7, 1fr); grid-auto-flow: column; grid-auto-columns: 1fr; gap: 3px; max-width: 360px; }
+.heat i, .heat-key { display: block; aspect-ratio: 1; border-radius: 2px; background: var(--panel-2); }
+.heat-key { display: inline-block; width: 10px; height: 10px; vertical-align: -1px; }
+.heat .kosong { visibility: hidden; }
+.h1 { background: #dbeafe !important; }
+.h2 { background: #93c5fd !important; }
+.h3 { background: #3b82f6 !important; }
+.h4 { background: #1e40af !important; }
+.rank-row { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
+.rank-no { font-weight: 700; color: var(--accent-2); min-width: 2.2em; }
+.rank-name { min-width: 0; overflow-wrap: anywhere; }
+.rank-score { text-align: right; white-space: nowrap; }
+.lencana { font-size: 14px; margin-left: 2px; cursor: help; }
+.insight { background: var(--accent-soft); border: 1px solid var(--line); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+details.group { border: 1px solid var(--line); border-radius: 10px; padding: 6px 10px; background: var(--panel); margin-bottom: 6px; }
+details.group summary { cursor: pointer; font-weight: 600; }
+details.group .list { margin-top: 6px; }
+#kd-isi > * + * { margin-top: 10px; }
+#kd-isi h3 { margin-top: 16px; margin-bottom: 6px; }
+#tab-peringkat .row.wrap > select, #tab-historis .row.wrap > select { flex: 1 1 10em; }
+#peringkat-tampilan { margin-bottom: 0; flex: 1 1 auto; }
+#peringkat-tampilan button, #historis-bagian button { white-space: nowrap; }

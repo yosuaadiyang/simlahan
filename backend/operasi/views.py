@@ -33,6 +33,7 @@ from asetlahan.geo import collection, feature
 from operasi import (
     approvals,
     daily_reports,
+    dashboard,
     enums,
     geo,
     patrol,
@@ -247,6 +248,7 @@ def _config(request) -> dict:
         "kirimLaporan": user.has_perm("operasi.add_dailyreport"),
         "rekap": user.has_perm("operasi.view_activity"),
         "tim": services.team_users(user).exclude(pk=user.pk).exists(),
+        "historis": dashboard.can_view_history(user),
         "setujuiIzin": services.leave_deciders_q(user) is not None,
         "kunci": user.is_superuser,
         "admin": user.has_perm("operasi.change_korwil"),
@@ -272,6 +274,9 @@ def _config(request) -> dict:
                 "chat",
                 "laporan",
                 "persetujuan",
+                "beranda",
+                "historis",
+                "peringkat",
             )
             else "peta"
         ),
@@ -365,8 +370,14 @@ def _config(request) -> dict:
             "approvals": reverse("operasi-approvals"),
             "badges": reverse("operasi-badges"),
             "recap": reverse("operasi-recap"),
+            "home": reverse("operasi-home"),
+            "korwilDetail": reverse("operasi-korwil-detail", args=[0]),
+            "history": reverse("operasi-history"),
             "performance": reverse("operasi-performance"),
+            "performanceInsight": reverse("operasi-performance-insight"),
             "leaderboard": reverse("operasi-leaderboard"),
+            "leaderboardExcel": reverse("operasi-leaderboard-excel"),
+            "leaderboardInsight": reverse("operasi-leaderboard-insight"),
             "structure": reverse("operasi-structure"),
             "feed": reverse("operasi-feed"),
             "aiChat": reverse("operasi-ai-chat"),
@@ -1612,24 +1623,6 @@ def resident_detail(request, pk):
 
 
 # --------------------------------------------------------------------------
-# Kinerja (KPI)
-# --------------------------------------------------------------------------
-
-
-@api()
-def performance(request):
-    start, end = services.period_bounds(request.GET.get("periode", "bulan"))
-    team = services.team_users(request.user)
-    target = request.user
-    if request.GET.get("petugas", "").isdigit():
-        target = get_object_or_404(team, pk=request.GET["petugas"])
-    data = {"me": services.performance(target, start, end)}
-    if team.exclude(pk=request.user.pk).exists():
-        data["team"] = services.leaderboard(request.user, start, end, trend=False)
-    return JsonResponse(data)
-
-
-# --------------------------------------------------------------------------
 # Chat internal
 # --------------------------------------------------------------------------
 
@@ -1844,15 +1837,8 @@ def satellite_analysis(request):
 
 
 # --------------------------------------------------------------------------
-# Leaderboard, struktur, feed, AI chat
+# Struktur, feed, AI chat
 # --------------------------------------------------------------------------
-
-
-@api(permission="operasi.view_korwil", methods=("GET",))
-def leaderboard(request):
-    """Peringkat tim dengan tren posisi (naik/turun/baru/stabil)."""
-    start, end = services.period_bounds(request.GET.get("periode", "bulan"))
-    return JsonResponse({"results": services.leaderboard(request.user, start, end)})
 
 
 @api(permission="operasi.view_korwil", methods=("GET",))

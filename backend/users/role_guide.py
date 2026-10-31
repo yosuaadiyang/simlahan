@@ -67,8 +67,12 @@ COMMAND_TABS = (
     "Patroli SMART), Absen, Lapor (Komsos, Topografi, Temuan ilegal, Patroli "
     "Taman Buru dengan impor SMART, Kegiatan lainnya, jenis lain, uji tanah, "
     "laporan saya), Warga, Tugas (saya, tim, verifikasi, terlambat, semua; "
-    "tombol Beri tugas bagi koordinator), Kinerja, Chat; Menu: Persetujuan, Laporan "
-    "harian (buat, masuk, lacak, rekap Excel), Peringkat tim, Struktur tim, Feed "
+    "tombol Beri tugas bagi koordinator), Kinerja (grafik harian/mingguan, "
+    "radar, kalender 90 hari, sebaran titik kerja di peta, wawasan), Chat; Menu: "
+    "Beranda (ringkasan sikap, tren dukungan, detail Korwil), Persetujuan, Laporan "
+    "harian (buat, masuk, lacak, rekap Excel), Peringkat tim (periode, Korwil, "
+    "tingkat, 10 teratas/terbawah, lencana, Excel, wawasan), Struktur tim, Historis "
+    "(bagi koordinator dan atasan: komsos, perubahan sikap, luas lahan), Feed "
     "aktivitas, Asisten AI, Aplikasi utama; tombol **⇄ Utama** di bilah atas"
 )
 
@@ -423,8 +427,8 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "Aplikasi lapangan (`/aset/lapangan/`)",
             "Pusat komando (`/komando/`, tombol **Pusat Komando** di panel "
             "admin) sebagai pengawas: Peta, Absen, Lapor (hanya Laporan "
-            "saya/tim), Warga, Tugas, Kinerja, Chat; Menu: Persetujuan, Laporan "
-            "harian (termasuk rekap Excel)",
+            "saya/tim), Warga, Tugas, Kinerja, Chat; Menu: Beranda, Persetujuan, "
+            "Laporan harian (termasuk rekap Excel), Peringkat tim, Historis",
         ),
         can=(
             "Membuat dan mengubah aset, penilaian, pajak, transaksi, okupasi, "
@@ -505,6 +509,8 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "atasan.",
             "Tidak bisa memverifikasi tugasnya sendiri; tugas yang dilaporkan "
             "selesai menunggu verifikasi pemberi tugas atau atasan.",
+            "Peringkat dan detail Korwil hanya menampilkan skor dirinya sendiri; "
+            "Historis tidak tersedia kecuali ia menjadi atasan petugas lain.",
         ),
     ),
     UserGroup.KOORDINATOR_WILAYAH: RoleGuide(
@@ -530,6 +536,8 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "keputusan ada di Menu → Persetujuan.",
             "Mengonfirmasi klaim dampak tinggi Kegiatan lainnya milik anggota "
             "(bukan milik sendiri).",
+            "Melihat Historis wilayahnya: komsos per petugas (warga baru dan "
+            "kunjungan berulang), perubahan sikap warga, dan perubahan luas lahan.",
         ),
         limits=(
             "Hanya Korwil yang dipimpinnya dan tugas Korwil yang " "dipimpin/diikuti.",

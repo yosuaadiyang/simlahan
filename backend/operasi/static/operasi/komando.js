@@ -1293,7 +1293,7 @@
 
   var currentTab = "peta";
   // Tab di balik tombol "Lainnya" agar bilah tab muat di layar ponsel.
-  var MORE_TABS = ["persetujuan", "laporan", "peringkat", "struktur", "feed", "ai"];
+  var MORE_TABS = ["beranda", "persetujuan", "laporan", "peringkat", "struktur", "historis", "feed", "ai"];
   // Tab dan sub-tab yang tidak bisa dipakai peran pengguna tidak ditampilkan.
   var TAB_ALLOWED = {
     absen: perms.absen,
@@ -1301,6 +1301,7 @@
     warga: perms.warga,
     tasks: perms.tugas,
     laporan: perms.laporanHarian,
+    historis: perms.historis,
     chat: perms.chat
   };
   var SUB_ALLOWED = { kegiatan: perms.lapor, tanah: perms.tambahTanah, riwayat: perms.kegiatan };
@@ -1337,6 +1338,8 @@
     if (name === "tasks") { loadTasks(); }
     if (name === "laporan") { loadReports(); }
     if (name === "persetujuan") { loadApprovals(); }
+    if (name === "beranda") { loadHome(); }
+    if (name === "historis") { loadHistory(); }
     if (name === "perf") { loadPerformance(); }
     if (name === "peringkat") { loadLeaderboard(); }
     if (name === "struktur") { loadStructure(); }
@@ -2643,24 +2646,7 @@
     });
     var button = this.querySelector("[type=submit]");
     button.disabled = true;
-    // Unduh lewat fetch agar galat (mis. rentang tidak sah) tampil sebagai pesan, bukan halaman JSON.
-    fetch(urls.recap + "?" + params.toString(), { credentials: "same-origin" }).then(function (response) {
-      if (!response.ok) {
-        return response.json().catch(function () { return null; }).then(function (data) {
-          throw new ApiError(errorText(data, "Gagal membuat rekap (" + response.status + ")."), response.status, data);
-        });
-      }
-      var match = /filename="([^"]+)"/.exec(response.headers.get("Content-Disposition") || "");
-      return response.blob().then(function (blob) {
-        var link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = match ? match[1] : "rekap-komando.xlsx";
-        document.body.appendChild(link);
-        link.click();
-        setTimeout(function () { URL.revokeObjectURL(link.href); link.remove(); }, 1000);
-        toast("Rekap Excel diunduh.", "ok");
-      });
-    }).catch(function (error) { toast(error.message || "Rekap butuh koneksi internet.", "error"); })
+    download(urls.recap + "?" + params.toString(), "rekap-komando.xlsx", "Rekap Excel diunduh.")
       .then(function () { button.disabled = false; });
   });
 
@@ -2726,13 +2712,173 @@
     }).catch(function () {});
   }
 
+  // ================================================================ Grafik ringan (SVG)
+
+  var STANCE_KEYS = ["mendukung", "netral", "menolak", "belum"];
+  function stanceColor(key) { return config.colors.stance[key] || "#57606a"; }
+  function fmtNum(value, digits) {
+    if (value === null || value === undefined) { return "–"; }
+    return Number(value).toLocaleString("id-ID", { maximumFractionDigits: digits === undefined ? 0 : digits });
+  }
+  function shortDate(iso) { return iso ? iso.slice(8, 10) + "/" + iso.slice(5, 7) : ""; }
+  function emptyChart() { return "<p class='muted small'>Belum ada data.</p>"; }
+
+  // Garis persentase (0–100). Nilai kosong (null) memutus garis.
+  function lineChart(points, series) {
+    if (!points.length) { return emptyChart(); }
+    var w = 400, h = 170, left = 30, right = 10, top = 8, bottom = 22;
+    var step = points.length > 1 ? (w - left - right) / (points.length - 1) : 0;
+    var x = function (i) { return left + i * step; };
+    var y = function (v) { return top + (100 - v) / 100 * (h - top - bottom); };
+    var svg = "<svg viewBox='0 0 " + w + " " + h + "' class='svg-chart' role='img' aria-label='Grafik tren'>";
+    [0, 50, 100].forEach(function (v) {
+      svg += "<line x1='" + left + "' x2='" + (w - right) + "' y1='" + y(v) + "' y2='" + y(v) + "' class='grid'/>" +
+        "<text x='" + (left - 4) + "' y='" + (y(v) + 3) + "' text-anchor='end'>" + v + "%</text>";
+    });
+    var every = Math.max(1, Math.ceil(points.length / 6));
+    points.forEach(function (p, i) {
+      if (i % every === 0 || i === points.length - 1) {
+        svg += "<text x='" + x(i) + "' y='" + (h - 6) + "' text-anchor='middle'>" + escapeHtml(shortDate(p.date)) + "</text>";
+      }
+    });
+    series.forEach(function (s) {
+      var d = "", pen = "M";
+      points.forEach(function (p, i) {
+        var v = p[s.key];
+        if (v === null || v === undefined) { pen = "M"; return; }
+        d += pen + x(i).toFixed(1) + " " + y(v).toFixed(1) + " ";
+        pen = "L";
+      });
+      if (d) { svg += "<path d='" + d + "' fill='none' stroke='" + escapeHtml(s.color) + "' stroke-width='2'/>"; }
+      points.forEach(function (p, i) {
+        var v = p[s.key];
+        if (v === null || v === undefined) { return; }
+        svg += "<circle cx='" + x(i).toFixed(1) + "' cy='" + y(v).toFixed(1) + "' r='2.5' fill='" + escapeHtml(s.color) + "'><title>" +
+          escapeHtml(s.label + " " + fmtDate(p.date) + ": " + v + "%") + "</title></circle>";
+      });
+    });
+    svg += "</svg>";
+    return svg + "<div class='legend-row'>" + series.map(function (s) {
+      return "<span><i style='background:" + escapeHtml(s.color) + "'></i>" + escapeHtml(s.label) + "</span>";
+    }).join("") + "</div>";
+  }
+
+  function barChart(rows, key, labelOf, color, titleOf) {
+    if (!rows.some(function (r) { return r[key]; })) { return emptyChart(); }
+    var w = 400, h = 130, left = 26, bottom = 18, top = 6;
+    var max = Math.max.apply(null, rows.map(function (r) { return r[key] || 0; }).concat([1]));
+    var slot = (w - left) / rows.length;
+    var bar = Math.max(1, slot * 0.7);
+    var svg = "<svg viewBox='0 0 " + w + " " + h + "' class='svg-chart' role='img' aria-label='Grafik batang'>" +
+      "<line x1='" + left + "' x2='" + w + "' y1='" + (h - bottom) + "' y2='" + (h - bottom) + "' class='grid'/>" +
+      "<text x='" + (left - 4) + "' y='" + (top + 8) + "' text-anchor='end'>" + fmtNum(max, 1) + "</text>";
+    var every = Math.max(1, Math.ceil(rows.length / 7));
+    rows.forEach(function (r, i) {
+      var v = r[key] || 0;
+      var bh = v / max * (h - top - bottom);
+      var bx = left + i * slot + (slot - bar) / 2;
+      svg += "<rect x='" + bx.toFixed(1) + "' y='" + (h - bottom - bh).toFixed(1) + "' width='" + bar.toFixed(1) + "' height='" + Math.max(bh, v ? 1 : 0).toFixed(1) +
+        "' rx='1.5' fill='" + escapeHtml(color) + "'><title>" + escapeHtml(titleOf(r)) + "</title></rect>";
+      if (i % every === 0) {
+        svg += "<text x='" + (bx + bar / 2).toFixed(1) + "' y='" + (h - 5) + "' text-anchor='middle'>" + escapeHtml(labelOf(r)) + "</text>";
+      }
+    });
+    return svg + "</svg>";
+  }
+
+  function radarChart(items) {
+    var w = 300, h = 230, cx = w / 2, cy = h / 2, r = 70, n = items.length;
+    var point = function (i, v) {
+      var angle = -Math.PI / 2 + i * 2 * Math.PI / n;
+      return [cx + Math.cos(angle) * r * v / 100, cy + Math.sin(angle) * r * v / 100];
+    };
+    var coords = function (pair) { return pair[0].toFixed(1) + "," + pair[1].toFixed(1); };
+    var svg = "<svg viewBox='0 0 " + w + " " + h + "' class='svg-chart radar' role='img' aria-label='Radar kinerja'>";
+    [25, 50, 75, 100].forEach(function (v) {
+      svg += "<polygon class='grid' fill='none' points='" + items.map(function (_x, i) { return coords(point(i, v)); }).join(" ") + "'/>";
+    });
+    items.forEach(function (item, i) {
+      var end = point(i, 100), at = point(i, 116);
+      var dx = at[0] - cx;
+      var anchor = Math.abs(dx) < 8 ? "middle" : dx > 0 ? "start" : "end";
+      var y = at[1] + (at[1] < cy - 8 ? -6 : at[1] > cy + 8 ? 8 : 0);
+      svg += "<line class='grid' x1='" + cx + "' y1='" + cy + "' x2='" + end[0].toFixed(1) + "' y2='" + end[1].toFixed(1) + "'/>" +
+        "<text x='" + at[0].toFixed(1) + "' y='" + y.toFixed(1) + "' text-anchor='" + anchor + "'>" + escapeHtml(item.label) +
+        "<tspan x='" + at[0].toFixed(1) + "' dy='11' class='val'>" + item.value + "%</tspan></text>";
+    });
+    svg += "<polygon points='" + items.map(function (item, i) { return coords(point(i, Math.min(Math.max(item.value || 0, 0), 100))); }).join(" ") +
+      "' fill='rgba(29,130,245,.25)' stroke='#1d82f5' stroke-width='2'/>";
+    return svg + "</svg>";
+  }
+
+  function heatGrid(days) {
+    if (!days.length) { return emptyChart(); }
+    var first = new Date(days[0].date + "T00:00:00");
+    var html = "";
+    for (var i = 0; i < (first.getDay() + 6) % 7; i += 1) { html += "<i class='kosong'></i>"; }
+    days.forEach(function (d) {
+      var level = d.activities >= 6 ? 4 : d.activities >= 3 ? 3 : d.activities >= 1 ? 2 : (DAY_CLASS[d.status] ? 1 : 0);
+      html += "<i class='h" + level + "' title='" + escapeHtml(fmtDate(d.date) + " · " + d.activities + " kegiatan" + (d.status ? " · " + d.status : "")) + "'></i>";
+    });
+    return "<div class='heat'>" + html + "</div><div class='legend-row small muted'>Sedikit <i class='heat-key h1'></i><i class='heat-key h2'></i><i class='heat-key h3'></i><i class='heat-key h4'></i> Banyak · hari hadir tanpa kegiatan berwarna paling muda</div>";
+  }
+
+  function stanceBar(row) {
+    var total = STANCE_KEYS.reduce(function (sum, key) { return sum + (row[key] || 0); }, 0);
+    if (!total) { return "<div class='stack-bar empty'></div>"; }
+    return "<div class='stack-bar'>" + STANCE_KEYS.map(function (key) {
+      var n = row[key] || 0;
+      return n ? "<span style='width:" + (n * 100 / total).toFixed(2) + "%;background:" + escapeHtml(stanceColor(key)) + "' title='" + escapeHtml(choiceLabel("stance", key) + ": " + n) + "'></span>" : "";
+    }).join("") + "</div>";
+  }
+
+  function insightHtml(data) {
+    return "<div>" + escapeHtml(data.text).replace(/\n/g, "<br>") + "</div><div class='small muted'>" +
+      (data.ai ? "Disusun AI dari angka di atas; periksa kembali sebelum dipakai." : "Ringkasan otomatis dari angka di atas.") + "</div>";
+  }
+
+  function askInsight(button, box, url, fields) {
+    button.disabled = true;
+    box.className = "small muted";
+    box.textContent = "Menyusun wawasan…";
+    request(url, { method: "POST", body: form(fields) }).then(function (data) {
+      box.className = "small";
+      box.innerHTML = insightHtml(data);
+    }).catch(function (error) { box.textContent = error.message; })
+      .then(function () { button.disabled = false; });
+  }
+
+  function download(url, fallbackName, message) {
+    // Unduh lewat fetch agar galat tampil sebagai pesan, bukan halaman JSON.
+    return fetch(url, { credentials: "same-origin" }).then(function (response) {
+      if (!response.ok) {
+        return response.json().catch(function () { return null; }).then(function (data) {
+          throw new ApiError(errorText(data, "Gagal mengunduh (" + response.status + ")."), response.status, data);
+        });
+      }
+      var match = /filename="([^"]+)"/.exec(response.headers.get("Content-Disposition") || "");
+      return response.blob().then(function (blob) {
+        var link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = match ? match[1] : fallbackName;
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(function () { URL.revokeObjectURL(link.href); link.remove(); }, 1000);
+        toast(message, "ok");
+      });
+    }).catch(function (error) { toast(error.message || "Unduhan butuh koneksi internet.", "error"); });
+  }
+
   // ================================================================ Kinerja
 
   var DAY_CLASS = { hadir: "hadir", terlambat: "terlambat", izin: "izin", sakit: "sakit", cuti: "cuti", dinas: "dinas" };
+  var perfTarget = "";
+  var perfPoints = [];
+  var perfLayer = L.layerGroup();
 
   function renderPerformance(me) {
     var calendar = "";
-    if (me.days.length) {
+    if (me.days.length && me.days.length <= 62) {
       var first = new Date(me.days[0].date + "T00:00:00");
       var offset = (first.getDay() + 6) % 7;
       for (var i = 0; i < offset; i += 1) { calendar += "<div style='visibility:hidden'></div>"; }
@@ -2754,30 +2900,83 @@
       "<div class='metric'><b>" + me.residents_visited + "</b><span>Warga dikunjungi</span></div>" +
       "<div class='metric'><b>" + me.tasks_on_time + "/" + me.tasks_due + "</b><span>Tugas tepat waktu</span></div>" +
       "<div class='metric'><b>" + me.tasks_overdue + "</b><span>Tugas terlambat (terbuka)</span></div>" +
-      "</div><h3>Kalender</h3><div class='calendar'>" + ["Sn", "Sl", "Rb", "Km", "Jm", "Sb", "Mg"].map(function (d) { return "<div class='muted' style='background:none'>" + d + "</div>"; }).join("") + calendar + "</div>";
+      "</div>" + (calendar ? "<h3>Kalender</h3><div class='calendar'>" + ["Sn", "Sl", "Rb", "Km", "Jm", "Sb", "Mg"].map(function (d) { return "<div class='muted' style='background:none'>" + d + "</div>"; }).join("") + calendar + "</div>" : "");
+  }
+
+  function renderPerformanceDetail(detail) {
+    perfPoints = detail.points;
+    var daily = detail.daily.length <= 62;
+    var rows = daily ? detail.daily : detail.weekly;
+    var label = daily ? function (r) { return r.date.slice(8, 10); } : function (r) { return r.week.slice(-3); };
+    var title = function (unit) {
+      return function (r) { return (daily ? fmtDate(r.date) : r.week + " (mulai " + fmtDate(r.start) + ")") + ": " + fmtNum(r[unit], 1) + (unit === "points" ? " poin" : " kegiatan"); };
+    };
+    var html = "<div class='grid2 split'>" +
+      "<div><h3>Kegiatan " + (daily ? "harian" : "mingguan") + "</h3><div class='chart'>" + barChart(rows, "activities", label, "#1d82f5", title("activities")) + "</div></div>" +
+      "<div><h3>Poin usaha " + (daily ? "harian" : "mingguan") + "</h3><div class='chart'>" + barChart(rows, "points", label, "#1a7f37", title("points")) + "</div></div>" +
+      "</div><div class='grid2 split'>" +
+      "<div><h3>Profil kinerja</h3><div class='chart'>" + radarChart(detail.radar) + "</div></div>" +
+      "<div><h3>Aktivitas 90 hari</h3>" + heatGrid(detail.heat) + "</div></div>" +
+      "<div class='row wrap'><button type='button' class='btn-small' id='kinerja-peta'" + (detail.points.length ? "" : " disabled") + ">🗺️ Lihat sebaran di peta (" + detail.points.length + " titik)</button></div>";
+    html += "<h3>Tugas terbuka</h3><ul class='list compact'>" + (detail.tasks.map(function (t) {
+      return "<li class='clickable' data-buka-tugas='" + t.id + "'><b>" + escapeHtml(t.number) + "</b> " + escapeHtml(t.title) +
+        "<div class='sub'>" + escapeHtml(t.status_label) + (t.due_date ? " · tenggat " + fmtDate(t.due_date) : "") + (t.overdue ? " · <span class='danger-text'>terlambat</span>" : "") + (t.points ? " · " + t.points + " poin" : "") + "</div></li>";
+    }).join("") || "<li class='muted'>Tidak ada tugas terbuka.</li>") + "</ul>";
+    html += "<h3>Kegiatan terakhir</h3><ul class='list compact'>" + (detail.recent.map(function (a) {
+      return "<li><b>" + escapeHtml(a.title || a.type_label) + "</b> " + (a.verified ? "<span class='badge' style='background:#1a7f37'>terverifikasi</span>" : "") +
+        "<div class='sub'>" + escapeHtml([a.number, a.type_label, a.korwil ? "Korwil " + a.korwil : ""].filter(Boolean).join(" · ")) + " · " + fmtDate(a.at, true) + " · " + fmtNum(a.points, 1) + " poin</div></li>";
+    }).join("") || "<li class='muted'>Belum ada kegiatan.</li>") + "</ul>";
+    return html;
   }
 
   function loadPerformance() {
-    var params = "?periode=" + $("kinerja-periode").value + ($("kinerja-petugas").value ? "&petugas=" + $("kinerja-petugas").value : "");
+    if (map.hasLayer(perfLayer)) { map.removeLayer(perfLayer); }
+    var params = "?rinci=1&periode=" + $("kinerja-periode").value + (perfTarget ? "&petugas=" + perfTarget : "");
     request(urls.performance + params).then(function (data) {
       $("kinerja-isi").innerHTML = renderPerformance(data.me);
+      $("kinerja-rinci").innerHTML = data.detail ? renderPerformanceDetail(data.detail) : "";
       if (data.team) {
         $("kinerja-tim").hidden = false;
         var select = $("kinerja-petugas");
-        var current = select.value;
         select.hidden = false;
         fillSelect(select, data.team.map(function (row) { return { value: row.user_id, label: row.user }; }), "Kinerja saya");
-        select.value = current;
+        select.value = perfTarget;
         $("kinerja-tim-isi").innerHTML = data.team.map(function (row, index) {
           return "<tr class='clickable' data-petugas='" + row.user_id + "'><td>" + (index + 1) + "</td><td>" + escapeHtml(row.user) + "</td><td><b>" + row.score + "</b> " + row.grade +
             "</td><td>" + row.attendance_pct + "%</td><td>" + row.activities + "/" + row.activity_target + "</td><td>" + row.task_pct + "%</td></tr>";
         }).join("");
       }
-    }).catch(function (error) { $("kinerja-isi").textContent = error.message; });
+    }).catch(function (error) { $("kinerja-isi").textContent = error.message; $("kinerja-rinci").innerHTML = ""; });
+  }
+
+  function openPerformance(userId) {
+    perfTarget = userId ? String(userId) : "";
+    $("kinerja-wawasan-isi").className = "small muted";
+    $("kinerja-wawasan-isi").textContent = "Ringkasan kekuatan, kelemahan, dan saran untuk periode terpilih.";
+    showTab("perf");
   }
 
   $("kinerja-periode").addEventListener("change", loadPerformance);
-  $("kinerja-petugas").addEventListener("change", loadPerformance);
+  $("kinerja-petugas").addEventListener("change", function () { openPerformance(this.value); });
+  $("kinerja-rinci").addEventListener("click", function (event) {
+    var task = event.target.closest("[data-buka-tugas]");
+    if (task) { openTask(parseInt(task.getAttribute("data-buka-tugas"), 10)); return; }
+    if (event.target.closest("#kinerja-peta")) {
+      perfLayer.clearLayers();
+      perfPoints.forEach(function (p) {
+        L.circleMarker([p.lat, p.lng], { radius: 5, color: "#fff", weight: 1, fillOpacity: 0.9, fillColor: p.kind === "absen" ? "#8250df" : "#1d82f5" })
+          .bindTooltip(escapeHtml(p.label)).addTo(perfLayer);
+      });
+      perfLayer.addTo(map);
+      showTab("peta");
+      var bounds = L.latLngBounds(perfPoints.map(function (p) { return [p.lat, p.lng]; }));
+      if (bounds.isValid()) { map.fitBounds(bounds.pad(0.2), { maxZoom: 16 }); }
+      toast(perfPoints.length + " titik kerja ditampilkan (biru: kegiatan, ungu: absen). Buka Kinerja lagi untuk menyembunyikan.", "ok");
+    }
+  });
+  $("kinerja-wawasan").addEventListener("click", function () {
+    askInsight(this, $("kinerja-wawasan-isi"), urls.performanceInsight, { periode: $("kinerja-periode").value, petugas: perfTarget });
+  });
 
   // ================================================================ Peringkat, struktur, feed, AI
 
@@ -2787,28 +2986,297 @@
     baru: '<span class="badge" style="background:#0969da">★ baru</span>',
     stabil: '<span class="badge" style="background:#8c959f">→ stabil</span>'
   };
+  var GRADE_COLORS = { A: "#1a7f37", B: "#0b5fcc", C: "#bf8700", D: "#cf222e" };
+  var boardView = "semua";
+
+  function boardParams() {
+    var params = new URLSearchParams({ periode: $("peringkat-periode").value, tampilan: boardView });
+    if ($("peringkat-korwil").value) { params.append("korwil", $("peringkat-korwil").value); }
+    if ($("peringkat-tier").value) { params.append("tier", $("peringkat-tier").value); }
+    return params;
+  }
 
   function loadLeaderboard() {
-    request(urls.leaderboard + "?periode=" + $("peringkat-periode").value).then(function (data) {
+    request(urls.leaderboard + "?" + boardParams().toString()).then(function (data) {
+      if ($("peringkat-tier").options.length <= 1) {
+        fillSelect($("peringkat-tier"), data.tiers, "Semua tingkat");
+        fillSelect($("peringkat-korwil"), data.korwils.map(function (k) { return { value: k.id, label: "Korwil " + k.code + " · " + k.name }; }), "Semua Korwil");
+      }
+      $("peringkat-korwil").hidden = !perms.tim || data.korwils.length < 2;
+      $("peringkat-tier").hidden = !perms.tim;
+      $("peringkat-tampilan").hidden = !perms.tim;
+      $("peringkat-wawasan-kotak").hidden = !perms.tim;
+      $("peringkat-ringkas").innerHTML = "<div class='metric'><b>" + data.count + "</b><span>Petugas dinilai</span></div>" +
+        "<div class='metric'><b>" + (data.average === null ? "–" : fmtNum(data.average, 1)) + "</b><span>Rata-rata skor</span></div>" +
+        "<div class='metric grades'>" + ["A", "B", "C", "D"].map(function (g) {
+          return "<span class='badge' style='background:" + GRADE_COLORS[g] + "'>" + g + " " + data.grades[g] + "</span>";
+        }).join(" ") + "<span>Sebaran nilai</span></div>";
+      $("peringkat-lencana").textContent = "Lencana: " + Object.keys(data.badges).map(function (key) { return data.badges[key].icon + " " + data.badges[key].label; }).join(" · ");
       $("peringkat-isi").innerHTML = data.results.map(function (row) {
-        return "<div class='row' style='justify-content:space-between;align-items:center'>" +
-          "<span><b>#" + row.rank + "</b> " + escapeHtml(row.user) +
-          " <span class='muted small'>(" + escapeHtml(row.grade) + ")</span></span>" +
-          "<span><b>" + row.score + "</b> " + (TREND_BADGE[row.trend] || "") + "</span></div>";
+        var badges = row.badges.map(function (key) {
+          var b = data.badges[key];
+          return b ? "<span class='lencana' title='" + escapeHtml(b.label) + "'>" + b.icon + "</span>" : "";
+        }).join("");
+        return "<div class='rank-row" + (perms.tim ? " clickable" : "") + "' data-petugas='" + row.user_id + "'>" +
+          "<span class='rank-no'>#" + row.rank + "</span>" +
+          "<span class='rank-name'><b>" + escapeHtml(row.user) + "</b> " + badges +
+          "<br><span class='muted small'>" + escapeHtml([row.tier_label, row.korwils.length ? "Korwil " + row.korwils.join(", ") : ""].filter(Boolean).join(" · ")) +
+          " · hadir " + row.attendance_pct + "% · kegiatan " + row.activities + "/" + row.activity_target + " · komsos " + row.komsos + "</span></span>" +
+          "<span class='rank-score'><b>" + row.score + "</b> <span class='badge' style='background:" + (GRADE_COLORS[row.grade] || "#57606a") + "'>" + escapeHtml(row.grade) + "</span><br>" + (TREND_BADGE[row.trend] || "") + "</span></div>";
       }).join("") || "<p class='muted'>Belum ada anggota tim.</p>";
     }).catch(function (error) { $("peringkat-isi").textContent = error.message; });
   }
+
+  function resetBoardInsight() {
+    $("peringkat-wawasan-isi").className = "small muted";
+    $("peringkat-wawasan-isi").textContent = "Siapa yang menonjol, siapa yang perlu didampingi, dan sarannya.";
+  }
+  ["peringkat-periode", "peringkat-korwil", "peringkat-tier"].forEach(function (id) {
+    $(id).addEventListener("change", function () { resetBoardInsight(); loadLeaderboard(); });
+  });
+  $("peringkat-tampilan").addEventListener("click", function (event) {
+    var button = event.target.closest("button[data-tampilan]");
+    if (!button) { return; }
+    boardView = button.getAttribute("data-tampilan");
+    this.querySelectorAll("button").forEach(function (b) { b.classList.toggle("active", b === button); });
+    loadLeaderboard();
+  });
+  $("peringkat-isi").addEventListener("click", function (event) {
+    var row = event.target.closest("[data-petugas]");
+    if (row && perms.tim) { openPerformance(row.getAttribute("data-petugas")); }
+  });
+  $("peringkat-excel").addEventListener("click", function () {
+    var button = this;
+    var params = boardParams();
+    params.set("tampilan", "semua");
+    button.disabled = true;
+    download(urls.leaderboardExcel + "?" + params.toString(), "peringkat.xlsx", "Peringkat Excel diunduh.")
+      .then(function () { button.disabled = false; });
+  });
+  $("peringkat-wawasan").addEventListener("click", function () {
+    var params = boardParams();
+    var fields = {};
+    params.forEach(function (value, key) { fields[key] = value; });
+    fields.tampilan = "semua";
+    askInsight(this, $("peringkat-wawasan-isi"), urls.leaderboardInsight, fields);
+  });
 
   function loadStructure() {
     request(urls.structure).then(function (data) {
       $("struktur-isi").innerHTML = data.results.map(function (k) {
         var members = k.members.map(function (m) { return escapeHtml(m.name); }).join(", ") || "—";
-        return "<div class='stack'><b style='color:" + escapeHtml(k.color) + "'>Korwil " + escapeHtml(k.code) + " – " + escapeHtml(k.name) + "</b>" +
+        return "<div class='stack card clickable' data-korwil-detail='" + k.id + "'><b style='color:" + escapeHtml(k.color) + "'>Korwil " + escapeHtml(k.code) + " – " + escapeHtml(k.name) + "</b>" +
           "<div class='small'>Koordinator: <b>" + escapeHtml(k.coordinator || "—") + "</b></div>" +
           "<div class='small muted'>Anggota: " + members + "</div></div>";
       }).join("") || "<p class='muted'>Belum ada Korwil.</p>";
     }).catch(function (error) { $("struktur-isi").textContent = error.message; });
   }
+  $("struktur-isi").addEventListener("click", function (event) {
+    var card = event.target.closest("[data-korwil-detail]");
+    if (card) { openKorwil(card.getAttribute("data-korwil-detail")); }
+  });
+
+  // ================================================================ Beranda
+
+  function goResidents(stance, korwil) {
+    if (!perms.warga) { return; }
+    $("warga-sikap").value = stance || "";
+    $("warga-korwil").value = korwil ? String(korwil) : "";
+    $("warga-cari").value = "";
+    showTab("warga");
+  }
+
+  var TREND_SERIES = function () {
+    return [
+      { key: "pro_pct", color: stanceColor("mendukung"), label: "Mendukung" },
+      { key: "neutral_pct", color: stanceColor("netral"), label: "Netral" },
+      { key: "contra_pct", color: stanceColor("menolak"), label: "Menolak" }
+    ];
+  };
+
+  function stanceCards(stances, korwil) {
+    return STANCE_KEYS.map(function (key) {
+      var pct = stances[key + "_pct"];
+      return "<button type='button' class='stance-card' data-sikap='" + key + "'" + (korwil ? " data-korwil='" + korwil + "'" : "") + (perms.warga ? "" : " disabled") +
+        " style='--c:" + escapeHtml(stanceColor(key)) + "'><b>" + fmtNum(stances[key]) + "</b><span>" + escapeHtml(choiceLabel("stance", key)) +
+        (pct !== undefined && pct !== null ? " · " + pct + "%" : "") + "</span></button>";
+    }).join("");
+  }
+
+  function loadHome() {
+    $("beranda-angka").innerHTML = "<p class='muted'>Memuat…</p>";
+    request(urls.home).then(function (data) {
+      var c = data.counts;
+      $("beranda-waktu").textContent = "Diperbarui " + fmtDate(data.updated_at, true) + ". Angka hanya dari wilayah yang boleh Anda lihat.";
+      $("beranda-angka").innerHTML =
+        "<div class='metric'><b>" + fmtNum(c.total) + "</b><span>Warga terdata</span></div>" +
+        "<div class='metric'><b>" + pctText(c.pro_pct) + "</b><span>Mendukung (dari yang diketahui)</span></div>" +
+        "<div class='metric'><b>" + pctText(c.released_pct) + "</b><span>Lahan dilepas (" + fmtNum(c.released) + ")</span></div>" +
+        "<div class='metric'><b>" + pctText(c.rtrw_pct) + "</b><span>Sesuai RTRW</span></div>";
+      $("beranda-sikap").innerHTML = stanceCards(data.stances);
+      $("beranda-tren").innerHTML = lineChart(data.trend, TREND_SERIES());
+      $("beranda-korwil").innerHTML = data.korwils.map(function (k) {
+        return "<tr class='clickable' data-korwil-detail='" + k.id + "'><td><b style='color:" + escapeHtml(k.color) + "'>" + escapeHtml(k.code) + "</b> " + escapeHtml(k.name) +
+          "<div class='small muted'>" + escapeHtml(k.coordinator || "—") + " · " + k.members + " anggota</div></td>" +
+          "<td>" + fmtNum(k.residents) + (k.target ? " / " + fmtNum(k.target) + " <span class='muted small'>(" + pctText(k.target_pct) + ")</span>" : "") + "</td>" +
+          "<td style='min-width:90px'>" + stanceBar({ mendukung: k.pro, netral: k.neutral, menolak: k.contra, belum: k.unknown }) + "</td>" +
+          "<td>" + pctText(k.pro_pct) + "</td><td>" + pctText(k.released_pct) + "</td><td>" + k.activities_week + "</td></tr>";
+      }).join("") || "<tr><td colspan='6' class='muted'>Belum ada Korwil.</td></tr>";
+      var maxType = Math.max.apply(null, data.activities_week.map(function (a) { return a.count; }).concat([1]));
+      $("beranda-kegiatan").innerHTML = data.activities_week.map(function (a) {
+        return "<div class='hbar'><span>" + escapeHtml(a.label) + "</span><i style='width:" + (a.count * 100 / maxType).toFixed(1) + "%;background:" + escapeHtml(a.color) + "'></i><b>" + a.count + "</b></div>";
+      }).join("") || "<p class='muted small'>Belum ada kegiatan 7 hari terakhir.</p>";
+      var maxSoil = Math.max.apply(null, data.soil.map(function (a) { return a.count; }).concat([1]));
+      $("beranda-tanah").innerHTML = data.soil.map(function (a) {
+        return "<div class='hbar'><span>" + escapeHtml(a.label) + "</span><i style='width:" + (a.count * 100 / maxSoil).toFixed(1) + "%;background:" + escapeHtml(config.colors.soil[a.value] || "#57606a") + "'></i><b>" + a.count + "</b></div>";
+      }).join("");
+    }).catch(function (error) { $("beranda-angka").textContent = error.message; });
+  }
+
+  $("beranda-muat").addEventListener("click", loadHome);
+  $("beranda-sikap").addEventListener("click", function (event) {
+    var card = event.target.closest("[data-sikap]");
+    if (card) { goResidents(card.getAttribute("data-sikap")); }
+  });
+  $("beranda-korwil").addEventListener("click", function (event) {
+    var row = event.target.closest("[data-korwil-detail]");
+    if (row) { openKorwil(row.getAttribute("data-korwil-detail")); }
+  });
+
+  // ================================================================ Detail Korwil
+
+  function openKorwil(id) {
+    var dialog = $("dlg-korwil");
+    $("kd-judul").textContent = "Korwil";
+    $("kd-isi").innerHTML = "<p class='muted'>Memuat…</p>";
+    if (!dialog.open) { dialog.showModal(); }
+    request(urls.korwilDetail.replace("/0/", "/" + id + "/")).then(function (k) {
+      $("kd-judul").innerHTML = "<span style='color:" + escapeHtml(k.color) + "'>Korwil " + escapeHtml(k.code) + "</span> – " + escapeHtml(k.name);
+      var html = "<p class='small muted'>Koordinator: <b>" + escapeHtml(k.coordinator || "—") + "</b>" + (k.villages ? " · " + escapeHtml(k.villages) : "") + "</p>" +
+        "<div class='metrics four'>" +
+        "<div class='metric'><b>" + fmtNum(k.counts.total) + (k.target ? " / " + fmtNum(k.target) : "") + "</b><span>Warga" + (k.target ? " / target KK" : "") + "</span></div>" +
+        "<div class='metric'><b>" + pctText(k.counts.pro_pct) + "</b><span>Mendukung</span></div>" +
+        "<div class='metric'><b>" + pctText(k.counts.released_pct) + "</b><span>Lahan dilepas</span></div>" +
+        "<div class='metric'><b>" + k.activities_week + " / " + k.activities_month + "</b><span>Kegiatan 7 / 30 hari</span></div></div>" +
+        "<div class='stance-cards'>" + stanceCards(k.stances, k.id) + "</div>" +
+        "<h3>Tren dukungan (8 pekan)</h3><div class='chart'>" + lineChart(k.trend, TREND_SERIES()) + "</div>" +
+        "<h3>Anggota (" + k.members.length + ")</h3><div class='table-wrap'><table class='table'><thead><tr><th>Petugas</th><th>Skor bulan ini</th><th>Hadir</th><th>Kegiatan</th><th>Warga</th></tr></thead><tbody>" +
+        (k.members.map(function (m) {
+          var scored = m.score !== null;
+          return "<tr" + (scored ? " class='clickable' data-petugas='" + m.id + "'" : "") + "><td><b>" + escapeHtml(m.name) + "</b><div class='small muted'>" + escapeHtml([m.role, m.position].filter(Boolean).join(" · ")) + "</div></td>" +
+            "<td>" + (scored ? "<b>" + m.score + "</b> <span class='badge' style='background:" + (GRADE_COLORS[m.grade] || "#57606a") + "'>" + escapeHtml(m.grade) + "</span>" : "–") + "</td>" +
+            "<td>" + pctText(m.attendance_pct) + "</td><td>" + (scored ? fmtNum(m.activities, 1) : "–") + "</td><td>" + (scored ? m.residents_visited : "–") + "</td></tr>";
+        }).join("") || "<tr><td colspan='5' class='muted'>Belum ada anggota.</td></tr>") + "</tbody></table></div>";
+      if (k.show_residents) {
+        html += "<h3>Warga per sikap</h3>" + (k.residents_truncated ? "<p class='small muted'>Menampilkan 500 warga pertama (urut nama). Gunakan tab Warga untuk mencari.</p>" : "");
+        html += STANCE_KEYS.map(function (key) {
+          var rows = k.residents[key] || [];
+          return "<details class='group'><summary><span class='badge' style='background:" + escapeHtml(stanceColor(key)) + "'>" + escapeHtml(choiceLabel("stance", key)) + "</span> " + rows.length + " warga</summary>" +
+            "<ul class='list compact'>" + (rows.map(function (r) {
+              return "<li class='clickable' data-warga='" + r.id + "'><b>" + escapeHtml(r.name) + "</b><div class='sub'>" + escapeHtml([r.number, r.village].filter(Boolean).join(" · ")) +
+                " · komsos " + r.komsos + (r.last_komsos ? " (terakhir " + fmtDate(r.last_komsos) + ")" : "") + "</div></li>";
+            }).join("") || "<li class='muted'>Tidak ada.</li>") + "</ul></details>";
+        }).join("");
+      }
+      if (k.recent.length) {
+        html += "<h3>Kegiatan terakhir</h3><ul class='list compact'>" + k.recent.map(function (a) {
+          return "<li><b>" + escapeHtml(a.title || a.type_label) + "</b><div class='sub'>" + escapeHtml([a.number, a.type_label, a.by].filter(Boolean).join(" · ")) + " · " + fmtDate(a.at, true) + " · " + fmtNum(a.points, 1) + " poin</div></li>";
+        }).join("") + "</ul>";
+      }
+      $("kd-isi").innerHTML = html;
+    }).catch(function (error) { $("kd-isi").textContent = error.message; });
+  }
+
+  $("kd-isi").addEventListener("click", function (event) {
+    var stance = event.target.closest("[data-sikap]");
+    var resident = event.target.closest("[data-warga]");
+    var officer = event.target.closest("[data-petugas]");
+    if (stance) {
+      $("dlg-korwil").close();
+      goResidents(stance.getAttribute("data-sikap"), stance.getAttribute("data-korwil"));
+    } else if (resident) {
+      openResident(parseInt(resident.getAttribute("data-warga"), 10));
+    } else if (officer) {
+      $("dlg-korwil").close();
+      openPerformance(officer.getAttribute("data-petugas"));
+    }
+  });
+
+  // ================================================================ Historis
+
+  var historyData = null;
+  var historyPart = "komsos";
+  var DIRECTION = {
+    membaik: { label: "Membaik", color: "#1a7f37" },
+    memburuk: { label: "Memburuk", color: "#cf222e" },
+    teridentifikasi: { label: "Teridentifikasi", color: "#0b5fcc" },
+    lainnya: { label: "Lainnya", color: "#8c959f" }
+  };
+
+  function renderHistory() {
+    var data = historyData;
+    if (!data) { return; }
+    var range = "<p class='small muted'>" + fmtDate(data.start) + " – " + fmtDate(data.end) + "</p>";
+    var html = "";
+    if (historyPart === "komsos") {
+      html = range + "<div class='table-wrap'><table class='table'><thead><tr><th>#</th><th>Petugas</th><th>Komsos</th><th>Warga baru</th><th>Berulang</th><th>Warga unik</th></tr></thead><tbody>" +
+        (data.komsos.map(function (r) {
+          return "<tr><td>" + r.rank + "</td><td>" + escapeHtml(r.user) + "</td><td><b>" + r.activities + "</b></td><td>" + r.new + "</td><td>" + r.repeat + "</td><td>" + r.unique + "</td></tr>";
+        }).join("") || "<tr><td colspan='6' class='muted'>Belum ada komsos pada periode ini.</td></tr>") + "</tbody></table></div>" +
+        "<p class='small muted'>Warga baru = warga yang pertama kali didata lewat komsos itu; berulang = kunjungan ke warga yang sudah terdata.</p>";
+    } else if (historyPart === "sikap") {
+      var st = data.stance;
+      html = range + "<div class='metrics four'>" + ["membaik", "memburuk", "teridentifikasi", "lainnya"].map(function (key) {
+        return "<div class='metric'><b style='color:" + DIRECTION[key].color + "'>" + st.totals[key] + "</b><span>" + DIRECTION[key].label + "</span></div>";
+      }).join("") + "</div>";
+      if (st.per_korwil.length) {
+        html += "<h3>Per Korwil</h3><div class='table-wrap'><table class='table'><thead><tr><th>Korwil</th><th>Membaik</th><th>Memburuk</th><th>Teridentifikasi</th><th>Bersih</th></tr></thead><tbody>" +
+          st.per_korwil.map(function (r) {
+            return "<tr><td>" + escapeHtml(r.korwil) + "</td><td>" + r.membaik + "</td><td>" + r.memburuk + "</td><td>" + r.teridentifikasi + "</td><td><b style='color:" + (r.net > 0 ? "#1a7f37" : r.net < 0 ? "#cf222e" : "inherit") + "'>" + (r.net > 0 ? "+" : "") + r.net + "</b></td></tr>";
+          }).join("") + "</tbody></table></div>";
+      }
+      html += "<h3>Rincian</h3><ul class='list compact'>" + (st.items.map(function (i) {
+        var dir = DIRECTION[i.direction] || DIRECTION.lainnya;
+        return "<li class='clickable' data-warga='" + i.resident_id + "'><b>" + escapeHtml(i.resident) + "</b> <span class='badge' style='background:" + dir.color + "'>" + dir.label + "</span>" +
+          "<div class='sub'>" + escapeHtml(i.old_label) + " → " + escapeHtml(i.new_label) + (i.korwil ? " · Korwil " + escapeHtml(i.korwil) : "") + " · " + escapeHtml(i.by) + " · " + fmtDate(i.at, true) + "</div></li>";
+      }).join("") || "<li class='muted'>Tidak ada perubahan sikap.</li>") + "</ul>";
+    } else {
+      var land = data.land;
+      html = range + "<div class='metrics four'>" +
+        "<div class='metric'><b style='color:#1a7f37'>" + land.increased + "</b><span>Bertambah</span></div>" +
+        "<div class='metric'><b style='color:#cf222e'>" + land.decreased + "</b><span>Berkurang</span></div>" +
+        "<div class='metric'><b>" + (land.net_m2 > 0 ? "+" : "") + fmtNum(land.net_m2, 2) + " m²</b><span>Perubahan bersih</span></div></div>" +
+        "<ul class='list compact'>" + (land.items.map(function (i) {
+          return "<li class='clickable' data-warga='" + i.resident_id + "'><b>" + escapeHtml(i.resident) + "</b> <b style='color:" + (i.delta >= 0 ? "#1a7f37" : "#cf222e") + "'>" + (i.delta > 0 ? "+" : "") + fmtNum(i.delta, 2) + " m²</b>" +
+            "<div class='sub'>" + fmtNum(i.old, 2) + " → " + fmtNum(i.new, 2) + " m²" + (i.korwil ? " · Korwil " + escapeHtml(i.korwil) : "") + " · " + escapeHtml(i.by) + " · " + fmtDate(i.at, true) + "</div></li>";
+        }).join("") || "<li class='muted'>Tidak ada perubahan luas lahan.</li>") + "</ul>";
+    }
+    $("historis-isi").innerHTML = html;
+  }
+
+  function loadHistory() {
+    if ($("historis-korwil").options.length <= 1) {
+      fillSelect($("historis-korwil"), config.korwils.map(function (k) { return { value: k.id, label: "Korwil " + k.code }; }), "Semua Korwil");
+    }
+    var params = "?periode=" + $("historis-periode").value + ($("historis-korwil").value ? "&korwil=" + $("historis-korwil").value : "");
+    $("historis-isi").innerHTML = "<p class='muted'>Memuat…</p>";
+    request(urls.history + params).then(function (data) { historyData = data; renderHistory(); })
+      .catch(function (error) { $("historis-isi").textContent = error.message; });
+  }
+
+  $("historis-periode").addEventListener("change", loadHistory);
+  $("historis-korwil").addEventListener("change", loadHistory);
+  $("historis-bagian").addEventListener("click", function (event) {
+    var button = event.target.closest("button[data-bagian]");
+    if (!button) { return; }
+    historyPart = button.getAttribute("data-bagian");
+    this.querySelectorAll("button").forEach(function (b) { b.classList.toggle("active", b === button); });
+    renderHistory();
+  });
+  $("historis-isi").addEventListener("click", function (event) {
+    var resident = event.target.closest("[data-warga]");
+    if (resident) { openResident(parseInt(resident.getAttribute("data-warga"), 10)); }
+  });
 
   function loadFeed() {
     var korwil = $("feed-korwil").value;
@@ -2821,7 +3289,6 @@
     }).catch(function (error) { $("feed-isi").innerHTML = "<li class='muted'>" + escapeHtml(error.message) + "</li>"; });
   }
 
-  $("peringkat-periode").addEventListener("change", loadLeaderboard);
   $("feed-korwil").addEventListener("change", loadFeed);
 
   $("form-ai").addEventListener("submit", function (event) {
@@ -2844,7 +3311,7 @@
   });
   $("kinerja-tim-isi").addEventListener("click", function (event) {
     var row = event.target.closest("[data-petugas]");
-    if (row) { $("kinerja-petugas").value = row.getAttribute("data-petugas"); loadPerformance(); }
+    if (row) { openPerformance(row.getAttribute("data-petugas")); }
   });
 
   // ================================================================ Chat
