@@ -289,6 +289,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "alokasi.context_processors.portal",
                 "users.context_processors.branding",
+                "utils.app_links.app_links_context",
                 "operasi.lock.system_lock",
             ]
         },

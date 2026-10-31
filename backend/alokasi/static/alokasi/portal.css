@@ -102,6 +102,7 @@ h3 { font-size: 1.0625rem; font-weight: 650; letter-spacing: -0.01em; margin: 1.
 .site-nav .cta { margin-left: 4px; background: var(--primary); color: #fff; font-weight: 600; box-shadow: var(--sl-shadow-xs); }
 .site-nav .cta:hover { background: var(--primary-dark); color: #fff; }
 .site-nav form { margin: 0; }
+.site-nav a.switch { color: var(--sl-primary-strong); font-weight: 600; }
 /* Menu desktop lengkap (12 tautan) tetap satu baris di kontainer 1200px. */
 @media (min-width: 1181px) {
   .site-header .container { gap: 12px; }

@@ -185,6 +185,7 @@ const App: React.FC<Props> = (props) => {
 
               <TopNavigation
                 isMenuOpen={displaySideMenu}
+                showAdminPanel={!!get(authenticatedUser, "is_staff")}
                 showCommandCenter={showCommandCenter}
                 linkUrl={linkUrl}
                 onLogout={logOut}

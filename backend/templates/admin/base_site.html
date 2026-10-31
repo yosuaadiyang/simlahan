@@ -25,9 +25,9 @@
 
 {# Sama dengan bawaan panel, tanpa garis miring pemisah (tautan tampil sebagai tombol). #}
 {% block userlinks %}
-  {% if site_url %}<a href="{{ site_url }}">{% translate 'View site' %}</a>{% endif %}
+  {# Pindah ke aplikasi lain yang boleh dibuka (menggantikan "Lihat situs"). #}
+  {% for link in app_links %}{% if link.key != "admin" %}<a class="sl-switch" href="{{ link.url }}" title="Pindah ke {{ link.label }}">⇄ {{ link.label }}</a>{% endif %}{% endfor %}
   {% if user.is_active and user.is_staff %}{% url 'django-admindocs-docroot' as docsroot %}{% if docsroot %}<a href="{{ docsroot }}">{% translate 'Documentation' %}</a>{% endif %}{% endif %}
-  {% if user.is_active and user.is_staff and perms.operasi.view_korwil %}<a class="sl-switch" href="{% url 'operasi-command' %}" title="Pindah ke Pusat Komando">⇄ Pusat Komando</a>{% endif %}
   {% if user.is_active and user.is_staff %}<a href="{% url 'akun-panduan' %}">Panduan peran</a>{% endif %}
   {% if user.has_usable_password %}<a href="{% url 'admin:password_change' %}">{% translate 'Change password' %}</a>{% endif %}
   <form id="logout-form" method="post" action="{% url 'admin:logout' %}">{% csrf_token %}<button type="submit">{% translate 'Log out' %}</button></form>

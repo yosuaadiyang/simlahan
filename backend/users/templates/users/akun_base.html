@@ -22,11 +22,10 @@
 </style>
 {% endblock %}
 {% block branding %}
-<div id="site-name"><a href="/"><img src="{% static 'simlahan/logo-mark.svg' %}" alt="" width="30" height="30"><span class="sl-site-title">{{ site_header|default:app_name }}</span></a></div>
+<div id="site-name"><a href="{{ app_links.0.url|default:"/" }}"><img src="{% static 'simlahan/logo-mark.svg' %}" alt="" width="30" height="30"><span class="sl-site-title">{{ site_header|default:app_name }}</span></a></div>
 {% endblock %}
 {% block userlinks %}
-  <a href="/">Aplikasi petugas</a>
-  {% if user.is_staff %}<a href="{% url 'admin:index' %}">Panel admin</a>{% endif %}
+  {% for link in app_links %}<a class="sl-switch" href="{{ link.url }}" title="Pindah ke {{ link.label }}">⇄ {{ link.label }}</a>{% endfor %}
   <a href="{% url 'akun-panduan' %}">Panduan peran</a>
   {% if user.has_usable_password %}<a href="{% url 'akun-sandi' %}">Ganti sandi</a>{% endif %}
 {% endblock %}
