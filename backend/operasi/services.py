@@ -413,8 +413,24 @@ def decide_leave(attendance, user, approve: bool):
 # --------------------------------------------------------------------------
 
 
+PERIODS = ("hari", "minggu", "bulan", "bulan-lalu", "kuartal", "tahun")
+
+
 def period_bounds(period: str, today=None) -> tuple[datetime.date, datetime.date]:
+    """Periode kalender berjalan (hari/minggu/bulan/kuartal/tahun) atau bulan lalu;
+    nilai lain dianggap bulan ini."""
     today = today or timezone.localdate()
+    if period == "hari":
+        return today, today
+    if period == "kuartal":
+        start = today.replace(month=(today.month - 1) // 3 * 3 + 1, day=1)
+        end_month = start.month + 2
+        last = (start.replace(month=end_month) + datetime.timedelta(days=32)).replace(
+            day=1
+        ) - datetime.timedelta(days=1)
+        return start, last
+    if period == "tahun":
+        return today.replace(month=1, day=1), today.replace(month=12, day=31)
     if period == "minggu":
         start = today - datetime.timedelta(days=today.weekday())
         return start, start + datetime.timedelta(days=6)

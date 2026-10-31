@@ -436,7 +436,7 @@ Mengelola seluruh data aset lahan unit layanannya.
 
 - Panel admin, Manajemen aset lahan: dasbor, peta tematik, data aset, keuangan (penilaian, pajak, transaksi), okupasi, permukiman kembali, pengaduan, lelang, dokumen, peta berbagi, laporan & asisten AI
 - Aplikasi lapangan (`/aset/lapangan/`)
-- Pusat komando (`/komando/`, tombol **Pusat Komando** di panel admin) sebagai pengawas: Peta, Absen, Lapor (hanya Laporan saya/tim), Warga, Tugas, Kinerja, Chat; Menu: Persetujuan, Laporan harian (termasuk rekap Excel)
+- Pusat komando (`/komando/`, tombol **Pusat Komando** di panel admin) sebagai pengawas: Peta, Absen, Lapor (hanya Laporan saya/tim), Warga, Tugas, Kinerja, Chat; Menu: Beranda, Persetujuan, Laporan harian (termasuk rekap Excel), Peringkat tim, Historis
 
 **Yang bisa dilakukan**
 
@@ -487,7 +487,7 @@ Bekerja di lapangan untuk Korwil tempatnya menjadi anggota.
 
 **Menu**
 
-- Pusat komando (`/komando/`): Peta (termasuk lapisan Temuan ilegal dan Patroli SMART), Absen, Lapor (Komsos, Topografi, Temuan ilegal, Patroli Taman Buru dengan impor SMART, Kegiatan lainnya, jenis lain, uji tanah, laporan saya), Warga, Tugas (saya, tim, verifikasi, terlambat, semua; tombol Beri tugas bagi koordinator), Kinerja, Chat; Menu: Persetujuan, Laporan harian (buat, masuk, lacak, rekap Excel), Peringkat tim, Struktur tim, Feed aktivitas, Asisten AI, Aplikasi utama; tombol **⇄ Utama** di bilah atas
+- Pusat komando (`/komando/`): Peta (termasuk lapisan Temuan ilegal dan Patroli SMART), Absen, Lapor (Komsos, Topografi, Temuan ilegal, Patroli Taman Buru dengan impor SMART, Kegiatan lainnya, jenis lain, uji tanah, laporan saya), Warga, Tugas (saya, tim, verifikasi, terlambat, semua; tombol Beri tugas bagi koordinator), Kinerja (grafik harian/mingguan, radar, kalender 90 hari, sebaran titik kerja di peta, wawasan), Chat; Menu: Beranda (ringkasan sikap, tren dukungan, detail Korwil), Persetujuan, Laporan harian (buat, masuk, lacak, rekap Excel), Peringkat tim (periode, Korwil, tingkat, 10 teratas/terbawah, lencana, Excel, wawasan), Struktur tim, Historis (bagi koordinator dan atasan: komsos, perubahan sikap, luas lahan), Feed aktivitas, Asisten AI, Aplikasi utama; tombol **⇄ Utama** di bilah atas
 - Aplikasi lapangan (`/aset/lapangan/`): laporan & foto lapangan
 - Panel admin: okupasi, pengaduan, survei, tugas, Korwil, warga, kegiatan, temuan ilegal, patroli Taman Buru, jejak patroli SMART, uji tanah, jabatan & atasan petugas, riwayat & poin tugas, laporan harian berjenjang (baca saja)
 
@@ -506,6 +506,7 @@ Bekerja di lapangan untuk Korwil tempatnya menjadi anggota.
 - Tidak memverifikasi laporan, tidak melihat NIK warga, dan tidak membuka modul lain.
 - Klaim dampak Signifikan/Kritis dihitung 6 poin sampai dikonfirmasi atasan.
 - Tidak bisa memverifikasi tugasnya sendiri; tugas yang dilaporkan selesai menunggu verifikasi pemberi tugas atau atasan.
+- Peringkat dan detail Korwil hanya menampilkan skor dirinya sendiri; Historis tidak tersedia kecuali ia menjadi atasan petugas lain.
 
 ## Koordinator Wilayah
 
@@ -517,7 +518,7 @@ Memimpin tim lapangan di Korwil yang dipimpinnya.
 
 **Menu**
 
-- Pusat komando (`/komando/`): Peta (termasuk lapisan Temuan ilegal dan Patroli SMART), Absen, Lapor (Komsos, Topografi, Temuan ilegal, Patroli Taman Buru dengan impor SMART, Kegiatan lainnya, jenis lain, uji tanah, laporan saya), Warga, Tugas (saya, tim, verifikasi, terlambat, semua; tombol Beri tugas bagi koordinator), Kinerja, Chat; Menu: Persetujuan, Laporan harian (buat, masuk, lacak, rekap Excel), Peringkat tim, Struktur tim, Feed aktivitas, Asisten AI, Aplikasi utama; tombol **⇄ Utama** di bilah atas
+- Pusat komando (`/komando/`): Peta (termasuk lapisan Temuan ilegal dan Patroli SMART), Absen, Lapor (Komsos, Topografi, Temuan ilegal, Patroli Taman Buru dengan impor SMART, Kegiatan lainnya, jenis lain, uji tanah, laporan saya), Warga, Tugas (saya, tim, verifikasi, terlambat, semua; tombol Beri tugas bagi koordinator), Kinerja (grafik harian/mingguan, radar, kalender 90 hari, sebaran titik kerja di peta, wawasan), Chat; Menu: Beranda (ringkasan sikap, tren dukungan, detail Korwil), Persetujuan, Laporan harian (buat, masuk, lacak, rekap Excel), Peringkat tim (periode, Korwil, tingkat, 10 teratas/terbawah, lencana, Excel, wawasan), Struktur tim, Historis (bagi koordinator dan atasan: komsos, perubahan sikap, luas lahan), Feed aktivitas, Asisten AI, Aplikasi utama; tombol **⇄ Utama** di bilah atas
 - Panel admin: Korwil, warga, kegiatan, uji tanah, SOS, tugas, jabatan & atasan petugas, riwayat & poin tugas, laporan harian berjenjang (baca saja)
 
 **Yang bisa dilakukan**
@@ -527,6 +528,7 @@ Memimpin tim lapangan di Korwil yang dipimpinnya.
 - Memberi tugas berpoin kepada anggota (penerima utama dan kontributor), lalu memverifikasi atau mengembalikan tugas yang dilaporkan selesai.
 - Menerima laporan harian anggota: mengembalikannya untuk revisi, atau merangkumnya ke laporan sendiri untuk atasan. Semua yang menunggu keputusan ada di Menu → Persetujuan.
 - Mengonfirmasi klaim dampak tinggi Kegiatan lainnya milik anggota (bukan milik sendiri).
+- Melihat Historis wilayahnya: komsos per petugas (warga baru dan kunjungan berulang), perubahan sikap warga, dan perubahan luas lahan.
 
 **Batas akses**
 

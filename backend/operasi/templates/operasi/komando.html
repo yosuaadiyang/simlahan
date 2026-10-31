@@ -39,7 +39,7 @@
     <button type="button" class="stat" data-goto="korwil"><b id="st-kegiatan">–</b><span>Kegiatan</span></button>
     <button type="button" class="stat" data-mode="stance"><b id="st-pro">–</b><span>Pro</span></button>
     <button type="button" class="stat" data-mode="rtrw"><b id="st-rtrw">–</b><span>RTRW</span></button>
-    <button type="button" class="stat" data-goto="peta"><b id="st-korwil">–</b><span>Korwil</span></button>
+    <button type="button" class="stat" data-goto="beranda" title="Buka beranda"><b id="st-korwil">–</b><span>Korwil</span></button>
     <button type="button" class="stat" data-layer="tanah"><b id="st-tanah">–</b><span>Uji tanah</span></button>
   </div>
   <div class="status">
@@ -477,10 +477,15 @@
   <section id="tab-perf" class="tab-view sheet" aria-label="Kinerja" hidden>
     <h2>Kinerja (KPI)</h2>
     <div class="row wrap">
-      <select id="kinerja-periode"><option value="minggu">Minggu ini</option><option value="bulan" selected>Bulan ini</option><option value="bulan-lalu">Bulan lalu</option></select>
-      <select id="kinerja-petugas" hidden></select>
+      <select id="kinerja-periode" aria-label="Periode"><option value="hari">Hari ini</option><option value="minggu">Minggu ini</option><option value="bulan" selected>Bulan ini</option><option value="bulan-lalu">Bulan lalu</option><option value="kuartal">Kuartal ini</option><option value="tahun">Tahun ini</option></select>
+      <select id="kinerja-petugas" aria-label="Petugas" hidden></select>
     </div>
     <div id="kinerja-isi" class="stack">Memuat…</div>
+    <div id="kinerja-rinci" class="stack"></div>
+    <div class="insight" id="kinerja-wawasan-kotak">
+      <div class="row" style="justify-content:space-between"><b>💡 Wawasan kinerja</b><button type="button" class="btn-small" id="kinerja-wawasan">Susun wawasan</button></div>
+      <div id="kinerja-wawasan-isi" class="small muted">Ringkasan kekuatan, kelemahan, dan saran untuk periode terpilih.</div>
+    </div>
     <div id="kinerja-tim" hidden>
       <h3>Peringkat tim</h3>
       <table class="table"><thead><tr><th>#</th><th>Petugas</th><th>Skor</th><th>Hadir</th><th>Kegiatan</th><th>Tugas</th></tr></thead><tbody id="kinerja-tim-isi"></tbody></table>
@@ -490,10 +495,12 @@
   <section id="tab-lainnya" class="tab-view sheet" aria-label="Menu lainnya" hidden>
     <h2>Menu lainnya</h2>
     <div class="more-menu">
+      <button type="button" class="btn" data-buka="beranda">📊<span>Beranda</span></button>
       <button type="button" class="btn" data-buka="persetujuan">🗳️<span>Persetujuan<i class="count" id="menu-persetujuan-n"></i></span></button>
       <button type="button" class="btn" data-buka="laporan">🗂️<span>Laporan harian<i class="count" id="menu-laporan-n"></i></span></button>
       <button type="button" class="btn" data-buka="peringkat">🏆<span>Peringkat tim</span></button>
       <button type="button" class="btn" data-buka="struktur">🕸️<span>Struktur tim</span></button>
+      <button type="button" class="btn" data-buka="historis">🕰️<span>Historis</span></button>
       <button type="button" class="btn" data-buka="feed">📰<span>Feed aktivitas</span></button>
       <button type="button" class="btn" data-buka="ai">🤖<span>Asisten AI</span></button>
       <a class="btn" href="{{ komando_config.urls.main }}">🏠<span>Aplikasi utama</span></a>
@@ -505,14 +512,61 @@
   <section id="tab-peringkat" class="tab-view sheet" aria-label="Peringkat" hidden>
     <h2>Peringkat Tim</h2>
     <div class="row wrap">
-      <select id="peringkat-periode"><option value="minggu">Minggu ini</option><option value="bulan" selected>Bulan ini</option><option value="bulan-lalu">Bulan lalu</option></select>
+      <select id="peringkat-periode" aria-label="Periode"><option value="hari">Hari ini</option><option value="minggu">Minggu ini</option><option value="bulan" selected>Bulan ini</option><option value="bulan-lalu">Bulan lalu</option><option value="kuartal">Kuartal ini</option><option value="tahun">Tahun ini</option></select>
+      <select id="peringkat-korwil" aria-label="Korwil"><option value="">Semua Korwil</option></select>
+      <select id="peringkat-tier" aria-label="Tingkat"><option value="">Semua tingkat</option></select>
     </div>
-    <p class="muted small">Tren membandingkan posisi periode ini dengan periode sebelumnya.</p>
+    <div class="row wrap">
+      <div class="segmented" id="peringkat-tampilan" role="group" aria-label="Tampilan">
+        <button type="button" data-tampilan="semua" class="active">Semua</button>
+        <button type="button" data-tampilan="atas">10 teratas</button>
+        <button type="button" data-tampilan="bawah">10 terbawah</button>
+      </div>
+      <button type="button" class="btn-small" id="peringkat-excel">⬇ Excel</button>
+    </div>
+    <div class="metrics" id="peringkat-ringkas"></div>
+    <p class="muted small">Tren membandingkan posisi periode ini dengan periode sebelumnya. <span id="peringkat-lencana"></span></p>
     <div id="peringkat-isi" class="stack">Memuat…</div>
+    <div class="insight" id="peringkat-wawasan-kotak" hidden>
+      <div class="row" style="justify-content:space-between"><b>💡 Wawasan tim</b><button type="button" class="btn-small" id="peringkat-wawasan">Susun wawasan</button></div>
+      <div id="peringkat-wawasan-isi" class="small muted">Siapa yang menonjol, siapa yang perlu didampingi, dan sarannya.</div>
+    </div>
+  </section>
+
+  <section id="tab-beranda" class="tab-view sheet" aria-label="Beranda" hidden>
+    <div class="row" style="justify-content:space-between"><h2>Beranda</h2><button type="button" class="btn-small" id="beranda-muat">↻ Muat ulang</button></div>
+    <p class="muted small" id="beranda-waktu"></p>
+    <div class="metrics four" id="beranda-angka"></div>
+    <h3>Sikap warga</h3>
+    <div class="stance-cards" id="beranda-sikap"></div>
+    <h3>Tren dukungan (12 pekan)</h3>
+    <div id="beranda-tren" class="chart"></div>
+    <h3>Per Korwil</h3>
+    <p class="muted small">Ketuk baris untuk detail Korwil.</p>
+    <div class="table-wrap"><table class="table"><thead><tr><th>Korwil</th><th>Warga / target</th><th>Sikap</th><th>Pro</th><th>Lepas</th><th>Kegiatan 7 hr</th></tr></thead><tbody id="beranda-korwil"></tbody></table></div>
+    <div class="grid2 split">
+      <div><h3>Kegiatan 7 hari</h3><div id="beranda-kegiatan" class="stack"></div></div>
+      <div><h3>Uji tanah</h3><div id="beranda-tanah" class="stack"></div></div>
+    </div>
+  </section>
+
+  <section id="tab-historis" class="tab-view sheet" aria-label="Historis" hidden>
+    <h2>Historis</h2>
+    <div class="row wrap">
+      <select id="historis-periode" aria-label="Periode"><option value="hari">Hari ini</option><option value="minggu">Minggu ini</option><option value="bulan" selected>Bulan ini</option><option value="bulan-lalu">Bulan lalu</option><option value="kuartal">Kuartal ini</option><option value="tahun">Tahun ini</option></select>
+      <select id="historis-korwil" aria-label="Korwil"><option value="">Semua Korwil</option></select>
+    </div>
+    <div class="segmented" id="historis-bagian" role="group" aria-label="Bagian">
+      <button type="button" data-bagian="komsos" class="active">Komsos</button>
+      <button type="button" data-bagian="sikap">Perubahan sikap</button>
+      <button type="button" data-bagian="lahan">Luas lahan</button>
+    </div>
+    <div id="historis-isi" class="stack">Memuat…</div>
   </section>
 
   <section id="tab-struktur" class="tab-view sheet" aria-label="Struktur" hidden>
     <h2>Struktur Tim Lapangan</h2>
+    <p class="muted small">Ketuk Korwil untuk melihat anggota, kinerja, dan warganya.</p>
     <div id="struktur-isi" class="stack">Memuat…</div>
   </section>
 
@@ -606,6 +660,13 @@
   <form method="dialog" class="stack">
     <div class="panel-head"><h3 id="wd-judul">Warga</h3><button value="tutup" class="close">✕</button></div>
     <div id="wd-isi"></div>
+  </form>
+</dialog>
+
+<dialog id="dlg-korwil" class="wide">
+  <form method="dialog" class="stack">
+    <div class="panel-head"><h3 id="kd-judul">Korwil</h3><button value="tutup" class="close">✕</button></div>
+    <div id="kd-isi"></div>
   </form>
 </dialog>
 

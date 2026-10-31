@@ -586,6 +586,9 @@ class Resident(TimeStampedModel):
         super().__init__(*args, **kwargs)
         # __dict__ agar instance dengan field tertunda (.only()) tidak memicu query tambahan.
         self._initial_stance = self.__dict__.get("stance") if self.pk else None
+        self._initial_land_area = (
+            self.__dict__.get("land_area_m2", _UNSET) if self.pk else _UNSET
+        )
 
     def __str__(self):
         return f"{self.number} {self.head_name}"
@@ -620,6 +623,29 @@ class Resident(TimeStampedModel):
                     activity=getattr(self, "_activity", None),
                 )
             self._initial_stance = self.stance
+        area = _area(self.land_area_m2)
+        if (
+            self._initial_land_area is not _UNSET
+            and _area(self._initial_land_area) != area
+        ):
+            LandAreaChange.objects.create(
+                resident=self,
+                old_area_m2=_area(self._initial_land_area),
+                new_area_m2=area,
+                changed_by=getattr(self, "_changed_by", None),
+                activity=getattr(self, "_activity", None),
+            )
+        self._initial_land_area = area
+
+
+# Penanda nilai awal yang tidak dimuat (instance dari .only()/.defer()).
+_UNSET = object()
+
+
+def _area(value):
+    return (
+        None if value in (None, "") else Decimal(str(value)).quantize(Decimal("0.01"))
+    )
 
 
 RELEASED_PARCEL_STATUSES = ["released", "handed_over"]
@@ -658,6 +684,49 @@ class StanceChange(models.Model):
 
     def __str__(self):
         return f"{self.resident} {self.old_stance} → {self.new_stance}"
+
+
+class LandAreaChange(models.Model):
+    """Riwayat perubahan luas lahan yang dikuasai warga (menu Historis)."""
+
+    resident = models.ForeignKey(
+        Resident,
+        verbose_name=_("Warga"),
+        related_name="land_area_changes",
+        on_delete=models.CASCADE,
+    )
+    old_area_m2 = models.DecimalField(
+        _("Luas sebelumnya (m²)"),
+        max_digits=16,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
+    new_area_m2 = models.DecimalField(
+        _("Luas baru (m²)"), max_digits=16, decimal_places=2, null=True, blank=True
+    )
+    changed_by = _user_field(_("Diubah oleh"))
+    changed_at = models.DateTimeField(_("Waktu"), auto_now_add=True)
+    activity = models.ForeignKey(
+        "operasi.Activity",
+        verbose_name=_("Kegiatan"),
+        related_name="+",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+
+    class Meta:
+        verbose_name = _("Perubahan luas lahan warga")
+        verbose_name_plural = _("Perubahan luas lahan warga")
+        ordering = ["-changed_at"]
+
+    def __str__(self):
+        return f"{self.resident} {self.old_area_m2} → {self.new_area_m2}"
+
+    @property
+    def delta_m2(self):
+        return (self.new_area_m2 or 0) - (self.old_area_m2 or 0)
 
 
 # --------------------------------------------------------------------------
