@@ -134,6 +134,10 @@ def permohonan_demo(applicant, investor, officer, verifier) -> int:
         return 0
     if sample_applications(applicant).exists():
         return 0
+    if not VerificationCriterion.objects.filter(is_active=True).exists():
+        # Kriteria verifikasi dipasang oleh migrasi; tanpa itu permohonan tidak
+        # bisa disetujui sehingga contoh permohonan dilewati.
+        return 0
     with override_settings(EMAIL_BACKEND=LOCMEM):
         return _create(applicant, investor, officer, verifier)
 

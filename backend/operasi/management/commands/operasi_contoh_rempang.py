@@ -1028,7 +1028,10 @@ def _demo_field(leader, coordinator, officer, korwil):
 
     now = timezone.now()
     today = timezone.localdate()
-    center = korwil.geometry.centroid
+    # Korwil tanpa batas wilayah (dibuat manual) memakai titik acuan Rempang.
+    center = (
+        korwil.geometry.centroid if korwil.geometry else Point(104.12, 0.89, srid=4326)
+    )
     near = [
         Point(center.x + dx, center.y + dy, srid=4326)
         for dx, dy in ((0.0006, 0.0004), (-0.0005, 0.0007), (0.0009, -0.0003))
