@@ -102,11 +102,13 @@ def _config() -> list[Finding]:
 
 
 def _sample_data() -> list[Finding]:
-    from alokasi.models import LandPlot, UwtRegion
+    from alokasi.models import ContactMessage, LandPlot, UwtRegion
     from asetlahan.models import LandAsset, MapOverlay
     from dokumen.models import LandUse
+    from leasing.models import Contact, Lease
     from operasi.models import Korwil, Ticket
     from pengadaan.models import AcquisitionProject
+    from plotsearch.models import AreaSearch
 
     found = []
     users = get_user_model().objects.filter(
@@ -159,6 +161,26 @@ def _sample_data() -> list[Finding]:
             WARN,
             MapOverlay.objects.filter(note__startswith="[contoh]"),
             "lapisan referensi contoh",
+        ),
+        (
+            WARN,
+            Lease.objects.filter(note__startswith="[CONTOH]"),
+            "sewa contoh (beserta tagihannya)",
+        ),
+        (
+            WARN,
+            Contact.objects.filter(email__iendswith="@contoh.simlahan.invalid"),
+            "kontak contoh",
+        ),
+        (
+            WARN,
+            AreaSearch.objects.filter(description_intended_use__startswith="[CONTOH]"),
+            "pencarian area contoh",
+        ),
+        (
+            WARN,
+            ContactMessage.objects.filter(email__iendswith="@contoh.simlahan.invalid"),
+            "pesan kontak contoh",
         ),
     )
     for level, queryset, label in checks:

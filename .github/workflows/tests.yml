@@ -88,13 +88,16 @@ jobs:
           python manage.py createcachetable
           python manage.py simlahan_bootstrap
           python manage.py simlahan_bootstrap
-          for module in pengadaan alokasi asetlahan operasi; do
-            python manage.py "${module}_contoh_rempang"
-            python manage.py "${module}_contoh_rempang"
-          done
-          python manage.py pengguna_contoh
-          python manage.py pengguna_contoh
-          python manage.py pengguna_contoh --hapus
+          # Data contoh semua modul dua kali (idempoten), cakupan tabel,
+          # penghapusan total, lalu dibuat ulang dari nol.
+          python manage.py data_contoh
+          python manage.py data_contoh
+          python manage.py data_contoh --cek
+          python manage.py hapus_data_contoh
+          python manage.py shell -c "import sys; from utils.production_check import _sample_data; left = [f.message for f in _sample_data()]; print(left); sys.exit(1 if left else 0)"
+          python manage.py data_contoh
+          python manage.py data_contoh --cek
+          python manage.py hapus_data_contoh
 
       - name: Run all backend tests
         run: pytest -p no:cacheprovider
@@ -216,10 +219,8 @@ jobs:
       - name: Production checks, sample data and a restart
         run: |
           docker compose exec -T backend python manage.py check --deploy
-          for module in pengadaan alokasi asetlahan operasi; do
-            docker compose exec -T backend python manage.py "${module}_contoh_rempang"
-          done
-          docker compose exec -T backend python manage.py pengguna_contoh
+          docker compose exec -T backend python manage.py data_contoh
+          docker compose exec -T backend python manage.py data_contoh --cek
           docker compose exec -T backend python manage.py pengadaan_cek_tenggat
           docker compose exec -T backend python manage.py alokasi_pemantauan
           docker compose exec -T backend python manage.py asetlahan_pengingat

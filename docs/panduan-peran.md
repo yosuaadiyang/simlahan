@@ -48,7 +48,7 @@ Panduan yang sama tersedia di aplikasi (`/akun/panduan/`) dan hanya menampilkan 
 4. Penilai dan Instansi: tambahkan akunnya di **Pengguna yang ditugaskan** pada proyek pengadaan.
 5. Koordinator Wilayah dan Petugas Lapangan: atur **Koordinator** dan **Anggota** pada data Korwil.
 6. Minta pengguna mengganti sandi saat pertama kali masuk.
-7. Untuk mencoba setiap peran, buat akun contoh: `python manage.py pengguna_contoh` (hapus dengan `--hapus`).
+7. Untuk mencoba setiap peran dengan data lengkap, buat semua data & akun contoh: `python manage.py data_contoh` (hapus dengan `python manage.py hapus_data_contoh`).
 
 ## Penelusur
 

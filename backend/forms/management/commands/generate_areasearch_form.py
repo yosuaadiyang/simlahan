@@ -2,6 +2,37 @@ from django.core.management.base import BaseCommand
 
 from forms.models.form import Choice, Field, Form, Section
 
+# Identifier baku bagian formulir pencarian area. Backend (plotsearch.utils,
+# filter, signals, serializer) dan SPA (application/constants.ts) mencari bagian
+# dengan identifier ini, bukan dengan judulnya.
+AREA_FORM_SECTION_IDENTIFIERS = (
+    "hakijan-tiedot",
+    "yrityksen-tiedot",
+    "yhteyshenkilo-company",
+    "laskutustiedot",
+    "muut-laskutustiedot",
+    "henkilon-tiedot",
+    "yhteyshenkilo-1",
+    "laskunsaaja",
+    "päätöksen-toimitus",
+)
+
+
+def _section(**kwargs) -> Section:
+    """Buat bagian dengan identifier yang diberikan.
+
+    ``Section.save()`` menurunkan identifier dari judul saat bagian dibuat.
+    Judul sudah berbahasa Indonesia, sehingga tanpa pemulihan ini identifier
+    menjadi mis. ``data-pemohon`` dan halaman pencarian area di SPA gagal
+    membaca data pemohon.
+    """
+    identifier = kwargs["identifier"]
+    section = Section.objects.create(**kwargs)
+    if section.identifier != identifier:
+        Section.objects.filter(pk=section.pk).update(identifier=identifier)
+        section.identifier = identifier
+    return section
+
 
 def initialize_area_search_form():
     form = Form.objects.create(
@@ -12,7 +43,7 @@ def initialize_area_search_form():
         title_en="Basic information form",
         is_area_form=True,
     )
-    main_section = Section.objects.create(
+    main_section = _section(
         form=form,
         title="Data pemohon",
         title_ind="Data pemohon",
@@ -50,7 +81,7 @@ def initialize_area_search_form():
         has_text_input=False,
     )
 
-    corporate_section = Section.objects.create(
+    corporate_section = _section(
         form=form,
         parent=main_section,
         title="Data badan usaha",
@@ -150,7 +181,7 @@ def initialize_area_search_form():
         sort_order=7,
     )
 
-    corporate_contact_section = Section.objects.create(
+    corporate_contact_section = _section(
         form=form,
         parent=corporate_section,
         title="Narahubung",
@@ -204,7 +235,7 @@ def initialize_area_search_form():
         sort_order=3,
     )
 
-    invoice_section = Section.objects.create(
+    invoice_section = _section(
         form=form,
         parent=corporate_contact_section,
         title="Data penagihan",
@@ -248,7 +279,7 @@ def initialize_area_search_form():
         sort_order=2,
     )
 
-    invoice_other_section = Section.objects.create(
+    invoice_other_section = _section(
         form=form,
         parent=invoice_section,
         title="Data penagihan lain",
@@ -409,7 +440,7 @@ def initialize_area_search_form():
         sort_order=10,
     )
 
-    people_section = Section.objects.create(
+    people_section = _section(
         form=form,
         parent=main_section,
         title="Data perorangan",
@@ -585,7 +616,7 @@ def initialize_area_search_form():
         has_text_input=False,
     )
 
-    contact_section = Section.objects.create(
+    contact_section = _section(
         form=form,
         parent=people_section,
         title="Narahubung",
@@ -653,7 +684,7 @@ def initialize_area_search_form():
         sort_order=4,
     )
 
-    invoice_section2 = Section.objects.create(
+    invoice_section2 = _section(
         form=form,
         parent=people_section,
         title="Penerima tagihan",
@@ -813,7 +844,7 @@ def initialize_area_search_form():
         sort_order=10,
     )
 
-    decision_section = Section.objects.create(
+    decision_section = _section(
         form=form,
         title="Saya setuju",
         title_ind="Saya setuju",

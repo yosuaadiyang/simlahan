@@ -763,8 +763,9 @@ ADMIN_STEPS = (
     "Koordinator Wilayah dan Petugas Lapangan: atur **Koordinator** dan "
     "**Anggota** pada data Korwil.",
     "Minta pengguna mengganti sandi saat pertama kali masuk.",
-    "Untuk mencoba setiap peran, buat akun contoh: `python manage.py "
-    "pengguna_contoh` (hapus dengan `--hapus`).",
+    "Untuk mencoba setiap peran dengan data lengkap, buat semua data & akun "
+    "contoh: `python manage.py data_contoh` (hapus dengan `python manage.py "
+    "hapus_data_contoh`).",
 )
 
 

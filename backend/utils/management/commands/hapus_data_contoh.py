@@ -8,6 +8,7 @@ SAMPLE_COMMANDS = (
     "dokumen_contoh_rempang",
     "operasi_contoh_rempang",
     "asetlahan_contoh_rempang",
+    "sewa_contoh_rempang",
     "pengadaan_contoh_rempang",
     "pengguna_contoh",
     "alokasi_contoh_rempang",
@@ -16,9 +17,9 @@ SAMPLE_COMMANDS = (
 
 class Command(BaseCommand):
     help = (
-        "Hapus semua data contoh (dokumen, pusat komando, aset, pengadaan, alokasi) "
-        "dan akun contoh sebelum SimLahan dibuka untuk publik. Data kerja nyata "
-        "tidak disentuh."
+        "Hapus semua data contoh (dokumen, pusat komando, aset, sewa & tagihan, "
+        "pencarian area, pengadaan, alokasi) dan akun contoh sebelum SimLahan "
+        "dibuka untuk publik. Data kerja nyata tidak disentuh."
     )
 
     def handle(self, *args, **options):

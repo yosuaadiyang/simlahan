@@ -99,7 +99,7 @@ def test_all_required_fields_answered_validator(
     entries["hakijan-tiedot"]["sections"]["company-information"]["sections"][
         "contact-person"
     ]["fields"]["henkilotunnus"] = {
-        "value": "010181-900C",
+        "value": "2171014507900001",
         "extraValue": "",
     }
 
@@ -146,7 +146,7 @@ def test_social_security_validator(
     entries["hakijan-tiedot"]["sections"]["company-information"]["sections"][
         "contact-person"
     ]["fields"][social_security_field.identifier] = {
-        "value": "010181-900C",
+        "value": "2171014507900001",
         "extraValue": "",
     }
     entries["hakijan-tiedot"]["sections"]["company-information"]["fields"][
@@ -166,18 +166,18 @@ def test_social_security_validator(
     }
 
     answer_serializer = AnswerSerializer(data=answer_data)
-    # test that a correctly formatted ssn passes the validator
+    # test that a valid NIK passes the validator
     assert answer_serializer.is_valid()
 
     answer_data["entries"]["hakijan-tiedot"]["sections"]["company-information"][
         "sections"
     ]["contact-person"]["fields"][social_security_field.identifier] = {
-        "value": "010181G900C",
+        "value": "2171014507G00001",
         "extraValue": "",
     }
     answer_serializer = AnswerSerializer(data=answer_data)
 
-    # test that a incorrectly formatted ssn is caught by the validator
+    # test that an invalid NIK is caught by the validator
     with pytest.raises(ValidationError) as val_error:
         answer_serializer.is_valid(raise_exception=True)
     assert val_error.value.args[0]["non_field_errors"][0].code == "invalid_ssn"
@@ -185,12 +185,12 @@ def test_social_security_validator(
     answer_data["entries"]["hakijan-tiedot"]["sections"]["company-information"][
         "sections"
     ]["contact-person"]["fields"][social_security_field.identifier] = {
-        "value": "010181-900D",
+        "value": "2171013213900001",
         "extraValue": "",
     }
     answer_serializer = AnswerSerializer(data=answer_data)
 
-    # test that a incorrectly formatted ssn is caught by the validator
+    # test that an invalid NIK is caught by the validator
     with pytest.raises(ValidationError) as val_error:
         answer_serializer.is_valid(raise_exception=True)
     assert val_error.value.args[0]["non_field_errors"][0].code == "invalid_ssn"
@@ -206,7 +206,7 @@ def test_company_id_validator(
         generate_entries(section, entries[section.identifier])
     entries["hakijan-tiedot"]["sections"]["company-information"]["sections"][
         "contact-person"
-    ]["fields"]["henkilotunnus"] = {"value": "010181-900C", "extraValue": ""}
+    ]["fields"]["henkilotunnus"] = {"value": "2171014507900001", "extraValue": ""}
     entries["hakijan-tiedot"]["sections"]["company-information"]["fields"][
         "y-tunnus"
     ] = {"value": "012345678901000", "extraValue": ""}
@@ -224,7 +224,7 @@ def test_company_id_validator(
     }
 
     answer_serializer = AnswerSerializer(data=answer_data)
-    # test that a correctly formatted ssn passes the validator
+    # test that a valid NPWP passes the validator
     assert answer_serializer.is_valid()
 
     answer_data["entries"]["hakijan-tiedot"]["sections"]["company-information"][
@@ -232,7 +232,7 @@ def test_company_id_validator(
     ]["y-tunnus"] = {"value": "12345A7-8", "extraValue": ""}
     answer_serializer = AnswerSerializer(data=answer_data)
 
-    # test that a incorrectly formatted ssn is caught by the validator
+    # test that an invalid NPWP is caught by the validator
     with pytest.raises(ValidationError) as val_error:
         answer_serializer.is_valid(raise_exception=True)
     assert val_error.value.args[0]["non_field_errors"][0].code == "invalid_company_id"
@@ -248,7 +248,7 @@ def test_control_share(
         generate_entries(section, entries[section.identifier])
     entries["hakijan-tiedot"]["sections"]["company-information"]["sections"][
         "contact-person"
-    ]["fields"]["henkilotunnus"] = {"value": "010181-900C", "extraValue": ""}
+    ]["fields"]["henkilotunnus"] = {"value": "2171014507900001", "extraValue": ""}
     entries["hakijan-tiedot"]["sections"]["company-information"]["fields"][
         "y-tunnus"
     ] = {"value": "012345678901000", "extraValue": ""}
@@ -278,7 +278,7 @@ def test_control_share(
     }
 
     answer_serializer = AnswerSerializer(data=answer_data)
-    # test that a correctly formatted ssn passes the validator
+    # test that matching control shares pass the validator
     assert answer_serializer.is_valid()
 
     answer_data["entries"]["hakijan-tiedot"]["sections"]["company-information[0]"][
@@ -286,7 +286,7 @@ def test_control_share(
     ]["hallintaosuus"] = {"value": "1/3", "extraValue": ""}
     answer_serializer = AnswerSerializer(data=answer_data)
 
-    # test that a incorrectly formatted ssn is caught by the validator
+    # test that uneven control shares are caught by the validator
     with pytest.raises(ValidationError) as val_error:
         answer_serializer.is_valid(raise_exception=True)
     assert (

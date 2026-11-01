@@ -270,7 +270,30 @@ diperbarui, bukan digandakan. Daftar nominatif dapat diunduh sebagai .xlsx.
 
 ## Data contoh Rempang
 
-Untuk uji coba, buat proyek contoh `[CONTOH] Pengadaan Tanah Pulau Rempang`
+Satu perintah mengisi **seluruh** bagian SimLahan dengan data fiktif agar
+setiap menu bisa dicoba dan menjadi acuan pemakaian: pengadaan tanah (tiap
+tahap), alokasi lahan & portal (permohonan di tiap status, KPT/PPT/PL,
+layanan, peralihan, pesan kontak), portal investor, dokumen & perizinan
+(termasuk penandatanganan selesai dan izin kedaluwarsa), aset lahan, pusat
+komando (tugas, laporan, absensi, patroli, foto 360°, geoteknik, analisis
+area), sewa/kontak/tagihan, pencarian area, dan akun contoh per peran.
+
+```sh
+docker compose exec backend python manage.py data_contoh                # buat semua (aman diulang)
+docker compose exec backend python manage.py data_contoh --sandi '...'  # sama, satu sandi untuk akun contoh
+docker compose exec backend python manage.py data_contoh --cek          # tabel yang masih kosong
+docker compose exec backend python manage.py hapus_data_contoh          # hapus semua data & akun contoh
+```
+
+Perintah ini menjalankan perintah per modul di bawah (dan `sewa_contoh_rempang`,
+`pengguna_contoh`) dengan urutan yang benar; bagian yang sudah ada dilewati dan
+yang belum ada dilengkapi. Semua data bertanda `[CONTOH]`/`[contoh]`/`CONTOH-`
+atau surel `@contoh.simlahan.invalid`, tidak mengirim surel, dan tidak memakai
+nomor urut tagihan sungguhan. `--cek` juga mencantumkan tabel yang sengaja
+dibiarkan kosong beserta alasannya (data acuan resmi seperti indeks dan suku
+bunga, hasil impor, log sistem, dan fitur pencarian kavling yang nonaktif).
+
+Untuk uji coba per modul, buat proyek contoh `[CONTOH] Pengadaan Tanah Pulau Rempang`
 berisi 6 bidang fiktif di Kel. Rempang Cate & Sembulang (Kec. Galang):
 
 ```sh

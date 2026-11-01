@@ -6,10 +6,16 @@ python manage.py asetlahan_contoh_rempang --hapus  # hapus seluruh data contoh
 Membuat aset dengan batas bidang, riwayat kepemilikan, silsilah waris,
 pemangku kepentingan, penilaian, pajak, transaksi, perkara & sidang, kasus
 okupasi, survei, urusan instansi, tugas, pengaduan, lelang, permukiman
-kembali, dan peta berbagi. Semua nama & nomor fiktif.
+kembali, peta berbagi, peserta lelang, dokumen & foto aset, fasilitator, dan
+citra satelit. Semua nama & nomor fiktif.
+
+Tim kerja dan laporan aplikasi lapangan memerlukan akun contoh, jadi dibuat
+oleh ``pengguna_contoh`` lewat ``aset_demo``. Bila data contoh lama sudah ada,
+bagian yang baru (dokumen, peserta lelang, fasilitator, citra) dilengkapi.
 """
 
 import datetime
+import uuid
 from decimal import Decimal
 
 from django.contrib.gis.geos import MultiPolygon, Point, Polygon
@@ -22,9 +28,13 @@ from asetlahan.models import (
     Advocate,
     AssetCategory,
     AssetValuation,
+    Bid,
     CaseHearing,
+    Document,
     EncroachmentActionLog,
     EncroachmentCase,
+    Facilitator,
+    FieldReport,
     Grievance,
     GrievanceCategory,
     HeirMember,
@@ -37,14 +47,17 @@ from asetlahan.models import (
     OwnershipRecord,
     ResettlementSite,
     ResettlementUnit,
+    SatelliteImage,
     Stakeholder,
     StakeholderEngagement,
     SurveyRequest,
     Task,
     TaxObligation,
+    Team,
     Tender,
     ValuationItem,
 )
+from utils.sample_files import delete_files, jpeg_upload, pdf_upload, png_upload
 
 PREFIX = "CONTOH-AST-"
 MARK = "[contoh]"
@@ -143,8 +156,14 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS("Data contoh aset lahan dihapus."))
             return
         if LandAsset.objects.filter(code__startswith=PREFIX).exists():
+            assets = {
+                a.code.removeprefix(PREFIX): a
+                for a in LandAsset.objects.filter(code__startswith=PREFIX)
+            }
+            added = self._extras(assets)
             self.stdout.write(
-                "Data contoh aset lahan sudah ada; jalankan --hapus dahulu untuk membuat ulang."
+                "Data contoh aset lahan sudah ada"
+                + (f"; {added} bagian baru dilengkapi." if added else ".")
             )
             return
         assets = self._assets()
@@ -154,12 +173,23 @@ class Command(BaseCommand):
         self._encroachment(assets, case)
         self._operations(assets)
         self._public(assets)
+        self._extras(assets)
         self.stdout.write(
             self.style.SUCCESS(f"Data contoh aset lahan dibuat: {len(assets)} aset.")
         )
 
     def _delete(self):
         codes = LandAsset.objects.filter(code__startswith=PREFIX)
+        delete_aset_demo()
+        documents = Document.objects.filter(title__startswith=MARK)
+        delete_files(*(d.file for d in documents))
+        documents.delete()
+        bids = Bid.objects.filter(tender__title__startswith=MARK)
+        delete_files(*(b.proposal for b in bids))
+        images = SatelliteImage.objects.filter(title__startswith=MARK)
+        delete_files(*(i.file for i in images))
+        images.delete()
+        Facilitator.objects.filter(name__startswith=MARK).delete()
         MapShare.objects.filter(title__startswith=MARK).delete()
         Tender.objects.filter(title__startswith=MARK).delete()
         Grievance.objects.filter(subject__startswith=MARK).delete()
@@ -515,3 +545,203 @@ class Command(BaseCommand):
             title=f"{MARK} Peta aset Rempang untuk rapat koordinasi"
         )
         share.assets.set(assets.values())
+
+    # ------------------------------------------------------------------
+    # Bagian tambahan (idempoten; melengkapi data contoh versi lama)
+    # ------------------------------------------------------------------
+
+    def _extras(self, assets) -> int:
+        added = 0
+        added += self._documents(assets)
+        added += self._bids()
+        added += self._facilitators()
+        added += self._imagery()
+        return added
+
+    def _documents(self, assets) -> int:
+        if Document.objects.filter(title__startswith=MARK).exists():
+            return 0
+        today = timezone.localdate()
+        case = LegalCase.objects.filter(title__startswith=MARK).first()
+        encroachment = EncroachmentCase.objects.filter(title__startswith=MARK).first()
+        survey = SurveyRequest.objects.filter(purpose__startswith=MARK).first()
+        liaison = LiaisonActivity.objects.filter(subject__startswith=MARK).first()
+        tender = Tender.objects.filter(title__startswith=MARK).first()
+        rows = [
+            (enums.DocumentType.CERTIFICATE, "Sertipikat hak pakai kantor kecamatan",
+             "HP 00012", {"asset": assets.get("01")}, "pdf", ""),
+            (enums.DocumentType.MAP, "Gambar ukur tanah cadangan",
+             "GU-CONTOH-03", {"asset": assets.get("02")}, "pdf", ""),
+            (enums.DocumentType.PHOTO, "Foto pagar liar sebelum penertiban", "",
+             {"asset": assets.get("02"), "encroachment": encroachment}, "jpg",
+             enums.PhotoPhase.BEFORE),
+            (enums.DocumentType.PHOTO, "Foto lokasi sesudah penertiban", "",
+             {"asset": assets.get("02"), "encroachment": encroachment}, "jpg",
+             enums.PhotoPhase.AFTER),
+            (enums.DocumentType.COURT, "Salinan gugatan perdata", "1/Pdt.G/CONTOH",
+             {"legal_case": case}, "pdf", ""),
+            (enums.DocumentType.REPORT, "Laporan survei batas", "LS-CONTOH-01",
+             {"survey": survey}, "pdf", ""),
+            (enums.DocumentType.LETTER, "Surat permohonan balik nama", "SRT-CONTOH-01",
+             {"liaison": liaison}, "pdf", ""),
+            (enums.DocumentType.CONTRACT, "Rancangan perjanjian pemanfaatan dermaga",
+             "PKS-CONTOH-01", {"tender": tender}, "pdf", ""),
+        ]  # fmt: skip
+        for doc_type, title, number, links, ext, phase in rows:
+            label = f"{MARK} {title}"
+            Document.objects.create(
+                title=label,
+                doc_type=doc_type,
+                number=number,
+                document_date=today - datetime.timedelta(days=30),
+                file=jpeg_upload(title) if ext == "jpg" else pdf_upload(title),
+                phase=phase,
+                note="Berkas contoh fiktif.",
+                **{k: v for k, v in links.items() if v is not None},
+            )
+        return 1
+
+    def _bids(self) -> int:
+        tender = Tender.objects.filter(title__startswith=MARK).first()
+        if tender is None or tender.bids.exists():
+            return 0
+        for name, amount, score, status in (
+            ("Koperasi Nelayan Contoh", 175000000, 82, enums.BidStatus.QUALIFIED),
+            ("CV Contoh Bahari", 160000000, 74, enums.BidStatus.SUBMITTED),
+            ("PT Contoh Perikanan", 120000000, None, enums.BidStatus.DISQUALIFIED),
+        ):
+            Bid.objects.create(
+                tender=tender,
+                bidder_name=f"{name} (contoh)",
+                email=f"{name.split()[-1].lower()}@contoh.simlahan.invalid",
+                phone="081200000001",
+                amount=Decimal(amount),
+                proposal=pdf_upload(f"Proposal {name}"),
+                technical_score=Decimal(score) if score is not None else None,
+                status=status,
+                evaluation_note=(
+                    "Penawaran di bawah nilai limit."
+                    if status == enums.BidStatus.DISQUALIFIED
+                    else ""
+                ),
+            )
+        return 1
+
+    def _facilitators(self) -> int:
+        if Facilitator.objects.filter(name__startswith=MARK).exists():
+            return 0
+        for name, kind, org, area in (
+            ("Pendamping Contoh", enums.FacilitatorType.COMPANION,
+             "Lembaga Pendamping Contoh", "Sembulang"),
+            ("Surveyor Contoh", enums.FacilitatorType.SURVEYOR,
+             "KJSB Contoh", "Pulau Rempang"),
+            ("Penilai Contoh", enums.FacilitatorType.APPRAISER,
+             "KJPP Contoh & Rekan", "Kota Batam"),
+        ):  # fmt: skip
+            Facilitator.objects.create(
+                name=f"{MARK} {name}",
+                facilitator_type=kind,
+                organization=org,
+                area=area,
+                phone="081200000002",
+                email=f"{name.split()[0].lower()}@contoh.simlahan.invalid",
+                contract_number="SPK/CONTOH/2026",
+                fee_note="Sesuai kontrak (contoh).",
+            )
+        return 1
+
+    def _imagery(self) -> int:
+        if SatelliteImage.objects.filter(title__startswith=MARK).exists():
+            return 0
+        today = timezone.localdate()
+        coverage = _square(104.130, 0.790, 0.100)
+        SatelliteImage.objects.create(
+            title=f"{MARK} Citra optik Pulau Rempang",
+            provider="Penyedia Citra Contoh",
+            platform=enums.ImageryPlatform.SATELLITE,
+            data_type=enums.ImageryType.OPTICAL,
+            sensor="Satelit contoh",
+            acquired_on=today - datetime.timedelta(days=45),
+            resolution_m=Decimal("0.50"),
+            cloud_cover=8,
+            coverage=coverage,
+            status=enums.ImageryStatus.RECEIVED,
+            requested_on=today - datetime.timedelta(days=60),
+            cost=Decimal("25000000"),
+            orthorectified=True,
+            gcp_count=12,
+            file=png_upload("Citra optik Pulau Rempang", color="#2f6b3a"),
+            note="Citra fiktif untuk uji coba.",
+        )
+        SatelliteImage.objects.create(
+            title=f"{MARK} Foto udara drone tanah cadangan",
+            provider="Tim drone internal (contoh)",
+            platform=enums.ImageryPlatform.DRONE,
+            data_type=enums.ImageryType.ORTHOPHOTO,
+            coverage=_square(104.140, 0.850, 0.006),
+            status=enums.ImageryStatus.REQUESTED,
+            requested_on=today - datetime.timedelta(days=3),
+            note="Permintaan contoh.",
+        )
+        return 1
+
+
+# --------------------------------------------------------------------------
+# Data yang memerlukan akun contoh (dipanggil pengguna_contoh)
+# --------------------------------------------------------------------------
+
+TEAM_NAME = f"{MARK} Tim Pengamanan Aset Rempang"
+
+
+def aset_demo(officers) -> None:
+    """Tim kerja dan laporan aplikasi lapangan contoh (idempoten)."""
+    leader = officers.get("contoh.aset")
+    field = officers.get("contoh.lapangan")
+    if leader is None:
+        return
+    team, _created = Team.objects.get_or_create(
+        name=TEAM_NAME,
+        defaults={
+            "leader": leader,
+            "description": "Pengamanan, patroli, dan pemasangan patok aset contoh.",
+        },
+    )
+    team.members.set([u for u in (leader, field) if u is not None])
+    if field is None or FieldReport.objects.filter(note__startswith=MARK).exists():
+        return
+    assets = {
+        a.code.removeprefix(PREFIX): a
+        for a in LandAsset.objects.filter(code__startswith=PREFIX)
+    }
+    encroachment = EncroachmentCase.objects.filter(title__startswith=MARK).first()
+    now = timezone.now()
+    for kind, code, hours, note, with_photo in (
+        (enums.FieldReportType.PATROL, "01", 30, "Kondisi aman, papan nama utuh.", True),
+        (enums.FieldReportType.ENCROACHMENT, "02", 6,
+         "Pagar baru ±20 m di sisi utara.", True),
+        (enums.FieldReportType.BOUNDARY, "03", 2, "Patok BPN-03 bergeser.", False),
+    ):  # fmt: skip
+        asset = assets.get(code)
+        if asset is None:
+            continue
+        FieldReport.objects.create(
+            client_id=uuid.uuid4(),
+            report_type=kind,
+            location=asset.geometry.centroid,
+            accuracy_m=Decimal("6.5"),
+            captured_at=now - datetime.timedelta(hours=hours),
+            note=f"{MARK} {note}",
+            photo=jpeg_upload(f"Laporan lapangan {code}") if with_photo else "",
+            asset=asset,
+            reported_by=field,
+            encroachment=(
+                encroachment if kind == enums.FieldReportType.ENCROACHMENT else None
+            ),
+        )
+
+
+def delete_aset_demo() -> None:
+    reports = FieldReport.objects.filter(note__startswith=MARK)
+    delete_files(*(r.photo for r in reports))
+    reports.delete()
+    Team.objects.filter(name=TEAM_NAME).delete()

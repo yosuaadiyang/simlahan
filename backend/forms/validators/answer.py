@@ -6,39 +6,20 @@ from rest_framework.serializers import ValidationError
 
 from forms.models import Field
 
-SSN_CHECK = [
-    "0",
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9",
-    "A",
-    "B",
-    "C",
-    "D",
-    "E",
-    "F",
-    "H",
-    "J",
-    "K",
-    "L",
-    "M",
-    "N",
-    "P",
-    "R",
-    "S",
-    "T",
-    "U",
-    "V",
-    "W",
-    "X",
-    "Y",
-]
+
+def nik_is_valid(value: str) -> bool:
+    """NIK: 16 digit, kode wilayah tidak diawali 00, nomor urut bukan 0000, dan
+    tanggal lahir (hari + 40 untuk perempuan) serta bulan masuk akal. Sama
+    dengan validasi di SPA (application/formValidation.ts)."""
+    nik = value.strip()
+    if not re.fullmatch(r"\d{16}", nik):
+        return False
+    if nik.startswith("00") or nik[12:] == "0000":
+        return False
+    day, month = int(nik[6:8]), int(nik[8:10])
+    if day > 40:
+        day -= 40
+    return 1 <= day <= 31 and 1 <= month <= 12
 
 
 class FieldRegexValidator:
@@ -96,16 +77,12 @@ class FieldRegexValidator:
             if entries[entry]["value"] == "":
                 return
 
-            regex_exists = bool(re.search(self._regex, entries[entry]["value"]))
+            value = str(entries[entry]["value"]).strip()
+            regex_exists = bool(re.search(self._regex, value))
             if regex_exists and self._identifier == "henkilotunnus":
-                self.ssn_checker(entries[entry]["value"])
+                regex_exists = nik_is_valid(value)
             if not regex_exists:
                 raise ValidationError(detail=self._message, code=self._error_code)
-
-    def ssn_checker(self, ssn_parts):
-        ssn_number = int(ssn_parts[0:6] + ssn_parts[7:-1])
-        if SSN_CHECK[ssn_number % 31] != ssn_parts[-1].upper():
-            raise ValidationError(detail=self._message, code=self._error_code)
 
 
 class RequiredFormFieldValidator:
