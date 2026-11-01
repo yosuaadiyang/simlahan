@@ -1131,7 +1131,9 @@ class SigningField(models.Model):
     file_name = models.CharField(
         verbose_name=_("Nama berkas"), max_length=255, blank=True, default=""
     )
-    file_sha256 = models.CharField(max_length=64, blank=True, default="")
+    file_sha256 = models.CharField(
+        verbose_name=_("Sidik berkas (SHA-256)"), max_length=64, blank=True, default=""
+    )
     filled_at = models.DateTimeField(verbose_name=_("Diisi"), null=True, blank=True)
 
     class Meta:

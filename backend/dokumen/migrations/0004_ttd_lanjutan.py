@@ -324,7 +324,12 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "file_sha256",
-                    models.CharField(blank=True, default="", max_length=64),
+                    models.CharField(
+                        blank=True,
+                        default="",
+                        max_length=64,
+                        verbose_name="Sidik berkas (SHA-256)",
+                    ),
                 ),
                 (
                     "filled_at",

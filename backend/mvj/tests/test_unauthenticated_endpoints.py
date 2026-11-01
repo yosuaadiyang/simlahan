@@ -51,7 +51,7 @@ PUBLIC_SESSION_PAGES = (
         r"|lahan/|lahan/[^/]+/|lahan/[^/]+/foto/|layanan/|layanan/[^/]+/"
         r"|informasi/.*|verifikasi/.*|daftar/|aktivasi/.*|masuk/|keluar/"
         r"|lupa-sandi/.*|atur-sandi/.*|pengaduan/.*|lelang/|lelang/[^/]+/"
-        r"|kalkulator-uwt/|lacak/|bantuan/"
+        r"|kalkulator-uwt/|lacak/|bantuan/|bantuan/kontak/"
         r"|investasi/|investasi/peta/|investasi/daftar/|investasi/kawasan/[^/]+/"
         r"|investasi/kawasan/[^/]+/foto/|investasi/bandingkan/"
         # Penanda tangan tanpa akun memakai token + kode surel; verifikasi keaslian publik.
