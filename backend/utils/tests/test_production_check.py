@@ -83,6 +83,6 @@ def test_sample_accounts_and_initial_password_are_reported(monkeypatch):
 def test_delete_all_samples_command_runs_on_empty_db():
     out = io.StringIO()
     call_command("hapus_data_contoh", stdout=out)
-    for name in ("dokumen", "operasi", "asetlahan", "pengadaan", "alokasi"):
+    for name in ("dokumen", "operasi", "asetlahan", "sewa", "pengadaan", "alokasi"):
         assert f"{name}_contoh_rempang --hapus" in out.getvalue()
     assert "pengguna_contoh --hapus" in out.getvalue()

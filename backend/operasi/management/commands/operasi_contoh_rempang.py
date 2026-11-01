@@ -8,17 +8,22 @@ lahan, kesesuaian RTRW, pilihan penyelesaian), laporan kegiatan, uji tanah,
 tugas wilayah, Komsos, temuan ilegal, patroli Taman Buru (temuan & bibit),
 kegiatan lainnya dengan penilaian dampak, bidang penguasaan lahan, zona
 ancaman, lapisan RTRW contoh, titik uji tanah PLTS, dan tiket masukan untuk
-pusat komando. Semua nama dan kode fiktif; tidak ada NIK.
+pusat komando, foto kegiatan, riwayat sikap & luas lahan warga, sesi patroli
+SMART (jalur, observasi, foto), foto 360°, serta foto & riwayat titik PLTS.
+Semua nama dan kode fiktif; tidak ada NIK. Bila data contoh lama sudah ada,
+bagian yang baru dilengkapi.
 
-Rantai komando contoh (tugas berpoin dan laporan harian berjenjang) dibuat oleh
-``pengguna_contoh`` lewat :func:`komando_demo` karena memerlukan akun contoh.
+Rantai komando contoh (tugas berpoin, laporan harian berjenjang & lampirannya,
+absensi, obrolan Korwil, SOS yang sudah selesai, posisi & jejak GPS petugas,
+analisis citra area) dibuat oleh ``pengguna_contoh`` lewat :func:`komando_demo`
+karena memerlukan akun contoh.
 """
 
 import datetime
 import random
 
 from django.contrib.auth import get_user_model
-from django.contrib.gis.geos import MultiPolygon, Point, Polygon
+from django.contrib.gis.geos import LineString, MultiPolygon, Point, Polygon
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils import timezone
@@ -28,25 +33,41 @@ from asetlahan.models import MapOverlay, MapOverlayFeature, Task
 from operasi import enums, geotech, spatial, task_flow, tools
 from operasi.models import (
     Activity,
+    ActivityPhoto,
+    AreaAnalysis,
+    Attendance,
+    ChatMessage,
     DailyReport,
+    DailyReportAttachment,
     DailyReportEvent,
+    GeotechChange,
+    GeotechPhoto,
     GeotechPoint,
     HuntingParkFinding,
     HuntingParkPatrol,
     IllegalFinding,
     IllegalFindingVisit,
     Korwil,
+    LandAreaChange,
     LandPlot,
     LandPlotChange,
+    OfficerPosition,
     OfficerProfile,
+    OfficerTrackPoint,
+    PatrolObservation,
+    PatrolPhoto,
+    PatrolSession,
     Resident,
     Seedling,
+    SitePhoto360,
     SoilTest,
+    SosAlert,
     StanceChange,
     TaskEvent,
     ThreatZone,
     Ticket,
 )
+from utils.sample_files import delete_files, jpeg_upload, pdf_upload, png_upload
 
 MARK = "[contoh]"
 
@@ -167,17 +188,51 @@ class Command(BaseCommand):
             return
         codes = [row[0] for row in KORWILS]
         if Korwil.objects.filter(code__in=codes).exists():
+            added = (
+                self._extras()
+                if Korwil.objects.filter(note__startswith=MARK).exists()
+                else 0
+            )
             self.stdout.write(
-                "Korwil A–K sudah ada; data contoh dilewati (jalankan --hapus dahulu "
-                "untuk membuat ulang data contoh)."
+                "Korwil A–K sudah ada; data contoh dilewati"
+                + (f" ({added} bagian baru dilengkapi)." if added else ".")
+                + " Jalankan --hapus dahulu untuk membuat ulang data contoh."
             )
             return
         self._create()
+        self._extras()
         self.stdout.write(self.style.SUCCESS("Data contoh pusat komando dibuat."))
 
     def _delete(self):
         korwils = Korwil.objects.filter(note__startswith=MARK)
         delete_komando_demo()
+        sessions = PatrolSession.objects.filter(name__startswith=MARK)
+        delete_files(
+            *(
+                photo.photo
+                for photo in PatrolPhoto.objects.filter(
+                    observation__session__in=sessions
+                )
+            )
+        )
+        sessions.delete()
+        photos360 = SitePhoto360.objects.filter(title__startswith=MARK)
+        delete_files(*(p.image for p in photos360))
+        photos360.delete()
+        delete_files(
+            *(
+                p.photo
+                for p in ActivityPhoto.objects.filter(
+                    activity__description__startswith=MARK
+                )
+            ),
+            *(
+                p.image
+                for p in GeotechPhoto.objects.filter(
+                    point__survey_note__startswith=MARK
+                )
+            ),
+        )
         GeotechPoint.objects.filter(survey_note__startswith=MARK).delete()
         Ticket.objects.filter(title__startswith=MARK).delete()
         LandPlot.objects.filter(note__startswith=MARK).delete()
@@ -314,6 +369,140 @@ class Command(BaseCommand):
             )
         self._spatial(user)
         self._tools(user)
+
+    def _extras(self) -> int:  # noqa: C901
+        """Bagian yang ditambahkan belakangan (idempoten)."""
+        user = get_user_model().objects.filter(is_superuser=True).order_by("pk").first()
+        rng = random.Random(20261102)
+        now = timezone.now()
+        added = 0
+        activities = Activity.objects.filter(description__startswith=MARK)
+        if not ActivityPhoto.objects.filter(activity__in=activities).exists():
+            for activity in activities.order_by("pk")[:6]:
+                ActivityPhoto.objects.create(
+                    activity=activity,
+                    photo=jpeg_upload(f"Foto kegiatan {activity.pk}"),
+                    caption=f"{MARK} Dokumentasi {activity.title}",
+                    location=activity.location,
+                )
+            added += 1
+        residents = Resident.objects.filter(note__startswith=MARK).order_by("pk")
+        if not StanceChange.objects.filter(resident__in=residents).exists():
+            for resident in residents[:4]:
+                old = (
+                    enums.Stance.NEUTRAL
+                    if resident.stance != enums.Stance.NEUTRAL
+                    else enums.Stance.UNKNOWN
+                )
+                StanceChange.objects.create(
+                    resident=resident,
+                    old_stance=old,
+                    new_stance=resident.stance,
+                    changed_by=user,
+                )
+            for resident in residents[4:7]:
+                new_area = resident.land_area_m2 or 600
+                LandAreaChange.objects.create(
+                    resident=resident,
+                    old_area_m2=None,
+                    new_area_m2=new_area,
+                    changed_by=user,
+                )
+                if resident.land_area_m2 is None:
+                    Resident.objects.filter(pk=resident.pk).update(
+                        land_area_m2=new_area
+                    )
+            added += 1
+        if not PatrolSession.objects.filter(name__startswith=MARK).exists():
+            patrol = (
+                Activity.objects.filter(
+                    description__startswith=MARK,
+                    activity_type=enums.ActivityType.HUNTING_PARK,
+                )
+                .select_related("korwil")
+                .first()
+            )
+            if patrol is not None:
+                self._patrol_session(rng, patrol, user, now)
+                added += 1
+        if not SitePhoto360.objects.filter(title__startswith=MARK).exists():
+            for code in ("A", "E"):
+                korwil = Korwil.objects.filter(code=code, note__startswith=MARK).first()
+                if korwil is None:
+                    continue
+                SitePhoto360.objects.create(
+                    title=f"{MARK} Panorama 360° Korwil {code}",
+                    korwil=korwil,
+                    location=korwil.geometry.centroid,
+                    captured_on=timezone.localdate() - datetime.timedelta(days=4),
+                    image=jpeg_upload(
+                        f"Panorama 360 Korwil {code}", size=(1024, 512), color="#2e7d5b"
+                    ),
+                    uploaded_by=user,
+                    note="Foto panorama fiktif.",
+                )
+            added += 1
+        points = GeotechPoint.objects.filter(survey_note__startswith=MARK).order_by(
+            "pk"
+        )
+        if not GeotechPhoto.objects.filter(point__in=points).exists():
+            for point in points[:3]:
+                GeotechPhoto.objects.create(
+                    point=point,
+                    image=jpeg_upload(f"Uji tanah {point.code}", color="#8d6e63"),
+                    caption=f"{MARK} Lubang uji {point.code}",
+                    uploaded_by=user,
+                )
+                GeotechChange.objects.create(
+                    point=point,
+                    field="Status pekerjaan",
+                    old_value="Belum dikerjakan",
+                    new_value=str(point.get_work_status_display()),
+                    note=f"{MARK} Pembaruan contoh",
+                    source="Panel admin",
+                    changed_by=user,
+                )
+            added += 1
+        return added
+
+    def _patrol_session(self, rng, activity, user, now):
+        start = activity.location
+        coords = [
+            (start.x + i * 0.0012, start.y + (0.0008 if i % 2 else 0) - i * 0.0004)
+            for i in range(6)
+        ]
+        session = PatrolSession.objects.create(
+            activity=activity,
+            korwil=activity.korwil,
+            smart_patrol_id=f"SMART-CONTOH-{activity.korwil.code}",
+            name=f"{MARK} Patroli SMART kawasan Taman Buru",
+            started_at=now - datetime.timedelta(days=2, hours=5),
+            ended_at=now - datetime.timedelta(days=2, hours=1),
+            leader="Ketua Regu Contoh",
+            team="Regu A",
+            station="Pos Contoh",
+            transport="Jalan kaki",
+            comments="Jalur aman; jejak satwa di dua titik.",
+            distance_m=3200,
+            track=LineString(coords, srid=4326),
+            source_name="patroli-contoh.xml",
+            uploaded_by=user,
+        )
+        for seq, (x, y) in enumerate(coords[1:5], 1):
+            observation = PatrolObservation.objects.create(
+                session=session,
+                seq=seq,
+                kind="Observation" if seq % 2 else "Waypoint",
+                location=Point(x, y, srid=4326),
+                observed_at=session.started_at + datetime.timedelta(minutes=40 * seq),
+                comment=f"{MARK} Titik pengamatan {seq}",
+                leg_distance_m=rng.randint(300, 900),
+            )
+            if seq == 1:
+                PatrolPhoto.objects.create(
+                    observation=observation,
+                    photo=jpeg_upload("Jejak satwa", color="#5d7a3a"),
+                )
 
     def _tools(self, user):
         """Titik uji tanah PLTS dan tiket masukan (fiktif)."""
@@ -680,9 +869,34 @@ DEMO_EVENTS = {
 }
 
 
+SAMPLE_AI_MODEL = "contoh"
+SAMPLE_DOMAIN = "contoh.simlahan.invalid"
+
+
 def delete_komando_demo():
-    """Hapus tugas & laporan harian contoh (dipanggil sebelum akun contoh dihapus)."""
+    """Hapus data rantai komando contoh (dipanggil sebelum akun contoh dihapus)."""
+    attendances = Attendance.objects.filter(note__startswith=MARK)
+    delete_files(
+        *(
+            field
+            for a in attendances
+            for field in (a.check_in_photo, a.check_out_photo, a.attachment)
+        )
+    )
+    attendances.delete()
+    ChatMessage.objects.filter(body__startswith=MARK).delete()
+    SosAlert.objects.filter(message__startswith=MARK).delete()
+    OfficerPosition.objects.filter(user__email__iendswith=f"@{SAMPLE_DOMAIN}").delete()
+    OfficerTrackPoint.objects.filter(
+        user__email__iendswith=f"@{SAMPLE_DOMAIN}"
+    ).delete()
+    analyses = AreaAnalysis.objects.filter(ai_model=SAMPLE_AI_MODEL)
+    delete_files(*(a.image for a in analyses))
+    analyses.delete()
     reports = DailyReport.objects.filter(content__startswith=MARK)
+    delete_files(
+        *(a.file for a in DailyReportAttachment.objects.filter(report__in=reports))
+    )
     DailyReport.objects.filter(consolidated_into__in=reports).update(
         consolidated_into=None
     )
@@ -710,8 +924,15 @@ def komando_demo(leader, coordinator, officer, korwil):
         },
     )
     OfficerProfile.objects.get_or_create(user=leader, defaults={"position": "Pimpinan"})
-    if Task.objects.filter(title__startswith=MARK, assignee=officer).exists():
-        return
+    if not Task.objects.filter(title__startswith=MARK, assignee=officer).exists():
+        _demo_tasks(leader, coordinator, officer, korwil)
+    else:
+        _demo_attachment(officer)
+    if not Attendance.objects.filter(user=officer, note__startswith=MARK).exists():
+        _demo_field(leader, coordinator, officer, korwil)
+
+
+def _demo_tasks(leader, coordinator, officer, korwil):
     now = timezone.now()
     today = timezone.localdate()
     for title, kind, points, due, steps in DEMO_TASKS:
@@ -773,12 +994,174 @@ def komando_demo(leader, coordinator, officer, korwil):
         target=leader,
         created_at=yesterday,
     )
-    _demo_report(
+    today_report = _demo_report(
         officer,
         coordinator,
         korwil,
         now - datetime.timedelta(hours=1),
         "Sosialisasi jadwal pengukuran disiapkan; pendataan ulang KK berlanjut.",
+    )
+    _demo_attachment(officer, today_report)
+
+
+def _demo_attachment(officer, report=None):
+    """Lampiran laporan harian contoh (juga untuk data contoh versi lama)."""
+    reports = DailyReport.objects.filter(author=officer, content__startswith=MARK)
+    if DailyReportAttachment.objects.filter(report__in=reports).exists():
+        return
+    report = report or reports.order_by("-pk").first()
+    if report is None:
+        return
+    DailyReportAttachment.objects.create(
+        report=report,
+        file=pdf_upload(
+            "Daftar hadir sosialisasi", ("Lampiran laporan harian contoh.",)
+        ),
+        name="daftar-hadir-sosialisasi-contoh.pdf",
+        uploaded_by=officer,
+    )
+
+
+def _demo_field(leader, coordinator, officer, korwil):
+    """Absensi, obrolan, SOS selesai, posisi & jejak GPS, dan analisis citra."""
+    from operasi.satellite import data_summary
+
+    now = timezone.now()
+    today = timezone.localdate()
+    # Korwil tanpa batas wilayah (dibuat manual) memakai titik acuan Rempang.
+    center = (
+        korwil.geometry.centroid if korwil.geometry else Point(104.12, 0.89, srid=4326)
+    )
+    near = [
+        Point(center.x + dx, center.y + dy, srid=4326)
+        for dx, dy in ((0.0006, 0.0004), (-0.0005, 0.0007), (0.0009, -0.0003))
+    ]
+    S = enums.AttendanceStatus
+    for user, days, status, note, approval in (
+        (officer, 0, S.PRESENT, "Hadir tepat waktu.", ""),
+        (officer, 1, S.LATE, "Terlambat karena ban bocor.", ""),
+        (officer, 2, S.SICK, "Demam, surat dokter terlampir.",
+         enums.LeaveApproval.APPROVED),
+        (officer, -1, S.DUTY, "Rapat koordinasi di kecamatan.",
+         enums.LeaveApproval.PENDING),
+        (coordinator, 0, S.PRESENT, "Hadir.", ""),
+    ):  # fmt: skip
+        date = today - datetime.timedelta(days=days)
+        moment = timezone.make_aware(
+            datetime.datetime.combine(date, datetime.time(7, 45 if days else 30))
+        )
+        present = status in (S.PRESENT, S.LATE)
+        defaults = {
+            "korwil": korwil,
+            "status": status,
+            "note": f"{MARK} {note}",
+            "approval": approval,
+            "approved_by": (
+                coordinator if approval == enums.LeaveApproval.APPROVED else None
+            ),
+            "approved_at": now if approval == enums.LeaveApproval.APPROVED else None,
+        }
+        if present:
+            defaults.update(
+                check_in_at=moment,
+                check_in_location=near[0],
+                check_in_accuracy_m=8,
+                check_in_in_area=True,
+                check_in_photo=jpeg_upload(f"Swafoto absen {user.username}"),
+            )
+            if days:
+                defaults.update(
+                    check_out_at=moment + datetime.timedelta(hours=9),
+                    check_out_location=near[1],
+                    check_out_accuracy_m=10,
+                    check_out_in_area=True,
+                )
+        elif status == S.SICK:
+            defaults["attachment"] = pdf_upload("Surat keterangan sakit")
+        Attendance.objects.update_or_create(user=user, date=date, defaults=defaults)
+
+    for minutes, sender, body, is_system in (
+        (180, None, "Absensi pagi dibuka.", True),
+        (170, coordinator, "Pagi tim, fokus pendataan RT 02 hari ini.", False),
+        (160, officer, "Siap, saya mulai dari rumah ujung jalan.", False),
+        (30, officer, "Pendataan 6 KK selesai, lanjut dokumentasi jalan.", False),
+    ):
+        message = ChatMessage.objects.create(
+            korwil=korwil,
+            sender=sender,
+            body=f"{MARK} {body}",
+            location=near[2] if sender is officer else None,
+            is_system=is_system,
+        )
+        ChatMessage.objects.filter(pk=message.pk).update(
+            created_at=now - datetime.timedelta(minutes=minutes)
+        )
+
+    SosAlert.objects.create(
+        raised_by=officer,
+        korwil=korwil,
+        location=near[1],
+        accuracy_m=12,
+        message=f"{MARK} Motor mogok di jalan hutan, minta jemput.",
+        status=enums.SosStatus.RESOLVED,
+        acknowledged_by=coordinator,
+        acknowledged_at=now - datetime.timedelta(days=3, hours=2),
+        resolved_by=coordinator,
+        resolved_at=now - datetime.timedelta(days=3, hours=1),
+        resolution_note="Dijemput tim; petugas aman (contoh).",
+    )
+
+    for user, point, minutes, battery in (
+        (officer, near[2], 4, 76),
+        (coordinator, near[0], 12, 58),
+    ):
+        OfficerPosition.objects.update_or_create(
+            user=user,
+            defaults={
+                "location": point,
+                "accuracy_m": 9,
+                "heading": 90,
+                "speed_mps": 0.8,
+                "battery_pct": battery,
+                "updated_at": now - datetime.timedelta(minutes=minutes),
+            },
+        )
+    for step in range(12):
+        OfficerTrackPoint.objects.create(
+            user=officer,
+            location=Point(
+                center.x - 0.003 + step * 0.0003,
+                center.y - 0.002 + (step % 3) * 0.0002,
+                srid=4326,
+            ),
+            accuracy_m=8,
+            recorded_at=now - datetime.timedelta(minutes=5 + (11 - step) * 10),
+        )
+
+    box = Polygon.from_bbox(
+        (center.x - 0.004, center.y - 0.003, center.x + 0.004, center.y + 0.003)
+    )
+    box.srid = 4326
+    AreaAnalysis.objects.create(
+        bbox=box,
+        requested_by=coordinator,
+        zoom=17,
+        image=png_upload("Mosaik citra area contoh", color="#3d6b4f"),
+        data_summary=data_summary(box, coordinator),
+        ai_model=SAMPLE_AI_MODEL,
+        ai_result={
+            "tutupan_lahan": {
+                "vegetasi_pct": 62,
+                "bangunan_pct": 9,
+                "lahan_terbuka_pct": 18,
+                "air_pct": 7,
+                "jalan_pct": 4,
+            },
+            "perkiraan_jumlah_bangunan": 14,
+            "temuan": ["Permukiman kecil di sisi barat", "Pembukaan lahan baru ±1 ha"],
+            "rekomendasi": ["Verifikasi lapangan pembukaan lahan baru"],
+            "ringkasan": f"{MARK} Hasil analisis fiktif untuk uji coba tampilan.",
+        },
     )
 
 

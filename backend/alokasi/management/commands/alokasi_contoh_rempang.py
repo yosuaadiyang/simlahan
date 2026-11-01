@@ -5,18 +5,25 @@ python manage.py alokasi_contoh_rempang --hapus  # hapus lahan contoh yang belum
 
 Termasuk profil portal investasi: sektor, dua kawasan investasi contoh, lahan
 yang dapat disewa, insentif, jarak, dan utilitas, serta tarif UWT per wilayah
-contoh untuk simulasi biaya di portal.
+contoh untuk simulasi biaya di portal, dan pesan Kontak Kami contoh.
+
+Permohonan alokasi contoh (beragam status, tagihan, KPT/PPT/PL, laporan
+pembangunan, peralihan hak) dibuat oleh ``pengguna_contoh`` karena memerlukan
+akun pemohon dan petugas contoh.
 """
 
+import datetime
 from decimal import Decimal
 
 from django.contrib.gis.geos import MultiPolygon, Polygon
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from django.utils import timezone
 
 from alokasi import enums
 from alokasi.importers import area_m2
 from alokasi.models import (
+    ContactMessage,
     InvestmentSector,
     InvestmentZone,
     LandPlot,
@@ -274,6 +281,67 @@ def _uwt_tariffs() -> int:
     return count
 
 
+CONTACT_DOMAIN = "contoh.simlahan.invalid"
+CONTACT_MARK = "[contoh]"
+# (nama, subjek, isi, status, balasan, hari lalu)
+CONTACT_MESSAGES = [
+    (
+        "Warga Contoh Sembulang",
+        "Jadwal sosialisasi alokasi lahan",
+        "Kapan jadwal sosialisasi alokasi lahan untuk warga Sembulang?",
+        ContactMessage.Status.NEW,
+        "",
+        1,
+    ),
+    (
+        "Calon Investor Contoh",
+        "Syarat permohonan alokasi untuk PMA",
+        "Dokumen apa saja yang perlu disiapkan perusahaan PMA?",
+        ContactMessage.Status.IN_PROGRESS,
+        "",
+        3,
+    ),
+    (
+        "Konsultan Contoh",
+        "Simulasi UWT kawasan pariwisata",
+        "Mohon penjelasan perbedaan tarif UWT baru dan perpanjangan.",
+        ContactMessage.Status.DONE,
+        "Tarif perpanjangan berlaku untuk alokasi yang masa berlakunya diperpanjang; "
+        "lihat menu Simulasi Biaya. (contoh)",
+        8,
+    ),
+]
+
+
+def sample_contact_messages():
+    return ContactMessage.objects.filter(email__iendswith=f"@{CONTACT_DOMAIN}")
+
+
+def _contact_messages() -> int:
+    created = 0
+    now = timezone.now()
+    for index, (name, subject, body, status, reply, days) in enumerate(
+        CONTACT_MESSAGES, 1
+    ):
+        _message, was_created = ContactMessage.objects.get_or_create(
+            email=f"kontak{index}@{CONTACT_DOMAIN}",
+            subject=f"{CONTACT_MARK} {subject}",
+            defaults={
+                "created_at": now - datetime.timedelta(days=days),
+                "name": name,
+                "phone": f"08120000000{index}",
+                "body": body,
+                "status": status,
+                "reply": reply,
+                "replied_at": (
+                    now - datetime.timedelta(days=days - 1) if reply else None
+                ),
+            },
+        )
+        created += was_created
+    return created
+
+
 def _box(x1, y1, x2, y2):
     return MultiPolygon(
         Polygon(((x1, y1), (x2, y1), (x2, y2), (x1, y2), (x1, y1))), srid=4326
@@ -314,6 +382,7 @@ class Command(BaseCommand):
                 .get("alokasi.InvestmentZone", 0)
             )
             UwtRegion.objects.filter(name=UWT_REGION).delete()
+            sample_contact_messages().delete()
             self.stdout.write(
                 self.style.SUCCESS(
                     f"{count} lahan contoh dan {zones} kawasan contoh dihapus."
@@ -400,6 +469,7 @@ class Command(BaseCommand):
             )
             created += was_created
         tariffs = _uwt_tariffs()
+        _contact_messages()
         self.stdout.write(
             self.style.SUCCESS(
                 f"{created} lahan contoh dibuat, {len(PLOTS) - created} diperbarui; "

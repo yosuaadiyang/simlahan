@@ -17,6 +17,12 @@ perintah data contoh itu lebih dahulu, lalu perintah ini sekali lagi). Di pusat
 komando, Petugas Lapangan melapor ke Koordinator Wilayah dan Koordinator Wilayah
 ke Administrator, lengkap dengan tugas berpoin dan laporan harian berjenjang contoh.
 
+Pemohon contoh mendapat permohonan alokasi beragam status (draf, verifikasi,
+perbaikan, ditolak, menunggu verifikasi bayar, alokasi aktif dengan KPT/PPT/PL,
+laporan pembangunan, surat rekomendasi, dan peralihan hak ke investor contoh)
+lewat ``alokasi.sample_applications``. Petugas aset & lapangan contoh mendapat
+tim, laporan lapangan, dan dokumen aset contoh.
+
 Investor contoh (``investor@contoh.simlahan.invalid``) mendapat lahan tersimpan
 dan tiga permintaan investasi contoh (diajukan, konsultasi terjadwal, penawaran
 menunggu jawaban) di lahan ``alokasi_contoh_rempang``. Data itu dibuat tanpa
@@ -47,6 +53,14 @@ from alokasi.models import (
     InvestmentZone,
     LandPlot,
     SavedPlot,
+)
+from alokasi.sample_applications import delete_permohonan_demo, permohonan_demo
+from asetlahan.management.commands.asetlahan_contoh_rempang import (
+    aset_demo,
+    delete_aset_demo,
+)
+from dokumen.management.commands.dokumen_contoh_rempang import (
+    delete_saved_signatures,
 )
 from leasing.models import ServiceUnit
 from operasi.management.commands.operasi_contoh_rempang import MARK as KORWIL_MARK
@@ -212,7 +226,38 @@ class Command(BaseCommand):
         self._assign_scopes(User)
         rows.append(self._applicant(fixed, renew))
         rows.append(self._investor(fixed, renew))
+        self._applications()
+        self._module_demos()
         return rows
+
+    def _applications(self):
+        applicants = {
+            a.user.email.lower(): a
+            for a in Applicant.objects.filter(
+                user__email__in=[APPLICANT_EMAIL, INVESTOR_EMAIL]
+            ).select_related("user")
+        }
+        officers = {u.username: u for u in sample_users()}
+        created = permohonan_demo(
+            applicants.get(APPLICANT_EMAIL),
+            applicants.get(INVESTOR_EMAIL),
+            officers.get("contoh.alokasi"),
+            officers.get("contoh.verifikasi"),
+        )
+        if created:
+            self.stdout.write(f"{created} permohonan alokasi contoh dibuat.")
+        elif not LandPlot.objects.filter(
+            code__startswith=alokasi_samples.PREFIX
+        ).exists():
+            self.stdout.write(
+                "Lahan contoh belum ada: pemohon contoh belum punya permohonan "
+                "(jalankan alokasi_contoh_rempang lalu perintah ini lagi)."
+            )
+
+    def _module_demos(self):
+        """Data contoh modul lain yang memerlukan akun petugas contoh."""
+        officers = {u.username: u for u in sample_users()}
+        aset_demo(officers)
 
     def _portal_user(self, email, last_name, fixed, renew):
         User = get_user_model()
@@ -540,6 +585,13 @@ class Command(BaseCommand):
 
     def _delete(self):
         delete_komando_demo()
+        delete_aset_demo()
+        delete_saved_signatures(sample_users())
+        applications = delete_permohonan_demo(
+            Applicant.objects.filter(user__in=sample_users())
+        )
+        if applications:
+            self.stdout.write(f"{applications} permohonan alokasi akun contoh dihapus.")
         removed = self._delete_investment_samples()
         if removed:
             self.stdout.write(f"{removed} permintaan investasi akun contoh dihapus.")

@@ -558,14 +558,16 @@ class AnswerSerializer(serializers.ModelSerializer):
         )
         validators = [
             RequiredFormFieldValidator(),
+            # NIK (16 digit) dan NPWP (15/16 digit, boleh berformat
+            # 01.234.567.8-901.000), sama dengan validasi di SPA.
             FieldRegexValidator(
-                "^[0-9]{6}[+AaBbCcDdEeFfYyXxWwVvUu-][0-9]{3}[A-z0-9]$",
+                r"^\d{16}$",
                 "invalid_ssn",
                 "henkilotunnus",
                 _("Invalid personal identity code"),
             ),
             FieldRegexValidator(
-                "[0-9]{6,7}-?[0-9]{1}$",
+                r"^(\d{15}|\d{16}|\d{2}\.\d{3}\.\d{3}\.\d-\d{3}\.\d{3})$",
                 "invalid_company_id",
                 "y-tunnus",
                 _("Invalid business ID"),
@@ -604,9 +606,12 @@ class AnswerSerializer(serializers.ModelSerializer):
         return information_checks
 
     def entry_generator(
-        self, entries, path="", sections=None, fields=None, metadata={}
+        self, entries, path="", sections=None, fields=None, metadata=None
     ):
-        if "metadata" in entries:
+        # Salinan per jalur: dict bawaan bersama dulu ikut terbawa ke jawaban
+        # lain dalam proses yang sama (termasuk NIK/NPWP pemohon sebelumnya).
+        metadata = dict(metadata or {})
+        if isinstance(entries, dict) and isinstance(entries.get("metadata"), dict):
             metadata.update(entries["metadata"])
         if "sections" in entries and entries["sections"] is not None:
             yield from self.entry_generator(
