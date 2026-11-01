@@ -508,7 +508,7 @@
       <button type="button" class="btn" data-buka="historis">🕰️<span>Historis</span></button>
       <button type="button" class="btn" data-buka="feed">📰<span>Feed aktivitas</span></button>
       <button type="button" class="btn" data-buka="ai">🤖<span>Asisten AI</span></button>
-      <a class="btn" href="{{ komando_config.urls.main }}">🏠<span>Aplikasi utama</span></a>
+      {% for link in app_links %}{% if link.key != "komando" %}<a class="btn" href="{{ link.url }}">{{ link.icon }}<span>{{ link.label }}</span></a>{% endif %}{% endfor %}
       <a class="btn" href="/akun/panduan/">📘<span>Panduan peran</span></a>
       <a class="btn" href="/akun/sandi/">🔑<span>Ganti sandi</span></a>
     </div>

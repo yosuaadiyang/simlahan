@@ -34,8 +34,9 @@ const LoginShell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
       {children}
       {/* Pusat komando punya halaman masuk sendiri, seperti portal publik. */}
       <nav className="login-page__switch" aria-label="Aplikasi lain">
-        <a href="/komando/masuk/">⇄ Masuk ke Pusat Komando</a>
-        <a href="/portal/">Portal publik</a>
+        <a href="/komando/masuk/">⇄ Pusat Komando</a>
+        <a href="/admin/login/">⇄ Panel admin</a>
+        <a href="/portal/">⇄ Portal</a>
       </nav>
       <p className="login-page__footnote">
         {APP_NAME} · {ORGANIZATION_NAME}

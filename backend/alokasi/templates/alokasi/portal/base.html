@@ -33,6 +33,9 @@
       {% if portal_applicant %}
         <a href="{% url 'portal:dashboard' %}"{% if name == 'dashboard' %} class="active"{% endif %}>Akun Saya</a>
         <form method="post" action="{% url 'portal:logout' %}">{% csrf_token %}<button type="submit">Keluar</button></form>
+      {% elif user.is_authenticated and app_links.0.key != "portal" %}
+        {# Petugas tidak mendaftar sebagai pemohon: tampilkan jalan kembali. #}
+        <a class="switch" href="{{ app_links.0.url }}" title="Kembali ke aplikasi petugas">⇄ Aplikasi petugas</a>
       {% else %}
         <a href="{% url 'portal:login' %}"{% if name == 'login' %} class="active"{% endif %}>Masuk</a>
         <a class="cta" href="{% url 'portal:register' %}">Daftar</a>
@@ -66,6 +69,12 @@
       <a href="{% url 'portal:info_category' 'tutorial' %}">Video tutorial</a><br>
       <a href="{% url 'portal:info_category' 'faq' %}">Tanya jawab</a>
     </div>
+    {% if app_links.0.key != "portal" %}
+    <div>
+      <strong>{% if user.is_authenticated %}Aplikasi petugas{% else %}Masuk petugas{% endif %}</strong><br>
+      {% for link in app_links %}{% if link.key != "portal" %}<a href="{{ link.url }}">⇄ {{ link.label }}</a><br>{% endif %}{% endfor %}
+    </div>
+    {% endif %}
     <div class="small">Seluruh layanan permohonan dilakukan secara daring melalui portal ini. Waspadai pihak yang mengatasnamakan petugas.</div>
   </div>
 </footer>

@@ -3,4 +3,4 @@
 {% block code %}403{% endblock %}
 {% block heading %}Tidak berhak{% endblock %}
 {% block message %}Akun Anda belum diberi hak mengirim laporan lapangan. Minta administrator menambahkan Anda ke grup Petugas Lapangan atau Petugas Aset.{% endblock %}
-{% block actions %}<a href="{% url 'admin:index' %}">Kembali ke panel petugas</a>{% endblock %}
+{% block actions %}{% for link in app_links %}{% if link.key != "lapangan" %}<a href="{{ link.url }}">⇄ {{ link.label }}</a>{% endif %}{% empty %}<a href="{% url 'admin:index' %}">Kembali ke panel petugas</a>{% endfor %}{% endblock %}

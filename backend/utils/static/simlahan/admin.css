@@ -251,6 +251,9 @@ a:focus {
   position: sticky;
   top: 0;
   z-index: 1000;
+  /* #container adalah kolom flex setinggi layar: tanpa ini bilah atas ikut
+     menyusut dan tombol yang terlipat menutupi isi halaman. */
+  flex: none;
   min-height: 60px;
   padding: 8px 24px;
   gap: 16px;
@@ -263,6 +266,8 @@ a:focus {
 
 #branding {
   align-items: center;
+  flex: none;
+  max-width: 100%;
   min-width: 0;
 }
 
@@ -341,7 +346,7 @@ a:focus {
   color: var(--body-loud-color) !important;
 }
 
-/* Tombol pindah ke pusat komando (aplikasi terpisah di /komando/). */
+/* Tombol pindah ke aplikasi lain (utama, pusat komando, aplikasi lapangan, portal). */
 #user-tools a.sl-switch {
   border: 1px solid var(--border-color);
   color: var(--link-fg) !important;
@@ -1505,6 +1510,13 @@ div.dj_map {
 }
 
 /* ===================================================== Responsif */
+/* Empat tombol pindah aplikasi + menu akun harus muat satu baris. */
+@media (max-width: 1366px) {
+  #user-tools .sl-welcome {
+    display: none;
+  }
+}
+
 @media (max-width: 1024px) {
   #header {
     padding: 8px 16px;
@@ -1525,6 +1537,9 @@ div.dj_map {
 
 @media (max-width: 767px) {
   #header {
+    /* Di HP tombol terlipat jadi beberapa baris: jangan menempel di atas
+       agar tidak menutupi sebagian besar layar saat menggulir. */
+    position: relative;
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
@@ -1546,7 +1561,7 @@ div.dj_map {
   #user-tools {
     flex: 1 1 100%;
     justify-content: flex-start;
-    margin: 0 -10px;
+    margin: 0;
     font-size: 0.8125rem;
   }
 
@@ -1642,4 +1657,23 @@ div.dj_map {
   .results {
     box-shadow: none;
   }
+}
+
+/* Halaman masuk panel: tautan ke pintu masuk aplikasi lain. */
+.sl-login-switch {
+  /* #content-main mengambang (float): tanpa clear, kotak flex ini
+     menyempit di sampingnya. */
+  clear: both;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 14px;
+  margin: 18px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--hairline-color);
+  font-size: 13px;
+}
+
+.sl-login-switch a {
+  font-weight: 600;
 }

@@ -123,7 +123,7 @@ def test_forbidden_page_offers_switch_and_other_account(seeded, units):
     response = login(plain).get("/komando/")
     assert response.status_code == 403
     body = response.content.decode()
-    assert "Aplikasi utama" in body and 'action="/komando/keluar/"' in body
+    assert "⇄ Panel admin" in body and 'action="/komando/keluar/"' in body
 
     plain.is_staff = False
     plain.save()

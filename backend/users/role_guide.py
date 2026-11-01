@@ -82,7 +82,8 @@ COMMAND_TABS = (
     "uji/resistivitas/sondir/termal, aksi cepat, foto, riwayat, impor & unduh "
     "Excel), Alat & tiket (tiket & masukan, OCR dokumen, AI dokumen → laporan, "
     "AI foto lapangan, audit data bagi koordinator, cek perangkat, sinkron "
-    "Excel), Aplikasi utama; tombol **⇄ Utama** di bilah atas"
+    "Excel), pindah ke aplikasi lain (utama, panel admin, aplikasi lapangan, "
+    "portal) sesuai hak; tombol **⇄ Utama** di bilah atas"
 )
 
 ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
@@ -684,6 +685,13 @@ GENERAL_STEPS = (
         "**Pusat Komando** di bilah atas aplikasi utama dan panel admin, dan "
         "tombol **⇄ Utama** di bilah atas pusat komando. **Keluar** di salah "
         "satunya mengakhiri keduanya di perangkat itu.",
+    ),
+    (
+        "Pindah aplikasi",
+        "Setiap halaman (aplikasi utama, panel admin, pusat komando, aplikasi "
+        "lapangan, portal, dan halaman akun) punya tombol **⇄** ke aplikasi lain "
+        "yang boleh Anda buka. Halaman masuk dan halaman galat menautkan ke "
+        "halaman masuk aplikasi lain.",
     ),
     (
         "Kode OTP",

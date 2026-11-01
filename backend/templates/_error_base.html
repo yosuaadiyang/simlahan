@@ -41,7 +41,7 @@
     <h1>{% block heading %}{% endblock %}</h1>
     <p>{% block message %}{% endblock %}</p>
     {% block extra %}{% endblock %}
-    <div class="actions">{% block actions %}<a href="javascript:history.back()">‹ Kembali</a><a href="/portal/">Beranda portal</a><a href="/admin/">Panel petugas</a>{% endblock %}</div>
+    <div class="actions">{% block actions %}<a href="javascript:history.back()">‹ Kembali</a>{% for link in app_links %}<a href="{{ link.url }}">{{ link.label }}</a>{% empty %}<a href="/portal/">Beranda portal</a><a href="/admin/">Panel petugas</a>{% endfor %}{% endblock %}</div>
   </main>
 </body>
 </html>

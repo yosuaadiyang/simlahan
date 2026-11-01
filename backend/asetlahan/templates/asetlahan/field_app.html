@@ -44,7 +44,7 @@
   </div>
   <p id="pesan" class="small" role="status"></p>
   <ul id="antrean"></ul>
-  <p class="small muted">Masuk sebagai {{ field_config.user }} · <a href="{% url 'admin:index' %}">Panel petugas</a></p>
+  <p class="small muted">Masuk sebagai {{ field_config.user }}{% for link in app_links %}{% if link.key != "lapangan" %} · <a href="{{ link.url }}">⇄ {{ link.label }}</a>{% endif %}{% endfor %}</p>
 </main>
 <script src="{% static 'alokasi/vendor/leaflet/leaflet.js' %}"></script>
 <script src="{% static 'asetlahan/field.js' %}"></script>

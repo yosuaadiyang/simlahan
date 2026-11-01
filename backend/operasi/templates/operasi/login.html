@@ -56,8 +56,7 @@
   </section>
 
   <nav class="pindah" aria-label="Aplikasi lain">
-    <a href="/">⇄ Aplikasi utama</a>
-    <a href="{% url 'portal:home' %}">Portal publik</a>
+    {% for link in app_links %}{% if link.key != "komando" %}<a href="{{ link.url }}">⇄ {{ link.label }}</a>{% endif %}{% endfor %}
   </nav>
 </main>
 <script src="{% static 'operasi/login.js' %}"></script>

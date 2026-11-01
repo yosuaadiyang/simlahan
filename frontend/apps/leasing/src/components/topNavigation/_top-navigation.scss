@@ -363,6 +363,18 @@
     }
   }
 
+  // Tiga tombol pindah aplikasi berlabel hanya muat di layar lebar; di bawah
+  // itu tampil sebagai ikon (nama aplikasi ada di tooltip & aria-label).
+  @media (max-width: 1365px) {
+    .app-switch {
+      padding: 0 rem-calc(9px);
+    }
+
+    .app-switch__label {
+      display: none;
+    }
+  }
+
   // Tablet: persempit pilihan unit layanan agar judul halaman tetap terbaca.
   @include breakpoint(large down) {
     &__right-wrapper {

@@ -38,6 +38,7 @@ type Props = {
   linkUrl: string;
   onLogout: (...args: Array<any>) => any;
   pageTitle: string;
+  showAdminPanel?: boolean;
   showCommandCenter?: boolean;
   showSearch: boolean;
   toggleSideMenu: (...args: Array<any>) => any;
@@ -103,6 +104,7 @@ class TopNavigation extends Component<Props & WithRouterProps, State> {
       isMenuOpen,
       linkUrl,
       pageTitle,
+      showAdminPanel,
       showCommandCenter,
       showSearch,
       toggleSideMenu,
@@ -312,6 +314,46 @@ class TopNavigation extends Component<Props & WithRouterProps, State> {
                     <span className="app-switch__label">Pusat Komando</span>
                   </a>
                 )}
+
+                {!!showAdminPanel && (
+                  <a
+                    className="app-switch"
+                    href="/admin/"
+                    onClick={handleExternalLinkClick}
+                    title="Pindah ke Panel admin"
+                    aria-label="Pindah ke Panel admin"
+                  >
+                    <svg
+                      className="app-switch__icon"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0" />
+                      <circle cx="16" cy="6" r="2" />
+                      <circle cx="10" cy="12" r="2" />
+                      <circle cx="18" cy="18" r="2" />
+                    </svg>
+                    <span className="app-switch__label">Panel admin</span>
+                  </a>
+                )}
+
+                <a
+                  className="app-switch"
+                  href="/portal/"
+                  onClick={handleExternalLinkClick}
+                  title="Pindah ke Portal"
+                  aria-label="Pindah ke Portal"
+                >
+                  <svg
+                    className="app-switch__icon"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
+                  </svg>
+                  <span className="app-switch__label">Portal</span>
+                </a>
 
                 <div className="username-wrapper">
                   <button

@@ -3,7 +3,7 @@
 {% block content %}
 <div class="card" style="max-width:640px">
   <h1>Halaman khusus akun pemohon</h1>
-  <p>Anda masuk dengan akun petugas. Petugas memproses permohonan melalui <a href="/admin/alokasi/">panel petugas</a>. Untuk mencoba alur pemohon, keluar lalu masuk dengan akun pemohon.</p>
+  <p>Anda masuk dengan akun petugas. Petugas memproses permohonan melalui <a href="/admin/alokasi/">panel petugas</a>{% for link in app_links %}{% if link.key != "portal" and link.key != "admin" %}, <a href="{{ link.url }}">{{ link.label|lower }}</a>{% endif %}{% endfor %}. Untuk mencoba alur pemohon, keluar lalu masuk dengan akun pemohon.</p>
   <form method="post" action="{% url 'portal:logout' %}">{% csrf_token %}<button class="btn btn-outline" type="submit">Keluar</button></form>
 </div>
 {% endblock %}

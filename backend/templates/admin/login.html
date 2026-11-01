@@ -1,0 +1,7 @@
+{% extends "admin/login.html" %}
+{# Halaman masuk panel: tautan ke pintu masuk aplikasi lain. #}
+{% block content %}{{ block.super }}
+<nav class="sl-login-switch" aria-label="Aplikasi lain">
+  {% for link in app_links %}{% if link.key != "admin" %}<a href="{{ link.url }}">⇄ {{ link.label }}</a>{% endif %}{% endfor %}
+</nav>
+{% endblock %}
