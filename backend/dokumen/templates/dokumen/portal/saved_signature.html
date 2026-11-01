@@ -1,0 +1,49 @@
+{% extends "alokasi/portal/base.html" %}{% load static %}
+{% block title %}Tanda tangan saya{% endblock %}
+{% block head %}<meta name="robots" content="noindex"><link rel="stylesheet" href="{% static 'dokumen/portal.css' %}">{% endblock %}
+{% block content %}
+<p class="small"><a href="{% url 'dokumen_portal:index' %}">‹ Dokumen &amp; perizinan</a></p>
+<h1>Tanda tangan saya</h1>
+<p class="muted">Simpan tanda tangan sekali, lalu pakai ulang setiap kali menandatangani dokumen dengan akun ini. Tanda tangan tersimpan hanya dapat dipakai setelah Anda masuk dengan akun Anda sendiri, dan tiap pemakaian tetap tercatat di jejak audit dokumen.</p>
+{% include "dokumen/portal/_nav.html" %}
+
+<div class="split">
+  <section class="card">
+    <h2>{% if saved %}Ganti tanda tangan{% else %}Aktifkan tanda tangan{% endif %}</h2>
+    <form method="post" id="dk-sign-form">{% csrf_token %}<input type="hidden" name="aksi" value="simpan">
+      {% if form.non_field_errors %}<div class="alert alert-danger">{% for e in form.non_field_errors %}{{ e }} {% endfor %}</div>{% endif %}
+      <div class="field required"><label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>{{ form.name }}{{ form.name.errors }}</div>
+      <div class="dk-sigpad" data-sigpad>
+        <div class="tabs dk-sig-tabs" role="tablist">
+          <button type="button" class="active" data-mode="gambar" role="tab" aria-selected="true">Gambar</button>
+          <button type="button" data-mode="ketik" role="tab" aria-selected="false">Ketik</button>
+        </div>
+        <canvas width="600" height="200" aria-label="Kotak tanda tangan. Gambar tanda tangan dengan jari atau tetikus." role="img"></canvas>
+        <div class="actions-row"><button type="button" class="btn btn-outline btn-small" data-clear>Hapus</button><span class="small muted" data-hint>Gambar tanda tangan di kotak di atas.</span></div>
+        {{ form.signature }}
+      </div>
+      <div class="field required"><label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>{{ form.password }}{{ form.password.errors }}</div>
+      <button type="submit" class="btn">Simpan tanda tangan</button>
+    </form>
+  </section>
+  <aside>
+    <section class="card">
+      <h2>Tersimpan</h2>
+      {% if saved %}
+      <p><img src="{{ saved.image }}" alt="Tanda tangan tersimpan {{ saved.name }}" style="max-width:100%;background:#fff;border:1px solid var(--border);border-radius:6px"></p>
+      <p class="small">{{ saved.name }} · diperbarui {{ saved.updated_at|date:"d-m-Y H.i" }}</p>
+      <details class="panel">
+        <summary>Hapus tanda tangan tersimpan</summary>
+        <form method="post">{% csrf_token %}<input type="hidden" name="aksi" value="hapus">
+          <div class="field required"><label for="dk-del-pass">Kata sandi akun</label><input id="dk-del-pass" type="password" name="password" autocomplete="current-password" required></div>
+          <button type="submit" class="btn btn-danger btn-small">Hapus</button>
+        </form>
+      </details>
+      {% else %}
+      <p class="muted small">Belum ada tanda tangan tersimpan.</p>
+      {% endif %}
+    </section>
+  </aside>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{% static 'dokumen/sign.js' %}"></script>{% endblock %}

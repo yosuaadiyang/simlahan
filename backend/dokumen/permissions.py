@@ -28,7 +28,9 @@ from dokumen.models import (
     LandUse,
     PermitRecord,
     PermitType,
+    SavedSignature,
     SigningDocument,
+    SigningField,
 )
 from utils.group_permissions import UG, GroupModelPermissions
 
@@ -66,6 +68,9 @@ DOKUMEN_GROUP_MODEL_PERMISSIONS: GroupModelPermissions = {
         ALL + SEND + ("approve_signingdocument",), ALL + SEND, V, ALL + SEND
     ),
     DocumentRecipient: _roles(ALL, ALL, V, ALL),
+    SigningField: _roles(ALL, ALL, V, ALL),
+    # Tanda tangan tersimpan hanya diubah pemiliknya sendiri lewat portal.
+    SavedSignature: _roles(V, None, None, None),
     DocumentComment: _roles(V, V, V, V),
     DownloadRequest: _roles(
         V + ("approve_downloadrequest", "approve_confidential_download"),

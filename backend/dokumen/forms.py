@@ -159,6 +159,9 @@ class SignForm(forms.Form):
         ),
         required=True,
     )
+    use_saved = forms.BooleanField(
+        label=_("Pakai tanda tangan tersimpan"), required=False
+    )
 
 
 class DeclineForm(forms.Form):
@@ -182,6 +185,134 @@ class OtpForm(forms.Form):
             }
         ),
     )
+    access_code = forms.CharField(
+        label=_("Kode akses dari petugas"),
+        max_length=64,
+        required=False,
+        widget=forms.PasswordInput(attrs={"autocomplete": "off"}),
+    )
+
+    def __init__(self, *args, needs_access_code=False, **kwargs):
+        super().__init__(*args, **kwargs)
+        if needs_access_code:
+            self.fields["access_code"].required = True
+        else:
+            del self.fields["access_code"]
+
+
+class SavedSignatureForm(forms.Form):
+    name = forms.CharField(label=_("Nama lengkap"), max_length=255, min_length=3)
+    signature = forms.CharField(
+        widget=forms.HiddenInput, required=False, max_length=600_000
+    )
+    password = forms.CharField(
+        label=_("Kata sandi akun (konfirmasi)"),
+        widget=forms.PasswordInput(attrs={"autocomplete": "current-password"}),
+    )
+
+    def __init__(self, *args, user=None, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+    def clean_password(self):
+        password = self.cleaned_data["password"]
+        if self.user is None or not self.user.check_password(password):
+            raise forms.ValidationError(_("Kata sandi salah."))
+        return password
+
+
+class ReassignForm(forms.Form):
+    user = forms.ModelChoiceField(
+        label=_("Akun penerima baru"),
+        queryset=None,
+        required=False,
+        help_text=_("Kosongkan untuk penerima tanpa akun (verifikasi kode surel)."),
+    )
+    name = forms.CharField(label=_("Nama"), max_length=255, required=False)
+    email = forms.EmailField(label=_("Surel"), required=False)
+    reason = forms.CharField(
+        label=_("Alasan penggantian"),
+        max_length=1000,
+        widget=forms.Textarea(attrs={"rows": 2}),
+    )
+
+    def __init__(self, *args, document=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["user"].queryset = recipient_user_queryset(document)
+        self.fields["user"].label_from_instance = (
+            lambda u: f"{u.get_full_name() or u.username} <{u.email}>"
+        )
+
+    def clean(self):
+        cleaned = super().clean()
+        user = cleaned.get("user")
+        if user is not None:
+            from dokumen.access import display_name
+
+            cleaned["name"] = cleaned.get("name") or display_name(user)[:255]
+            cleaned["email"] = cleaned.get("email") or user.email
+        return cleaned
+
+
+class HostedSignForm(forms.Form):
+    evidence = forms.CharField(
+        label=_("Bukti identitas yang diperiksa"),
+        max_length=255,
+        min_length=4,
+        help_text=_("Mis. KTP 2171xxxxxxxxxxxx atas nama penerima, dicocokkan wajah."),
+    )
+    confirm = forms.BooleanField(
+        label=_(
+            "Saya telah memeriksa identitas penerima secara langsung dan "
+            "menyerahkan perangkat ini kepadanya untuk menandatangani."
+        )
+    )
+
+
+class BulkSendForm(forms.Form):
+    template = forms.ModelChoiceField(label=_("Templat"), queryset=None)
+    title = forms.CharField(
+        label=_("Judul dokumen"),
+        max_length=200,
+        required=False,
+        help_text=_(
+            "Kosongkan untuk memakai nama templat; {nomor} = nomor pemanfaatan."
+        ),
+    )
+    message = forms.CharField(
+        label=_("Pesan untuk penerima"),
+        max_length=5000,
+        required=False,
+        widget=forms.Textarea(attrs={"rows": 3}),
+    )
+    countersigner = forms.ModelChoiceField(
+        label=_("Penanda tangan kedua (petugas)"),
+        queryset=None,
+        required=False,
+        help_text=_("Opsional: menandatangani setelah pemegang hak."),
+    )
+    countersigner_role = forms.CharField(
+        label=_("Peran penanda tangan kedua"), max_length=100, required=False
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from django.contrib.auth import get_user_model
+
+        from dokumen.models import DocumentTemplate
+
+        self.fields["template"].queryset = DocumentTemplate.objects.filter(
+            is_active=True, kind=enums.TemplateKind.HTML
+        ).order_by("name")
+        self.fields["countersigner"].queryset = (
+            get_user_model()
+            .objects.filter(is_active=True, is_staff=True)
+            .exclude(email="")
+            .order_by("first_name", "username")
+        )
+        self.fields["countersigner"].label_from_instance = (
+            lambda u: f"{u.get_full_name() or u.username} <{u.email}>"
+        )
 
 
 class CommentForm(forms.Form):
@@ -444,12 +575,39 @@ def recipient_user_queryset(document=None):
 class RecipientForm(forms.ModelForm):
     class Meta:
         model = DocumentRecipient
-        fields = ("order", "role", "action", "user", "name", "email")
+        fields = (
+            "order",
+            "role",
+            "action",
+            "user",
+            "name",
+            "email",
+            "in_person",
+            "stamp_page",
+            "stamp_x",
+            "stamp_y",
+            "stamp_width",
+        )
+
+    access_code = forms.CharField(
+        label=_("Kode akses"),
+        max_length=64,
+        required=False,
+        widget=forms.PasswordInput(render_value=False, attrs={"autocomplete": "off"}),
+        help_text=_(
+            "Opsional, dibagikan di luar surel (mis. lewat telepon). "
+            "Isi '-' untuk menghapus."
+        ),
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["name"].required = False
         self.fields["email"].required = False
+        if self.instance and self.instance.access_code_hash:
+            self.fields["access_code"].help_text = _(
+                "Sudah diatur. Kosongkan untuk tetap, isi '-' untuk menghapus."
+            )
         if "user" in self.fields:
             self.fields["user"].label_from_instance = (
                 lambda u: f"{u.get_full_name() or u.username} <{u.email}>"
@@ -472,9 +630,25 @@ class RecipientForm(forms.ModelForm):
         else:
             if not cleaned.get("name"):
                 self.add_error("name", _("Isi nama atau pilih akun."))
-            if not cleaned.get("email"):
-                self.add_error("email", _("Isi surel atau pilih akun."))
+            if not cleaned.get("email") and not cleaned.get("in_person"):
+                self.add_error(
+                    "email",
+                    _("Isi surel, pilih akun, atau centang tanda tangan langsung."),
+                )
+        code = (cleaned.get("access_code") or "").strip()
+        if code and code != "-" and len(code) < 4:
+            self.add_error("access_code", _("Kode akses minimal 4 karakter."))
         return cleaned
+
+    def save(self, commit=True):
+        from dokumen.signing import set_access_code
+
+        code = (self.cleaned_data.get("access_code") or "").strip()
+        if code == "-":
+            set_access_code(self.instance, "")
+        elif code:
+            set_access_code(self.instance, code)
+        return super().save(commit)
 
 
 class SigningDocumentForm(forms.ModelForm):

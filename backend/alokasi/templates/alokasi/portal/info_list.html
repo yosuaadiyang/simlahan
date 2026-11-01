@@ -6,14 +6,16 @@
   <a href="{% url 'portal:info_index' %}"{% if not category %} class="active"{% endif %}>Semua</a>
   {% for value, label, n in categories %}<a href="{% url 'portal:info_category' value %}"{% if category == value %} class="active"{% endif %}>{{ label }} ({{ n }})</a>{% endfor %}
 </nav>
+<p class="small"><a href="{% url 'portal:forms' %}">Formulir permohonan per layanan</a> · <a href="{% url 'portal:open_winners' %}">Pemenang alokasi terbuka</a> · <a href="{% url 'portal:uwt_calculator' %}">Simulasi biaya UWT</a></p>
 <form class="filters" method="get" role="search" style="grid-template-columns: 1fr auto">
   <div><input type="search" name="q" value="{{ q }}" placeholder="Cari informasi" aria-label="Cari informasi"></div>
   <div><button class="btn" type="submit">Cari</button></div>
 </form>
 {% for item in page %}
-  <article class="card">
+  <article class="card info-item">
+    {% if item.image %}<a class="info-thumb" href="{% url 'portal:info_detail' item.slug %}"><img src="{% url 'portal:info_image' item.slug %}" alt="" loading="lazy"></a>{% endif %}
     <h2 style="margin-top:0"><a href="{% url 'portal:info_detail' item.slug %}">{{ item.title }}</a></h2>
-    <p class="small muted">{{ item.get_category_display }} · {{ item.published_at|tanggal }}{% if item.attachment %} · ada lampiran{% endif %}{% if item.video_url %} · video{% endif %}</p>
+    <p class="small muted">{{ item.get_category_display }} · {{ item.published_at|tanggal }} · {{ item.view_count|angka }} dilihat{% if item.attachment %} · ada lampiran{% endif %}{% if item.video_url %} · video{% endif %}</p>
     {% if item.summary %}<p>{{ item.summary }}</p>{% endif %}
   </article>
 {% empty %}

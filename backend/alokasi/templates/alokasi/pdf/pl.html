@@ -1,0 +1,40 @@
+{% extends "alokasi/pdf/_base.html" %}{% load alokasi_tags %}
+{% block title %}Penetapan Lokasi {{ doc.number }}{% endblock %}
+{% block content %}
+<h1>PENETAPAN LOKASI (PL)</h1>
+<p class="center">Nomor: {{ doc.number }}</p>
+
+<p>Sebagai lampiran Keputusan Pengalokasian Tanah Nomor {{ allocation.kpt_number }}, {{ config.authority_short_name }}
+menetapkan lokasi bidang tanah berikut kepada {{ holder.name }}:</p>
+
+<table class="data">
+  <tr><td style="width: 32%;">Kode lahan (Object ID)</td><td>: {{ plot.code }}</td></tr>
+  <tr><td>Lokasi</td><td>: {{ plot.name }}{% if plot.village %}, Kel. {{ plot.village }}{% endif %}{% if plot.district %}, Kec. {{ plot.district }}{% endif %}</td></tr>
+  {% if plot.address %}<tr><td>Alamat</td><td>: {{ plot.address }}</td></tr>{% endif %}
+  <tr><td>Luas</td><td>: {{ allocation.area_m2|angka:2 }} m²</td></tr>
+  <tr><td>Peruntukan</td><td>: {{ allocation.activity }}</td></tr>
+  {% if plot.zoning %}<tr><td>Peruntukan RTRW/RDTR</td><td>: {{ plot.zoning }}</td></tr>{% endif %}
+  <tr><td>Dasar</td><td>: KPT {{ allocation.kpt_number }} / PPT {{ allocation.ppt_number }}</td></tr>
+</table>
+
+<h2>Gambar bidang</h2>
+{% if sketch %}
+<p class="center"><img src="{{ sketch }}" width="450" height="310"></p>
+<p class="muted">Gambar tanpa skala peta dasar; titik bernomor merujuk ke daftar koordinat (WGS 84, derajat desimal).</p>
+<table class="grid">
+  <tr><th style="width: 12%;">Titik</th><th>Lintang</th><th>Bujur</th></tr>
+  {% for v in vertices %}<tr><td>{{ v.no }}</td><td>{{ v.lat|floatformat:7 }}</td><td>{{ v.lon|floatformat:7 }}</td></tr>{% endfor %}
+</table>
+{% else %}
+<p class="muted">Batas bidang belum digambar pada data lahan. Gambar bidang dilengkapi melalui layanan pengukuran ulang atau revisi PL.</p>
+{% endif %}
+
+<h2>Ketentuan</h2>
+<ol>
+  <li>Penetapan lokasi ini berlaku selama Keputusan Pengalokasian Tanah Nomor {{ allocation.kpt_number }} berlaku.</li>
+  <li>Perubahan batas, pemecahan, penggabungan, atau pengukuran ulang bidang hanya dapat dilakukan melalui layanan resmi di portal.</li>
+  <li>Dokumen ini tidak berlaku apabila telah diganti dengan penetapan lokasi bernomor baru; periksa keaslian melalui kode QR.</li>
+</ol>
+
+{% include "alokasi/pdf/_signature.html" %}
+{% endblock %}

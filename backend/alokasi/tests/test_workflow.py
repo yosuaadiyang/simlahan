@@ -83,7 +83,7 @@ def test_full_allocation_flow(filled_application, officer, verifier, seeded):
         year=allocation.start_date.year + 30
     ) - datetime.timedelta(days=1)
     docs = {d.kind: d for d in IssuedDocument.objects.filter(allocation=allocation)}
-    assert set(docs) == {"kpt", "ppt"}
+    assert set(docs) == {"kpt", "ppt", "pl"}
     for doc in docs.values():
         with doc.file.open("rb") as fh:
             assert fh.read(5) == b"%PDF-"

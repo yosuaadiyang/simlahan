@@ -5,7 +5,8 @@
 <div class="split">
   <article class="card">
     <h1>{{ item.title }}</h1>
-    <p class="small muted">{{ item.published_at|tanggal }}</p>
+    <p class="small muted">{{ item.published_at|tanggal }} · {{ item.view_count|angka }} dilihat{% if item.service %} · {{ item.service.name }}{% endif %}</p>
+    {% if item.image %}<p><img class="info-cover" src="{% url 'portal:info_image' item.slug %}" alt=""></p>{% endif %}
     {% if item.summary %}<p><strong>{{ item.summary }}</strong></p>{% endif %}
     {% if item.youtube_embed_url %}<div class="video"><iframe src="{{ item.youtube_embed_url }}" title="{{ item.title }}" loading="lazy" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
     {% elif item.video_url %}<p><a href="{{ item.video_url }}" target="_blank" rel="noopener">Tonton video</a></p>{% endif %}

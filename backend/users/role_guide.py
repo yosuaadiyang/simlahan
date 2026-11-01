@@ -58,6 +58,14 @@ DOCUMENTS_MENU = (
     "Dokumen & Perizinan: Dasbor dokumen, Pemanfaatan lahan, Dokumen perizinan, "
     "Dokumen tanda tangan, Templat dokumen, Permintaan unduh"
 )
+SIGNING_TOOLS = (
+    "Dokumen tanda tangan: kolom isian penerima (`{{ kolom.<kunci> }}`: teks, "
+    "tanggal, angka, centang, pilihan, paraf, lampiran), kode akses tambahan, "
+    "tanda tangan langsung di hadapan petugas (bukti identitas tercatat), ganti "
+    "penerima yang belum bertindak, cap tanda tangan pada posisi PDF, dan kirim "
+    "massal dari daftar Pemanfaatan lahan (aksi **Kirim dokumen tanda tangan "
+    "massal**)."
+)
 DOWNLOAD_RULE = (
     "Mengunduh dokumen selalu lewat permintaan unduh yang disetujui orang lain; "
     "setiap unduhan diberi tanda air dan tercatat."
@@ -246,7 +254,8 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             ACQUISITION_MENU,
             "Alokasi Lahan: Permohonan & verifikasi, Tagihan & pembayaran, "
             "Alokasi & lahan tidur, Data lahan, Portal investasi (permintaan "
-            "investasi, sektor, kawasan), Portal publik",
+            "investasi, sektor, kawasan), Portal publik (termasuk tarif UWT per "
+            "wilayah dan pesan Kontak Kami)",
             "Manajemen Aset Lahan: Dasbor aset, Data aset & peta, Perkara & "
             "sidang, Okupasi & perambahan, Pengaduan masyarakat, Lelang & seleksi "
             "lahan, Laporan & asisten AI, Aplikasi lapangan",
@@ -282,6 +291,8 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "Dokumen & perizinan: mengatur jenis dokumen wajib, templat, dan "
             "pengaturan modul; menyetujui dokumen tanda tangan sebelum dikirim; "
             "menyetujui permintaan unduh, termasuk dokumen rahasia.",
+            SIGNING_TOOLS,
+            "Memblokir dan membuka blokir penetapan lokasi alokasi.",
             "Melihat daftar pengguna.",
             "Menangani tiket & masukan di pusat komando (Menu → Alat & tiket): "
             "memproses, menyelesaikan (poin untuk pengirim), atau menolak dengan "
@@ -377,7 +388,7 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
         menus=(
             "Panel admin, Alokasi lahan: Permohonan, Tagihan, Alokasi, Data lahan "
             "(termasuk impor peta dan profil investasi), Pemohon, Laporan "
-            "pembangunan, konten portal",
+            "pembangunan, konten portal, Wilayah & tarif UWT, Pesan Kontak Kami",
             "Panel admin, Alokasi lahan: Permintaan investasi, Sektor investasi, "
             "Kawasan investasi",
             "Panel admin, " + DOCUMENTS_MENU + ", Jenis dokumen, Riwayat unduhan",
@@ -394,6 +405,10 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "mengunggah/mengimpor templat (Word, PDF, HTML), memverifikasi atau "
             "meminta revisi dokumen, dan mengirim dokumen untuk ditandatangani "
             "(berurutan, OTP surel, sertifikat & kode QR verifikasi).",
+            SIGNING_TOOLS,
+            "Memblokir dan membuka blokir penetapan lokasi alokasi; mengelola "
+            "tarif UWT per wilayah (simulasi di portal) dan menjawab pesan Kontak "
+            "Kami.",
             "Menyetujui atau menolak permintaan unduh dokumen biasa.",
             "Menerima ringkasan pemantauan mingguan lewat surel.",
         ),
@@ -483,6 +498,7 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
             "Membaca aset, kepemilikan, pemangku kepentingan, dan survei.",
             "Menyusun templat dan blok isi, membuat dan mengirim dokumen tanda "
             "tangan (kontrak, perjanjian), serta membaca dokumen perizinan.",
+            SIGNING_TOOLS,
             "Mengajukan permintaan unduh dokumen. " + DOWNLOAD_RULE,
         ),
         limits=(
@@ -605,19 +621,27 @@ APPLICANT_GUIDE = RoleGuide(
         "ajukan minat), Lelang, Pengaduan, Lacak, Verifikasi dokumen, Bantuan, "
         "Akun saya (permohonan, permintaan investasi, lahan tersimpan, tagihan, "
         "profil, sandi)",
+        "Layanan & informasi: Formulir permohonan, Pemenang alokasi terbuka, "
+        "Simulasi biaya UWT (per lahan atau per wilayah dengan denda), Buku "
+        "panduan; Bantuan → Kontak kami",
         "Akun saya → Dokumen & perizinan (`/portal/dokumen/`): pemanfaatan lahan, "
-        "dokumen tanda tangan, permintaan unduh",
+        "dokumen tanda tangan, permintaan unduh, tanda tangan saya",
     ),
     can=(
         "Mengajukan dan melengkapi permohonan, membayar tagihan, melacak status, "
-        "dan mengunduh dokumen terbit.",
+        "dan mengunduh dokumen terbit (KPT, PPT, Penetapan Lokasi + sketsa bidang).",
+        "Mengajukan layanan atas alokasinya: perpanjangan/pembaruan, pecah/gabung/"
+        "revisi PL, pengukuran ulang, penyesuaian, rekomendasi, hak tanggungan, "
+        "lelang, dokumen pengganti, KPT & PPT baru/perubahan, dan buka blokir "
+        "(bila penetapan lokasi diblokir hanya buka blokir yang bisa diajukan).",
         "Menjelajah peta investasi tanpa masuk; setelah masuk: menyimpan lahan, "
         "mengajukan minat sewa/alokasi/kerja sama (memilih lahan atau menggambar "
         "usulan lokasi), berkirim pesan dengan petugas, serta menerima atau "
         "menolak penawaran.",
         "Melihat status setiap dokumen perizinan pemanfaatan lahannya, mengunduh "
         "format templat, mengunggah dokumen atau revisi, serta menandatangani "
-        "dokumen secara elektronik.",
+        "dokumen secara elektronik (mengisi kolom isian, melampirkan berkas, dan "
+        "memakai tanda tangan tersimpan yang diaktifkan dengan kata sandi).",
         "Mengajukan permintaan unduh dokumen; unduhan terbuka setelah disetujui "
         "petugas, diberi tanda air, dan tercatat.",
         "Mengubah profil dan sandi; memakai Lupa sandi bila lupa.",

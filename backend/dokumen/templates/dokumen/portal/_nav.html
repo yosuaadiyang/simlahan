@@ -2,6 +2,7 @@
   {% with name=request.resolver_match.url_name %}
   <a href="{% url 'dokumen_portal:index' %}"{% if name == 'index' %} class="active" aria-current="page"{% endif %}>Ringkasan</a>
   <a href="{% url 'dokumen_portal:downloads' %}"{% if name == 'downloads' %} class="active" aria-current="page"{% endif %}>Permintaan unduh</a>
+  <a href="{% url 'dokumen_portal:saved_signature' %}"{% if name == 'saved_signature' %} class="active" aria-current="page"{% endif %}>Tanda tangan saya</a>
   <a href="{% url 'dokumen_portal:verify' %}">Cek keaslian dokumen</a>
   {% endwith %}
 </nav>

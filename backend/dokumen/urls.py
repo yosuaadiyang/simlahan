@@ -33,6 +33,7 @@ portal_urlpatterns = [
     path("unduhan/<str:number>/batal/", views.download_cancel, name="download_cancel"),
     path("unduh/<str:number>/", views.download, name="download"),
     path("ttd/<uuid:token>/", views.sign, name="sign"),
+    path("tanda-tangan-saya/", views.saved_signature, name="saved_signature"),
     path("ttd/<uuid:token>/pdf/", views.sign_pdf, name="sign_pdf"),
     path("verifikasi/", views.verify, name="verify"),
     path("verifikasi/<uuid:token>/", views.verify, name="verify_token"),

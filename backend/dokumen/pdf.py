@@ -41,14 +41,18 @@ def template_pdf(title: str, body_html: str, *, number: str = "") -> bytes:
 
 
 def _context(document, *, include_body: bool) -> dict:
+    from dokumen.signing import render_body
+
     url = verification_url(document)
     recipients = list(document.recipients.order_by("order", "pk"))
+    fields = list(document.fields.select_related("recipient").order_by("order", "pk"))
     events = list(
         document.activities.select_related("actor").order_by("created_at", "pk")
     )
     return {
         "doc": document,
-        "body": document.body if include_body else "",
+        "body": render_body(document) if include_body else "",
+        "fields": [f for f in fields if f.filled_at],
         "signers": [r for r in recipients if r.is_acting],
         "copies": [r for r in recipients if not r.is_acting],
         "events": events,
@@ -133,6 +137,81 @@ def watermark(data: bytes, lines: list[str]) -> bytes:
     return _overlay(data, draw)
 
 
+def _png(data_uri: str):
+    import base64
+
+    from reportlab.lib.utils import ImageReader
+
+    if not data_uri or "," not in data_uri:
+        return None
+    try:
+        return ImageReader(io.BytesIO(base64.b64decode(data_uri.split(",", 1)[1])))
+    except (ValueError, OSError):
+        return None
+
+
+def stamp_signatures(data: bytes, recipients) -> bytes:
+    """Cap tanda tangan penerima pada posisi yang ditetapkan di PDF unggahan.
+
+    Posisi ``stamp_x``/``stamp_y``/``stamp_width`` dalam persen halaman;
+    ``stamp_page`` 1 = halaman pertama, -1 = terakhir. Halaman di luar jangkauan
+    diabaikan (tanda tangan tetap ada di lembar pengesahan).
+    """
+    from pypdf import PdfReader, PdfWriter
+    from reportlab.pdfgen import canvas
+
+    stamps = [r for r in recipients if r.stamp_page and r.completed_at]
+    if not stamps:
+        return data
+    reader = PdfReader(io.BytesIO(data))
+    pages = list(reader.pages)
+    total = len(pages)
+    by_page = {}
+    for r in stamps:
+        index = total - 1 if r.stamp_page < 0 else r.stamp_page - 1
+        if 0 <= index < total:
+            by_page.setdefault(index, []).append(r)
+    writer = PdfWriter()
+    for index, page in enumerate(pages):
+        if index in by_page:
+            width = float(page.mediabox.width)
+            height = float(page.mediabox.height)
+            buffer = io.BytesIO()
+            sheet = canvas.Canvas(buffer, pagesize=(width, height))
+            for r in by_page[index]:
+                box_w = width * r.stamp_width / 100
+                box_h = box_w * 60 / 170
+                left = width * r.stamp_x / 100
+                top = height - height * r.stamp_y / 100
+                left = min(left, width - box_w - 4)
+                bottom = max(top - box_h, 22)
+                image = _png(r.signature_image)
+                if image is not None:
+                    sheet.drawImage(
+                        image,
+                        left,
+                        bottom,
+                        width=box_w,
+                        height=box_h,
+                        mask="auto",
+                        preserveAspectRatio=True,
+                    )
+                else:
+                    sheet.setFont("Helvetica-Bold", 9)
+                    sheet.setFillColorRGB(0.05, 0.37, 0.8)
+                    sheet.drawString(left, bottom + box_h / 2, "DISETUJUI")
+                sheet.setFillGray(0.2)
+                sheet.setFont("Helvetica", 6.5)
+                caption = f"{r.signature_name or r.name} · {timezone.localtime(r.completed_at):%d-%m-%Y %H.%M} WIB"
+                sheet.drawString(left, bottom - 8, caption[:90])
+            sheet.save()
+            page.merge_page(PdfReader(io.BytesIO(buffer.getvalue())).pages[0])
+        writer.add_page(page)
+    output = io.BytesIO()
+    writer.write(output)
+    return output.getvalue()
+
+
 def signing_pdf(document) -> bytes:
     """PDF final dokumen tanda tangan beserta lembar pengesahan dan sertifikat."""
     if document.source == enums.SigningSource.HTML:
@@ -145,7 +224,8 @@ def signing_pdf(document) -> bytes:
         f"Ditandatangani elektronik {document.number} · periksa keaslian: "
         f"{verification_url(document)}"
     )
-    stamped = stamp_footer(original, footer)
+    recipients = list(document.recipients.order_by("order", "pk"))
+    stamped = stamp_footer(stamp_signatures(original, recipients), footer)
     appendix = render_pdf(
         "dokumen/pdf/signed.html", _context(document, include_body=False)
     )

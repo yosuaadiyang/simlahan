@@ -26,6 +26,7 @@
   {% if original.status == 'menunggu_persetujuan' %}<p class="dk-muted">Menunggu persetujuan internal oleh pejabat selain pembuat.</p>{% endif %}
   {% if original.status == 'disetujui' %}<p class="dk-muted">Disetujui {{ original.approved_by.get_full_name|default:original.approved_by }} pada {{ original.approved_at|date:"d-m-Y H.i" }}. Siap dikirim.</p>{% endif %}
   {% if original.closed_reason %}<p class="dk-warn-text">{{ original.closed_reason }}</p>{% endif %}
+  <p class="dk-muted"><a href="{% url 'dokumen_portal:saved_signature' %}">Tanda tangan tersimpan saya</a> · Kolom isian penerima: tulis <code>{% templatetag openvariable %} kolom.kunci {% templatetag closevariable %}</code> di isi, lalu atur jenis &amp; penerimanya di bagian "Kolom isian penerima".</p>
   {% if problems %}
   <ul class="dk-problems">{% for p in problems %}<li>{{ p }}</li>{% endfor %}</ul>
   {% endif %}
@@ -33,16 +34,20 @@
   {% if recipients %}
   <h3>Penerima &amp; urutan</h3>
   <div class="dk-table-wrap"><table class="dk-table">
-    <thead><tr><th>Urutan</th><th>Penerima</th><th>Tindakan</th><th>Status</th><th>Waktu</th>{% if can_remind %}<th></th>{% endif %}</tr></thead>
+    <thead><tr><th>Urutan</th><th>Penerima</th><th>Tindakan</th><th>Status</th><th>Waktu</th>{% if can_manage_recipients %}<th></th>{% endif %}</tr></thead>
     <tbody>
     {% for r in recipients %}
       <tr{% if current_order == r.order and r.status != 'selesai' and r.action != 'salinan' %} class="dk-current"{% endif %}>
         <td>{{ r.order }}</td>
-        <td class="dk-break">{{ r.name }}{% if r.role %} <span class="dk-muted">({{ r.role }})</span>{% endif %}<br><span class="dk-muted">{{ r.email }}{% if r.user_id %} · akun SimLahan{% else %} · verifikasi kode surel{% endif %}</span></td>
+        <td class="dk-break">{{ r.name }}{% if r.role %} <span class="dk-muted">({{ r.role }})</span>{% endif %}<br><span class="dk-muted">{{ r.email|default:"tanpa surel" }}{% if r.in_person %} · tanda tangan langsung{% elif r.user_id %} · akun SimLahan{% else %} · verifikasi kode surel{% endif %}{% if r.has_access_code %} · kode akses{% endif %}</span>{% if r.verification_note %}<br><span class="dk-muted">{{ r.verification_note }}</span>{% endif %}</td>
         <td>{{ r.get_action_display }}</td>
         <td><span class="dk-status dk-s-{{ r.status }}">{{ r.get_status_display }}</span>{% if r.decline_reason %}<br><span class="dk-muted">{{ r.decline_reason }}</span>{% endif %}</td>
-        <td class="dk-muted">{% if r.completed_at %}{{ r.completed_at|date:"d-m-Y H.i" }}{% elif r.viewed_at %}dilihat {{ r.viewed_at|date:"d-m-Y H.i" }}{% elif r.notified_at %}dikirim {{ r.notified_at|date:"d-m-Y H.i" }}{% else %}–{% endif %}</td>
-        {% if can_remind %}<td>{% if r.status != 'selesai' and r.status != 'ditolak' and r.notified_at %}<button type="submit" class="button dk-small" form="dk-resend-{{ r.pk }}">Kirim ulang</button>{% endif %}</td>{% endif %}
+        <td class="dk-muted">{% if r.completed_at %}{{ r.completed_at|date:"d-m-Y H.i" }}{% elif r.viewed_at %}dilihat {{ r.viewed_at|date:"d-m-Y H.i" }}{% elif r.notified_at %}dikirim {{ r.notified_at|date:"d-m-Y H.i" }}{% else %}–{% endif %}{% if r.view_count %}<br>dibuka {{ r.view_count }}×, terakhir {{ r.last_viewed_at|date:"d-m-Y H.i" }}{% endif %}</td>
+        {% if can_manage_recipients %}<td class="dk-actions">{% if r.status != 'selesai' and r.status != 'ditolak' %}
+          {% if can_remind and r.notified_at and r.email and not r.in_person %}<button type="submit" class="button dk-small" form="dk-resend-{{ r.pk }}">Kirim ulang</button>{% endif %}
+          {% if original.is_open and r.action != 'salinan' and current_order == r.order %}<a class="button dk-small" href="{% url 'admin:dokumen_signingdocument_hosted' r.pk %}">TTD langsung</a>{% endif %}
+          {% if original.is_open %}<a class="button dk-small" href="{% url 'admin:dokumen_signingdocument_reassign' r.pk %}">Ganti</a>{% endif %}
+        {% endif %}</td>{% endif %}
       </tr>
     {% endfor %}
     </tbody>
@@ -59,7 +64,7 @@
   {% endif %}
 
   {% if original.source == 'html' and not original.is_editable %}
-  <details class="dk-body-details"><summary>Lihat isi dokumen</summary><div class="dk-paper">{{ original.body|bersih }}</div></details>
+  <details class="dk-body-details"><summary>Lihat isi dokumen</summary><div class="dk-paper">{{ rendered_body|bersih }}</div></details>
   {% endif %}
 </div>
 {% endif %}

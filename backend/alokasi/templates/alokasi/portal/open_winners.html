@@ -1,0 +1,37 @@
+{% extends "alokasi/portal/base.html" %}{% load alokasi_tags %}
+{% block title %}Pemenang Alokasi Terbuka{% endblock %}
+{% block content %}
+<h1>Pemenang Alokasi Terbuka</h1>
+<p class="muted">Hasil penilaian lelang/seleksi atas lahan alokasi terbuka. Pemenang melanjutkan permohonan alokasi atas lahan tersebut di portal.</p>
+{% if not config.publish_open_winners %}
+<p class="muted">Pengumuman pemenang alokasi terbuka belum dibuka untuk publik.</p>
+{% else %}
+<div class="table-wrap"><table class="data winner-table">
+  <thead><tr><th>No</th><th>Object ID</th><th>Lokasi</th><th>Luas (m²)</th><th>Tanggal selesai penilaian</th><th>Pemenang</th><th>Detail</th></tr></thead>
+  <tbody>
+  {% for t in page %}
+    <tr>
+      <td>{{ page.start_index|add:forloop.counter0 }}</td>
+      <td><a href="{% url 'portal:plot_detail' t.alokasi_plot.code %}">{{ t.alokasi_plot.code }}</a></td>
+      <td>{{ t.alokasi_plot.name }}{% if t.alokasi_plot.village %}, {{ t.alokasi_plot.village }}{% endif %}{% if t.alokasi_plot.district %}, Kec. {{ t.alokasi_plot.district }}{% endif %}</td>
+      <td>{{ t.alokasi_plot.area_m2|angka:2|patah }}</td>
+      <td>{{ t.awarded_on|tanggal }}</td>
+      <td><strong>{{ t.winner.bidder_name }}</strong></td>
+      <td>
+        <details><summary>{{ t.public_bids|length }} peserta</summary>
+          <table class="data small" style="margin-top:6px">
+            <thead><tr><th>No</th><th>Pemohon</th><th>{% if t.method == 'lelang' %}Nilai penawaran{% else %}Nilai investasi / penawaran{% endif %}</th></tr></thead>
+            <tbody>{% for b in t.public_bids %}<tr><td>{{ forloop.counter }}</td><td>{{ b.bidder_name }}{% if b.pk == t.winner_id %} <span class="badge badge-terbit">Pemenang</span>{% endif %}</td><td>{{ b.amount|rupiah|patah }}</td></tr>{% endfor %}</tbody>
+          </table>
+          <p class="small"><a href="{% url 'aset_portal:tender_detail' t.number %}">Halaman lelang {{ t.number }}</a></p>
+        </details>
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="7" class="muted">Belum ada pemenang alokasi terbuka yang ditetapkan.</td></tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+{% include "alokasi/portal/_pagination.html" %}
+{% endif %}
+{% endblock %}

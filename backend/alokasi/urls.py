@@ -69,12 +69,20 @@ urlpatterns = [
     path("kalkulator-uwt/", views.uwt_calculator, name="uwt_calculator"),
     path("lacak/", views.track_application, name="track"),
     path("bantuan/", views.help_page, name="help"),
+    path("bantuan/kontak/", views.contact, name="contact"),
     path("informasi/", views.info_index, name="info_index"),
+    path("informasi/formulir/", views.forms_page, name="forms"),
+    path(
+        "informasi/pemenang-alokasi-terbuka/",
+        views.open_winners,
+        name="open_winners",
+    ),
     path("informasi/kategori/<str:category>/", views.info_index, name="info_category"),
     path("informasi/<slug:slug>/", views.info_detail, name="info_detail"),
     path(
         "informasi/<slug:slug>/lampiran/", views.info_attachment, name="info_attachment"
     ),
+    path("informasi/<slug:slug>/gambar/", views.info_image, name="info_image"),
     path("verifikasi/", views.verify_document, name="verify"),
     path("verifikasi/<uuid:token>/", views.verify_document, name="verify_token"),
     # Akun

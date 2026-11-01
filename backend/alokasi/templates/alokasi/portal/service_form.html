@@ -3,7 +3,8 @@
 {% block content %}
 <p class="small"><a href="{% url 'portal:allocation_detail' allocation.pk %}">‹ Alokasi {{ allocation.kpt_number }}</a></p>
 <h1>Ajukan Layanan Alokasi</h1>
-<p class="muted">Perpanjangan / pembaruan hak, pemecahan penetapan lokasi (PL), atau pengukuran ulang atas alokasi {{ allocation.kpt_number }}.</p>
+<p class="muted">Layanan pertanahan dan perubahan dokumen atas alokasi {{ allocation.kpt_number }}: perpanjangan/pembaruan hak, pecah/gabung/revisi PL, pengukuran ulang, dokumen pengganti, KPT &amp; PPT baru/perubahan, hak tanggungan, lelang, rekomendasi, dan lainnya.</p>
+{% if not form.fields.service_type.choices %}<div class="alert alert-warn">Tidak ada layanan yang dapat diajukan untuk alokasi ini pada keadaannya sekarang.</div>{% endif %}
 
 <section class="card">
   <form method="post" action="{% url 'portal:service_create' allocation.pk %}">{% csrf_token %}

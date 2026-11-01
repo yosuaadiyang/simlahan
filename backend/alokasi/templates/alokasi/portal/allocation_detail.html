@@ -13,6 +13,9 @@
 {% elif is_active and not has_started %}
 <div class="alert alert-info">Batas memulai pembangunan: <strong>{{ allocation.idle_deadline|tanggal }}</strong> ({{ idle_days_left }} hari lagi). Laporkan tahap konstruksi setelah pembangunan dimulai.</div>
 {% endif %}
+{% if allocation.is_blocked %}
+<div class="alert alert-danger"><strong>Penetapan lokasi diblokir</strong> sejak {{ allocation.blocked_at|tanggal }}.<div class="prose">{{ allocation.block_reason }}</div>Selama diblokir, peralihan hak dan layanan lain tidak dapat diajukan. {% if is_active %}<a href="{% url 'portal:service_create' allocation.pk %}?jenis=buka_blokir">Ajukan pembukaan blokir</a>.{% endif %}</div>
+{% endif %}
 {% if report_due and allocation.status == 'aktif' %}
 <div class="alert alert-warn"><strong>Laporan progres jatuh tempo.</strong> Kirim laporan pembangunan terbaru di bawah ini (wajib setiap {{ config.report_interval_months }} bulan).</div>
 {% endif %}
@@ -86,21 +89,15 @@
       <h2>Dokumen</h2>
       <ul>{% for d in issued %}<li><a href="{% url 'portal:issued_download' d.token %}">{{ d.get_kind_display }}</a><br><span class="small muted">{{ d.number }}</span></li>{% empty %}<li class="muted">–</li>{% endfor %}</ul>
     </section>
-    {% if is_active or allocation.status == 'berakhir' %}
+    {% if service_options %}
     <section class="card">
       <h2>Layanan alokasi</h2>
       <ul class="small">
-        {% if is_active %}
-        <li><a href="{% url 'portal:service_create' allocation.pk %}?jenis=perpanjangan">Perpanjangan hak</a> — tambah jangka waktu sebelum alokasi berakhir.</li>
-        <li><a href="{% url 'portal:service_create' allocation.pk %}?jenis=pecah_pl">Pemecahan penetapan lokasi (PL)</a> — pecah PL induk menjadi beberapa PL.</li>
-        <li><a href="{% url 'portal:service_create' allocation.pk %}?jenis=ukur_ulang">Pengukuran ulang</a> — ukur ulang objek penetapan lokasi.</li>
-        {% else %}
-        <li><a href="{% url 'portal:service_create' allocation.pk %}?jenis=pembaruan">Pembaruan hak</a> — jangka waktu baru setelah alokasi berakhir.</li>
-        {% endif %}
+        {% for value, label, hint in service_options %}<li><a href="{% url 'portal:service_create' allocation.pk %}?jenis={{ value }}">{{ label }}</a>{% if hint %} — {{ hint }}{% endif %}</li>{% endfor %}
       </ul>
     </section>
     {% endif %}
-    {% if is_active %}
+    {% if is_active and not allocation.is_blocked %}
     <section class="card">
       <h2>Peralihan hak</h2>
       {% if open_transfer %}

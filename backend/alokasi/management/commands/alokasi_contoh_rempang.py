@@ -4,7 +4,8 @@ python manage.py alokasi_contoh_rempang          # buat/perbarui
 python manage.py alokasi_contoh_rempang --hapus  # hapus lahan contoh yang belum dimohonkan
 
 Termasuk profil portal investasi: sektor, dua kawasan investasi contoh, lahan
-yang dapat disewa, insentif, jarak, dan utilitas.
+yang dapat disewa, insentif, jarak, dan utilitas, serta tarif UWT per wilayah
+contoh untuk simulasi biaya di portal.
 """
 
 from decimal import Decimal
@@ -15,7 +16,13 @@ from django.db import transaction
 
 from alokasi import enums
 from alokasi.importers import area_m2
-from alokasi.models import InvestmentSector, InvestmentZone, LandPlot
+from alokasi.models import (
+    InvestmentSector,
+    InvestmentZone,
+    LandPlot,
+    UwtRegion,
+    UwtTariff,
+)
 
 PREFIX = "CONTOH-RMP-"
 
@@ -224,6 +231,49 @@ SECTOR_STYLE = {
 }
 
 
+# Wilayah & tarif UWT contoh (fiktif): (sub wilayah, peruntukan, jenis, tarif, tahun)
+UWT_REGION = "Pulau Rempang (CONTOH)"
+UWT_TARIFFS = [
+    ("Sembulang", "Industri", "baru", "14500", 30),
+    ("Sembulang", "Industri", "perpanjangan", "9800", 20),
+    ("Sembulang", "Industri", "pembaruan", "11200", 30),
+    ("Sembulang", "Perdagangan & jasa", "baru", "17800", 30),
+    ("Pantai Melayu", "Pariwisata", "baru", "12400", 30),
+    ("Pantai Melayu", "Pariwisata", "perpanjangan", "8600", 20),
+    ("Pantai Melayu", "Pariwisata", "pembaruan", "9900", 30),
+    ("Pantai Melayu", "Perumahan", "baru", "6500", 30),
+]
+
+
+def _uwt_tariffs() -> int:
+    count = 0
+    for order, sub in enumerate(dict.fromkeys(t[0] for t in UWT_TARIFFS), 1):
+        region, _created = UwtRegion.objects.update_or_create(
+            name=UWT_REGION,
+            sub_name=sub,
+            defaults={
+                "order": order,
+                "is_active": True,
+                "description": "Tarif fiktif untuk uji coba simulasi. Hapus dengan --hapus.",
+            },
+        )
+        for _sub, land_use, kind, rate, years in (
+            t for t in UWT_TARIFFS if t[0] == sub
+        ):
+            UwtTariff.objects.update_or_create(
+                region=region,
+                land_use=land_use,
+                kind=kind,
+                defaults={
+                    "rate_per_m2_year": Decimal(rate),
+                    "term_years": years,
+                    "is_active": True,
+                },
+            )
+            count += 1
+    return count
+
+
 def _box(x1, y1, x2, y2):
     return MultiPolygon(
         Polygon(((x1, y1), (x2, y1), (x2, y2), (x1, y2), (x1, y1))), srid=4326
@@ -263,6 +313,7 @@ class Command(BaseCommand):
                 .delete()[1]
                 .get("alokasi.InvestmentZone", 0)
             )
+            UwtRegion.objects.filter(name=UWT_REGION).delete()
             self.stdout.write(
                 self.style.SUCCESS(
                     f"{count} lahan contoh dan {zones} kawasan contoh dihapus."
@@ -348,8 +399,10 @@ class Command(BaseCommand):
                 },
             )
             created += was_created
+        tariffs = _uwt_tariffs()
         self.stdout.write(
             self.style.SUCCESS(
-                f"{created} lahan contoh dibuat, {len(PLOTS) - created} diperbarui."
+                f"{created} lahan contoh dibuat, {len(PLOTS) - created} diperbarui; "
+                f"{tariffs} tarif UWT contoh."
             )
         )

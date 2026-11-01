@@ -71,6 +71,7 @@ def _upload_to(name, prefix):
 upload_version = _upload_to("upload_version", "versi")
 upload_template = _upload_to("upload_template", "templat")
 upload_signing = _upload_to("upload_signing", "tanda_tangan")
+upload_field = _upload_to("upload_field", "lampiran_penerima")
 
 
 def next_number(prefix: str) -> str:
@@ -921,13 +922,87 @@ class DocumentRecipient(models.Model):
         help_text=_("Penerima dengan akun wajib masuk sebelum menandatangani."),
     )
     name = models.CharField(verbose_name=_("Nama"), max_length=255)
-    email = models.EmailField(verbose_name=_("Surel"))
+    email = models.EmailField(
+        verbose_name=_("Surel"),
+        blank=True,
+        default="",
+        help_text=_(
+            "Boleh kosong hanya untuk tanda tangan langsung di hadapan petugas."
+        ),
+    )
+    in_person = models.BooleanField(
+        verbose_name=_("Tanda tangan langsung"),
+        default=False,
+        help_text=_(
+            "Penerima menandatangani di perangkat petugas setelah identitasnya "
+            "diperiksa (mis. warga tanpa surel). Tautan surel tidak dikirim."
+        ),
+    )
+    access_code_hash = models.CharField(
+        max_length=128, blank=True, default="", editable=False
+    )
+    # Posisi cap tanda tangan pada PDF unggahan (persen dari kiri/atas halaman).
+    stamp_page = models.SmallIntegerField(
+        verbose_name=_("Halaman cap TTD"),
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(-1), MaxValueValidator(999)],
+        help_text=_(
+            "Khusus PDF unggahan: nomor halaman (1 = pertama, -1 = terakhir). "
+            "Kosongkan bila tanda tangan cukup di lembar pengesahan."
+        ),
+    )
+    stamp_x = models.PositiveSmallIntegerField(
+        verbose_name=_("Posisi kiri (%)"),
+        default=60,
+        validators=[MaxValueValidator(95)],
+    )
+    stamp_y = models.PositiveSmallIntegerField(
+        verbose_name=_("Posisi atas (%)"),
+        default=80,
+        validators=[MaxValueValidator(95)],
+    )
+    stamp_width = models.PositiveSmallIntegerField(
+        verbose_name=_("Lebar cap (%)"),
+        default=30,
+        validators=[MinValueValidator(5), MaxValueValidator(60)],
+    )
     token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     status = models.CharField(
         verbose_name=_("Status"),
         max_length=16,
         choices=enums.RecipientStatus.choices,
         default=enums.RecipientStatus.WAITING,
+    )
+    view_count = models.PositiveIntegerField(
+        verbose_name=_("Dibuka"), default=0, editable=False
+    )
+    last_viewed_at = models.DateTimeField(
+        verbose_name=_("Terakhir dibuka"), null=True, blank=True, editable=False
+    )
+    hosted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Dipandu petugas"),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        editable=False,
+        related_name="+",
+    )
+    hosted_until = models.DateTimeField(null=True, blank=True, editable=False)
+    host_evidence = models.CharField(
+        verbose_name=_("Bukti identitas (TTD langsung)"),
+        max_length=255,
+        blank=True,
+        default="",
+        editable=False,
+    )
+    verification_note = models.CharField(
+        verbose_name=_("Cara verifikasi"),
+        max_length=255,
+        blank=True,
+        default="",
+        editable=False,
     )
     notified_at = models.DateTimeField(
         verbose_name=_("Diberi tahu"), null=True, blank=True
@@ -968,11 +1043,149 @@ class DocumentRecipient(models.Model):
 
     @property
     def needs_otp(self) -> bool:
-        return self.user_id is None
+        """Kode surel wajib bagi penerima tanpa akun dan penerima berkode akses."""
+        return self.user_id is None or bool(self.access_code_hash)
+
+    @property
+    def has_access_code(self) -> bool:
+        return bool(self.access_code_hash)
 
     @property
     def is_acting(self) -> bool:
         return self.action != enums.RecipientAction.COPY
+
+    def hosted_for(self, user) -> bool:
+        """Sesi tanda tangan langsung yang dibuka ``user`` masih berlaku."""
+        return bool(
+            user is not None
+            and getattr(user, "pk", None)
+            and self.hosted_by_id == user.pk
+            and self.hosted_until
+            and self.hosted_until > timezone.now()
+        )
+
+
+class SigningField(models.Model):
+    """Kolom isian yang diisi penerima saat menandatangani (seperti PandaDoc).
+
+    Pada dokumen isian, tempatnya ditandai ``{{ kolom.<kunci> }}``; pada PDF
+    unggahan nilainya dicantumkan di lembar pengesahan.
+    """
+
+    class Kind(models.TextChoices):
+        TEXT = "teks", _("Teks singkat")
+        PARAGRAPH = "paragraf", _("Teks panjang")
+        DATE = "tanggal", _("Tanggal")
+        NUMBER = "angka", _("Angka")
+        CHECKBOX = "centang", _("Kotak centang")
+        CHOICE = "pilihan", _("Pilihan")
+        INITIALS = "paraf", _("Paraf")
+        FILE = "berkas", _("Lampiran berkas")
+
+    document = models.ForeignKey(
+        SigningDocument,
+        verbose_name=_("Dokumen"),
+        on_delete=models.CASCADE,
+        related_name="fields",
+    )
+    recipient = models.ForeignKey(
+        DocumentRecipient,
+        verbose_name=_("Diisi oleh"),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="fields",
+    )
+    key = models.CharField(
+        verbose_name=_("Kunci"),
+        max_length=40,
+        validators=[
+            RegexValidator(
+                r"^[a-z0-9_]{1,40}$",
+                _("Gunakan huruf kecil, angka, atau garis bawah."),
+            )
+        ],
+        help_text=_("Ditulis {{ kolom.<kunci> }} di isi dokumen."),
+    )
+    label = models.CharField(verbose_name=_("Label"), max_length=255)
+    kind = models.CharField(
+        verbose_name=_("Jenis"), max_length=16, choices=Kind.choices, default=Kind.TEXT
+    )
+    options = models.TextField(
+        verbose_name=_("Pilihan"),
+        blank=True,
+        default="",
+        help_text=_("Untuk jenis Pilihan: satu pilihan per baris."),
+    )
+    required = models.BooleanField(verbose_name=_("Wajib"), default=True)
+    order = models.PositiveSmallIntegerField(verbose_name=_("Urutan"), default=0)
+    value = models.TextField(verbose_name=_("Nilai"), blank=True, default="")
+    file = PrivateFileField(
+        verbose_name=_("Berkas"),
+        max_length=255,
+        upload_to=upload_field,
+        null=True,
+        blank=True,
+        validators=DOCUMENT_VALIDATORS,
+    )
+    file_name = models.CharField(
+        verbose_name=_("Nama berkas"), max_length=255, blank=True, default=""
+    )
+    file_sha256 = models.CharField(
+        verbose_name=_("Sidik berkas (SHA-256)"), max_length=64, blank=True, default=""
+    )
+    filled_at = models.DateTimeField(verbose_name=_("Diisi"), null=True, blank=True)
+
+    class Meta:
+        verbose_name = _("Kolom isian penerima")
+        verbose_name_plural = _("Kolom isian penerima")
+        ordering = ["document", "order", "pk"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=("document", "key"), name="dokumen_signingfield_unique_key"
+            )
+        ]
+
+    def __str__(self):
+        return self.label
+
+    @property
+    def choices(self) -> list[str]:
+        return [line.strip() for line in self.options.splitlines() if line.strip()]
+
+    @property
+    def display_value(self) -> str:
+        if self.kind == self.Kind.FILE:
+            return self.file_name
+        if self.kind == self.Kind.CHECKBOX:
+            return str(_("Ya")) if self.value == "1" else str(_("Tidak"))
+        if self.kind == self.Kind.DATE and self.value:
+            try:
+                return datetime.date.fromisoformat(self.value).strftime("%d-%m-%Y")
+            except ValueError:
+                return self.value
+        return self.value
+
+
+class SavedSignature(models.Model):
+    """Tanda tangan tersimpan milik akun (aktivasi TTD digital)."""
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Akun"),
+        on_delete=models.CASCADE,
+        related_name="saved_signature",
+    )
+    name = models.CharField(verbose_name=_("Nama pada tanda tangan"), max_length=255)
+    image = models.TextField(verbose_name=_("Gambar tanda tangan"), editable=False)
+    updated_at = models.DateTimeField(verbose_name=_("Diperbarui"), auto_now=True)
+
+    class Meta:
+        verbose_name = _("Tanda tangan tersimpan")
+        verbose_name_plural = _("Tanda tangan tersimpan")
+
+    def __str__(self):
+        return f"{self.name} ({self.user})"
 
 
 class DocumentComment(models.Model):
@@ -1285,5 +1498,14 @@ for _model in (
     auditlog.register(_model)
 auditlog.register(
     DocumentRecipient,
-    exclude_fields=["signature_image", "otp_hash", "otp_expires_at", "otp_attempts"],
+    exclude_fields=[
+        "signature_image",
+        "otp_hash",
+        "otp_expires_at",
+        "otp_attempts",
+        "access_code_hash",
+        "view_count",
+        "last_viewed_at",
+    ],
 )
+auditlog.register(SigningField, exclude_fields=["value"])

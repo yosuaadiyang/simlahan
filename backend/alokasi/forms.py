@@ -268,12 +268,59 @@ class TransferApplicationForm(RecipientEmailMixin, forms.Form):
     )
 
 
-# Layanan atas alokasi sendiri: perpanjangan, pembaruan, pecah PL, pengukuran ulang.
+# Layanan atas alokasi sendiri (semua selain peralihan hak).
 SERVICE_APPLICATION_TYPES = tuple(
     (value, label)
     for value, label in enums.ServiceType.choices
     if value in enums.OWN_ALLOCATION_SERVICES and value != enums.ServiceType.TRANSFER
 )
+
+# Penjelasan singkat tiap layanan untuk daftar di halaman alokasi.
+SERVICE_HINTS = {
+    enums.ServiceType.EXTENSION: _("Tambah jangka waktu sebelum alokasi berakhir."),
+    enums.ServiceType.RENEWAL: _("Jangka waktu baru setelah alokasi berakhir."),
+    enums.ServiceType.SPLIT: _("Pecah PL induk menjadi beberapa PL."),
+    enums.ServiceType.REMEASURE: _("Ukur ulang objek penetapan lokasi."),
+    enums.ServiceType.REVISE_PL: _("Periksa ulang dan perbaiki data PL."),
+    enums.ServiceType.MERGE_PL: _("Satukan beberapa PL milik Anda menjadi satu."),
+    enums.ServiceType.ADJUSTMENT: _(
+        "Sesuaikan dokumen alokasi dengan KKPR yang terbit."
+    ),
+    enums.ServiceType.RECOMMENDATION: _(
+        "Surat rekomendasi untuk pengurusan sertipikat hak atas tanah."
+    ),
+    enums.ServiceType.UNBLOCK: _("Ajukan pembukaan blokir PL beserta alasannya."),
+    enums.ServiceType.REPLACEMENT: _(
+        "Ganti KPT/PPT/PL yang hilang atau rusak; dokumen lama tidak berlaku."
+    ),
+    enums.ServiceType.MORTGAGE: _("Persetujuan pembebanan hak tanggungan (bank)."),
+    enums.ServiceType.AUCTION: _("Persetujuan lelang atas hak tanah ini."),
+    enums.ServiceType.KPT_CHANGE: _(
+        "Terbitkan KPT dan PPT perubahan (mis. perubahan data atau peruntukan)."
+    ),
+    enums.ServiceType.KPT_NEW: _(
+        "Terbitkan KPT dan PPT baru menggantikan dokumen alokasi lama."
+    ),
+}
+
+
+def service_choices(allocation) -> list[tuple[str, str]]:
+    """Layanan yang dapat diajukan untuk alokasi ini pada keadaannya sekarang."""
+    if allocation is None:
+        return list(SERVICE_APPLICATION_TYPES)
+    if allocation.status == enums.AllocationStatus.EXPIRED:
+        allowed = () if allocation.is_blocked else (enums.ServiceType.RENEWAL,)
+    elif allocation.status != enums.AllocationStatus.ACTIVE:
+        allowed = ()
+    elif allocation.is_blocked:
+        allowed = (enums.ServiceType.UNBLOCK,)
+    else:
+        allowed = tuple(
+            value
+            for value, _label in SERVICE_APPLICATION_TYPES
+            if value != enums.ServiceType.UNBLOCK
+        )
+    return [(v, label) for v, label in SERVICE_APPLICATION_TYPES if v in allowed]
 
 
 class ServiceApplicationForm(forms.Form):
@@ -286,16 +333,8 @@ class ServiceApplicationForm(forms.Form):
 
     def __init__(self, *args, allocation=None, **kwargs):
         super().__init__(*args, **kwargs)
-        if (
-            allocation is not None
-            and allocation.status == enums.AllocationStatus.EXPIRED
-        ):
-            # Alokasi yang sudah berakhir hanya dapat diperbarui.
-            self.fields["service_type"].choices = [
-                (value, label)
-                for value, label in SERVICE_APPLICATION_TYPES
-                if value == enums.ServiceType.RENEWAL
-            ]
+        if allocation is not None:
+            self.fields["service_type"].choices = service_choices(allocation)
 
 
 class ServiceReasonEditForm(forms.ModelForm):
@@ -423,6 +462,90 @@ class UwtCalculatorForm(forms.Form):
 
         super().__init__(*args, **kwargs)
         self.fields["plot"].queryset = LandPlot.objects.filter(is_published=True)
+
+
+class UwtTariffCalculatorForm(forms.Form):
+    """Simulasi UWT menurut wilayah, peruntukan, dan jenis pengurusan (ala LMS)."""
+
+    region = forms.ModelChoiceField(
+        label=_("Wilayah"), queryset=None, empty_label=_("— pilih wilayah —")
+    )
+    land_use = forms.ChoiceField(label=_("Peruntukan"))
+    area_m2 = forms.DecimalField(
+        label=_("Luas (m²)"), min_value=Decimal("0.01"), max_digits=16, decimal_places=2
+    )
+    kind = forms.ChoiceField(label=_("Jenis pengurusan"), widget=forms.RadioSelect)
+    end_date = forms.DateField(
+        label=_("Tanggal berakhir UWT"),
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date"}),
+        help_text=_(
+            "Untuk perpanjangan/pembaruan: denda dihitung bila tanggal ini sudah lewat."
+        ),
+    )
+
+    def __init__(self, *args, **kwargs):
+        from alokasi.models import UwtRegion, UwtTariff
+
+        super().__init__(*args, **kwargs)
+        tariffs = UwtTariff.objects.filter(is_active=True, region__is_active=True)
+        self.fields["region"].queryset = UwtRegion.objects.filter(
+            is_active=True, tariffs__in=tariffs
+        ).distinct()
+        uses = sorted(set(tariffs.values_list("land_use", flat=True)))
+        self.fields["land_use"].choices = [("", _("— pilih peruntukan —"))] + [
+            (use, use) for use in uses
+        ]
+        self.fields["kind"].choices = UwtTariff.Kind.choices
+        self.fields["kind"].initial = UwtTariff.Kind.NEW
+
+    def clean(self):
+        from alokasi.models import UwtTariff
+
+        data = super().clean()
+        region, land_use, kind = (
+            data.get("region"),
+            data.get("land_use"),
+            data.get("kind"),
+        )
+        if region and land_use and kind:
+            tariff = UwtTariff.objects.filter(
+                region=region, land_use=land_use, kind=kind, is_active=True
+            ).first()
+            if tariff is None:
+                raise forms.ValidationError(
+                    _(
+                        "Tarif untuk wilayah, peruntukan, dan jenis pengurusan ini "
+                        "belum tersedia."
+                    )
+                )
+            data["tariff"] = tariff
+        if kind == UwtTariff.Kind.RENEWAL and not data.get("end_date"):
+            self.add_error(
+                "end_date", _("Isi tanggal berakhir UWT untuk menghitung pembaruan.")
+            )
+        return data
+
+
+class ContactForm(forms.Form):
+    name = forms.CharField(label=_("Nama lengkap"), max_length=255)
+    email = forms.EmailField(label=_("Surel"))
+    phone = forms.CharField(label=_("No. telepon"), max_length=32)
+    subject = forms.CharField(label=_("Subjek"), max_length=255)
+    body = forms.CharField(
+        label=_("Isi pesan"),
+        max_length=5000,
+        widget=forms.Textarea(attrs={"rows": 6}),
+    )
+    # Isian jebakan robot: harus tetap kosong (disembunyikan dengan CSS).
+    website = forms.CharField(label=_("Situs web"), required=False)
+
+    def clean_phone(self):
+        phone = self.cleaned_data["phone"].strip()
+        digits = sum(c.isdigit() for c in phone)
+        if digits < 8 or any(c not in "0123456789+-() " for c in phone):
+            raise forms.ValidationError(_("Nomor telepon tidak valid."))
+        return phone
 
 
 # --------------------------------------------------------------------------

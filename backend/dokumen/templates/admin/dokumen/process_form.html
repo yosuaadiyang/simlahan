@@ -42,7 +42,7 @@
       {% for group, label, fields in field_groups %}
       <div><strong>{{ label }}</strong><ul>{% for name, text in fields %}<li><code>{% templatetag openvariable %} {{ group }}.{{ name }} {% templatetag closevariable %}</code> {{ text }}</li>{% endfor %}</ul></div>
       {% endfor %}
-      <div><strong>Lainnya</strong><ul><li><code>{% templatetag openvariable %} isian.nama_bebas {% templatetag closevariable %}</code> diisi petugas saat membuat dokumen</li><li><code>{% templatetag openvariable %} blok.kode {% templatetag closevariable %}</code> paragraf dari pustaka konten</li></ul></div>
+      <div><strong>Lainnya</strong><ul><li><code>{% templatetag openvariable %} isian.nama_bebas {% templatetag closevariable %}</code> diisi petugas saat membuat dokumen</li><li><code>{% templatetag openvariable %} blok.kode {% templatetag closevariable %}</code> paragraf dari pustaka konten</li><li><code>{% templatetag openvariable %} kolom.nama_bebas {% templatetag closevariable %}</code> diisi penerima saat menandatangani (teks, tanggal, angka, centang, pilihan, paraf, lampiran)</li></ul></div>
     </div>
   </details>
   {% endif %}

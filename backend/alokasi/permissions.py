@@ -12,6 +12,7 @@ from alokasi.models import (
     Application,
     ApplicationDocument,
     ApplicationEvent,
+    ContactMessage,
     DevelopmentReport,
     InfoPage,
     InvestmentEvent,
@@ -24,6 +25,8 @@ from alokasi.models import (
     LandPlot,
     RequirementDocType,
     ServiceCatalog,
+    UwtRegion,
+    UwtTariff,
     VerificationCriterion,
     VerificationScore,
 )
@@ -67,7 +70,11 @@ ALOKASI_GROUP_MODEL_PERMISSIONS: GroupModelPermissions = {
     VerificationScore: _staff(V, V, V),
     ApplicationEvent: _staff(V, V, V),
     Invoice: _staff(VC + ("verify_payment",), VC + ("verify_payment",), V),
-    Allocation: _staff(VC + ("revoke_allocation",), VC + ("revoke_allocation",), V),
+    Allocation: _staff(
+        VC + ("revoke_allocation", "block_allocation"),
+        VC + ("revoke_allocation", "block_allocation"),
+        V,
+    ),
     IssuedDocument: _staff(V, V, V),
     DevelopmentReport: _staff(V, V, V),
     # Portal investasi: sektor & kawasan dikelola petugas; permintaan investor
@@ -79,4 +86,8 @@ ALOKASI_GROUP_MODEL_PERMISSIONS: GroupModelPermissions = {
     ),
     InvestmentMessage: _staff(V, V, V),
     InvestmentEvent: _staff(V, V, V),
+    # Simulasi biaya UWT & Kontak Kami.
+    UwtRegion: _staff(ALL, ALL, V),
+    UwtTariff: _staff(ALL, ALL, V),
+    ContactMessage: _staff(VC + ("delete",), VC, None),
 }

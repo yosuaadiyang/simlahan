@@ -13,6 +13,7 @@ import hashlib
 import hmac
 import io
 import secrets
+import uuid
 
 from django.conf import settings
 from django.core.cache import cache
@@ -24,13 +25,15 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 
 from alokasi.services import portal_url
-from dokumen import enums, merge, pdf
+from dokumen import enums, merge, pdf, services
 from dokumen.access import display_name, users_with_perm
 from dokumen.models import (
     DocumentComment,
     DocumentRecipient,
     DocumentSettings,
+    SavedSignature,
     SigningDocument,
+    SigningField,
 )
 from dokumen.sanitizer import sanitize_html
 from dokumen.services import (
@@ -50,6 +53,8 @@ OTP_SESSION = datetime.timedelta(minutes=30)
 OTP_MAX_ATTEMPTS = 5
 OTP_SENDS_PER_HOUR = 5
 MAX_SIGNATURE_BYTES = 300 * 1024
+HOST_SESSION = datetime.timedelta(minutes=30)
+MAX_FIELD_CHARS = 5000
 
 
 def _lock(document: SigningDocument) -> SigningDocument:
@@ -163,6 +168,7 @@ def create(
     holder = _holder_recipient(document, land_use, roles[0] if roles else "")
     if holder is not None:
         holder.save()
+    sync_fields(document, default_recipient=holder)
     log(
         enums.Action.CREATED,
         actor=user,
@@ -218,6 +224,191 @@ def fill_fields(
     return document
 
 
+# --------------------------------------------------------------------------
+# Kolom isian penerima ({{ kolom.<kunci> }})
+# --------------------------------------------------------------------------
+
+
+def field_keys(body: str) -> list[str]:
+    keys = []
+    for group, name in merge.FIELD_RE.findall(body or ""):
+        if group == merge.RECIPIENT_FIELD_GROUP and name not in keys:
+            keys.append(name)
+    return keys
+
+
+def sync_fields(document: SigningDocument, default_recipient=None) -> int:
+    """Buat baris kolom untuk ``{{ kolom.* }}`` di isi yang belum punya definisi."""
+    if document.source != enums.SigningSource.HTML or not document.is_editable:
+        return 0
+    existing = set(document.fields.values_list("key", flat=True))
+    created = 0
+    for order, key in enumerate(field_keys(document.body), 1):
+        if key in existing:
+            continue
+        SigningField.objects.create(
+            document=document,
+            recipient=default_recipient,
+            key=key,
+            label=key.replace("_", " ").capitalize(),
+            order=order,
+        )
+        created += 1
+    return created
+
+
+def render_body(document: SigningDocument, *, viewer=None, preview=False) -> str:
+    """Isi dokumen dengan nilai kolom penerima.
+
+    Kolom yang belum diisi tampil sebagai penanda ``[label]``: milik
+    ``viewer`` diberi penanda khusus agar mudah ditemukan saat mengisi.
+    """
+    from html import escape
+
+    fields = {f.key: f for f in document.fields.select_related("recipient")}
+
+    def replace(match):
+        group, name = match.groups()
+        if group != merge.RECIPIENT_FIELD_GROUP:
+            return match.group(0)
+        field = fields.get(name)
+        if field is None:
+            return escape(match.group(0)) if preview else ""
+        if field.filled_at and (
+            field.display_value or field.kind == field.Kind.CHECKBOX
+        ):
+            return escape(field.display_value).replace("\n", "<br>")
+        if document.status == S.COMPLETED:
+            return ""
+        owner = field.recipient.name if field.recipient_id else _("penerima")
+        css = (
+            "merge-field own-field"
+            if viewer is not None and field.recipient_id == viewer.pk
+            else "merge-field"
+        )
+        return f'<span class="{css}">[{escape(field.label)} · {escape(owner)}]</span>'
+
+    return sanitize_html(merge.FIELD_RE.sub(replace, document.body or ""))
+
+
+def _clean_number(field: SigningField, value: str) -> str:
+    from decimal import Decimal, InvalidOperation
+
+    try:
+        number = Decimal(value.replace(" ", "").replace(",", "."))
+    except InvalidOperation as error:
+        raise ValidationError(_("Isi angka pada kolom %s.") % field.label) from error
+    require(number.is_finite(), _("Isi angka pada kolom %s.") % field.label)
+    return format(number.normalize(), "f")
+
+
+def _clean_date(field: SigningField, value: str) -> str:
+    try:
+        return datetime.date.fromisoformat(value).isoformat()
+    except ValueError as error:
+        raise ValidationError(
+            _("Tanggal tidak valid pada kolom %s.") % field.label
+        ) from error
+
+
+def _clean_choice(field: SigningField, value: str) -> str:
+    require(value in field.choices, _("Pilihan tidak dikenal: %s.") % field.label)
+    return value
+
+
+def _clean_initials(field: SigningField, value: str) -> str:
+    require(len(value) <= 12, _("Paraf maksimal 12 karakter."))
+    return value
+
+
+def _clean_text(field: SigningField, value: str) -> str:
+    return " ".join(value.split())[:500]
+
+
+FIELD_CLEANERS = {
+    SigningField.Kind.NUMBER: _clean_number,
+    SigningField.Kind.DATE: _clean_date,
+    SigningField.Kind.CHOICE: _clean_choice,
+    SigningField.Kind.INITIALS: _clean_initials,
+    SigningField.Kind.TEXT: _clean_text,
+}
+
+
+def _clean_field_value(field: SigningField, raw, upload=None) -> tuple[str, object]:
+    """Validasi nilai satu kolom; mengembalikan (nilai, berkas)."""
+    if field.kind == SigningField.Kind.FILE:
+        if upload is None:
+            require(not field.required, _("Lampirkan berkas: %s.") % field.label)
+            return "", None
+        services.validate_upload(upload)
+        return "", upload
+    value = (raw or "").strip() if isinstance(raw, str) else raw
+    if field.kind == SigningField.Kind.CHECKBOX:
+        checked = value in ("1", "on", "true", True)
+        require(checked or not field.required, _("Centang: %s.") % field.label)
+        return ("1" if checked else "0"), None
+    if not value:
+        require(not field.required, _("Isi kolom: %s.") % field.label)
+        return "", None
+    require(len(value) <= MAX_FIELD_CHARS, _("Isian %s terlalu panjang.") % field.label)
+    cleaner = FIELD_CLEANERS.get(field.kind)
+    return (cleaner(field, value) if cleaner else value), None
+
+
+def save_fields(recipient: DocumentRecipient, values: dict, files: dict) -> list[str]:
+    """Simpan isian kolom milik penerima; semua divalidasi dulu (atomik)."""
+    fields = list(recipient.fields.select_for_update())
+    cleaned = []
+    errors = []
+    for field in fields:
+        try:
+            cleaned.append(
+                (field,)
+                + _clean_field_value(
+                    field, values.get(field.key, ""), files.get(field.key)
+                )
+            )
+        except ValidationError as error:
+            errors.extend(error.messages)
+    if errors:
+        raise ValidationError(errors)
+    now = timezone.now()
+    filled = []
+    for field, value, upload in cleaned:
+        if upload is not None:
+            field.file_sha256, _size = services.file_digest(upload)
+            field.file_name = (upload.name or "berkas")[:255]
+            field.file.save(field.file_name, upload, save=False)
+        field.value = value
+        field.filled_at = now
+        field.save()
+        filled.append(field.label)
+    return filled
+
+
+def _field_problems(document: SigningDocument, recipients) -> list[str]:
+    issues = []
+    acting_ids = {r.pk for r in recipients if r.is_acting}
+    fields = list(document.fields.all())
+    defined = {f.key for f in fields}
+    if document.source == enums.SigningSource.HTML:
+        missing = [k for k in field_keys(document.body) if k not in defined]
+        if missing:
+            issues.append(
+                _("Kolom penerima belum didefinisikan: %s")
+                % ", ".join(f"{{{{ kolom.{k} }}}}" for k in missing)
+            )
+    for field in fields:
+        if field.recipient_id not in acting_ids:
+            issues.append(
+                _("Kolom %s belum ditetapkan ke penanda tangan/penyetuju.")
+                % field.label
+            )
+        if field.kind == SigningField.Kind.CHOICE and not field.choices:
+            issues.append(_("Kolom pilihan %s belum punya pilihan.") % field.label)
+    return issues
+
+
 def problems(document: SigningDocument) -> list[str]:
     """Hal yang harus dibereskan sebelum dokumen dapat dikirim."""
     issues = []
@@ -231,16 +422,26 @@ def problems(document: SigningDocument) -> list[str]:
     recipients = list(document.recipients.all())
     if not any(r.is_acting for r in recipients):
         issues.append(_("Tambahkan minimal satu penanda tangan atau penyetuju."))
-    emails = [r.email.lower() for r in recipients if r.is_acting]
+    emails = [r.email.lower() for r in recipients if r.is_acting and r.email]
     if len(emails) != len(set(emails)):
         issues.append(_("Satu surel tidak boleh menjadi dua penerima yang bertindak."))
+    for r in recipients:
+        if not r.email and not (r.is_acting and r.in_person):
+            issues.append(
+                _("Surel %s wajib diisi (kecuali tanda tangan langsung).") % r.name
+            )
+    issues.extend(_field_problems(document, recipients))
     if document.expires_on and document.expires_on < timezone.localdate():
         issues.append(_("Batas tanda tangan sudah lewat; ubah tanggalnya."))
-    leftovers = (
-        merge.FIELD_RE.findall(merge.sanitize_html(document.body or ""))
-        if document.body
-        else []
-    )
+    leftovers = [
+        (group, name)
+        for group, name in (
+            merge.FIELD_RE.findall(merge.sanitize_html(document.body or ""))
+            if document.body
+            else []
+        )
+        if group != merge.RECIPIENT_FIELD_GROUP
+    ]
     if leftovers:
         issues.append(
             _("Masih ada isian yang belum terganti: %s")
@@ -412,7 +613,9 @@ def _notify_turn(document: SigningDocument, *, reminder=False) -> int:
                 document.expires_on.strftime("%d-%m-%Y") if document.expires_on else "-"
             ),
         }
-        on_commit_email([recipient.email], subject, body)
+        if not recipient.in_person:
+            # Penerima tanda tangan langsung tidak diberi tautan lewat surel.
+            on_commit_email([recipient.email], subject, body)
         recipient.notified_at = timezone.now()
         recipient.save(update_fields=["notified_at"])
         count += 1
@@ -555,8 +758,9 @@ def duplicate(document, user, request=None) -> SigningDocument:
             document.source_name or "dokumen.pdf",
             ContentFile(read_file(document.source_file)),
         )
+    mapping = {}
     for recipient in document.recipients.all():
-        DocumentRecipient.objects.create(
+        mapping[recipient.pk] = DocumentRecipient.objects.create(
             document=copy,
             order=recipient.order,
             role=recipient.role,
@@ -564,6 +768,22 @@ def duplicate(document, user, request=None) -> SigningDocument:
             user=recipient.user,
             name=recipient.name,
             email=recipient.email,
+            in_person=recipient.in_person,
+            stamp_page=recipient.stamp_page,
+            stamp_x=recipient.stamp_x,
+            stamp_y=recipient.stamp_y,
+            stamp_width=recipient.stamp_width,
+        )
+    for field in document.fields.all():
+        SigningField.objects.create(
+            document=copy,
+            recipient=mapping.get(field.recipient_id),
+            key=field.key,
+            label=field.label,
+            kind=field.kind,
+            options=field.options,
+            required=field.required,
+            order=field.order,
         )
     log(
         enums.Action.CREATED,
@@ -631,6 +851,11 @@ def is_turn(recipient: DocumentRecipient) -> bool:
 def record_view(recipient: DocumentRecipient, request=None) -> None:
     document = _lock(recipient.document)
     recipient = DocumentRecipient.objects.select_for_update().get(pk=recipient.pk)
+    if document.sent_at is not None:
+        now = timezone.now()
+        DocumentRecipient.objects.filter(pk=recipient.pk).update(
+            view_count=recipient.view_count + 1, last_viewed_at=now
+        )
     if recipient.viewed_at is None and document.sent_at is not None:
         recipient.viewed_at = timezone.now()
         if recipient.status == enums.RecipientStatus.WAITING:
@@ -659,6 +884,10 @@ def send_otp(recipient: DocumentRecipient, request=None) -> None:
     )
     require(
         is_turn(recipient), _("Dokumen belum atau tidak lagi menunggu tindakan Anda.")
+    )
+    require(
+        not recipient.in_person and bool(recipient.email),
+        _("Penerima ini menandatangani langsung di hadapan petugas."),
     )
     key = f"dokumen:otp:{recipient.pk}"
     try:
@@ -695,7 +924,18 @@ def send_otp(recipient: DocumentRecipient, request=None) -> None:
     )
 
 
-def check_otp(recipient: DocumentRecipient, code: str) -> bool:
+def set_access_code(recipient: DocumentRecipient, code: str) -> None:
+    """Simpan kode akses (dibagikan petugas di luar surel) dalam bentuk hash."""
+    from django.contrib.auth.hashers import make_password
+
+    code = (code or "").strip()
+    recipient.access_code_hash = make_password(code) if code else ""
+
+
+def check_otp(recipient: DocumentRecipient, code: str, access_code: str = "") -> bool:
+    """Kode surel (dan kode akses bila diatur) harus cocok bersamaan."""
+    from django.contrib.auth.hashers import check_password
+
     recipient = DocumentRecipient.objects.get(pk=recipient.pk)
     code = (code or "").strip()
     if (
@@ -710,6 +950,10 @@ def check_otp(recipient: DocumentRecipient, code: str) -> bool:
     )
     if not hmac.compare_digest(recipient.otp_hash, _otp_digest(recipient, code)):
         return False
+    if recipient.access_code_hash and not check_password(
+        (access_code or "").strip(), recipient.access_code_hash
+    ):
+        return False
     DocumentRecipient.objects.filter(pk=recipient.pk).update(
         otp_verified_at=timezone.now(), otp_hash="", otp_expires_at=None
     )
@@ -717,6 +961,9 @@ def check_otp(recipient: DocumentRecipient, code: str) -> bool:
 
 
 def otp_ok(recipient: DocumentRecipient) -> bool:
+    if recipient.in_person:
+        # Hanya lewat sesi tanda tangan langsung yang dipandu petugas.
+        return False
     if not recipient.needs_otp:
         return True
     return bool(
@@ -758,25 +1005,60 @@ def clean_signature(data_uri: str) -> str:
     return prefix + base64.b64encode(output.getvalue()).decode()
 
 
+def _require_verified(recipient: DocumentRecipient, host=None) -> str:
+    """Pastikan penerima terverifikasi; kembalikan catatan cara verifikasinya."""
+    if host is not None:
+        require(
+            recipient.hosted_for(host),
+            _(
+                "Sesi tanda tangan langsung sudah berakhir; buka ulang dari panel petugas."
+            ),
+        )
+        return _("Langsung di hadapan petugas %(officer)s; identitas: %(evidence)s") % {
+            "officer": display_name(host),
+            "evidence": recipient.host_evidence,
+        }
+    require(
+        otp_ok(recipient), _("Masukkan kode verifikasi yang dikirim ke surel Anda.")
+    )
+    notes = []
+    if recipient.user_id:
+        notes.append(_("Masuk dengan akun SimLahan"))
+    if recipient.needs_otp:
+        notes.append(_("Kode verifikasi surel"))
+    if recipient.access_code_hash:
+        notes.append(_("Kode akses"))
+    return " + ".join(str(n) for n in notes)
+
+
 @transaction.atomic
 def act(
-    recipient: DocumentRecipient, *, name: str, signature: str = "", request=None
+    recipient: DocumentRecipient,
+    *,
+    name: str,
+    signature: str = "",
+    request=None,
+    field_values=None,
+    field_files=None,
+    host=None,
 ) -> SigningDocument:
-    """Penerima menandatangani (atau menyetujui) dokumen."""
+    """Penerima menandatangani (atau menyetujui) dokumen.
+
+    ``host`` diisi petugas yang memandu tanda tangan langsung.
+    """
     document = _lock(recipient.document)
     recipient = DocumentRecipient.objects.select_for_update().get(pk=recipient.pk)
     recipient.document = document
     require(
         is_turn(recipient), _("Dokumen belum atau tidak lagi menunggu tindakan Anda.")
     )
-    require(
-        otp_ok(recipient), _("Masukkan kode verifikasi yang dikirim ke surel Anda.")
-    )
+    verification = _require_verified(recipient, host)
     name = (name or "").strip()
     require(len(name) >= 3, _("Tulis nama lengkap Anda."))
     image = clean_signature(signature)
     if recipient.action == enums.RecipientAction.SIGN:
         require(bool(image), _("Bubuhkan tanda tangan pada kotak yang tersedia."))
+    filled = save_fields(recipient, field_values or {}, field_files or {})
     recipient.signature_name = name[:255]
     recipient.signature_image = image
     recipient.status = enums.RecipientStatus.DONE
@@ -784,19 +1066,25 @@ def act(
     recipient.viewed_at = recipient.viewed_at or recipient.completed_at
     recipient.ip_address = client_ip(request)
     recipient.user_agent = user_agent(request)
+    recipient.verification_note = verification[:255]
+    recipient.hosted_by = None
+    recipient.hosted_until = None
     recipient.save()
     action = (
         enums.Action.SIGNED
         if recipient.action == enums.RecipientAction.SIGN
         else enums.Action.RECIPIENT_APPROVED
     )
+    detail = f"{name} <{recipient.email or '-'}> · {verification}"
+    if filled:
+        detail += " · " + _("kolom diisi: %s") % ", ".join(filled)
     log(
         action,
-        actor=recipient.user,
+        actor=host or recipient.user,
         actor_name=recipient.name,
         request=request,
         signing=document,
-        detail=f"{name} <{recipient.email}>",
+        detail=detail,
     )
     if document.current_order() is None:
         _complete(document)
@@ -806,16 +1094,18 @@ def act(
 
 
 @transaction.atomic
-def decline(recipient: DocumentRecipient, reason: str, request=None) -> SigningDocument:
+def decline(
+    recipient: DocumentRecipient, reason: str, request=None, host=None
+) -> SigningDocument:
     document = _lock(recipient.document)
     recipient = DocumentRecipient.objects.select_for_update().get(pk=recipient.pk)
     recipient.document = document
     require(
         is_turn(recipient), _("Dokumen belum atau tidak lagi menunggu tindakan Anda.")
     )
-    require(
-        otp_ok(recipient), _("Masukkan kode verifikasi yang dikirim ke surel Anda.")
-    )
+    _require_verified(recipient, host)
+    recipient.hosted_by = None
+    recipient.hosted_until = None
     reason = (reason or "").strip()
     require(bool(reason), _("Tuliskan alasan menolak."))
     recipient.status = enums.RecipientStatus.DECLINED
@@ -960,3 +1250,200 @@ def send_due_reminders(now=None) -> int:
             continue
         count += remind(document)
     return count
+
+
+# --------------------------------------------------------------------------
+# Ganti penerima, tanda tangan langsung, tanda tangan tersimpan, kirim massal
+# --------------------------------------------------------------------------
+
+
+@transaction.atomic
+def reassign(
+    recipient: DocumentRecipient,
+    *,
+    name: str,
+    email: str,
+    user,
+    officer,
+    reason: str,
+    request=None,
+) -> DocumentRecipient:
+    """Ganti penerima yang belum bertindak (mis. pejabat berganti, surel salah).
+
+    Tautan lama tidak berlaku lagi (token baru) dan kode verifikasi direset.
+    """
+    document = _lock(recipient.document)
+    recipient = DocumentRecipient.objects.select_for_update().get(pk=recipient.pk)
+    require(
+        document.is_open or document.is_editable,
+        _(
+            "Penerima hanya dapat diganti selama dokumen draf atau menunggu tanda tangan."
+        ),
+    )
+    require(
+        recipient.status
+        not in (enums.RecipientStatus.DONE, enums.RecipientStatus.DECLINED),
+        _("Penerima ini sudah bertindak."),
+    )
+    name = (name or "").strip()
+    email = (email or "").strip().lower()
+    reason = (reason or "").strip()
+    require(len(name) >= 3, _("Tulis nama penerima baru."))
+    require(bool(reason), _("Tuliskan alasan penggantian."))
+    require(
+        bool(email) or recipient.in_person,
+        _("Surel penerima baru wajib diisi."),
+    )
+    if user is not None:
+        require(
+            bool(user.email) and user.email.lower() == email,
+            _("Surel harus sama dengan surel akun yang dipilih."),
+        )
+    clash = (
+        document.recipients.exclude(pk=recipient.pk)
+        .exclude(action=enums.RecipientAction.COPY)
+        .filter(email__iexact=email)
+        .exists()
+    )
+    require(
+        not (email and recipient.is_acting and clash),
+        _("Surel ini sudah menjadi penerima lain yang bertindak."),
+    )
+    old = f"{recipient.name} <{recipient.email or '-'}>"
+    recipient.name = name[:255]
+    recipient.email = email
+    recipient.user = user
+    recipient.token = uuid.uuid4()
+    recipient.status = enums.RecipientStatus.WAITING
+    recipient.notified_at = None
+    recipient.viewed_at = None
+    recipient.otp_hash = ""
+    recipient.otp_expires_at = None
+    recipient.otp_attempts = 0
+    recipient.otp_verified_at = None
+    recipient.hosted_by = None
+    recipient.hosted_until = None
+    recipient.save()
+    log(
+        enums.Action.REASSIGNED,
+        actor=officer,
+        request=request,
+        signing=document,
+        detail=_("%(old)s diganti %(new)s: %(reason)s")
+        % {"old": old, "new": f"{name} <{email or '-'}>", "reason": reason},
+    )
+    if document.is_open:
+        _notify_turn(document)
+    return recipient
+
+
+@transaction.atomic
+def start_hosted(
+    recipient: DocumentRecipient, officer, evidence: str, request=None
+) -> DocumentRecipient:
+    """Buka sesi tanda tangan langsung di perangkat petugas (30 menit)."""
+    recipient = DocumentRecipient.objects.select_for_update().get(pk=recipient.pk)
+    require(
+        is_turn(recipient),
+        _("Dokumen belum atau tidak lagi menunggu tindakan penerima ini."),
+    )
+    evidence = " ".join((evidence or "").split())
+    require(len(evidence) >= 4, _("Catat bukti identitas yang diperiksa."))
+    recipient.hosted_by = officer
+    recipient.hosted_until = timezone.now() + HOST_SESSION
+    recipient.host_evidence = evidence[:255]
+    recipient.save(update_fields=["hosted_by", "hosted_until", "host_evidence"])
+    log(
+        enums.Action.HOSTED,
+        actor=officer,
+        request=request,
+        signing=recipient.document,
+        detail=_("%(name)s · identitas: %(evidence)s")
+        % {"name": recipient.name, "evidence": recipient.host_evidence},
+    )
+    return recipient
+
+
+def save_signature(user, name: str, signature: str) -> SavedSignature:
+    """Simpan (atau ganti) tanda tangan tersimpan milik akun."""
+    name = (name or "").strip()
+    require(len(name) >= 3, _("Tulis nama lengkap Anda."))
+    image = clean_signature(signature)
+    require(bool(image), _("Bubuhkan tanda tangan pada kotak yang tersedia."))
+    saved, _created = SavedSignature.objects.update_or_create(
+        user=user, defaults={"name": name[:255], "image": image}
+    )
+    return saved
+
+
+def bulk_send(
+    *,
+    template,
+    land_uses,
+    user,
+    title: str = "",
+    extra_recipient: dict | None = None,
+    message: str = "",
+    request=None,
+) -> list[dict]:
+    """Buat (dan kirim bila bisa) satu dokumen per pemanfaatan lahan.
+
+    Setiap dokumen ditangani dalam transaksi sendiri sehingga kegagalan satu
+    pemanfaatan lahan tidak membatalkan yang lain. Hasil per baris:
+    ``{"land_use", "document", "status", "note"}``.
+    """
+    results = []
+    for land_use in land_uses:
+        row = {"land_use": land_use, "document": None, "status": "gagal", "note": ""}
+        try:
+            with transaction.atomic():
+                holder = land_use.holder
+                require(
+                    holder is not None and holder.user_id and holder.user.email,
+                    _("Pemegang hak belum punya akun portal bersurel."),
+                )
+                document = create(
+                    user=user,
+                    title=(title or template.name).replace("{nomor}", land_use.number),
+                    template=template,
+                    land_use=land_use,
+                    request=request,
+                )
+                if message:
+                    document.message = message[:5000]
+                    document.save(update_fields=["message", "modified_at"])
+                if extra_recipient:
+                    DocumentRecipient.objects.create(
+                        document=document,
+                        order=extra_recipient.get("order") or 2,
+                        role=extra_recipient.get("role", "")[:100],
+                        action=extra_recipient.get("action")
+                        or enums.RecipientAction.SIGN,
+                        user=extra_recipient.get("user"),
+                        name=extra_recipient["name"][:255],
+                        email=extra_recipient["email"],
+                    )
+                log(
+                    enums.Action.BULK_SENT,
+                    actor=user,
+                    request=request,
+                    signing=document,
+                    land_use=land_use,
+                    detail=str(template),
+                )
+                row["document"] = document
+                issues = problems(document)
+                if issues:
+                    row["status"] = "draf"
+                    row["note"] = " ".join(str(i) for i in issues)
+                elif document.needs_approval:
+                    submit_for_approval(document, user, request=request)
+                    row["status"] = "menunggu_persetujuan"
+                else:
+                    send(document, user, request=request)
+                    row["status"] = "dikirim"
+        except ValidationError as error:
+            row["note"] = " ".join(error.messages)
+            row["document"] = None
+        results.append(row)
+    return results

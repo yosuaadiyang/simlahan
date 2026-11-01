@@ -1,0 +1,6 @@
+{% with logo=config.letterhead_logo_data_uri lines=config.letterhead_line_list %}<div class="kop">
+  {% if logo %}<table style="width:100%"><tr><td style="width:64pt;vertical-align:middle"><img src="{{ logo }}" height="52"></td><td class="center" style="vertical-align:middle">{% endif %}
+  <div class="org">{{ config.authority_name|upper }}</div>
+  {% for line in lines %}<div class="muted">{{ line }}</div>{% endfor %}
+  {% if logo %}</td><td style="width:64pt"></td></tr></table>{% endif %}
+</div>{% endwith %}

@@ -26,6 +26,7 @@ FILE_KINDS = {
     "progres": (DevelopmentReport, "photo"),
     "lahan": (LandPlot, "photo"),
     "informasi": (InfoPage, "attachment"),
+    "informasi_gambar": (InfoPage, "image"),
     "kawasan": (InvestmentZone, "photo"),
     "investasi": (InvestmentRequest, "attachment"),
     "pesan_investasi": (InvestmentMessage, "attachment"),

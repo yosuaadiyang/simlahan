@@ -34,6 +34,11 @@
 .dk-paper { padding: 28px 32px; background: #fff; color: #111; border: 1px solid var(--border); border-radius: var(--sl-radius); font-family: Georgia, "Times New Roman", serif; line-height: 1.55; overflow-wrap: anywhere; overflow-x: auto; }
 .dk-paper table { border-collapse: collapse; max-width: 100%; }
 .dk-paper img { max-width: 100%; height: auto; }
+.dk-paper .merge-field { background: #eef2f7; color: #4b5563; padding: 0 3px; border-radius: 3px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .82em; }
+.dk-paper .merge-field.own-field { background: #fff3a3; color: #5c4400; outline: 1px dashed #bf8700; }
+.dk-fields { display: grid; gap: 12px; margin: 12px 0 16px; padding: 12px; border: 1px solid var(--border); border-radius: var(--sl-radius); background: var(--surface-2, #f8fafc); }
+.dk-fields legend { font-weight: 600; padding: 0 4px; }
+.dk-host { border-left: 4px solid #bf8700; }
 .dk-pdf { width: 100%; height: 70vh; min-height: 420px; border: 1px solid var(--border); border-radius: var(--sl-radius); background: var(--sl-gray-50); }
 .dk-sigpad { margin: 12px 0; }
 .dk-sigpad canvas { display: block; width: 100%; max-width: 600px; aspect-ratio: 3 / 1; height: auto; border: 2px dashed var(--sl-border-strong); border-radius: var(--sl-radius); background: #fff; touch-action: none; cursor: crosshair; }

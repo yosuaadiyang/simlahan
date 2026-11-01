@@ -1,0 +1,55 @@
+{% extends "alokasi/portal/base.html" %}{% load alokasi_tags %}
+{% block title %}Kontak Kami{% endblock %}
+{% block content %}
+<h1>Kontak Kami</h1>
+<p class="muted">Kirim pertanyaan atau masukan tentang layanan {{ config.authority_name }}. Petugas membalas ke surel Anda.</p>
+<div class="split">
+  <section class="card">
+    <h2>Kirim pesan</h2>
+    <form method="post" action="{% url 'portal:contact' %}" novalidate>{% csrf_token %}
+      {% if form.non_field_errors %}<div class="alert alert-danger">{% for e in form.non_field_errors %}{{ e }}<br>{% endfor %}</div>{% endif %}
+      <div class="form-grid">
+        {% for field in form.visible_fields %}{% if field.name != 'website' %}
+        <div class="field required"{% if field.name == 'body' %} style="grid-column: 1 / -1"{% endif %}>
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {{ field.errors }}
+        </div>
+        {% endif %}{% endfor %}
+      </div>
+      <div class="hp-field" aria-hidden="true"><label for="{{ form.website.id_for_label }}">{{ form.website.label }}</label><input type="text" name="{{ form.website.html_name }}" id="{{ form.website.id_for_label }}" tabindex="-1" autocomplete="off"></div>
+      <button class="btn btn-accent" type="submit">Kirim pesan</button>
+    </form>
+  </section>
+  <aside>
+    <section class="card">
+      <h2>Jam layanan</h2>
+      <p>{{ config.office_hours|default:"–" }}</p>
+      {% if config.contact_info %}<div class="prose small">{{ config.contact_info }}</div>{% endif %}
+    </section>
+    {% if config.contact_email or config.whatsapp_channels %}
+    <section class="card">
+      <h2>Kanal layanan</h2>
+      <ul class="channel-list">
+        {% if config.contact_email %}<li>Surel: <a href="mailto:{{ config.contact_email }}">{{ config.contact_email }}</a></li>{% endif %}
+        {% for wa in config.whatsapp_channels %}<li>WhatsApp {{ wa.label }}: <a href="{{ wa.url }}" target="_blank" rel="noopener">{{ wa.number }}</a></li>{% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+    {% if config.social_channels %}
+    <section class="card">
+      <h2>Media sosial</h2>
+      <ul class="channel-list">{% for link in config.social_channels %}<li><a href="{{ link.url }}" target="_blank" rel="noopener">{{ link.label }}</a></li>{% endfor %}</ul>
+    </section>
+    {% endif %}
+    <section class="card small">
+      <h2>Bantuan lain</h2>
+      <ul>
+        <li><a href="{% url 'portal:help' %}">Panduan, tanya jawab, dan video tutorial</a></li>
+        <li><a href="{% url 'portal:track' %}">Lacak permohonan</a></li>
+        <li><a href="{% url 'portal:forms' %}">Formulir permohonan</a></li>
+      </ul>
+    </section>
+  </aside>
+</div>
+{% endblock %}

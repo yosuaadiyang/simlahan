@@ -102,7 +102,7 @@ def _config() -> list[Finding]:
 
 
 def _sample_data() -> list[Finding]:
-    from alokasi.models import LandPlot
+    from alokasi.models import LandPlot, UwtRegion
     from asetlahan.models import LandAsset, MapOverlay
     from dokumen.models import LandUse
     from operasi.models import Korwil, Ticket
@@ -124,6 +124,11 @@ def _sample_data() -> list[Finding]:
             FAIL,
             LandPlot.objects.filter(code__startswith="CONTOH-RMP-"),
             "lahan contoh tampil di peta portal publik",
+        ),
+        (
+            FAIL,
+            UwtRegion.objects.filter(name__endswith="(CONTOH)"),
+            "wilayah tarif UWT contoh tampil di simulasi biaya portal publik",
         ),
         (
             WARN,

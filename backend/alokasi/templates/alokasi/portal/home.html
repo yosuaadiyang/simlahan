@@ -15,6 +15,16 @@
 </section>
 {% endblock %}
 {% block content %}
+{% if pinned %}
+<div class="pinned-list">
+  {% for item in pinned %}
+  <a class="pinned card" href="{% url 'portal:info_detail' item.slug %}">
+    {% if item.image %}<img src="{% url 'portal:info_image' item.slug %}" alt="" loading="lazy">{% endif %}
+    <span><span class="small muted">{{ item.get_category_display }} · {{ item.published_at|tanggal }}</span><br><strong>{{ item.title }}</strong>{% if item.summary %}<br><span class="small">{{ item.summary }}</span>{% endif %}<br><span class="small">Selengkapnya ›</span></span>
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
 <div class="grid grid-4">
   <div class="card"><div class="stat">{{ stats.total|default:0 }}</div><div class="muted">Lahan tersedia</div></div>
   <div class="card"><div class="stat">{{ stats.area|default:0|hektare|patah }}</div><div class="muted">Total luas tersedia</div></div>

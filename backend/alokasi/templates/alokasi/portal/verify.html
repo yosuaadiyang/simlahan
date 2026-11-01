@@ -2,15 +2,18 @@
 {% block title %}Cek Keaslian Dokumen{% endblock %}
 {% block content %}
 <h1>Cek keaslian dokumen</h1>
-<p>Pindai kode QR pada KPT, PPT, atau Surat Izin Peralihan Hak, atau masukkan kode verifikasinya.</p>
+<p>Pindai kode QR pada KPT, PPT, Penetapan Lokasi, Surat Izin Peralihan Hak, atau surat layanan lainnya, atau masukkan kode verifikasinya.</p>
 <form method="get" action="{% url 'portal:verify' %}" class="card" style="max-width:640px">
   {% include "alokasi/portal/_form.html" with grid_class="stack" %}
   <button class="btn" type="submit">Periksa</button>
 </form>
 {% if searched %}
   {% if document %}
-  <div class="card {% if transfer %}alert-warn{% else %}alert-ok{% endif %}" style="max-width:640px;margin-top:16px">
-    {% if transfer %}
+  <div class="card {% if transfer or document.replaced_at %}alert-warn{% else %}alert-ok{% endif %}" style="max-width:640px;margin-top:16px">
+    {% if document.replaced_at %}
+    <h2>Dokumen terdaftar, tetapi sudah diganti</h2>
+    <p>Dokumen ini sudah tidak berlaku sejak {{ document.replaced_at|tanggal }} karena diganti dengan {{ document.replaced_by.get_kind_display }} nomor {{ document.replaced_by.number }}.</p>
+    {% elif transfer %}
     <h2>Dokumen terdaftar, tetapi hak sudah dialihkan</h2>
     <p>Hak atas alokasi ini telah dialihkan dengan {{ transfer.get_kind_display }} nomor {{ transfer.number }} tanggal {{ transfer.issued_at|tanggal }}. Dokumen ini atas nama pemegang hak sebelumnya dan tidak lagi menunjukkan pemegang hak yang berlaku.</p>
     {% else %}
@@ -24,7 +27,7 @@
       <dt>Lahan</dt><dd>{{ document.allocation.plot.code }} – {{ document.allocation.plot.name }}</dd>
       <dt>Luas</dt><dd>{{ document.allocation.area_m2|angka:2|patah }} m²</dd>
       {% if transfer %}<dt>Pemegang hak saat ini</dt><dd>{{ document.allocation.holder.name }}</dd>{% endif %}
-      <dt>Status alokasi saat ini</dt><dd><span class="badge badge-{{ document.allocation.status }}">{{ document.allocation.get_status_display }}</span></dd>
+      <dt>Status alokasi saat ini</dt><dd><span class="badge badge-{{ document.allocation.status }}">{{ document.allocation.get_status_display }}</span>{% if document.allocation.is_blocked %} <span class="badge badge-ditolak">PL diblokir</span>{% endif %}</dd>
     </dl>
     {% if document.allocation.status != 'aktif' %}<p class="small">Alokasi atas dokumen ini tidak lagi aktif.</p>{% endif %}
   </div>

@@ -14,11 +14,20 @@
   <tr>
     <td><strong>{{ r.signature_name|default:r.name }}</strong><br>{{ r.role|default:r.get_action_display }}<br><span class="small">{{ r.email|pecah:24 }}</span></td>
     <td>{% if r.signature_image %}<img src="{{ r.signature_image }}" width="170" height="60">{% else %}<strong>DISETUJUI</strong>{% endif %}<br><span class="small">{{ r.get_action_display }}</span></td>
-    <td class="small">{{ r.completed_at|date:"d-m-Y H.i.s" }} WIB<br>IP {{ r.ip_address|default:"-" }}{% if r.user_id %}<br>Masuk dengan akun SimLahan{% else %}<br>Kode verifikasi surel{% endif %}</td>
+    <td class="small">{{ r.completed_at|date:"d-m-Y H.i.s" }} WIB<br>IP {{ r.ip_address|default:"-" }}<br>{% if r.verification_note %}{{ r.verification_note|pecah:28 }}{% elif r.user_id %}Masuk dengan akun SimLahan{% else %}Kode verifikasi surel{% endif %}</td>
   </tr>
   {% endfor %}
 </table>
-{% if copies %}<p class="small">Salinan: {% for r in copies %}{{ r.name }} ({{ r.email|pecah:32 }}){% if not forloop.last %}, {% endif %}{% endfor %}</p>{% endif %}
+{% if fields %}
+<h3>Isian penerima</h3>
+<table class="grid">
+  <tr><th style="width:34%">Kolom</th><th style="width:40%">Isian</th><th>Diisi oleh</th></tr>
+  {% for f in fields %}
+  <tr><td>{{ f.label }}</td><td>{{ f.display_value|default:"-"|pecah:32|linebreaksbr }}{% if f.file_sha256 %}<br><span class="small">SHA-256 {{ f.file_sha256|pecah:32 }}</span>{% endif %}</td><td class="small">{{ f.recipient.name|default:"-" }}<br>{{ f.filled_at|date:"d-m-Y H.i" }} WIB</td></tr>
+  {% endfor %}
+</table>
+{% endif %}
+{% if copies %}<p class="small">Salinan: {% for r in copies %}{{ r.name }} ({{ r.email|default:"-"|pecah:32 }}){% if not forloop.last %}, {% endif %}{% endfor %}</p>{% endif %}
 </div>
 
 <div class="page-break">
