@@ -177,6 +177,10 @@ LOGGING = {
         # Diteruskan ke root (console); surel ke ADMINS tetap bila diisi.
         "django": {"handlers": ["mail_admins"], "level": "INFO"},
         "django.request": {"level": "ERROR"},
+        # xhtml2pdf mencatat setiap properti CSS yang tidak didukungnya
+        # (mis. border-collapse dari isi templat dokumen) sebagai WARNING;
+        # PDF tetap jadi, jadi hanya kesalahan sungguhan yang ditampilkan.
+        "xhtml2pdf": {"level": "ERROR"},
     },
 }
 
