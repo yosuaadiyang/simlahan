@@ -23,10 +23,10 @@
       <a href="{% url 'portal:plot_list' %}"{% if name == 'plot_list' or name == 'plot_detail' %} class="active"{% endif %}>Peta Lahan</a>
       <a href="{% url 'portal:investment_home' %}"{% if name|slice:":11" == "investment_" or name == "investor_register" %} class="active"{% endif %}>Investasi</a>
       <a href="{% url 'portal:services' %}"{% if name == 'services' or name == 'service_detail' or name == 'service_terms' or name == 'uwt_calculator' %} class="active"{% endif %}>Layanan</a>
-      <a href="{% url 'portal:info_index' %}"{% if name == 'info_index' or name == 'info_category' or name == 'info_detail' %} class="active"{% endif %}>Informasi</a>
+      <a href="{% url 'portal:info_index' %}"{% if name == 'info_index' or name == 'info_category' or name == 'info_detail' or name == 'forms' or name == 'open_winners' %} class="active"{% endif %}>Informasi</a>
       <a href="{% url 'portal:verify' %}"{% if name == 'verify' or name == 'verify_token' %} class="active"{% endif %}>Cek Dokumen</a>
       <a href="{% url 'portal:track' %}"{% if name == 'track' %} class="active"{% endif %}>Lacak</a>
-      <a href="{% url 'portal:help' %}"{% if name == 'help' %} class="active"{% endif %}>Bantuan</a>
+      <a href="{% url 'portal:help' %}"{% if name == 'help' or name == 'contact' %} class="active"{% endif %}>Bantuan</a>
       {% aset_portal_flags as aset_flags %}
       {% if aset_flags.enable_tender %}<a href="{% url 'aset_portal:tender_list' %}"{% if name == 'tender_list' or name == 'tender_detail' or name == 'bid_submit' %} class="active"{% endif %}>Lelang</a>{% endif %}
       {% if aset_flags.enable_grievance %}<a href="{% url 'aset_portal:grievance_create' %}"{% if name == 'grievance_create' or name == 'grievance_done' or name == 'grievance_check' %} class="active"{% endif %}>Pengaduan</a>{% endif %}
@@ -60,14 +60,28 @@
     <div>
       <div class="footer-brand"><img src="{% static 'simlahan/logo-mark.svg' %}" alt="" width="28" height="28"><strong>{{ portal_config.authority_name }}</strong></div>
       {% if portal_config.contact_info %}<p class="prose">{{ portal_config.contact_info }}</p>{% endif %}
+      {% if portal_config.office_hours %}<p>Jam layanan: {{ portal_config.office_hours }}</p>{% endif %}
+      {% if portal_config.contact_email %}<a href="mailto:{{ portal_config.contact_email }}">{{ portal_config.contact_email }}</a><br>{% endif %}
+      {% for wa in portal_config.whatsapp_channels %}<a href="{{ wa.url }}" target="_blank" rel="noopener">WhatsApp {{ wa.label }}</a><br>{% endfor %}
+      {% if portal_config.social_channels %}<p>{% for link in portal_config.social_channels %}<a href="{{ link.url }}" target="_blank" rel="noopener">{{ link.label }}</a>{% if not forloop.last %} · {% endif %}{% endfor %}</p>{% endif %}
     </div>
     <div>
-      <strong>Tautan</strong><br>
-      <a href="{% url 'portal:investment_home' %}">Peluang investasi</a><br>
+      <strong>Layanan & informasi</strong><br>
       <a href="{% url 'portal:services' %}">Layanan & persyaratan</a><br>
-      <a href="{% url 'portal:info_category' 'regulasi' %}">Regulasi</a><br>
+      <a href="{% url 'portal:plot_list' %}">Ketersediaan tanah</a><br>
+      <a href="{% url 'portal:forms' %}">Formulir permohonan</a><br>
+      <a href="{% url 'portal:open_winners' %}">Pemenang alokasi terbuka</a><br>
+      <a href="{% url 'portal:uwt_calculator' %}">Simulasi biaya UWT</a><br>
+      <a href="{% url 'portal:investment_home' %}">Peluang investasi</a><br>
+      <a href="{% url 'portal:info_category' 'regulasi' %}">Regulasi</a>
+    </div>
+    <div>
+      <strong>Bantuan</strong><br>
+      <a href="{% url 'portal:info_category' 'panduan' %}">Buku panduan</a><br>
       <a href="{% url 'portal:info_category' 'tutorial' %}">Video tutorial</a><br>
-      <a href="{% url 'portal:info_category' 'faq' %}">Tanya jawab</a>
+      <a href="{% url 'portal:info_category' 'faq' %}">Tanya jawab</a><br>
+      <a href="{% url 'portal:track' %}">Lacak permohonan</a><br>
+      <a href="{% url 'portal:contact' %}">Kontak kami</a>
     </div>
     {% if app_links.0.key != "portal" %}
     <div>

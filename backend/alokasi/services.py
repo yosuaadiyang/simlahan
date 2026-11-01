@@ -111,6 +111,31 @@ def _require(condition: bool, message: str) -> None:
         raise ValidationError(message)
 
 
+def _require_block_state(
+    allocation: Allocation, service_type: str, *, deciding: bool = False
+) -> None:
+    """PL terblokir hanya dapat diajukan pembukaan blokir, dan sebaliknya.
+
+    Saat memutuskan/menerbitkan (``deciding``), pembukaan blokir tetap boleh
+    selesai walau petugas sudah membuka blokirnya langsung lebih dulu.
+    """
+    if service_type == enums.ServiceType.UNBLOCK:
+        if deciding:
+            return
+        _require(
+            allocation.is_blocked,
+            _("Penetapan lokasi alokasi ini tidak sedang diblokir."),
+        )
+    else:
+        _require(
+            not allocation.is_blocked,
+            _(
+                "Penetapan lokasi alokasi ini sedang diblokir: ajukan pembukaan "
+                "blokir terlebih dahulu."
+            ),
+        )
+
+
 # --------------------------------------------------------------------------
 # Pemohon
 # --------------------------------------------------------------------------
@@ -143,12 +168,18 @@ def create_allocation_application(applicant: Applicant, plot: LandPlot) -> Appli
 def create_service_application(
     applicant: Applicant, allocation: Allocation, service_type: str, reason: str
 ) -> Application:
-    """Permohonan layanan atas alokasi sendiri: perpanjangan, pembaruan,
-    pecah PL, atau pengukuran ulang."""
+    """Permohonan layanan atas alokasi sendiri (perpanjangan, pembaruan,
+    layanan perubahan dokumen, penerbitan ulang KPT/PPT, dsb.)."""
     allocation = Allocation.objects.select_for_update().get(pk=allocation.pk)
     _require(
         allocation.holder_id == applicant.pk, _("Anda bukan pemegang alokasi ini.")
     )
+    _require(
+        service_type in enums.OWN_ALLOCATION_SERVICES
+        and service_type != enums.ServiceType.TRANSFER,
+        _("Jenis layanan tidak dikenal."),
+    )
+    _require_block_state(allocation, service_type)
     if service_type == enums.ServiceType.RENEWAL:
         _require(
             allocation.status
@@ -190,6 +221,7 @@ def _require_service_allocation(application: Application, allocation) -> None:
         in (enums.AllocationStatus.ACTIVE, enums.AllocationStatus.EXPIRED),
         _("Alokasi tidak lagi dapat diajukan layanan ini oleh pemohon ini."),
     )
+    _require_block_state(allocation, application.service_type, deciding=True)
 
 
 @transaction.atomic
@@ -204,6 +236,7 @@ def create_transfer_application(
         allocation.status == enums.AllocationStatus.ACTIVE,
         _("Hanya alokasi aktif yang dapat dialihkan."),
     )
+    _require_block_state(allocation, enums.ServiceType.TRANSFER)
     _require(
         recipient.pk != applicant.pk, _("Penerima hak tidak boleh pemohon sendiri.")
     )
@@ -232,13 +265,17 @@ def validate_for_submission(application: Application) -> list[str]:
     if application.is_allocation:
         if not application.plot_id:
             errors.append(_("Lahan belum dipilih."))
-        for field, label in (
+        fields = [
             ("activity", _("Rencana kegiatan")),
             ("investment_value", _("Nilai investasi")),
             ("workforce", _("Rencana tenaga kerja")),
             ("development_months", _("Jangka waktu pembangunan")),
             ("description", _("Uraian rencana usaha")),
-        ):
+        ]
+        if application.is_settlement:
+            # Penataan / KSB: cukup rencana pemanfaatan dan uraiannya.
+            fields = [fields[0], (fields[4][0], _("Uraian penguasaan & pemanfaatan"))]
+        for field, label in fields:
             if getattr(application, field) in (None, ""):
                 errors.append(_("%s wajib diisi.") % label)
     else:
@@ -282,6 +319,7 @@ def submit(application: Application, user) -> Application:
             and allocation.holder_id == application.applicant_id,
             _("Alokasi tidak lagi dapat diajukan layanan ini oleh pemohon ini."),
         )
+        _require_block_state(allocation, application.service_type)
     resubmission = application.status == S.REVISION
     application.submitted_at = timezone.now()
     if application.is_transfer:
@@ -435,6 +473,7 @@ def approve(application: Application, officer, note: str = "") -> Application:
             application.recipient_accepted_at is not None,
             _("Penerima hak belum menyetujui peralihan ini di portal."),
         )
+        _require_block_state(application.source_allocation, application.service_type)
     else:
         _require_service_allocation(application, application.source_allocation)
     application.decided_at = timezone.now()
@@ -546,7 +585,7 @@ def _create_invoices(  # noqa: C901
                     config.extension_admin_fee,
                 )
             )
-    else:  # Pecah PL dan pengukuran ulang.
+    else:  # Layanan perubahan dokumen & penerbitan ulang KPT/PPT.
         if config.service_admin_fee > 0:
             items.append(
                 (
@@ -697,9 +736,12 @@ def issue_documents(application: Application, officer=None) -> list[IssuedDocume
         issued.append(
             documents.issue(application, allocation, "ppt", allocation.ppt_number)
         )
+        issued.append(
+            documents.issue(application, allocation, "pl", _pl_number(allocation))
+        )
         body = _(
-            "Keputusan Pengalokasian Tanah %(kpt)s dan Perjanjian Pemanfaatan Tanah %(ppt)s "
-            "telah terbit. Unduh di %(url)s\n\nPemegang alokasi wajib melaporkan progres "
+            "Keputusan Pengalokasian Tanah %(kpt)s, Perjanjian Pemanfaatan Tanah %(ppt)s "
+            "dan Penetapan Lokasi telah terbit. Unduh di %(url)s\n\nPemegang alokasi wajib melaporkan progres "
             "perizinan dan pembangunan secara berkala melalui portal."
         ) % {
             "kpt": allocation.kpt_number,
@@ -715,6 +757,7 @@ def issue_documents(application: Application, officer=None) -> list[IssuedDocume
             and allocation.holder_id == application.applicant_id,
             _("Alokasi tidak lagi dapat dialihkan."),
         )
+        _require_block_state(allocation, application.service_type)
         number = _next_number("IPH")
         previous_holder = allocation.holder
         allocation.holder = application.recipient
@@ -770,11 +813,54 @@ def issue_documents(application: Application, officer=None) -> list[IssuedDocume
             "end": allocation.end_date.strftime("%d-%m-%Y"),
             "url": portal_url(f"permohonan/{application.number}/"),
         }
-    else:  # Pecah PL dan pengukuran ulang: surat persetujuan, tanpa ubah alokasi.
+    elif application.is_reissue:
+        # Dokumen pengganti / KPT-PPT perubahan / KPT-PPT baru: nomor baru,
+        # dokumen lama tetap tersimpan tetapi dinyatakan sudah diganti.
         allocation = Allocation.objects.select_for_update().get(
             pk=application.source_allocation_id
         )
         _require_service_allocation(application, allocation)
+        old_documents = list(
+            allocation.issued_documents.select_for_update().filter(
+                kind__in=("kpt", "ppt", "pl"), replaced_at__isnull=True
+            )
+        )
+        old_kpt = allocation.kpt_number
+        allocation.kpt_number = _next_number("KPT")
+        allocation.ppt_number = _next_number("PPT")
+        allocation.save(update_fields=["kpt_number", "ppt_number", "modified_at"])
+        new_by_kind = {}
+        for kind, number in (
+            ("kpt", allocation.kpt_number),
+            ("ppt", allocation.ppt_number),
+            ("pl", _pl_number(allocation)),
+        ):
+            new_by_kind[kind] = documents.issue(application, allocation, kind, number)
+            issued.append(new_by_kind[kind])
+        now = timezone.now()
+        for old in old_documents:
+            old.replaced_by = new_by_kind[old.kind]
+            old.replaced_at = now
+            old.save(update_fields=["replaced_by", "replaced_at"])
+        body = _(
+            "%(service)s atas alokasi %(old)s selesai: KPT %(kpt)s, PPT %(ppt)s dan "
+            "Penetapan Lokasi baru telah terbit; dokumen lama tidak berlaku lagi. "
+            "Unduh di %(url)s"
+        ) % {
+            "service": application.get_service_type_display(),
+            "old": old_kpt,
+            "kpt": allocation.kpt_number,
+            "ppt": allocation.ppt_number,
+            "url": portal_url(f"alokasi/{allocation.pk}/"),
+        }
+    else:  # Layanan perubahan dokumen: surat persetujuan, tanpa ubah alokasi.
+        allocation = Allocation.objects.select_for_update().get(
+            pk=application.source_allocation_id
+        )
+        _require_service_allocation(application, allocation)
+        if application.service_type == enums.ServiceType.UNBLOCK:
+            allocation.is_blocked = False
+            allocation.save(update_fields=["is_blocked", "modified_at"])
         number = _next_number("SPT")
         issued.append(documents.issue(application, allocation, "spt", number))
         body = _(
@@ -792,6 +878,61 @@ def issue_documents(application: Application, officer=None) -> list[IssuedDocume
         body,
     )
     return issued
+
+
+def _pl_number(allocation: Allocation) -> str:
+    return _next_number("PL")
+
+
+@transaction.atomic
+def block_allocation(allocation: Allocation, officer, reason: str) -> Allocation:
+    """Blokir PL: pemegang tidak dapat mengalihkan atau mengajukan layanan lain."""
+    allocation = Allocation.objects.select_for_update().get(pk=allocation.pk)
+    _require(
+        allocation.status == enums.AllocationStatus.ACTIVE, _("Alokasi tidak aktif.")
+    )
+    _require(not allocation.is_blocked, _("Penetapan lokasi sudah diblokir."))
+    _require(bool(reason.strip()), _("Alasan blokir wajib diisi."))
+    allocation.is_blocked = True
+    allocation.blocked_at = timezone.now()
+    allocation.block_reason = reason.strip()
+    allocation.save(
+        update_fields=["is_blocked", "blocked_at", "block_reason", "modified_at"]
+    )
+    notify(
+        allocation.holder,
+        _("Penetapan lokasi %s diblokir") % allocation.kpt_number,
+        _(
+            "Penetapan lokasi alokasi %(kpt)s diblokir dengan alasan: %(reason)s\n\n"
+            "Selama diblokir, peralihan hak dan layanan lain tidak dapat diproses. "
+            "Pembukaan blokir dapat diajukan di %(url)s"
+        )
+        % {
+            "kpt": allocation.kpt_number,
+            "reason": allocation.block_reason,
+            "url": portal_url(f"alokasi/{allocation.pk}/"),
+        },
+    )
+    return allocation
+
+
+@transaction.atomic
+def unblock_allocation(allocation: Allocation, officer, note: str = "") -> Allocation:
+    """Buka blokir PL langsung oleh petugas (tanpa permohonan pemegang)."""
+    allocation = Allocation.objects.select_for_update().get(pk=allocation.pk)
+    _require(allocation.is_blocked, _("Penetapan lokasi tidak sedang diblokir."))
+    allocation.is_blocked = False
+    allocation.save(update_fields=["is_blocked", "modified_at"])
+    notify(
+        allocation.holder,
+        _("Blokir penetapan lokasi %s dibuka") % allocation.kpt_number,
+        _("Blokir penetapan lokasi alokasi %(kpt)s telah dibuka.%(note)s")
+        % {
+            "kpt": allocation.kpt_number,
+            "note": f"\n\n{note.strip()}" if note.strip() else "",
+        },
+    )
+    return allocation
 
 
 @transaction.atomic
@@ -840,3 +981,54 @@ def revoke_allocation(allocation: Allocation, officer, reason: str) -> Allocatio
         % {"kpt": allocation.kpt_number, "reason": reason},
     )
     return allocation
+
+
+# --------------------------------------------------------------------------
+# Simulasi biaya UWT per wilayah
+# --------------------------------------------------------------------------
+
+
+def months_late(end_date: datetime.date | None, today: datetime.date) -> int:
+    """Bulan keterlambatan sejak UWT berakhir; bagian bulan dihitung satu bulan."""
+    if end_date is None or today <= end_date:
+        return 0
+    months = (today.year - end_date.year) * 12 + (today.month - end_date.month)
+    if today.day > end_date.day:
+        months += 1
+    return max(months, 1)
+
+
+def uwt_simulation(
+    tariff, area_m2: Decimal, end_date=None, today=None, config=None
+) -> dict:
+    """Hitung UWT, denda keterlambatan, dan total tagihan untuk satu tarif."""
+    config = config or AllocationSettings.load()
+    today = today or timezone.localdate()
+    total = (area_m2 * tariff.rate_per_m2_year * tariff.term_years).quantize(
+        Decimal("1")
+    )
+    late = 0
+    if tariff.kind != tariff.Kind.NEW:
+        late = months_late(end_date, today)
+        if config.uwt_penalty_max_months:
+            late = min(late, config.uwt_penalty_max_months)
+    percent = config.uwt_penalty_percent
+    penalty = (total * percent / Decimal("100") * late).quantize(Decimal("1"))
+    return {
+        "tariff": tariff,
+        "area_m2": area_m2,
+        "rate": tariff.rate_per_m2_year,
+        "years": tariff.term_years,
+        "uwt_total": total,
+        "late_months": late,
+        "penalty_percent": percent,
+        "penalty": penalty,
+        "grand_total": total + penalty,
+        "end_date": end_date,
+        "valid_on": today,
+        "capped": bool(
+            config.uwt_penalty_max_months
+            and months_late(end_date, today) > config.uwt_penalty_max_months
+            and tariff.kind != tariff.Kind.NEW
+        ),
+    }

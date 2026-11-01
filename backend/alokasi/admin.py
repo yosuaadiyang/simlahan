@@ -14,6 +14,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
+from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
@@ -36,6 +37,7 @@ from alokasi.models import (
     Application,
     ApplicationDocument,
     ApplicationEvent,
+    ContactMessage,
     DevelopmentReport,
     InfoPage,
     InvestmentEvent,
@@ -47,6 +49,8 @@ from alokasi.models import (
     LandPlot,
     RequirementDocType,
     ServiceCatalog,
+    UwtRegion,
+    UwtTariff,
     VerificationCriterion,
     VerificationScore,
 )
@@ -88,10 +92,13 @@ class PrivateClearableFileInput(forms.ClearableFileInput):
 
 class PrivateFileAdminMixin:
     file_kind = ""
+    # Jenis berkas per nama kolom bila model punya lebih dari satu berkas.
+    file_kinds: dict = {}
 
     def formfield_for_dbfield(self, db_field, request, **kwargs):
-        if isinstance(db_field, PrivateFileField) and self.file_kind:
-            kwargs["widget"] = PrivateClearableFileInput(self.file_kind)
+        kind = self.file_kinds.get(db_field.name, self.file_kind)
+        if isinstance(db_field, PrivateFileField) and kind:
+            kwargs["widget"] = PrivateClearableFileInput(kind)
         return super().formfield_for_dbfield(db_field, request, **kwargs)
 
 
@@ -226,7 +233,23 @@ class AllocationSettingsAdmin(admin.ModelAdmin):
                 )
             },
         ),
-        (_("Portal"), {"fields": ("contact_info",)}),
+        (
+            _("Portal & Kontak Kami"),
+            {
+                "fields": (
+                    "contact_info",
+                    "office_hours",
+                    "contact_email",
+                    "contact_whatsapp",
+                    "social_links",
+                    "publish_open_winners",
+                )
+            },
+        ),
+        (
+            _("Simulasi biaya UWT"),
+            {"fields": ("uwt_penalty_percent", "uwt_penalty_max_months")},
+        ),
         (
             _("Portal investasi"),
             {"fields": ("investment_intro", "investment_contact")},
@@ -497,9 +520,20 @@ class PlotImportForm(forms.Form):
 @admin.register(InfoPage)
 class InfoPageAdmin(PrivateFileAdminMixin, admin.ModelAdmin):
     file_kind = "informasi"
-    list_display = ("title", "category", "published_at", "order", "is_published")
-    list_filter = ("category", "is_published")
+    file_kinds = {"image": "informasi_gambar"}
+    list_display = (
+        "title",
+        "category",
+        "service",
+        "published_at",
+        "view_count",
+        "is_pinned",
+        "order",
+        "is_published",
+    )
+    list_filter = ("category", "is_pinned", "is_published", "service")
     list_editable = ("order", "is_published")
+    readonly_fields = ("view_count",)
     search_fields = ("title", "summary", "body")
     date_hierarchy = "published_at"
 
@@ -516,9 +550,13 @@ class InfoPageAdmin(PrivateFileAdminMixin, admin.ModelAdmin):
         "body",
         "video_url",
         "attachment",
+        "image",
+        "service",
+        "is_pinned",
         "order",
         "published_at",
         "is_published",
+        "view_count",
     )
 
 
@@ -544,6 +582,7 @@ class ServiceCatalogAdmin(admin.ModelAdmin):
                     "slug",
                     "category",
                     "service_type",
+                    "allocation_type",
                     "order",
                     "is_active",
                 )
@@ -773,7 +812,7 @@ class InvoiceInline(ReadOnlyInline):
 
 class IssuedDocumentInline(ReadOnlyInline):
     model = IssuedDocument
-    fields = ("kind", "number", "holder_name", "issued_at", "download")
+    fields = ("kind", "number", "holder_name", "issued_at", "replaced_at", "download")
     readonly_fields = fields
     verbose_name_plural = _("Dokumen terbit")
 
@@ -1308,11 +1347,18 @@ class AllocationAdmin(ReadOnlyAdmin):
         "issued_date",
         "end_date",
         "status",
+        "is_blocked",
         "idle",
         "progress",
         "last_report",
     )
-    list_filter = ("status", IdleFilter, ReportOverdueFilter, "plot__allocation_type")
+    list_filter = (
+        "status",
+        "is_blocked",
+        IdleFilter,
+        ReportOverdueFilter,
+        "plot__allocation_type",
+    )
     search_fields = (
         "kpt_number",
         "ppt_number",
@@ -1339,6 +1385,9 @@ class AllocationAdmin(ReadOnlyAdmin):
         "status",
         "revoked_at",
         "revoke_reason",
+        "is_blocked",
+        "blocked_at",
+        "block_reason",
         "permit_documents",
     )
     readonly_fields = fields
@@ -1390,6 +1439,11 @@ class AllocationAdmin(ReadOnlyAdmin):
             extra = {
                 "can_revoke": request.user.has_perm("alokasi.revoke_allocation")
                 and obj.status == enums.AllocationStatus.ACTIVE,
+                "can_block": request.user.has_perm("alokasi.block_allocation")
+                and obj.status == enums.AllocationStatus.ACTIVE
+                and not obj.is_blocked,
+                "can_unblock": request.user.has_perm("alokasi.block_allocation")
+                and obj.is_blocked,
                 "is_idle": obj.is_idle,
             }
         return super().change_view(
@@ -1403,7 +1457,73 @@ class AllocationAdmin(ReadOnlyAdmin):
                 self.admin_site.admin_view(self.revoke_view),
                 name="alokasi_allocation_revoke",
             ),
+            path(
+                "<int:pk>/blokir/",
+                self.admin_site.admin_view(self.block_view),
+                name="alokasi_allocation_block",
+            ),
+            path(
+                "<int:pk>/buka-blokir/",
+                self.admin_site.admin_view(self.unblock_view),
+                name="alokasi_allocation_unblock",
+            ),
         ] + super().get_urls()
+
+    def block_view(self, request, pk):
+        if not request.user.has_perm("alokasi.block_allocation"):
+            raise PermissionDenied
+        allocation = get_object_or_404(Allocation, pk=pk)
+        form = OfficerNoteForm(request.POST or None, required=True)
+        if request.method == "POST" and form.is_valid():
+            _run(
+                request,
+                lambda: services.block_allocation(
+                    allocation, request.user, form.cleaned_data["note"]
+                ),
+                _("Penetapan lokasi %s diblokir.") % allocation.kpt_number,
+            )
+            return HttpResponseRedirect(
+                reverse("admin:alokasi_allocation_change", args=[pk])
+            )
+        return _process_page(
+            request,
+            self,
+            allocation,
+            title=_("Blokir penetapan lokasi (PL)"),
+            intro=_(
+                "Selama diblokir, pemegang tidak dapat mengalihkan hak atau mengajukan "
+                "layanan lain selain pembukaan blokir. Pemegang diberi tahu lewat surel."
+            ),
+            form=form,
+            submit_label=_("Blokir PL"),
+            danger=True,
+        )
+
+    def unblock_view(self, request, pk):
+        if not request.user.has_perm("alokasi.block_allocation"):
+            raise PermissionDenied
+        allocation = get_object_or_404(Allocation, pk=pk)
+        form = OfficerNoteForm(request.POST or None, required=False)
+        if request.method == "POST" and form.is_valid():
+            _run(
+                request,
+                lambda: services.unblock_allocation(
+                    allocation, request.user, form.cleaned_data["note"]
+                ),
+                _("Blokir penetapan lokasi %s dibuka.") % allocation.kpt_number,
+            )
+            return HttpResponseRedirect(
+                reverse("admin:alokasi_allocation_change", args=[pk])
+            )
+        return _process_page(
+            request,
+            self,
+            allocation,
+            title=_("Buka blokir penetapan lokasi (PL)"),
+            intro=_("Pemegang alokasi diberi tahu lewat surel."),
+            form=form,
+            submit_label=_("Buka blokir"),
+        )
 
     def revoke_view(self, request, pk):
         if not request.user.has_perm("alokasi.revoke_allocation"):
@@ -1449,6 +1569,8 @@ class IssuedDocumentAdmin(ReadOnlyAdmin):
         "allocation",
         "holder_name",
         "issued_at",
+        "replaced_at",
+        "replaced_by",
         "token",
         "download",
     )
@@ -1943,3 +2065,104 @@ class InvestmentRequestAdmin(admin.ModelAdmin):
                 for error in errors:
                     messages.error(request, error)
         return HttpResponseRedirect(back + "#pesan")
+
+
+# --------------------------------------------------------------------------
+# Simulasi biaya UWT & Kontak Kami
+# --------------------------------------------------------------------------
+
+
+class UwtTariffInline(admin.TabularInline):
+    model = UwtTariff
+    extra = 0
+    fields = ("land_use", "kind", "rate_per_m2_year", "term_years", "note", "is_active")
+
+
+@admin.register(UwtRegion)
+class UwtRegionAdmin(admin.ModelAdmin):
+    list_display = ("name", "sub_name", "tariff_count", "order", "is_active")
+    list_editable = ("order", "is_active")
+    search_fields = ("name", "sub_name")
+    inlines = (UwtTariffInline,)
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).annotate(_tariffs=Count("tariffs"))
+
+    @admin.display(description=_("Jumlah tarif"), ordering="_tariffs")
+    def tariff_count(self, obj):
+        return obj._tariffs
+
+
+@admin.register(UwtTariff)
+class UwtTariffAdmin(admin.ModelAdmin):
+    list_display = (
+        "region",
+        "land_use",
+        "kind",
+        "rate_per_m2_year",
+        "term_years",
+        "is_active",
+    )
+    list_filter = ("kind", "is_active", "region")
+    search_fields = ("land_use", "region__name", "region__sub_name")
+    list_select_related = ("region",)
+
+
+@admin.register(ContactMessage)
+class ContactMessageAdmin(admin.ModelAdmin):
+    list_display = ("created_at", "subject", "name", "email", "status", "replied_at")
+    list_filter = ("status",)
+    search_fields = ("subject", "name", "email", "body")
+    date_hierarchy = "created_at"
+    fields = (
+        "created_at",
+        "name",
+        "email",
+        "phone",
+        "subject",
+        "body",
+        "ip_address",
+        "status",
+        "reply",
+        "replied_at",
+        "handled_by",
+    )
+    readonly_fields = (
+        "created_at",
+        "name",
+        "email",
+        "phone",
+        "subject",
+        "body",
+        "ip_address",
+        "replied_at",
+        "handled_by",
+    )
+
+    def has_add_permission(self, request):
+        return False
+
+    def save_model(self, request, obj, form, change):
+        reply = (obj.reply or "").strip()
+        send = "reply" in form.changed_data and bool(reply)
+        obj.handled_by = request.user
+        if send:
+            obj.reply = reply
+            obj.replied_at = timezone.now()
+            obj.status = ContactMessage.Status.DONE
+        super().save_model(request, obj, form, change)
+        if send:
+            sent = services.send_email(
+                [obj.email],
+                _("Balasan: %s") % obj.subject,
+                _("Yth. %(name)s,\n\n%(reply)s\n\n— Pesan Anda —\n%(body)s")
+                % {"name": obj.name, "reply": reply, "body": obj.body},
+            )
+            if sent:
+                messages.success(request, _("Balasan dikirim ke %s.") % obj.email)
+            else:
+                messages.warning(
+                    request,
+                    _("Balasan tersimpan, tetapi surel ke %s gagal dikirim.")
+                    % obj.email,
+                )

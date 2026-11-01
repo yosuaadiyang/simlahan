@@ -6,6 +6,7 @@
   var canvas = pad.querySelector("canvas");
   var ctx = canvas.getContext("2d");
   var input = pad.querySelector('input[name="signature"]');
+  var useSaved = pad.querySelector('input[name="use_saved"]');
   var hint = pad.querySelector("[data-hint]");
   var form = document.getElementById("dk-sign-form");
   var nameInput = form ? form.querySelector('input[name="name"]') : null;
@@ -23,6 +24,21 @@
     ctx.fillStyle = "#0b1f4d";
     dirty = false;
     input.value = "";
+    if (useSaved) useSaved.value = "";
+  }
+
+  function saved(btn) {
+    reset();
+    var img = new Image();
+    img.onload = function () {
+      var scale = Math.min(canvas.width / img.width, canvas.height / img.height, 1);
+      var w = img.width * scale;
+      var h = img.height * scale;
+      ctx.drawImage(img, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+    };
+    img.src = btn.getAttribute("data-saved-src");
+    dirty = true;
+    if (useSaved) useSaved.value = "1";
   }
 
   function point(event) {
@@ -76,6 +92,11 @@
   pad.querySelector("[data-clear]").addEventListener("click", function () {
     reset();
     if (mode === "ketik") typed();
+    if (mode === "tersimpan") {
+      // Hapus berarti kembali menggambar sendiri.
+      var draw = pad.querySelector('[data-mode="gambar"]');
+      if (draw) draw.click();
+    }
   });
   pad.querySelectorAll("[data-mode]").forEach(function (btn) {
     btn.addEventListener("click", function () {
@@ -85,9 +106,13 @@
         b.classList.toggle("active", on);
         b.setAttribute("aria-selected", on ? "true" : "false");
       });
-      if (hint) hint.textContent = mode === "ketik" ? "Tanda tangan dibuat dari nama lengkap Anda." : "Gambar tanda tangan di kotak di atas.";
-      canvas.style.cursor = mode === "ketik" ? "default" : "crosshair";
-      if (mode === "ketik") { typed(); } else { reset(); }
+      if (hint) {
+        hint.textContent = mode === "ketik" ? "Tanda tangan dibuat dari nama lengkap Anda."
+          : mode === "tersimpan" ? "Memakai tanda tangan tersimpan di akun Anda."
+          : "Gambar tanda tangan di kotak di atas.";
+      }
+      canvas.style.cursor = mode === "gambar" ? "crosshair" : "default";
+      if (mode === "ketik") { typed(); } else if (mode === "tersimpan") { saved(btn); } else { reset(); }
     });
   });
   if (nameInput) {
@@ -101,7 +126,7 @@
         canvas.focus();
         return;
       }
-      input.value = canvas.toDataURL("image/png");
+      input.value = mode === "tersimpan" ? "" : canvas.toDataURL("image/png");
     });
   }
   reset();

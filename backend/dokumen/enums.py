@@ -142,3 +142,6 @@ class Action(models.TextChoices):
     DOWNLOAD_CANCELLED = "unduh_dibatalkan", _("Permintaan unduhan dibatalkan")
     DOWNLOADED = "diunduh", _("Diunduh")
     PREVIEWED = "pratinjau", _("Dipratinjau")
+    REASSIGNED = "ganti_penerima", _("Penerima diganti")
+    HOSTED = "ttd_langsung", _("Sesi tanda tangan langsung dibuka")
+    BULK_SENT = "kirim_massal", _("Dibuat lewat kirim massal")

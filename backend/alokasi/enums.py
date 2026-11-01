@@ -18,6 +18,13 @@ class AllocationType(models.TextChoices):
     REGULAR = "reguler", _("Alokasi tanah reguler")
     DIRECT = "langsung", _("Alokasi tanah langsung")
     OPEN = "terbuka", _("Alokasi tanah terbuka")
+    ARRANGEMENT = "penataan", _("Pengalokasian penataan")
+    KSB = "ksb", _("Pengalokasian kavling siap bangun (KSB)")
+
+
+# Alokasi untuk penataan permukiman / KSB: pemohon (umumnya perorangan yang
+# menguasai fisik bidang) tidak wajib mengisi rencana investasi usaha.
+SETTLEMENT_ALLOCATION_TYPES = (AllocationType.ARRANGEMENT, AllocationType.KSB)
 
 
 class PlotStatus(models.TextChoices):
@@ -39,6 +46,7 @@ class InfoCategory(models.TextChoices):
     PROCEDURE = "prosedur", _("Prosedur & tahapan")
     ANNOUNCEMENT = "pengumuman", _("Pengumuman")
     TUTORIAL = "tutorial", _("Video tutorial")
+    GUIDE = "panduan", _("Buku panduan")
     DOWNLOAD = "unduhan", _("Unduhan")
     FAQ = "faq", _("Tanya jawab")
     INVESTMENT = "investasi", _("Panduan investasi")
@@ -57,6 +65,16 @@ class ServiceType(models.TextChoices):
     RENEWAL = "pembaruan", _("Permohonan pembaruan hak atas tanah")
     SPLIT = "pecah_pl", _("Permohonan pemecahan penetapan lokasi (PL)")
     REMEASURE = "ukur_ulang", _("Permohonan pengukuran ulang")
+    REVISE_PL = "revisi_pl", _("Permohonan revisi penetapan lokasi (PL)")
+    MERGE_PL = "gabung_pl", _("Permohonan penggabungan penetapan lokasi (PL)")
+    ADJUSTMENT = "penyesuaian", _("Permohonan penyesuaian dokumen alokasi tanah")
+    RECOMMENDATION = "rekomendasi", _("Permohonan surat rekomendasi")
+    UNBLOCK = "buka_blokir", _("Permohonan pembukaan blokir penetapan lokasi (PL)")
+    REPLACEMENT = "dok_pengganti", _("Permohonan dokumen pengganti")
+    MORTGAGE = "hak_tanggungan", _("Permohonan persetujuan hak tanggungan")
+    AUCTION = "lelang", _("Permohonan persetujuan lelang")
+    KPT_CHANGE = "kpt_perubahan", _("Permohonan penerbitan KPT dan PPT perubahan")
+    KPT_NEW = "kpt_baru", _("Permohonan penerbitan KPT dan PPT baru")
 
 
 # Layanan atas alokasi milik sendiri (bukan alokasi lahan baru).
@@ -66,6 +84,24 @@ OWN_ALLOCATION_SERVICES = (
     ServiceType.RENEWAL,
     ServiceType.SPLIT,
     ServiceType.REMEASURE,
+    ServiceType.REVISE_PL,
+    ServiceType.MERGE_PL,
+    ServiceType.ADJUSTMENT,
+    ServiceType.RECOMMENDATION,
+    ServiceType.UNBLOCK,
+    ServiceType.REPLACEMENT,
+    ServiceType.MORTGAGE,
+    ServiceType.AUCTION,
+    ServiceType.KPT_CHANGE,
+    ServiceType.KPT_NEW,
+)
+
+# Layanan yang menerbitkan ulang KPT dan PPT bernomor baru; dokumen lama
+# ditandai sudah diganti.
+REISSUE_SERVICES = (
+    ServiceType.REPLACEMENT,
+    ServiceType.KPT_CHANGE,
+    ServiceType.KPT_NEW,
 )
 
 

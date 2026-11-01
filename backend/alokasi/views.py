@@ -17,7 +17,7 @@ from django.core.cache import cache
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
 from django.db import transaction
-from django.db.models import Count, Q, Sum
+from django.db.models import Count, F, Prefetch, Q, Sum
 from django.http import FileResponse, Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
@@ -29,8 +29,10 @@ from django.views.decorators.http import require_POST
 
 from alokasi import documents, enums, services
 from alokasi.forms import (
+    SERVICE_HINTS,
     AllocationApplicationForm,
     ApplicantProfileForm,
+    ContactForm,
     DevelopmentReportForm,
     DocumentUploadForm,
     PaymentProofForm,
@@ -43,13 +45,16 @@ from alokasi.forms import (
     TransferApplicationForm,
     TransferEditForm,
     UwtCalculatorForm,
+    UwtTariffCalculatorForm,
     VerifyCodeForm,
+    service_choices,
 )
 from alokasi.models import (
     Allocation,
     AllocationSettings,
     Application,
     ApplicationDocument,
+    ContactMessage,
     DevelopmentReport,
     InfoPage,
     Invoice,
@@ -57,6 +62,7 @@ from alokasi.models import (
     LandPlot,
     RequirementDocType,
     ServiceCatalog,
+    UwtTariff,
     VerificationCriterion,
 )
 from alokasi.monitoring import report_deadline
@@ -206,6 +212,9 @@ def home(request):
         "announcements": InfoPage.objects.filter(
             is_published=True, category=enums.InfoCategory.ANNOUNCEMENT
         ).order_by("-published_at")[:5],
+        "pinned": InfoPage.objects.filter(is_published=True, is_pinned=True).order_by(
+            "-published_at"
+        )[:3],
         "tutorials": InfoPage.objects.filter(
             is_published=True, category=enums.InfoCategory.TUTORIAL
         )[:3],
@@ -377,6 +386,12 @@ def service_catalog(request):
     )
 
 
+def _download_forms():
+    return InfoPage.objects.filter(
+        is_published=True, category=enums.InfoCategory.DOWNLOAD
+    ).exclude(attachment="")
+
+
 def service_catalog_detail(request, slug):
     entry = get_object_or_404(ServiceCatalog, slug=slug, is_active=True)
     return render(
@@ -385,14 +400,150 @@ def service_catalog_detail(request, slug):
         {
             "entry": entry,
             "requirements": entry.requirement_docs,
+            "forms": _download_forms().filter(Q(service=entry) | Q(service=None)),
             "config": AllocationSettings.load(),
         },
     )
 
 
-def uwt_calculator(request):
-    """Simulasi biaya UWT lahan; murni hitungan, tidak menyimpan data."""
+def forms_page(request):
+    """Formulir permohonan per jenis pelayanan (unduhan berlampiran)."""
+    pages = list(_download_forms().select_related("service"))
+    groups = {}
+    for page in pages:
+        key = page.service_id or 0
+        label = page.service.name if page.service_id else _("Semua pelayanan")
+        groups.setdefault(key, {"label": label, "items": []})["items"].append(page)
+    general = groups.pop(0, None)
+    ordered = sorted(groups.values(), key=lambda g: g["label"].lower())
+    if general:
+        ordered.append(general)
+    return render(
+        request,
+        "alokasi/portal/forms.html",
+        {"groups": ordered, "total": len(pages)},
+    )
+
+
+def open_winners(request):
+    """Pemenang alokasi terbuka: hasil lelang/seleksi atas lahan alokasi."""
+    from asetlahan.enums import BidStatus, TenderStatus
+    from asetlahan.models import Bid, Tender
+
     config = AllocationSettings.load()
+    tenders = []
+    if config.publish_open_winners:
+        tenders = list(
+            Tender.objects.filter(
+                status=TenderStatus.AWARDED,
+                winner__isnull=False,
+                alokasi_plot__isnull=False,
+            )
+            .select_related("alokasi_plot", "winner")
+            .prefetch_related(
+                Prefetch(
+                    "bids",
+                    queryset=Bid.objects.exclude(
+                        status=BidStatus.DISQUALIFIED
+                    ).order_by("-amount", "pk"),
+                    to_attr="public_bids",
+                )
+            )
+            .order_by("-awarded_on", "-pk")
+        )
+    page = _paginate(request, tenders)
+    return render(
+        request,
+        "alokasi/portal/open_winners.html",
+        {"page": page, "config": config},
+    )
+
+
+def contact(request):
+    """Kontak Kami: formulir pesan + jam layanan, WhatsApp, dan media sosial."""
+    config = AllocationSettings.load()
+    form = ContactForm(request.POST or None)
+    if request.method == "POST":
+        if _throttled(request, "kontak", limit=5, window=600):
+            return _too_many(request)
+        if form.is_valid():
+            data = form.cleaned_data
+            if not data.get("website"):
+                message = ContactMessage.objects.create(
+                    name=data["name"],
+                    email=data["email"],
+                    phone=data["phone"],
+                    subject=data["subject"],
+                    body=data["body"],
+                    ip_address=_client_ip(request) or None,
+                )
+                if config.contact_email:
+                    transaction.on_commit(
+                        lambda: services.send_email(
+                            [config.contact_email],
+                            _("Pesan Kontak Kami: %s") % message.subject,
+                            _(
+                                "Dari: %(name)s <%(email)s>, %(phone)s\n\n%(body)s\n\n"
+                                "Tangani di panel petugas: %(url)s"
+                            )
+                            % {
+                                "name": message.name,
+                                "email": message.email,
+                                "phone": message.phone,
+                                "body": message.body,
+                                "url": (
+                                    (settings.OFFICER_UI_URL or "").rstrip("/")
+                                    + reverse(
+                                        "admin:alokasi_contactmessage_change",
+                                        args=[message.pk],
+                                    )
+                                ),
+                            },
+                        )
+                    )
+            messages.success(
+                request,
+                _("Pesan terkirim. Petugas akan membalas ke surel Anda."),
+            )
+            return redirect("portal:contact")
+    return render(
+        request, "alokasi/portal/contact.html", {"form": form, "config": config}
+    )
+
+
+def uwt_calculator(request):
+    """Simulasi biaya UWT; murni hitungan, tidak menyimpan data.
+
+    Dua cara: per lahan portal (bawaan) atau per wilayah & peruntukan dengan
+    jenis pengurusan (baru/perpanjangan/pembaruan) dan denda keterlambatan.
+    """
+    config = AllocationSettings.load()
+    has_tariffs = UwtTariff.objects.filter(
+        is_active=True, region__is_active=True
+    ).exists()
+    if request.GET.get("mode") == "wilayah" and has_tariffs:
+        tariff_form = UwtTariffCalculatorForm(
+            request.GET if "w-region" in request.GET else None, prefix="w"
+        )
+        result = None
+        if tariff_form.is_bound and tariff_form.is_valid():
+            result = services.uwt_simulation(
+                tariff_form.cleaned_data["tariff"],
+                tariff_form.cleaned_data["area_m2"],
+                tariff_form.cleaned_data.get("end_date"),
+                config=config,
+            )
+        return render(
+            request,
+            "alokasi/portal/calculator.html",
+            {
+                "mode": "wilayah",
+                "form": tariff_form,
+                "tariff_result": result,
+                "config": config,
+                "has_tariffs": has_tariffs,
+            },
+        )
     data = request.GET
     plot_id = data.get("plot", "")
     if plot_id and not data.get("area_m2") and not data.get("years"):
@@ -414,7 +565,10 @@ def uwt_calculator(request):
         )
         form = UwtCalculatorForm(initial=initial)
     else:
-        form = UwtCalculatorForm(data or None)
+        # Hanya parameter kalkulator per lahan yang membuat formulir terisi
+        # (mis. ``?mode=wilayah`` tanpa tarif tidak menampilkan galat).
+        bound = any(data.get(key) for key in ("plot", "area_m2", "years"))
+        form = UwtCalculatorForm(data if bound else None)
     result = None
     if form.is_bound and form.is_valid():
         plot = form.cleaned_data["plot"]
@@ -433,7 +587,13 @@ def uwt_calculator(request):
     return render(
         request,
         "alokasi/portal/calculator.html",
-        {"form": form, "result": result, "config": config},
+        {
+            "mode": "lahan",
+            "form": form,
+            "result": result,
+            "config": config,
+            "has_tariffs": has_tariffs,
+        },
     )
 
 
@@ -485,6 +645,9 @@ def help_page(request):
             "tutorials": InfoPage.objects.filter(
                 is_published=True, category=enums.InfoCategory.TUTORIAL
             ),
+            "guides": InfoPage.objects.filter(
+                is_published=True, category=enums.InfoCategory.GUIDE
+            ),
             "config": AllocationSettings.load(),
         },
     )
@@ -523,6 +686,8 @@ def info_index(request, category=None):
 
 def info_detail(request, slug):
     page = get_object_or_404(InfoPage, slug=slug, is_published=True)
+    InfoPage.objects.filter(pk=page.pk).update(view_count=F("view_count") + 1)
+    page.view_count += 1
     related = InfoPage.objects.filter(
         is_published=True, category=page.category
     ).exclude(pk=page.pk)[:5]
@@ -536,6 +701,13 @@ def info_attachment(request, slug):
     return serve_file(page.attachment)
 
 
+def info_image(request, slug):
+    page = get_object_or_404(InfoPage, slug=slug, is_published=True)
+    if not page.image:
+        raise Http404
+    return serve_file(page.image, inline=True)
+
+
 def verify_document(request, token=None):
     document = None
     form = VerifyCodeForm(request.GET or None)
@@ -545,7 +717,7 @@ def verify_document(request, token=None):
     if token is not None:
         document = (
             IssuedDocument.objects.select_related(
-                "allocation", "allocation__plot", "application"
+                "allocation", "allocation__plot", "application", "replaced_by"
             )
             .filter(token=token)
             .first()
@@ -1145,6 +1317,10 @@ def _render_allocation(request, allocation, *, development_form=None):
             else None
         ),
         "is_active": is_active,
+        "service_options": [
+            (value, label, SERVICE_HINTS.get(value, ""))
+            for value, label in service_choices(allocation)
+        ],
         "is_idle": allocation.is_idle,
         "has_started": allocation.has_started_development,
         "idle_days_left": (allocation.idle_deadline - today).days,

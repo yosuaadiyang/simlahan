@@ -29,6 +29,14 @@
   {% endif %}
 </section>
 
+{% if forms %}
+<section class="card">
+  <h2>Formulir</h2>
+  <ul>{% for f in forms %}<li><a href="{% url 'portal:info_attachment' f.slug %}">{{ f.title }}</a>{% if not f.service_id %} <span class="small muted">(semua pelayanan)</span>{% endif %}</li>{% endfor %}</ul>
+  <p class="small"><a href="{% url 'portal:forms' %}">Semua formulir permohonan</a></p>
+</section>
+{% endif %}
+
 <section class="card">
   <h2>Alur layanan</h2>
   {% if entry.flow %}<div class="prose">{{ entry.flow|linebreaks }}</div>{% else %}<p class="muted">–</p>{% endif %}
@@ -48,6 +56,9 @@
   <div class="prose">{{ entry.legal_basis|default:"–"|linebreaks }}</div>
 </section>
 
+{% if entry.category == 'pelaporan' %}
+<div class="alert alert-info">Laporan dikirim pemegang alokasi dari halaman alokasinya (menu <strong>Akun Saya</strong> → alokasi → <strong>Laporan progres</strong>).</div>
+{% endif %}
 {% if entry.service_type %}
 <div class="alert alert-info">
   Layanan ini diajukan secara daring melalui portal.

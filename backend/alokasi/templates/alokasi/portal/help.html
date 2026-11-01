@@ -25,9 +25,17 @@
       <h2>Video tutorial</h2>
       <ul>{% for item in tutorials %}<li><a href="{% url 'portal:info_detail' item.slug %}">{{ item.title }}</a></li>{% empty %}<li class="muted">–</li>{% endfor %}</ul>
     </section>
+    {% if guides %}
+    <section class="card">
+      <h2>Buku panduan</h2>
+      <ul>{% for item in guides %}<li><a href="{% url 'portal:info_detail' item.slug %}">{{ item.title }}</a>{% if item.attachment %} · <a class="small" href="{% url 'portal:info_attachment' item.slug %}">Unduh</a>{% endif %}</li>{% endfor %}</ul>
+    </section>
+    {% endif %}
     <section class="card">
       <h2>Kontak layanan</h2>
       <div class="prose small">{{ config.contact_info|default:"Hubungi " }}{% if not config.contact_info %}{{ config.authority_name }}.{% endif %}</div>
+      {% if config.office_hours %}<p class="small">Jam layanan: {{ config.office_hours }}</p>{% endif %}
+      <a class="btn btn-outline btn-small" href="{% url 'portal:contact' %}">Kirim pesan ke petugas</a>
     </section>
     <section class="card" id="investor">
       <h2>Panduan investor</h2>
@@ -44,6 +52,8 @@
       <ul class="small">
         <li><a href="{% url 'portal:service_terms' %}">Ketentuan umum & tahapan</a></li>
         <li><a href="{% url 'portal:uwt_calculator' %}">Kalkulator UWT</a></li>
+        <li><a href="{% url 'portal:forms' %}">Formulir permohonan</a></li>
+        <li><a href="{% url 'portal:open_winners' %}">Pemenang alokasi terbuka</a></li>
         <li><a href="{% url 'portal:track' %}">Lacak permohonan</a></li>
         <li><a href="{% url 'portal:verify' %}">Cek keaslian dokumen</a></li>
         <li><a href="{% url 'dokumen_portal:index' %}">Dokumen &amp; perizinan</a> — status dokumen wajib, unggah, tanda tangan elektronik, izin unduh</li>

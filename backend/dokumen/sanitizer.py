@@ -74,7 +74,13 @@ ALLOWED_ATTRS = {
     "table": {"width", "border", "cellpadding", "cellspacing"},
     "ol": {"start", "type"},
 }
-ALLOWED_CLASSES = {"page-break", "merge-field", "text-center", "text-right"}
+ALLOWED_CLASSES = {
+    "page-break",
+    "merge-field",
+    "own-field",
+    "text-center",
+    "text-right",
+}
 ALLOWED_STYLES = {
     "text-align",
     "font-weight",

@@ -1,0 +1,24 @@
+{% extends "alokasi/portal/base.html" %}{% load alokasi_tags %}
+{% block title %}Formulir Permohonan{% endblock %}
+{% block content %}
+<h1>Formulir Permohonan</h1>
+<p class="muted">Unduh formulir dan templat dokumen permohonan per jenis pelayanan. Isi, tanda tangani, lalu unggah sebagai dokumen persyaratan saat mengajukan permohonan di portal.</p>
+{% for group in groups %}
+<section class="card">
+  <h2>{{ group.label }}</h2>
+  <div class="table-wrap"><table class="data">
+    <thead><tr><th style="width:3em">No</th><th>Formulir</th><th style="width:10em"></th></tr></thead>
+    <tbody>{% for f in group.items %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td><a href="{% url 'portal:info_detail' f.slug %}">{{ f.title }}</a>{% if f.summary %}<br><span class="small muted">{{ f.summary }}</span>{% endif %}</td>
+        <td><a class="btn btn-outline btn-small" href="{% url 'portal:info_attachment' f.slug %}">Unduh formulir</a></td>
+      </tr>
+    {% endfor %}</tbody>
+  </table></div>
+</section>
+{% empty %}
+<p class="muted">Belum ada formulir yang diunggah petugas.</p>
+{% endfor %}
+<p class="small"><a href="{% url 'portal:services' %}">Lihat katalog layanan &amp; persyaratan</a></p>
+{% endblock %}

@@ -68,6 +68,7 @@ upload_report = _upload_to("upload_report", "laporan")
 upload_plot = _upload_to("upload_plot", "lahan")
 upload_zone = _upload_to("upload_zone", "kawasan")
 upload_investment = _upload_to("upload_investment", "investasi")
+upload_letterhead = _upload_to("upload_letterhead", "kop")
 
 
 def _next_number(prefix: str) -> str:
@@ -153,6 +154,24 @@ class AllocationSettings(models.Model):
     report_interval_months = models.PositiveSmallIntegerField(
         verbose_name=_("Interval wajib lapor progres (bulan)"), default=6
     )
+    letterhead_logo = PrivateFileField(
+        max_length=255,
+        verbose_name=_("Logo kop surat"),
+        upload_to=upload_letterhead,
+        null=True,
+        blank=True,
+        validators=[
+            FileExtensionValidator(["png", "jpg", "jpeg"]),
+            validate_upload_size,
+        ],
+        help_text=_("Tampil di kop semua PDF (KPT, PPT, PL, surat, dokumen e-sign)."),
+    )
+    letterhead_lines = models.TextField(
+        verbose_name=_("Baris kop surat"),
+        blank=True,
+        default="",
+        help_text=_("Di bawah nama otoritas, mis. alamat, telepon, surel, situs."),
+    )
     payment_instructions = models.TextField(
         verbose_name=_("Petunjuk pembayaran"),
         blank=True,
@@ -178,6 +197,53 @@ class AllocationSettings(models.Model):
             "Ditampilkan di portal investasi. Kosongkan untuk memakai kontak layanan."
         ),
     )
+    # Kontak Kami & kaki halaman portal
+    office_hours = models.CharField(
+        verbose_name=_("Jam layanan"),
+        max_length=255,
+        blank=True,
+        default="Senin–Jumat, 08.00–16.00 WIB",
+    )
+    contact_email = models.EmailField(
+        verbose_name=_("Surel layanan"),
+        blank=True,
+        default="",
+        help_text=_("Pesan dari formulir Kontak Kami juga diteruskan ke surel ini."),
+    )
+    contact_whatsapp = models.TextField(
+        verbose_name=_("Kanal WhatsApp"),
+        blank=True,
+        default="",
+        help_text=_("Satu kanal per baris: Label: nomor (mis. Konsultasi: 0811…)."),
+    )
+    social_links = models.TextField(
+        verbose_name=_("Media sosial"),
+        blank=True,
+        default="",
+        help_text=_("Satu tautan per baris: Label: https://…"),
+    )
+    # Simulasi biaya UWT
+    uwt_penalty_percent = models.DecimalField(
+        verbose_name=_("Denda keterlambatan UWT per bulan (%)"),
+        max_digits=5,
+        decimal_places=2,
+        default=Decimal("2"),
+        validators=[MinValueValidator(Decimal("0")), MaxValueValidator(Decimal("100"))],
+    )
+    uwt_penalty_max_months = models.PositiveSmallIntegerField(
+        verbose_name=_("Batas bulan denda UWT"),
+        default=24,
+        validators=[MaxValueValidator(600)],
+        help_text=_("0 = tanpa batas."),
+    )
+    publish_open_winners = models.BooleanField(
+        verbose_name=_("Umumkan pemenang alokasi terbuka"),
+        default=True,
+        help_text=_(
+            "Tampilkan hasil lelang/seleksi alokasi terbuka (pemenang dan peserta) "
+            "di portal."
+        ),
+    )
 
     class Meta:
         verbose_name = _("Pengaturan layanan alokasi")
@@ -194,6 +260,70 @@ class AllocationSettings(models.Model):
     def load(cls) -> "AllocationSettings":
         obj, _created = cls.objects.get_or_create(pk=1)
         return obj
+
+    @property
+    def letterhead_logo_data_uri(self) -> str:
+        """Logo kop sebagai data URI untuk xhtml2pdf (kosong bila tidak ada)."""
+        import base64
+        import mimetypes
+
+        if not self.letterhead_logo:
+            return ""
+        try:
+            with self.letterhead_logo.open("rb") as handle:
+                data = handle.read()
+        except Exception:  # noqa: BLE001 - berkas hilang/belum dipindai
+            return ""
+        mime = mimetypes.guess_type(self.letterhead_logo.name)[0] or "image/png"
+        return f"data:{mime};base64,{base64.b64encode(data).decode()}"
+
+    @property
+    def letterhead_line_list(self) -> list[str]:
+        return [
+            line.strip() for line in self.letterhead_lines.splitlines() if line.strip()
+        ]
+
+    @staticmethod
+    def _pairs(text: str) -> list[tuple[str, str]]:
+        pairs = []
+        for line in (text or "").splitlines():
+            label, sep, value = line.partition(":")
+            if not sep:
+                label, value = "", line
+            label, value = label.strip(), value.strip()
+            if value:
+                pairs.append((label or value, value))
+        return pairs
+
+    @property
+    def whatsapp_channels(self) -> list[dict]:
+        """Kanal WhatsApp dengan tautan wa.me (nomor dinormalkan ke 62…)."""
+        channels = []
+        for label, number in self._pairs(self.contact_whatsapp):
+            digits = "".join(c for c in number if c.isdigit())
+            if digits.startswith("0"):
+                digits = "62" + digits[1:]
+            if digits:
+                channels.append(
+                    {"label": label, "number": number, "url": f"https://wa.me/{digits}"}
+                )
+        return channels
+
+    @property
+    def social_channels(self) -> list[dict]:
+        # Label sebelum titik dua pertama; "https://" di nilai tetap utuh.
+        links = []
+        for line in (self.social_links or "").splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            label, sep, url = line.partition(": ")
+            if not sep:
+                label, url = "", line
+            url = url.strip()
+            if url.startswith(("https://", "http://")):
+                links.append({"label": label.strip() or url, "url": url})
+        return links
 
 
 HEX_COLOR = RegexValidator(
@@ -663,6 +793,35 @@ class InfoPage(TimeStampedModel):
             validate_upload_size,
         ],
     )
+    image = PrivateFileField(
+        max_length=255,
+        verbose_name=_("Gambar sampul"),
+        upload_to=upload_info,
+        null=True,
+        blank=True,
+        validators=[
+            FileExtensionValidator(["jpg", "jpeg", "png"]),
+            validate_upload_size,
+        ],
+    )
+    # Formulir unduhan dikelompokkan per jenis pelayanan (kosong = semua).
+    service = models.ForeignKey(
+        "ServiceCatalog",
+        verbose_name=_("Jenis pelayanan"),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="info_pages",
+        help_text=_("Untuk formulir unduhan: kosongkan bila berlaku semua pelayanan."),
+    )
+    is_pinned = models.BooleanField(
+        verbose_name=_("Sematkan di beranda"),
+        default=False,
+        help_text=_("Pengumuman sematan tampil sebagai banner di beranda portal."),
+    )
+    view_count = models.PositiveIntegerField(
+        verbose_name=_("Dilihat"), default=0, editable=False
+    )
     order = models.PositiveIntegerField(verbose_name=_("Urutan"), default=0)
     is_published = models.BooleanField(verbose_name=_("Terbit"), default=True)
     published_at = models.DateField(
@@ -823,11 +982,18 @@ class RequirementDocType(models.Model):
             application.service_type == enums.ServiceType.ALLOCATION
             and application.plot_id
         ):
-            qs = qs.filter(
-                models.Q(allocation_type="")
-                | models.Q(allocation_type=application.plot.allocation_type)
-            )
+            qs = cls.filter_allocation_type(qs, application.plot.allocation_type)
         return qs
+
+    @staticmethod
+    def filter_allocation_type(qs, allocation_type: str):
+        """Dokumen umum alokasi + dokumen khusus jenisnya. Penataan/KSB hanya
+        memakai dokumen khususnya (tanpa proposal usaha, laporan keuangan, dsb.)."""
+        if allocation_type in enums.SETTLEMENT_ALLOCATION_TYPES:
+            return qs.filter(allocation_type=allocation_type)
+        return qs.filter(
+            models.Q(allocation_type="") | models.Q(allocation_type=allocation_type)
+        )
 
 
 class ServiceCatalog(models.Model):
@@ -841,6 +1007,7 @@ class ServiceCatalog(models.Model):
     class Category(models.TextChoices):
         LAND = "pertanahan", _("Layanan pertanahan")
         DOCUMENT = "perubahan_dokumen", _("Layanan perubahan dokumen")
+        REPORTING = "pelaporan", _("Layanan pelaporan")
 
     name = models.CharField(verbose_name=_("Nama layanan"), max_length=255)
     slug = models.SlugField(
@@ -860,6 +1027,17 @@ class ServiceCatalog(models.Model):
         blank=True,
         default="",
         help_text=_("Kosongkan bila layanan belum dapat diajukan secara daring."),
+    )
+    allocation_type = models.CharField(
+        verbose_name=_("Jenis alokasi"),
+        max_length=16,
+        choices=enums.AllocationType.choices,
+        blank=True,
+        default="",
+        help_text=_(
+            "Khusus permohonan alokasi: dokumen persyaratan yang ditampilkan "
+            "mengikuti jenis alokasi ini."
+        ),
     )
     summary = models.CharField(
         verbose_name=_("Ringkasan"), max_length=500, blank=True, default=""
@@ -909,9 +1087,12 @@ class ServiceCatalog(models.Model):
     def requirement_docs(self):
         if not self.service_type:
             return ()
-        return RequirementDocType.objects.filter(
+        qs = RequirementDocType.objects.filter(
             is_active=True, service_type=self.service_type
         )
+        if self.service_type == enums.ServiceType.ALLOCATION and self.allocation_type:
+            qs = RequirementDocType.filter_allocation_type(qs, self.allocation_type)
+        return qs
 
 
 class VerificationCriterion(models.Model):
@@ -1072,6 +1253,16 @@ class Application(TimeStampedModel):
         enums.ServiceType.RENEWAL: "PMB",
         enums.ServiceType.SPLIT: "PCH",
         enums.ServiceType.REMEASURE: "PGU",
+        enums.ServiceType.REVISE_PL: "RPL",
+        enums.ServiceType.MERGE_PL: "GPL",
+        enums.ServiceType.ADJUSTMENT: "PSD",
+        enums.ServiceType.RECOMMENDATION: "REK",
+        enums.ServiceType.UNBLOCK: "BBL",
+        enums.ServiceType.REPLACEMENT: "DPG",
+        enums.ServiceType.MORTGAGE: "PHT",
+        enums.ServiceType.AUCTION: "PLL",
+        enums.ServiceType.KPT_CHANGE: "KPU",
+        enums.ServiceType.KPT_NEW: "KPB",
     }
 
     def save(self, *args, **kwargs):
@@ -1100,6 +1291,19 @@ class Application(TimeStampedModel):
         return self.service_type in (
             enums.ServiceType.EXTENSION,
             enums.ServiceType.RENEWAL,
+        )
+
+    @property
+    def is_reissue(self) -> bool:
+        return self.service_type in enums.REISSUE_SERVICES
+
+    @property
+    def is_settlement(self) -> bool:
+        """Alokasi penataan / KSB: tanpa syarat rencana investasi usaha."""
+        return (
+            self.is_allocation
+            and self.plot_id is not None
+            and self.plot.allocation_type in enums.SETTLEMENT_ALLOCATION_TYPES
         )
 
     @property
@@ -1358,12 +1562,24 @@ class Allocation(TimeStampedModel):
     revoke_reason = models.TextField(
         verbose_name=_("Alasan pencabutan"), blank=True, default=""
     )
+    # Blokir penetapan lokasi (mis. sengketa, sita, tunggakan): selama
+    # terblokir pemegang hanya dapat mengajukan pembukaan blokir.
+    is_blocked = models.BooleanField(verbose_name=_("PL diblokir"), default=False)
+    blocked_at = models.DateTimeField(
+        verbose_name=_("Diblokir pada"), null=True, blank=True
+    )
+    block_reason = models.TextField(
+        verbose_name=_("Alasan blokir"), blank=True, default=""
+    )
 
     class Meta:
         verbose_name = _("Alokasi lahan")
         verbose_name_plural = _("Alokasi lahan")
         ordering = ["-issued_date", "-pk"]
-        permissions = [("revoke_allocation", _("Dapat mencabut alokasi lahan"))]
+        permissions = [
+            ("revoke_allocation", _("Dapat mencabut alokasi lahan")),
+            ("block_allocation", _("Dapat memblokir dan membuka blokir PL")),
+        ]
 
     def __str__(self):
         return f"{self.kpt_number} – {self.holder}"
@@ -1413,7 +1629,8 @@ class IssuedDocument(models.Model):
         ("ppt", _("Perjanjian Pemanfaatan Tanah (PPT)")),
         ("iph", _("Surat Izin Persetujuan Peralihan Hak Atas Tanah")),
         ("sph", _("Surat Perpanjangan / Pembaruan Hak Atas Tanah")),
-        ("spt", _("Surat Persetujuan Layanan Tanah (pecah PL / pengukuran ulang)")),
+        ("spt", _("Surat Persetujuan Layanan Tanah")),
+        ("pl", _("Penetapan Lokasi (PL)")),
     )
 
     kind = models.CharField(verbose_name=_("Jenis"), max_length=8, choices=KIND_CHOICES)
@@ -1442,6 +1659,19 @@ class IssuedDocument(models.Model):
     )
     issued_at = models.DateTimeField(
         verbose_name=_("Diterbitkan"), default=timezone.now
+    )
+    # KPT/PPT/PL yang diterbitkan ulang (dokumen pengganti, perubahan, baru)
+    # tetap tersimpan, tetapi verifikasi menyatakan sudah tidak berlaku.
+    replaced_by = models.ForeignKey(
+        "self",
+        verbose_name=_("Diganti oleh"),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="replaces",
+    )
+    replaced_at = models.DateTimeField(
+        verbose_name=_("Diganti pada"), null=True, blank=True
     )
 
     class Meta:
@@ -1875,7 +2105,133 @@ class SavedPlot(models.Model):
         return f"{self.applicant} – {self.plot}"
 
 
+class UwtRegion(models.Model):
+    """Wilayah / sub wilayah tarif UWT untuk simulasi biaya di portal."""
+
+    name = models.CharField(verbose_name=_("Wilayah"), max_length=128)
+    sub_name = models.CharField(
+        verbose_name=_("Sub wilayah"), max_length=128, blank=True, default=""
+    )
+    description = models.TextField(verbose_name=_("Keterangan"), blank=True, default="")
+    order = models.PositiveSmallIntegerField(verbose_name=_("Urutan"), default=0)
+    is_active = models.BooleanField(verbose_name=_("Aktif"), default=True)
+
+    class Meta:
+        verbose_name = _("Wilayah tarif UWT")
+        verbose_name_plural = _("Wilayah tarif UWT")
+        ordering = ["order", "name", "sub_name"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=("name", "sub_name"), name="alokasi_uwtregion_unique"
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.name} – {self.sub_name}" if self.sub_name else self.name
+
+
+class UwtTariff(models.Model):
+    """Tarif UWT per m² per tahun menurut wilayah, peruntukan, dan jenis pengurusan."""
+
+    class Kind(models.TextChoices):
+        NEW = "baru", _("Tarif alokasi baru")
+        EXTENSION = "perpanjangan", _("Tarif perpanjangan")
+        RENEWAL = "pembaruan", _("Tarif pembaruan")
+
+    region = models.ForeignKey(
+        UwtRegion,
+        verbose_name=_("Wilayah"),
+        on_delete=models.CASCADE,
+        related_name="tariffs",
+    )
+    land_use = models.CharField(verbose_name=_("Peruntukan"), max_length=128)
+    kind = models.CharField(
+        verbose_name=_("Jenis pengurusan"), max_length=16, choices=Kind.choices
+    )
+    rate_per_m2_year = models.DecimalField(
+        verbose_name=_("Tarif per m² per tahun (Rp)"),
+        validators=[MinValueValidator(Decimal("0"))],
+        **MONEY,
+    )
+    term_years = models.PositiveSmallIntegerField(
+        verbose_name=_("Jangka waktu (tahun)"),
+        default=30,
+        validators=[MinValueValidator(1), MaxValueValidator(MAX_TERM_YEARS)],
+    )
+    note = models.CharField(
+        verbose_name=_("Catatan"), max_length=255, blank=True, default=""
+    )
+    is_active = models.BooleanField(verbose_name=_("Aktif"), default=True)
+
+    class Meta:
+        verbose_name = _("Tarif UWT")
+        verbose_name_plural = _("Tarif UWT")
+        ordering = ["region__order", "region__name", "land_use", "kind"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=("region", "land_use", "kind"), name="alokasi_uwttariff_unique"
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.region} · {self.land_use} · {self.get_kind_display()}"
+
+
+class ContactMessage(models.Model):
+    """Pesan dari formulir Kontak Kami portal."""
+
+    class Status(models.TextChoices):
+        NEW = "baru", _("Baru")
+        IN_PROGRESS = "diproses", _("Diproses")
+        DONE = "selesai", _("Selesai")
+
+    created_at = models.DateTimeField(verbose_name=_("Diterima"), default=timezone.now)
+    name = models.CharField(verbose_name=_("Nama lengkap"), max_length=255)
+    email = models.EmailField(verbose_name=_("Surel"))
+    phone = models.CharField(verbose_name=_("No. telepon"), max_length=32)
+    subject = models.CharField(verbose_name=_("Subjek"), max_length=255)
+    body = models.TextField(verbose_name=_("Isi pesan"), max_length=5000)
+    status = models.CharField(
+        verbose_name=_("Status"),
+        max_length=16,
+        choices=Status.choices,
+        default=Status.NEW,
+    )
+    reply = models.TextField(
+        verbose_name=_("Balasan ke pengirim"),
+        blank=True,
+        default="",
+        help_text=_("Diisi lalu disimpan: balasan dikirim ke surel pengirim."),
+    )
+    replied_at = models.DateTimeField(
+        verbose_name=_("Dibalas pada"), null=True, blank=True, editable=False
+    )
+    handled_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Ditangani oleh"),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        editable=False,
+        related_name="+",
+    )
+    ip_address = models.GenericIPAddressField(
+        verbose_name=_("Alamat IP"), null=True, blank=True, editable=False
+    )
+
+    class Meta:
+        verbose_name = _("Pesan Kontak Kami")
+        verbose_name_plural = _("Pesan Kontak Kami")
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.subject} – {self.name}"
+
+
 for _model in (
+    UwtRegion,
+    UwtTariff,
+    ContactMessage,
     AllocationSettings,
     LandPlot,
     InfoPage,

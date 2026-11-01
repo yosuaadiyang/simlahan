@@ -3,7 +3,8 @@
 Isian ditulis ``{{ grup.nama }}`` (mis. ``{{ pemohon.nama }}``). Pada templat
 HTML nilai di-escape lalu disisipkan; ``{{ blok.<kode> }}`` menyisipkan blok
 dari pustaka konten; ``{{ isian.<kunci> }}`` diisi petugas saat membuat
-dokumen. Templat Word dirender dengan docxtpl di lingkungan Jinja tersandbox
+dokumen; ``{{ kolom.<kunci> }}`` diisi penerima saat menandatangani
+(kolom isian penerima). Templat Word dirender dengan docxtpl di lingkungan Jinja tersandbox
 (tanpa akses atribut Python) memakai nama isian yang sama.
 """
 
@@ -19,6 +20,7 @@ from alokasi.templatetags.alokasi_tags import angka, rupiah, tanggal
 from dokumen.sanitizer import sanitize_html
 
 FIELD_RE = re.compile(r"\{\{\s*([a-z_]+)\.([a-z0-9_]+)\s*\}\}")
+RECIPIENT_FIELD_GROUP = "kolom"
 CUSTOM_KEY_RE = re.compile(r"^[a-z0-9_]{1,40}$")
 MAX_DOCX_BYTES = 20 * 1024 * 1024
 
@@ -296,7 +298,7 @@ def unknown_fields(text: str) -> list[str]:
     found = []
     for group, name in FIELD_RE.findall(text or ""):
         key = f"{group}.{name}"
-        if group == "isian" or key in KNOWN_KEYS:
+        if group in ("isian", RECIPIENT_FIELD_GROUP) or key in KNOWN_KEYS:
             continue
         if group == "blok" and name in blocks:
             continue

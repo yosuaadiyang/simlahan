@@ -2,29 +2,66 @@
 {% block title %}Kalkulator UWT{% endblock %}
 {% block content %}
 <h1>Simulasi Biaya UWT</h1>
-<p class="muted">Hitung perkiraan Uang Wajib Tahunan (UWT) untuk lahan yang tersedia sebelum mengajukan permohonan. Angka bersifat simulasi; tagihan resmi terbit setelah permohonan disetujui.</p>
+<p class="muted">Hitung perkiraan Uang Wajib Tahunan (UWT) sebelum mengajukan permohonan. Angka bersifat simulasi; tagihan resmi terbit setelah permohonan disetujui.</p>
+{% if has_tariffs %}
+<nav class="tabs" aria-label="Cara menghitung">
+  <a href="{% url 'portal:uwt_calculator' %}"{% if mode == 'lahan' %} class="active" aria-current="page"{% endif %}>Per lahan tersedia</a>
+  <a href="{% url 'portal:uwt_calculator' %}?mode=wilayah"{% if mode == 'wilayah' %} class="active" aria-current="page"{% endif %}>Per wilayah &amp; peruntukan</a>
+</nav>
+{% endif %}
 
 <div class="split">
   <section class="card">
     <form method="get" action="{% url 'portal:uwt_calculator' %}">
+      {% if mode == 'wilayah' %}<input type="hidden" name="mode" value="wilayah">{% endif %}
       {% include "alokasi/portal/_form.html" with form=form %}
       <button class="btn btn-accent" type="submit">Hitung</button>
     </form>
   </section>
 
-  {% if result %}
+  {% if mode == 'wilayah' %}
+    {% if tariff_result %}{% with r=tariff_result %}
+    <section class="card">
+      <h2>Tarif UWT</h2>
+      <dl class="props">
+        <dt>Wilayah</dt><dd>{{ r.tariff.region.name }}</dd>
+        {% if r.tariff.region.sub_name %}<dt>Sub wilayah</dt><dd>{{ r.tariff.region.sub_name }}</dd>{% endif %}
+        <dt>Peruntukan</dt><dd>{{ r.tariff.land_use }}</dd>
+        <dt>Jenis pengurusan</dt><dd>{{ r.tariff.get_kind_display }}</dd>
+        <dt>Tarif per meter</dt><dd>{{ r.rate|rupiah|patah }} / m² / tahun</dd>
+        <dt>Luas</dt><dd>{{ r.area_m2|angka:2|patah }} m²</dd>
+      </dl>
+      <table class="data" style="margin-top:12px">
+        <tr><td>Total UWT ({{ r.area_m2|angka:2 }} m² × {{ r.rate|rupiah|patah }} × {{ r.years }} tahun)<br><span class="small muted">Tarif tersebut berlaku untuk {{ r.years }} tahun.</span></td><td><strong>{{ r.uwt_total|rupiah|patah }}</strong></td></tr>
+        <tr><td>Total denda<br><span class="small muted">Sanksi {{ r.late_months }} bulan × ({{ r.penalty_percent|angka:2 }}% × {{ r.uwt_total|rupiah|patah }}){% if r.capped %} — dibatasi {{ config.uwt_penalty_max_months }} bulan{% endif %}</span></td><td>{{ r.penalty|rupiah|patah }}</td></tr>
+        <tr><td><strong>Total tagihan UWT</strong></td><td><strong>{{ r.grand_total|rupiah|patah }}</strong></td></tr>
+      </table>
+      {% if r.tariff.note %}<p class="small">{{ r.tariff.note }}</p>{% endif %}
+      <div class="alert alert-info small">Tagihan ini berlaku apabila proses dilakukan pada tanggal <strong>{{ r.valid_on|tanggal }}</strong>.</div>
+      <p class="small muted">{{ config.payment_instructions }}</p>
+      <div class="actions-row">
+        <a class="btn btn-outline btn-small" href="{% url 'portal:services' %}">Ajukan permohonan</a>
+        <a class="btn btn-outline btn-small" href="{% url 'portal:investment_map' %}">Wilayah pengembangan</a>
+      </div>
+    </section>
+    {% endwith %}{% else %}
+    <section class="card small muted">
+      Pilih wilayah, peruntukan, luas, dan jenis pengurusan (alokasi baru, perpanjangan, atau pembaruan). Untuk perpanjangan/pembaruan isi tanggal berakhir UWT: keterlambatan dikenai denda {{ config.uwt_penalty_percent|angka:2 }}% per bulan{% if config.uwt_penalty_max_months %} (paling lama {{ config.uwt_penalty_max_months }} bulan){% endif %} dari total UWT.
+    </section>
+    {% endif %}
+  {% elif result %}
   <section class="card">
     <h2>Hasil simulasi</h2>
     <dl class="props">
       <dt>Lahan</dt><dd>{{ result.plot.code }} – {{ result.plot.name }}{% if result.plot.district %} (Kec. {{ result.plot.district }}){% endif %}</dd>
-      <dt>Tarif</dt><dd>Rp {{ result.rate|rupiah|patah }} / m² / tahun</dd>
+      <dt>Tarif</dt><dd>{{ result.rate|rupiah|patah }} / m² / tahun</dd>
       <dt>Luas</dt><dd>{{ result.area_m2|angka:2|patah }} m²</dd>
       <dt>Jangka waktu</dt><dd>{{ result.years }} tahun</dd>
     </dl>
     <table class="data" style="margin-top:12px">
-      <tr><td>UWT ({{ result.area_m2|angka:0 }} m² × Rp {{ result.rate|rupiah|patah }} × {{ result.years }} tahun)</td><td><strong>Rp {{ result.uwt_total|rupiah|patah }}</strong></td></tr>
-      <tr><td>Biaya administrasi alokasi</td><td>Rp {{ result.admin_fee|rupiah|patah }}</td></tr>
-      <tr><td><strong>Total perkiraan</strong></td><td><strong>Rp {{ result.grand_total|rupiah|patah }}</strong></td></tr>
+      <tr><td>UWT ({{ result.area_m2|angka:0 }} m² × {{ result.rate|rupiah|patah }} × {{ result.years }} tahun)</td><td><strong>{{ result.uwt_total|rupiah|patah }}</strong></td></tr>
+      <tr><td>Biaya administrasi alokasi</td><td>{{ result.admin_fee|rupiah|patah }}</td></tr>
+      <tr><td><strong>Total perkiraan</strong></td><td><strong>{{ result.grand_total|rupiah|patah }}</strong></td></tr>
     </table>
     {% if result.plot.uwt_rate_per_m2_year == 0 %}<div class="alert alert-warn small">Tarif lahan ini belum diisi petugas; hubungi {{ config.authority_short_name }} untuk informasi resmi.</div>{% endif %}
     <p class="small muted">{{ config.payment_instructions }}</p>

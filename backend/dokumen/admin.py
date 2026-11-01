@@ -5,7 +5,7 @@ import datetime
 from django import forms
 from django.contrib import admin, messages
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db.models import Count, Q
+from django.db.models import Count, Q, TextField
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
@@ -17,14 +17,17 @@ from django.utils.translation import gettext_lazy as _
 from alokasi.templatetags.alokasi_tags import angka
 from dokumen import downloads, enums, merge, services, signing
 from dokumen.forms import (
+    BulkSendForm,
     ContentBlockForm,
     DocumentTemplateForm,
     DownloadDecisionForm,
     FillFieldsForm,
     GenerateForm,
+    HostedSignForm,
     OfficerNoteForm,
     OfficerUploadForm,
     OfficerVerifyForm,
+    ReassignForm,
     RecipientForm,
     SigningCreateForm,
     SigningDocumentForm,
@@ -43,7 +46,9 @@ from dokumen.models import (
     LandUse,
     PermitRecord,
     PermitType,
+    SavedSignature,
     SigningDocument,
+    SigningField,
 )
 
 COLORS = {
@@ -646,6 +651,8 @@ class LandUseAdmin(admin.ModelAdmin):
     autocomplete_fields = ("holder", "plot")
     inlines = (RecordInline, LandUseActivityInline)
     change_form_template = "admin/dokumen/landuse/change_form.html"
+    actions = ("bulk_send_documents",)
+    BULK_LIMIT = 200
     fieldsets = (
         (None, {"fields": ("number", "title", "scheme", "status", "assigned_to")}),
         (_("Pemegang hak"), {"fields": ("holder", "holder_name")}),
@@ -795,11 +802,108 @@ class LandUseAdmin(admin.ModelAdmin):
     def get_urls(self):
         return [
             path(
+                "kirim-massal/",
+                self.admin_site.admin_view(self.bulk_send_view),
+                name="dokumen_landuse_bulk_send",
+            ),
+            path(
                 "<int:pk>/tambah-dokumen/",
                 self.admin_site.admin_view(self.add_record_view),
                 name="dokumen_landuse_add_record",
             ),
         ] + super().get_urls()
+
+    @admin.action(
+        description=_("Kirim dokumen tanda tangan massal (satu per pemanfaatan)"),
+        permissions=("bulk_send",),
+    )
+    def bulk_send_documents(self, request, queryset):
+        ids = list(queryset.values_list("pk", flat=True)[: self.BULK_LIMIT + 1])
+        if len(ids) > self.BULK_LIMIT:
+            self.message_user(
+                request,
+                _("Maksimal %d pemanfaatan sekali kirim.") % self.BULK_LIMIT,
+                messages.ERROR,
+            )
+            return None
+        url = reverse("admin:dokumen_landuse_bulk_send")
+        return HttpResponseRedirect(f"{url}?ids={','.join(str(i) for i in ids)}")
+
+    def has_bulk_send_permission(self, request):
+        return request.user.has_perm(
+            "dokumen.add_signingdocument"
+        ) and request.user.has_perm("dokumen.send_signingdocument")
+
+    def bulk_send_view(self, request):
+        if not self.has_bulk_send_permission(request):
+            raise PermissionDenied
+        back = reverse("admin:dokumen_landuse_changelist")
+        try:
+            ids = [int(i) for i in request.GET.get("ids", "").split(",") if i.strip()][
+                : self.BULK_LIMIT
+            ]
+        except ValueError:
+            ids = []
+        land_uses = list(
+            self.get_queryset(request)
+            .filter(pk__in=ids)
+            .select_related("holder", "holder__user", "plot")
+            .order_by("number")
+        )
+        if not land_uses:
+            return _redirect(request, back, error=_("Pilih pemanfaatan lahan dahulu."))
+        form = BulkSendForm(request.POST or None)
+        if request.method == "POST" and form.is_valid():
+            data = form.cleaned_data
+            extra = None
+            if data["countersigner"] is not None:
+                user = data["countersigner"]
+                extra = {
+                    "user": user,
+                    "name": signing.display_name(user)[:255],
+                    "email": user.email,
+                    "role": data["countersigner_role"],
+                    "order": 2,
+                }
+            results = signing.bulk_send(
+                template=data["template"],
+                land_uses=land_uses,
+                user=request.user,
+                title=data["title"],
+                extra_recipient=extra,
+                message=data["message"],
+                request=request,
+            )
+            context = {
+                **self.admin_site.each_context(request),
+                "opts": self.model._meta,
+                "title": _("Hasil kirim massal"),
+                "results": results,
+                "back_url": back,
+                "sent": sum(1 for r in results if r["status"] == "dikirim"),
+            }
+            return TemplateResponse(
+                request, "admin/dokumen/bulk_send_result.html", context
+            )
+        names = ", ".join(lu.number for lu in land_uses[:10])
+        if len(land_uses) > 10:
+            names += _(" dan %d lainnya") % (len(land_uses) - 10)
+        return process_page(
+            request,
+            self,
+            None,
+            title=_("Kirim dokumen tanda tangan massal"),
+            form=form,
+            back_url=back,
+            submit_label=_("Buat & kirim %d dokumen") % len(land_uses),
+            intro=_(
+                "Satu dokumen dibuat dari templat untuk tiap pemanfaatan lahan "
+                "(%(count)d): %(names)s. Pemegang hak menjadi penanda tangan pertama. "
+                "Dokumen yang perlu persetujuan internal diajukan dahulu; yang belum "
+                "lengkap disimpan sebagai draf."
+            )
+            % {"count": len(land_uses), "names": names},
+        )
 
     def add_record_view(self, request, pk):
         land_use = get_object_or_404(LandUse, pk=pk)
@@ -1181,11 +1285,17 @@ class RecipientInline(admin.TabularInline):
         "user",
         "name",
         "email",
+        "in_person",
+        "access_code",
+        "stamp_page",
+        "stamp_x",
+        "stamp_y",
+        "stamp_width",
         "status_col",
-        "viewed_at",
+        "views_col",
         "completed_at",
     )
-    readonly_fields = ("status_col", "viewed_at", "completed_at")
+    readonly_fields = ("status_col", "views_col", "completed_at")
     verbose_name_plural = _("Penerima (urutan tanda tangan)")
 
     @admin.display(description=_("Status"))
@@ -1196,6 +1306,12 @@ class RecipientInline(admin.TabularInline):
             obj.status if obj.status != "selesai" else "selesai",
             obj.get_status_display(),
         )
+
+    @admin.display(description=_("Dibuka"))
+    def views_col(self, obj):
+        if obj is None or not obj.pk or not obj.view_count:
+            return "–"
+        return f"{obj.view_count}× · {timezone.localtime(obj.last_viewed_at):%d-%m-%Y %H.%M}"
 
     def _editable(self, obj):
         return obj is not None and obj.is_editable
@@ -1217,6 +1333,73 @@ class RecipientInline(admin.TabularInline):
         if "user" in formset.form.base_fields:
             formset.form.base_fields["user"].queryset = recipient_user_queryset(obj)
         return formset
+
+
+class SigningFieldInline(admin.TabularInline):
+    model = SigningField
+    extra = 0
+    fields = (
+        "order",
+        "key",
+        "label",
+        "kind",
+        "options",
+        "required",
+        "recipient",
+        "value_col",
+    )
+    readonly_fields = ("value_col",)
+    verbose_name_plural = _(
+        "Kolom isian penerima ({{ kolom.<kunci> }} di isi; PDF: tampil di lembar pengesahan)"
+    )
+    formfield_overrides = {
+        TextField: {"widget": forms.Textarea(attrs={"rows": 2, "cols": 24})}
+    }
+
+    @admin.display(description=_("Isian"))
+    def value_col(self, obj):
+        if obj is None or not obj.pk or not obj.filled_at:
+            return "–"
+        if obj.kind == SigningField.Kind.FILE and obj.file:
+            return format_html(
+                '<a href="{}">{}</a>',
+                reverse("admin:dokumen_signingdocument_field_file", args=[obj.pk]),
+                obj.file_name,
+            )
+        return obj.display_value or "–"
+
+    def _editable(self, obj):
+        return obj is not None and obj.is_editable
+
+    def has_add_permission(self, request, obj=None):
+        return self._editable(obj) and super().has_add_permission(request, obj)
+
+    def has_change_permission(self, request, obj=None):
+        return self._editable(obj) and super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        return self._editable(obj) and super().has_delete_permission(request, obj)
+
+    def has_view_permission(self, request, obj=None):
+        return super().has_view_permission(request, obj) and (
+            obj is None or obj.is_editable or obj.fields.exists()
+        )
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "recipient":
+            object_id = (
+                request.resolver_match.kwargs.get("object_id")
+                if request.resolver_match
+                else None
+            )
+            kwargs["queryset"] = (
+                DocumentRecipient.objects.filter(document_id=object_id).exclude(
+                    action=enums.RecipientAction.COPY
+                )
+                if object_id
+                else DocumentRecipient.objects.none()
+            )
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 class SigningActivityInline(ActivityInline):
@@ -1247,7 +1430,7 @@ class SigningDocumentAdmin(admin.ModelAdmin):
     )
     list_select_related = ("land_use", "created_by")
     autocomplete_fields = ("land_use",)
-    inlines = (RecipientInline, SigningActivityInline)
+    inlines = (RecipientInline, SigningFieldInline, SigningActivityInline)
     change_form_template = "admin/dokumen/signingdocument/change_form.html"
     date_hierarchy = "created_at"
     INFO = (
@@ -1396,6 +1579,18 @@ class SigningDocumentAdmin(admin.ModelAdmin):
                 detail=", ".join(form.changed_data),
             )
 
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+        # Kolom {{ kolom.* }} baru di isi otomatis mendapat definisi bawaan.
+        if signing.sync_fields(form.instance):
+            messages.info(
+                request,
+                _(
+                    "Kolom isian penerima baru ditambahkan dari isi dokumen; "
+                    "tetapkan penerima dan jenisnya."
+                ),
+            )
+
     # --- pembuatan ---------------------------------------------------------
 
     def add_view(self, request, form_url="", extra_context=None):
@@ -1503,6 +1698,12 @@ class SigningDocumentAdmin(admin.ModelAdmin):
                 "comments": comments,
                 "recipients": obj.recipients.order_by("order", "pk"),
                 "current_order": obj.current_order(),
+                "rendered_body": (
+                    signing.render_body(obj)
+                    if obj.source == enums.SigningSource.HTML
+                    else ""
+                ),
+                "can_manage_recipients": can_send and (obj.is_open or obj.is_editable),
                 "verify_url": reverse(
                     "dokumen_portal:verify_token", args=[obj.verify_token]
                 ),
@@ -1546,6 +1747,21 @@ class SigningDocumentAdmin(admin.ModelAdmin):
                 "penerima/<int:rid>/kirim-ulang/",
                 self.admin_site.admin_view(self.resend_view),
                 name="dokumen_signingdocument_resend",
+            ),
+            path(
+                "penerima/<int:rid>/ganti/",
+                self.admin_site.admin_view(self.reassign_view),
+                name="dokumen_signingdocument_reassign",
+            ),
+            path(
+                "penerima/<int:rid>/ttd-langsung/",
+                self.admin_site.admin_view(self.hosted_view),
+                name="dokumen_signingdocument_hosted",
+            ),
+            path(
+                "kolom/<int:fid>/berkas/",
+                self.admin_site.admin_view(self.field_file_view),
+                name="dokumen_signingdocument_field_file",
             ),
         ] + super().get_urls()
 
@@ -1683,7 +1899,9 @@ class SigningDocumentAdmin(admin.ModelAdmin):
                 data = services.read_file(document.source_file)
             else:
                 data = pdf.template_pdf(
-                    document.title, document.body, number=document.number
+                    document.title,
+                    signing.render_body(document, preview=True),
+                    number=document.number,
                 )
             data = pdf.watermark(
                 data,
@@ -1725,6 +1943,129 @@ class SigningDocumentAdmin(admin.ModelAdmin):
         return _redirect(
             request, back, success=_("Tautan dikirim ulang ke %s.") % recipient.email
         )
+
+    def _recipient_for(self, request, rid):
+        recipient = get_object_or_404(
+            DocumentRecipient.objects.select_related("document"), pk=rid
+        )
+        if not request.user.has_perm("dokumen.send_signingdocument"):
+            raise PermissionDenied
+        if not self.has_view_permission(request, recipient.document):
+            raise PermissionDenied
+        back = reverse(
+            "admin:dokumen_signingdocument_change", args=[recipient.document_id]
+        )
+        return recipient, back
+
+    def reassign_view(self, request, rid):
+        recipient, back = self._recipient_for(request, rid)
+        form = ReassignForm(request.POST or None, document=recipient.document)
+        if request.method == "POST" and form.is_valid():
+            data = form.cleaned_data
+            try:
+                signing.reassign(
+                    recipient,
+                    name=data["name"],
+                    email=data["email"],
+                    user=data["user"],
+                    officer=request.user,
+                    reason=data["reason"],
+                    request=request,
+                )
+            except ValidationError as error:
+                form.add_error(None, _errors(error))
+            else:
+                return _redirect(request, back, success=_("Penerima diganti."))
+        return process_page(
+            request,
+            self,
+            recipient.document,
+            title=_("Ganti penerima"),
+            form=form,
+            back_url=back,
+            submit_label=_("Ganti penerima"),
+            intro=_(
+                "Mengganti %(name)s (%(action)s). Tautan lama tidak berlaku lagi; "
+                "penerima baru diberi tahu bila sudah gilirannya."
+            )
+            % {"name": recipient.name, "action": recipient.get_action_display()},
+        )
+
+    def hosted_view(self, request, rid):
+        recipient, back = self._recipient_for(request, rid)
+        form = HostedSignForm(request.POST or None)
+        if request.method == "POST" and form.is_valid():
+            try:
+                signing.start_hosted(
+                    recipient,
+                    request.user,
+                    form.cleaned_data["evidence"],
+                    request=request,
+                )
+            except ValidationError as error:
+                form.add_error(None, _errors(error))
+            else:
+                return HttpResponseRedirect(
+                    reverse("dokumen_portal:sign", args=[recipient.token])
+                )
+        return process_page(
+            request,
+            self,
+            recipient.document,
+            title=_("Tanda tangan langsung"),
+            form=form,
+            back_url=back,
+            submit_label=_("Buka halaman tanda tangan"),
+            intro=_(
+                "%(name)s menandatangani di perangkat ini, di hadapan Anda. Sesi "
+                "berlaku 30 menit dan tercatat di jejak audit beserta bukti identitas."
+            )
+            % {"name": recipient.name},
+        )
+
+    def field_file_view(self, request, fid):
+        from dokumen.views import file_response
+
+        field = get_object_or_404(
+            SigningField.objects.select_related("document"), pk=fid
+        )
+        if not self.has_view_permission(request, field.document) or not field.file:
+            raise PermissionDenied
+        data = services.read_file(field.file)
+        downloads.log_preview(
+            request.user,
+            signing=field.document,
+            filename=field.file_name,
+            data=data,
+            request=request,
+            preview=False,
+        )
+        import mimetypes
+
+        return file_response(
+            data,
+            field.file_name or "berkas",
+            mimetypes.guess_type(field.file_name or "")[0]
+            or "application/octet-stream",
+        )
+
+
+@admin.register(SavedSignature)
+class SavedSignatureAdmin(admin.ModelAdmin):
+    list_display = ("user", "name", "updated_at")
+    search_fields = ("user__username", "user__email", "name")
+    readonly_fields = ("user", "name", "preview", "updated_at")
+    fields = readonly_fields
+
+    @admin.display(description=_("Tanda tangan"))
+    def preview(self, obj):
+        return format_html('<img src="{}" alt="" style="max-width:240px">', obj.image)
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
 
 
 # --------------------------------------------------------------------------

@@ -1,10 +1,17 @@
 {% extends "admin/change_form.html" %}
 {% block object-tools-items %}
+  {% if can_block %}<li><a href="{% url 'admin:alokasi_allocation_block' original.pk %}">Blokir PL</a></li>{% endif %}
+  {% if can_unblock %}<li><a href="{% url 'admin:alokasi_allocation_unblock' original.pk %}">Buka blokir PL</a></li>{% endif %}
   {% if can_revoke %}<li><a href="{% url 'admin:alokasi_allocation_revoke' original.pk %}">Cabut alokasi</a></li>{% endif %}
   {% if original %}<li><a href="{% url 'admin:alokasi_application_change' original.application_id %}">Permohonan asal</a></li>{% endif %}
   {{ block.super }}
 {% endblock %}
 {% block field_sets %}
+{% if original.is_blocked %}
+<div class="module" style="padding:10px 12px;margin-bottom:16px;border-left:4px solid var(--delete-button-bg)">
+  <strong>PL diblokir</strong> sejak {{ original.blocked_at|date:"d-m-Y" }}: {{ original.block_reason }}
+</div>
+{% endif %}
 {% if is_idle %}
 <div class="module" style="padding:10px 12px;margin-bottom:16px;border-left:4px solid var(--delete-button-bg)">
   <strong>Lahan tidur:</strong> pembangunan belum dimulai hingga batas {{ original.idle_deadline|date:"d-m-Y" }}. Alokasi dapat dicabut sesuai ketentuan.

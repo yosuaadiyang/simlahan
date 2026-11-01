@@ -22,6 +22,7 @@ from dokumen.forms import (
     HashCheckForm,
     HolderRecordForm,
     OtpForm,
+    SavedSignatureForm,
     SignForm,
 )
 from dokumen.models import (
@@ -31,7 +32,9 @@ from dokumen.models import (
     DownloadRequest,
     LandUse,
     PermitRecord,
+    SavedSignature,
     SigningDocument,
+    SigningField,
 )
 from file_operations.errors import FileScanError, FileScanPendingError, FileUnsafeError
 
@@ -474,7 +477,17 @@ def _gate(request, recipient):
 OTP_SESSION_KEY = "dokumen_otp_penerima"
 
 
+def _host(request, recipient):
+    """Petugas yang sedang memandu tanda tangan langsung penerima ini."""
+    user = request.user if request.user.is_authenticated else None
+    return user if user is not None and recipient.hosted_for(user) else None
+
+
 def _otp_ok(request, recipient) -> bool:
+    if _host(request, recipient) is not None:
+        return True
+    if recipient.in_person:
+        return False
     if not recipient.needs_otp:
         return True
     return signing.otp_ok(recipient) and str(recipient.pk) in request.session.get(
@@ -490,21 +503,54 @@ def _remember_otp(request, recipient) -> None:
 
 
 def _mask_email(email: str) -> str:
+    if not email:
+        return ""
     name, _at, domain = email.partition("@")
     return f"{name[:2]}{'*' * max(len(name) - 2, 1)}@{domain}"
+
+
+def _saved_signature(request, recipient):
+    """Tanda tangan tersimpan hanya untuk pemilik akun yang menandatangani sendiri."""
+    if (
+        recipient.user_id is None
+        or request.user.pk != recipient.user_id
+        or _host(request, recipient) is not None
+    ):
+        return None
+    return SavedSignature.objects.filter(user_id=recipient.user_id).first()
 
 
 def _sign_context(request, recipient, **extra):
     document = recipient.document
     verified = _otp_ok(request, recipient)
+    host = _host(request, recipient)
+    my_fields = list(recipient.fields.order_by("order", "pk"))
+    posted = extra.pop("field_values", None)
     return {
+        "host": host,
+        "field_rows": [
+            {
+                "field": f,
+                "value": (posted.get(f.key, "") if posted is not None else f.value),
+            }
+            for f in my_fields
+        ],
+        "needs_upload": any(f.kind == SigningField.Kind.FILE for f in my_fields),
+        "saved_signature": _saved_signature(request, recipient),
+        "rendered_body": (
+            signing.render_body(document, viewer=recipient)
+            if verified and document.source == enums.SigningSource.HTML
+            else ""
+        ),
         "recipient": recipient,
         "document": document,
         "recipients": document.recipients.order_by("order", "pk"),
         "verified": verified,
         "my_turn": signing.is_turn(recipient),
         "masked_email": _mask_email(recipient.email),
-        "otp_form": extra.pop("otp_form", OtpForm()),
+        "otp_form": extra.pop(
+            "otp_form", OtpForm(needs_access_code=recipient.has_access_code)
+        ),
         "sign_form": extra.pop(
             "sign_form",
             SignForm(initial={"name": recipient.signature_name or recipient.name}),
@@ -527,12 +573,23 @@ def _sign_send_code(request, recipient):
 
 
 def _sign_check_code(request, recipient):
-    form = OtpForm(request.POST)
-    if form.is_valid() and signing.check_otp(recipient, form.cleaned_data["code"]):
+    form = OtpForm(request.POST, needs_access_code=recipient.has_access_code)
+    if form.is_valid() and signing.check_otp(
+        recipient,
+        form.cleaned_data["code"],
+        form.cleaned_data.get("access_code", ""),
+    ):
         _remember_otp(request, recipient)
         messages.success(request, _("Kode cocok. Silakan tinjau dokumen."))
         return None
-    form.add_error(None, _("Kode salah atau kedaluwarsa. Minta kode baru bila perlu."))
+    form.add_error(
+        None,
+        (
+            _("Kode verifikasi atau kode akses salah, atau kode kedaluwarsa.")
+            if recipient.has_access_code
+            else _("Kode salah atau kedaluwarsa. Minta kode baru bila perlu.")
+        ),
+    )
     return {"otp_form": form}
 
 
@@ -555,21 +612,47 @@ def _sign_decline(request, recipient):
     form = DeclineForm(request.POST)
     if not form.is_valid():
         return {"decline_form": form, "open_decline": True}
-    signing.decline(recipient, form.cleaned_data["reason"], request=request)
+    signing.decline(
+        recipient,
+        form.cleaned_data["reason"],
+        request=request,
+        host=_host(request, recipient),
+    )
     messages.success(request, _("Penolakan Anda tercatat dan pengirim diberi tahu."))
     return None
 
 
 def _sign_act(request, recipient):
     form = SignForm(request.POST)
+    fields = list(recipient.fields.all())
+    values = {f.key: request.POST.get(f"kolom_{f.key}", "") for f in fields}
+    files = {
+        f.key: request.FILES[f"kolom_{f.key}"]
+        for f in fields
+        if f"kolom_{f.key}" in request.FILES
+    }
     if not form.is_valid():
-        return {"sign_form": form}
-    signing.act(
-        recipient,
-        name=form.cleaned_data["name"],
-        signature=form.cleaned_data["signature"],
-        request=request,
-    )
+        return {"sign_form": form, "field_values": values}
+    signature = form.cleaned_data["signature"]
+    if form.cleaned_data.get("use_saved"):
+        saved = _saved_signature(request, recipient)
+        if saved is None:
+            form.add_error(None, _("Tanda tangan tersimpan tidak ditemukan."))
+            return {"sign_form": form, "field_values": values}
+        signature = saved.image
+    try:
+        signing.act(
+            recipient,
+            name=form.cleaned_data["name"],
+            signature=signature,
+            request=request,
+            field_values=values,
+            field_files=files,
+            host=_host(request, recipient),
+        )
+    except ValidationError as error:
+        form.add_error(None, _errors(error))
+        return {"sign_form": form, "field_values": values}
     messages.success(
         request,
         (
@@ -604,7 +687,7 @@ def _sign_post(request, recipient):
 @require_http_methods(["GET", "POST"])
 def sign(request, token):
     recipient = _recipient(token)
-    gate = _gate(request, recipient)
+    gate = None if _host(request, recipient) is not None else _gate(request, recipient)
     if gate is not None:
         return gate
     if recipient.document.status in (
@@ -617,12 +700,22 @@ def sign(request, token):
     if request.method == "POST":
         if _throttled(request, "dokumen-ttd", limit=30, window=300):
             return _too_many(request)
+        host = _host(request, recipient)
         try:
             failed = _sign_post(request, recipient)
         except ValidationError as error:
             messages.error(request, _errors(error))
             failed = None
         if failed is None:
+            recipient.refresh_from_db()
+            if host is not None and recipient.status in (
+                enums.RecipientStatus.DONE,
+                enums.RecipientStatus.DECLINED,
+            ):
+                # Sesi tanda tangan langsung selesai: kembalikan petugas ke panel.
+                return redirect(
+                    "admin:dokumen_signingdocument_change", recipient.document_id
+                )
             return redirect("dokumen_portal:sign", token=token)
         extra = failed
         recipient.refresh_from_db()
@@ -639,7 +732,7 @@ def sign_pdf(request, token):
     from dokumen import pdf
 
     recipient = _recipient(token)
-    gate = _gate(request, recipient)
+    gate = None if _host(request, recipient) is not None else _gate(request, recipient)
     if gate is not None:
         return gate
     document = recipient.document
@@ -665,6 +758,54 @@ def sign_pdf(request, token):
         detail=_("PDF dibuka"),
     )
     return file_response(data, f"{document.number}.pdf", "application/pdf", inline=True)
+
+
+@require_http_methods(["GET", "POST"])
+def saved_signature(request):
+    """Aktivasi tanda tangan tersimpan untuk akun (dipakai ulang saat menandatangani)."""
+    if not request.user.is_authenticated:
+        login = reverse("portal:login")
+        return redirect(f"{login}?{urlencode({'next': request.get_full_path()})}")
+    saved = SavedSignature.objects.filter(user=request.user).first()
+    form = SavedSignatureForm(
+        request.POST or None,
+        user=request.user,
+        initial={"name": saved.name if saved else access.display_name(request.user)},
+    )
+    if request.method == "POST":
+        if _throttled(request, "dokumen-ttd-tersimpan", limit=10, window=300):
+            return _too_many(request)
+        if request.POST.get("aksi") == "hapus":
+            if saved is not None and request.user.check_password(
+                request.POST.get("password", "")
+            ):
+                saved.delete()
+                messages.success(request, _("Tanda tangan tersimpan dihapus."))
+                return redirect("dokumen_portal:saved_signature")
+            messages.error(request, _("Kata sandi salah."))
+        elif form.is_valid():
+            try:
+                signing.save_signature(
+                    request.user,
+                    form.cleaned_data["name"],
+                    form.cleaned_data["signature"],
+                )
+            except ValidationError as error:
+                form.add_error(None, _errors(error))
+            else:
+                services.log(
+                    enums.Action.UPDATED,
+                    actor=request.user,
+                    request=request,
+                    detail=_("Tanda tangan tersimpan diperbarui"),
+                )
+                messages.success(request, _("Tanda tangan tersimpan."))
+                return redirect("dokumen_portal:saved_signature")
+    return render(
+        request,
+        "dokumen/portal/saved_signature.html",
+        {"form": form, "saved": saved},
+    )
 
 
 # --------------------------------------------------------------------------

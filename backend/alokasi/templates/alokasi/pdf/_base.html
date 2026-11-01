@@ -27,9 +27,7 @@
 </style>
 </head>
 <body>
-<div class="kop">
-  <div class="org">{{ config.authority_name|upper }}</div>
-</div>
+{% include "alokasi/pdf/_kop.html" %}
 {% block content %}{% endblock %}
 <div id="footer" class="muted">
   {% block footer %}Dokumen elektronik {{ doc.number }}. Keaslian dapat diperiksa di {{ verification_url }}{% endblock %}
