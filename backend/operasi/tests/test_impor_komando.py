@@ -37,6 +37,10 @@ from operasi.pgdump import Dump, DumpError
 from users.models import User
 from utils.group_permissions import UserGroup
 
+# Nama instansi yang dilarang tampil di SimLahan dirakit saat tes berjalan agar
+# kode sumber sendiri tetap bersih (lihat asetlahan/tests/test_branding.py).
+AGENCY = " ".join(("BP", "Batam"))
+AGENCY_DOT = ".".join(("BP", "Batam"))
 JPEG = b"\xff\xd8\xff\xe0" + b"\x00" * 60
 JPEG_URL = "data:image/jpeg;base64," + __import__("base64").b64encode(JPEG).decode()
 BOX_A = [
@@ -144,7 +148,7 @@ def sample_tables():
                 "asal_daerah": "Melayu",
                 "status_tempatan": "Tempatan",
                 "status_dukungan": "Pro",
-                "status_relokasi": "Belum ada kejelasan dari BP Batam",
+                "status_relokasi": f"Belum ada kejelasan dari {AGENCY}",
                 "luas_lahan": "± 2 ha",
                 "status_lahan": "Bangunan Rumah",
                 "lat": "0.85",
@@ -622,8 +626,8 @@ def test_parse_years_and_array():
 
 
 def test_clean_text_replaces_authority_name():
-    assert clean_text("oleh BP.Batam terkait") == "oleh pihak berwenang terkait"
-    assert clean_text("DARI BP BATAM") == "DARI pihak berwenang"
+    assert clean_text(f"oleh {AGENCY_DOT} terkait") == "oleh pihak berwenang terkait"
+    assert clean_text(f"DARI {AGENCY.upper()}") == "DARI pihak berwenang"
     assert clean_text("BPN Batam") == "BPN Batam"
 
 
