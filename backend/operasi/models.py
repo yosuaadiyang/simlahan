@@ -2507,6 +2507,45 @@ class GeotechChange(TimeStampedModel):
         return f"{self.point} · {self.field}"
 
 
+# --------------------------------------------------------------------------
+# Pemindahan data dari sistem pusat komando lama
+# --------------------------------------------------------------------------
+
+
+class ImportedRecord(models.Model):
+    """Jejak baris data sistem lama yang sudah dipindahkan (``impor_komando``).
+
+    Satu baris sumber menjadi tepat satu objek SimLahan, sehingga impor yang
+    diulang tidak membuat data ganda.
+    """
+
+    source_table = models.CharField(_("Tabel asal"), max_length=128)
+    source_id = models.CharField(_("ID asal"), max_length=128)
+    content_type = models.ForeignKey(
+        "contenttypes.ContentType",
+        verbose_name=_("Jenis data"),
+        related_name="+",
+        on_delete=models.CASCADE,
+    )
+    object_id = models.PositiveBigIntegerField(_("ID data"))
+    imported_at = models.DateTimeField(_("Diimpor pada"), auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("Jejak impor sistem lama")
+        verbose_name_plural = _("Jejak impor sistem lama")
+        ordering = ["pk"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["source_table", "source_id"],
+                name="operasi_imported_record_unique",
+            )
+        ]
+        indexes = [models.Index(fields=["content_type", "object_id"])]
+
+    def __str__(self):
+        return f"{self.source_table} {self.source_id}"
+
+
 for _model in (
     CommandSettings,
     Korwil,
