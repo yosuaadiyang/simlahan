@@ -68,6 +68,7 @@ NOT_SAMPLED = {
     "leasing.UiData": "teks bantuan antarmuka yang ditulis admin",
     "operasi.ActivityWeight": "bobot poin resmi; contoh akan mengubah peringkat",
     "operasi.SystemLock": "tombol darurat; tidak boleh dinyalakan contoh",
+    "operasi.ImportedRecord": "jejak impor_komando; terisi saat data lama dipindah",
     # Hasil impor dari sistem lain (tidak dibuat lewat aplikasi).
     "leasing.Area": "hasil impor batas wilayah dari sistem GIS",
     "leasing.AreaSource": "sumber impor batas wilayah",
