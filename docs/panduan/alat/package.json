@@ -1,0 +1,12 @@
+{
+  "name": "simlahan-buku-panduan",
+  "private": true,
+  "description": "Alat pembuat ulang gambar dan PDF buku panduan SimLahan",
+  "scripts": {
+    "gambar": "node ambil-gambar.js",
+    "pdf": "node buat-pdf.js"
+  },
+  "dependencies": {
+    "marked": "12.0.2"
+  }
+}

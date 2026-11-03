@@ -1,0 +1,173 @@
+{
+ "out": "../gambar/dasar",
+ "groups": [
+  {
+   "login": "none",
+   "items": [
+    {
+     "url": "/",
+     "name": "masuk-aplikasi-utama",
+     "mark": [
+      [
+       "#login-username",
+       "1"
+      ],
+      [
+       "#login-password",
+       "2"
+      ],
+      [
+       "button[type=submit]",
+       "3"
+      ],
+      [
+       "text=⇄ Pusat Komando",
+       ""
+      ]
+     ]
+    },
+    {
+     "url": "/admin/login/",
+     "name": "masuk-panel-admin"
+    },
+    {
+     "url": "/komando/masuk/",
+     "name": "masuk-pusat-komando"
+    },
+    {
+     "url": "/portal/masuk/",
+     "name": "masuk-portal"
+    }
+   ]
+  },
+  {
+   "login": "none",
+   "phone": true,
+   "items": [
+    {
+     "url": "/",
+     "name": "masuk-aplikasi-utama-hp"
+    },
+    {
+     "url": "/komando/masuk/",
+     "name": "masuk-pusat-komando-hp"
+    }
+   ]
+  },
+  {
+   "login": "spa",
+   "user": "contoh.penyusun",
+   "items": [
+    {
+     "url": "/sewa",
+     "name": "bilah-atas",
+     "mark": [
+      [
+       "header button >> nth=0",
+       "1"
+      ],
+      [
+       "select >> nth=0",
+       "2"
+      ],
+      [
+       "text=Contoh Penyusun",
+       "3"
+      ],
+      [
+       "text=Keluar",
+       "4"
+      ]
+     ]
+    },
+    {
+     "url": "/sewa",
+     "name": "menu-samping",
+     "actions": [
+      {
+       "click": "header button >> nth=0"
+      },
+      {
+       "wait": 800
+      }
+     ]
+    },
+    {
+     "url": "/sewa",
+     "name": "menu-nama",
+     "actions": [
+      {
+       "click": "text=Contoh Penyusun"
+      },
+      {
+       "wait": 600
+      }
+     ]
+    },
+    {
+     "url": "/akun/panduan/",
+     "name": "panduan-peran"
+    },
+    {
+     "url": "/akun/sandi/",
+     "name": "ganti-sandi"
+    }
+   ]
+  },
+  {
+   "login": "spa",
+   "user": "contoh.administrator",
+   "items": [
+    {
+     "url": "/sewa",
+     "name": "bilah-atas-admin",
+     "mark": [
+      [
+       "text=Pusat Komando",
+       "1"
+      ],
+      [
+       "text=Panel admin",
+       "2"
+      ],
+      [
+       "text=Portal",
+       "3"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/",
+     "name": "panel-admin-beranda"
+    },
+    {
+     "url": "/admin/asetlahan/landasset/",
+     "name": "panel-daftar",
+     "mark": [
+      [
+       "#searchbar",
+       "1"
+      ],
+      [
+       "#changelist-filter",
+       "2"
+      ],
+      [
+       "select[name=action]",
+       "3"
+      ],
+      [
+       ".object-tools a",
+       "4"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/asetlahan/landasset/1/change/",
+     "name": "panel-formulir",
+     "full": false
+    }
+   ]
+  }
+ ]
+}

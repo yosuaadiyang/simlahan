@@ -1,0 +1,366 @@
+{
+ "out": "../gambar/portal",
+ "groups": [
+  {
+   "login": "none",
+   "items": [
+    {
+     "url": "/portal/",
+     "name": "beranda"
+    },
+    {
+     "url": "/portal/",
+     "name": "beranda-full",
+     "full": true
+    },
+    {
+     "url": "/portal/layanan/",
+     "name": "layanan"
+    },
+    {
+     "url": "/portal/layanan/alokasi-tanah-reguler/",
+     "name": "layanan-detail"
+    },
+    {
+     "url": "/portal/layanan/ketentuan-umum/",
+     "name": "ketentuan-umum"
+    },
+    {
+     "url": "/portal/lahan/",
+     "name": "peta-lahan",
+     "delay": 2500
+    },
+    {
+     "url": "/portal/lahan/CONTOH-RMP-01/",
+     "name": "lahan-detail"
+    },
+    {
+     "url": "/portal/lahan/CONTOH-RMP-01/",
+     "name": "lahan-detail-full",
+     "full": true
+    },
+    {
+     "url": "/portal/kalkulator-uwt/",
+     "name": "kalkulator-uwt"
+    },
+    {
+     "url": "/portal/informasi/",
+     "name": "informasi"
+    },
+    {
+     "url": "/portal/informasi/formulir/",
+     "name": "formulir"
+    },
+    {
+     "url": "/portal/informasi/pemenang-alokasi-terbuka/",
+     "name": "pemenang-terbuka"
+    },
+    {
+     "url": "/portal/lelang/",
+     "name": "lelang"
+    },
+    {
+     "url": "/portal/lelang/LLG-2026-0001/",
+     "name": "lelang-detail"
+    },
+    {
+     "url": "/portal/pengaduan/",
+     "name": "pengaduan"
+    },
+    {
+     "url": "/portal/pengaduan/cek/",
+     "name": "pengaduan-cek"
+    },
+    {
+     "url": "/portal/lacak/",
+     "name": "lacak"
+    },
+    {
+     "url": "/portal/verifikasi/",
+     "name": "verifikasi"
+    },
+    {
+     "url": "/portal/dokumen/verifikasi/",
+     "name": "verifikasi-dokumen"
+    },
+    {
+     "url": "/portal/bantuan/",
+     "name": "bantuan"
+    },
+    {
+     "url": "/portal/bantuan/kontak/",
+     "name": "kontak"
+    },
+    {
+     "url": "/portal/daftar/",
+     "name": "daftar"
+    },
+    {
+     "url": "/portal/daftar/",
+     "name": "daftar-full",
+     "full": true
+    },
+    {
+     "url": "/portal/lupa-sandi/",
+     "name": "lupa-sandi"
+    },
+    {
+     "url": "/portal/investasi/",
+     "name": "inv-beranda"
+    },
+    {
+     "url": "/portal/investasi/peta/",
+     "name": "inv-peta",
+     "delay": 2500
+    },
+    {
+     "url": "/portal/investasi/kawasan/contoh-kawasan-industri-logistik-rempang/",
+     "name": "inv-kawasan"
+    },
+    {
+     "url": "/portal/investasi/bandingkan/?lahan=CONTOH-RMP-01&lahan=CONTOH-RMP-02",
+     "name": "inv-bandingkan"
+    },
+    {
+     "url": "/portal/investasi/daftar/",
+     "name": "inv-daftar"
+    },
+    {
+     "url": "/aset/peta/7def6811-168f-4bd4-bf4a-6bfa6761d973/",
+     "name": "peta-berbagi",
+     "delay": 2500
+    }
+   ]
+  },
+  {
+   "login": "none",
+   "phone": true,
+   "prefix": "hp-",
+   "items": [
+    {
+     "url": "/portal/",
+     "name": "beranda"
+    },
+    {
+     "url": "/portal/lahan/",
+     "name": "peta-lahan",
+     "delay": 2500
+    }
+   ]
+  },
+  {
+   "login": "portal",
+   "user": "pemohon@contoh.simlahan.invalid",
+   "prefix": "pemohon-",
+   "items": [
+    {
+     "url": "/portal/akun/",
+     "name": "akun"
+    },
+    {
+     "url": "/portal/akun/",
+     "name": "akun-full",
+     "full": true
+    },
+    {
+     "url": "/portal/permohonan/ALK-2026-00006/",
+     "name": "permohonan-draf"
+    },
+    {
+     "url": "/portal/permohonan/ALK-2026-00006/",
+     "name": "permohonan-draf-full",
+     "full": true
+    },
+    {
+     "url": "/portal/permohonan/ALK-2026-00005/",
+     "name": "permohonan-perbaikan"
+    },
+    {
+     "url": "/portal/permohonan/ALK-2026-00002/",
+     "name": "permohonan-disetujui"
+    },
+    {
+     "url": "/portal/permohonan/ALK-2026-00001/",
+     "name": "permohonan-terbit"
+    },
+    {
+     "url": "/portal/alokasi/1/",
+     "name": "alokasi"
+    },
+    {
+     "url": "/portal/alokasi/1/layanan/",
+     "name": "alokasi-layanan"
+    },
+    {
+     "url": "/portal/alokasi/1/peralihan/",
+     "name": "alokasi-peralihan"
+    },
+    {
+     "url": "/portal/akun/profil/",
+     "name": "profil"
+    },
+    {
+     "url": "/portal/akun/sandi/",
+     "name": "sandi"
+    },
+    {
+     "url": "/portal/dokumen/",
+     "name": "dokumen"
+    },
+    {
+     "url": "/portal/dokumen/pemanfaatan/PML-2026-00004/",
+     "name": "dokumen-pemanfaatan"
+    },
+    {
+     "url": "/portal/dokumen/pemanfaatan/PML-2026-00004/",
+     "name": "dokumen-pemanfaatan-full",
+     "full": true
+    },
+    {
+     "url": "/portal/dokumen/tanda-tangan/DOK-2026-00002/",
+     "name": "dokumen-ttd"
+    },
+    {
+     "url": "/portal/dokumen/unduhan/",
+     "name": "dokumen-unduhan"
+    },
+    {
+     "url": "/portal/dokumen/tanda-tangan-saya/",
+     "name": "dokumen-ttd-saya"
+    },
+    {
+     "url": "/portal/lelang/LLG-2026-0001/tawar/",
+     "name": "lelang-tawar"
+    }
+   ]
+  },
+  {
+   "login": "portal",
+   "user": "investor@contoh.simlahan.invalid",
+   "prefix": "investor-",
+   "items": [
+    {
+     "url": "/portal/akun/",
+     "name": "akun"
+    },
+    {
+     "url": "/portal/akun/",
+     "name": "akun-full",
+     "full": true
+    },
+    {
+     "url": "/portal/investasi/permintaan/",
+     "name": "permintaan"
+    },
+    {
+     "url": "/portal/investasi/permintaan/INV-2026-00002/",
+     "name": "permintaan-ditawarkan"
+    },
+    {
+     "url": "/portal/investasi/permintaan/INV-2026-00002/",
+     "name": "permintaan-ditawarkan-full",
+     "full": true
+    },
+    {
+     "url": "/portal/investasi/permintaan/INV-2026-00001/",
+     "name": "permintaan-konsultasi"
+    },
+    {
+     "url": "/portal/investasi/ajukan/",
+     "name": "ajukan"
+    },
+    {
+     "url": "/portal/investasi/ajukan/",
+     "name": "ajukan-full",
+     "full": true
+    },
+    {
+     "url": "/portal/investasi/tersimpan/",
+     "name": "tersimpan"
+    },
+    {
+     "url": "/portal/lahan/CONTOH-RMP-01/",
+     "name": "lahan-detail"
+    },
+    {
+     "url": "/portal/akun/profil/",
+     "name": "profil"
+    }
+   ]
+  },
+  {
+   "login": "portal",
+   "user": "pemohon@contoh.simlahan.invalid",
+   "prefix": "pemohon-",
+   "items": [
+    {
+     "url": "/portal/permohonan/ALK-2026-00006/ubah/",
+     "name": "permohonan-ubah"
+    },
+    {
+     "url": "/portal/permohonan/ALK-2026-00006/",
+     "name": "permohonan-unggah",
+     "actions": [
+      {
+       "scroll": "text=Dokumen persyaratan"
+      }
+     ],
+     "mark": [
+      [
+       "button:has-text('Unggah')",
+       "1"
+      ],
+      [
+       "button:has-text('Ajukan') >> nth=0",
+       "2"
+      ]
+     ]
+    },
+    {
+     "url": "/portal/alokasi/1/",
+     "name": "alokasi-progres-form",
+     "actions": [
+      {
+       "scroll": "h2:has-text('Progres pembangunan')"
+      }
+     ]
+    },
+    {
+     "url": "/portal/permohonan/ALK-2026-00002/",
+     "name": "permohonan-bayar",
+     "actions": [
+      {
+       "scroll": "h2:has-text('Tagihan')"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "login": "portal",
+   "user": "pemohon@contoh.simlahan.invalid",
+   "prefix": "pemohon-",
+   "items": [
+    {
+     "url": "/portal/lahan/CONTOH-RMP-01/",
+     "name": "lahan-detail",
+     "actions": [
+      {
+       "scroll": "button:has-text('Langsung ajukan permohonan alokasi')"
+      }
+     ],
+     "mark": [
+      [
+       "button:has-text('Langsung ajukan permohonan alokasi')",
+       "1"
+      ],
+      [
+       "button:has-text('Ajukan minat investasi'), a:has-text('Ajukan minat investasi')",
+       "2"
+      ]
+     ]
+    }
+   ]
+  }
+ ]
+}

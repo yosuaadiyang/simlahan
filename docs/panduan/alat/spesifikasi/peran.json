@@ -1,0 +1,483 @@
+{
+ "out": "../gambar/peran",
+ "groups": [
+  {
+   "login": "spa",
+   "user": "contoh.penelusur",
+   "prefix": "penelusur-",
+   "items": [
+    {
+     "url": null,
+     "name": "beranda",
+     "delay": 2000
+    },
+    {
+     "url": null,
+     "name": "menu",
+     "actions": [
+      {
+       "click": "header button >> nth=0"
+      },
+      {
+       "wait": 900
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "login": "spa",
+   "user": "contoh.penyusun",
+   "prefix": "penyusun-",
+   "items": [
+    {
+     "url": null,
+     "name": "beranda",
+     "delay": 2000
+    },
+    {
+     "url": null,
+     "name": "menu",
+     "actions": [
+      {
+       "click": "header button >> nth=0"
+      },
+      {
+       "wait": 900
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "login": "spa",
+   "user": "contoh.kontrak",
+   "prefix": "kontrak-",
+   "items": [
+    {
+     "url": null,
+     "name": "beranda",
+     "delay": 2000
+    },
+    {
+     "url": null,
+     "name": "menu",
+     "actions": [
+      {
+       "click": "header button >> nth=0"
+      },
+      {
+       "wait": 900
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "login": "spa",
+   "user": "contoh.operator",
+   "prefix": "operator-",
+   "items": [
+    {
+     "url": null,
+     "name": "beranda",
+     "delay": 2000
+    },
+    {
+     "url": null,
+     "name": "menu",
+     "actions": [
+      {
+       "click": "header button >> nth=0"
+      },
+      {
+       "wait": 900
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "login": "spa",
+   "user": "contoh.ahlihukum",
+   "prefix": "ahlihukum-",
+   "items": [
+    {
+     "url": null,
+     "name": "beranda",
+     "delay": 2000
+    },
+    {
+     "url": null,
+     "name": "menu",
+     "actions": [
+      {
+       "click": "header button >> nth=0"
+      },
+      {
+       "wait": 900
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "login": "spa",
+   "user": "contoh.penagihan",
+   "prefix": "penagihan-",
+   "items": [
+    {
+     "url": null,
+     "name": "beranda",
+     "delay": 2000
+    },
+    {
+     "url": null,
+     "name": "menu",
+     "actions": [
+      {
+       "click": "header button >> nth=0"
+      },
+      {
+       "wait": 900
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "login": "spa",
+   "user": "contoh.administrator",
+   "prefix": "administrator-",
+   "items": [
+    {
+     "url": null,
+     "name": "beranda",
+     "delay": 2000
+    },
+    {
+     "url": null,
+     "name": "menu",
+     "actions": [
+      {
+       "click": "header button >> nth=0"
+      },
+      {
+       "wait": 900
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "login": "spa",
+   "user": "contoh.pelaksana",
+   "prefix": "pelaksana-",
+   "items": [
+    {
+     "url": null,
+     "name": "beranda",
+     "delay": 2000
+    },
+    {
+     "url": null,
+     "name": "menu",
+     "actions": [
+      {
+       "click": "header button >> nth=0"
+      },
+      {
+       "wait": 900
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "login": "spa",
+   "user": "contoh.satgas",
+   "prefix": "satgas-",
+   "items": [
+    {
+     "url": null,
+     "name": "beranda",
+     "delay": 2000
+    },
+    {
+     "url": null,
+     "name": "menu",
+     "actions": [
+      {
+       "click": "header button >> nth=0"
+      },
+      {
+       "wait": 900
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "login": "spa",
+   "user": "contoh.penilai",
+   "prefix": "penilai-",
+   "items": [
+    {
+     "url": null,
+     "name": "beranda",
+     "delay": 2000
+    },
+    {
+     "url": null,
+     "name": "menu",
+     "actions": [
+      {
+       "click": "header button >> nth=0"
+      },
+      {
+       "wait": 900
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "login": "spa",
+   "user": "contoh.instansi",
+   "prefix": "instansi-",
+   "items": [
+    {
+     "url": null,
+     "name": "beranda",
+     "delay": 2000
+    },
+    {
+     "url": null,
+     "name": "menu",
+     "actions": [
+      {
+       "click": "header button >> nth=0"
+      },
+      {
+       "wait": 900
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "login": "spa",
+   "user": "contoh.alokasi",
+   "prefix": "alokasi-",
+   "items": [
+    {
+     "url": null,
+     "name": "beranda",
+     "delay": 2000
+    },
+    {
+     "url": "/admin/",
+     "name": "panel"
+    },
+    {
+     "url": "/akun/panduan/",
+     "name": "panduan"
+    }
+   ]
+  },
+  {
+   "login": "spa",
+   "user": "contoh.verifikasi",
+   "prefix": "verifikasi-",
+   "items": [
+    {
+     "url": null,
+     "name": "beranda",
+     "delay": 2000
+    },
+    {
+     "url": "/admin/",
+     "name": "panel"
+    },
+    {
+     "url": "/akun/panduan/",
+     "name": "panduan"
+    }
+   ]
+  },
+  {
+   "login": "spa",
+   "user": "contoh.aset",
+   "prefix": "aset-",
+   "items": [
+    {
+     "url": null,
+     "name": "beranda",
+     "delay": 2000
+    },
+    {
+     "url": "/admin/",
+     "name": "panel"
+    },
+    {
+     "url": "/akun/panduan/",
+     "name": "panduan"
+    }
+   ]
+  },
+  {
+   "login": "spa",
+   "user": "contoh.hukum",
+   "prefix": "hukum-",
+   "items": [
+    {
+     "url": null,
+     "name": "beranda",
+     "delay": 2000
+    },
+    {
+     "url": "/admin/",
+     "name": "panel"
+    },
+    {
+     "url": "/akun/panduan/",
+     "name": "panduan"
+    }
+   ]
+  },
+  {
+   "login": "komando",
+   "user": "contoh.lapangan",
+   "prefix": "lapangan-",
+   "phone": true,
+   "items": [
+    {
+     "url": "/komando/",
+     "name": "beranda",
+     "delay": 3000
+    },
+    {
+     "url": "/komando/",
+     "name": "menu",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 800
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "login": "komando",
+   "user": "contoh.lapangan",
+   "prefix": "lapangan-",
+   "items": [
+    {
+     "url": "/admin/",
+     "name": "panel"
+    }
+   ]
+  },
+  {
+   "login": "komando",
+   "user": "contoh.korwil",
+   "prefix": "korwil-",
+   "phone": true,
+   "items": [
+    {
+     "url": "/komando/",
+     "name": "beranda",
+     "delay": 3000
+    },
+    {
+     "url": "/komando/",
+     "name": "menu",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 800
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "login": "komando",
+   "user": "contoh.korwil",
+   "prefix": "korwil-",
+   "items": [
+    {
+     "url": "/admin/",
+     "name": "panel"
+    }
+   ]
+  },
+  {
+   "login": "admin",
+   "user": "admin",
+   "prefix": "superuser-",
+   "items": [
+    {
+     "url": "/admin/",
+     "name": "panel"
+    },
+    {
+     "url": "/admin/users/user/",
+     "name": "pengguna"
+    },
+    {
+     "url": "/admin/users/user/add/",
+     "name": "pengguna-tambah"
+    },
+    {
+     "url": "/admin/users/user/?q=contoh.korwil",
+     "name": "pengguna-ubah",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a"
+      },
+      {
+       "wait": 1200
+      }
+     ],
+     "full": true
+    },
+    {
+     "url": "/admin/auth/group/",
+     "name": "grup"
+    },
+    {
+     "url": "/admin/leasing/serviceunit/",
+     "name": "unit-layanan"
+    },
+    {
+     "url": "/admin/operasi/systemlock/",
+     "name": "kunci-sistem"
+    },
+    {
+     "url": "/admin/batchrun/",
+     "name": "batchrun"
+    },
+    {
+     "url": "/admin/batchrun/jobrun/",
+     "name": "batchrun-riwayat"
+    },
+    {
+     "url": "/admin/batchrun/scheduledjob/",
+     "name": "batchrun-jadwal"
+    }
+   ]
+  }
+ ]
+}

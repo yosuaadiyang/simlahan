@@ -1,0 +1,267 @@
+{
+ "out": "../gambar/aset",
+ "groups": [
+  {
+   "login": "admin",
+   "user": "contoh.administrator",
+   "items": [
+    {
+     "url": "/admin/asetlahan/dasbor/",
+     "name": "dasbor"
+    },
+    {
+     "url": "/admin/asetlahan/dasbor/",
+     "name": "dasbor-full",
+     "full": true
+    },
+    {
+     "url": "/admin/asetlahan/peta/",
+     "name": "peta-tematik",
+     "delay": 3000
+    },
+    {
+     "url": "/admin/asetlahan/landasset/",
+     "name": "aset-daftar"
+    },
+    {
+     "url": "/admin/asetlahan/landasset/",
+     "name": "aset-detail",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      }
+     ]
+    },
+    {
+     "url": "/admin/asetlahan/landasset/",
+     "name": "aset-detail-full",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      }
+     ],
+     "full": true
+    },
+    {
+     "url": "/admin/asetlahan/landasset/impor/",
+     "name": "aset-impor"
+    },
+    {
+     "url": "/admin/asetlahan/gantt/",
+     "name": "gantt"
+    },
+    {
+     "url": "/admin/asetlahan/laporan/",
+     "name": "laporan"
+    },
+    {
+     "url": "/admin/asetlahan/buku-besar/",
+     "name": "buku-besar"
+    },
+    {
+     "url": "/admin/asetlahan/tumpang-tindih/",
+     "name": "tumpang-tindih"
+    },
+    {
+     "url": "/admin/asetlahan/citra/",
+     "name": "citra"
+    },
+    {
+     "url": "/admin/asetlahan/cari/?q=contoh",
+     "name": "cari"
+    },
+    {
+     "url": "/admin/asetlahan/asisten/",
+     "name": "asisten"
+    },
+    {
+     "url": "/admin/asetlahan/pemangku/matriks/",
+     "name": "matriks-pemangku"
+    },
+    {
+     "url": "/admin/asetlahan/legalcase/",
+     "name": "perkara-daftar"
+    },
+    {
+     "url": "/admin/asetlahan/legalcase/",
+     "name": "perkara-detail",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      }
+     ]
+    },
+    {
+     "url": "/admin/asetlahan/legalcase/",
+     "name": "perkara-detail-full",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      }
+     ],
+     "full": true
+    },
+    {
+     "url": "/admin/asetlahan/encroachmentcase/",
+     "name": "okupasi-daftar"
+    },
+    {
+     "url": "/admin/asetlahan/encroachmentcase/",
+     "name": "okupasi-detail",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      }
+     ]
+    },
+    {
+     "url": "/admin/asetlahan/grievance/",
+     "name": "pengaduan-daftar"
+    },
+    {
+     "url": "/admin/asetlahan/grievance/",
+     "name": "pengaduan-detail",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      }
+     ]
+    },
+    {
+     "url": "/admin/asetlahan/tender/",
+     "name": "lelang-daftar"
+    },
+    {
+     "url": "/admin/asetlahan/tender/",
+     "name": "lelang-detail",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      }
+     ]
+    },
+    {
+     "url": "/admin/asetlahan/bid/",
+     "name": "penawaran"
+    },
+    {
+     "url": "/admin/asetlahan/assetvaluation/",
+     "name": "penilaian"
+    },
+    {
+     "url": "/admin/asetlahan/taxobligation/",
+     "name": "pajak"
+    },
+    {
+     "url": "/admin/asetlahan/landtransaction/",
+     "name": "transaksi"
+    },
+    {
+     "url": "/admin/asetlahan/resettlementsite/",
+     "name": "permukiman-kawasan"
+    },
+    {
+     "url": "/admin/asetlahan/resettlementunit/",
+     "name": "permukiman-unit"
+    },
+    {
+     "url": "/admin/asetlahan/document/",
+     "name": "dokumen"
+    },
+    {
+     "url": "/admin/asetlahan/mapshare/",
+     "name": "peta-berbagi"
+    },
+    {
+     "url": "/admin/asetlahan/task/",
+     "name": "tugas"
+    },
+    {
+     "url": "/admin/asetlahan/task/",
+     "name": "tugas-detail",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      }
+     ]
+    },
+    {
+     "url": "/admin/asetlahan/stakeholder/",
+     "name": "pemangku"
+    },
+    {
+     "url": "/admin/asetlahan/heirship/",
+     "name": "ahli-waris"
+    },
+    {
+     "url": "/admin/asetlahan/surveyrequest/",
+     "name": "survei"
+    },
+    {
+     "url": "/admin/asetlahan/fieldreport/",
+     "name": "laporan-lapangan"
+    },
+    {
+     "url": "/admin/asetlahan/satelliteimage/",
+     "name": "citra-daftar"
+    },
+    {
+     "url": "/admin/asetlahan/mapoverlay/",
+     "name": "lapisan-peta"
+    },
+    {
+     "url": "/admin/asetlahan/facilitator/",
+     "name": "fasilitator"
+    },
+    {
+     "url": "/admin/asetlahan/liaisonactivity/",
+     "name": "urusan-instansi"
+    },
+    {
+     "url": "/admin/asetlahan/advocate/",
+     "name": "advokat"
+    },
+    {
+     "url": "/admin/asetlahan/team/",
+     "name": "tim"
+    },
+    {
+     "url": "/admin/asetlahan/assetcategory/",
+     "name": "kategori-aset"
+    },
+    {
+     "url": "/admin/asetlahan/grievancecategory/",
+     "name": "kategori-pengaduan"
+    },
+    {
+     "url": "/admin/asetlahan/modulesettings/",
+     "name": "pengaturan"
+    }
+   ]
+  }
+ ]
+}

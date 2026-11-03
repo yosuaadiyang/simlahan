@@ -1,0 +1,162 @@
+{
+ "out": "../gambar/dokumen",
+ "groups": [
+  {
+   "login": "admin",
+   "user": "contoh.administrator",
+   "prefix": "",
+   "items": [
+    {
+     "url": "/admin/dokumen/dasbor/",
+     "name": "dasbor"
+    },
+    {
+     "url": "/admin/dokumen/dasbor/",
+     "name": "dasbor-full",
+     "full": true
+    },
+    {
+     "url": "/admin/dokumen/landuse/",
+     "name": "pemanfaatan-daftar",
+     "mark": [
+      [
+       "select[name=action]",
+       "1"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/dokumen/landuse/",
+     "name": "pemanfaatan-detail",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      }
+     ]
+    },
+    {
+     "url": "/admin/dokumen/landuse/",
+     "name": "pemanfaatan-detail-full",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      }
+     ],
+     "full": true
+    },
+    {
+     "url": "/admin/dokumen/permitrecord/",
+     "name": "perizinan-daftar"
+    },
+    {
+     "url": "/admin/dokumen/permitrecord/",
+     "name": "perizinan-detail",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      }
+     ]
+    },
+    {
+     "url": "/admin/dokumen/signingdocument/",
+     "name": "ttd-daftar"
+    },
+    {
+     "url": "/admin/dokumen/signingdocument/",
+     "name": "ttd-detail",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      }
+     ]
+    },
+    {
+     "url": "/admin/dokumen/signingdocument/",
+     "name": "ttd-detail-full",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      }
+     ],
+     "full": true
+    },
+    {
+     "url": "/admin/dokumen/signingdocument/add/",
+     "name": "ttd-tambah"
+    },
+    {
+     "url": "/admin/dokumen/documenttemplate/",
+     "name": "templat-daftar"
+    },
+    {
+     "url": "/admin/dokumen/documenttemplate/",
+     "name": "templat-detail",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      }
+     ]
+    },
+    {
+     "url": "/admin/dokumen/documenttemplate/impor/",
+     "name": "templat-impor"
+    },
+    {
+     "url": "/admin/dokumen/downloadrequest/",
+     "name": "unduh-daftar"
+    },
+    {
+     "url": "/admin/dokumen/downloadrequest/",
+     "name": "unduh-detail",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      }
+     ]
+    },
+    {
+     "url": "/admin/dokumen/downloadlog/",
+     "name": "riwayat-unduh"
+    },
+    {
+     "url": "/admin/dokumen/permittype/",
+     "name": "jenis-perizinan"
+    },
+    {
+     "url": "/admin/dokumen/contentblock/",
+     "name": "pustaka-konten"
+    },
+    {
+     "url": "/admin/dokumen/activity/",
+     "name": "jejak-aktivitas"
+    },
+    {
+     "url": "/admin/dokumen/documentsettings/",
+     "name": "pengaturan"
+    }
+   ],
+   "out": "dokumen"
+  }
+ ]
+}
