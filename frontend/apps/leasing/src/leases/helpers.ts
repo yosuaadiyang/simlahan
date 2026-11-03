@@ -554,14 +554,16 @@ export const getContentCustomDetailedPlan = (
     return null;
   }
 
-  customDetailedPlan.state =
-    get(customDetailedPlan, "state.id") || customDetailedPlan.state;
-  customDetailedPlan.type =
-    get(customDetailedPlan, "type.id") || customDetailedPlan.type;
-  customDetailedPlan.intended_use =
-    get(customDetailedPlan, "intended_use.id") ||
-    customDetailedPlan.intended_use;
-  return customDetailedPlan;
+  // Salin dulu: objek berasal dari store Redux yang dibekukan, jadi menimpa
+  // propertinya langsung melempar TypeError dan menggagalkan render halaman.
+  return {
+    ...customDetailedPlan,
+    state: get(customDetailedPlan, "state.id") || customDetailedPlan.state,
+    type: get(customDetailedPlan, "type.id") || customDetailedPlan.type,
+    intended_use:
+      get(customDetailedPlan, "intended_use.id") ||
+      customDetailedPlan.intended_use,
+  };
 };
 
 /**

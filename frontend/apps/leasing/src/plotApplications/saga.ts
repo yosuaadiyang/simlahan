@@ -303,7 +303,14 @@ function* fetchApplicationRelatedFormSaga({
     switch (statusCode) {
       case 200:
         yield put(receiveApplicationRelatedForm(bodyAsJson));
-        yield put(fetchApplicationRelatedPlotSearch(bodyAsJson.plot_search_id));
+        // Formulir tanpa pencarian kavling: jangan minta /plot_search/null/.
+        if (bodyAsJson.plot_search_id) {
+          yield put(
+            fetchApplicationRelatedPlotSearch(bodyAsJson.plot_search_id),
+          );
+        } else {
+          yield put(applicationRelatedPlotSearchNotFound());
+        }
         break;
 
       default:

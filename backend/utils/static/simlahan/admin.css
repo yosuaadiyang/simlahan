@@ -1677,3 +1677,19 @@ div.dj_map {
 .sl-login-switch a {
   font-weight: 600;
 }
+
+/* Kotak pilih ganda (filter_horizontal): judul & kaki daftar "terpilih"
+   berlatar biru tua. Django mewarnai teksnya dengan --header-link-color,
+   yang di SimLahan abu-abu (kepala halaman berlatar putih) sehingga nyaris
+   tak terbaca. Paksa teks putih di atas latar biru. */
+.selector-chosen-title,
+form .aligned .selector-chosen-title label,
+.selector-chosen-title label,
+.selector-chosen-title .helptext,
+.selector-chosen .list-footer-display {
+  color: #fff;
+}
+
+.selector-chosen .list-footer-display__clear {
+  color: rgba(255, 255, 255, 0.85);
+}

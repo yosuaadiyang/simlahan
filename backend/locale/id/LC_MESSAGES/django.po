@@ -7008,3 +7008,6 @@ msgstr "Badan permintaan harus berupa objek JSON."
 
 msgid "Enter a duration in ISO 8601 format, e.g. P3M or P1Y."
 msgstr "Masukkan durasi dalam format ISO 8601, mis. P3M atau P1Y."
+
+msgid "Go"
+msgstr "Jalankan"

@@ -93,15 +93,8 @@ from leasing.models.map_layers import VipunenMapLayer
 from leasing.models.service_unit import ServiceUnitGroupMapping
 
 
-class CenterOnIndonesiaGISAdmin(admin.GISModelAdmin):
-    # Titik tengah Indonesia (SRID 4326)
-    gis_widget_kwargs = {
-        "attrs": {"default_lon": 118.0, "default_lat": -2.5, "default_zoom": 5}
-    }
-
-
 @admin.register(AreaNote)
-class AreaNoteAdmin(FieldPermissionsAdminMixin, CenterOnIndonesiaGISAdmin):
+class AreaNoteAdmin(FieldPermissionsAdminMixin, admin.GISModelAdmin):
     list_display = ("created_at", "user")
     search_fields = ["note", "user__first_name", "user__last_name", "user__username"]
 
@@ -138,7 +131,7 @@ class NameAdmin(FieldPermissionsModelAdmin):
 
 
 @admin.register(Area)
-class AreaAdmin(CenterOnIndonesiaGISAdmin):
+class AreaAdmin(admin.GISModelAdmin):
     list_display = ("identifier", "type", "source")
     list_filter = (("type", EnumFieldListFilter), "source")
     search_fields = ["identifier"]
