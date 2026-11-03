@@ -4,8 +4,6 @@ import re
 from pathlib import Path
 from urllib.parse import unquote
 
-import pytest
-
 from users.role_books import BOOK_DIR, MANUAL_DIR, books, sync
 from users.role_guide import ROLE_GUIDES
 
@@ -105,13 +103,18 @@ def test_every_image_is_used():
     assert not unused, f"gambar tidak dipakai: {unused}"
 
 
-@pytest.mark.parametrize("word", ["BP Batam", "Django"])
-def test_forbidden_words(word):
+def test_no_framework_name():
+    """Buku panduan memakai nama SimLahan, bukan nama kerangka kerjanya.
+
+    Nama instansi terlarang sudah dijaga untuk seluruh repositori oleh
+    asetlahan/tests/test_branding.py.
+    """
+    word = "django"
     hits = [
         str(path.relative_to(MANUAL_DIR))
         for path in MANUAL_DIR.rglob("*")
         if path.is_file()
         and path.suffix in {".md", ".js", ".json", ".py", ".html", ".css"}
-        and word.lower() in path.read_text(encoding="utf-8").lower()
+        and word in path.read_text(encoding="utf-8").lower()
     ]
-    assert not hits, f"kata '{word}' ditemukan di: {hits}"
+    assert not hits, f"nama kerangka kerja ditemukan di: {hits}"
