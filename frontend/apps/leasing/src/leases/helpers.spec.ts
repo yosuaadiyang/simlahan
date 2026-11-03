@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  getContentCustomDetailedPlan,
   getContentLeaseAddress,
   getContentLeaseAreaIdentifier,
   getContentLeaseListLeaseAddresses,
@@ -153,6 +154,30 @@ describe("leases/helpers", () => {
       } as unknown as Lease;
       expect(getContentLeaseAddress(lease)).toBe("Jl. Uji 1");
       expect(getContentLeaseAreaIdentifier(lease)).toBe("A-1");
+    });
+  });
+
+  describe("getContentCustomDetailedPlan", () => {
+    it("does not mutate a frozen store object", () => {
+      const plan = Object.freeze({
+        identifier: "RDTR-1",
+        state: Object.freeze({ id: 2, name: "Berlaku" }),
+        type: Object.freeze({ id: 3 }),
+        intended_use: 4,
+      });
+      const area = Object.freeze({ custom_detailed_plan: plan });
+      const result = getContentCustomDetailedPlan(area as any);
+      expect(result).toEqual({
+        identifier: "RDTR-1",
+        state: 2,
+        type: 3,
+        intended_use: 4,
+      });
+      expect(plan.state).toEqual({ id: 2, name: "Berlaku" });
+    });
+
+    it("returns null without a plan", () => {
+      expect(getContentCustomDetailedPlan({} as any)).toBeNull();
     });
   });
 });
