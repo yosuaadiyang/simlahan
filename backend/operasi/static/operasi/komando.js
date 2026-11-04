@@ -2074,7 +2074,7 @@
       $("daftar-kegiatan").innerHTML = data.results.map(function (a) {
         var extras = [];
         if (a.location_name) { extras.push("📍 " + a.location_name); }
-        extras.push(a.points + " poin");
+        extras.push(fmtNum(a.points, 1) + " poin");
         if (a.impact_label) { extras.push("Dampak " + a.impact_label + (a.impact_pending ? " (menunggu konfirmasi)" : "")); }
         if (a.ai_stance) { extras.push("AI: " + choiceLabel("stance", a.ai_stance)); }
         if (a.temuan) { extras.push("⚠️ " + a.temuan.number + " " + a.temuan.kind + (a.temuan.is_new ? " (baru)" : " (kunjungan ke-" + a.temuan.visits + ")")); }
@@ -2340,7 +2340,7 @@
   function taskMeta(t) {
     return [t.number, t.priority_label, t.activity_label, t.due_date ? "tenggat " + fmtDate(t.due_date) : "",
       t.korwil ? "Korwil " + t.korwil : "", t.mine ? (t.giver && !t.given ? "dari " + t.giver : "") : (t.assignee ? "untuk " + t.assignee : ""),
-      t.points ? t.points + " poin" : ""].filter(Boolean).join(" · ");
+      t.points ? fmtNum(t.points) + " poin" : ""].filter(Boolean).join(" · ");
   }
 
   function loadTasks() {
@@ -2395,7 +2395,7 @@
     var rows = [
       ["Penerima utama", t.assignee], ["Pemberi tugas", t.giver], ["Kontributor", t.contributors.join(", ")],
       ["Jenis kegiatan", t.activity_label], ["Prioritas", t.priority_label], ["Tenggat", t.due_date ? fmtDate(t.due_date) + (t.overdue ? " (terlambat)" : "") : ""],
-      ["Korwil", t.korwil], ["Nilai poin", t.points ? t.points + " poin per orang" : ""], ["Status", t.status_label]
+      ["Korwil", t.korwil], ["Nilai poin", t.points ? fmtNum(t.points) + " poin per orang" : ""], ["Status", t.status_label]
     ].filter(function (r) { return r[1]; });
     var html = (t.description ? "<p class='pre'>" + escapeHtml(t.description) + "</p>" : "") +
       "<table class='table kv'><tbody>" + rows.map(function (r) { return "<tr><th>" + escapeHtml(r[0]) + "</th><td>" + escapeHtml(r[1]) + "</td></tr>"; }).join("") + "</tbody></table>";
@@ -2417,7 +2417,7 @@
     }
     if (t.points_awarded.length) {
       html += "<h3>Poin diberikan</h3><ul class='list compact'>" + t.points_awarded.map(function (p) {
-        return "<li>" + escapeHtml(p.name) + " · " + escapeHtml(p.role) + " · <b>" + p.points + " poin</b></li>";
+        return "<li>" + escapeHtml(p.name) + " · " + escapeHtml(p.role) + " · <b>" + fmtNum(p.points) + " poin</b></li>";
       }).join("") + "</ul>";
     }
     html += "<h3>Riwayat</h3><ul class='timeline'>" + (t.events.map(function (e) {
@@ -2541,7 +2541,7 @@
           : "Anda di puncak rantai laporan: tinjau dan tandai laporan masuk selesai.");
       $("lh-kegiatan").innerHTML = data.activities.map(function (a) {
         return "<label class='check'><input type='checkbox' value='" + a.id + "' checked> " +
-          escapeHtml(fmtDate(a.at, true) + " · " + a.type_label + " · " + a.title + (a.korwil ? " · Korwil " + a.korwil : "") + " · " + a.points + " poin") + "</label>";
+          escapeHtml(fmtDate(a.at, true) + " · " + a.type_label + " · " + a.title + (a.korwil ? " · Korwil " + a.korwil : "") + " · " + fmtNum(a.points, 1) + " poin") + "</label>";
       }).join("") || "<span class='muted small'>Tidak ada kegiatan yang belum dilaporkan.</span>";
       $("lh-sumber-wrap").hidden = !data.inbox.length || !data.can_send;
       $("lh-sumber").innerHTML = data.inbox.map(function (r) { return reportItem(r, "checked"); }).join("");
@@ -2984,7 +2984,7 @@
       "<div class='metrics'>" +
       "<div class='metric'><b>" + me.attendance_pct + "%</b><span>Kehadiran (" + me.present_days + " hari, " + me.late_days + " terlambat)</span></div>" +
       "<div class='metric'><b>" + pctText(me.on_time_pct) + "</b><span>Tepat waktu</span></div>" +
-      "<div class='metric'><b>" + me.activities + "/" + me.activity_target + "</b><span>Kegiatan vs target</span></div>" +
+      "<div class='metric'><b>" + fmtNum(me.activities, 1) + "/" + fmtNum(me.activity_target) + "</b><span>Kegiatan vs target</span></div>" +
       "<div class='metric'><b>" + me.residents_visited + "</b><span>Warga dikunjungi</span></div>" +
       "<div class='metric'><b>" + me.tasks_on_time + "/" + me.tasks_due + "</b><span>Tugas tepat waktu</span></div>" +
       "<div class='metric'><b>" + me.tasks_overdue + "</b><span>Tugas terlambat (terbuka)</span></div>" +
@@ -3008,7 +3008,7 @@
       "<div class='row wrap'><button type='button' class='btn-small' id='kinerja-peta'" + (detail.points.length ? "" : " disabled") + ">🗺️ Lihat sebaran di peta (" + detail.points.length + " titik)</button></div>";
     html += "<h3>Tugas terbuka</h3><ul class='list compact'>" + (detail.tasks.map(function (t) {
       return "<li class='clickable' data-buka-tugas='" + t.id + "'><b>" + escapeHtml(t.number) + "</b> " + escapeHtml(t.title) +
-        "<div class='sub'>" + escapeHtml(t.status_label) + (t.due_date ? " · tenggat " + fmtDate(t.due_date) : "") + (t.overdue ? " · <span class='danger-text'>terlambat</span>" : "") + (t.points ? " · " + t.points + " poin" : "") + "</div></li>";
+        "<div class='sub'>" + escapeHtml(t.status_label) + (t.due_date ? " · tenggat " + fmtDate(t.due_date) : "") + (t.overdue ? " · <span class='danger-text'>terlambat</span>" : "") + (t.points ? " · " + fmtNum(t.points) + " poin" : "") + "</div></li>";
     }).join("") || "<li class='muted'>Tidak ada tugas terbuka.</li>") + "</ul>";
     html += "<h3>Kegiatan terakhir</h3><ul class='list compact'>" + (detail.recent.map(function (a) {
       return "<li><b>" + escapeHtml(a.title || a.type_label) + "</b> " + (a.verified ? "<span class='badge' style='background:#1a7f37'>terverifikasi</span>" : "") +
@@ -3031,7 +3031,7 @@
         select.value = perfTarget;
         $("kinerja-tim-isi").innerHTML = data.team.map(function (row, index) {
           return "<tr class='clickable' data-petugas='" + row.user_id + "'><td>" + (index + 1) + "</td><td>" + escapeHtml(row.user) + "</td><td><b>" + row.score + "</b> " + row.grade +
-            "</td><td>" + row.attendance_pct + "%</td><td>" + row.activities + "/" + row.activity_target + "</td><td>" + row.task_pct + "%</td></tr>";
+            "</td><td>" + row.attendance_pct + "%</td><td>" + fmtNum(row.activities, 1) + "/" + fmtNum(row.activity_target) + "</td><td>" + row.task_pct + "%</td></tr>";
         }).join("");
       }
     }).catch(function (error) { $("kinerja-isi").textContent = error.message; $("kinerja-rinci").innerHTML = ""; });
@@ -3109,7 +3109,7 @@
           "<span class='rank-no'>#" + row.rank + "</span>" +
           "<span class='rank-name'><b>" + escapeHtml(row.user) + "</b> " + badges +
           "<br><span class='muted small'>" + escapeHtml([row.tier_label, row.korwils.length ? "Korwil " + row.korwils.join(", ") : ""].filter(Boolean).join(" · ")) +
-          " · hadir " + row.attendance_pct + "% · kegiatan " + row.activities + "/" + row.activity_target + " · komsos " + row.komsos + "</span></span>" +
+          " · hadir " + row.attendance_pct + "% · kegiatan " + fmtNum(row.activities, 1) + "/" + fmtNum(row.activity_target) + " · komsos " + row.komsos + "</span></span>" +
           "<span class='rank-score'><b>" + row.score + "</b> <span class='badge' style='background:" + (GRADE_COLORS[row.grade] || "#57606a") + "'>" + escapeHtml(row.grade) + "</span><br>" + (TREND_BADGE[row.trend] || "") + "</span></div>";
       }).join("") || "<p class='muted'>Belum ada anggota tim.</p>";
     }).catch(function (error) { $("peringkat-isi").textContent = error.message; });

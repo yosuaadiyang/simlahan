@@ -13,6 +13,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
+from django.utils.formats import number_format
 from django.utils.translation import gettext as _
 
 from asetlahan import enums as aset_enums
@@ -222,8 +223,15 @@ def create_task(user, data) -> Task:
         points = int(data.get("poin") or 0)
     except ValueError:
         points = -1
-    if not 0 <= points <= 100:
-        raise ValidationError({"poin": [_("Nilai poin harus 0–100.")]})
+    if not 0 <= points <= enums.MAX_TASK_POINTS:
+        raise ValidationError(
+            {
+                "poin": [
+                    _("Nilai poin harus 0–%(max)s.")
+                    % {"max": number_format(enums.MAX_TASK_POINTS, force_grouping=True)}
+                ]
+            }
+        )
     korwil = _korwil(user, data.get("korwil"), assignee)
     task = Task(
         title=title[:255],

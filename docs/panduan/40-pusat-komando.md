@@ -179,7 +179,7 @@ Saring dengan tombol **Saya**, **Tim**, **Verifikasi**, **Terlambat**, **Semua**
 ![Beri tugas](gambar/komando/korwil-beri-tugas.png)
 
 1. Ketuk **＋ Beri tugas**.
-2. Isi **Judul tugas**, **Uraian / instruksi**, **Penerima utama**, **Kontributor** (opsional, ikut mendapat poin), **Jenis kegiatan**, **Prioritas**, **Tenggat**, **Nilai poin (0–100)**, dan **Korwil**.
+2. Isi **Judul tugas**, **Uraian / instruksi**, **Penerima utama**, **Kontributor** (opsional, ikut mendapat poin), **Jenis kegiatan**, **Prioritas**, **Tenggat**, **Nilai poin (0–1.000.000)**, dan **Korwil**.
 3. Ketuk **Kirim tugas**. Penerima mendapat pemberitahuan.
 4. Saat tugas dilaporkan selesai, buka dari filter **Verifikasi**, lalu ketuk **✔ Verifikasi selesai** atau **↩ Kembalikan untuk revisi** (wajib dengan catatan). Poin tugas yang diverifikasi masuk KPI penerima, kontributor, dan pemberi tugas. **✕ Batalkan tugas** membatalkan tugas.
 

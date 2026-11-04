@@ -113,9 +113,10 @@ def test_create_task_only_for_subordinates(chain, other_field, korwil):
     assert response.status_code == 400 and "kontributor" in response.json()["errors"]
     response = client.post(
         api("tugas/"),
-        {"judul": "Pendataan RT 03", "penerima": field.pk, "poin": "101"},
+        {"judul": "Pendataan RT 03", "penerima": field.pk, "poin": "1000001"},
     )
     assert response.status_code == 400
+    assert "1.000.000" in response.json()["errors"]["poin"][0]
     yesterday = timezone.localdate() - datetime.timedelta(days=1)
     response = client.post(
         api("tugas/"),
@@ -129,11 +130,12 @@ def test_create_task_only_for_subordinates(chain, other_field, korwil):
             "penerima": field.pk,
             "jenis": enums.ActivityType.CENSUS,
             "prioritas": aset_enums.Priority.HIGH,
-            "poin": "10",
+            "poin": "250000",
         },
     )
     assert response.status_code == 201, response.content
     task = Task.objects.get(pk=response.json()["id"])
+    assert task.point_value == 250_000
     assert task.korwil == korwil and task.created_by == coordinator
     assert task.service_unit == korwil.service_unit
     assert task.komando_events.get().kind == enums.TaskEventKind.CREATED
