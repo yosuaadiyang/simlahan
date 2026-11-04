@@ -109,5 +109,5 @@ def test_kpi_filter_shrinks_long_values():
     )
     short, medium, long = html.split("|")
     assert short == "5"
-    assert 'kpi-panjang--md' in medium and "Rp45.<wbr>000.<wbr>000" in medium
-    assert 'kpi-panjang--sm' in long
+    assert "kpi-panjang--md" in medium and "Rp45.<wbr>000.<wbr>000" in medium
+    assert "kpi-panjang--sm" in long

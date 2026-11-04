@@ -169,13 +169,13 @@ def _box(col, row, size=0.0015, gap=0.0004):
     )
 
 
-
 def _decision_maker():
     """Pengambil keputusan contoh: unit pengelola kawasan, bukan pejabat negara."""
     return (
         DecisionMaker.objects.filter(name="Kepala Badan Pengelola Kawasan").first()
         or DecisionMaker.objects.order_by("pk").first()
     )
+
 
 class Command(BaseCommand):
     help = "Buat atau hapus data contoh sewa, kontak, dan tagihan (fiktif)"

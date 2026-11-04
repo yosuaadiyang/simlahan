@@ -1070,27 +1070,6 @@
     },
     {
      "url": "/komando/",
-     "name": "persetujuan",
-     "actions": [
-      {
-       "wait": 2500
-      },
-      {
-       "click": ".tabbar button[data-tab='lainnya']"
-      },
-      {
-       "wait": 600
-      },
-      {
-       "click": ".more-menu button[data-buka='persetujuan']"
-      },
-      {
-       "wait": 2500
-      }
-     ]
-    },
-    {
-     "url": "/komando/",
      "name": "laporan-harian",
      "tinggi": 900,
      "actions": [
@@ -1556,27 +1535,6 @@
     },
     {
      "url": "/komando/",
-     "name": "beranda",
-     "actions": [
-      {
-       "wait": 2500
-      },
-      {
-       "click": ".tabbar button[data-tab='lainnya']"
-      },
-      {
-       "wait": 600
-      },
-      {
-       "click": ".more-menu button[data-buka='beranda']"
-      },
-      {
-       "wait": 2500
-      }
-     ]
-    },
-    {
-     "url": "/komando/",
      "name": "spasial-ancaman",
      "tinggi": 860,
      "actions": [
@@ -1995,27 +1953,6 @@
       },
       {
        "click": ".more-menu button[data-buka='peringkat']"
-      },
-      {
-       "wait": 2500
-      }
-     ]
-    },
-    {
-     "url": "/komando/",
-     "name": "alat-desktop",
-     "actions": [
-      {
-       "wait": 2500
-      },
-      {
-       "click": ".tabbar button[data-tab='lainnya']"
-      },
-      {
-       "wait": 600
-      },
-      {
-       "click": ".more-menu button[data-buka='alat']"
       },
       {
        "wait": 2500

@@ -204,7 +204,8 @@
        "text=+ Tambah tonggak",
        "3"
       ]
-     ]
+     ],
+     "tinggi": 1150
     }
    ]
   },
@@ -939,12 +940,6 @@
      "url": "/pengadaan-tanah/1/bidang/1",
      "name": "bidang-detail",
      "delay": 2500
-    },
-    {
-     "url": "/pengadaan-tanah/1/bidang/1",
-     "name": "bidang-detail-full",
-     "delay": 2500,
-     "full": true
     }
    ]
   },
@@ -953,10 +948,6 @@
    "user": "contoh.penilai",
    "prefix": "penilai-",
    "items": [
-    {
-     "url": "/dasbor-pengadaan",
-     "name": "dasbor"
-    },
     {
      "url": "/pengadaan-tanah",
      "name": "daftar"
@@ -967,26 +958,19 @@
      "delay": 2000
     },
     {
-     "url": "/pengadaan-tanah/1?tab=penilaian",
-     "name": "form-penilaian",
-     "actions": [
-      {
-       "wait": 1500
-      },
-      {
-       "click": "button:has-text('+ Tambah penilaian')"
-      },
-      {
-       "wait": 1200
-      }
-     ],
-     "el": ".acq-modal.modal-open .modal__wrapper",
-     "tinggi": 1150
-    },
-    {
      "url": "/pengadaan-tanah/1?tab=pihak",
      "name": "pihak",
-     "delay": 2000
+     "delay": 2000,
+     "mark": [
+      [
+       "tr:has-text('Pemilik Contoh 1') >> td >> nth=3",
+       1
+      ],
+      [
+       "tr:has-text('Pemilik Contoh 1') >> td >> nth=5",
+       2
+      ]
+     ]
     }
    ]
   },
@@ -1073,7 +1057,17 @@
     {
      "url": "/pengadaan-tanah/1?tab=pihak",
      "name": "pihak",
-     "delay": 2000
+     "delay": 2000,
+     "mark": [
+      [
+       "tr:has-text('Pemilik Contoh 1') >> td >> nth=3",
+       1
+      ],
+      [
+       "tr:has-text('Pemilik Contoh 1') >> td >> nth=5",
+       2
+      ]
+     ]
     }
    ]
   }

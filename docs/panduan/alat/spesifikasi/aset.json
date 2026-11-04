@@ -380,6 +380,36 @@
     },
     {
      "url": "/admin/asetlahan/legalcase/",
+     "name": "perkara-detail",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      }
+     ],
+     "mark": [
+      [
+       "#id_title",
+       "1"
+      ],
+      [
+       "#id_case_type",
+       "2"
+      ],
+      [
+       "#id_court",
+       "3"
+      ],
+      [
+       "#id_court_case_number",
+       "4"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/asetlahan/legalcase/",
      "name": "perkara-pihak",
      "actions": [
       {
@@ -445,19 +475,6 @@
        "2"
       ]
      ]
-    },
-    {
-     "url": "/admin/asetlahan/legalcase/",
-     "name": "perkara-detail-full",
-     "actions": [
-      {
-       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
-      },
-      {
-       "wait": 1500
-      }
-     ],
-     "full": true
     },
     {
      "url": "/admin/asetlahan/encroachmentcase/",

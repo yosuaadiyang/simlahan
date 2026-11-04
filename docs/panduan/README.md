@@ -5,8 +5,8 @@ Buku ini menjelaskan cara memakai SimLahan langkah demi langkah, untuk setiap pe
 ## Cara memakai buku ini
 
 1. Baru pertama kali? Baca [Bab 1 – Mengenal SimLahan](01-mengenal-simlahan.md) dan [Bab 2 – Dasar penggunaan](02-dasar-penggunaan.md).
-2. Cari peran Anda di tabel [Buku per peran](#buku-per-peran), lalu buka bukunya. Buku peran berisi menu yang Anda lihat, pekerjaan sehari-hari langkah demi langkah, dan tautan ke bab yang perlu dibaca.
-3. Buka bab modul bila perlu penjelasan lengkap setiap layar, kolom, dan tombol.
+2. Cari peran Anda di tabel [Buku per peran](#buku-per-peran), lalu buka bukunya. Buku peran berisi halaman awal dan menu yang Anda lihat, urutan kerja, dan **semua langkah kerja peran itu lengkap dengan gambar**, jadi cukup dibaca sendiri.
+3. Bab modul (Bab 3–16) adalah buku lengkap per modul untuk semua peran. Langkah di buku peran disalin dari bab ini, jadi isinya selalu sama.
 
 Tulisan **tebal** adalah nama menu, tombol, atau kolom persis seperti di layar. Tanda → berarti "lalu klik". Nomor merah di gambar menunjuk langkah yang dijelaskan di bawahnya.
 

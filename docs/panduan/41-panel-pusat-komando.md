@@ -114,7 +114,7 @@ Daftar tanda darurat dengan status **Aktif – butuh bantuan**, **Sedang ditanga
 |---|---|
 | Temuan ilegal | Temuan pembalakan, tambang, perambahan, pembukaan lahan, pembangunan liar beserta kunjungan berulangnya. Saringan **Aktivitas**, **Korwil**. Aksi **Ekspor CSV**. |
 | Laporan patroli Taman Buru | Patroli beserta temuan dan bibit. Saringan **Situasi**, **Korwil**, **Waktu kegiatan**. |
-| Jejak patroli SMART | Jalur patroli dari SMART Mobile / CyberTracker. Klik **Impor patroli SMART (.json)** (nomor 1 pada gambar Jejak patroli SMART di bawah) untuk mengunggah berkas GeoJSON (maks. 15 MB); jalur, observasi, dan foto tampil di lapisan **Patroli SMART** pusat komando. |
+| Jejak patroli SMART | Jalur patroli dari SMART Mobile / CyberTracker. Berkas diimpor dengan tombol **Impor patroli SMART (.json)** (lihat gambar di bawah). |
 | Uji tanah | Hasil uji tanah lapangan. Saringan **Kelayakan**, **Jenis / tekstur tanah**, **Korwil**, **Waktu pengambilan**. Aksi **Ekspor CSV**. |
 | Titik uji tanah PLTS | Titik penyelidikan tanah PLTS. Saringan **Status pekerjaan**, **Status survei**, **Kondisi sosial**, **Bagian proyek**, **Metode**, **Batch**, **Korwil**. Aksi **Unduh Excel**. |
 
@@ -123,6 +123,8 @@ Daftar tanda darurat dengan status **Aktif – butuh bantuan**, **Sedang ditanga
 ![Patroli Taman Buru](gambar/lapangan/op-huntingparkpatrol.png)
 
 ![Jejak patroli SMART](gambar/lapangan/op-patrolsession.png)
+
+Klik **Impor patroli SMART (.json)** (nomor 1) untuk mengunggah berkas GeoJSON dari SMART Mobile / CyberTracker (maks. 15 MB). Jalur, observasi, dan foto tampil di lapisan **Patroli SMART** pusat komando.
 
 ![Uji tanah](gambar/lapangan/op-soiltest.png)
 

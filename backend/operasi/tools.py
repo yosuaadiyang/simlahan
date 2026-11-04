@@ -538,9 +538,7 @@ def document_report(user, name: str, data: bytes, focus: str = "") -> dict:
             "preview": document["text"].strip()[:1500],
         }
     if not ai.enabled():
-        result["message"] = _(
-            "AI belum dikonfigurasi. Ditampilkan profil data saja."
-        )
+        result["message"] = _("AI belum dikonfigurasi. Ditampilkan profil data saja.")
         return result
     if (
         document["kind"] != "gambar"

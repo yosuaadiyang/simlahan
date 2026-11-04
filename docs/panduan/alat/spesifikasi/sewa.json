@@ -325,38 +325,6 @@
     },
     {
      "url": "/sewa/2",
-     "name": "sewa-tab-area-sewa",
-     "actions": [
-      {
-       "wait": 1500
-      },
-      {
-       "click": ".tabs a[aria-label='Area sewa']"
-      },
-      {
-       "wait": 1500
-      }
-     ],
-     "delay": 1500
-    },
-    {
-     "url": "/sewa/2",
-     "name": "sewa-tab-penyewa",
-     "actions": [
-      {
-       "wait": 1500
-      },
-      {
-       "click": ".tabs a[aria-label='Penyewa']"
-      },
-      {
-       "wait": 1500
-      }
-     ],
-     "delay": 1500
-    },
-    {
-     "url": "/sewa/2",
      "name": "sewa-tab-sewa",
      "actions": [
       {

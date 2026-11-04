@@ -30,13 +30,15 @@ Di bawah tombol ada angka **Lahan tersedia**, **Total luas tersedia**, **Lahan s
 
 Paling bawah ada **Pengumuman**, **Lahan terbaru**, dan **Video tutorial**.
 
-**Di HP**, menu atas disembunyikan. Ketuk **Menu** (nomor 1) untuk membukanya.
+**Di HP**, menu atas disembunyikan:
 
 ![Beranda portal di HP](gambar/portal/hp-beranda.png)
 
-Daftar menu lalu tampil memanjang ke bawah. Ketuk nama halaman, misalnya **Peta Lahan** (nomor 1). **Masuk** (nomor 2) dan **Daftar** (nomor 3) ada di paling bawah. Ketuk **✕ Menu** untuk menutup.
+Ketuk **Menu** (nomor 1) untuk membukanya. Daftar menu lalu tampil memanjang ke bawah:
 
 ![Menu portal di HP](gambar/portal/hp-menu.png)
+
+Ketuk nama halaman, misalnya **Peta Lahan** (nomor 1). **Masuk** (nomor 2) dan **Daftar** (nomor 3) ada di paling bawah. Ketuk **✕ Menu** untuk menutup.
 
 ## 12.2 Peta lahan dan detail lahan
 
@@ -115,12 +117,12 @@ Halaman kawasan juga berisi **Insentif & kemudahan**, **Infrastruktur pendukung*
 
 **Membandingkan lahan:**
 
+![Bandingkan lahan](gambar/portal/inv-bandingkan.png)
+
 1. Klik **Bandingkan** di 2 sampai 4 lahan (di halaman detail lahan, kartu lahan, atau halaman kawasan).
-2. Bilah hitam muncul di bawah layar, misalnya "2 lahan dipilih". Klik **Bandingkan** di bilah itu (nomor 2 pada gambar di bawah).
+2. Bilah hitam muncul di bawah layar, misalnya "2 lahan dipilih". Klik **Bandingkan** di bilah itu (nomor 2).
 3. Tabel membandingkan lahan berdampingan (nomor 1 adalah kolom lahan pertama): status, sektor, kawasan, lokasi, luas, peruntukan, skema dan biaya, kesiapan, serta jarak.
 4. Klik **Hapus** di bawah kolom lahan untuk mengeluarkannya, atau **✕** (nomor 3) untuk mengosongkan semua pilihan.
-
-![Bandingkan lahan](gambar/portal/inv-bandingkan.png)
 
 ## 12.4 Layanan, ketentuan umum, kalkulator UWT
 

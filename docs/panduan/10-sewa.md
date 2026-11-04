@@ -209,22 +209,37 @@ Halaman **Pencarian kavling** dan **Permohonan kavling** (bila ditampilkan untuk
 
 ## 3.11 Menu "Lainnya"
 
-| Menu | Kegunaan |
-|---|---|
-| **Indeks biaya hidup** | Tabel indeks per bulan dan tahun yang dipakai untuk penyesuaian sewa berindeks. Hanya dibaca. |
-| **Tugas terjadwal** | Riwayat (**Eksekusi**) dan **Jadwal** proses otomatis, misalnya pembuatan tagihan dan pengingat. Hanya dibaca; mengubah jadwal hanya oleh superuser. |
-| **Catatan tagihan** | Pengumuman yang dicetak pada tagihan per sewa dan periode. Klik **Buat pengumuman** (nomor 1 di gambar Catatan tagihan) untuk menambah. |
-| **Kalkulator sewa** | Menghitung perkiraan sewa tanpa menyimpan ke data sewa. Pilih **Jenis kalkulator** (nomor 1 di gambar Kalkulator sewa), isi nilai yang muncul, lalu lihat hasilnya. **Tambah kalkulator sewa** (nomor 2) menambah perhitungan kedua untuk dibandingkan. |
+Klik **☰ → Lainnya** untuk membuka empat halaman berikut. Peran yang tidak memerlukannya tidak melihat menunya.
 
 > Di sistem latihan, tabel **Indeks biaya hidup**, **Tugas terjadwal**, dan **Pencarian kavling** tampak kosong karena data contoh belum berisi indeks, riwayat proses otomatis, atau seleksi kavling. Di sistem yang sudah berjalan, tabelnya terisi dengan kolom seperti pada gambar.
 
+**Indeks biaya hidup**
+
 ![Indeks biaya hidup](gambar/sewa/indeks.png)
+
+Tabel indeks per bulan dan tahun yang dipakai untuk penyesuaian sewa berindeks. Hanya dibaca.
+
+**Tugas terjadwal**
 
 ![Tugas terjadwal](gambar/sewa/tugas-terjadwal.png)
 
+Riwayat (**Eksekusi**) dan **Jadwal** proses otomatis, misalnya pembuatan tagihan dan pengingat. Hanya dibaca; mengubah jadwal hanya oleh superuser.
+
+**Catatan tagihan**
+
 ![Catatan tagihan](gambar/sewa/catatan-tagihan.png)
 
+Pengumuman yang dicetak pada tagihan per sewa dan periode. Klik **Buat pengumuman** (nomor 1) untuk menambah, isi teks dan periodenya, lalu simpan.
+
+**Kalkulator sewa**
+
 ![Kalkulator sewa](gambar/sewa/kalkulator-sewa.png)
+
+Menghitung perkiraan sewa tanpa menyimpan ke data sewa.
+
+1. Pilih **Jenis kalkulator** (nomor 1).
+2. Isi nilai yang muncul. Hasilnya langsung tampil.
+3. Klik **Tambah kalkulator sewa** (nomor 2) bila ingin menambah perhitungan kedua untuk dibandingkan.
 
 ## 3.12 Pertanyaan umum
 

@@ -76,9 +76,11 @@ Saat Anda menyetujui, sistem otomatis membuat **tagihan UWT** dan **biaya admini
 - nilai akhir di bawah **nilai minimum** yang diatur di **Pengaturan layanan alokasi**;
 - untuk peralihan hak: penerima hak belum menyetujui peralihan di portal.
 
-Halaman konfirmasi **Minta perbaikan** terlihat seperti ini. Kolom **Catatan** (nomor 1) wajib diisi dengan hal yang harus diperbaiki pemohon, lalu klik **Minta perbaikan kepada pemohon** (nomor 2).
+Halaman konfirmasi **Minta perbaikan** terlihat seperti ini:
 
 ![Formulir minta perbaikan](gambar/alokasi/proses-perbaikan.png)
+
+Kolom **Catatan** (nomor 1) wajib diisi dengan hal yang harus diperbaiki pemohon, lalu klik **Minta perbaikan kepada pemohon** (nomor 2).
 
 ### Langkah 4 – Verifikasi pembayaran
 

@@ -48,6 +48,8 @@ Di HP, halaman masuk tampil seperti ini:
 
 ![Masuk Pusat Komando di HP](gambar/dasar/masuk-pusat-komando-hp.png)
 
+Nomornya sama: **Nama pengguna** (nomor 1), **Kata sandi** (nomor 2), **Lihat** (nomor 3), dan **Masuk** (nomor 4).
+
 ### D. Portal (pemohon dan investor)
 
 ![Halaman masuk portal](gambar/dasar/masuk-portal.png)

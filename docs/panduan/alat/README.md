@@ -15,6 +15,15 @@ python manage.py panduan_peran > ../docs/panduan-peran.md
 
 Tes `backend/users/tests/test_user_manual.py` gagal bila buku peran belum diperbarui, ada gambar atau tautan yang rusak, ada gambar yang tidak dipakai, atau ada kata terlarang.
 
+Langkah kerja di buku peran tidak ditulis ulang, tetapi disisipkan dari bab dengan penanda:
+
+```
+<!-- sisip: 11-pengadaan-tanah.md#47-penilaian-kjpp -->
+<!-- akhir sisip -->
+```
+
+`panduan_buku` mengisi di antara kedua penanda dengan bagian bab itu (judul sampai judul berikutnya yang setingkat), menurunkan tingkat judulnya, dan menyesuaikan alamat gambar dan tautan. Jadi setelah mengubah bab, jalankan `panduan_buku` lagi; tes gagal bila buku peran belum diperbarui. Jangan mengubah teks di dalam sisipan langsung di buku peran.
+
 Buku peran baru: tambahkan berkasnya di `BOOK_FILES` (`backend/users/role_books.py`), buat berkas di `peran/` dengan penanda blok (salin dari buku lain), lalu jalankan `panduan_buku` dan tambahkan baris di tabel README buku.
 
 ## 2. Menyiapkan sistem latihan
@@ -78,4 +87,4 @@ npm install
 node buat-pdf.js            # hasil di alat/keluaran/
 ```
 
-Hasilnya `panduan-simlahan-lengkap.pdf` dan `peran/<peran>.pdf` (buku peran + Bab 1, Bab 2, dan bab yang ditautkan buku itu). Folder `keluaran/` tidak disimpan di repositori.
+Hasilnya `panduan-simlahan-lengkap.pdf` (README dan Bab 1–16) dan `peran/<peran>.pdf` (buku peran + Bab 1, Bab 2, dan bab yang ditautkan di luar sisipan, misalnya semua bab untuk Administrator). Folder `keluaran/` tidak disimpan di repositori.

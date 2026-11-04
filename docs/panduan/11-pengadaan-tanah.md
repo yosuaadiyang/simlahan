@@ -380,7 +380,7 @@ Tab **Tenggat** berisi semua tenggat hukum proyek ini: kewajiban, batas waktu, s
 
 ![Tab Penilaian bagi Penilai](gambar/pengadaan/penilai-penilaian.png)
 
-**Instansi** melihat ringkasan tanpa nilai uang dan tanpa data pihak, dan bisa menambah dokumen:
+**Instansi** melihat ringkasan proyek, bidang, pengumuman, musyawarah, penyerahan hasil, dan tenggat. Tab berisi data pihak, penilaian, dan ganti kerugian menampilkan "Anda tidak berwenang melihat data ini". Instansi bisa menambah dokumen:
 
 ![Dokumen bagi Instansi](gambar/pengadaan/instansi-dokumen.png)
 

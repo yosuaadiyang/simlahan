@@ -9,7 +9,33 @@
     {
      "url": null,
      "name": "beranda",
-     "delay": 2000
+     "delay": 2000,
+     "mark": [
+      [
+       "header button >> nth=0",
+       1
+      ],
+      [
+       "input[placeholder='Cari dengan kata kunci']",
+       2
+      ],
+      [
+       "[role=tablist]:has([role=tab]:has-text('Peta'))",
+       3
+      ],
+      [
+       "a:has-text('L1217108-1')",
+       4
+      ],
+      [
+       "header :text-matches('^Contoh ')",
+       5
+      ],
+      [
+       "header :text('Keluar')",
+       6
+      ]
+     ]
     },
     {
      "url": null,
@@ -33,7 +59,37 @@
     {
      "url": null,
      "name": "beranda",
-     "delay": 2000
+     "delay": 2000,
+     "mark": [
+      [
+       "header button >> nth=0",
+       1
+      ],
+      [
+       "input[placeholder='Cari dengan kata kunci']",
+       2
+      ],
+      [
+       "[role=tablist]:has([role=tab]:has-text('Peta'))",
+       3
+      ],
+      [
+       "a:has-text('L1217108-1')",
+       4
+      ],
+      [
+       "header :text-matches('^Contoh ')",
+       5
+      ],
+      [
+       "header :text('Keluar')",
+       6
+      ],
+      [
+       ":text('Buat pengenal sewa')",
+       7
+      ]
+     ]
     },
     {
      "url": null,
@@ -57,7 +113,33 @@
     {
      "url": null,
      "name": "beranda",
-     "delay": 2000
+     "delay": 2000,
+     "mark": [
+      [
+       "header button >> nth=0",
+       1
+      ],
+      [
+       "input[placeholder='Cari dengan kata kunci']",
+       2
+      ],
+      [
+       "[role=tablist]:has([role=tab]:has-text('Peta'))",
+       3
+      ],
+      [
+       "a:has-text('L1217108-1')",
+       4
+      ],
+      [
+       "header :text-matches('^Contoh ')",
+       5
+      ],
+      [
+       "header :text('Keluar')",
+       6
+      ]
+     ]
     },
     {
      "url": null,
@@ -81,7 +163,37 @@
     {
      "url": null,
      "name": "beranda",
-     "delay": 2000
+     "delay": 2000,
+     "mark": [
+      [
+       "header button >> nth=0",
+       1
+      ],
+      [
+       "input[placeholder='Cari dengan kata kunci']",
+       2
+      ],
+      [
+       "[role=tablist]:has([role=tab]:has-text('Peta'))",
+       3
+      ],
+      [
+       "a:has-text('L1217108-1')",
+       4
+      ],
+      [
+       "header :text-matches('^Contoh ')",
+       5
+      ],
+      [
+       "header :text('Keluar')",
+       6
+      ],
+      [
+       ":text('Buat pengenal sewa')",
+       7
+      ]
+     ]
     },
     {
      "url": null,
@@ -105,7 +217,33 @@
     {
      "url": null,
      "name": "beranda",
-     "delay": 2000
+     "delay": 2000,
+     "mark": [
+      [
+       "header button >> nth=0",
+       1
+      ],
+      [
+       "input[placeholder='Cari dengan kata kunci']",
+       2
+      ],
+      [
+       "[role=tablist]:has([role=tab]:has-text('Peta'))",
+       3
+      ],
+      [
+       "a:has-text('L1217108-1')",
+       4
+      ],
+      [
+       "header :text-matches('^Contoh ')",
+       5
+      ],
+      [
+       "header :text('Keluar')",
+       6
+      ]
+     ]
     },
     {
      "url": null,
@@ -129,7 +267,33 @@
     {
      "url": null,
      "name": "beranda",
-     "delay": 2000
+     "delay": 2000,
+     "mark": [
+      [
+       "header button >> nth=0",
+       1
+      ],
+      [
+       "input[placeholder='Cari dengan kata kunci']",
+       2
+      ],
+      [
+       "[role=tablist]:has([role=tab]:has-text('Peta'))",
+       3
+      ],
+      [
+       "a:has-text('L1217108-1')",
+       4
+      ],
+      [
+       "header :text-matches('^Contoh ')",
+       5
+      ],
+      [
+       "header :text('Keluar')",
+       6
+      ]
+     ]
     },
     {
      "url": null,
@@ -153,7 +317,45 @@
     {
      "url": null,
      "name": "beranda",
-     "delay": 2000
+     "delay": 2000,
+     "mark": [
+      [
+       "header button >> nth=0",
+       1
+      ],
+      [
+       "input[placeholder='Cari dengan kata kunci']",
+       2
+      ],
+      [
+       "[role=tablist]:has([role=tab]:has-text('Peta'))",
+       3
+      ],
+      [
+       "a:has-text('L1217108-1')",
+       4
+      ],
+      [
+       "header :text-matches('^Contoh ')",
+       5
+      ],
+      [
+       "header :text('Keluar')",
+       6
+      ],
+      [
+       ":text('Buat pengenal sewa')",
+       7
+      ],
+      [
+       "header a:has-text('Pusat Komando'), header button:has-text('Pusat Komando')",
+       8
+      ],
+      [
+       "header a:has-text('Panel admin'), header button:has-text('Panel admin')",
+       9
+      ]
+     ]
     },
     {
      "url": null,
@@ -177,7 +379,29 @@
     {
      "url": null,
      "name": "beranda",
-     "delay": 2000
+     "delay": 2000,
+     "mark": [
+      [
+       "header button >> nth=0",
+       1
+      ],
+      [
+       ":text('Lihat proyek')",
+       2
+      ],
+      [
+       "h3:has-text('Tenggat hukum'), h2:has-text('Tenggat hukum'), :text-is('Tenggat hukum')",
+       3
+      ],
+      [
+       "header :text-matches('^Contoh ')",
+       4
+      ],
+      [
+       "header :text('Keluar')",
+       5
+      ]
+     ]
     },
     {
      "url": null,
@@ -187,7 +411,13 @@
        "click": "header button >> nth=0"
       },
       {
-       "wait": 900
+       "wait": 700
+      },
+      {
+       "click": "nav :text('Pengadaan Tanah') >> nth=0"
+      },
+      {
+       "wait": 700
       }
      ]
     }
@@ -201,7 +431,29 @@
     {
      "url": null,
      "name": "beranda",
-     "delay": 2000
+     "delay": 2000,
+     "mark": [
+      [
+       "header button >> nth=0",
+       1
+      ],
+      [
+       ":text('Lihat proyek')",
+       2
+      ],
+      [
+       "h3:has-text('Tenggat hukum'), h2:has-text('Tenggat hukum'), :text-is('Tenggat hukum')",
+       3
+      ],
+      [
+       "header :text-matches('^Contoh ')",
+       4
+      ],
+      [
+       "header :text('Keluar')",
+       5
+      ]
+     ]
     },
     {
      "url": null,
@@ -211,7 +463,13 @@
        "click": "header button >> nth=0"
       },
       {
-       "wait": 900
+       "wait": 700
+      },
+      {
+       "click": "nav :text('Pengadaan Tanah') >> nth=0"
+      },
+      {
+       "wait": 700
       }
      ]
     }
@@ -225,7 +483,29 @@
     {
      "url": null,
      "name": "beranda",
-     "delay": 2000
+     "delay": 2000,
+     "mark": [
+      [
+       "header button >> nth=0",
+       1
+      ],
+      [
+       ":text('Lihat proyek')",
+       2
+      ],
+      [
+       "h3:has-text('Tenggat hukum'), h2:has-text('Tenggat hukum'), :text-is('Tenggat hukum')",
+       3
+      ],
+      [
+       "header :text-matches('^Contoh ')",
+       4
+      ],
+      [
+       "header :text('Keluar')",
+       5
+      ]
+     ]
     },
     {
      "url": null,
@@ -235,7 +515,13 @@
        "click": "header button >> nth=0"
       },
       {
-       "wait": 900
+       "wait": 700
+      },
+      {
+       "click": "nav :text('Pengadaan Tanah') >> nth=0"
+      },
+      {
+       "wait": 700
       }
      ]
     }
@@ -249,7 +535,29 @@
     {
      "url": null,
      "name": "beranda",
-     "delay": 2000
+     "delay": 2000,
+     "mark": [
+      [
+       "header button >> nth=0",
+       1
+      ],
+      [
+       ":text('Lihat proyek')",
+       2
+      ],
+      [
+       "h3:has-text('Tenggat hukum'), h2:has-text('Tenggat hukum'), :text-is('Tenggat hukum')",
+       3
+      ],
+      [
+       "header :text-matches('^Contoh ')",
+       4
+      ],
+      [
+       "header :text('Keluar')",
+       5
+      ]
+     ]
     },
     {
      "url": null,
@@ -259,7 +567,13 @@
        "click": "header button >> nth=0"
       },
       {
-       "wait": 900
+       "wait": 700
+      },
+      {
+       "click": "nav :text('Pengadaan Tanah') >> nth=0"
+      },
+      {
+       "wait": 700
       }
      ]
     }
@@ -273,15 +587,37 @@
     {
      "url": null,
      "name": "beranda",
-     "delay": 2000
+     "delay": 2000,
+     "mark": [
+      [
+       "#nav-filter",
+       1
+      ],
+      [
+       "#searchbar",
+       2
+      ],
+      [
+       "#changelist-filter h2",
+       3
+      ],
+      [
+       "#result_list tbody tr >> nth=0 >> th a",
+       4
+      ],
+      [
+       "#user-tools a:text-is('Panduan peran')",
+       5
+      ],
+      [
+       "#user-tools :text-is('Keluar')",
+       6
+      ]
+     ]
     },
     {
      "url": "/admin/",
      "name": "panel"
-    },
-    {
-     "url": "/akun/panduan/",
-     "name": "panduan"
     }
    ]
   },
@@ -293,15 +629,37 @@
     {
      "url": null,
      "name": "beranda",
-     "delay": 2000
+     "delay": 2000,
+     "mark": [
+      [
+       "#nav-filter",
+       1
+      ],
+      [
+       "#searchbar",
+       2
+      ],
+      [
+       "#changelist-filter h2",
+       3
+      ],
+      [
+       "#result_list tbody tr >> nth=0 >> th a",
+       4
+      ],
+      [
+       "#user-tools a:text-is('Panduan peran')",
+       5
+      ],
+      [
+       "#user-tools :text-is('Keluar')",
+       6
+      ]
+     ]
     },
     {
      "url": "/admin/",
      "name": "panel"
-    },
-    {
-     "url": "/akun/panduan/",
-     "name": "panduan"
     }
    ]
   },
@@ -313,15 +671,45 @@
     {
      "url": null,
      "name": "beranda",
-     "delay": 2000
+     "delay": 2000,
+     "mark": [
+      [
+       "#nav-filter",
+       1
+      ],
+      [
+       "a:text-is('Dasbor')",
+       2
+      ],
+      [
+       "a:text-is('Peta tematik')",
+       3
+      ],
+      [
+       ":text-is('Peringatan & tenggat')",
+       4
+      ],
+      [
+       "#user-tools a:text-is('Panduan peran')",
+       5
+      ],
+      [
+       "#user-tools :text-is('Keluar')",
+       6
+      ],
+      [
+       "#user-tools a:has-text('Pusat Komando')",
+       7
+      ],
+      [
+       "#user-tools a:has-text('Aplikasi lapangan')",
+       8
+      ]
+     ]
     },
     {
      "url": "/admin/",
      "name": "panel"
-    },
-    {
-     "url": "/akun/panduan/",
-     "name": "panduan"
     }
    ]
   },
@@ -333,15 +721,37 @@
     {
      "url": null,
      "name": "beranda",
-     "delay": 2000
+     "delay": 2000,
+     "mark": [
+      [
+       "#nav-filter",
+       1
+      ],
+      [
+       "ul.object-tools a",
+       2
+      ],
+      [
+       "#searchbar",
+       3
+      ],
+      [
+       "#result_list tbody tr >> nth=0 >> th a",
+       4
+      ],
+      [
+       "#user-tools a:text-is('Panduan peran')",
+       5
+      ],
+      [
+       "#user-tools :text-is('Keluar')",
+       6
+      ]
+     ]
     },
     {
      "url": "/admin/",
      "name": "panel"
-    },
-    {
-     "url": "/akun/panduan/",
-     "name": "panduan"
     }
    ]
   },
@@ -354,7 +764,38 @@
     {
      "url": "/komando/",
      "name": "beranda",
-     "delay": 3000
+     "delay": 3000,
+     "actions": [
+      {
+       "wait": 2500
+      }
+     ],
+     "mark": [
+      [
+       ".stats, .kpi-strip, header + div",
+       1
+      ],
+      [
+       "#live",
+       2
+      ],
+      [
+       "#sos-tombol",
+       3
+      ],
+      [
+       ".tabbar",
+       4
+      ],
+      [
+       "header a:has-text('Utama')",
+       5
+      ],
+      [
+       "header :text('Keluar')",
+       6
+      ]
+     ]
     },
     {
      "url": "/komando/",
@@ -369,6 +810,12 @@
       {
        "wait": 800
       }
+     ],
+     "mark": [
+      [
+       ".tabbar button[data-tab='lainnya']",
+       1
+      ]
      ]
     }
    ]
@@ -393,7 +840,38 @@
     {
      "url": "/komando/",
      "name": "beranda",
-     "delay": 3000
+     "delay": 3000,
+     "actions": [
+      {
+       "wait": 2500
+      }
+     ],
+     "mark": [
+      [
+       ".stats, .kpi-strip, header + div",
+       1
+      ],
+      [
+       "#live",
+       2
+      ],
+      [
+       "#sos-tombol",
+       3
+      ],
+      [
+       ".tabbar",
+       4
+      ],
+      [
+       "header a:has-text('Utama')",
+       5
+      ],
+      [
+       "header :text('Keluar')",
+       6
+      ]
+     ]
     },
     {
      "url": "/komando/",
@@ -408,6 +886,12 @@
       {
        "wait": 800
       }
+     ],
+     "mark": [
+      [
+       ".tabbar button[data-tab='lainnya']",
+       1
+      ]
      ]
     }
    ]

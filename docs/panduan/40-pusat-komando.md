@@ -276,11 +276,15 @@ Koordinator melihat tombol **Verifikasi** pada laporan anggota yang belum diveri
 5. Bila terhambat, tulis kendalanya di catatan (wajib), lalu ketuk **⚠ Ada kendala** (nomor 7). Setelah kendala teratasi, ketuk **▶ Mulai / lanjut**.
 6. Tugas yang dilaporkan selesai menunggu verifikasi pemberi tugas atau atasan. Anda tidak bisa memverifikasi tugas sendiri. **Riwayat** di bagian bawah mencatat setiap langkah.
 
-**Memberi tugas (koordinator):**
-
-1. Di tab **Tugas**, ketuk **＋ Beri tugas** (nomor 1).
+**Tab Tugas bagi koordinator:**
 
 ![Tugas bagi koordinator](gambar/komando/korwil-tugas.png)
+
+Koordinator melihat dua tombol tambahan: **＋ Beri tugas** (nomor 1) untuk memberi tugas baru, dan saringan **Verifikasi** (nomor 2) untuk tugas yang menunggu verifikasi. Angka merah di **Verifikasi** adalah jumlah tugas yang menunggu.
+
+**Memberi tugas (koordinator):**
+
+1. Di tab **Tugas**, ketuk **＋ Beri tugas**. Formulir terbuka:
 
 ![Beri tugas](gambar/komando/korwil-beri-tugas.png)
 
@@ -294,8 +298,8 @@ Koordinator melihat tombol **Verifikasi** pada laporan anggota yang belum diveri
 
 **Memverifikasi tugas (koordinator):**
 
-1. Di tab **Tugas**, ketuk **Verifikasi** (nomor 2 pada gambar tugas koordinator). Angka merah menunjukkan jumlah tugas yang menunggu.
-2. Ketuk judul tugas yang dilaporkan selesai.
+1. Di tab **Tugas**, ketuk saringan **Verifikasi**.
+2. Ketuk judul tugas yang dilaporkan selesai. Rincian tugas terbuka:
 
 ![Verifikasi tugas](gambar/komando/korwil-tugas-verifikasi.png)
 
@@ -319,9 +323,11 @@ Koordinator melihat tombol **Verifikasi** pada laporan anggota yang belum diveri
 6. **Tugas terbuka** (nomor 1) dan **Kegiatan terakhir** (nomor 2) merangkum pekerjaan Anda.
 7. Ketuk **Susun wawasan** (nomor 3) untuk ringkasan kekuatan, kelemahan, dan saran.
 
-Koordinator dan atasan bisa memilih petugas lain di kotak kedua (nomor 2):
+Koordinator dan atasan punya kotak tambahan di tab Kinerja:
 
 ![Kinerja bagi koordinator](gambar/komando/korwil-kinerja.png)
+
+Pilih periode (nomor 1), lalu pilih petugas lain di kotak kedua (nomor 2) untuk melihat kinerjanya.
 
 ## 10.8 Chat
 

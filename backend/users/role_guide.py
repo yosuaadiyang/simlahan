@@ -376,7 +376,8 @@ ROLE_GUIDES: dict[UserGroup, RoleGuide] = {
         ),
         limits=(
             "Hanya proyek yang mencantumkan akunnya di **Pengguna yang "
-            "ditugaskan**; tanpa nilai uang dan tanpa data pihak.",
+            "ditugaskan**; tidak melihat data pihak, penilaian, dan ganti "
+            "kerugian.",
             ACQUISITION_ONLY,
         ),
     ),

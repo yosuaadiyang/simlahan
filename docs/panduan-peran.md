@@ -370,7 +370,7 @@ Memantau proyek pengadaan milik instansinya.
 
 **Batas akses**
 
-- Hanya proyek yang mencantumkan akunnya di **Pengguna yang ditugaskan**; tanpa nilai uang dan tanpa data pihak.
+- Hanya proyek yang mencantumkan akunnya di **Pengguna yang ditugaskan**; tidak melihat data pihak, penilaian, dan ganti kerugian.
 - Hanya modul pengadaan tanah; modul sewa, alokasi, aset, pusat komando, dan panel admin tidak terbuka.
 
 ## Petugas Alokasi Lahan

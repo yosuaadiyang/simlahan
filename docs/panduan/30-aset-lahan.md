@@ -56,6 +56,15 @@ Klik **Tambahkan Aset lahan**, atau klik kode aset di daftar untuk mengubahnya.
 
 ![Halaman aset lahan](gambar/aset/aset-detail.png)
 
+Tombol di kanan atas halaman aset (muncul setelah aset disimpan) mempercepat pekerjaan terkait aset itu:
+
+- **Tambah penilaian** (nomor 1): membuka formulir penilaian dengan aset ini sudah terpilih.
+- **Buat tugas** (nomor 2): membuat tugas atau perintah kerja untuk aset ini.
+- **Ajukan survei** (nomor 3): mengajukan survei atau pengukuran.
+- **Catat okupasi** (nomor 4): mencatat temuan okupasi di aset ini.
+
+Mengisi data aset:
+
 1. Isi **Kode aset** (nomor 5) dan **Nama / lokasi aset** (nomor 6).
 2. Pilih **Kategori** (nomor 7) dan **Status penguasaan** (nomor 8). Di bawahnya, pilih **Unit layanan / lokasi** dan **Penanggung jawab**.
 3. Bagian **Pemantauan lapangan**: isi **Pemantauan tiap (hari)**. Kosongkan untuk memakai jadwal bawaan modul; isi 0 bila aset tidak perlu dipantau.
@@ -67,18 +76,13 @@ Klik **Tambahkan Aset lahan**, atau klik kode aset di daftar untuk mengubahnya.
 6. Di peta di bawahnya, gambar batas aset: klik titik-titik sudut satu per satu, lalu klik dua kali di titik terakhir untuk selesai. Isi **Luas (m²)** bila tidak ingin dihitung dari gambar.
 7. Bagian **Alas hak**: pilih jenis (SHM, HGB, HGU, Hak Pakai, HPL, girik, belum bersertipikat, lainnya), lalu isi nomor hak, NIB, dan tanggal berakhir hak.
 8. Bagian **Perolehan & nilai** dan **Pemanfaatan**: isi cara perolehan, nilai perolehan, dan penggunaan aset saat ini.
-9. Di bagian paling bawah, tambah baris **Riwayat kepemilikan** (nomor 1), **Pajak & retribusi** (nomor 2), dan **Dokumen & arsip** (nomor 3) bila ada. Klik **Tambahkan … lagi** di bawah tiap tabel untuk baris berikutnya.
+9. Gulir ke bagian paling bawah:
 
 ![Tabel di bagian bawah halaman aset](gambar/aset/aset-detail-bawah.png)
 
+   Tambah baris **Riwayat kepemilikan** (nomor 1), **Pajak & retribusi** (nomor 2), dan **Dokumen & arsip** (nomor 3) bila ada. Klik **Tambahkan … lagi** di bawah tiap tabel untuk baris berikutnya.
+
 10. Klik **Simpan**.
-
-Tombol di kanan atas halaman aset (gambar pertama) mempercepat pekerjaan terkait aset itu:
-
-- **Tambah penilaian** (nomor 1): membuka formulir penilaian dengan aset ini sudah terpilih.
-- **Buat tugas** (nomor 2): membuat tugas atau perintah kerja untuk aset ini.
-- **Ajukan survei** (nomor 3): mengajukan survei atau pengukuran.
-- **Catat okupasi** (nomor 4): mencatat temuan okupasi di aset ini.
 
 Kolom ringkasan di halaman aset menampilkan **Penilaian terakhir** dan jumlah **Perkara, okupasi, tugas, survei** yang terkait.
 
@@ -108,27 +112,33 @@ Kolom ringkasan di halaman aset menampilkan **Penilaian terakhir** dan jumlah **
 
 ## 8.4 Keuangan: penilaian, pajak, transaksi, buku besar
 
-**Penilaian aset** mencatat nilai tanah, bangunan & benda, dan total. Metode: NJOP, Penilai publik (KJPP), Penilai internal, Data pasar / pembanding. Rincian benda (bangunan, tanaman, sarana pelengkap) diisi di tabel di bawah formulir.
+**Penilaian aset**
 
 ![Penilaian aset](gambar/aset/penilaian.png)
 
-**Pajak & retribusi**: PBB-P2, BPHTB, Uang Wajib Tahunan, Retribusi daerah, Sewa tanah, Lainnya. Kolom **Status bayar** menunjukkan lunas, belum, atau terlambat. Untuk mencatat pembayaran sekaligus: centang baris, pilih aksi (nomor 1) **Tandai lunas hari ini & catat transaksi**, lalu klik **Jalankan**. Sistem membuat transaksi pengeluaran otomatis.
+Penilaian mencatat nilai tanah, bangunan & benda, dan total. Metode: NJOP, Penilai publik (KJPP), Penilai internal, Data pasar / pembanding. Rincian benda (bangunan, tanaman, sarana pelengkap) diisi di tabel di bawah formulir. Klik **Tambahkan Penilaian aset** untuk mencatat penilaian baru.
+
+**Pajak & retribusi**
 
 ![Pajak & retribusi](gambar/aset/pajak.png)
 
-**Transaksi keuangan lahan**: pembelian, penjualan/pelepasan, penerimaan dan pembayaran sewa, ganti kerugian, biaya permukiman kembali, pajak, biaya survei, biaya hukum, biaya lain. Untuk sistem akuntansi, centang transaksi, pilih aksi (nomor 1) **Ekspor jurnal ERP (CSV)** atau **Ekspor jurnal ERP (Excel)**, lalu klik **Jalankan**. Kode akun kas/bank diatur di pengaturan modul.
+Jenisnya: PBB-P2, BPHTB, Uang Wajib Tahunan, Retribusi daerah, Sewa tanah, Lainnya. Kolom **Status bayar** menunjukkan lunas, belum, atau terlambat. Untuk mencatat pembayaran sekaligus: centang baris, pilih aksi **Tandai lunas hari ini & catat transaksi** di kotak **Aksi** (nomor 1), lalu klik **Jalankan**. Sistem membuat transaksi pengeluaran otomatis.
+
+**Transaksi keuangan lahan**
 
 ![Transaksi keuangan lahan](gambar/aset/transaksi.png)
 
-**Buku besar gabungan** menggabungkan transaksi aset, pembayaran ganti kerugian pengadaan tanah, dan tagihan alokasi yang lunas:
+Jenisnya: pembelian, penjualan/pelepasan, penerimaan dan pembayaran sewa, ganti kerugian, biaya permukiman kembali, pajak, biaya survei, biaya hukum, biaya lain. Untuk sistem akuntansi, centang transaksi, pilih aksi **Ekspor jurnal ERP (CSV)** atau **Ekspor jurnal ERP (Excel)** di kotak **Aksi** (nomor 1), lalu klik **Jalankan**. Kode akun kas/bank diatur di pengaturan modul.
+
+**Buku besar gabungan** menggabungkan transaksi aset, pembayaran ganti kerugian pengadaan tanah, dan tagihan alokasi yang lunas.
+
+![Buku besar gabungan](gambar/aset/buku-besar.png)
 
 1. Isi tanggal **Dari** (nomor 1) dan **Sampai** (nomor 2).
 2. Klik **Tampilkan** (nomor 3). Layar menampilkan 1.000 baris pertama.
 3. Klik **Ekspor Excel** (nomor 4) atau **Ekspor CSV** (nomor 5) untuk mengunduh semua baris.
 
 > Jangan mencatat ulang pembayaran ganti kerugian sebagai transaksi aset, karena sudah otomatis masuk buku besar.
-
-![Buku besar gabungan](gambar/aset/buku-besar.png)
 
 ## 8.5 Perkara & litigasi
 
@@ -168,6 +178,8 @@ Saringan: **Status**, **Jenis perkara**, **Forum**, **Hasil**, **Unit layanan / 
 
 ![Daftar okupasi](gambar/aset/okupasi-daftar.png)
 
+Kotak **Aksi** (nomor 1) menjalankan perintah untuk baris yang dicentang, misalnya **Limpahkan ke perkara baru** (lihat langkah 8 di bawah).
+
 Saringan: **Status**, **Cara ditemukan**, **Bentuk okupasi**, **Tingkat**, **Unit layanan / lokasi**. Kolom **Tanpa tindak lanjut** menandai kasus yang terlalu lama tidak ditangani.
 
 Klik **Tambahkan Kasus okupasi / perambahan** (atau **Catat okupasi** dari halaman aset).
@@ -192,6 +204,8 @@ Pengaduan masuk dari portal (`/portal/pengaduan/`), telepon/WhatsApp, surat, dat
 
 ![Daftar pengaduan](gambar/aset/pengaduan-daftar.png)
 
+Kotak **Aksi** (nomor 1) menjalankan perintah untuk baris yang dicentang, misalnya **Jadikan kasus okupasi** (lihat langkah 8 di bawah).
+
 Klik nomor pengaduan untuk membukanya.
 
 ![Halaman pengaduan](gambar/aset/pengaduan-detail.png)
@@ -213,6 +227,8 @@ Kolom **Lewat batas** di daftar menyala bila pengaduan melewati batas penyelesai
 ## 8.8 Lelang & seleksi lahan
 
 ![Daftar lelang](gambar/aset/lelang-daftar.png)
+
+Kotak **Aksi** (nomor 1) menjalankan perintah lelang (umumkan, tutup penawaran, tetapkan pemenang) untuk baris yang dicentang; caranya di **Menjalankan lelang** di bawah.
 
 **Membuat lelang:** klik **Tambahkan Lelang / seleksi lahan**.
 
@@ -256,15 +272,25 @@ Kolom **Lewat batas** di daftar menyala bila pengaduan melewati batas penyelesai
 
 ## 8.11 Survei, citra, lapisan peta, fasilitator, urusan instansi
 
-**Survei & pemetaan** (pengukuran batas, topografi, drone, inventarisasi, identifikasi pemilik, objek ganti kerugian, digitalisasi warkah). Status: Diajukan → Dijadwalkan → Berlangsung → Selesai. Setelah hasil ukur diunggah, pilih aksi **Terapkan batas hasil ukur ke aset** agar batas aset diperbarui.
+**Survei & pemetaan**
 
 ![Survei & pemetaan](gambar/aset/survei.png)
 
-**Citra satelit & foto udara** mencatat pengadaan citra (diminta, dipesan, tersedia, batal), wahana (satelit, drone, pesawat), jenis data, dan penyedia. Isi URL ubin/WMS agar citra muncul di peta. **Pembanding citra** menampilkan dua citra di satu peta: pilih citra **Kiri (sebelum)** (nomor 1) dan **Kanan (sesudah)** (nomor 2), klik **Bandingkan** (nomor 3), lalu geser penggeser (nomor 4) ke kiri dan kanan untuk membandingkan. Area kasus dan batas aset ditandai kuning.
+Jenis survei: pengukuran batas, topografi, drone, inventarisasi, identifikasi pemilik, objek ganti kerugian, digitalisasi warkah. Status: Diajukan → Dijadwalkan → Berlangsung → Selesai. Setelah hasil ukur diunggah, centang surveinya dan pilih aksi **Terapkan batas hasil ukur ke aset** agar batas aset diperbarui.
+
+**Citra satelit & foto udara**
 
 ![Daftar citra](gambar/aset/citra-daftar.png)
 
+Daftar ini mencatat pengadaan citra (diminta, dipesan, tersedia, batal), wahana (satelit, drone, pesawat), jenis data, dan penyedia. Isi URL ubin/WMS agar citra muncul di peta.
+
+**Pembanding citra** menampilkan dua citra di satu peta:
+
 ![Pembanding citra](gambar/aset/citra.png)
+
+1. Pilih citra **Kiri (sebelum)** (nomor 1) dan **Kanan (sesudah)** (nomor 2).
+2. Klik **Bandingkan** (nomor 3).
+3. Geser penggeser (nomor 4) ke kiri dan kanan untuk membandingkan. Area kasus dan batas aset ditandai kuning.
 
 **Lapisan peta referensi** (batas administrasi, kadaster, sungai, jalan, kawasan hutan, RTRW/RDTR, utilitas, dsb.) diunggah sekali lalu tampil di peta tematik. Centang **Tampil di pusat komando** agar muncul juga di peta komando.
 
@@ -278,15 +304,25 @@ Kolom **Lewat batas** di daftar menyala bila pengaduan melewati batas penyelesai
 
 ## 8.12 Dokumen & arsip, tugas, tim, laporan lapangan
 
-**Dokumen & arsip**: unggah sertipikat, akta, putusan, surat, peta, foto, laporan, perjanjian, izin, bukti pajak. Untuk membaca teks pindaian, centang dokumen dan pilih aksi **Baca teks dokumen (OCR)**. Setelah terbaca, buka dokumen dan klik **Terapkan data ke aset** untuk mengisi kolom aset yang masih kosong. Teks hasil OCR juga ikut dicari di **Pencarian**.
+**Dokumen & arsip**
 
 ![Dokumen & arsip](gambar/aset/dokumen.png)
 
-**Tugas & perintah kerja**: judul, jenis (survei, verifikasi, administrasi, hukum, patroli, pemeliharaan aset), **Prioritas** (Rendah, Normal, Tinggi, Mendesak), penerima, **Kontributor lapangan**, tenggat, Korwil, dan objek terkait. Status: Baru → Dikerjakan → Menunggu verifikasi / Menunggu pihak lain → Selesai (atau Batal). Tugas untuk petugas lapangan juga muncul di tab **Tugas** pusat komando. **Tampilan Gantt** menampilkan tugas dan tonggak pengadaan pada garis waktu: isi **Dari** (nomor 1) dan **Sampai** (nomor 2), pilih **Tim** (nomor 3), centang **Tugas saya saja** bila perlu, lalu klik **Terapkan** (nomor 4).
+Unggah sertipikat, akta, putusan, surat, peta, foto, laporan, perjanjian, izin, dan bukti pajak. Untuk membaca teks pindaian, centang dokumen dan pilih aksi **Baca teks dokumen (OCR)**. Setelah terbaca, buka dokumen dan klik **Terapkan data ke aset** untuk mengisi kolom aset yang masih kosong. Teks hasil OCR juga ikut dicari di **Pencarian**.
+
+**Tugas & perintah kerja**
 
 ![Daftar tugas](gambar/aset/tugas.png)
 
+Isi tugas: judul, jenis (survei, verifikasi, administrasi, hukum, patroli, pemeliharaan aset), **Prioritas** (Rendah, Normal, Tinggi, Mendesak), penerima, **Kontributor lapangan**, tenggat, Korwil, dan objek terkait. Status: Baru → Dikerjakan → Menunggu verifikasi / Menunggu pihak lain → Selesai (atau Batal). Tugas untuk petugas lapangan juga muncul di tab **Tugas** pusat komando.
+
+**Tampilan Gantt** menampilkan tugas dan tonggak pengadaan pada garis waktu:
+
 ![Jadwal Gantt](gambar/aset/gantt.png)
+
+1. Isi **Dari** (nomor 1) dan **Sampai** (nomor 2).
+2. Pilih **Tim** (nomor 3). Centang **Tugas saya saja** bila perlu.
+3. Klik **Terapkan** (nomor 4).
 
 **Tim internal** mengelompokkan petugas; kolom **Anggota** dan **Tugas terbuka** dihitung otomatis.
 

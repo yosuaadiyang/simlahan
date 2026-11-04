@@ -52,7 +52,7 @@ Satu **pemanfaatan lahan** mewakili satu hak pakai lahan: alokasi, sewa, kerja s
 
 ### Menambah pemanfaatan lahan
 
-1. Klik **Tambahkan Pemanfaatan lahan** (nomor 1).
+1. Di daftar **Pemanfaatan lahan**, klik **Tambahkan Pemanfaatan lahan** di kanan atas.
 2. Isi **Nama kegiatan / proyek**, **Skema**, dan **Status**.
 3. Isi pemegang hak: pilih **Pemegang hak (akun portal)** bila ia punya akun portal (ia lalu bisa melihat dan mengunggah dokumennya sendiri), atau isi **Nama pemegang hak** secara manual.
 4. Isi **Lahan**, **Sektor**, **Nomor dasar hak / kontrak**, **Luas (m²)**, **Mulai**, **Berakhir**, dan **Petugas penanggung jawab**. Bila berasal dari alokasi atau permintaan investasi, isi juga kolom **Alokasi** atau **Permintaan investasi**.
@@ -109,16 +109,9 @@ Arti status:
 
 1. Buka dokumen berstatus **Menunggu verifikasi** dari **Antrean verifikasi** di dasbor, atau dari daftar dengan filter status itu.
 2. Di bagian **Versi berkas**, klik **Pratinjau** (nomor 7) untuk melihat berkas yang diunggah. Pratinjau diberi tanda air dan tercatat.
-3. Bila berkas sah, klik **Verifikasi** (nomor 1). Halaman verifikasi terbuka:
+3. Bila berkas sah, klik **Verifikasi** (nomor 1). Halaman verifikasi terbuka (lihat **Menyatakan terverifikasi** di bawah).
 
-![Formulir verifikasi dokumen](gambar/dokumen/perizinan-verifikasi.png)
-
-4. Periksa atau isi **Nomor dokumen / izin** (nomor 1) sesuai berkas.
-5. Isi **Tanggal terbit** (nomor 2) dan **Berlaku sampai** (nomor 3). Bila **Berlaku sampai** dikosongkan, sistem menghitungnya dari masa berlaku bawaan jenis dokumen.
-6. Bila perlu, tulis **Catatan verifikasi** (nomor 4).
-7. Klik **Nyatakan terverifikasi** (nomor 5). Status menjadi **Terverifikasi**.
-
-Tombol lain di halaman dokumen perizinan (gambar sebelumnya):
+Tombol lain di halaman ini:
 
 - **Minta perbaikan** (nomor 2): tulis apa yang harus diperbaiki, lalu kirim. Pemegang hak diberi tahu dan mengunggah ulang.
 - **Unggah versi** (nomor 3): petugas mengunggah berkas atas nama pemegang hak, misalnya bila berkas dikirim lewat surel.
@@ -126,6 +119,15 @@ Tombol lain di halaman dokumen perizinan (gambar sebelumnya):
 - **Minta tanda tangan** (nomor 5): membuat dokumen tanda tangan untuk dokumen ini. Setelah selesai ditandatangani, PDF-nya otomatis menjadi versi baru dokumen ini.
 - **Tidak wajib** (nomor 6): mengecualikan dokumen ini untuk pemanfaatan ini, dengan alasan.
 - **Buka kembali**: muncul pada dokumen yang sudah terverifikasi atau tidak wajib, untuk membukanya lagi dengan alasan.
+
+**Menyatakan terverifikasi**
+
+![Formulir verifikasi dokumen](gambar/dokumen/perizinan-verifikasi.png)
+
+1. Periksa atau isi **Nomor dokumen / izin** (nomor 1) sesuai berkas.
+2. Isi **Tanggal terbit** (nomor 2) dan **Berlaku sampai** (nomor 3). Bila **Berlaku sampai** dikosongkan, sistem menghitungnya dari masa berlaku bawaan jenis dokumen.
+3. Bila perlu, tulis **Catatan verifikasi** (nomor 4).
+4. Klik **Nyatakan terverifikasi** (nomor 5). Status menjadi **Terverifikasi**.
 
 Setiap tindakan tercatat di **Riwayat** dan **Jejak aktivitas**. Sistem mengirim peringatan otomatis sebelum izin kedaluwarsa (jumlah harinya diatur di **Pengaturan dokumen**).
 

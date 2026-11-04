@@ -25,19 +25,6 @@
      "tinggi": 1150
     },
     {
-     "url": "/admin/alokasi/allocation/",
-     "name": "alokasi-detail-full",
-     "actions": [
-      {
-       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
-      },
-      {
-       "wait": 1500
-      }
-     ],
-     "full": true
-    },
-    {
      "url": "/admin/alokasi/landplot/1/change/",
      "name": "lahan-detail",
      "mark": [
@@ -148,18 +135,6 @@
      "name": "pesan-kontak"
     },
     {
-     "url": "/admin/alokasi/investmentrequest/",
-     "name": "investasi-detail",
-     "actions": [
-      {
-       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
-      },
-      {
-       "wait": 1500
-      }
-     ]
-    },
-    {
      "url": "/admin/alokasi/investmentsector/",
      "name": "sektor-investasi"
     },
@@ -218,21 +193,6 @@
        "text=Tolak",
        "3"
       ]
-     ]
-    },
-    {
-     "url": "/admin/alokasi/application/5/change/",
-     "name": "permohonan-dokumen",
-     "actions": [
-      {
-       "scroll": "h2:has-text('Dokumen persyaratan')"
-      },
-      {
-       "scrollY": 0
-      },
-      {
-       "js": "document.querySelectorAll('h2').forEach(h=>{if(h.textContent.includes('Dokumen persyaratan'))window.scrollTo(0,h.getBoundingClientRect().top+scrollY-120)})"
-      }
      ]
     },
     {
@@ -541,25 +501,6 @@
       [
        "#id_note_1",
        "2"
-      ]
-     ]
-    },
-    {
-     "url": "/admin/alokasi/application/5/nilai/",
-     "name": "form-nilai-full",
-     "full": true,
-     "mark": [
-      [
-       "#id_score_1",
-       "1"
-      ],
-      [
-       "#id_note_1",
-       "2"
-      ],
-      [
-       "#content-main input[type=submit]",
-       "3"
       ]
      ]
     }

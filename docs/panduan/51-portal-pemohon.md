@@ -51,12 +51,12 @@ Di bawahnya ada **Permintaan investasi saya**, **Lahan tersimpan**, dan (bila ad
 
 **Langkah 1 – Pilih lahan dan buat draf**
 
+![Detail lahan bagi pemohon](gambar/portal/pemohon-lahan-detail.png)
+
 1. Klik **Ajukan alokasi baru** di **Akun saya** (atau **Peta Lahan** di menu atas), lalu klik kode lahan yang diinginkan.
 2. Periksa data lahan, tarif, dan **Dokumen persyaratan permohonan alokasi** (lihat [Bab 12.2](50-portal-publik.md#122-peta-lahan-dan-detail-lahan)).
-3. Gulir ke kotak **Tertarik dengan lahan ini?** (nomor 1 pada gambar di bawah).
+3. Gulir ke kotak **Tertarik dengan lahan ini?** (nomor 1).
 4. Klik **Langsung ajukan permohonan alokasi** (nomor 3). Sistem membuat **draf**; lahan baru dipesan setelah permohonan diajukan. (**Ajukan minat investasi**, nomor 2, dipakai bila Anda ingin berkonsultasi dulu atau memilih skema sewa; lihat [Bab 14](52-portal-investor.md).)
-
-![Detail lahan bagi pemohon](gambar/portal/pemohon-lahan-detail.png)
 
 **Langkah 2 – Lengkapi data**
 
@@ -74,7 +74,7 @@ Halaman permohonan berstatus **Draf** terbuka.
 
 **Langkah 3 – Unggah dokumen persyaratan**
 
-Di halaman permohonan, gulir ke **Dokumen persyaratan**.
+Di halaman permohonan, gulir ke **Dokumen persyaratan** (nomor 2 pada gambar Langkah 2).
 
 ![Unggah dokumen](gambar/portal/pemohon-permohonan-unggah.png)
 
@@ -86,7 +86,9 @@ Di halaman permohonan, gulir ke **Dokumen persyaratan**.
 
 **Langkah 4 – Ajukan**
 
-Kembali ke gambar **Permohonan berstatus Draf** di atas:
+Kembali ke halaman permohonan (gambar yang sama dengan Langkah 2):
+
+![Kotak Ajukan permohonan](gambar/portal/pemohon-permohonan-draf.png)
 
 1. Kotak **Ajukan permohonan** di kanan menampilkan **Lengkapi dulu:** (nomor 3) bila masih ada data atau dokumen yang kurang. Selama daftar ini ada, tombol **Ajukan** (nomor 4) abu-abu dan tidak bisa diklik.
 2. Setelah semua lengkap, daftar itu hilang. Klik **Ajukan** lalu konfirmasi. Setelah diajukan, data tidak dapat diubah kecuali petugas meminta perbaikan.
