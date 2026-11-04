@@ -61,12 +61,25 @@ async function shotWithMargin(p, sel, out) {
       // PANDUAN_HANYA=nama1,nama2 mengambil gambar tertentu saja (nama tanpa .png).
       const only = (process.env.PANDUAN_HANYA || '').split(',').filter(Boolean);
       if (only.length && !grp.items.some((it) => only.includes(`${grp.prefix || ''}${it.name}`))) continue;
+      // "tautan": alamat yang baru diketahui setelah masuk sebagai pengguna lain (misalnya
+      // tautan verifikasi dokumen contoh). {NAMA} di "url" diganti dengan href elemennya.
+      const vars = {};
+      for (const [k, v] of Object.entries(grp.tautan || {})) {
+        const c2 = await L.newCtx(browser);
+        const p2 = await c2.newPage();
+        await LOGIN[v.login](p2, v.user);
+        await p2.goto(L.BASE + v.url, { waitUntil: 'networkidle' });
+        const href = await p2.locator(v.ambil).first().getAttribute('href');
+        vars[k] = new URL(href, L.BASE).pathname;
+        await c2.close();
+      }
       const ctx = await L.newCtx(browser, grp.phone);
       const p = await ctx.newPage();
       if (LOGIN[grp.login]) await LOGIN[grp.login](p, grp.user); // "none" = tanpa masuk
       for (const it of grp.items) {
         if (only.length && !it.tanpa_gambar && !only.includes(`${grp.prefix || ''}${it.name}`)) continue;
         const vp0 = p.viewportSize();
+        if (it.url) it.url = it.url.replace(/\{(\w+)\}/g, (m, k) => vars[k] || m);
         try {
           // "tinggi": layar dibuat lebih tinggi agar formulir panjang (modal) tampil utuh.
           if (it.tinggi) await p.setViewportSize({ width: vp0.width, height: it.tinggi });

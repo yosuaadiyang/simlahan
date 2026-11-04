@@ -46,13 +46,23 @@ node ambil-gambar.js                          # semua
 node ambil-gambar.js spesifikasi/sewa.json    # satu folder gambar
 ```
 
-Setiap berkas `spesifikasi/<folder>.json` menulis ke `gambar/<folder>/`. Isinya kelompok per akun (`login`: `spa`, `admin`, `komando`, `portal`, atau `none`; `user`; `phone` untuk tampilan HP) dan daftar gambar (`name`, `url`, `actions`, `mark` untuk kotak merah bernomor, `full` untuk satu halaman penuh, `el` untuk satu bagian). Langkah `tanpa_gambar` hanya untuk navigasi.
+Setiap berkas `spesifikasi/<folder>.json` menulis ke `gambar/<folder>/`. Isinya kelompok per akun (`login`: `spa`, `admin`, `komando`, `portal`, atau `none`; `user`; `phone` untuk tampilan HP) dan daftar gambar.
 
-Gambar halaman tanda tangan (Bab 15.3) butuh token penerima yang masih menunggu tanda tangan pemohon contoh (dokumen tanda tangan contoh di panel admin → penerima → tautan tanda tangan):
+Isi setiap gambar:
 
-```
-node ambil-gambar-ttd.js <token>
-```
+| Kunci | Arti |
+|---|---|
+| `name`, `url` | Nama berkas dan alamat halaman. |
+| `mark` | Daftar `[selektor, nomor]`. Kotak merah bernomor digambar di sekitar elemennya; nomornya dipakai di teks sebagai "(nomor N)". Elemen yang tidak ada atau di luar layar membuat gambar gagal, jadi gambar tidak pernah salah nomor diam-diam. |
+| `actions` | Langkah sebelum memotret: `click`, `fill`/`value`, `select`/`value`, `wait`, `scroll`, `js`. |
+| `js` | Skrip yang dijalankan setelah halaman terbuka (misalnya menggulir atau membuka `<details>`). |
+| `tinggi` | Tinggi layar khusus (px) untuk formulir panjang. |
+| `full` / `el` | Satu halaman penuh / satu bagian saja. |
+| `tanpa_gambar` | Langkah navigasi saja. |
+
+Kelompok boleh punya `tautan`: alamat yang baru diketahui setelah masuk sebagai pengguna lain, misalnya `{"KPT": {"login": "admin", "user": "admin", "url": "...", "ambil": "td.field-verify a"}}`. `{KPT}` di `url` gambar diganti dengan alamat tautan itu (dipakai untuk halaman verifikasi dan halaman tanda tangan).
+
+`PANDUAN_HANYA=nama1,nama2` hanya mengambil gambar tertentu (nama berkas tanpa `.png`).
 
 Setelah itu perkecil dan kompres gambar (butuh Pillow dan `pngquant`):
 

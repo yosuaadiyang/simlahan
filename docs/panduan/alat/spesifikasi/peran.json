@@ -434,15 +434,56 @@
     },
     {
      "url": "/admin/users/user/",
-     "name": "pengguna"
+     "name": "pengguna",
+     "mark": [
+      [
+       ".object-tools a",
+       1
+      ],
+      [
+       "#searchbar",
+       2
+      ],
+      [
+       "#changelist-filter h2",
+       3
+      ],
+      [
+       "#result_list tbody tr:first-child th a",
+       4
+      ]
+     ]
     },
     {
      "url": "/admin/users/user/add/",
-     "name": "pengguna-tambah"
+     "name": "pengguna-tambah",
+     "mark": [
+      [
+       "#id_username",
+       1
+      ],
+      [
+       "#id_usable_password_0",
+       2
+      ],
+      [
+       "#id_password1",
+       3
+      ],
+      [
+       "#id_password2",
+       4
+      ],
+      [
+       "input[name=_continue]",
+       5
+      ]
+     ]
     },
     {
      "url": "/admin/users/user/?q=contoh.korwil",
      "name": "pengguna-ubah",
+     "tinggi": 1080,
      "actions": [
       {
        "click": "#result_list tbody tr:first-child th a"
@@ -451,23 +492,175 @@
        "wait": 1200
       }
      ],
-     "full": true
+     "mark": [
+      [
+       "#id_password a >> nth=0",
+       1
+      ],
+      [
+       "#id_first_name",
+       2
+      ],
+      [
+       "#id_last_name",
+       3
+      ],
+      [
+       "#id_email",
+       4
+      ],
+      [
+       "#id_is_active",
+       5
+      ],
+      [
+       "#id_is_staff",
+       6
+      ],
+      [
+       "#id_is_superuser",
+       7
+      ]
+     ]
+    },
+    {
+     "url": "/admin/users/user/?q=contoh.korwil",
+     "name": "pengguna-grup",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a"
+      },
+      {
+       "wait": 1200
+      },
+      {
+       "scrollY": 1000
+      }
+     ],
+     "mark": [
+      [
+       "#id_groups_from",
+       1
+      ],
+      [
+       "#id_groups_add",
+       2
+      ],
+      [
+       "#id_groups_to",
+       3
+      ],
+      [
+       "#id_groups_remove",
+       4
+      ]
+     ]
+    },
+    {
+     "url": "/admin/users/user/?q=contoh.korwil",
+     "name": "pengguna-unit",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a"
+      },
+      {
+       "wait": 1200
+      },
+      {
+       "scrollY": 2250
+      }
+     ],
+     "mark": [
+      [
+       "#id_service_units",
+       1
+      ],
+      [
+       "#id_department_name",
+       2
+      ],
+      [
+       "input[name=_save]",
+       3
+      ]
+     ]
     },
     {
      "url": "/admin/auth/group/",
-     "name": "grup"
+     "name": "grup",
+     "mark": [
+      [
+       "#result_list tbody tr:first-child th a",
+       1
+      ]
+     ]
     },
     {
      "url": "/admin/leasing/serviceunit/",
-     "name": "unit-layanan"
+     "name": "unit-layanan",
+     "mark": [
+      [
+       ".object-tools a",
+       1
+      ],
+      [
+       "#result_list tbody tr:first-child th a",
+       2
+      ]
+     ]
     },
     {
      "url": "/admin/operasi/systemlock/",
-     "name": "kunci-sistem"
+     "name": "kunci-sistem",
+     "tinggi": 1340,
+     "mark": [
+      [
+       "#id_is_armed",
+       1
+      ],
+      [
+       "#id_shutdown_at_0",
+       2
+      ],
+      [
+       "#id_shutdown_at_1",
+       3
+      ],
+      [
+       "#id_message",
+       4
+      ],
+      [
+       "#id_new_passcode",
+       5
+      ],
+      [
+       "#id_confirm_passcode",
+       6
+      ],
+      [
+       "#id_current_passcode",
+       7
+      ],
+      [
+       "input[name=_save]",
+       8
+      ]
+     ]
     },
     {
      "url": "/admin/batchrun/",
-     "name": "batchrun"
+     "name": "batchrun",
+     "mark": [
+      [
+       "#content-main a:text-is('Tugas terjadwal')",
+       1
+      ],
+      [
+       "#content-main a:text-is('Eksekusi tugas')",
+       2
+      ]
+     ]
     },
     {
      "url": "/admin/batchrun/jobrun/",
@@ -475,7 +668,13 @@
     },
     {
      "url": "/admin/batchrun/scheduledjob/",
-     "name": "batchrun-jadwal"
+     "name": "batchrun-jadwal",
+     "mark": [
+      [
+       "#result_list tbody tr:first-child th a",
+       1
+      ]
+     ]
     }
    ]
   }

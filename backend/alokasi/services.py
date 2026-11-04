@@ -505,6 +505,14 @@ def reject(application: Application, officer, note: str) -> Application:
     return application
 
 
+def _angka(value) -> str:
+    """Angka gaya Indonesia untuk uraian tagihan: 110.703,47 dan 2.000."""
+    from alokasi.templatetags.alokasi_tags import angka
+
+    value = Decimal(value)
+    return angka(value, 0 if value == value.to_integral_value() else 2)
+
+
 def _create_invoices(  # noqa: C901
     application: Application, config: AllocationSettings
 ) -> None:
@@ -519,8 +527,8 @@ def _create_invoices(  # noqa: C901
                     _("UWT lahan %(code)s: %(area)s m² × Rp%(rate)s × %(years)s tahun")
                     % {
                         "code": plot.code,
-                        "area": plot.area_m2,
-                        "rate": plot.uwt_rate_per_m2_year,
+                        "area": _angka(plot.area_m2),
+                        "rate": _angka(plot.uwt_rate_per_m2_year),
                         "years": plot.effective_term_years,
                     },
                     plot.uwt_total,
@@ -566,8 +574,8 @@ def _create_invoices(  # noqa: C901
                     % {
                         "kpt": allocation.kpt_number,
                         "service": application.get_service_type_display(),
-                        "area": allocation.area_m2,
-                        "rate": plot.uwt_rate_per_m2_year,
+                        "area": _angka(allocation.area_m2),
+                        "rate": _angka(plot.uwt_rate_per_m2_year),
                         "years": years,
                     },
                     uwt,

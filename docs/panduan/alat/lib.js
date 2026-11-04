@@ -86,8 +86,8 @@ async function mark(p, marks, full = false) {
       // Label di kiri kotak (formulir panel admin): nomor di kanan agar label tetap terbaca.
       const lab = e.id && document.querySelector(`label[for="${e.id}"]`);
       const labLeft = lab && lab.getBoundingClientRect().right <= e.getBoundingClientRect().left + 4;
-      if (e.tagName === 'INPUT' && ['checkbox', 'radio', 'file'].includes(e.type)) return labLeft ? 'check-r' : 'check';
-      if (['SELECT', 'TEXTAREA'].includes(e.tagName) || (e.tagName === 'INPUT' && !['submit', 'button', 'file'].includes(e.type)) || (/-control\b/.test(e.className) && !!e.querySelector('input'))) return labLeft ? 'field-r' : 'field';
+      if (e.tagName === 'INPUT' && (['checkbox', 'radio'].includes(e.type) || (e.type === 'file' && e.getBoundingClientRect().width < 150))) return labLeft ? 'check-r' : 'check';
+      if (['SELECT', 'TEXTAREA'].includes(e.tagName) || (e.tagName === 'INPUT' && !['submit', 'button'].includes(e.type)) || (/-control\b/.test(e.className) && !!e.querySelector('input'))) return labLeft ? 'field-r' : 'field';
       return '';
     });
     await p.evaluate(({ box, n, field, inDialog }) => {

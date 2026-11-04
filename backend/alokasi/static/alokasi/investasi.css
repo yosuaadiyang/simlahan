@@ -42,8 +42,9 @@
 
 /* ------------------------------------------------------------ Kartu lahan */
 .plot-tile { display: flex; flex-direction: column; gap: 10px; position: relative; }
-.plot-tile .top { display: flex; justify-content: space-between; align-items: start; gap: 8px; }
-.plot-tile .code { font-size: .75rem; color: var(--muted); font-weight: 700; letter-spacing: .03em; }
+.plot-tile .top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: start; gap: 6px 8px; }
+.plot-tile .top > div { flex: 1 1 9rem; min-width: 0; }
+.plot-tile .code { white-space: nowrap; font-size: .75rem; color: var(--muted); font-weight: 700; letter-spacing: .03em; }
 .plot-tile h3 { margin: 2px 0 0; font-size: 1rem; line-height: 1.35; }
 .plot-tile h3 a { color: var(--sl-gray-950); text-decoration: none; }
 .plot-tile h3 a::after { content: ""; position: absolute; inset: 0; }

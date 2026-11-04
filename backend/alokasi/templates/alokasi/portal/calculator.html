@@ -32,9 +32,9 @@
         <dt>Luas</dt><dd>{{ r.area_m2|angka:2|patah }} m²</dd>
       </dl>
       <table class="data" style="margin-top:12px">
-        <tr><td>Total UWT ({{ r.area_m2|angka:2 }} m² × {{ r.rate|rupiah|patah }} × {{ r.years }} tahun)<br><span class="small muted">Tarif tersebut berlaku untuk {{ r.years }} tahun.</span></td><td><strong>{{ r.uwt_total|rupiah|patah }}</strong></td></tr>
-        <tr><td>Total denda<br><span class="small muted">Sanksi {{ r.late_months }} bulan × ({{ r.penalty_percent|angka:2 }}% × {{ r.uwt_total|rupiah|patah }}){% if r.capped %} — dibatasi {{ config.uwt_penalty_max_months }} bulan{% endif %}</span></td><td>{{ r.penalty|rupiah|patah }}</td></tr>
-        <tr><td><strong>Total tagihan UWT</strong></td><td><strong>{{ r.grand_total|rupiah|patah }}</strong></td></tr>
+        <tr><td>Total UWT ({{ r.area_m2|angka:2 }} m² × {{ r.rate|rupiah|patah }} × {{ r.years }} tahun)<br><span class="small muted">Tarif tersebut berlaku untuk {{ r.years }} tahun.</span></td><td class="nominal"><strong>{{ r.uwt_total|rupiah|patah }}</strong></td></tr>
+        <tr><td>Total denda<br><span class="small muted">Sanksi {{ r.late_months }} bulan × ({{ r.penalty_percent|angka:2 }}% × {{ r.uwt_total|rupiah|patah }}){% if r.capped %} — dibatasi {{ config.uwt_penalty_max_months }} bulan{% endif %}</span></td><td class="nominal">{{ r.penalty|rupiah|patah }}</td></tr>
+        <tr><td><strong>Total tagihan UWT</strong></td><td class="nominal"><strong>{{ r.grand_total|rupiah|patah }}</strong></td></tr>
       </table>
       {% if r.tariff.note %}<p class="small">{{ r.tariff.note }}</p>{% endif %}
       <div class="alert alert-info small">Tagihan ini berlaku apabila proses dilakukan pada tanggal <strong>{{ r.valid_on|tanggal }}</strong>.</div>
@@ -59,9 +59,9 @@
       <dt>Jangka waktu</dt><dd>{{ result.years }} tahun</dd>
     </dl>
     <table class="data" style="margin-top:12px">
-      <tr><td>UWT ({{ result.area_m2|angka:0 }} m² × {{ result.rate|rupiah|patah }} × {{ result.years }} tahun)</td><td><strong>{{ result.uwt_total|rupiah|patah }}</strong></td></tr>
-      <tr><td>Biaya administrasi alokasi</td><td>{{ result.admin_fee|rupiah|patah }}</td></tr>
-      <tr><td><strong>Total perkiraan</strong></td><td><strong>{{ result.grand_total|rupiah|patah }}</strong></td></tr>
+      <tr><td>UWT ({{ result.area_m2|angka:0 }} m² × {{ result.rate|rupiah|patah }} × {{ result.years }} tahun)</td><td class="nominal"><strong>{{ result.uwt_total|rupiah|patah }}</strong></td></tr>
+      <tr><td>Biaya administrasi alokasi</td><td class="nominal">{{ result.admin_fee|rupiah|patah }}</td></tr>
+      <tr><td><strong>Total perkiraan</strong></td><td class="nominal"><strong>{{ result.grand_total|rupiah|patah }}</strong></td></tr>
     </table>
     {% if result.plot.uwt_rate_per_m2_year == 0 %}<div class="alert alert-warn small">Tarif lahan ini belum diisi petugas; hubungi {{ config.authority_short_name }} untuk informasi resmi.</div>{% endif %}
     <p class="small muted">{{ config.payment_instructions }}</p>

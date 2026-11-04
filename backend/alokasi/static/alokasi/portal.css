@@ -288,6 +288,7 @@ table.data th, table.data td { text-align: left; padding: 11px 14px; border-bott
 table.data tr:last-child td { border-bottom: 0; }
 table.data tbody tr:hover td { background: var(--sl-gray-25); }
 table.data td:first-child a { white-space: nowrap; font-weight: 600; }
+table.data td.nominal { width: 45%; }
 table.data th { background: var(--sl-gray-50); font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--sl-gray-600); white-space: nowrap; }
 /* Di HP kolom tidak diperas jadi sempit: tabel lebar menggulir di .table-wrap. */
 @media (max-width: 640px) { table.data { font-size: .875rem; } table.data th, table.data td { padding: 9px 11px; } table.data:has(th:nth-child(3)) { min-width: 32rem; } table.data:has(th:nth-child(5)) { min-width: 44rem; } }
