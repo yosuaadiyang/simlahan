@@ -1,5 +1,5 @@
 {
- "out": "../gambar/portal",
+ "out": "../../gambar/portal",
  "groups": [
   {
    "login": "none",

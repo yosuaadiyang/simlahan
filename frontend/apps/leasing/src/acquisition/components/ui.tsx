@@ -1,6 +1,7 @@
 import React from "react";
 import classNames from "classnames";
 import type { Choice, ChoiceMap } from "../types";
+import { statValueParts, statValueSize } from "../format";
 
 export const labelOf = (
   choices: ChoiceMap | null | undefined,
@@ -33,13 +34,30 @@ export const Stat: React.FC<{
   value: React.ReactNode;
   tone?: "default" | "warning" | "danger" | "success";
   hint?: React.ReactNode;
-}> = ({ label, value, tone = "default", hint }) => (
-  <div className={classNames("acq-stat", `acq-stat--${tone}`)}>
-    <span className="acq-stat__label">{label}</span>
-    <strong className="acq-stat__value">{value}</strong>
-    {hint && <span className="acq-stat__hint">{hint}</span>}
-  </div>
-);
+}> = ({ label, value, tone = "default", hint }) => {
+  const text = typeof value === "string" ? value : null;
+  const size = text ? statValueSize(text) : undefined;
+  return (
+    <div className={classNames("acq-stat", `acq-stat--${tone}`)}>
+      <span className="acq-stat__label">{label}</span>
+      <strong
+        className={classNames("acq-stat__value", {
+          [`acq-stat__value--${size}`]: size,
+        })}
+      >
+        {text
+          ? statValueParts(text).map((part, index) => (
+              <React.Fragment key={index}>
+                {index > 0 && <wbr />}
+                {part}
+              </React.Fragment>
+            ))
+          : value}
+      </strong>
+      {hint && <span className="acq-stat__hint">{hint}</span>}
+    </div>
+  );
+};
 
 export const Progress: React.FC<{ value: number; label?: string }> = ({
   value,

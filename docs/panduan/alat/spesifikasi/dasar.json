@@ -1,5 +1,5 @@
 {
- "out": "../gambar/dasar",
+ "out": "../../gambar/dasar",
  "groups": [
   {
    "login": "none",

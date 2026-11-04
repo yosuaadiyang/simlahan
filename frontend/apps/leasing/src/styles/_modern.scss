@@ -534,6 +534,24 @@ a {
     tbody tr.clickable-row:hover td {
       background-color: variables.$is-dirty-color !important;
     }
+
+    // Tabel berkepala tetap: kepala yang terlihat adalah salinan di
+    // .scroll-head-table. Kepala asli di tabel isi hanya menentukan lebar
+    // kolom, jadi tingginya harus nol (padding di atas tidak boleh membuatnya
+    // tampil sebagai baris kepala kedua).
+    &.scroll-body-table thead {
+      border-bottom: 0 !important;
+
+      th,
+      td {
+        div {
+          height: 0;
+          padding-top: 0 !important;
+          padding-bottom: 0 !important;
+          overflow: hidden;
+        }
+      }
+    }
   }
 }
 

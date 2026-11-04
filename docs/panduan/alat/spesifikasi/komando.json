@@ -1,5 +1,5 @@
 {
- "out": "../gambar/komando",
+ "out": "../../gambar/komando",
  "groups": [
   {
    "login": "komando",
