@@ -27,6 +27,14 @@
       [
        ".tabbar",
        "4"
+      ],
+      [
+       "button[data-goto=korwil] >> xpath=..",
+       "5"
+      ],
+      [
+       "text=Daring >> nth=0",
+       "6"
       ]
      ]
     },
@@ -41,17 +49,29 @@
        "click": ".tabbar button[data-tab='absen']"
       },
       {
-       "wait": 2000
+       "wait": 1800
       }
      ],
      "mark": [
       [
-       "text=Absen masuk",
+       "#absen-masuk",
        "1"
       ],
       [
-       "text=Absen pulang",
+       "#absen-pulang",
        "2"
+      ],
+      [
+       "#absen-foto",
+       "3"
+      ],
+      [
+       "summary:has-text('Ajukan izin')",
+       "4"
+      ],
+      [
+       "h3:text-is('Riwayat 30 hari')",
+       "5"
       ]
      ]
     },
@@ -66,7 +86,7 @@
        "click": ".tabbar button[data-tab='absen']"
       },
       {
-       "wait": 1200
+       "wait": 1800
       },
       {
        "click": "summary:has-text('Ajukan izin')"
@@ -75,13 +95,39 @@
        "wait": 800
       },
       {
-       "scroll": "text=Kirim pengajuan"
+       "js": "(()=>{const t=[...document.querySelectorAll(\"summary\")].find(x=>x.offsetParent!==null); t.scrollIntoView({block:'start'}); let e=t.parentElement; while(e && !(e.scrollHeight>e.clientHeight+5 && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e=e.parentElement; if(e) e.scrollTop-=20; else window.scrollBy(0,-20);})()"
+      },
+      {
+       "wait": 500
       }
+     ],
+     "mark": [
+      [
+       "#izin-jenis",
+       "1"
+      ],
+      [
+       "input[name=tanggal]",
+       "2"
+      ],
+      [
+       "textarea[name=note]",
+       "3"
+      ],
+      [
+       "input[name=lampiran]",
+       "4"
+      ],
+      [
+       "button:has-text('Kirim pengajuan')",
+       "5"
+      ]
      ]
     },
     {
      "url": "/komando/",
      "name": "lapor",
+     "tinggi": 780,
      "actions": [
       {
        "wait": 2500
@@ -90,13 +136,48 @@
        "click": ".tabbar button[data-tab='korwil']"
       },
       {
-       "wait": 2000
+       "wait": 1800
       }
+     ],
+     "mark": [
+      [
+       "button[data-sub=kegiatan]",
+       "1"
+      ],
+      [
+       "button[data-sub=tanah]",
+       "2"
+      ],
+      [
+       "button[data-sub=riwayat]",
+       "3"
+      ],
+      [
+       "button[data-kartu=komsos] >> xpath=..",
+       "4"
+      ],
+      [
+       "#kg-jenis",
+       "5"
+      ],
+      [
+       "#kg-judul",
+       "6"
+      ],
+      [
+       "#kg-waktu",
+       "7"
+      ],
+      [
+       "#kg-korwil",
+       "8"
+      ]
      ]
     },
     {
      "url": "/komando/",
      "name": "lapor-komsos",
+     "tinggi": 900,
      "actions": [
       {
        "wait": 2500
@@ -105,18 +186,126 @@
        "click": ".tabbar button[data-tab='korwil']"
       },
       {
-       "wait": 1200
+       "wait": 1800
       },
       {
-       "select": "#form-kegiatan select >> nth=0",
-       "value": "komsos"
+       "js": "(()=>{const t=[...document.querySelectorAll(\"input[name=pendamping]\")].find(x=>x.offsetParent!==null); t.scrollIntoView({block:'start'}); let e=t.parentElement; while(e && !(e.scrollHeight>e.clientHeight+5 && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e=e.parentElement; if(e) e.scrollTop-=40; else window.scrollBy(0,-40);})()"
+      },
+      {
+       "wait": 500
+      }
+     ],
+     "mark": [
+      [
+       "input[name=pendamping]",
+       "1"
+      ],
+      [
+       "#kg-lokasi",
+       "2"
+      ],
+      [
+       "#kg-warga-baru-buka",
+       "3"
+      ],
+      [
+       "textarea[name=uraian]",
+       "4"
+      ],
+      [
+       "input[name=durasi]",
+       "5"
+      ],
+      [
+       "input[name=peserta]",
+       "6"
+      ],
+      [
+       "textarea[name=hasil]",
+       "7"
+      ]
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "lapor-warga-baru",
+     "tinggi": 980,
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='korwil']"
+      },
+      {
+       "wait": 1800
+      },
+      {
+       "click": "#kg-warga-baru-buka"
       },
       {
        "wait": 800
       },
       {
-       "scroll": "legend:has-text('Komsos')"
+       "js": "(()=>{const t=[...document.querySelectorAll(\"[data-wb=status_warga]\")].find(x=>x.offsetParent!==null); t.scrollIntoView({block:'start'}); let e=t.parentElement; while(e && !(e.scrollHeight>e.clientHeight+5 && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e=e.parentElement; if(e) e.scrollTop-=40; else window.scrollBy(0,-40);})()"
+      },
+      {
+       "wait": 500
       }
+     ],
+     "mark": [
+      [
+       "[data-wb=status_warga]",
+       "1"
+      ],
+      [
+       "[data-wb=nama]",
+       "2"
+      ],
+      [
+       "[data-wb=gender]",
+       "3"
+      ],
+      [
+       "[data-wb=pekerjaan]",
+       "4"
+      ],
+      [
+       "[data-wb=umur]",
+       "5"
+      ],
+      [
+       "[data-wb=telepon]",
+       "6"
+      ],
+      [
+       "[data-wb=alamat]",
+       "7"
+      ],
+      [
+       "[data-wb=kampung]",
+       "8"
+      ],
+      [
+       "[data-wb=asal]",
+       "9"
+      ],
+      [
+       "[data-wb=menetap]",
+       "10"
+      ],
+      [
+       "[data-wb=sikap]",
+       "11"
+      ],
+      [
+       "summary:has-text('Data tambahan (poin lebih)')",
+       "12"
+      ],
+      [
+       "#kg-warga-baru-simpan",
+       "13"
+      ]
      ]
     },
     {
@@ -130,22 +319,46 @@
        "click": ".tabbar button[data-tab='korwil']"
       },
       {
-       "wait": 1200
+       "wait": 1800
       },
       {
-       "scroll": "text=Simpan laporan"
+       "js": "(()=>{const t=[...document.querySelectorAll(\"#kg-tugas\")].find(x=>x.offsetParent!==null); t.scrollIntoView({block:'start'}); let e=t.parentElement; while(e && !(e.scrollHeight>e.clientHeight+5 && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e=e.parentElement; if(e) e.scrollTop-=40; else window.scrollBy(0,-40);})()"
+      },
+      {
+       "wait": 500
       }
      ],
      "mark": [
       [
-       "text=Simpan laporan",
+       "#kg-tugas",
        "1"
+      ],
+      [
+       "#kg-cari-warga",
+       "2"
+      ],
+      [
+       "input[name=foto]",
+       "3"
+      ],
+      [
+       "label:has(#kg-titik)",
+       "4"
+      ],
+      [
+       "#kg-suara",
+       "5"
+      ],
+      [
+       "button:has-text('Simpan laporan')",
+       "6"
       ]
      ]
     },
     {
      "url": "/komando/",
      "name": "lapor-uji-tanah",
+     "tinggi": 900,
      "actions": [
       {
        "wait": 2500
@@ -154,14 +367,105 @@
        "click": ".tabbar button[data-tab='korwil']"
       },
       {
-       "wait": 1000
+       "wait": 1800
       },
       {
-       "click": "button[data-sub='tanah']"
+       "click": "button[data-sub=tanah]"
       },
       {
        "wait": 1000
       }
+     ],
+     "mark": [
+      [
+       "input[name=kedalaman]",
+       "1"
+      ],
+      [
+       "#tn-tekstur",
+       "2"
+      ],
+      [
+       "input[name=warna]",
+       "3"
+      ],
+      [
+       "input[name=ph]",
+       "4"
+      ],
+      [
+       "input[name=kadar_air]",
+       "5"
+      ],
+      [
+       "input[name=c_organik]",
+       "6"
+      ],
+      [
+       "input[name=daya_dukung]",
+       "7"
+      ],
+      [
+       "input[name=cbr]",
+       "8"
+      ],
+      [
+       "#tn-kelayakan",
+       "9"
+      ]
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "lapor-uji-tanah-bawah",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='korwil']"
+      },
+      {
+       "wait": 1800
+      },
+      {
+       "click": "button[data-sub=tanah]"
+      },
+      {
+       "wait": 1000
+      },
+      {
+       "js": "(()=>{const t=[...document.querySelectorAll(\"input[name=lab]\")].find(x=>x.offsetParent!==null); t.scrollIntoView({block:'start'}); let e=t.parentElement; while(e && !(e.scrollHeight>e.clientHeight+5 && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e=e.parentElement; if(e) e.scrollTop-=40; else window.scrollBy(0,-40);})()"
+      },
+      {
+       "wait": 500
+      }
+     ],
+     "mark": [
+      [
+       "input[name=lab]",
+       "1"
+      ],
+      [
+       "textarea[name=catatan]",
+       "2"
+      ],
+      [
+       "input[name=foto]",
+       "3"
+      ],
+      [
+       "input[name=laporan]",
+       "4"
+      ],
+      [
+       "label:has(#tn-titik)",
+       "5"
+      ],
+      [
+       "button:has-text('Simpan uji tanah')",
+       "6"
+      ]
      ]
     },
     {
@@ -175,14 +479,36 @@
        "click": ".tabbar button[data-tab='korwil']"
       },
       {
-       "wait": 1000
+       "wait": 1800
       },
       {
-       "click": "button[data-sub='riwayat']"
+       "click": "button[data-sub=riwayat]"
       },
       {
        "wait": 2000
       }
+     ],
+     "mark": [
+      [
+       "h3:text-is('Antrean kirim')",
+       "1"
+      ],
+      [
+       "#kirim-sekarang",
+       "2"
+      ],
+      [
+       "#riwayat-lingkup",
+       "3"
+      ],
+      [
+       "#daftar-kegiatan li >> nth=0",
+       "4"
+      ],
+      [
+       "button[data-lihat] >> nth=0",
+       "5"
+      ]
      ]
     },
     {
@@ -196,13 +522,36 @@
        "click": ".tabbar button[data-tab='warga']"
       },
       {
-       "wait": 2000
+       "wait": 1800
       }
+     ],
+     "mark": [
+      [
+       "#warga-cari",
+       "1"
+      ],
+      [
+       "#warga-korwil",
+       "2"
+      ],
+      [
+       "#warga-sikap",
+       "3"
+      ],
+      [
+       "#warga-tambah-buka",
+       "4"
+      ],
+      [
+       "text=Abdul bin Taher >> xpath=ancestor::li[1]",
+       "5"
+      ]
      ]
     },
     {
      "url": "/komando/",
      "name": "warga-tambah",
+     "tinggi": 980,
      "actions": [
       {
        "wait": 2500
@@ -211,14 +560,124 @@
        "click": ".tabbar button[data-tab='warga']"
       },
       {
-       "wait": 1500
+       "wait": 1800
       },
       {
-       "click": "text=＋ Warga"
+       "click": "#warga-tambah-buka"
       },
       {
        "wait": 1000
+      },
+      {
+       "js": "(()=>{const t=[...document.querySelectorAll(\"h3:has-text('Tambah warga')\")].find(x=>x.offsetParent!==null); t.scrollIntoView({block:'start'}); let e=t.parentElement; while(e && !(e.scrollHeight>e.clientHeight+5 && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e=e.parentElement; if(e) e.scrollTop-=20; else window.scrollBy(0,-20);})()"
+      },
+      {
+       "wait": 500
       }
+     ],
+     "mark": [
+      [
+       "input[name=nama]",
+       "1"
+      ],
+      [
+       "input[name=nik]",
+       "2"
+      ],
+      [
+       "input[name=jiwa]",
+       "3"
+      ],
+      [
+       "input[name=telepon]",
+       "4"
+      ],
+      [
+       "input[name=kampung]",
+       "5"
+      ],
+      [
+       "input[name=alamat]",
+       "6"
+      ],
+      [
+       "select[name=sikap]",
+       "7"
+      ],
+      [
+       "select[name=lahan]",
+       "8"
+      ],
+      [
+       "select[name=rtrw]",
+       "9"
+      ],
+      [
+       "select[name=zona]",
+       "10"
+      ],
+      [
+       "select[name=pilihan]",
+       "11"
+      ]
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "warga-tambah-bawah",
+     "tinggi": 980,
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='warga']"
+      },
+      {
+       "wait": 1800
+      },
+      {
+       "click": "#warga-tambah-buka"
+      },
+      {
+       "wait": 1000
+      },
+      {
+       "js": "(()=>{const t=[...document.querySelectorAll(\"select[name=penggarapan]\")].find(x=>x.offsetParent!==null); t.scrollIntoView({block:'start'}); let e=t.parentElement; while(e && !(e.scrollHeight>e.clientHeight+5 && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e=e.parentElement; if(e) e.scrollTop-=40; else window.scrollBy(0,-40);})()"
+      },
+      {
+       "wait": 500
+      }
+     ],
+     "mark": [
+      [
+       "select[name=penggarapan]",
+       "1"
+      ],
+      [
+       "select[name=status_warga]",
+       "2"
+      ],
+      [
+       "input[name=pasangan]",
+       "3"
+      ],
+      [
+       "input[name=luas_lahan]",
+       "4"
+      ],
+      [
+       "textarea[name=kondisi_lahan]",
+       "5"
+      ],
+      [
+       "label:has(input[name=pakai_gps])",
+       "6"
+      ],
+      [
+       "button:has-text('Simpan warga')",
+       "7"
+      ]
      ]
     },
     {
@@ -232,8 +691,73 @@
        "click": ".tabbar button[data-tab='tasks']"
       },
       {
-       "wait": 2000
+       "wait": 1800
       }
+     ],
+     "mark": [
+      [
+       "button[data-filter=saya] >> xpath=..",
+       "1"
+      ],
+      [
+       "text=[contoh] Dokumentasi kondisi jalan kampung",
+       "2"
+      ],
+      [
+       "button[data-lapor-tugas] >> nth=0",
+       "3"
+      ]
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "tugas-detail",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='tasks']"
+      },
+      {
+       "wait": 1800
+      },
+      {
+       "click": "text=[contoh] Pendataan ulang KK Pasir Panjang"
+      },
+      {
+       "wait": 1500
+      }
+     ],
+     "mark": [
+      [
+       "#td-progres",
+       "1"
+      ],
+      [
+       "#td-progres-simpan",
+       "2"
+      ],
+      [
+       "#td-catatan",
+       "3"
+      ],
+      [
+       "#td-foto",
+       "4"
+      ],
+      [
+       "label:has(#td-gps)",
+       "5"
+      ],
+      [
+       "button[data-aksi=lapor]",
+       "6"
+      ],
+      [
+       "button[data-aksi=kendala]",
+       "7"
+      ]
      ]
     },
     {
@@ -247,8 +771,54 @@
        "click": ".tabbar button[data-tab='perf']"
       },
       {
-       "wait": 2000
+       "wait": 1800
       }
+     ],
+     "mark": [
+      [
+       "#kinerja-periode",
+       "1"
+      ],
+      [
+       "h3:text-is('Kalender')",
+       "2"
+      ]
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "kinerja-bawah",
+     "tinggi": 780,
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='perf']"
+      },
+      {
+       "wait": 1800
+      },
+      {
+       "js": "(()=>{const t=[...document.querySelectorAll(\"h3:text-is('Tugas terbuka')\")].find(x=>x.offsetParent!==null); t.scrollIntoView({block:'start'}); let e=t.parentElement; while(e && !(e.scrollHeight>e.clientHeight+5 && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e=e.parentElement; if(e) e.scrollTop-=40; else window.scrollBy(0,-40);})()"
+      },
+      {
+       "wait": 500
+      }
+     ],
+     "mark": [
+      [
+       "h3:text-is('Tugas terbuka')",
+       "1"
+      ],
+      [
+       "h3:text-is('Kegiatan terakhir')",
+       "2"
+      ],
+      [
+       "#kinerja-wawasan",
+       "3"
+      ]
      ]
     },
     {
@@ -262,8 +832,35 @@
        "click": ".tabbar button[data-tab='chat']"
       },
       {
-       "wait": 2000
+       "wait": 1800
+      },
+      {
+       "select": "#chat-kanal",
+       "value": {
+        "index": 1
+       }
+      },
+      {
+       "wait": 1500
       }
+     ],
+     "mark": [
+      [
+       "#chat-kanal",
+       "1"
+      ],
+      [
+       "label:has(#chat-lokasi)",
+       "2"
+      ],
+      [
+       "#chat-teks",
+       "3"
+      ],
+      [
+       "button:text-is('Kirim')",
+       "4"
+      ]
      ]
     },
     {
@@ -277,7 +874,7 @@
        "click": ".tabbar button[data-tab='lainnya']"
       },
       {
-       "wait": 2000
+       "wait": 1800
       }
      ]
     },
@@ -300,6 +897,20 @@
       {
        "wait": 2500
       }
+     ],
+     "mark": [
+      [
+       "button:has-text('Muat ulang')",
+       "1"
+      ],
+      [
+       "h3:text-is('Anomali & peringatan')",
+       "2"
+      ],
+      [
+       "h3:text-is('Skor risiko Korwil')",
+       "3"
+      ]
      ]
     },
     {
@@ -321,6 +932,32 @@
       {
        "wait": 2500
       }
+     ],
+     "mark": [
+      [
+       "button[data-bagian=bidang] >> xpath=..",
+       "1"
+      ],
+      [
+       "#bd-korwil",
+       "2"
+      ],
+      [
+       "#bd-status",
+       "3"
+      ],
+      [
+       "#bd-urut",
+       "4"
+      ],
+      [
+       "#bd-cari",
+       "5"
+      ],
+      [
+       "#bd-impor",
+       "6"
+      ]
      ]
     },
     {
@@ -342,11 +979,46 @@
       {
        "wait": 2500
       }
+     ],
+     "mark": [
+      [
+       "#up-korwil",
+       "1"
+      ],
+      [
+       "#up-status",
+       "2"
+      ],
+      [
+       "#up-bagian",
+       "3"
+      ],
+      [
+       "#up-metode",
+       "4"
+      ],
+      [
+       "#up-batch",
+       "5"
+      ],
+      [
+       "#up-impor",
+       "6"
+      ],
+      [
+       "#up-excel",
+       "7"
+      ],
+      [
+       "#up-peta",
+       "8"
+      ]
      ]
     },
     {
      "url": "/komando/",
      "name": "alat",
+     "tinggi": 780,
      "actions": [
       {
        "wait": 2500
@@ -363,6 +1035,36 @@
       {
        "wait": 2500
       }
+     ],
+     "mark": [
+      [
+       "button[data-alat=tiket] >> xpath=..",
+       "1"
+      ],
+      [
+       "#tk-kategori",
+       "2"
+      ],
+      [
+       "#tk-prioritas",
+       "3"
+      ],
+      [
+       "input[name=judul]",
+       "4"
+      ],
+      [
+       "textarea[name=deskripsi]",
+       "5"
+      ],
+      [
+       "input[name=lampiran]",
+       "6"
+      ],
+      [
+       "button:has-text('Kirim tiket')",
+       "7"
+      ]
      ]
     },
     {
@@ -389,6 +1091,7 @@
     {
      "url": "/komando/",
      "name": "laporan-harian",
+     "tinggi": 820,
      "actions": [
       {
        "wait": 2500
@@ -405,6 +1108,32 @@
       {
        "wait": 2500
       }
+     ],
+     "mark": [
+      [
+       "button[data-lh=buat] >> xpath=..",
+       "1"
+      ],
+      [
+       "#lh-hari",
+       "2"
+      ],
+      [
+       "#lh-susun",
+       "3"
+      ],
+      [
+       "#lh-isi",
+       "4"
+      ],
+      [
+       "input[name=lampiran]",
+       "5"
+      ],
+      [
+       "#lh-kirim",
+       "6"
+      ]
      ]
     },
     {
@@ -426,6 +1155,16 @@
       {
        "wait": 2500
       }
+     ],
+     "mark": [
+      [
+       "#peringkat-periode",
+       "1"
+      ],
+      [
+       "#peringkat-excel",
+       "2"
+      ]
      ]
     },
     {
@@ -447,6 +1186,12 @@
       {
        "wait": 2500
       }
+     ],
+     "mark": [
+      [
+       "text=Korwil A – Pasir Panjang >> nth=-1",
+       "1"
+      ]
      ]
     },
     {
@@ -468,6 +1213,12 @@
       {
        "wait": 2500
       }
+     ],
+     "mark": [
+      [
+       "#feed-korwil",
+       "1"
+      ]
      ]
     },
     {
@@ -488,7 +1239,27 @@
       },
       {
        "wait": 2500
+      },
+      {
+       "fill": "#ai-teks",
+       "value": "Berapa warga yang mendukung di Korwil A?"
+      },
+      {
+       "click": "button:text-is('Tanya')"
+      },
+      {
+       "wait": 3000
       }
+     ],
+     "mark": [
+      [
+       "#ai-teks",
+       "1"
+      ],
+      [
+       "button:text-is('Tanya')",
+       "2"
+      ]
      ]
     },
     {
@@ -504,6 +1275,20 @@
       {
        "wait": 800
       }
+     ],
+     "mark": [
+      [
+       "#sos-pesan",
+       "1"
+      ],
+      [
+       "button:has-text('KIRIM SOS')",
+       "2"
+      ],
+      [
+       "button:text-is('Batal')",
+       "3"
+      ]
      ]
     }
    ]
@@ -525,19 +1310,24 @@
        "click": ".tabbar button[data-tab='tasks']"
       },
       {
-       "wait": 2000
+       "wait": 1800
       }
      ],
      "mark": [
       [
        "text=＋ Beri tugas",
        "1"
+      ],
+      [
+       "button[data-filter=verifikasi]",
+       "2"
       ]
      ]
     },
     {
      "url": "/komando/",
      "name": "beri-tugas",
+     "tinggi": 900,
      "actions": [
       {
        "wait": 2500
@@ -546,7 +1336,7 @@
        "click": ".tabbar button[data-tab='tasks']"
       },
       {
-       "wait": 1500
+       "wait": 1800
       },
       {
        "click": "text=＋ Beri tugas"
@@ -554,6 +1344,93 @@
       {
        "wait": 1000
       }
+     ],
+     "mark": [
+      [
+       "input[name=judul]",
+       "1"
+      ],
+      [
+       "textarea[name=uraian]",
+       "2"
+      ],
+      [
+       "#tb-penerima",
+       "3"
+      ],
+      [
+       "label:has-text('Contoh Petugas Lapangan · Petugas Lapangan Korwil A') >> nth=-1",
+       "4"
+      ],
+      [
+       "#tb-jenis",
+       "5"
+      ],
+      [
+       "#tb-prioritas",
+       "6"
+      ],
+      [
+       "input[name=tenggat]",
+       "7"
+      ],
+      [
+       "input[name=poin]",
+       "8"
+      ],
+      [
+       "#tb-korwil",
+       "9"
+      ],
+      [
+       "button:text-is('Kirim tugas')",
+       "10"
+      ]
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "tugas-verifikasi",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='tasks']"
+      },
+      {
+       "wait": 1800
+      },
+      {
+       "click": "button[data-filter=verifikasi]"
+      },
+      {
+       "wait": 1500
+      },
+      {
+       "click": "text=[contoh] Dokumentasi kondisi jalan kampung"
+      },
+      {
+       "wait": 1500
+      }
+     ],
+     "mark": [
+      [
+       "#td-catatan",
+       "1"
+      ],
+      [
+       "button[data-aksi=verifikasi]",
+       "2"
+      ],
+      [
+       "button[data-aksi=kembalikan]",
+       "3"
+      ],
+      [
+       "button[data-aksi=batal]",
+       "4"
+      ]
      ]
     },
     {
@@ -575,6 +1452,24 @@
       {
        "wait": 2500
       }
+     ],
+     "mark": [
+      [
+       "button[data-keputusan=setuju] >> nth=0",
+       "1"
+      ],
+      [
+       "button[data-keputusan=tolak] >> nth=0",
+       "2"
+      ],
+      [
+       "text=Periksa & verifikasi",
+       "3"
+      ],
+      [
+       "button[data-laporan] >> nth=0",
+       "4"
+      ]
      ]
     },
     {
@@ -596,6 +1491,20 @@
       {
        "wait": 2500
       }
+     ],
+     "mark": [
+      [
+       "button[data-lh=masuk]",
+       "1"
+      ],
+      [
+       "#lh-sumber-wrap",
+       "2"
+      ],
+      [
+       "#lh-susun",
+       "3"
+      ]
      ]
     },
     {
@@ -616,7 +1525,31 @@
       },
       {
        "wait": 2500
+      },
+      {
+       "js": "(async()=>{const s=document.getElementById('historis-periode'); for(const v of ['bulan','bulan-lalu','kuartal','tahun']){s.value=v; s.dispatchEvent(new Event('change')); await new Promise(r=>setTimeout(r,1500)); if(!/Belum ada komsos/.test(document.getElementById('historis-isi').textContent)) return;}})()"
+      },
+      {
+       "wait": 800
       }
+     ],
+     "mark": [
+      [
+       "#historis-periode",
+       "1"
+      ],
+      [
+       "#historis-korwil",
+       "2"
+      ],
+      [
+       "button[data-bagian=komsos] >> xpath=..",
+       "3"
+      ],
+      [
+       "#historis-isi",
+       "4"
+      ]
      ]
     },
     {
@@ -643,6 +1576,7 @@
     {
      "url": "/komando/",
      "name": "spasial-ancaman",
+     "tinggi": 860,
      "actions": [
       {
        "wait": 2500
@@ -660,11 +1594,41 @@
        "wait": 2500
       },
       {
-       "click": "button[data-bagian='ancaman']"
+       "click": "button[data-bagian=ancaman]"
       },
       {
        "wait": 1500
       }
+     ],
+     "mark": [
+      [
+       "input[name=name]",
+       "1"
+      ],
+      [
+       "#za-level",
+       "2"
+      ],
+      [
+       "input[name=radius]",
+       "3"
+      ],
+      [
+       "#za-korwil",
+       "4"
+      ],
+      [
+       "label:has(#za-titik)",
+       "5"
+      ],
+      [
+       "textarea[name=note] >> visible=true",
+       "6"
+      ],
+      [
+       "button:text-is('Simpan zona')",
+       "7"
+      ]
      ]
     },
     {
@@ -687,11 +1651,41 @@
        "wait": 2500
       },
       {
-       "click": "button[data-bagian='jejak']"
+       "click": "button[data-bagian=jejak]"
       },
       {
        "wait": 1500
+      },
+      {
+       "js": "(async()=>{const i=document.getElementById('jj-tanggal'); for(let k=0;k<60;k++){const d=new Date(Date.now()-k*864e5); i.value=d.toLocaleDateString('sv-SE',{timeZone:'Asia/Jakarta'}); i.dispatchEvent(new Event('change')); await new Promise(r=>setTimeout(r,600)); const s=document.getElementById('jj-petugas'); if(s.options.length>1){s.selectedIndex=1; s.dispatchEvent(new Event('change')); return;}}})()"
+      },
+      {
+       "wait": 500
+      },
+      {
+       "click": "#jj-tampil"
+      },
+      {
+       "wait": 2500
       }
+     ],
+     "mark": [
+      [
+       "#jj-tanggal",
+       "1"
+      ],
+      [
+       "#jj-petugas",
+       "2"
+      ],
+      [
+       "#jj-tampil",
+       "3"
+      ],
+      [
+       "#jj-hasil",
+       "4"
+      ]
      ]
     },
     {
@@ -714,11 +1708,23 @@
        "wait": 2500
       },
       {
-       "click": "button[data-alat='audit']"
+       "click": "button[data-alat=audit]"
       },
       {
        "wait": 800
+      },
+      {
+       "click": "#au-data-jalankan"
+      },
+      {
+       "wait": 3000
       }
+     ],
+     "mark": [
+      [
+       "#au-data-jalankan",
+       "1"
+      ]
      ]
     },
     {
@@ -732,8 +1738,18 @@
        "click": ".tabbar button[data-tab='perf']"
       },
       {
-       "wait": 2000
+       "wait": 1800
       }
+     ],
+     "mark": [
+      [
+       "#kinerja-periode",
+       "1"
+      ],
+      [
+       "#kinerja-petugas",
+       "2"
+      ]
      ]
     },
     {
@@ -747,8 +1763,28 @@
        "click": ".tabbar button[data-tab='absen']"
       },
       {
-       "wait": 2000
+       "wait": 1800
+      },
+      {
+       "js": "(()=>{const t=[...document.querySelectorAll(\"h3:text-is('Persetujuan izin tim')\")].find(x=>x.offsetParent!==null); t.scrollIntoView({block:'start'}); let e=t.parentElement; while(e && !(e.scrollHeight>e.clientHeight+5 && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e=e.parentElement; if(e) e.scrollTop-=20; else window.scrollBy(0,-20);})()"
+      },
+      {
+       "wait": 500
       }
+     ],
+     "mark": [
+      [
+       "h3:text-is('Persetujuan izin tim')",
+       "1"
+      ],
+      [
+       "button:text-is('Setujui') >> nth=0",
+       "2"
+      ],
+      [
+       "button:text-is('Tolak') >> nth=0",
+       "3"
+      ]
      ]
     }
    ]
@@ -761,7 +1797,29 @@
     {
      "url": "/komando/",
      "name": "peta-desktop",
-     "delay": 4000
+     "delay": 4000,
+     "mark": [
+      [
+       ".map-tools",
+       "1"
+      ],
+      [
+       "button[data-goto=korwil] >> xpath=..",
+       "2"
+      ],
+      [
+       "button:has-text('Live')",
+       "3"
+      ],
+      [
+       "button:has-text('🆘')",
+       "4"
+      ],
+      [
+       ".tabbar",
+       "5"
+      ]
+     ]
     },
     {
      "url": "/komando/",
@@ -776,6 +1834,20 @@
       {
        "wait": 1000
       }
+     ],
+     "mark": [
+      [
+       "#mode-warga",
+       "1"
+      ],
+      [
+       "#mode-korwil",
+       "2"
+      ],
+      [
+       "label:has(input[data-lapisan=korwil])",
+       "3"
+      ]
      ]
     },
     {
@@ -791,6 +1863,24 @@
       {
        "wait": 1000
       }
+     ],
+     "mark": [
+      [
+       "#cetak-korwil",
+       "1"
+      ],
+      [
+       "#cetak-kertas",
+       "2"
+      ],
+      [
+       "#cetak-orientasi",
+       "3"
+      ],
+      [
+       "#cetak-mulai",
+       "4"
+      ]
      ]
     },
     {
@@ -897,11 +1987,39 @@
        "wait": 2500
       },
       {
-       "click": "button[data-bagian='tumpang']"
+       "click": "button[data-bagian=tumpang]"
       },
       {
-       "wait": 800
+       "wait": 1000
+      },
+      {
+       "click": "#tt-jalankan"
+      },
+      {
+       "wait": 3000
       }
+     ],
+     "mark": [
+      [
+       "#tt-a",
+       "1"
+      ],
+      [
+       "#tt-b",
+       "2"
+      ],
+      [
+       "#tt-jalankan",
+       "3"
+      ],
+      [
+       "#tt-csv",
+       "4"
+      ],
+      [
+       "#tt-peta",
+       "5"
+      ]
      ]
     },
     {
@@ -924,11 +2042,35 @@
        "wait": 2500
       },
       {
-       "click": "button[data-bagian='audit']"
+       "click": "button[data-bagian=audit]"
       },
       {
-       "wait": 800
+       "wait": 1000
+      },
+      {
+       "click": "#au-jalankan"
+      },
+      {
+       "wait": 3000
       }
+     ],
+     "mark": [
+      [
+       "#au-korwil",
+       "1"
+      ],
+      [
+       "#au-jalankan",
+       "2"
+      ],
+      [
+       "#au-csv",
+       "3"
+      ],
+      [
+       "h3:text-is('Per Korwil')",
+       "4"
+      ]
      ]
     },
     {
@@ -951,11 +2093,35 @@
        "wait": 2500
       },
       {
-       "click": "button[data-bagian='panas']"
+       "click": "button[data-bagian=panas]"
       },
       {
-       "wait": 800
+       "wait": 1000
+      },
+      {
+       "select": "#ph-periode",
+       "value": "tahun"
+      },
+      {
+       "click": "#ph-tampil"
+      },
+      {
+       "wait": 3000
       }
+     ],
+     "mark": [
+      [
+       "#ph-sumber",
+       "1"
+      ],
+      [
+       "#ph-periode",
+       "2"
+      ],
+      [
+       "#ph-tampil",
+       "3"
+      ]
      ]
     },
     {
@@ -978,11 +2144,40 @@
        "wait": 2500
       },
       {
-       "click": "button[data-bagian='foto']"
+       "click": "button[data-bagian=foto]"
       },
       {
-       "wait": 1200
+       "wait": 1000
+      },
+      {
+       "wait": 500
       }
+     ],
+     "mark": [
+      [
+       "input[name=title]",
+       "1"
+      ],
+      [
+       "input[name=tanggal] >> visible=true",
+       "2"
+      ],
+      [
+       "input[name=foto] >> visible=true",
+       "3"
+      ],
+      [
+       "label:has(#f3-titik)",
+       "4"
+      ],
+      [
+       "button:text-is('Unggah')",
+       "5"
+      ],
+      [
+       "button[data-f3-lihat] >> nth=0",
+       "6"
+      ]
      ]
     },
     {
@@ -1005,11 +2200,21 @@
        "wait": 2500
       },
       {
-       "click": "button[data-alat='ocr']"
+       "click": "button[data-alat=ocr]"
       },
       {
        "wait": 800
       }
+     ],
+     "mark": [
+      [
+       "input[name=berkas] >> visible=true",
+       "1"
+      ],
+      [
+       "button:text-is('Baca teks')",
+       "2"
+      ]
      ]
     },
     {
@@ -1032,11 +2237,66 @@
        "wait": 2500
       },
       {
-       "click": "button[data-alat='dokumen']"
+       "click": "button[data-alat=dokumen]"
       },
       {
        "wait": 800
       }
+     ],
+     "mark": [
+      [
+       "input[name=berkas] >> visible=true",
+       "1"
+      ],
+      [
+       "input[name=fokus]",
+       "2"
+      ],
+      [
+       "button:text-is('Analisis') >> visible=true",
+       "3"
+      ]
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "alat-foto",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='alat']"
+      },
+      {
+       "wait": 2500
+      },
+      {
+       "click": "button[data-alat=foto]"
+      },
+      {
+       "wait": 800
+      }
+     ],
+     "mark": [
+      [
+       "form:has(input[name=konteks]) input[type=file]",
+       "1"
+      ],
+      [
+       "input[name=konteks]",
+       "2"
+      ],
+      [
+       "button:text-is('Analisis foto')",
+       "3"
+      ]
      ]
     },
     {
@@ -1059,11 +2319,21 @@
        "wait": 2500
       },
       {
-       "click": "button[data-alat='sinkron']"
+       "click": "button[data-alat=sinkron]"
       },
       {
        "wait": 800
       }
+     ],
+     "mark": [
+      [
+       "#sk-unduh",
+       "1"
+      ],
+      [
+       "#sk-impor",
+       "2"
+      ]
      ]
     },
     {

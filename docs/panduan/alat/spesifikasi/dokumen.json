@@ -12,21 +12,46 @@
     },
     {
      "url": "/admin/dokumen/dasbor/",
-     "name": "dasbor-full",
-     "full": true
+     "name": "dasbor-antrean",
+     "actions": [
+      {
+       "js": "const e=[...document.querySelectorAll('h2,h3')].find(x=>x.textContent.includes('Dokumen perizinan per status')); window.scrollTo(0, e.getBoundingClientRect().top+scrollY-90)"
+      },
+      {
+       "wait": 500
+      }
+     ],
+     "mark": [
+      [
+       "h2:has-text('Antrean verifikasi')",
+       "1"
+      ],
+      [
+       "h2:has-text('Izin segera habis')",
+       "2"
+      ]
+     ]
     },
     {
      "url": "/admin/dokumen/landuse/",
      "name": "pemanfaatan-daftar",
      "mark": [
       [
-       "select[name=action]",
+       "a.addlink",
        "1"
+      ],
+      [
+       "#changelist-filter >> text=Berdasarkan Status",
+       "2"
+      ],
+      [
+       "select[name=action]",
+       "3"
       ]
      ]
     },
     {
-     "url": "/admin/dokumen/landuse/",
+     "url": "/admin/dokumen/landuse/?q=Gudang",
      "name": "pemanfaatan-detail",
      "actions": [
       {
@@ -35,27 +60,46 @@
       {
        "wait": 1500
       }
+     ],
+     "mark": [
+      [
+       "text=Kelengkapan dokumen wajib",
+       "1"
+      ],
+      [
+       "a:text-is('Tambah dokumen ke daftar'), button:text-is('Tambah dokumen ke daftar')",
+       "2"
+      ],
+      [
+       "a:text-is('Buat dokumen tanda tangan'), button:text-is('Buat dokumen tanda tangan')",
+       "3"
+      ]
      ]
     },
     {
-     "url": "/admin/dokumen/landuse/",
-     "name": "pemanfaatan-detail-full",
+     "url": "/admin/dokumen/landuse/?q=Gudang",
+     "name": "pemanfaatan-dokumen",
      "actions": [
       {
        "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
       },
       {
        "wait": 1500
+      },
+      {
+       "js": "const e=[...document.querySelectorAll('h2,h3')].find(x=>x.textContent.includes('Dokumen perizinan')); window.scrollTo(0, e.getBoundingClientRect().top+scrollY-110)"
+      },
+      {
+       "wait": 500
       }
-     ],
-     "full": true
+     ]
     },
     {
      "url": "/admin/dokumen/permitrecord/",
      "name": "perizinan-daftar"
     },
     {
-     "url": "/admin/dokumen/permitrecord/",
+     "url": "/admin/dokumen/permitrecord/?status__exact=diajukan",
      "name": "perizinan-detail",
      "actions": [
       {
@@ -64,6 +108,76 @@
       {
        "wait": 1500
       }
+     ],
+     "mark": [
+      [
+       "a:text-is('Verifikasi')",
+       "1"
+      ],
+      [
+       "a:text-is('Minta perbaikan')",
+       "2"
+      ],
+      [
+       "a:text-is('Unggah versi')",
+       "3"
+      ],
+      [
+       "a:text-is('Buat dari templat')",
+       "4"
+      ],
+      [
+       "a:text-is('Minta tanda tangan')",
+       "5"
+      ],
+      [
+       "a:text-is('Tidak wajib')",
+       "6"
+      ],
+      [
+       "#content-main a:text-is('Pratinjau')",
+       "7"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/dokumen/permitrecord/?status__exact=diajukan",
+     "name": "perizinan-verifikasi",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      },
+      {
+       "click": "a:text-is('Verifikasi')"
+      },
+      {
+       "wait": 1500
+      }
+     ],
+     "mark": [
+      [
+       "#id_number",
+       "1"
+      ],
+      [
+       "#id_issued_date",
+       "2"
+      ],
+      [
+       "#id_expiry_date",
+       "3"
+      ],
+      [
+       "#id_note",
+       "4"
+      ],
+      [
+       "#content-main input[type=submit]",
+       "5"
+      ]
      ]
     },
     {
@@ -71,7 +185,7 @@
      "name": "ttd-daftar"
     },
     {
-     "url": "/admin/dokumen/signingdocument/",
+     "url": "/admin/dokumen/signingdocument/?q=Surat+pernyataan",
      "name": "ttd-detail",
      "actions": [
       {
@@ -80,11 +194,33 @@
       {
        "wait": 1500
       }
+     ],
+     "mark": [
+      [
+       "button:text-is('Kirim pengingat')",
+       "1"
+      ],
+      [
+       "#content-main .object-tools a:text-is('Batalkan')",
+       "2"
+      ],
+      [
+       "button:text-is('Kirim ulang')",
+       "3"
+      ],
+      [
+       "a:text-is('TTD langsung')",
+       "4"
+      ],
+      [
+       "a:text-is('Ganti') >> nth=0",
+       "5"
+      ]
      ]
     },
     {
-     "url": "/admin/dokumen/signingdocument/",
-     "name": "ttd-detail-full",
+     "url": "/admin/dokumen/signingdocument/?q=Berita+acara",
+     "name": "ttd-selesai",
      "actions": [
       {
        "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
@@ -93,11 +229,209 @@
        "wait": 1500
       }
      ],
-     "full": true
+     "mark": [
+      [
+       "text=Halaman verifikasi keaslian",
+       "1"
+      ],
+      [
+       "text=Minta unduh PDF final",
+       "2"
+      ],
+      [
+       "button:text-is('Salin jadi draf baru')",
+       "3"
+      ]
+     ]
     },
     {
      "url": "/admin/dokumen/signingdocument/add/",
-     "name": "ttd-tambah"
+     "name": "ttd-tambah",
+     "mark": [
+      [
+       "#id_title",
+       "1"
+      ],
+      [
+       "#id_template",
+       "2"
+      ],
+      [
+       "#id_source_file",
+       "3"
+      ],
+      [
+       "#id_land_use + .select2-container",
+       "4"
+      ],
+      [
+       "#content-main input[type=submit]",
+       "5"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/dokumen/signingdocument/?q=Perjanjian",
+     "name": "ttd-draf",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      }
+     ],
+     "mark": [
+      [
+       "button:text-is('Minta persetujuan')",
+       "1"
+      ],
+      [
+       "#id_title",
+       "2"
+      ],
+      [
+       "#id_land_use + .select2-container",
+       "3"
+      ],
+      [
+       "#id_record",
+       "4"
+      ]
+     ],
+     "tinggi": 900
+    },
+    {
+     "url": "/admin/dokumen/signingdocument/?q=Perjanjian",
+     "name": "ttd-draf-pengiriman",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      },
+      {
+       "js": "const e=[...document.querySelectorAll('h2,h3')].find(x=>x.textContent.includes('Pengiriman')); window.scrollTo(0, e.getBoundingClientRect().top+scrollY-110)"
+      },
+      {
+       "wait": 400
+      }
+     ],
+     "mark": [
+      [
+       "#id_message",
+       "1"
+      ],
+      [
+       "#id_expires_on",
+       "2"
+      ],
+      [
+       "#id_reminder_every_days",
+       "3"
+      ],
+      [
+       "#id_needs_approval",
+       "4"
+      ],
+      [
+       "#id_confidentiality",
+       "5"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/dokumen/signingdocument/?q=Perjanjian",
+     "name": "ttd-draf-penerima",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      },
+      {
+       "js": "const e=[...document.querySelectorAll('h2,h3')].find(x=>x.textContent.includes('Penerima (urutan')); window.scrollTo(0, e.getBoundingClientRect().top+scrollY-110)"
+      },
+      {
+       "wait": 400
+      }
+     ],
+     "mark": [
+      [
+       "#id_recipients-0-order",
+       "1"
+      ],
+      [
+       "#id_recipients-0-role",
+       "2"
+      ],
+      [
+       "#id_recipients-0-action",
+       "3"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/dokumen/signingdocument/?q=Perjanjian",
+     "name": "ttd-draf-penerima-2",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      },
+      {
+       "js": "document.querySelector('#id_recipients-0-user').scrollIntoView({block:'center', inline:'start'})"
+      },
+      {
+       "wait": 400
+      }
+     ],
+     "mark": [
+      [
+       "#id_recipients-0-user",
+       "4"
+      ],
+      [
+       "#id_recipients-0-name",
+       "5"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/dokumen/signingdocument/?q=Perjanjian",
+     "name": "ttd-draf-penerima-3",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      },
+      {
+       "js": "document.querySelector('#id_recipients-0-email').scrollIntoView({block:'center', inline:'start'})"
+      },
+      {
+       "wait": 400
+      }
+     ],
+     "mark": [
+      [
+       "#id_recipients-0-email",
+       "6"
+      ],
+      [
+       "#id_recipients-0-in_person",
+       "7"
+      ],
+      [
+       "#id_recipients-0-access_code",
+       "8"
+      ]
+     ]
     },
     {
      "url": "/admin/dokumen/documenttemplate/",
@@ -124,7 +458,7 @@
      "name": "unduh-daftar"
     },
     {
-     "url": "/admin/dokumen/downloadrequest/",
+     "url": "/admin/dokumen/downloadrequest/?status__exact=menunggu",
      "name": "unduh-detail",
      "actions": [
       {
@@ -133,6 +467,28 @@
       {
        "wait": 1500
       }
+     ],
+     "mark": [
+      [
+       "#id_note",
+       "1"
+      ],
+      [
+       "#id_hours",
+       "2"
+      ],
+      [
+       "#id_max_count",
+       "3"
+      ],
+      [
+       "button[name=decision]:text-is('Setujui')",
+       "4"
+      ],
+      [
+       "button[name=decision]:text-is('Tolak')",
+       "5"
+      ]
      ]
     },
     {

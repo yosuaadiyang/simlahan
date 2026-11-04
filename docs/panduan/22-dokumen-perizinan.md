@@ -33,7 +33,12 @@ Panel di bawahnya:
 - **Izin segera habis (≤ 60 hari)**: tanggal merah berarti perlu segera diperpanjang.
 - **Pemanfaatan aktif per skema**, **Dokumen tanda tangan per status**, dan **Aktivitas terbaru** (gulir ke bawah).
 
-![Dasbor lengkap](gambar/dokumen/dasbor-full.png)
+Gulir sedikit ke bawah untuk melihat panel-panel itu:
+
+![Panel antrean dan izin segera habis](gambar/dokumen/dasbor-antrean.png)
+
+- **Antrean verifikasi** (nomor 1): klik judul dokumen untuk langsung memeriksanya (lihat 7.3).
+- **Izin segera habis** (nomor 2): tanggal merah di kanan adalah tanggal izin berakhir. Hubungi pemegang hak agar segera memperpanjang.
 
 ## 7.2 Pemanfaatan lahan
 
@@ -41,11 +46,13 @@ Satu **pemanfaatan lahan** mewakili satu hak pakai lahan: alokasi, sewa, kerja s
 
 ![Daftar pemanfaatan lahan](gambar/dokumen/pemanfaatan-daftar.png)
 
-Saringan di kanan: **Status** (Aktif, Berakhir, Dicabut), **Skema**, **Kelengkapan** dokumen, dan **Sektor**.
+- **Tambahkan Pemanfaatan lahan** (nomor 1): membuat pemanfaatan lahan baru.
+- **Filter** (nomor 2): saring per **Status** (Aktif, Berakhir, Dicabut), **Skema**, **Kelengkapan** dokumen, dan **Sektor**.
+- **Aksi** (nomor 3): tindakan untuk baris yang dicentang, misalnya kirim dokumen tanda tangan massal (lihat di bawah).
 
 ### Menambah pemanfaatan lahan
 
-1. Klik **Tambahkan Pemanfaatan lahan**.
+1. Klik **Tambahkan Pemanfaatan lahan** (nomor 1).
 2. Isi **Nama kegiatan / proyek**, **Skema**, dan **Status**.
 3. Isi pemegang hak: pilih **Pemegang hak (akun portal)** bila ia punya akun portal (ia lalu bisa melihat dan mengunggah dokumennya sendiri), atau isi **Nama pemegang hak** secara manual.
 4. Isi **Lahan**, **Sektor**, **Nomor dasar hak / kontrak**, **Luas (m²)**, **Mulai**, **Berakhir**, dan **Petugas penanggung jawab**. Bila berasal dari alokasi atau permintaan investasi, isi juga kolom **Alokasi** atau **Permintaan investasi**.
@@ -53,15 +60,18 @@ Saringan di kanan: **Status** (Aktif, Berakhir, Dicabut), **Skema**, **Kelengkap
 
 ### Halaman pemanfaatan lahan
 
+Klik nomor pemanfaatan di daftar untuk membukanya.
+
 ![Halaman pemanfaatan lahan](gambar/dokumen/pemanfaatan-detail.png)
 
-Bagian atas menampilkan progres kelengkapan dan daftar dokumen beserta statusnya. Tombol:
+- **Kelengkapan dokumen wajib** (nomor 1): berapa dokumen wajib sudah terverifikasi, beserta jumlah yang menunggu verifikasi atau perlu perbaikan. Di bawahnya tampil dokumen tanda tangan milik pemanfaatan ini.
+- **Tambah dokumen ke daftar** (nomor 2): menambah dokumen yang tidak otomatis masuk daftar, misalnya izin khusus.
+- **Buat dokumen tanda tangan** (nomor 3): membuat dokumen tanda tangan dengan data pemanfaatan ini terisi otomatis (lihat 7.4).
+- Tautan **Lihat alokasi** atau **Lihat permintaan investasi** muncul bila pemanfaatan berasal dari sana.
 
-- **Tambah dokumen ke daftar**: menambah dokumen yang tidak otomatis masuk daftar (misalnya izin khusus).
-- **Buat dokumen tanda tangan**: membuat dokumen tanda tangan dengan data pemanfaatan ini terisi otomatis (lihat 7.4).
-- Tautan **Lihat alokasi** atau **Lihat permintaan investasi** bila ada.
+Gulir ke bawah sampai bagian **Dokumen perizinan**. Di sini tampil semua dokumen wajib beserta status, nomor izin, dan tanggal berlakunya. Klik nama dokumen untuk memeriksanya.
 
-![Halaman pemanfaatan lahan lengkap](gambar/dokumen/pemanfaatan-detail-full.png)
+![Daftar dokumen perizinan di halaman pemanfaatan](gambar/dokumen/pemanfaatan-dokumen.png)
 
 ### Kirim dokumen tanda tangan massal
 
@@ -97,17 +107,25 @@ Arti status:
 
 ![Halaman dokumen perizinan](gambar/dokumen/perizinan-detail.png)
 
-1. Buka dokumen dari **Antrean verifikasi** di dasbor atau dari daftar.
-2. Lihat bagian **Versi berkas**. Klik **Pratinjau** untuk melihat berkas (bertanda air, tercatat).
-3. Pilih tindakan:
-   - **Verifikasi**: isi **Nomor dokumen / izin**, **Tanggal terbit**, dan **Berlaku sampai**, lalu klik **Nyatakan terverifikasi**. Bila **Berlaku sampai** kosong, sistem menghitungnya dari masa berlaku bawaan jenis dokumen.
-   - **Minta perbaikan**: tulis apa yang harus diperbaiki, lalu **Kirim permintaan perbaikan**. Pemegang hak diberi tahu.
-4. Tindakan lain:
-   - **Unggah versi**: petugas mengunggah berkas atas nama pemegang hak (misalnya berkas dikirim lewat surel).
-   - **Buat dari templat**: membuat berkas dari templat jenis dokumen ini.
-   - **Minta tanda tangan**: membuat dokumen tanda tangan untuk dokumen ini. Setelah selesai, PDF bertanda tangan otomatis menjadi versi baru dokumen.
-   - **Tidak wajib**: mengecualikan dokumen ini, dengan alasan.
-   - **Buka kembali**: membuka lagi dokumen yang sudah terverifikasi atau tidak wajib, dengan alasan.
+1. Buka dokumen berstatus **Menunggu verifikasi** dari **Antrean verifikasi** di dasbor, atau dari daftar dengan filter status itu.
+2. Di bagian **Versi berkas**, klik **Pratinjau** (nomor 7) untuk melihat berkas yang diunggah. Pratinjau diberi tanda air dan tercatat.
+3. Bila berkas sah, klik **Verifikasi** (nomor 1). Halaman verifikasi terbuka:
+
+![Formulir verifikasi dokumen](gambar/dokumen/perizinan-verifikasi.png)
+
+4. Periksa atau isi **Nomor dokumen / izin** (nomor 1) sesuai berkas.
+5. Isi **Tanggal terbit** (nomor 2) dan **Berlaku sampai** (nomor 3). Bila **Berlaku sampai** dikosongkan, sistem menghitungnya dari masa berlaku bawaan jenis dokumen.
+6. Bila perlu, tulis **Catatan verifikasi** (nomor 4).
+7. Klik **Nyatakan terverifikasi** (nomor 5). Status menjadi **Terverifikasi**.
+
+Tombol lain di halaman dokumen perizinan (gambar sebelumnya):
+
+- **Minta perbaikan** (nomor 2): tulis apa yang harus diperbaiki, lalu kirim. Pemegang hak diberi tahu dan mengunggah ulang.
+- **Unggah versi** (nomor 3): petugas mengunggah berkas atas nama pemegang hak, misalnya bila berkas dikirim lewat surel.
+- **Buat dari templat** (nomor 4): membuat berkas dari templat jenis dokumen ini.
+- **Minta tanda tangan** (nomor 5): membuat dokumen tanda tangan untuk dokumen ini. Setelah selesai ditandatangani, PDF-nya otomatis menjadi versi baru dokumen ini.
+- **Tidak wajib** (nomor 6): mengecualikan dokumen ini untuk pemanfaatan ini, dengan alasan.
+- **Buka kembali**: muncul pada dokumen yang sudah terverifikasi atau tidak wajib, untuk membukanya lagi dengan alasan.
 
 Setiap tindakan tercatat di **Riwayat** dan **Jejak aktivitas**. Sistem mengirim peringatan otomatis sebelum izin kedaluwarsa (jumlah harinya diatur di **Pengaturan dokumen**).
 
@@ -126,45 +144,83 @@ Draf → (Menunggu persetujuan internal → Disetujui, siap dikirim) → Dikirim
 
 Tahap persetujuan internal hanya ada bila **Wajib persetujuan internal sebelum dikirim** dicentang.
 
-### Membuat dokumen tanda tangan
+### Langkah 1 – Buat draf
 
 ![Formulir dokumen tanda tangan baru](gambar/dokumen/ttd-tambah.png)
 
-1. Klik **Tambahkan Dokumen tanda tangan**, atau klik **Buat dokumen tanda tangan** dari halaman pemanfaatan lahan atau templat.
-2. Isi **Judul dokumen** dan pilih **Pemanfaatan lahan** (opsional). Bila dokumen ini untuk memenuhi dokumen perizinan, pilih **Untuk dokumen perizinan**.
-3. Pilih **Sumber isi**:
-   - **Isi dari templat / editor**: pilih **Templat**, lalu sunting **Isi dokumen** bila perlu. Isian otomatis (misalnya nama pemegang hak dan kode lahan) terisi sendiri.
-   - **Berkas PDF unggahan**: unggah **Berkas PDF**.
-4. Di bagian **Pengiriman**, isi **Pesan untuk penerima**, **Batas tanda tangan**, **Pengingat setiap (hari)** (0 = tanpa pengingat), **Sifat dokumen** (Biasa/Rahasia), dan centang **Wajib persetujuan internal sebelum dikirim** bila perlu.
-5. Isi tabel **Penerima** (satu baris per orang):
-   - **Urutan**: urutan yang sama berarti bertindak bersamaan; urutan berikutnya menunggu yang sebelumnya selesai.
-   - **Peran** (misalnya "Pemegang hak", "Pejabat penandatangan") dan **Tindakan**: **Menandatangani**, **Menyetujui**, atau **Menerima salinan**.
-   - **Akun** (bila penerima punya akun, ia wajib masuk sebelum menandatangani), **Nama**, dan **Surel**.
-   - **Kode akses** (opsional): kode tambahan yang Anda sampaikan lewat telepon. Isi `-` untuk menghapus.
-   - **Tanda tangan langsung**: centang bila penerima menandatangani di perangkat petugas setelah identitasnya diperiksa (misalnya warga tanpa surel). Surel tidak dikirim.
-   - Khusus PDF unggahan: **Halaman cap TTD** (1 = pertama, -1 = terakhir), **Posisi kiri (%)**, **Posisi atas (%)**, dan **Lebar cap (%)** menentukan letak gambar tanda tangan di PDF.
-6. Bila penerima perlu mengisi sesuatu, isi tabel **Kolom isian penerima**: **Kunci**, **Label**, **Jenis** (Teks singkat, Teks panjang, Tanggal, Angka, Kotak centang, Pilihan, Paraf, Lampiran berkas), **Diisi oleh**, dan **Wajib**. Di isi dokumen, tulis `{{ kolom.<kunci> }}` di tempat isian itu harus muncul.
-7. Klik **Simpan dan terus mengedit**. Klik **Pratinjau PDF** untuk memeriksa hasilnya.
+1. Buka **Dokumen tanda tangan**, lalu klik **Tambahkan Dokumen tanda tangan**. Cara lain: klik **Buat dokumen tanda tangan** di halaman pemanfaatan lahan atau di halaman templat.
+2. Isi **Judul dokumen** (nomor 1).
+3. Pilih isi dokumen, salah satu saja:
+   - **Templat isian** (nomor 2): isi disusun dari templat dan masih bisa disunting.
+   - **Atau unggah PDF** (nomor 3): klik **Pilih File** dan pilih PDF yang sudah jadi (maksimal 20 MB).
+4. Pilih **Pemanfaatan lahan** (nomor 4): ketik nomor atau nama kegiatan, lalu klik pilihannya. Data pemegang hak dan lahan dipakai untuk isian otomatis, dan pemegang hak langsung ditambahkan sebagai penanda tangan.
+5. Klik **Buat draf** (nomor 5). Halaman draf terbuka.
 
-### Mengirim dan memantau
+### Langkah 2 – Lengkapi draf
 
-![Halaman dokumen tanda tangan](gambar/dokumen/ttd-detail.png)
+![Halaman draf dokumen tanda tangan](gambar/dokumen/ttd-draf.png)
 
-1. Bila wajib persetujuan internal, klik **Minta persetujuan**. Pejabat lain (bukan pembuat) membuka dokumen lalu klik **Setujui**, atau **Kembalikan ke draf** dengan alasan.
-2. Klik **Kirim untuk ditandatangani**. Penerima urutan pertama menerima surel berisi tautan.
+Bagian atas halaman draf menampilkan status **Draf** dan ringkasan penerima. Periksa dan lengkapi:
+
+1. **Judul dokumen** (nomor 2) dan **Pemanfaatan lahan** (nomor 3).
+2. Bila dokumen ini untuk memenuhi satu dokumen perizinan, pilih di **Untuk dokumen perizinan** (nomor 4). Setelah selesai ditandatangani, PDF-nya otomatis menjadi versi baru dokumen perizinan itu.
+3. Gulir ke bagian **Isi**. Sunting **Isi dokumen** dengan bilah alat editor bila perlu. Isian otomatis seperti nama pemegang hak dan kode lahan sudah terisi sendiri.
+4. Gulir ke bagian **Pengiriman**:
+
+![Bagian Pengiriman](gambar/dokumen/ttd-draf-pengiriman.png)
+
+5. Tulis **Pesan untuk penerima** (nomor 1). Pesan ini ikut di surel undangan.
+6. Atur **Batas tanda tangan** (nomor 2), yaitu tanggal terakhir penerima boleh bertindak.
+7. Atur **Pengingat setiap (hari)** (nomor 3). Isi 0 bila tidak perlu pengingat otomatis.
+8. Centang **Wajib persetujuan internal sebelum dikirim** (nomor 4) bila dokumen harus disetujui pejabat lain sebelum dikirim.
+9. Pilih **Sifat dokumen** (nomor 5): **Biasa** atau **Rahasia**. Unduhan dokumen rahasia hanya dapat disetujui Administrator.
+10. Gulir ke bagian **Penerima (urutan tanda tangan)**. Isi satu baris per orang. Tabelnya lebar; geser ke kanan untuk melihat semua kolom.
+
+![Kolom penerima: urutan, peran, tindakan](gambar/dokumen/ttd-draf-penerima.png)
+
+11. **Urutan** (nomor 1): penerima dengan urutan sama bertindak bersamaan; urutan berikutnya menunggu yang sebelumnya selesai.
+12. **Peran** (nomor 2), misalnya "Pemegang hak" atau "Pejabat penandatangan".
+13. **Tindakan** (nomor 3): **Menandatangani**, **Menyetujui**, atau **Menerima salinan**.
+
+![Kolom penerima: akun dan nama](gambar/dokumen/ttd-draf-penerima-2.png)
+
+14. **Akun** (nomor 4): pilih akun bila penerima punya akun SimLahan atau portal. Penerima berakun wajib masuk dulu sebelum menandatangani.
+15. **Nama** (nomor 5) penerima.
+
+![Kolom penerima: surel, tanda tangan langsung, kode akses](gambar/dokumen/ttd-draf-penerima-3.png)
+
+16. **Surel** (nomor 6): alamat tujuan undangan.
+17. **Tanda tangan langsung** (nomor 7): centang bila penerima menandatangani di perangkat petugas setelah identitasnya diperiksa, misalnya warga tanpa surel. Surel undangan tidak dikirim.
+18. **Kode akses** (nomor 8, opsional): kode tambahan yang Anda sampaikan lewat telepon. Isi `-` untuk menghapus kode yang ada.
+19. Khusus PDF unggahan, kolom di kanannya menentukan letak gambar tanda tangan di PDF: **Halaman cap TTD** (1 = halaman pertama, -1 = terakhir), **Posisi kiri (%)**, **Posisi atas (%)**, dan **Lebar cap (%)**.
+20. Untuk penerima berikutnya, klik **Tambahkan Penerima dokumen lagi**.
+21. Bila penerima perlu mengisi sesuatu, isi tabel **Kolom isian penerima** di bawahnya: **Kunci**, **Label**, **Jenis** (Teks singkat, Teks panjang, Tanggal, Angka, Kotak centang, Pilihan, Paraf, Lampiran berkas), **Diisi oleh**, dan **Wajib**. Di isi dokumen, tulis `{{ kolom.<kunci> }}` di tempat isian itu harus muncul.
+22. Klik **Simpan dan terus mengedit** di bagian bawah, lalu klik **Pratinjau PDF** di kanan atas untuk memeriksa hasilnya.
+
+### Langkah 3 – Kirim dan pantau
+
+1. Bila **Wajib persetujuan internal** dicentang, klik **Minta persetujuan** (nomor 1 pada gambar draf). Pejabat lain (bukan pembuat) membuka dokumen lalu klik **Setujui**, atau **Kembalikan ke draf** dengan alasan.
+2. Klik **Kirim untuk ditandatangani** di kanan atas. Tombol ini muncul setelah draf disetujui (atau langsung, bila tidak wajib persetujuan). Penerima urutan pertama menerima surel berisi tautan.
+
+![Dokumen yang sudah dikirim](gambar/dokumen/ttd-detail.png)
+
 3. Pantau tabel **Penerima & urutan**: status tiap penerima (Menunggu, Sudah melihat, Selesai, Menolak) dan waktunya.
-4. Tindakan per penerima yang belum bertindak:
-   - **Kirim ulang**: mengirim ulang surel undangan.
-   - **Ganti**: mengganti penerima (misalnya pejabat berganti).
-   - **TTD langsung**: membuka sesi tanda tangan di perangkat Anda untuk penerima yang hadir. Catat bukti identitasnya (misalnya KTP diperiksa).
-5. **Kirim pengingat** mengirim pengingat ke semua penerima yang belum bertindak. **Batalkan dokumen** menghentikan proses dengan alasan.
-6. Gunakan **Komentar** untuk catatan bersama, termasuk komentar **Internal (hanya petugas)**.
+4. Untuk penerima yang belum bertindak:
+   - **Kirim ulang** (nomor 3): mengirim ulang surel undangan.
+   - **TTD langsung** (nomor 4): membuka sesi tanda tangan di perangkat Anda untuk penerima yang hadir. Catat bukti identitasnya, misalnya "KTP diperiksa".
+   - **Ganti** (nomor 5): mengganti penerima, misalnya karena pejabatnya berganti.
+5. **Kirim pengingat** (nomor 1) mengirim pengingat ke semua penerima yang belum bertindak.
+6. **Batalkan** (nomor 2) menghentikan proses. Alasan wajib ditulis.
+7. Gulir ke bawah ke **Komentar** untuk catatan bersama. Centang **Internal (hanya petugas)** bila komentar tidak boleh dilihat penerima.
 
-Setelah semua penerima selesai, status menjadi **Selesai** dan bagian **Dokumen final** menampilkan waktu selesai, **Sidik SHA-256**, tautan **Halaman verifikasi keaslian**, dan **Minta unduh PDF final**.
+Setelah semua penerima selesai, status menjadi **Selesai**:
 
-![Dokumen tanda tangan selesai](gambar/dokumen/ttd-detail-full.png)
+![Dokumen tanda tangan selesai](gambar/dokumen/ttd-selesai.png)
 
-**Salin jadi draf baru** membuat salinan dokumen (misalnya untuk penerima lain atau setelah ditolak).
+- Bagian **Dokumen final** menampilkan waktu selesai dan **Sidik SHA-256** (sidik digital PDF final).
+- **Halaman verifikasi keaslian** (nomor 1): halaman publik untuk memeriksa keaslian PDF.
+- **Minta unduh PDF final** (nomor 2): mengajukan permintaan unduh PDF final (lihat 7.7).
+- **Salin jadi draf baru** (nomor 3): membuat salinan dokumen, misalnya untuk penerima lain atau setelah ditolak.
 
 ### Yang dialami penerima
 
@@ -237,9 +293,11 @@ Saringan **Tindakan saya** menampilkan permintaan yang menunggu keputusan Anda.
 
 ![Halaman permintaan unduh](gambar/dokumen/unduh-detail.png)
 
-1. Buka permintaan dari saringan **Tindakan saya** atau kartu di dasbor.
-2. Periksa keperluan, alasan, dan **Riwayat permintaan pemohon ini**.
-3. Klik **Setujui** (boleh mengubah **Berlaku (jam)**; kosong = pengaturan) atau **Tolak** (wajib isi **Catatan keputusan**).
+1. Buka permintaan berstatus **Menunggu persetujuan** dari saringan **Tindakan saya** atau dari kartu di dasbor.
+2. Di bagian **Keputusan**, baca keperluan dan alasan pemohon. Periksa juga **Riwayat permintaan pemohon ini** di bawahnya.
+3. Bila perlu, tulis **Catatan keputusan** (nomor 1). Catatan wajib diisi bila Anda menolak.
+4. Bila perlu, ubah **Berlaku (jam)** (nomor 2), yaitu berapa jam izin unduh berlaku, dan **Batas unduh** (nomor 3), yaitu berapa kali berkas boleh diunduh. Kosongkan untuk memakai pengaturan umum.
+5. Klik **Setujui** (nomor 4) atau **Tolak** (nomor 5). Pemohon diberi tahu.
 
 Permintaan Anda sendiri harus diputuskan pejabat lain. Dokumen **rahasia** hanya dapat disetujui Administrator.
 

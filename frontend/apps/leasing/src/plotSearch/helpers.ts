@@ -213,7 +213,7 @@ export const formatDecisionName = (decision: Record<string, any>): string => {
     decision.section ? decision.section + "\u00a0§" : null,
     decision.type?.name,
     decision.conditions?.length > 0
-      ? `(${decision.conditions.length} ehto${decision.conditions.length === 1 ? "" : "a"})`
+      ? `(${decision.conditions.length} syarat)`
       : null,
   ].filter((text) => !!text);
   return textsFromFields.join("\u00a0\u00a0");

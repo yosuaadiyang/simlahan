@@ -886,6 +886,10 @@ def delete_komando_demo():
     attendances.delete()
     ChatMessage.objects.filter(body__startswith=MARK).delete()
     SosAlert.objects.filter(message__startswith=MARK).delete()
+    Activity.objects.filter(
+        description__startswith=MARK,
+        reported_by__email__iendswith=f"@{SAMPLE_DOMAIN}",
+    ).delete()
     OfficerPosition.objects.filter(user__email__iendswith=f"@{SAMPLE_DOMAIN}").delete()
     OfficerTrackPoint.objects.filter(
         user__email__iendswith=f"@{SAMPLE_DOMAIN}"
@@ -930,6 +934,42 @@ def komando_demo(leader, coordinator, officer, korwil):
         _demo_attachment(officer)
     if not Attendance.objects.filter(user=officer, note__startswith=MARK).exists():
         _demo_field(leader, coordinator, officer, korwil)
+    if not Activity.objects.filter(
+        reported_by=officer, description__startswith=MARK
+    ).exists():
+        _demo_activities(coordinator, officer, korwil)
+
+
+def _demo_activities(coordinator, officer, korwil):
+    """Laporan kegiatan milik petugas contoh agar "Laporan saya" tidak kosong."""
+    now = timezone.now()
+    center = (
+        korwil.geometry.centroid if korwil.geometry else Point(104.12, 0.89, srid=4326)
+    )
+    T = enums.ActivityType
+    for days, kind, title, place, verified in (
+        (0, T.VISIT, "Kunjungan warga RT 02", "Kampung Pasir Panjang", False),
+        (1, T.PATROL, "Patroli batas wilayah", "Batas utara Korwil", True),
+        (3, T.SOCIALIZATION, "Sosialisasi jadwal pengukuran", "Balai warga", True),
+    ):  # fmt: skip
+        activity = Activity.objects.create(
+            korwil=korwil,
+            activity_type=kind,
+            title=title,
+            description=f"{MARK} Laporan contoh petugas lapangan.",
+            location_name=place,
+            started_at=now - datetime.timedelta(days=days, hours=2),
+            duration_minutes=90,
+            location=Point(center.x + 0.0004 * days, center.y + 0.0003, srid=4326),
+            accuracy_m=8,
+            participants_count=6,
+            outcome="Warga menerima penjelasan; tindak lanjut pada kunjungan berikutnya.",
+            reported_by=officer,
+            verified=verified,
+            verified_by=coordinator if verified else None,
+            verified_at=now if verified else None,
+        )
+        activity.refresh_effort()
 
 
 def _demo_tasks(leader, coordinator, officer, korwil):

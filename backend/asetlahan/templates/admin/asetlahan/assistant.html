@@ -1,7 +1,7 @@
 {% extends "admin/asetlahan/tool_base.html" %}
 {% block tool %}
 <div class="al-chat">
-  {% if not ai_enabled %}<p class="help">Mode tanpa AI: pertanyaan dicocokkan dengan pola umum (sewa, okupasi, alokasi, pemantauan, sidang, pajak, tugas, pengaduan, perkara, keuangan, lokasi). Isi <code>ANTHROPIC_API_KEY</code> untuk jawaban bahasa alami dari Claude.</p>{% endif %}
+  {% if not ai_enabled %}<p class="help">Mode tanpa AI: pertanyaan dicocokkan dengan pola umum (sewa, okupasi, alokasi, pemantauan, sidang, pajak, tugas, pengaduan, perkara, keuangan, lokasi). {% if request.user.is_superuser %}Isi <code>ANTHROPIC_API_KEY</code> di berkas .env untuk jawaban bahasa alami dari Claude.{% else %}Jawaban bahasa alami tersedia setelah Administrator mengaktifkan layanan AI.{% endif %}</p>{% endif %}
   {% for turn in history %}
     <p class="al-q">❓ {{ turn.q }}</p>
     <div class="al-a">{{ turn.answer }}</div>

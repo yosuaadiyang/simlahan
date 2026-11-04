@@ -27,8 +27,23 @@ async function runItem(p, it) {
     if (a.scroll) await p.locator(a.scroll).first().scrollIntoViewIfNeeded();
     if (a.scrollY !== undefined) await p.evaluate((y) => window.scrollTo(0, y), a.scrollY);
     if (a.check) await p.check(a.check);
+    if (a.open) await p.locator(a.open + ' >> visible=true').first().evaluate((d) => { d.open = true; });
     if (a.goto) await p.goto(L.BASE + a.goto, { waitUntil: 'networkidle' });
+    if (a.js) await p.evaluate(a.js);
   }
+}
+
+// Potongan elemen + sedikit tepi, agar nomor penanda di luar tepi elemen tidak terpotong.
+async function shotWithMargin(p, sel, out) {
+  const el = p.locator(sel).first();
+  await el.scrollIntoViewIfNeeded();
+  const b = await el.boundingBox();
+  const vp = p.viewportSize();
+  if (!b || b.height > vp.height) return el.screenshot({ path: out });
+  const pad = 34;
+  const x = Math.max(0, b.x - pad), y = Math.max(0, b.y - pad);
+  const clip = { x, y, width: Math.min(vp.width, b.x + b.width + pad) - x, height: Math.min(vp.height, b.y + b.height + pad) - y };
+  await p.screenshot({ path: out, clip });
 }
 
 (async () => {
@@ -43,25 +58,35 @@ async function runItem(p, it) {
     fs.mkdirSync(outDir, { recursive: true });
     console.log('==', path.basename(file));
     for (const grp of spec.groups) {
+      // PANDUAN_HANYA=nama1,nama2 mengambil gambar tertentu saja (nama tanpa .png).
+      const only = (process.env.PANDUAN_HANYA || '').split(',').filter(Boolean);
+      if (only.length && !grp.items.some((it) => only.includes(`${grp.prefix || ''}${it.name}`))) continue;
       const ctx = await L.newCtx(browser, grp.phone);
       const p = await ctx.newPage();
       if (LOGIN[grp.login]) await LOGIN[grp.login](p, grp.user); // "none" = tanpa masuk
       for (const it of grp.items) {
+        if (only.length && !it.tanpa_gambar && !only.includes(`${grp.prefix || ''}${it.name}`)) continue;
+        const vp0 = p.viewportSize();
         try {
+          // "tinggi": layar dibuat lebih tinggi agar formulir panjang (modal) tampil utuh.
+          if (it.tinggi) await p.setViewportSize({ width: vp0.width, height: it.tinggi });
           await runItem(p, it);
           if (it.tanpa_gambar) continue; // langkah navigasi saja
           await p.waitForTimeout(it.delay || 1200);
-          if (it.mark) await L.mark(p, it.mark);
+          if (it.full) await L.unstick(p);
+          if (it.mark) await L.mark(p, it.mark, !!(it.full || it.el));
           const out = path.join(outDir, `${grp.prefix || ''}${it.name}.png`);
-          if (it.el) await p.locator(it.el).first().screenshot({ path: out });
+          if (it.el && it.mark) await shotWithMargin(p, it.el, out);
+          else if (it.el) await p.locator(it.el).first().screenshot({ path: out });
           else await p.screenshot({ path: out, fullPage: !!it.full });
-          await p.evaluate(() => document.querySelectorAll('.__mk').forEach((e) => e.remove()));
+          await p.evaluate(() => { document.querySelectorAll('.__mk').forEach((e) => e.remove()); window.__mkPlaced = []; });
           ok += 1;
           console.log('ok', path.relative(process.cwd(), out));
         } catch (e) {
           failed += 1;
           console.log('GAGAL', it.name, e.message.split('\n')[0]);
         }
+        if (it.tinggi) await p.setViewportSize(vp0);
       }
       await ctx.close();
     }

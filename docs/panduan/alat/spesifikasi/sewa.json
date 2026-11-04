@@ -12,12 +12,46 @@
       [
        "text=Buat kontak",
        "1"
+      ],
+      [
+       "input[placeholder='Cari dengan kata kunci']",
+       "2"
+      ],
+      [
+       "#contact_service_unit-main-button",
+       "3"
       ]
      ]
     },
     {
      "url": "/kontak-baru",
-     "name": "kontak-baru"
+     "name": "kontak-baru",
+     "mark": [
+      [
+       "#react-select-3-input >> xpath=ancestor::div[contains(@class,'-control')][1]",
+       "1"
+      ],
+      [
+       "#address",
+       "2"
+      ],
+      [
+       "#phone",
+       "3"
+      ],
+      [
+       "#email",
+       "4"
+      ],
+      [
+       "button:has-text('Simpan')",
+       "5"
+      ],
+      [
+       "button:has-text('Batalkan perubahan')",
+       "6"
+      ]
+     ]
     },
     {
      "url": "/kontak/4",
@@ -26,11 +60,43 @@
     {
      "url": "/catatan-area",
      "name": "catatan-area",
-     "delay": 2500
+     "delay": 2500,
+     "mark": [
+      [
+       "button:has-text('Buat catatan area') >> nth=0",
+       "1"
+      ],
+      [
+       "#area-note__comment",
+       "2"
+      ],
+      [
+       "button:has-text('Buat catatan area') >> nth=-1",
+       "3"
+      ]
+     ],
+     "actions": [
+      {
+       "click": "button:has-text('Buat catatan area') >> nth=0"
+      },
+      {
+       "wait": 1200
+      }
+     ]
     },
     {
      "url": "/dasar-sewa",
-     "name": "prinsip-sewa-daftar"
+     "name": "prinsip-sewa-daftar",
+     "mark": [
+      [
+       "text=Buat prinsip sewa",
+       "1"
+      ],
+      [
+       "#search",
+       "2"
+      ]
+     ]
     },
     {
      "url": "/dasar-sewa/1",
@@ -38,11 +104,49 @@
     },
     {
      "url": "/laporan",
-     "name": "laporan"
+     "name": "laporan",
+     "actions": [
+      {
+       "click": "#react-select-3-input >> xpath=ancestor::div[contains(@class,'-control')][1]"
+      },
+      {
+       "wait": 500
+      },
+      {
+       "click": "[class*=-option]:has-text('Tagihan terbuka')"
+      },
+      {
+       "wait": 1500
+      }
+     ],
+     "mark": [
+      [
+       "#react-select-3-input >> xpath=ancestor::div[contains(@class,'-control')][1]",
+       "1"
+      ],
+      [
+       "text=Buat laporan",
+       "2"
+      ]
+     ]
     },
     {
      "url": "/kompensasi-pembangunan-sisipan",
-     "name": "kompensasi-daftar"
+     "name": "kompensasi-daftar",
+     "mark": [
+      [
+       "text=Buat kompensasi pembangunan sisipan",
+       "1"
+      ],
+      [
+       "#search",
+       "2"
+      ],
+      [
+       "label:has-text('Berlangsung')",
+       "3"
+      ]
+     ]
     },
     {
      "url": "/kompensasi-pembangunan-sisipan/1",
@@ -50,7 +154,21 @@
     },
     {
      "url": "/pencarian-area",
-     "name": "pencarian-area-daftar"
+     "name": "pencarian-area-daftar",
+     "mark": [
+      [
+       "text=Buat permohonan area",
+       "1"
+      ],
+      [
+       "#q",
+       "2"
+      ],
+      [
+       "label:has-text('Diterima')",
+       "3"
+      ]
+     ]
     },
     {
      "url": "/pencarian-area/1",
@@ -67,11 +185,27 @@
     },
     {
      "url": "/catatan-tagihan",
-     "name": "catatan-tagihan"
+     "name": "catatan-tagihan",
+     "mark": [
+      [
+       "text=Buat pengumuman",
+       "1"
+      ]
+     ]
     },
     {
      "url": "/kalkulator-sewa",
-     "name": "kalkulator-sewa"
+     "name": "kalkulator-sewa",
+     "mark": [
+      [
+       "#react-select-3-input >> xpath=ancestor::div[contains(@class,'-control')][1]",
+       "1"
+      ],
+      [
+       "text=Tambah kalkulator sewa",
+       "2"
+      ]
+     ]
     },
     {
      "url": "/pencarian-kavling",
@@ -92,16 +226,24 @@
        "1"
       ],
       [
-       "input[placeholder*='Cari']",
+       "#search",
        "2"
       ],
       [
-       "text=Unit layanan >> nth=1",
+       "#lease-search-toggle-target",
        "3"
       ],
       [
-       "[role=tab]:has(svg[aria-label=map])",
+       "#service_unit-main-button",
        "4"
+      ],
+      [
+       "#tab-1-button",
+       "5"
+      ],
+      [
+       "text=Kosongkan pencarian",
+       "6"
       ]
      ]
     },
@@ -127,6 +269,32 @@
       {
        "wait": 1000
       }
+     ],
+     "mark": [
+      [
+       "#react-select-3-input >> xpath=ancestor::div[contains(@class,'-control')][1]",
+       "1"
+      ],
+      [
+       "#react-select-4-input >> xpath=ancestor::div[contains(@class,'-control')][1]",
+       "2"
+      ],
+      [
+       "#react-select-5-input >> xpath=ancestor::div[contains(@class,'-control')][1]",
+       "3"
+      ],
+      [
+       "#react-select-6-input >> xpath=ancestor::div[contains(@class,'-control')][1]",
+       "4"
+      ],
+      [
+       "#reference_number",
+       "5"
+      ],
+      [
+       "button:text-is('Buat pengenal')",
+       "6"
+      ]
      ]
     },
     {
@@ -233,7 +401,34 @@
        "wait": 1500
       }
      ],
-     "delay": 1500
+     "delay": 1500,
+     "full": true,
+     "mark": [
+      [
+       "text=Hentikan penagihan",
+       "1"
+      ],
+      [
+       "text=Buat tagihan",
+       "2"
+      ],
+      [
+       "text=Kreditkan tagihan",
+       "3"
+      ],
+      [
+       "text=Hapus tagihan",
+       "4"
+      ],
+      [
+       "text=Buat surat penagihan",
+       "5"
+      ],
+      [
+       "text=Tambah putusan pengadilan",
+       "6"
+      ]
+     ]
     },
     {
      "url": "/sewa/2",
@@ -251,11 +446,11 @@
      ],
      "mark": [
       [
-       "button:has-text('Tallenna'), button:has-text('Simpan')",
+       "button:has-text('Simpan')",
        "1"
       ],
       [
-       "button:has-text('Batal'), button:has-text('Peruuta')",
+       "button:has-text('Batalkan perubahan')",
        "2"
       ]
      ]

@@ -434,6 +434,8 @@ details.group .list { margin-top: 6px; }
 #kd-isi > * + *, #bdd-isi > * + * { margin-top: 10px; }
 #kd-isi h3, #bdd-isi h3 { margin-top: 16px; margin-bottom: 6px; }
 #tab-peringkat .row.wrap > select, #tab-historis .row.wrap > select { flex: 1 1 10em; }
+#tab-warga > .row.wrap > #warga-cari { flex: 1 1 100%; min-width: 0; }
+#tab-warga > .row.wrap > select { flex: 1 1 8em; min-width: 0; }
 #peringkat-tampilan { margin-bottom: 0; flex: 1 1 auto; }
 #peringkat-tampilan button, #historis-bagian button { white-space: nowrap; }
 /* Peta & spasial */

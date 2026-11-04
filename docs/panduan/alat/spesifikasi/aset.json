@@ -11,17 +11,72 @@
     },
     {
      "url": "/admin/asetlahan/dasbor/",
-     "name": "dasbor-full",
-     "full": true
+     "name": "dasbor-peringatan",
+     "actions": [
+      {
+       "js": "const e=[...document.querySelectorAll('h2,h3,legend')].find(x=>x.textContent.trim().startsWith('Peringatan')); window.scrollTo(0, e.getBoundingClientRect().top+scrollY-90)"
+      },
+      {
+       "wait": 500
+      }
+     ]
     },
     {
      "url": "/admin/asetlahan/peta/",
      "name": "peta-tematik",
-     "delay": 3000
+     "delay": 3000,
+     "mark": [
+      [
+       "#content-main [name=warna]",
+       "1"
+      ],
+      [
+       "#content-main [name=status]",
+       "2"
+      ],
+      [
+       "#content-main [name=kategori]",
+       "3"
+      ],
+      [
+       "#content-main button:text-is('Terapkan'), #content-main input[value=Terapkan]",
+       "4"
+      ],
+      [
+       ".leaflet-control-layers",
+       "5"
+      ]
+     ]
     },
     {
      "url": "/admin/asetlahan/landasset/",
-     "name": "aset-daftar"
+     "name": "aset-daftar",
+     "mark": [
+      [
+       "#content-main .object-tools a:text-is('Tambahkan Aset lahan'), a.addlink",
+       "1"
+      ],
+      [
+       "#content-main .object-tools a:text-is('Impor SHP/KML/KMZ/GeoJSON')",
+       "2"
+      ],
+      [
+       "#content-main .object-tools a:text-is('Peta tematik')",
+       "3"
+      ],
+      [
+       "#searchbar",
+       "4"
+      ],
+      [
+       "#changelist-filter >> text=Berdasarkan Status penguasaan",
+       "5"
+      ],
+      [
+       "select[name=action]",
+       "6"
+      ]
+     ]
     },
     {
      "url": "/admin/asetlahan/landasset/",
@@ -33,36 +88,213 @@
       {
        "wait": 1500
       }
+     ],
+     "mark": [
+      [
+       "#content-main .object-tools a:text-is('Tambah penilaian')",
+       "1"
+      ],
+      [
+       "#content-main .object-tools a:text-is('Buat tugas')",
+       "2"
+      ],
+      [
+       "#content-main .object-tools a:text-is('Ajukan survei')",
+       "3"
+      ],
+      [
+       "#content-main .object-tools a:text-is('Catat okupasi')",
+       "4"
+      ],
+      [
+       "#id_code",
+       "5"
+      ],
+      [
+       "#id_name",
+       "6"
+      ],
+      [
+       "#id_category",
+       "7"
+      ],
+      [
+       "#id_status",
+       "8"
+      ]
      ]
     },
     {
      "url": "/admin/asetlahan/landasset/",
-     "name": "aset-detail-full",
+     "name": "aset-detail-lokasi",
      "actions": [
       {
        "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
       },
       {
        "wait": 1500
+      },
+      {
+       "js": "const e=[...document.querySelectorAll('h2,h3,legend')].find(x=>x.textContent.trim().startsWith('Lokasi & batas')); window.scrollTo(0, e.getBoundingClientRect().top+scrollY-110)"
+      },
+      {
+       "wait": 800
       }
      ],
-     "full": true
+     "mark": [
+      [
+       "#id_municipality",
+       "1"
+      ],
+      [
+       "#id_district",
+       "2"
+      ],
+      [
+       "#id_village",
+       "3"
+      ],
+      [
+       "#id_address",
+       "4"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/asetlahan/landasset/",
+     "name": "aset-detail-bawah",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      },
+      {
+       "js": "const e=[...document.querySelectorAll('h2,h3,legend')].find(x=>x.textContent.trim().startsWith('Riwayat kepemilikan')); window.scrollTo(0, e.getBoundingClientRect().top+scrollY-90)"
+      },
+      {
+       "wait": 500
+      }
+     ],
+     "mark": [
+      [
+       "h2:text-is('Riwayat kepemilikan')",
+       "1"
+      ],
+      [
+       "h2:text-is('Pajak & retribusi')",
+       "2"
+      ],
+      [
+       "h2:has-text('Dokumen & arsip')",
+       "3"
+      ]
+     ]
     },
     {
      "url": "/admin/asetlahan/landasset/impor/",
-     "name": "aset-impor"
+     "name": "aset-impor",
+     "mark": [
+      [
+       "#id_file",
+       "1"
+      ],
+      [
+       "#id_category",
+       "2"
+      ],
+      [
+       "#id_status",
+       "3"
+      ],
+      [
+       "#content-main input[type=submit]",
+       "4"
+      ]
+     ]
     },
     {
      "url": "/admin/asetlahan/gantt/",
-     "name": "gantt"
+     "name": "gantt",
+     "mark": [
+      [
+       "#content-main [name=dari]",
+       "1"
+      ],
+      [
+       "#content-main [name=sampai]",
+       "2"
+      ],
+      [
+       "#content-main [name=tim]",
+       "3"
+      ],
+      [
+       "button:text-is('Terapkan')",
+       "4"
+      ]
+     ]
     },
     {
      "url": "/admin/asetlahan/laporan/",
-     "name": "laporan"
+     "name": "laporan",
+     "mark": [
+      [
+       "#content-main [name=data]",
+       "1"
+      ],
+      [
+       "#content-main [name=q]",
+       "2"
+      ],
+      [
+       "#content-main [name=status]",
+       "3"
+      ],
+      [
+       "#content-main [name=dari]",
+       "4"
+      ],
+      [
+       "#content-main [name=sampai]",
+       "5"
+      ],
+      [
+       "button:text-is('Tampilkan')",
+       "6"
+      ],
+      [
+       "button:text-is('Ekspor Excel')",
+       "7"
+      ]
+     ]
     },
     {
      "url": "/admin/asetlahan/buku-besar/",
-     "name": "buku-besar"
+     "name": "buku-besar",
+     "mark": [
+      [
+       "#content-main [name=dari]",
+       "1"
+      ],
+      [
+       "#content-main [name=sampai]",
+       "2"
+      ],
+      [
+       "button:text-is('Tampilkan')",
+       "3"
+      ],
+      [
+       "button:text-is('Ekspor Excel')",
+       "4"
+      ],
+      [
+       "button:text-is('Ekspor CSV')",
+       "5"
+      ]
+     ]
     },
     {
      "url": "/admin/asetlahan/tumpang-tindih/",
@@ -70,7 +302,25 @@
     },
     {
      "url": "/admin/asetlahan/citra/",
-     "name": "citra"
+     "name": "citra",
+     "mark": [
+      [
+       "#content-main [name=kiri]",
+       "1"
+      ],
+      [
+       "#content-main [name=kanan]",
+       "2"
+      ],
+      [
+       "button:text-is('Bandingkan')",
+       "3"
+      ],
+      [
+       "#swipe",
+       "4"
+      ]
+     ]
     },
     {
      "url": "/admin/asetlahan/cari/?q=contoh",
@@ -78,7 +328,47 @@
     },
     {
      "url": "/admin/asetlahan/asisten/",
-     "name": "asisten"
+     "name": "asisten",
+     "mark": [
+      [
+       "#content-main [name=q]",
+       "1"
+      ],
+      [
+       "button:text-is('Tanya'), input[value=Tanya]",
+       "2"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/asetlahan/asisten/",
+     "name": "asisten-jawab",
+     "actions": [
+      {
+       "fill": "#content-main [name=q]",
+       "value": "okupasi terbuka"
+      },
+      {
+       "click": "button:text-is('Tanya'), input[value=Tanya]"
+      },
+      {
+       "wait": 2500
+      }
+     ],
+     "mark": [
+      [
+       "text=Ditemukan 1 data.",
+       "1"
+      ],
+      [
+       "text=Unduh laporan: >> xpath=..",
+       "2"
+      ],
+      [
+       "button:text-is('Mulai percakapan baru')",
+       "3"
+      ]
+     ]
     },
     {
      "url": "/admin/asetlahan/pemangku/matriks/",
@@ -90,14 +380,70 @@
     },
     {
      "url": "/admin/asetlahan/legalcase/",
-     "name": "perkara-detail",
+     "name": "perkara-pihak",
      "actions": [
       {
        "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
       },
       {
        "wait": 1500
+      },
+      {
+       "js": "const e=[...document.querySelectorAll('h2,h3,legend')].find(x=>x.textContent.trim().startsWith('Para pihak')); window.scrollTo(0, e.getBoundingClientRect().top+scrollY-110)"
+      },
+      {
+       "wait": 500
       }
+     ],
+     "mark": [
+      [
+       "#id_our_position",
+       "1"
+      ],
+      [
+       "#id_opposing_party",
+       "2"
+      ],
+      [
+       "#id_advocates_from",
+       "3"
+      ],
+      [
+       "#id_advocates_add",
+       "4"
+      ],
+      [
+       "#id_advocates_to",
+       "5"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/asetlahan/legalcase/",
+     "name": "perkara-jadwal",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      },
+      {
+       "js": "const e=[...document.querySelectorAll('h2,h3,legend')].find(x=>x.textContent.trim().startsWith('Perkembangan')); window.scrollTo(0, e.getBoundingClientRect().top+scrollY-110)"
+      },
+      {
+       "wait": 500
+      }
+     ],
+     "mark": [
+      [
+       "#id_status",
+       "1"
+      ],
+      [
+       "#id_outcome",
+       "2"
+      ]
      ]
     },
     {
@@ -115,7 +461,13 @@
     },
     {
      "url": "/admin/asetlahan/encroachmentcase/",
-     "name": "okupasi-daftar"
+     "name": "okupasi-daftar",
+     "mark": [
+      [
+       "select[name=action]",
+       "1"
+      ]
+     ]
     },
     {
      "url": "/admin/asetlahan/encroachmentcase/",
@@ -127,11 +479,59 @@
       {
        "wait": 1500
       }
+     ],
+     "mark": [
+      [
+       "#id_title",
+       "1"
+      ],
+      [
+       "#id_asset",
+       "2"
+      ],
+      [
+       "#id_status",
+       "3"
+      ],
+      [
+       "#id_severity",
+       "4"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/asetlahan/encroachmentcase/",
+     "name": "okupasi-tindakan",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      },
+      {
+       "js": "const e=[...document.querySelectorAll('h2,h3,legend')].find(x=>x.textContent.trim().startsWith('Tindakan penanganan')); window.scrollTo(0, e.getBoundingClientRect().top+scrollY-90)"
+      },
+      {
+       "wait": 500
+      }
+     ],
+     "mark": [
+      [
+       "h2:has-text('Tindakan penanganan')",
+       "1"
+      ]
      ]
     },
     {
      "url": "/admin/asetlahan/grievance/",
-     "name": "pengaduan-daftar"
+     "name": "pengaduan-daftar",
+     "mark": [
+      [
+       "select[name=action]",
+       "1"
+      ]
+     ]
     },
     {
      "url": "/admin/asetlahan/grievance/",
@@ -143,11 +543,67 @@
       {
        "wait": 1500
       }
+     ],
+     "mark": [
+      [
+       "#id_channel",
+       "1"
+      ],
+      [
+       "#id_category",
+       "2"
+      ],
+      [
+       "#id_status",
+       "3"
+      ],
+      [
+       "#id_assigned_to",
+       "4"
+      ],
+      [
+       "#id_due_date",
+       "5"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/asetlahan/grievance/",
+     "name": "pengaduan-tindak-lanjut",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      },
+      {
+       "js": "const e=[...document.querySelectorAll('h2,h3,legend')].find(x=>x.textContent.trim().startsWith('Terkait')); window.scrollTo(0, e.getBoundingClientRect().top+scrollY-90)"
+      },
+      {
+       "wait": 500
+      }
+     ],
+     "mark": [
+      [
+       "h2:text-is('Terkait')",
+       "1"
+      ],
+      [
+       "h2:text-is('Tindak lanjut')",
+       "2"
+      ]
      ]
     },
     {
      "url": "/admin/asetlahan/tender/",
-     "name": "lelang-daftar"
+     "name": "lelang-daftar",
+     "mark": [
+      [
+       "select[name=action]",
+       "1"
+      ]
+     ]
     },
     {
      "url": "/admin/asetlahan/tender/",
@@ -159,6 +615,24 @@
       {
        "wait": 1500
       }
+     ],
+     "mark": [
+      [
+       "#id_title",
+       "1"
+      ],
+      [
+       "#id_method",
+       "2"
+      ],
+      [
+       "#id_asset",
+       "3"
+      ],
+      [
+       "#id_description",
+       "4"
+      ]
      ]
     },
     {
@@ -171,11 +645,23 @@
     },
     {
      "url": "/admin/asetlahan/taxobligation/",
-     "name": "pajak"
+     "name": "pajak",
+     "mark": [
+      [
+       "select[name=action]",
+       "1"
+      ]
+     ]
     },
     {
      "url": "/admin/asetlahan/landtransaction/",
-     "name": "transaksi"
+     "name": "transaksi",
+     "mark": [
+      [
+       "select[name=action]",
+       "1"
+      ]
+     ]
     },
     {
      "url": "/admin/asetlahan/resettlementsite/",
@@ -207,7 +693,30 @@
       {
        "wait": 1500
       }
-     ]
+     ],
+     "mark": [
+      [
+       "#id_title",
+       "1"
+      ],
+      [
+       "#id_task_type",
+       "2"
+      ],
+      [
+       "#id_priority",
+       "3"
+      ],
+      [
+       "#id_status",
+       "4"
+      ],
+      [
+       "#id_progress",
+       "5"
+      ]
+     ],
+     "tinggi": 960
     },
     {
      "url": "/admin/asetlahan/stakeholder/",

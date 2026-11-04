@@ -2104,7 +2104,7 @@ def _ai_fallback(question: str, context: str) -> str:
             return lead + context
     return (
         _(
-            "Asisten AI belum dikonfigurasi (ANTHROPIC_API_KEY kosong). "
+            "Asisten AI belum dikonfigurasi. "
             "Ringkasan data wilayah Anda:\n"
         )
         + context

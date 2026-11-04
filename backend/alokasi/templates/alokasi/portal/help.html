@@ -19,11 +19,11 @@
   <aside>
     <section class="card">
       <h2>Regulasi</h2>
-      <ul>{% for item in regulations %}<li><a href="{% url 'portal:info_detail' item.slug %}">{{ item.title }}</a></li>{% empty %}<li class="muted">–</li>{% endfor %}</ul>
+      <ul>{% for item in regulations %}<li><a href="{% url 'portal:info_detail' item.slug %}">{{ item.title }}</a></li>{% empty %}<li class="muted">Belum ada regulasi yang diterbitkan.</li>{% endfor %}</ul>
     </section>
     <section class="card">
       <h2>Video tutorial</h2>
-      <ul>{% for item in tutorials %}<li><a href="{% url 'portal:info_detail' item.slug %}">{{ item.title }}</a></li>{% empty %}<li class="muted">–</li>{% endfor %}</ul>
+      <ul>{% for item in tutorials %}<li><a href="{% url 'portal:info_detail' item.slug %}">{{ item.title }}</a></li>{% empty %}<li class="muted">Belum ada video tutorial.</li>{% endfor %}</ul>
     </section>
     {% if guides %}
     <section class="card">

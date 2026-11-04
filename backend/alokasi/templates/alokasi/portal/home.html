@@ -76,7 +76,7 @@
   <section class="card">
     <h2>Lahan terbaru</h2>
     {% for plot in latest_plots %}
-      <p><a href="{% url 'portal:plot_detail' plot.code %}"><strong>{{ plot.code }}</strong> {{ plot.name }}</a><br><span class="small muted">{{ plot.get_allocation_type_display }} · {{ plot.area_m2|angka:0|patah }} m²{% if plot.district %} · Kec. {{ plot.district }}{% endif %}</span></p>
+      <p><a href="{% url 'portal:plot_detail' plot.code %}"><strong>{{ plot.code }}</strong> {{ plot.name }}</a><br><span class="small muted">{{ plot.get_allocation_type_display }} · {{ plot.area_m2|angka:0 }}&nbsp;m²{% if plot.district %} · Kec. {{ plot.district }}{% endif %}</span></p>
     {% empty %}<p class="muted">Belum ada lahan yang ditawarkan.</p>{% endfor %}
     <a href="{% url 'portal:plot_list' %}">Peta & daftar lahan ›</a>
   </section>

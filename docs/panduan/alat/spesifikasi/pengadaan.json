@@ -34,7 +34,31 @@
       {
        "wait": 1200
       }
-     ]
+     ],
+     "mark": [
+      [
+       "#acq-pengadaan-project--name",
+       "1"
+      ],
+      [
+       "#acq-pengadaan-project--requiring_agency",
+       "2"
+      ],
+      [
+       "#acq-pengadaan-project--estimated_area_m2",
+       "3"
+      ],
+      [
+       "#acq-pengadaan-project--start_date",
+       "4"
+      ],
+      [
+       ".acq-modal.modal-open button[type=submit]",
+       "5"
+      ]
+     ],
+     "el": ".acq-modal.modal-open .modal__wrapper",
+     "tinggi": 1150
     },
     {
      "url": "/pengadaan-tanah/1",
@@ -226,7 +250,31 @@
       {
        "wait": 1200
       }
-     ]
+     ],
+     "mark": [
+      [
+       "#acq-pengadaan-milestone--stage",
+       "1"
+      ],
+      [
+       "#acq-pengadaan-milestone--title",
+       "2"
+      ],
+      [
+       "#acq-pengadaan-milestone--planned_date",
+       "3"
+      ],
+      [
+       "#acq-pengadaan-milestone--status",
+       "4"
+      ],
+      [
+       ".acq-modal.modal-open button[type=submit]",
+       "5"
+      ]
+     ],
+     "el": ".acq-modal.modal-open .modal__wrapper",
+     "tinggi": 1150
     },
     {
      "url": "/pengadaan-tanah/1?tab=bidang",
@@ -241,7 +289,35 @@
       {
        "wait": 1200
       }
-     ]
+     ],
+     "mark": [
+      [
+       "#acq-pengadaan-parcel--parcel_number",
+       "1"
+      ],
+      [
+       "#acq-pengadaan-parcel--right_type",
+       "2"
+      ],
+      [
+       "#acq-pengadaan-parcel--affected_area_m2",
+       "3"
+      ],
+      [
+       "#acq-pengadaan-parcel--building_description",
+       "4"
+      ],
+      [
+       "#acq-pengadaan-parcel--is_disputed",
+       "5"
+      ],
+      [
+       ".acq-modal.modal-open button[type=submit]",
+       "6"
+      ]
+     ],
+     "el": ".acq-modal.modal-open .modal__wrapper",
+     "tinggi": 1150
     },
     {
      "url": "/pengadaan-tanah/1?tab=bidang",
@@ -256,7 +332,27 @@
       {
        "wait": 1200
       }
-     ]
+     ],
+     "mark": [
+      [
+       "#acq-import-file",
+       "1"
+      ],
+      [
+       "#acq-import-number",
+       "2"
+      ],
+      [
+       "#acq-import-area",
+       "3"
+      ],
+      [
+       ".acq-modal.modal-open button[type=submit]",
+       "4"
+      ]
+     ],
+     "el": ".acq-modal.modal-open .modal__wrapper",
+     "tinggi": 1150
     },
     {
      "url": "/pengadaan-tanah/1?tab=pihak",
@@ -271,7 +367,39 @@
       {
        "wait": 1200
       }
-     ]
+     ],
+     "mark": [
+      [
+       "#acq-pengadaan-party--parcel",
+       "1"
+      ],
+      [
+       "#acq-pengadaan-party--role",
+       "2"
+      ],
+      [
+       "#acq-pengadaan-party--name",
+       "3"
+      ],
+      [
+       "#acq-pengadaan-party--nik",
+       "4"
+      ],
+      [
+       "#acq-pengadaan-party--share_percentage",
+       "5"
+      ],
+      [
+       "#acq-pengadaan-party--bank_name",
+       "6"
+      ],
+      [
+       ".acq-modal.modal-open button[type=submit]",
+       "7"
+      ]
+     ],
+     "el": ".acq-modal.modal-open .modal__wrapper",
+     "tinggi": 1150
     },
     {
      "url": "/pengadaan-tanah/1?tab=pihak",
@@ -286,7 +414,35 @@
       {
        "wait": 1200
       }
-     ]
+     ],
+     "mark": [
+      [
+       "#acq-pengadaan-survey--parcel",
+       "1"
+      ],
+      [
+       "#acq-pengadaan-survey--survey_type",
+       "2"
+      ],
+      [
+       "#acq-pengadaan-survey--status",
+       "3"
+      ],
+      [
+       "#acq-pengadaan-survey--latitude",
+       "4"
+      ],
+      [
+       "#acq-pengadaan-survey--findings",
+       "5"
+      ],
+      [
+       ".acq-modal.modal-open button[type=submit]",
+       "6"
+      ]
+     ],
+     "el": ".acq-modal.modal-open .modal__wrapper",
+     "tinggi": 1150
     },
     {
      "url": "/pengadaan-tanah/1?tab=pengumuman",
@@ -301,7 +457,23 @@
       {
        "wait": 1200
       }
-     ]
+     ],
+     "mark": [
+      [
+       "#acq-pengadaan-announcement--announcement_type",
+       "1"
+      ],
+      [
+       "#acq-pengadaan-announcement--announced_on",
+       "2"
+      ],
+      [
+       ".acq-modal.modal-open button[type=submit]",
+       "3"
+      ]
+     ],
+     "el": ".acq-modal.modal-open .modal__wrapper",
+     "tinggi": 1150
     },
     {
      "url": "/pengadaan-tanah/1?tab=penilaian",
@@ -316,7 +488,31 @@
       {
        "wait": 1200
       }
-     ]
+     ],
+     "mark": [
+      [
+       "#acq-pengadaan-valuation--parcel",
+       "1"
+      ],
+      [
+       "#acq-pengadaan-valuation--status",
+       "2"
+      ],
+      [
+       "#acq-pengadaan-valuation--appraiser_firm",
+       "3"
+      ],
+      [
+       "#acq-pengadaan-valuation--value_land",
+       "4"
+      ],
+      [
+       ".acq-modal.modal-open button[type=submit]",
+       "5"
+      ]
+     ],
+     "el": ".acq-modal.modal-open .modal__wrapper",
+     "tinggi": 1150
     },
     {
      "url": "/pengadaan-tanah/1?tab=musyawarah",
@@ -331,7 +527,23 @@
       {
        "wait": 1200
       }
-     ]
+     ],
+     "mark": [
+      [
+       "#acq-pengadaan-deliberation--held_on",
+       "1"
+      ],
+      [
+       "#acq-pengadaan-deliberation--minutes_number",
+       "2"
+      ],
+      [
+       ".acq-modal.modal-open button[type=submit]",
+       "3"
+      ]
+     ],
+     "el": ".acq-modal.modal-open .modal__wrapper",
+     "tinggi": 1150
     },
     {
      "url": "/pengadaan-tanah/1?tab=musyawarah",
@@ -346,7 +558,35 @@
       {
        "wait": 1200
       }
-     ]
+     ],
+     "mark": [
+      [
+       "#acq-pengadaan-deliberation_result--deliberation",
+       "1"
+      ],
+      [
+       "#acq-pengadaan-deliberation_result--parcel",
+       "2"
+      ],
+      [
+       "#acq-pengadaan-deliberation_result--party",
+       "3"
+      ],
+      [
+       "#acq-pengadaan-deliberation_result--outcome",
+       "4"
+      ],
+      [
+       "#acq-pengadaan-deliberation_result--agreed_amount",
+       "5"
+      ],
+      [
+       ".acq-modal.modal-open button[type=submit]",
+       "6"
+      ]
+     ],
+     "el": ".acq-modal.modal-open .modal__wrapper",
+     "tinggi": 1150
     },
     {
      "url": "/pengadaan-tanah/1?tab=keberatan",
@@ -361,7 +601,35 @@
       {
        "wait": 1200
       }
-     ]
+     ],
+     "mark": [
+      [
+       "#acq-pengadaan-objection--objection_type",
+       "1"
+      ],
+      [
+       "#acq-pengadaan-objection--status",
+       "2"
+      ],
+      [
+       "#acq-pengadaan-objection--parcel",
+       "3"
+      ],
+      [
+       "#acq-pengadaan-objection--case_number",
+       "4"
+      ],
+      [
+       "#acq-pengadaan-objection--decided_amount",
+       "5"
+      ],
+      [
+       ".acq-modal.modal-open button[type=submit]",
+       "6"
+      ]
+     ],
+     "el": ".acq-modal.modal-open .modal__wrapper",
+     "tinggi": 1150
     },
     {
      "url": "/pengadaan-tanah/1?tab=keberatan",
@@ -376,7 +644,31 @@
       {
        "wait": 1200
       }
-     ]
+     ],
+     "mark": [
+      [
+       "#acq-pengadaan-consignment--parcel",
+       "1"
+      ],
+      [
+       "#acq-pengadaan-consignment--reason",
+       "2"
+      ],
+      [
+       "#acq-pengadaan-consignment--status",
+       "3"
+      ],
+      [
+       "#acq-pengadaan-consignment--amount",
+       "4"
+      ],
+      [
+       ".acq-modal.modal-open button[type=submit]",
+       "5"
+      ]
+     ],
+     "el": ".acq-modal.modal-open .modal__wrapper",
+     "tinggi": 1150
     },
     {
      "url": "/pengadaan-tanah/1?tab=ganti-kerugian",
@@ -391,7 +683,35 @@
       {
        "wait": 1200
       }
-     ]
+     ],
+     "mark": [
+      [
+       "#acq-pengadaan-compensation--parcel",
+       "1"
+      ],
+      [
+       "#acq-pengadaan-compensation--party",
+       "2"
+      ],
+      [
+       "#acq-pengadaan-compensation--form",
+       "3"
+      ],
+      [
+       "#acq-pengadaan-compensation--amount",
+       "4"
+      ],
+      [
+       "#acq-pengadaan-compensation--valuation",
+       "5"
+      ],
+      [
+       ".acq-modal.modal-open button[type=submit]",
+       "6"
+      ]
+     ],
+     "el": ".acq-modal.modal-open .modal__wrapper",
+     "tinggi": 1150
     },
     {
      "url": "/pengadaan-tanah/1?tab=ganti-kerugian",
@@ -406,7 +726,31 @@
       {
        "wait": 1200
       }
-     ]
+     ],
+     "mark": [
+      [
+       "#acq-pengadaan-payment--compensation",
+       "1"
+      ],
+      [
+       "#acq-pengadaan-payment--paid_on",
+       "2"
+      ],
+      [
+       "#acq-pengadaan-payment--amount",
+       "3"
+      ],
+      [
+       "#acq-pengadaan-payment--method",
+       "4"
+      ],
+      [
+       ".acq-modal.modal-open button[type=submit]",
+       "5"
+      ]
+     ],
+     "el": ".acq-modal.modal-open .modal__wrapper",
+     "tinggi": 1150
     },
     {
      "url": "/pengadaan-tanah/1?tab=ganti-kerugian",
@@ -418,12 +762,16 @@
      ],
      "mark": [
       [
-       "text=Validasi >> nth=0",
+       "button:text-is('Validasi') >> nth=0",
        "1"
       ],
       [
-       "text=+ Tambah pembayaran",
+       "button:text-is('Batalkan') >> nth=0",
        "2"
+      ],
+      [
+       "text=+ Tambah pembayaran",
+       "3"
       ]
      ]
     },
@@ -440,7 +788,31 @@
       {
        "wait": 1200
       }
-     ]
+     ],
+     "mark": [
+      [
+       "#acq-pengadaan-rights_release--parcel",
+       "1"
+      ],
+      [
+       "#acq-pengadaan-rights_release--party",
+       "2"
+      ],
+      [
+       "#acq-pengadaan-rights_release--released_on",
+       "3"
+      ],
+      [
+       "#acq-pengadaan-rights_release--certificate_surrendered",
+       "4"
+      ],
+      [
+       ".acq-modal.modal-open button[type=submit]",
+       "5"
+      ]
+     ],
+     "el": ".acq-modal.modal-open .modal__wrapper",
+     "tinggi": 1150
     },
     {
      "url": "/pengadaan-tanah/1?tab=pelepasan",
@@ -455,7 +827,31 @@
       {
        "wait": 1200
       }
-     ]
+     ],
+     "mark": [
+      [
+       "#acq-pengadaan-handover--minutes_number",
+       "1"
+      ],
+      [
+       "#acq-pengadaan-handover--handed_over_on",
+       "2"
+      ],
+      [
+       "#acq-pengadaan-handover--recipient",
+       "3"
+      ],
+      [
+       "#acq-pengadaan-handover--parcels",
+       "4"
+      ],
+      [
+       ".acq-modal.modal-open button[type=submit]",
+       "5"
+      ]
+     ],
+     "el": ".acq-modal.modal-open .modal__wrapper",
+     "tinggi": 1150
     },
     {
      "url": "/pengadaan-tanah/1?tab=relokasi",
@@ -470,7 +866,35 @@
       {
        "wait": 1200
       }
-     ]
+     ],
+     "mark": [
+      [
+       "#acq-pengadaan-household--parcel",
+       "1"
+      ],
+      [
+       "#acq-pengadaan-household--head_name",
+       "2"
+      ],
+      [
+       "#acq-pengadaan-household--nik",
+       "3"
+      ],
+      [
+       "#acq-pengadaan-household--displacement",
+       "4"
+      ],
+      [
+       "#acq-pengadaan-household--progress_percentage",
+       "5"
+      ],
+      [
+       ".acq-modal.modal-open button[type=submit]",
+       "6"
+      ]
+     ],
+     "el": ".acq-modal.modal-open .modal__wrapper",
+     "tinggi": 1150
     },
     {
      "url": "/pengadaan-tanah/1?tab=dokumen",
@@ -485,7 +909,31 @@
       {
        "wait": 1200
       }
-     ]
+     ],
+     "mark": [
+      [
+       "#acq-pengadaan-document--document_type",
+       "1"
+      ],
+      [
+       "#acq-pengadaan-document--title",
+       "2"
+      ],
+      [
+       "#acq-pengadaan-document--parcel",
+       "3"
+      ],
+      [
+       "#acq-pengadaan-document--file",
+       "4"
+      ],
+      [
+       ".acq-modal.modal-open button[type=submit]",
+       "5"
+      ]
+     ],
+     "el": ".acq-modal.modal-open .modal__wrapper",
+     "tinggi": 1150
     },
     {
      "url": "/pengadaan-tanah/1/bidang/1",
@@ -531,7 +979,9 @@
       {
        "wait": 1200
       }
-     ]
+     ],
+     "el": ".acq-modal.modal-open .modal__wrapper",
+     "tinggi": 1150
     },
     {
      "url": "/pengadaan-tanah/1?tab=pihak",
@@ -568,7 +1018,9 @@
       {
        "wait": 1200
       }
-     ]
+     ],
+     "el": ".acq-modal.modal-open .modal__wrapper",
+     "tinggi": 1150
     }
    ]
   },

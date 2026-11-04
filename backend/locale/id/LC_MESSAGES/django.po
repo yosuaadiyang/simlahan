@@ -7011,3 +7011,18 @@ msgstr "Masukkan durasi dalam format ISO 8601, mis. P3M atau P1Y."
 
 msgid "Go"
 msgstr "Jalankan"
+
+msgid "Your password can’t be too similar to your other personal information."
+msgstr "Kata sandi tidak boleh terlalu mirip dengan data pribadi Anda."
+
+msgid "Your password can’t be a commonly used password."
+msgstr "Kata sandi tidak boleh kata sandi yang umum dipakai."
+
+msgid "Your password can’t be entirely numeric."
+msgstr "Kata sandi tidak boleh hanya berisi angka."
+
+msgid "Password-based authentication"
+msgstr "Masuk dengan kata sandi"
+
+msgid "After you’ve created a user, you’ll be able to edit more user options."
+msgstr "Setelah pengguna dibuat, Anda dapat mengubah pilihan pengguna lainnya."

@@ -180,7 +180,7 @@ const DecisionItemEdit: React.FC<Props> = ({
             </Authorization>
             {!!savedDecision.conditions &&
               !!savedDecision.conditions.length &&
-              ` (${savedDecision.conditions.length} ${savedDecision.conditions.length === 1 ? "ehto" : "ehtoa"})`}
+              ` (${savedDecision.conditions.length} syarat)`}
           </>
         ) : (
           "-"

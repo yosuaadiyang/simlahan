@@ -150,3 +150,13 @@ def test_assistant_page_keeps_history(client, admin, overdue_grievance, settings
     assert overdue_grievance.number in page
     client.post(url, {"reset": "1"})
     assert overdue_grievance.number not in client.get(url).content.decode()
+
+
+def test_assistant_hides_config_hint_from_officers(client, admin, officer, settings):
+    settings.ANTHROPIC_API_KEY = ""
+    url = reverse("asetlahan-assistant")
+    client.force_login(officer)
+    page = client.get(url).content.decode()
+    assert "Mode tanpa AI" in page and "ANTHROPIC_API_KEY" not in page
+    client.force_login(admin)
+    assert "ANTHROPIC_API_KEY" in client.get(url).content.decode()

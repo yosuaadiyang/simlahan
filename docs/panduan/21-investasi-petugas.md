@@ -21,48 +21,58 @@ Saring per **Tahap**, **Status**, **Skema yang diminati** (sewa, alokasi/UWT, ke
 
 ![Permintaan berstatus Diajukan](gambar/alokasi/investasi-diajukan.png)
 
-Bagian halaman:
+Isi halaman dari atas ke bawah:
 
 - **Status** dan ringkasan (skema, sektor, nilai investasi).
-- **Pesan dengan investor**: percakapan dua arah beserta lampiran.
-- **Penanganan**: petugas penanggung jawab dan **catatan internal** (tidak terlihat investor).
+- **Pesan dengan investor**: percakapan dua arah beserta lampiran (lihat 6.3).
+- **Penanganan**: petugas penanggung jawab dan **catatan internal**. Catatan internal tidak terlihat oleh investor.
 - **Rencana investasi**: nama proyek, kegiatan, nilai, tenaga kerja, jadwal.
-- **Lokasi**: lahan yang dipilih investor atau area yang digambar investor di peta.
+- **Lokasi**: lahan yang dipilih investor, atau area yang digambar investor di peta.
 - **Konsultasi**, **Penawaran**, **Penutupan**, dan **Riwayat status**.
 
-Tombol tindakan (kanan atas) muncul sesuai status:
+Tombol tindakan di kanan atas muncul sesuai status:
 
-1. **Mulai tinjau**: menandai sedang ditinjau dan menugaskan Anda (bila belum ada petugas). Investor diberi tahu lewat surel.
-2. **Jadwalkan konsultasi**: undangan konsultasi atau kunjungan lapangan.
-3. **Kirim penawaran** (atau **Perbarui penawaran**): penawaran sewa/alokasi/kerja sama.
-4. **Tolak**: menutup permintaan dengan alasan yang dikirim ke investor.
+- **Mulai tinjau** (nomor 1): menandai permintaan sedang ditinjau dan menjadikan Anda petugas penanggung jawab (bila belum ada). Investor diberi tahu lewat surel.
+- **Jadwalkan konsultasi** (nomor 2): mengirim undangan konsultasi atau kunjungan lapangan (lihat 6.4).
+- **Kirim penawaran** (nomor 3): mengirim penawaran sewa, alokasi, atau kerja sama (lihat 6.5). Bila sudah pernah dikirim, tombolnya bernama **Perbarui penawaran**.
+- **Tolak** (nomor 4): menutup permintaan. Alasan wajib ditulis dan dikirim ke investor.
 
-Setelah investor menerima penawaran, tombol **Selesaikan** muncul.
+Setelah investor menerima penawaran, muncul tombol **Selesaikan** (lihat 6.6).
+
+**Mengisi penanggung jawab dan catatan internal:** gulir ke bagian **Penanganan**, pilih petugas di **Petugas penanggung jawab**, tulis catatan di **Catatan internal petugas**, lalu klik **Simpan** di bagian bawah halaman.
 
 ## 6.3 Membalas pesan investor
 
 ![Pesan dengan investor](gambar/alokasi/investasi-pesan.png)
 
-1. Di bagian **Pesan dengan investor**, tulis balasan di **Balas investor**.
-2. Lampirkan berkas bila perlu (PDF/JPG/PNG, maksimal 10 MB).
-3. Klik **Kirim pesan**. Investor menerima pemberitahuan dan bisa membalas dari portal.
+1. Gulir ke bagian **Pesan dengan investor**. Pesan lama tampil berurutan dari yang terlama.
+2. Tulis balasan di kotak **Balas investor** (nomor 1).
+3. Bila perlu, klik **Pilih File** (nomor 2) untuk melampirkan berkas PDF, JPG, atau PNG (maksimal 10 MB).
+4. Klik **Kirim pesan** (nomor 3). Investor menerima pemberitahuan dan bisa membalas dari portal.
 
 ## 6.4 Menjadwalkan konsultasi
 
 ![Formulir jadwal konsultasi](gambar/alokasi/investasi-form-konsultasi.png)
 
-1. Klik **Jadwalkan konsultasi**.
-2. Isi **Jadwal konsultasi / kunjungan** (tanggal dan jam), **Tempat / tautan pertemuan**, dan **Catatan untuk investor**.
-3. Klik tombol simpan. Investor menerima undangan di portal dan surel.
+1. Klik **Jadwalkan konsultasi** di kanan atas halaman permintaan.
+2. Isi **Jadwal konsultasi / kunjungan** (nomor 1): tanggal dan jam pertemuan.
+3. Isi **Tempat / tautan pertemuan** (nomor 2): alamat kantor, titik kumpul kunjungan lapangan, atau tautan rapat daring.
+4. Tulis **Catatan untuk investor** (nomor 3), misalnya dokumen yang perlu dibawa.
+5. Klik **Jadwalkan konsultasi / kunjungan lapangan** (nomor 4). Investor menerima undangan di portal dan lewat surel.
 
 ## 6.5 Mengirim penawaran
 
 ![Formulir penawaran](gambar/alokasi/investasi-form-penawaran.png)
 
-1. Klik **Kirim penawaran**.
-2. Pilih **Skema ditawarkan** (sewa, alokasi, atau kerja sama) dan **Lahan ditawarkan**. Skema alokasi wajib memakai lahan yang membuka alokasi.
-3. Isi **Luas ditawarkan (m²)**, **Tarif per m² per tahun (Rp)**, **Jangka waktu (tahun)**, **Penawaran berlaku s.d.**, dan **Ketentuan penawaran**. Luas dan tarif terisi dari data lahan bila dikosongkan.
-4. Klik tombol kirim. Investor dapat **menerima** atau **menolak** penawaran di portal sampai tanggal berlaku. Lahan belum dipesan sampai permintaan diselesaikan.
+1. Klik **Kirim penawaran** di kanan atas halaman permintaan.
+2. Pilih **Skema ditawarkan** (nomor 1): sewa lahan, alokasi lahan (UWT), atau kerja sama pemanfaatan.
+3. Pilih **Lahan ditawarkan** (nomor 2). Skema alokasi wajib memakai lahan yang membuka skema alokasi. Pilih "tanpa lahan dari daftar" bila yang ditawarkan adalah lokasi usulan investor.
+4. Isi **Luas ditawarkan (m²)** (nomor 3) dan **Tarif per m² per tahun (Rp)** (nomor 4). Bila dikosongkan, keduanya diambil dari data lahan.
+5. Isi **Jangka waktu (tahun)** (nomor 5) dan **Penawaran berlaku s.d.** (nomor 6), yaitu batas waktu investor menjawab.
+6. Tulis **Ketentuan penawaran** (nomor 7), misalnya syarat pembayaran dan kewajiban investor.
+7. Klik **Kirim penawaran kepada investor** (nomor 8).
+
+Investor dapat **menerima** atau **menolak** penawaran di portal sampai tanggal berlaku. Lahan belum dipesan sampai permintaan diselesaikan. Status permintaan kini **Penawaran dikirim**:
 
 ![Permintaan berstatus Penawaran dikirim](gambar/alokasi/investasi-ditawarkan.png)
 
@@ -70,9 +80,9 @@ Setelah investor menerima penawaran, tombol **Selesaikan** muncul.
 
 Hanya untuk penawaran yang sudah **diterima** investor.
 
-1. Klik **Selesaikan**.
-2. **Skema alokasi**: sistem membuat **draf permohonan alokasi** atas nama investor dengan rencana usaha terisi. Investor melengkapi dokumen lalu mengajukannya di portal; prosesnya berlanjut seperti [Bab 5](20-alokasi-lahan.md).
-3. **Skema sewa/kerja sama**: isi **nomor kontrak** sewa atau perjanjian kerja sama. Lahan yang ditawarkan ditandai **Sudah disewakan**.
+1. Buka permintaan berstatus **Penawaran diterima**, lalu klik **Selesaikan** di kanan atas.
+2. Bila skemanya **alokasi**: klik tombol penegasan. Sistem membuat **draf permohonan alokasi** atas nama investor dengan rencana usaha yang sudah terisi. Investor melengkapi dokumen lalu mengajukannya di portal; prosesnya berlanjut seperti [Bab 5](20-alokasi-lahan.md).
+3. Bila skemanya **sewa** atau **kerja sama**: isi **nomor kontrak** sewa atau perjanjian kerja sama, lalu klik tombol penegasan. Lahan yang ditawarkan ditandai **Sudah disewakan**.
 4. Status menjadi **Selesai, diteruskan**. Investor dapat mengelola dokumen perizinan kontraknya di portal (lihat [Bab 15](53-portal-dokumen.md)).
 
 ## 6.7 Sektor dan kawasan investasi

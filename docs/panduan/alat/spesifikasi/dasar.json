@@ -21,22 +21,76 @@
        "3"
       ],
       [
-       "text=⇄ Pusat Komando",
-       ""
+       "text=⇄ Pusat Komando >> xpath=..",
+       "4"
       ]
      ]
     },
     {
      "url": "/admin/login/",
-     "name": "masuk-panel-admin"
+     "name": "masuk-panel-admin",
+     "mark": [
+      [
+       "#id_username",
+       "1"
+      ],
+      [
+       "#id_password",
+       "2"
+      ],
+      [
+       "input[type=submit]",
+       "3"
+      ]
+     ]
     },
     {
      "url": "/komando/masuk/",
-     "name": "masuk-pusat-komando"
+     "name": "masuk-pusat-komando",
+     "mark": [
+      [
+       "#id_username",
+       "1"
+      ],
+      [
+       "#id_password",
+       "2"
+      ],
+      [
+       "#lihat-sandi",
+       "3"
+      ],
+      [
+       "button[type=submit]",
+       "4"
+      ]
+     ]
     },
     {
      "url": "/portal/masuk/",
-     "name": "masuk-portal"
+     "name": "masuk-portal",
+     "mark": [
+      [
+       "#id_username",
+       "1"
+      ],
+      [
+       "#id_password",
+       "2"
+      ],
+      [
+       "form button[type=submit]",
+       "3"
+      ],
+      [
+       "text=Lupa kata sandi?",
+       "4"
+      ],
+      [
+       "text=Daftar akun baru",
+       "5"
+      ]
+     ]
     }
    ]
   },
@@ -50,7 +104,25 @@
     },
     {
      "url": "/komando/masuk/",
-     "name": "masuk-pusat-komando-hp"
+     "name": "masuk-pusat-komando-hp",
+     "mark": [
+      [
+       "#id_username",
+       "1"
+      ],
+      [
+       "#id_password",
+       "2"
+      ],
+      [
+       "#lihat-sandi",
+       "3"
+      ],
+      [
+       "button[type=submit]",
+       "4"
+      ]
+     ]
     }
    ]
   },
@@ -67,7 +139,7 @@
        "1"
       ],
       [
-       "select >> nth=0",
+       "div:has(> label:has-text('Unit layanan sendiri'))",
        "2"
       ],
       [
@@ -75,7 +147,7 @@
        "3"
       ],
       [
-       "text=Keluar",
+       "header >> text=Keluar",
        "4"
       ]
      ]
@@ -102,6 +174,16 @@
       {
        "wait": 600
       }
+     ],
+     "mark": [
+      [
+       "text=Panduan peran",
+       "1"
+      ],
+      [
+       "text=Ganti sandi",
+       "2"
+      ]
      ]
     },
     {
@@ -110,7 +192,25 @@
     },
     {
      "url": "/akun/sandi/",
-     "name": "ganti-sandi"
+     "name": "ganti-sandi",
+     "mark": [
+      [
+       "#id_old_password",
+       "1"
+      ],
+      [
+       "#id_new_password1",
+       "2"
+      ],
+      [
+       "#id_new_password2",
+       "3"
+      ],
+      [
+       "input[type=submit]",
+       "4"
+      ]
+     ]
     }
    ]
   },
@@ -138,7 +238,29 @@
     },
     {
      "url": "/admin/",
-     "name": "panel-admin-beranda"
+     "name": "panel-admin-beranda",
+     "mark": [
+      [
+       "#content-main .module caption >> nth=0",
+       "1"
+      ],
+      [
+       "#content-main a.addlink >> nth=0",
+       "2"
+      ],
+      [
+       "#content-main a.changelink >> nth=0",
+       "3"
+      ],
+      [
+       "#recent-actions-module",
+       "4"
+      ],
+      [
+       "#user-tools >> text=Panduan peran",
+       "5"
+      ]
+     ]
     },
     {
      "url": "/admin/asetlahan/landasset/",
@@ -163,9 +285,35 @@
      ]
     },
     {
-     "url": "/admin/asetlahan/landasset/1/change/",
+     "url": "/admin/asetlahan/assetcategory/1/change/",
      "name": "panel-formulir",
-     "full": false
+     "full": false,
+     "mark": [
+      [
+       "#id_name",
+       "1"
+      ],
+      [
+       "a.historylink",
+       "2"
+      ],
+      [
+       "input[name=_save]",
+       "3"
+      ],
+      [
+       "input[name=_addanother]",
+       "4"
+      ],
+      [
+       "input[name=_continue]",
+       "5"
+      ],
+      [
+       "a.deletelink",
+       "6"
+      ]
+     ]
     }
    ]
   }

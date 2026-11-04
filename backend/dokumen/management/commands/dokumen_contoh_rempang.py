@@ -198,6 +198,8 @@ class Command(BaseCommand):
         with transaction.atomic():
             self._signing(officer, applicant)
         with transaction.atomic():
+            self._draft_signing(officer)
+        with transaction.atomic():
             self._download(applicant)
         with transaction.atomic():
             self._extras(officer, applicant)
@@ -458,6 +460,31 @@ class Command(BaseCommand):
         if document.needs_approval:
             return
         signing.send(document, officer)
+
+    def _draft_signing(self, officer):
+        """Satu dokumen berstatus Draf, agar halaman penyusunan bisa dicoba."""
+        land_use = sample_land_uses().filter(reference=f"{PREFIX}03").first()
+        if land_use is None or officer is None or land_use.signing_documents.exists():
+            return
+        template = DocumentTemplate.objects.filter(
+            name__istartswith="Perjanjian sewa", is_active=True
+        ).first()
+        if template is None:
+            return
+        document = signing.create(
+            user=officer,
+            title=f"Perjanjian sewa lahan – {land_use.holder_display}",
+            template=template,
+            land_use=land_use,
+        )
+        if not document.recipients.exists():
+            document.recipients.create(
+                order=1,
+                role="Pemegang hak",
+                action=enums.RecipientAction.SIGN,
+                name=land_use.holder_display,
+                email=APPLICANT_EMAIL,
+            )
 
     def _download(self, applicant):
         if applicant is None:

@@ -100,3 +100,14 @@ def test_portal_plot_detail_breaks_long_area(client, plot):
 def test_rupiah_negative_sign_before_currency():
     assert rupiah(Decimal("-1975308643975308644")) == "-Rp1.975.308.643.975.308.644"
     assert rupiah(0) == "Rp0"
+
+
+def test_kpi_filter_shrinks_long_values():
+    template = Template("{% load alokasi_tags %}{{ a|kpi }}|{{ b|kpi }}|{{ c|kpi }}")
+    html = template.render(
+        Context({"a": "5", "b": "Rp45.000.000", "c": "Rp100.608.876.500"})
+    )
+    short, medium, long = html.split("|")
+    assert short == "5"
+    assert 'kpi-panjang--md' in medium and "Rp45.<wbr>000.<wbr>000" in medium
+    assert 'kpi-panjang--sm' in long

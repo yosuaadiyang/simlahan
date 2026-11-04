@@ -62,7 +62,7 @@
             <td>{{ r.report_date|tanggal }}</td>
             <td>{{ r.get_stage_display }}</td>
             <td>{{ r.progress_percent }}%</td>
-            <td>{{ r.realized_investment|rupiah|patah }}</td>
+            <td style="white-space:nowrap">{{ r.realized_investment|rupiah }}</td>
             <td>{{ r.workforce|default_if_none:"-" }}</td>
             <td class="prose">{{ r.description }}{% if r.photo %}<br><a href="{% url 'portal:development_attachment' allocation.pk r.pk %}">Lampiran</a>{% endif %}</td>
           </tr>
