@@ -110,3 +110,19 @@ export const percent = (part: unknown, total: unknown): number => {
   const t = toNumber(total) || 0;
   return t > 0 ? Math.min(100, Math.round((p / t) * 100)) : 0;
 };
+
+/**
+ * Tampilan angka besar di kartu ringkasan: ukuran huruf mengecil untuk nilai
+ * panjang, dan baris hanya boleh patah setelah "Rp" atau di pemisah ribuan
+ * (bukan di tengah kelompok angka seperti "666.000.00 0").
+ */
+export const statValueSize = (text: string): "md" | "sm" | undefined => {
+  if (text.length > 15) return "sm";
+  if (text.length > 11) return "md";
+  return undefined;
+};
+
+export const statValueParts = (text: string): string[] =>
+  text
+    .replace(/^(-?Rp)\u00a0/, "$1 ")
+    .split(/(?<=\d[.,])(?=\d)/);

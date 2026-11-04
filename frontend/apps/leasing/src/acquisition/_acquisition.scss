@@ -165,6 +165,14 @@ $acq-shadow:
     letter-spacing: -0.02em;
     line-height: 1.25;
     font-variant-numeric: tabular-nums;
+
+    &--md {
+      font-size: 1.25rem;
+    }
+
+    &--sm {
+      font-size: 1.0625rem;
+    }
   }
 
   &__hint {

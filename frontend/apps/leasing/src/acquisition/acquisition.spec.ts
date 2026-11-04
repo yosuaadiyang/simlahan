@@ -7,6 +7,8 @@ import {
   formatNumberId,
   formatRupiah,
   percent,
+  statValueParts,
+  statValueSize,
 } from "./format";
 import { labelOf } from "./components/ui";
 import {
@@ -31,6 +33,15 @@ describe("Acquisition helpers", () => {
       /Rp.?1\.500\.000/,
     );
     expect(formatRupiah(null)).toBe("–");
+  });
+  it("breaks long summary values only at thousand separators", () => {
+    const value = formatRupiah("666000000");
+    expect(statValueParts(value)).toEqual(["Rp 666.", "000.", "000"]);
+    expect(statValueParts("-Rp\u00a01.500")).toEqual(["-Rp 1.", "500"]);
+    expect(statValueParts("40%")).toEqual(["40%"]);
+    expect(statValueSize("12")).toBeUndefined();
+    expect(statValueSize(formatRupiah("666000000"))).toBe("md");
+    expect(statValueSize(formatRupiah("1929000000"))).toBe("sm");
   });
   it("formats area in square metres", () => {
     expect(formatArea("1234.5")).toBe("1.234,5 m²");

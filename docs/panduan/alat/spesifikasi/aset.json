@@ -1,5 +1,5 @@
 {
- "out": "../gambar/aset",
+ "out": "../../gambar/aset",
  "groups": [
   {
    "login": "admin",

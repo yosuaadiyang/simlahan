@@ -1,5 +1,5 @@
 {
- "out": "../gambar/dokumen",
+ "out": "../../gambar/dokumen",
  "groups": [
   {
    "login": "admin",

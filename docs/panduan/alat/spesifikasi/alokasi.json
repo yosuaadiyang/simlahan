@@ -1,5 +1,5 @@
 {
- "out": "../gambar/alokasi",
+ "out": "../../gambar/alokasi",
  "groups": [
   {
    "login": "admin",
