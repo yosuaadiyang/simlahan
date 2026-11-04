@@ -1,0 +1,629 @@
+{
+ "out": "../gambar/pengadaan",
+ "groups": [
+  {
+   "login": "spa",
+   "user": "contoh.pelaksana",
+   "items": [
+    {
+     "url": "/dasbor-pengadaan",
+     "name": "dasbor",
+     "full": true
+    },
+    {
+     "url": "/pengadaan-tanah",
+     "name": "daftar-proyek",
+     "mark": [
+      [
+       "text=+ Proyek baru",
+       "1"
+      ],
+      [
+       "text=Saring",
+       "2"
+      ]
+     ]
+    },
+    {
+     "url": "/pengadaan-tanah",
+     "name": "proyek-baru",
+     "actions": [
+      {
+       "click": "text=+ Proyek baru"
+      },
+      {
+       "wait": 1200
+      }
+     ]
+    },
+    {
+     "url": "/pengadaan-tanah/1",
+     "name": "tab-02",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "button:has-text('Bidang & peta')"
+      },
+      {
+       "wait": 1800
+      }
+     ],
+     "full": true
+    },
+    {
+     "url": "/pengadaan-tanah/1",
+     "name": "tab-03",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "button:has-text('Pihak & inventarisasi')"
+      },
+      {
+       "wait": 1800
+      }
+     ],
+     "full": true
+    },
+    {
+     "url": "/pengadaan-tanah/1",
+     "name": "tab-05",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "button:has-text('Penilaian')"
+      },
+      {
+       "wait": 1800
+      }
+     ],
+     "full": true
+    },
+    {
+     "url": "/pengadaan-tanah/1",
+     "name": "tab-06",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "button:has-text('Musyawarah')"
+      },
+      {
+       "wait": 1800
+      }
+     ],
+     "full": true
+    },
+    {
+     "url": "/pengadaan-tanah/1",
+     "name": "tab-07",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "button:has-text('Keberatan & konsinyasi')"
+      },
+      {
+       "wait": 1800
+      }
+     ],
+     "full": true
+    },
+    {
+     "url": "/pengadaan-tanah/1",
+     "name": "tab-08",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "button:has-text('Ganti kerugian')"
+      },
+      {
+       "wait": 1800
+      }
+     ],
+     "full": true
+    },
+    {
+     "url": "/pengadaan-tanah/1",
+     "name": "tab-09",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "button:has-text('Pelepasan & penyerahan')"
+      },
+      {
+       "wait": 1800
+      }
+     ],
+     "full": true
+    },
+    {
+     "url": "/pengadaan-tanah/1",
+     "name": "tab-12",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "button:has-text('Tenggat')"
+      },
+      {
+       "wait": 1800
+      }
+     ],
+     "full": true
+    },
+    {
+     "url": "/pengadaan-tanah/1",
+     "name": "proyek-ringkasan",
+     "mark": [
+      [
+       "text=Unduh daftar nominatif (.xlsx)",
+       "1"
+      ],
+      [
+       "text=Ubah data",
+       "2"
+      ],
+      [
+       "text=+ Tambah tonggak",
+       "3"
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "login": "spa",
+   "user": "contoh.pelaksana",
+   "items": [
+    {
+     "url": "/pengaturan-pengadaan",
+     "name": "pengaturan",
+     "mark": [
+      [
+       "button:has-text('Hitung')",
+       "1"
+      ]
+     ]
+    },
+    {
+     "url": "/pengaturan-pengadaan",
+     "name": "pengaturan-libur",
+     "actions": [
+      {
+       "scroll": "text=Hari libur & cuti bersama"
+      }
+     ],
+     "mark": [
+      [
+       "text=+ Tambah hari libur",
+       "1"
+      ]
+     ]
+    },
+    {
+     "url": "/pengadaan-tanah/1?tab=ringkasan",
+     "name": "form-tonggak",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "button:has-text('+ Tambah tonggak')"
+      },
+      {
+       "wait": 1200
+      }
+     ]
+    },
+    {
+     "url": "/pengadaan-tanah/1?tab=bidang",
+     "name": "form-bidang",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "button:has-text('+ Tambah bidang')"
+      },
+      {
+       "wait": 1200
+      }
+     ]
+    },
+    {
+     "url": "/pengadaan-tanah/1?tab=bidang",
+     "name": "form-impor-bidang",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "button:has-text('Impor GeoJSON/SHP')"
+      },
+      {
+       "wait": 1200
+      }
+     ]
+    },
+    {
+     "url": "/pengadaan-tanah/1?tab=pihak",
+     "name": "form-pihak",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "button:has-text('+ Tambah pihak')"
+      },
+      {
+       "wait": 1200
+      }
+     ]
+    },
+    {
+     "url": "/pengadaan-tanah/1?tab=pihak",
+     "name": "form-survei",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "button:has-text('+ Tambah survei')"
+      },
+      {
+       "wait": 1200
+      }
+     ]
+    },
+    {
+     "url": "/pengadaan-tanah/1?tab=pengumuman",
+     "name": "form-pengumuman",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "button:has-text('+ Tambah pengumuman')"
+      },
+      {
+       "wait": 1200
+      }
+     ]
+    },
+    {
+     "url": "/pengadaan-tanah/1?tab=penilaian",
+     "name": "form-penilaian",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "button:has-text('+ Tambah penilaian')"
+      },
+      {
+       "wait": 1200
+      }
+     ]
+    },
+    {
+     "url": "/pengadaan-tanah/1?tab=musyawarah",
+     "name": "form-musyawarah",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "button:has-text('+ Tambah musyawarah')"
+      },
+      {
+       "wait": 1200
+      }
+     ]
+    },
+    {
+     "url": "/pengadaan-tanah/1?tab=musyawarah",
+     "name": "form-hasil-musyawarah",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "button:has-text('+ Tambah hasil musyawarah')"
+      },
+      {
+       "wait": 1200
+      }
+     ]
+    },
+    {
+     "url": "/pengadaan-tanah/1?tab=keberatan",
+     "name": "form-keberatan",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "button:has-text('+ Tambah keberatan')"
+      },
+      {
+       "wait": 1200
+      }
+     ]
+    },
+    {
+     "url": "/pengadaan-tanah/1?tab=keberatan",
+     "name": "form-konsinyasi",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "button:has-text('+ Tambah konsinyasi')"
+      },
+      {
+       "wait": 1200
+      }
+     ]
+    },
+    {
+     "url": "/pengadaan-tanah/1?tab=ganti-kerugian",
+     "name": "form-ganti-kerugian",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "button:has-text('+ Tambah ganti kerugian')"
+      },
+      {
+       "wait": 1200
+      }
+     ]
+    },
+    {
+     "url": "/pengadaan-tanah/1?tab=ganti-kerugian",
+     "name": "form-pembayaran",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "button:has-text('+ Tambah pembayaran')"
+      },
+      {
+       "wait": 1200
+      }
+     ]
+    },
+    {
+     "url": "/pengadaan-tanah/1?tab=ganti-kerugian",
+     "name": "validasi",
+     "actions": [
+      {
+       "wait": 1500
+      }
+     ],
+     "mark": [
+      [
+       "text=Validasi >> nth=0",
+       "1"
+      ],
+      [
+       "text=+ Tambah pembayaran",
+       "2"
+      ]
+     ]
+    },
+    {
+     "url": "/pengadaan-tanah/1?tab=pelepasan",
+     "name": "form-pelepasan",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "button:has-text('+ Tambah pelepasan hak')"
+      },
+      {
+       "wait": 1200
+      }
+     ]
+    },
+    {
+     "url": "/pengadaan-tanah/1?tab=pelepasan",
+     "name": "form-penyerahan",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "button:has-text('+ Tambah penyerahan hasil')"
+      },
+      {
+       "wait": 1200
+      }
+     ]
+    },
+    {
+     "url": "/pengadaan-tanah/1?tab=relokasi",
+     "name": "form-rumah-tangga",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "button:has-text('+ Tambah rumah tangga')"
+      },
+      {
+       "wait": 1200
+      }
+     ]
+    },
+    {
+     "url": "/pengadaan-tanah/1?tab=dokumen",
+     "name": "form-dokumen",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "button:has-text('+ Tambah dokumen')"
+      },
+      {
+       "wait": 1200
+      }
+     ]
+    },
+    {
+     "url": "/pengadaan-tanah/1/bidang/1",
+     "name": "bidang-detail",
+     "delay": 2500
+    },
+    {
+     "url": "/pengadaan-tanah/1/bidang/1",
+     "name": "bidang-detail-full",
+     "delay": 2500,
+     "full": true
+    }
+   ]
+  },
+  {
+   "login": "spa",
+   "user": "contoh.penilai",
+   "prefix": "penilai-",
+   "items": [
+    {
+     "url": "/dasbor-pengadaan",
+     "name": "dasbor"
+    },
+    {
+     "url": "/pengadaan-tanah",
+     "name": "daftar"
+    },
+    {
+     "url": "/pengadaan-tanah/1?tab=penilaian",
+     "name": "penilaian",
+     "delay": 2000
+    },
+    {
+     "url": "/pengadaan-tanah/1?tab=penilaian",
+     "name": "form-penilaian",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "button:has-text('+ Tambah penilaian')"
+      },
+      {
+       "wait": 1200
+      }
+     ]
+    },
+    {
+     "url": "/pengadaan-tanah/1?tab=pihak",
+     "name": "pihak",
+     "delay": 2000
+    }
+   ]
+  },
+  {
+   "login": "spa",
+   "user": "contoh.instansi",
+   "prefix": "instansi-",
+   "items": [
+    {
+     "url": "/pengadaan-tanah/1",
+     "name": "ringkasan",
+     "delay": 2000
+    },
+    {
+     "url": "/pengadaan-tanah/1?tab=dokumen",
+     "name": "dokumen",
+     "delay": 2000
+    },
+    {
+     "url": "/pengadaan-tanah/1?tab=dokumen",
+     "name": "form-dokumen",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "button:has-text('+ Tambah dokumen')"
+      },
+      {
+       "wait": 1200
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "login": "spa",
+   "user": "contoh.satgas",
+   "prefix": "satgas-",
+   "items": [
+    {
+     "url": "/pengadaan-tanah/1?tab=pihak",
+     "name": "pihak",
+     "delay": 2000
+    },
+    {
+     "url": "/pengadaan-tanah/1?tab=ganti-kerugian",
+     "name": "ganti-kerugian",
+     "delay": 2000
+    }
+   ]
+  },
+  {
+   "login": "spa",
+   "user": "contoh.penagihan",
+   "prefix": "penagihan-",
+   "items": [
+    {
+     "url": "/pengadaan-tanah/1?tab=ganti-kerugian",
+     "name": "ganti-kerugian",
+     "delay": 2000
+    }
+   ]
+  },
+  {
+   "login": "spa",
+   "user": "contoh.ahlihukum",
+   "prefix": "ahlihukum-",
+   "items": [
+    {
+     "url": "/pengadaan-tanah/1?tab=keberatan",
+     "name": "keberatan",
+     "delay": 2000
+    }
+   ]
+  },
+  {
+   "login": "spa",
+   "user": "contoh.penelusur",
+   "prefix": "penelusur-",
+   "items": [
+    {
+     "url": "/pengadaan-tanah/1?tab=pihak",
+     "name": "pihak",
+     "delay": 2000
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,155 @@
+{
+ "out": "../gambar/lapangan",
+ "groups": [
+  {
+   "login": "spa",
+   "user": "contoh.lapangan",
+   "phone": true,
+   "prefix": "hp-",
+   "items": [
+    {
+     "url": "/aset/lapangan/",
+     "name": "lapangan",
+     "delay": 3000
+    },
+    {
+     "url": "/aset/lapangan/",
+     "name": "lapangan-full",
+     "full": true,
+     "delay": 3000
+    }
+   ]
+  },
+  {
+   "login": "spa",
+   "user": "contoh.aset",
+   "prefix": "aset-",
+   "items": [
+    {
+     "url": "/aset/lapangan/",
+     "name": "lapangan",
+     "delay": 3000
+    }
+   ]
+  },
+  {
+   "login": "admin",
+   "user": "contoh.administrator",
+   "items": [
+    {
+     "url": "/admin/operasi/",
+     "name": "panel-operasi"
+    },
+    {
+     "url": "/admin/operasi/korwil/",
+     "name": "op-korwil"
+    },
+    {
+     "url": "/admin/operasi/resident/",
+     "name": "op-resident"
+    },
+    {
+     "url": "/admin/operasi/activity/",
+     "name": "op-activity"
+    },
+    {
+     "url": "/admin/operasi/attendance/",
+     "name": "op-attendance"
+    },
+    {
+     "url": "/admin/operasi/sosalert/",
+     "name": "op-sosalert"
+    },
+    {
+     "url": "/admin/operasi/illegalfinding/",
+     "name": "op-illegalfinding"
+    },
+    {
+     "url": "/admin/operasi/huntingparkpatrol/",
+     "name": "op-huntingparkpatrol"
+    },
+    {
+     "url": "/admin/operasi/patrolsession/",
+     "name": "op-patrolsession"
+    },
+    {
+     "url": "/admin/operasi/soiltest/",
+     "name": "op-soiltest"
+    },
+    {
+     "url": "/admin/operasi/geotechpoint/",
+     "name": "op-geotechpoint"
+    },
+    {
+     "url": "/admin/operasi/landplot/",
+     "name": "op-landplot"
+    },
+    {
+     "url": "/admin/operasi/threatzone/",
+     "name": "op-threatzone"
+    },
+    {
+     "url": "/admin/operasi/sitephoto360/",
+     "name": "op-sitephoto360"
+    },
+    {
+     "url": "/admin/operasi/officerprofile/",
+     "name": "op-officerprofile"
+    },
+    {
+     "url": "/admin/operasi/taskpoint/",
+     "name": "op-taskpoint"
+    },
+    {
+     "url": "/admin/operasi/taskevent/",
+     "name": "op-taskevent"
+    },
+    {
+     "url": "/admin/operasi/dailyreport/",
+     "name": "op-dailyreport"
+    },
+    {
+     "url": "/admin/operasi/ticket/",
+     "name": "op-ticket"
+    },
+    {
+     "url": "/admin/operasi/officerposition/",
+     "name": "op-officerposition"
+    },
+    {
+     "url": "/admin/operasi/officertrackpoint/",
+     "name": "op-officertrackpoint"
+    },
+    {
+     "url": "/admin/operasi/chatmessage/",
+     "name": "op-chatmessage"
+    },
+    {
+     "url": "/admin/operasi/areaanalysis/",
+     "name": "op-areaanalysis"
+    },
+    {
+     "url": "/admin/operasi/commandsettings/",
+     "name": "op-commandsettings"
+    },
+    {
+     "url": "/admin/operasi/korwil/",
+     "name": "op-korwil-detail",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a"
+      },
+      {
+       "wait": 1500
+      }
+     ]
+    },
+    {
+     "url": "/admin/operasi/commandsettings/",
+     "name": "op-pengaturan-full",
+     "full": true
+    }
+   ]
+  }
+ ]
+}

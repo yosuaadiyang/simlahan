@@ -1,0 +1,357 @@
+{
+ "out": "../gambar/alokasi",
+ "groups": [
+  {
+   "login": "admin",
+   "user": "contoh.alokasi",
+   "items": [
+    {
+     "url": "/admin/alokasi/allocation/",
+     "name": "alokasi-daftar"
+    },
+    {
+     "url": "/admin/alokasi/allocation/",
+     "name": "alokasi-detail-full",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      }
+     ],
+     "full": true
+    },
+    {
+     "url": "/admin/alokasi/landplot/",
+     "name": "lahan-detail",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      }
+     ]
+    },
+    {
+     "url": "/admin/alokasi/landplot/impor/",
+     "name": "lahan-impor"
+    },
+    {
+     "url": "/admin/alokasi/applicant/",
+     "name": "pemohon-daftar"
+    },
+    {
+     "url": "/admin/alokasi/developmentreport/",
+     "name": "laporan-pembangunan"
+    },
+    {
+     "url": "/admin/alokasi/issueddocument/",
+     "name": "dokumen-terbit"
+    },
+    {
+     "url": "/admin/alokasi/servicecatalog/",
+     "name": "katalog-layanan"
+    },
+    {
+     "url": "/admin/alokasi/requirementdoctype/",
+     "name": "jenis-persyaratan"
+    },
+    {
+     "url": "/admin/alokasi/infopage/",
+     "name": "konten-informasi"
+    },
+    {
+     "url": "/admin/alokasi/allocationsettings/",
+     "name": "pengaturan-alokasi"
+    },
+    {
+     "url": "/admin/alokasi/uwtregion/",
+     "name": "wilayah-uwt"
+    },
+    {
+     "url": "/admin/alokasi/uwtregion/",
+     "name": "wilayah-uwt-detail",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      }
+     ]
+    },
+    {
+     "url": "/admin/alokasi/uwttariff/",
+     "name": "tarif-uwt"
+    },
+    {
+     "url": "/admin/alokasi/contactmessage/",
+     "name": "pesan-kontak"
+    },
+    {
+     "url": "/admin/alokasi/investmentrequest/",
+     "name": "investasi-detail",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      }
+     ]
+    },
+    {
+     "url": "/admin/alokasi/investmentsector/",
+     "name": "sektor-investasi"
+    },
+    {
+     "url": "/admin/alokasi/investmentzone/",
+     "name": "kawasan-investasi"
+    }
+   ]
+  },
+  {
+   "login": "admin",
+   "user": "contoh.verifikasi",
+   "prefix": "verifikasi-",
+   "items": [
+    {
+     "url": "/admin/alokasi/verificationcriterion/",
+     "name": "kriteria"
+    }
+   ]
+  },
+  {
+   "login": "admin",
+   "user": "contoh.alokasi",
+   "items": [
+    {
+     "url": "/admin/alokasi/application/3/change/",
+     "name": "permohonan-diajukan",
+     "mark": [
+      [
+       "text=Mulai verifikasi teknis",
+       "1"
+      ],
+      [
+       "text=Minta perbaikan",
+       "2"
+      ],
+      [
+       "text=Tolak",
+       "3"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/alokasi/application/5/change/",
+     "name": "permohonan-verifikasi",
+     "mark": [
+      [
+       "text=Setujui",
+       "1"
+      ],
+      [
+       "text=Minta perbaikan",
+       "2"
+      ],
+      [
+       "text=Tolak",
+       "3"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/alokasi/application/5/change/",
+     "name": "permohonan-dokumen",
+     "actions": [
+      {
+       "scroll": "h2:has-text('Dokumen persyaratan')"
+      },
+      {
+       "scrollY": 0
+      },
+      {
+       "js": "document.querySelectorAll('h2').forEach(h=>{if(h.textContent.includes('Dokumen persyaratan'))window.scrollTo(0,h.getBoundingClientRect().top+scrollY-120)})"
+      }
+     ]
+    },
+    {
+     "url": "/admin/alokasi/application/3/proses/verifikasi/",
+     "name": "proses-verifikasi"
+    },
+    {
+     "url": "/admin/alokasi/application/5/proses/setujui/",
+     "name": "proses-setujui"
+    },
+    {
+     "url": "/admin/alokasi/application/5/proses/perbaikan/",
+     "name": "proses-perbaikan"
+    },
+    {
+     "url": "/admin/alokasi/application/",
+     "name": "permohonan-daftar",
+     "mark": [
+      [
+       "#changelist-filter",
+       "1"
+      ],
+      [
+       "#searchbar",
+       "2"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/alokasi/invoice/2/change/",
+     "name": "tagihan-detail",
+     "mark": [
+      [
+       "text=Nyatakan lunas",
+       "1"
+      ],
+      [
+       "text=Tolak bukti bayar",
+       "2"
+      ],
+      [
+       "text=Unduh tagihan PDF",
+       "3"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/alokasi/invoice/",
+     "name": "tagihan-daftar",
+     "mark": [
+      [
+       "select[name=action]",
+       "1"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/alokasi/allocation/1/change/",
+     "name": "alokasi-detail",
+     "mark": [
+      [
+       "text=Blokir PL",
+       "1"
+      ],
+      [
+       "text=Cabut alokasi",
+       "2"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/alokasi/allocation/1/blokir/",
+     "name": "alokasi-blokir"
+    },
+    {
+     "url": "/admin/alokasi/landplot/",
+     "name": "lahan-daftar",
+     "mark": [
+      [
+       "text=Impor GeoJSON/KML/KMZ",
+       "1"
+      ],
+      [
+       "text=Tambahkan Lahan",
+       "2"
+      ],
+      [
+       "select[name=action]",
+       "3"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/alokasi/investmentrequest/3/change/",
+     "name": "investasi-diajukan",
+     "mark": [
+      [
+       "text=Mulai tinjau",
+       "1"
+      ],
+      [
+       "text=Jadwalkan konsultasi",
+       "2"
+      ],
+      [
+       "text=Kirim penawaran",
+       "3"
+      ],
+      [
+       "text=Tolak",
+       "4"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/alokasi/investmentrequest/3/change/",
+     "name": "investasi-pesan",
+     "actions": [
+      {
+       "js": "document.querySelectorAll('h2').forEach(h=>{if(h.textContent.includes('Pesan dengan investor'))window.scrollTo(0,h.getBoundingClientRect().top+scrollY-100)})"
+      }
+     ]
+    },
+    {
+     "url": "/admin/alokasi/investmentrequest/2/change/",
+     "name": "investasi-ditawarkan"
+    },
+    {
+     "url": "/admin/alokasi/investmentrequest/3/proses/penawaran/",
+     "name": "investasi-form-penawaran"
+    },
+    {
+     "url": "/admin/alokasi/investmentrequest/1/proses/konsultasi/",
+     "name": "investasi-form-konsultasi"
+    },
+    {
+     "url": "/admin/alokasi/investmentrequest/",
+     "name": "investasi-daftar"
+    }
+   ]
+  },
+  {
+   "login": "admin",
+   "user": "contoh.verifikasi",
+   "prefix": "verifikasi-",
+   "items": [
+    {
+     "url": "/admin/alokasi/application/",
+     "name": "permohonan-daftar",
+     "mark": [
+      [
+       "text=Berdasarkan penilaian saya",
+       "1"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/alokasi/application/5/change/",
+     "name": "permohonan",
+     "mark": [
+      [
+       "text=Nilai verifikasi",
+       "1"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/alokasi/application/5/nilai/",
+     "name": "form-nilai"
+    },
+    {
+     "url": "/admin/alokasi/application/5/nilai/",
+     "name": "form-nilai-full",
+     "full": true
+    }
+   ]
+  }
+ ]
+}

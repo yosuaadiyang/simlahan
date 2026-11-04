@@ -1,6 +1,7 @@
 """Panduan pengguna per peran: satu sumber untuk halaman /akun/panduan/ dan
 dokumen ``docs/panduan-peran.md`` (dibuat ulang dengan
-``python manage.py panduan_peran > ../docs/panduan-peran.md``).
+``python manage.py panduan_peran > ../docs/panduan-peran.md``), serta ringkasan
+peran di buku panduan ``docs/panduan/peran/`` (``python manage.py panduan_buku``).
 
 Setiap grup di ``UserGroup`` wajib punya panduan di sini (dijaga tes).
 """

@@ -1,0 +1,287 @@
+{
+ "out": "../gambar/sewa",
+ "groups": [
+  {
+   "login": "spa",
+   "user": "contoh.administrator",
+   "items": [
+    {
+     "url": "/kontak",
+     "name": "kontak-daftar",
+     "mark": [
+      [
+       "text=Buat kontak",
+       "1"
+      ]
+     ]
+    },
+    {
+     "url": "/kontak-baru",
+     "name": "kontak-baru"
+    },
+    {
+     "url": "/kontak/4",
+     "name": "kontak-detail"
+    },
+    {
+     "url": "/catatan-area",
+     "name": "catatan-area",
+     "delay": 2500
+    },
+    {
+     "url": "/dasar-sewa",
+     "name": "prinsip-sewa-daftar"
+    },
+    {
+     "url": "/dasar-sewa/1",
+     "name": "prinsip-sewa-detail"
+    },
+    {
+     "url": "/laporan",
+     "name": "laporan"
+    },
+    {
+     "url": "/kompensasi-pembangunan-sisipan",
+     "name": "kompensasi-daftar"
+    },
+    {
+     "url": "/kompensasi-pembangunan-sisipan/1",
+     "name": "kompensasi-detail"
+    },
+    {
+     "url": "/pencarian-area",
+     "name": "pencarian-area-daftar"
+    },
+    {
+     "url": "/pencarian-area/1",
+     "name": "pencarian-area-detail",
+     "delay": 2500
+    },
+    {
+     "url": "/indeks",
+     "name": "indeks"
+    },
+    {
+     "url": "/tugas-terjadwal",
+     "name": "tugas-terjadwal"
+    },
+    {
+     "url": "/catatan-tagihan",
+     "name": "catatan-tagihan"
+    },
+    {
+     "url": "/kalkulator-sewa",
+     "name": "kalkulator-sewa"
+    },
+    {
+     "url": "/pencarian-kavling",
+     "name": "pencarian-kavling"
+    }
+   ]
+  },
+  {
+   "login": "spa",
+   "user": "contoh.administrator",
+   "items": [
+    {
+     "url": "/sewa",
+     "name": "daftar-sewa",
+     "mark": [
+      [
+       "text=Buat pengenal sewa",
+       "1"
+      ],
+      [
+       "input[placeholder*='Cari']",
+       "2"
+      ],
+      [
+       "text=Unit layanan >> nth=1",
+       "3"
+      ],
+      [
+       "[role=tab]:has(svg[aria-label=map])",
+       "4"
+      ]
+     ]
+    },
+    {
+     "url": "/sewa",
+     "name": "daftar-sewa-peta",
+     "actions": [
+      {
+       "click": "[role=tab]:has(svg[aria-label=map])"
+      },
+      {
+       "wait": 2000
+      }
+     ]
+    },
+    {
+     "url": "/sewa",
+     "name": "buat-pengenal-sewa",
+     "actions": [
+      {
+       "click": "text=Buat pengenal sewa"
+      },
+      {
+       "wait": 1000
+      }
+     ]
+    },
+    {
+     "url": "/sewa/2",
+     "name": "sewa-tab-ringkasan",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": ".tabs a[aria-label='Ringkasan']"
+      },
+      {
+       "wait": 1500
+      }
+     ],
+     "delay": 1500,
+     "mark": [
+      [
+       ".tabs__wrapper",
+       "1"
+      ],
+      [
+       "text=Ubah",
+       "2"
+      ]
+     ]
+    },
+    {
+     "url": "/sewa/2",
+     "name": "sewa-tab-area-sewa",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": ".tabs a[aria-label='Area sewa']"
+      },
+      {
+       "wait": 1500
+      }
+     ],
+     "delay": 1500
+    },
+    {
+     "url": "/sewa/2",
+     "name": "sewa-tab-penyewa",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": ".tabs a[aria-label='Penyewa']"
+      },
+      {
+       "wait": 1500
+      }
+     ],
+     "delay": 1500
+    },
+    {
+     "url": "/sewa/2",
+     "name": "sewa-tab-sewa",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": ".tabs a[aria-label='Sewa']"
+      },
+      {
+       "wait": 1500
+      }
+     ],
+     "delay": 1500
+    },
+    {
+     "url": "/sewa/2",
+     "name": "sewa-tab-keputusan-dan-kontrak",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": ".tabs a[aria-label='Keputusan dan kontrak']"
+      },
+      {
+       "wait": 1500
+      }
+     ],
+     "delay": 1500
+    },
+    {
+     "url": "/sewa/2",
+     "name": "sewa-tab-penagihan",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": ".tabs a[aria-label='Penagihan']"
+      },
+      {
+       "wait": 1500
+      }
+     ],
+     "delay": 1500
+    },
+    {
+     "url": "/sewa/2",
+     "name": "sewa-mode-ubah",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": "text=Ubah"
+      },
+      {
+       "wait": 1500
+      }
+     ],
+     "mark": [
+      [
+       "button:has-text('Tallenna'), button:has-text('Simpan')",
+       "1"
+      ],
+      [
+       "button:has-text('Batal'), button:has-text('Peruuta')",
+       "2"
+      ]
+     ]
+    },
+    {
+     "url": "/sewa/2",
+     "name": "sewa-area-ubah",
+     "actions": [
+      {
+       "wait": 1500
+      },
+      {
+       "click": ".tabs a[aria-label='Area sewa']"
+      },
+      {
+       "wait": 800
+      },
+      {
+       "click": "text=Ubah"
+      },
+      {
+       "wait": 1500
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

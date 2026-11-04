@@ -1,0 +1,1120 @@
+{
+ "out": "../gambar/komando",
+ "groups": [
+  {
+   "login": "komando",
+   "user": "contoh.lapangan",
+   "phone": true,
+   "prefix": "hp-",
+   "items": [
+    {
+     "url": "/komando/",
+     "name": "peta",
+     "delay": 3500,
+     "mark": [
+      [
+       ".map-tools",
+       "1"
+      ],
+      [
+       "button:has-text('Live')",
+       "2"
+      ],
+      [
+       "button:has-text('🆘')",
+       "3"
+      ],
+      [
+       ".tabbar",
+       "4"
+      ]
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "absen",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='absen']"
+      },
+      {
+       "wait": 2000
+      }
+     ],
+     "mark": [
+      [
+       "text=Absen masuk",
+       "1"
+      ],
+      [
+       "text=Absen pulang",
+       "2"
+      ]
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "absen-izin",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='absen']"
+      },
+      {
+       "wait": 1200
+      },
+      {
+       "click": "summary:has-text('Ajukan izin')"
+      },
+      {
+       "wait": 800
+      },
+      {
+       "scroll": "text=Kirim pengajuan"
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "lapor",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='korwil']"
+      },
+      {
+       "wait": 2000
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "lapor-komsos",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='korwil']"
+      },
+      {
+       "wait": 1200
+      },
+      {
+       "select": "#form-kegiatan select >> nth=0",
+       "value": "komsos"
+      },
+      {
+       "wait": 800
+      },
+      {
+       "scroll": "legend:has-text('Komsos')"
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "lapor-simpan",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='korwil']"
+      },
+      {
+       "wait": 1200
+      },
+      {
+       "scroll": "text=Simpan laporan"
+      }
+     ],
+     "mark": [
+      [
+       "text=Simpan laporan",
+       "1"
+      ]
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "lapor-uji-tanah",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='korwil']"
+      },
+      {
+       "wait": 1000
+      },
+      {
+       "click": "button[data-sub='tanah']"
+      },
+      {
+       "wait": 1000
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "lapor-saya",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='korwil']"
+      },
+      {
+       "wait": 1000
+      },
+      {
+       "click": "button[data-sub='riwayat']"
+      },
+      {
+       "wait": 2000
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "warga",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='warga']"
+      },
+      {
+       "wait": 2000
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "warga-tambah",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='warga']"
+      },
+      {
+       "wait": 1500
+      },
+      {
+       "click": "text=＋ Warga"
+      },
+      {
+       "wait": 1000
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "tugas",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='tasks']"
+      },
+      {
+       "wait": 2000
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "kinerja",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='perf']"
+      },
+      {
+       "wait": 2000
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "chat",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='chat']"
+      },
+      {
+       "wait": 2000
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "menu",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 2000
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "beranda",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='beranda']"
+      },
+      {
+       "wait": 2500
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "spasial",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='spasial']"
+      },
+      {
+       "wait": 2500
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "uji-plts",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='ujiplts']"
+      },
+      {
+       "wait": 2500
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "alat",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='alat']"
+      },
+      {
+       "wait": 2500
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "persetujuan",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='persetujuan']"
+      },
+      {
+       "wait": 2500
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "laporan-harian",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='laporan']"
+      },
+      {
+       "wait": 2500
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "peringkat",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='peringkat']"
+      },
+      {
+       "wait": 2500
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "struktur",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='struktur']"
+      },
+      {
+       "wait": 2500
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "feed",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='feed']"
+      },
+      {
+       "wait": 2500
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "asisten-ai",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='ai']"
+      },
+      {
+       "wait": 2500
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "sos",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": "button:has-text('🆘')"
+      },
+      {
+       "wait": 800
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "login": "komando",
+   "user": "contoh.korwil",
+   "phone": true,
+   "prefix": "korwil-",
+   "items": [
+    {
+     "url": "/komando/",
+     "name": "tugas",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='tasks']"
+      },
+      {
+       "wait": 2000
+      }
+     ],
+     "mark": [
+      [
+       "text=＋ Beri tugas",
+       "1"
+      ]
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "beri-tugas",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='tasks']"
+      },
+      {
+       "wait": 1500
+      },
+      {
+       "click": "text=＋ Beri tugas"
+      },
+      {
+       "wait": 1000
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "persetujuan",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='persetujuan']"
+      },
+      {
+       "wait": 2500
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "laporan-harian",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='laporan']"
+      },
+      {
+       "wait": 2500
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "historis",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='historis']"
+      },
+      {
+       "wait": 2500
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "beranda",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='beranda']"
+      },
+      {
+       "wait": 2500
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "spasial-ancaman",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='spasial']"
+      },
+      {
+       "wait": 2500
+      },
+      {
+       "click": "button[data-bagian='ancaman']"
+      },
+      {
+       "wait": 1500
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "spasial-jejak",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='spasial']"
+      },
+      {
+       "wait": 2500
+      },
+      {
+       "click": "button[data-bagian='jejak']"
+      },
+      {
+       "wait": 1500
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "alat-audit",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='alat']"
+      },
+      {
+       "wait": 2500
+      },
+      {
+       "click": "button[data-alat='audit']"
+      },
+      {
+       "wait": 800
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "kinerja",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='perf']"
+      },
+      {
+       "wait": 2000
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "absen",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='absen']"
+      },
+      {
+       "wait": 2000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "login": "komando",
+   "user": "contoh.administrator",
+   "prefix": "",
+   "items": [
+    {
+     "url": "/komando/",
+     "name": "peta-desktop",
+     "delay": 4000
+    },
+    {
+     "url": "/komando/",
+     "name": "legenda-desktop",
+     "actions": [
+      {
+       "wait": 3000
+      },
+      {
+       "click": "button[data-tool='legend']"
+      },
+      {
+       "wait": 1000
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "cetak-desktop",
+     "actions": [
+      {
+       "wait": 3000
+      },
+      {
+       "click": "button[data-tool='print']"
+      },
+      {
+       "wait": 1000
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "spasial-desktop",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='spasial']"
+      },
+      {
+       "wait": 2500
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "beranda-desktop",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='beranda']"
+      },
+      {
+       "wait": 2500
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "peringkat-desktop",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='peringkat']"
+      },
+      {
+       "wait": 2500
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "alat-desktop",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='alat']"
+      },
+      {
+       "wait": 2500
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "spasial-tumpang",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='spasial']"
+      },
+      {
+       "wait": 2500
+      },
+      {
+       "click": "button[data-bagian='tumpang']"
+      },
+      {
+       "wait": 800
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "spasial-audit",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='spasial']"
+      },
+      {
+       "wait": 2500
+      },
+      {
+       "click": "button[data-bagian='audit']"
+      },
+      {
+       "wait": 800
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "spasial-panas",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='spasial']"
+      },
+      {
+       "wait": 2500
+      },
+      {
+       "click": "button[data-bagian='panas']"
+      },
+      {
+       "wait": 800
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "spasial-foto",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='spasial']"
+      },
+      {
+       "wait": 2500
+      },
+      {
+       "click": "button[data-bagian='foto']"
+      },
+      {
+       "wait": 1200
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "alat-ocr",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='alat']"
+      },
+      {
+       "wait": 2500
+      },
+      {
+       "click": "button[data-alat='ocr']"
+      },
+      {
+       "wait": 800
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "alat-dokumen",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='alat']"
+      },
+      {
+       "wait": 2500
+      },
+      {
+       "click": "button[data-alat='dokumen']"
+      },
+      {
+       "wait": 800
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "alat-sinkron",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='alat']"
+      },
+      {
+       "wait": 2500
+      },
+      {
+       "click": "button[data-alat='sinkron']"
+      },
+      {
+       "wait": 800
+      }
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "uji-plts-desktop",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='ujiplts']"
+      },
+      {
+       "wait": 2500
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "login": "komando",
+   "user": "contoh.aset",
+   "prefix": "aset-",
+   "items": [
+    {
+     "url": "/komando/",
+     "name": "peta",
+     "delay": 3500
+    },
+    {
+     "url": "/komando/",
+     "name": "lapor",
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='korwil']"
+      },
+      {
+       "wait": 2000
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
