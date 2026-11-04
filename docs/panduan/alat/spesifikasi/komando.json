@@ -95,7 +95,7 @@
        "wait": 800
       },
       {
-       "js": "(()=>{const t=[...document.querySelectorAll(\"summary\")].find(x=>x.offsetParent!==null); t.scrollIntoView({block:'start'}); let e=t.parentElement; while(e && !(e.scrollHeight>e.clientHeight+5 && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e=e.parentElement; if(e) e.scrollTop-=20; else window.scrollBy(0,-20);})()"
+       "js": "(()=>{const t=[...document.querySelectorAll(\"summary\")].find(x=>x.offsetParent!==null && (null===null || x.textContent.trim().startsWith(null))); t.scrollIntoView({block:'start'}); let e=t.parentElement; while(e && !(e.scrollHeight>e.clientHeight+5 && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e=e.parentElement; if(e) e.scrollTop-=20; else window.scrollBy(0,-20);})()"
       },
       {
        "wait": 500
@@ -189,7 +189,7 @@
        "wait": 1800
       },
       {
-       "js": "(()=>{const t=[...document.querySelectorAll(\"input[name=pendamping]\")].find(x=>x.offsetParent!==null); t.scrollIntoView({block:'start'}); let e=t.parentElement; while(e && !(e.scrollHeight>e.clientHeight+5 && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e=e.parentElement; if(e) e.scrollTop-=40; else window.scrollBy(0,-40);})()"
+       "js": "(()=>{const t=[...document.querySelectorAll(\"input[name=pendamping]\")].find(x=>x.offsetParent!==null && (null===null || x.textContent.trim().startsWith(null))); t.scrollIntoView({block:'start'}); let e=t.parentElement; while(e && !(e.scrollHeight>e.clientHeight+5 && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e=e.parentElement; if(e) e.scrollTop-=40; else window.scrollBy(0,-40);})()"
       },
       {
        "wait": 500
@@ -247,7 +247,7 @@
        "wait": 800
       },
       {
-       "js": "(()=>{const t=[...document.querySelectorAll(\"[data-wb=status_warga]\")].find(x=>x.offsetParent!==null); t.scrollIntoView({block:'start'}); let e=t.parentElement; while(e && !(e.scrollHeight>e.clientHeight+5 && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e=e.parentElement; if(e) e.scrollTop-=40; else window.scrollBy(0,-40);})()"
+       "js": "(()=>{const t=[...document.querySelectorAll(\"[data-wb=status_warga]\")].find(x=>x.offsetParent!==null && (null===null || x.textContent.trim().startsWith(null))); t.scrollIntoView({block:'start'}); let e=t.parentElement; while(e && !(e.scrollHeight>e.clientHeight+5 && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e=e.parentElement; if(e) e.scrollTop-=40; else window.scrollBy(0,-40);})()"
       },
       {
        "wait": 500
@@ -322,7 +322,7 @@
        "wait": 1800
       },
       {
-       "js": "(()=>{const t=[...document.querySelectorAll(\"#kg-tugas\")].find(x=>x.offsetParent!==null); t.scrollIntoView({block:'start'}); let e=t.parentElement; while(e && !(e.scrollHeight>e.clientHeight+5 && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e=e.parentElement; if(e) e.scrollTop-=40; else window.scrollBy(0,-40);})()"
+       "js": "(()=>{const t=[...document.querySelectorAll(\"#kg-tugas\")].find(x=>x.offsetParent!==null && (null===null || x.textContent.trim().startsWith(null))); t.scrollIntoView({block:'start'}); let e=t.parentElement; while(e && !(e.scrollHeight>e.clientHeight+5 && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e=e.parentElement; if(e) e.scrollTop-=40; else window.scrollBy(0,-40);})()"
       },
       {
        "wait": 500
@@ -435,7 +435,7 @@
        "wait": 1000
       },
       {
-       "js": "(()=>{const t=[...document.querySelectorAll(\"input[name=lab]\")].find(x=>x.offsetParent!==null); t.scrollIntoView({block:'start'}); let e=t.parentElement; while(e && !(e.scrollHeight>e.clientHeight+5 && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e=e.parentElement; if(e) e.scrollTop-=40; else window.scrollBy(0,-40);})()"
+       "js": "(()=>{const t=[...document.querySelectorAll(\"input[name=lab]\")].find(x=>x.offsetParent!==null && (null===null || x.textContent.trim().startsWith(null))); t.scrollIntoView({block:'start'}); let e=t.parentElement; while(e && !(e.scrollHeight>e.clientHeight+5 && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e=e.parentElement; if(e) e.scrollTop-=40; else window.scrollBy(0,-40);})()"
       },
       {
        "wait": 500
@@ -569,7 +569,7 @@
        "wait": 1000
       },
       {
-       "js": "(()=>{const t=[...document.querySelectorAll(\"h3:has-text('Tambah warga')\")].find(x=>x.offsetParent!==null); t.scrollIntoView({block:'start'}); let e=t.parentElement; while(e && !(e.scrollHeight>e.clientHeight+5 && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e=e.parentElement; if(e) e.scrollTop-=20; else window.scrollBy(0,-20);})()"
+       "js": "(()=>{const t=[...document.querySelectorAll(\"h3\")].find(x=>x.offsetParent!==null && (\"Tambah warga\"===null || x.textContent.trim().startsWith(\"Tambah warga\"))); t.scrollIntoView({block:'start'}); let e=t.parentElement; while(e && !(e.scrollHeight>e.clientHeight+5 && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e=e.parentElement; if(e) e.scrollTop-=20; else window.scrollBy(0,-20);})()"
       },
       {
        "wait": 500
@@ -625,7 +625,7 @@
     {
      "url": "/komando/",
      "name": "warga-tambah-bawah",
-     "tinggi": 980,
+     "tinggi": 1120,
      "actions": [
       {
        "wait": 2500
@@ -643,7 +643,7 @@
        "wait": 1000
       },
       {
-       "js": "(()=>{const t=[...document.querySelectorAll(\"select[name=penggarapan]\")].find(x=>x.offsetParent!==null); t.scrollIntoView({block:'start'}); let e=t.parentElement; while(e && !(e.scrollHeight>e.clientHeight+5 && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e=e.parentElement; if(e) e.scrollTop-=40; else window.scrollBy(0,-40);})()"
+       "js": "(()=>{const t=[...document.querySelectorAll(\"select[name=penggarapan]\")].find(x=>x.offsetParent!==null && (null===null || x.textContent.trim().startsWith(null))); t.scrollIntoView({block:'start'}); let e=t.parentElement; while(e && !(e.scrollHeight>e.clientHeight+5 && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e=e.parentElement; if(e) e.scrollTop-=40; else window.scrollBy(0,-40);})()"
       },
       {
        "wait": 500
@@ -712,6 +712,7 @@
     {
      "url": "/komando/",
      "name": "tugas-detail",
+     "tinggi": 840,
      "actions": [
       {
        "wait": 2500
@@ -788,7 +789,7 @@
     {
      "url": "/komando/",
      "name": "kinerja-bawah",
-     "tinggi": 780,
+     "tinggi": 880,
      "actions": [
       {
        "wait": 2500
@@ -800,7 +801,7 @@
        "wait": 1800
       },
       {
-       "js": "(()=>{const t=[...document.querySelectorAll(\"h3:text-is('Tugas terbuka')\")].find(x=>x.offsetParent!==null); t.scrollIntoView({block:'start'}); let e=t.parentElement; while(e && !(e.scrollHeight>e.clientHeight+5 && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e=e.parentElement; if(e) e.scrollTop-=40; else window.scrollBy(0,-40);})()"
+       "js": "(()=>{const t=[...document.querySelectorAll(\"h3\")].find(x=>x.offsetParent!==null && (\"Tugas terbuka\"===null || x.textContent.trim().startsWith(\"Tugas terbuka\"))); t.scrollIntoView({block:'start'}); let e=t.parentElement; while(e && !(e.scrollHeight>e.clientHeight+5 && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e=e.parentElement; if(e) e.scrollTop-=40; else window.scrollBy(0,-40);})()"
       },
       {
        "wait": 500
@@ -1018,7 +1019,7 @@
     {
      "url": "/komando/",
      "name": "alat",
-     "tinggi": 780,
+     "tinggi": 880,
      "actions": [
       {
        "wait": 2500
@@ -1091,7 +1092,7 @@
     {
      "url": "/komando/",
      "name": "laporan-harian",
-     "tinggi": 820,
+     "tinggi": 900,
      "actions": [
       {
        "wait": 2500
@@ -1391,6 +1392,7 @@
     {
      "url": "/komando/",
      "name": "tugas-verifikasi",
+     "tinggi": 780,
      "actions": [
       {
        "wait": 2500
@@ -1661,12 +1663,6 @@
       },
       {
        "wait": 500
-      },
-      {
-       "click": "#jj-tampil"
-      },
-      {
-       "wait": 2500
       }
      ],
      "mark": [
@@ -1681,11 +1677,47 @@
       [
        "#jj-tampil",
        "3"
-      ],
-      [
-       "#jj-hasil",
-       "4"
       ]
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "spasial-jejak-peta",
+     "delay": 1500,
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "click": ".tabbar button[data-tab='lainnya']"
+      },
+      {
+       "wait": 600
+      },
+      {
+       "click": ".more-menu button[data-buka='spasial']"
+      },
+      {
+       "wait": 2500
+      },
+      {
+       "click": "button[data-bagian=jejak]"
+      },
+      {
+       "wait": 1500
+      },
+      {
+       "js": "(async()=>{const i=document.getElementById('jj-tanggal'); for(let k=0;k<60;k++){const d=new Date(Date.now()-k*864e5); i.value=d.toLocaleDateString('sv-SE',{timeZone:'Asia/Jakarta'}); i.dispatchEvent(new Event('change')); await new Promise(r=>setTimeout(r,600)); const s=document.getElementById('jj-petugas'); if(s.options.length>1){s.selectedIndex=1; s.dispatchEvent(new Event('change')); return;}}})()"
+      },
+      {
+       "wait": 500
+      },
+      {
+       "click": "#jj-tampil"
+      },
+      {
+       "wait": 3000
+      }
      ]
     },
     {
@@ -1766,7 +1798,7 @@
        "wait": 1800
       },
       {
-       "js": "(()=>{const t=[...document.querySelectorAll(\"h3:text-is('Persetujuan izin tim')\")].find(x=>x.offsetParent!==null); t.scrollIntoView({block:'start'}); let e=t.parentElement; while(e && !(e.scrollHeight>e.clientHeight+5 && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e=e.parentElement; if(e) e.scrollTop-=20; else window.scrollBy(0,-20);})()"
+       "js": "(()=>{const t=[...document.querySelectorAll(\"h3\")].find(x=>x.offsetParent!==null && (\"Persetujuan izin tim\"===null || x.textContent.trim().startsWith(\"Persetujuan izin tim\"))); t.scrollIntoView({block:'start'}); let e=t.parentElement; while(e && !(e.scrollHeight>e.clientHeight+5 && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e=e.parentElement; if(e) e.scrollTop-=20; else window.scrollBy(0,-20);})()"
       },
       {
        "wait": 500
@@ -1843,10 +1875,33 @@
       [
        "#mode-korwil",
        "2"
-      ],
+      ]
+     ]
+    },
+    {
+     "url": "/komando/",
+     "name": "legenda-lapisan",
+     "actions": [
+      {
+       "wait": 3000
+      },
+      {
+       "click": "button[data-tool='legend']"
+      },
+      {
+       "wait": 1000
+      },
+      {
+       "js": "const l=document.querySelector('.legend'); l.scrollTop=l.scrollHeight"
+      },
+      {
+       "wait": 400
+      }
+     ],
+     "mark": [
       [
-       "label:has(input[data-lapisan=korwil])",
-       "3"
+       ".legend .layer-list >> nth=0",
+       "1"
       ]
      ]
     },
@@ -2254,47 +2309,6 @@
       ],
       [
        "button:text-is('Analisis') >> visible=true",
-       "3"
-      ]
-     ]
-    },
-    {
-     "url": "/komando/",
-     "name": "alat-foto",
-     "actions": [
-      {
-       "wait": 2500
-      },
-      {
-       "click": ".tabbar button[data-tab='lainnya']"
-      },
-      {
-       "wait": 600
-      },
-      {
-       "click": ".more-menu button[data-buka='alat']"
-      },
-      {
-       "wait": 2500
-      },
-      {
-       "click": "button[data-alat=foto]"
-      },
-      {
-       "wait": 800
-      }
-     ],
-     "mark": [
-      [
-       "form:has(input[name=konteks]) input[type=file]",
-       "1"
-      ],
-      [
-       "input[name=konteks]",
-       "2"
-      ],
-      [
-       "button:text-is('Analisis foto')",
        "3"
       ]
      ]

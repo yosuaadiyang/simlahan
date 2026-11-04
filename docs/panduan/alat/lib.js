@@ -79,6 +79,9 @@ async function mark(p, marks, full = false) {
     const vp = p.viewportSize();
     if (!full && (box.y < 0 || box.y + box.height > vp.height)) throw new Error('penanda di luar layar (gulir dulu): ' + sel);
     if (box.x < 0 || box.x + box.width > vp.width + 1) throw new Error('penanda di luar layar (geser ke samping): ' + sel);
+    // Penanda di dalam <dialog> modal harus ditempel ke dialog itu (lapisan teratas),
+    // kalau tidak tertutup dialog.
+    const inDialog = await loc.evaluate((e) => !!e.closest('dialog[open]'));
     const field = await loc.evaluate((e) => {
       // Label di kiri kotak (formulir panel admin): nomor di kanan agar label tetap terbaca.
       const lab = e.id && document.querySelector(`label[for="${e.id}"]`);
@@ -87,11 +90,13 @@ async function mark(p, marks, full = false) {
       if (['SELECT', 'TEXTAREA'].includes(e.tagName) || (e.tagName === 'INPUT' && !['submit', 'button', 'file'].includes(e.type)) || (/-control\b/.test(e.className) && !!e.querySelector('input'))) return labLeft ? 'field-r' : 'field';
       return '';
     });
-    await p.evaluate(({ box, n, field }) => {
-      const sx = window.scrollX, sy = window.scrollY;
+    await p.evaluate(({ box, n, field, inDialog }) => {
+      const host = (inDialog && document.querySelector('dialog[open]')) || document.body;
+      const pos = host === document.body ? 'absolute' : 'fixed';
+      const sx = pos === 'fixed' ? 0 : window.scrollX, sy = pos === 'fixed' ? 0 : window.scrollY;
       const r = document.createElement('div'); r.className = '__mk';
-      Object.assign(r.style, { position: 'absolute', left: (box.x + sx - 4) + 'px', top: (box.y + sy - 4) + 'px', width: (box.width + 8) + 'px', height: (box.height + 8) + 'px', border: '3px solid #e11d48', borderRadius: '8px', zIndex: 2147483646, pointerEvents: 'none', boxShadow: '0 0 0 3px rgba(225,29,72,.18)' });
-      document.body.appendChild(r);
+      Object.assign(r.style, { position: pos, left: (box.x + sx - 4) + 'px', top: (box.y + sy - 4) + 'px', width: (box.width + 8) + 'px', height: (box.height + 8) + 'px', border: '3px solid #e11d48', borderRadius: '8px', zIndex: 2147483646, pointerEvents: 'none', boxShadow: '0 0 0 3px rgba(225,29,72,.18)' });
+      host.appendChild(r);
       if (n) {
         const b = document.createElement('div'); b.className = '__mk'; b.textContent = n;
         // Kolom isian: nomor di sudut kanan atas kotak (menumpang garis tepi) agar
@@ -117,10 +122,10 @@ async function mark(p, marks, full = false) {
         const clash = ([l, t]) => placed.some(([a, c]) => Math.abs(a - l) < 30 && Math.abs(c - t) < 30);
         let [left, top] = fit(cands.find((c) => !clash(fit(c))) || cands[0]);
         placed.push([left, top]);
-        Object.assign(b.style, { position: 'absolute', left: left + 'px', top: top + 'px', minWidth: '26px', height: '26px', borderRadius: '13px', background: '#e11d48', color: '#fff', font: '700 15px/26px Inter, Arial, sans-serif', textAlign: 'center', zIndex: 2147483647, pointerEvents: 'none', boxShadow: '0 1px 4px rgba(0,0,0,.35)' });
-        document.body.appendChild(b);
+        Object.assign(b.style, { position: pos, left: left + 'px', top: top + 'px', minWidth: '26px', height: '26px', borderRadius: '13px', background: '#e11d48', color: '#fff', font: '700 15px/26px Inter, Arial, sans-serif', textAlign: 'center', zIndex: 2147483647, pointerEvents: 'none', boxShadow: '0 1px 4px rgba(0,0,0,.35)' });
+        host.appendChild(b);
       }
-    }, { box, n, field });
+    }, { box, n, field, inDialog });
   }
 }
 // Gambar satu halaman penuh: bilah yang menempel (sticky/fixed) dibuat biasa agar
