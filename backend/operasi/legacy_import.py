@@ -87,7 +87,6 @@ from operasi.pgdump import Dump
 from operasi.spatial import TRACK_KEEP_DAYS
 from utils.group_permissions import UserGroup
 
-MAX_TASK_POINTS = 100
 NO_KORWIL = {"", "-", "NK", "ALL", "LINTAS", "TL"}
 FIELD_ROLES = {"Anggota", "PHL"}
 COORDINATOR_ROLES = {"Ka Korwil", "Ka Tim Lahan"}
@@ -1358,10 +1357,10 @@ class LegacyImporter:
 
     def _task_values(self, row):
         points = to_int(row["poin_nilai"]) or 0
-        if points > MAX_TASK_POINTS:
+        if points > enums.MAX_TASK_POINTS:
             self.report.warn(
                 f"Tugas '{clean_text(row['title'])}': nilai poin {points} "
-                f"dipangkas jadi {MAX_TASK_POINTS} (batas SimLahan); poin yang "
+                f"dipangkas jadi {enums.MAX_TASK_POINTS} (batas SimLahan); poin yang "
                 "sudah diterima petugas tetap seperti data lama."
             )
         notes = meaningful(row["completion_notes"])
@@ -1385,7 +1384,7 @@ class LegacyImporter:
                 clean_text(row["jenis_kegiatan"]).lower(),
                 enums.ActivityType.OTHER if row["jenis_kegiatan"] else "",
             ),
-            "point_value": min(points, MAX_TASK_POINTS),
+            "point_value": min(points, enums.MAX_TASK_POINTS),
             "created_by": self.user(row["assigned_by"]),
         }
         if (
@@ -1438,7 +1437,7 @@ class LegacyImporter:
             task=task,
             user=user,
             role=role,
-            points=min(points, 32767),
+            points=points,
             awarded_at=moment or timezone.now(),
         )
         self.report.add("tasks", "poin KPI")

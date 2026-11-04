@@ -1880,7 +1880,7 @@ class TaskPoint(models.Model):
     role = models.CharField(
         _("Peran"), max_length=16, choices=enums.TaskPointRole.choices
     )
-    points = models.PositiveSmallIntegerField(_("Poin"))
+    points = models.PositiveIntegerField(_("Poin"))
     awarded_at = models.DateTimeField(_("Diberikan pada"), default=timezone.now)
 
     class Meta:

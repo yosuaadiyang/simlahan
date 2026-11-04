@@ -384,6 +384,11 @@ class TaskEventKind(models.TextChoices):
     CANCELLED = "dibatalkan", _("Dibatalkan")
 
 
+# Batas nilai poin satu tugas (seperti sistem komando lama: ribuan hingga
+# ratusan ribu poin).
+MAX_TASK_POINTS = 1_000_000
+
+
 class TaskPointRole(models.TextChoices):
     ASSIGNEE = "penerima", _("Penerima utama")
     CONTRIBUTOR = "kontributor", _("Kontributor lapangan")

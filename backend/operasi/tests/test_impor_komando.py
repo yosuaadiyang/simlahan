@@ -276,7 +276,7 @@ def sample_tables():
                 ),
                 "created_at": "2026-09-04 09:46:04+00",
                 "updated_at": "2026-09-04 09:46:04+00",
-                "poin_nilai": "1000",
+                "poin_nilai": "250000",
             }
         ],
         "task_assignees": [
@@ -284,7 +284,7 @@ def sample_tables():
                 "id": "x1",
                 "task_id": TASK,
                 "personel_id": FIELD,
-                "poin_earned": "1000",
+                "poin_earned": "250000",
                 "poin_given": "t",
             },
             {
@@ -781,12 +781,12 @@ def test_full_import_and_rerun(importable, dump_file, tmp_path):
 
     task = Task.objects.get()
     assert report.task == task
-    assert task.point_value == 100
+    assert task.point_value == 250_000  # ratusan ribu poin tidak dipangkas
     assert task.assignee == officer and task.created_by == coordinator
     assert list(task.contributors.all()) == [leader]
     points = {(p.user, p.role, p.points) for p in TaskPoint.objects.all()}
     assert points == {
-        (officer, enums.TaskPointRole.ASSIGNEE, 1000),
+        (officer, enums.TaskPointRole.ASSIGNEE, 250_000),
         (coordinator, enums.TaskPointRole.GIVER, 10),
     }
     kinds = list(
@@ -809,7 +809,7 @@ def test_full_import_and_rerun(importable, dump_file, tmp_path):
     assert "land_polygons: dibaca 2, dibuat 1, dilewati 1" in output
     assert "activity_log (1 baris)" in output
     assert "backup_warga_20260903 (1 baris)" in output
-    assert "Tugas 'Lahan PLTS 96 Ha': nilai poin 1000" in output
+    assert "dipangkas" not in output
 
     assert stat.S_IMODE(os.stat(secrets_file).st_mode) == 0o600
     rows = secrets_file.read_text().splitlines()
@@ -829,6 +829,15 @@ def test_full_import_and_rerun(importable, dump_file, tmp_path):
 
 
 @pytest.mark.django_db
+def test_task_points_above_limit_are_capped(importable, tmp_path):
+    tables = sample_tables()
+    tables["tasks"][0]["poin_nilai"] = str(enums.MAX_TASK_POINTS + 1)
+    out = io.StringIO()
+    call_command("impor_komando", write_sql(tmp_path / "besar.sql", tables), stdout=out)
+    assert Task.objects.get().point_value == enums.MAX_TASK_POINTS
+    assert "nilai poin 1000001 dipangkas jadi 1000000" in out.getvalue()
+
+
 def test_update_and_deleted_records(importable, dump_file):
     run(dump_file)
     agus = Resident.objects.get(head_name="Agus")

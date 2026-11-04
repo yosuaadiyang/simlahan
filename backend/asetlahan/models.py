@@ -1730,10 +1730,10 @@ class Task(TimeStampedModel):
         blank=True,
         default="",
     )
-    point_value = models.PositiveSmallIntegerField(
+    point_value = models.PositiveIntegerField(
         _("Nilai poin KPI"),
         default=0,
-        validators=[MaxValueValidator(100)],
+        validators=[MaxValueValidator(operasi_enums.MAX_TASK_POINTS)],
         help_text=_(
             "Diberikan ke penerima, kontributor, dan pemberi tugas setelah tugas "
             "diverifikasi selesai."

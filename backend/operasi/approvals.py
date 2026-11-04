@@ -9,6 +9,7 @@ import datetime
 
 from django.db.models import Q
 from django.utils import timezone
+from django.utils.formats import number_format
 from django.utils.translation import gettext as _
 
 from asetlahan import enums as aset_enums
@@ -135,7 +136,12 @@ def pending(user) -> list[dict]:
                             [
                                 _name(task.assignee),
                                 (
-                                    _("%(n)d poin") % {"n": task.point_value}
+                                    _("%(n)s poin")
+                                    % {
+                                        "n": number_format(
+                                            task.point_value, force_grouping=True
+                                        )
+                                    }
                                     if task.point_value
                                     else ""
                                 ),
