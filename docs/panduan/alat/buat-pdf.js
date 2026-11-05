@@ -103,8 +103,11 @@ async function pdf(page, files, subtitle, out) {
   console.log('ok', path.relative(process.cwd(), out));
 }
 
+// Bab yang ditautkan buku peran ikut masuk PDF perannya. Isi sisipan (langkah yang
+// sudah disalin dari bab) tidak dihitung agar bab yang sama tidak tercetak dua kali.
 function linkedChapters(rel) {
-  const src = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+  const src = fs.readFileSync(path.join(ROOT, rel), 'utf8')
+    .replace(/<!-- sisip: [^>]*-->[\s\S]*?<!-- akhir sisip -->/g, '');
   const dir = path.dirname(path.join(ROOT, rel));
   const found = new Set();
   for (const m of src.matchAll(/\]\(([^)#\s]+\.md)(#[^)]*)?\)/g)) {
@@ -118,7 +121,9 @@ function linkedChapters(rel) {
   fs.mkdirSync(OUT, { recursive: true });
   const browser = await launch();
   const page = await browser.newPage();
-  await pdf(page, ['README.md', ...chapters, ...roleBooks], 'Buku lengkap', path.join(OUT, 'panduan-simlahan-lengkap.pdf'));
+  // Buku peran berisi salinan langkah dari bab, jadi tidak ikut buku lengkap
+  // (masing-masing punya PDF sendiri di folder peran/).
+  await pdf(page, ['README.md', ...chapters], 'Buku lengkap', path.join(OUT, 'panduan-simlahan-lengkap.pdf'));
   for (const book of roleBooks) {
     const name = fs.readFileSync(path.join(ROOT, book), 'utf8').match(/^# Buku peran: (.+)$/m)[1];
     const files = [book, ...new Set(['01-mengenal-simlahan.md', '02-dasar-penggunaan.md', ...linkedChapters(book)])];

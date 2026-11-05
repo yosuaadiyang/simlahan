@@ -64,24 +64,79 @@ async function loginKomando(page, user) {
   await Promise.all([page.waitForNavigation(), page.click('form [type=submit]')]);
 }
 // Kotak merah bernomor untuk menunjuk tombol atau kolom di gambar.
-async function mark(p, marks) {
+// Setiap penanda berupa [pemilih, nomor]. Pemilih memakai sintaks Playwright
+// (misalnya "text=Simpan", "#id_nama", "role=button[name='Simpan']"), atau
+// "label=Teks label" untuk kolom isian berlabel. Penanda yang tidak ditemukan
+// menggagalkan gambar agar nomor di teks tidak pernah menunjuk ke tempat kosong.
+async function mark(p, marks, full = false) {
   for (const [sel, n] of marks) {
-    const loc = p.locator(sel + ' >> visible=true').first();
+    const loc = sel.startsWith('label=')
+      ? p.getByLabel(sel.slice(6)).filter({ visible: true }).first()
+      : p.locator(sel + ' >> visible=true').first();
     let box;
     try { box = await loc.boundingBox({ timeout: 4000 }); } catch (e) { box = null; }
-    if (!box) { console.log('  penanda tidak ditemukan:', sel); continue; }
-    await p.evaluate(({ box, n }) => {
-      const sx = window.scrollX, sy = window.scrollY;
+    if (!box) throw new Error('penanda tidak ditemukan: ' + sel);
+    const vp = p.viewportSize();
+    if (!full && (box.y < 0 || box.y + box.height > vp.height)) throw new Error('penanda di luar layar (gulir dulu): ' + sel);
+    if (box.x < 0 || box.x + box.width > vp.width + 1) throw new Error('penanda di luar layar (geser ke samping): ' + sel);
+    // Penanda di dalam <dialog> modal harus ditempel ke dialog itu (lapisan teratas),
+    // kalau tidak tertutup dialog.
+    const inDialog = await loc.evaluate((e) => !!e.closest('dialog[open]'));
+    const field = await loc.evaluate((e) => {
+      // Label di kiri kotak (formulir panel admin): nomor di kanan agar label tetap terbaca.
+      const lab = e.id && document.querySelector(`label[for="${e.id}"]`);
+      const labLeft = lab && lab.getBoundingClientRect().right <= e.getBoundingClientRect().left + 4;
+      if (e.tagName === 'INPUT' && (['checkbox', 'radio'].includes(e.type) || (e.type === 'file' && e.getBoundingClientRect().width < 150))) return labLeft ? 'check-r' : 'check';
+      if (['SELECT', 'TEXTAREA'].includes(e.tagName) || (e.tagName === 'INPUT' && !['submit', 'button'].includes(e.type)) || (/-control\b/.test(e.className) && !!e.querySelector('input'))) return labLeft ? 'field-r' : 'field';
+      return '';
+    });
+    await p.evaluate(({ box, n, field, inDialog }) => {
+      const host = (inDialog && document.querySelector('dialog[open]')) || document.body;
+      const pos = host === document.body ? 'absolute' : 'fixed';
+      const sx = pos === 'fixed' ? 0 : window.scrollX, sy = pos === 'fixed' ? 0 : window.scrollY;
       const r = document.createElement('div'); r.className = '__mk';
-      Object.assign(r.style, { position: 'absolute', left: (box.x + sx - 4) + 'px', top: (box.y + sy - 4) + 'px', width: (box.width + 8) + 'px', height: (box.height + 8) + 'px', border: '3px solid #e11d48', borderRadius: '8px', zIndex: 2147483646, pointerEvents: 'none', boxShadow: '0 0 0 3px rgba(225,29,72,.18)' });
-      document.body.appendChild(r);
+      Object.assign(r.style, { position: pos, left: (box.x + sx - 4) + 'px', top: (box.y + sy - 4) + 'px', width: (box.width + 8) + 'px', height: (box.height + 8) + 'px', border: '3px solid #e11d48', borderRadius: '8px', zIndex: 2147483646, pointerEvents: 'none', boxShadow: '0 0 0 3px rgba(225,29,72,.18)' });
+      host.appendChild(r);
       if (n) {
         const b = document.createElement('div'); b.className = '__mk'; b.textContent = n;
-        Object.assign(b.style, { position: 'absolute', left: Math.max(2, box.x + sx - 16) + 'px', top: Math.max(2, box.y + sy - 16) + 'px', minWidth: '26px', height: '26px', borderRadius: '13px', background: '#e11d48', color: '#fff', font: '700 15px/26px Inter, Arial, sans-serif', textAlign: 'center', zIndex: 2147483647, pointerEvents: 'none', boxShadow: '0 1px 4px rgba(0,0,0,.35)' });
-        document.body.appendChild(b);
+        // Kolom isian: nomor di sudut kanan atas kotak (menumpang garis tepi) agar
+        // jelas milik kolom itu tanpa menutupi isi atau labelnya. Kotak centang: di
+        // sampingnya. Tombol dan lainnya: sudut kiri atas. Bila bertabrakan dengan
+        // nomor lain, dipakai posisi cadangan.
+        const X = box.x + sx, Y = box.y + sy, W = box.width, H = box.height;
+        const cw = document.documentElement.clientWidth;
+        let cands;
+        if (field === 'field' || field === 'field-r') {
+          cands = [[X + W - 20, Y - 14], [X - 12, Y - 14], [X + W + 6, Y + Math.min(H / 2, 18) - 13], [X + W - 20, Y + H - 12]];
+        } else if (field === 'check-r') {
+          cands = [[X + W + 6, Y + H / 2 - 13], [X - 30, Y + H / 2 - 13]];
+        } else if (field) {
+          cands = [[X >= 36 ? X - 30 : X + W + 6, Y + H / 2 - 13], [X + W + 6, Y + H / 2 - 13]];
+        } else {
+          cands = W > 200
+            ? [[X - 20, Y - 18], [X - 20, Y + H - 8], [X + W - 8, Y - 18], [X + W - 8, Y + H - 8]]
+            : [[X - 20, Y - 18], [X + W - 8, Y - 18], [X - 20, Y + H - 8], [X + W - 8, Y + H - 8]];
+        }
+        const placed = (window.__mkPlaced = window.__mkPlaced || []);
+        const fit = ([l, t]) => [Math.min(Math.max(2, l), cw - 30), Math.max(2, t)];
+        const clash = ([l, t]) => placed.some(([a, c]) => Math.abs(a - l) < 30 && Math.abs(c - t) < 30);
+        let [left, top] = fit(cands.find((c) => !clash(fit(c))) || cands[0]);
+        placed.push([left, top]);
+        Object.assign(b.style, { position: pos, left: left + 'px', top: top + 'px', minWidth: '26px', height: '26px', borderRadius: '13px', background: '#e11d48', color: '#fff', font: '700 15px/26px Inter, Arial, sans-serif', textAlign: 'center', zIndex: 2147483647, pointerEvents: 'none', boxShadow: '0 1px 4px rgba(0,0,0,.35)' });
+        host.appendChild(b);
       }
-    }, { box, n });
+    }, { box, n, field, inDialog });
   }
+}
+// Gambar satu halaman penuh: bilah yang menempel (sticky/fixed) dibuat biasa agar
+// tidak muncul di tengah gambar.
+async function unstick(p) {
+  await p.evaluate(() => {
+    document.querySelectorAll('body *').forEach((e) => {
+      const pos = getComputedStyle(e).position;
+      if (pos === 'sticky' || pos === 'fixed') e.style.setProperty('position', pos === 'fixed' && e.offsetHeight > window.innerHeight * 0.8 ? 'absolute' : 'static', 'important');
+    });
+  });
 }
 // Chromium penuh (bukan headless shell) dengan LANG Indonesia agar tombol bawaan
 // peramban (Pilih File, format tanggal hh/bb/tttt) ikut berbahasa Indonesia.
@@ -94,4 +149,4 @@ async function launch() {
     env: { ...process.env, LANG: 'id_ID.UTF-8', LANGUAGE: 'id' },
   });
 }
-module.exports = { BASE, PW, clearThrottle, launch, newCtx, mark, loginSpa, loginAdmin, loginPortal, loginKomando };
+module.exports = { BASE, PW, clearThrottle, launch, newCtx, mark, unstick, loginSpa, loginAdmin, loginPortal, loginKomando };

@@ -15,6 +15,15 @@ python manage.py panduan_peran > ../docs/panduan-peran.md
 
 Tes `backend/users/tests/test_user_manual.py` gagal bila buku peran belum diperbarui, ada gambar atau tautan yang rusak, ada gambar yang tidak dipakai, atau ada kata terlarang.
 
+Langkah kerja di buku peran tidak ditulis ulang, tetapi disisipkan dari bab dengan penanda:
+
+```
+<!-- sisip: 11-pengadaan-tanah.md#47-penilaian-kjpp -->
+<!-- akhir sisip -->
+```
+
+`panduan_buku` mengisi di antara kedua penanda dengan bagian bab itu (judul sampai judul berikutnya yang setingkat), menurunkan tingkat judulnya, dan menyesuaikan alamat gambar dan tautan. Jadi setelah mengubah bab, jalankan `panduan_buku` lagi; tes gagal bila buku peran belum diperbarui. Jangan mengubah teks di dalam sisipan langsung di buku peran.
+
 Buku peran baru: tambahkan berkasnya di `BOOK_FILES` (`backend/users/role_books.py`), buat berkas di `peran/` dengan penanda blok (salin dari buku lain), lalu jalankan `panduan_buku` dan tambahkan baris di tabel README buku.
 
 ## 2. Menyiapkan sistem latihan
@@ -46,13 +55,23 @@ node ambil-gambar.js                          # semua
 node ambil-gambar.js spesifikasi/sewa.json    # satu folder gambar
 ```
 
-Setiap berkas `spesifikasi/<folder>.json` menulis ke `gambar/<folder>/`. Isinya kelompok per akun (`login`: `spa`, `admin`, `komando`, `portal`, atau `none`; `user`; `phone` untuk tampilan HP) dan daftar gambar (`name`, `url`, `actions`, `mark` untuk kotak merah bernomor, `full` untuk satu halaman penuh, `el` untuk satu bagian). Langkah `tanpa_gambar` hanya untuk navigasi.
+Setiap berkas `spesifikasi/<folder>.json` menulis ke `gambar/<folder>/`. Isinya kelompok per akun (`login`: `spa`, `admin`, `komando`, `portal`, atau `none`; `user`; `phone` untuk tampilan HP) dan daftar gambar.
 
-Gambar halaman tanda tangan (Bab 15.3) butuh token penerima yang masih menunggu tanda tangan pemohon contoh (dokumen tanda tangan contoh di panel admin → penerima → tautan tanda tangan):
+Isi setiap gambar:
 
-```
-node ambil-gambar-ttd.js <token>
-```
+| Kunci | Arti |
+|---|---|
+| `name`, `url` | Nama berkas dan alamat halaman. |
+| `mark` | Daftar `[selektor, nomor]`. Kotak merah bernomor digambar di sekitar elemennya; nomornya dipakai di teks sebagai "(nomor N)". Elemen yang tidak ada atau di luar layar membuat gambar gagal, jadi gambar tidak pernah salah nomor diam-diam. |
+| `actions` | Langkah sebelum memotret: `click`, `fill`/`value`, `select`/`value`, `wait`, `scroll`, `js`. |
+| `js` | Skrip yang dijalankan setelah halaman terbuka (misalnya menggulir atau membuka `<details>`). |
+| `tinggi` | Tinggi layar khusus (px) untuk formulir panjang. |
+| `full` / `el` | Satu halaman penuh / satu bagian saja. |
+| `tanpa_gambar` | Langkah navigasi saja. |
+
+Kelompok boleh punya `tautan`: alamat yang baru diketahui setelah masuk sebagai pengguna lain, misalnya `{"KPT": {"login": "admin", "user": "admin", "url": "...", "ambil": "td.field-verify a"}}`. `{KPT}` di `url` gambar diganti dengan alamat tautan itu (dipakai untuk halaman verifikasi dan halaman tanda tangan).
+
+`PANDUAN_HANYA=nama1,nama2` hanya mengambil gambar tertentu (nama berkas tanpa `.png`).
 
 Setelah itu perkecil dan kompres gambar (butuh Pillow dan `pngquant`):
 
@@ -68,4 +87,4 @@ npm install
 node buat-pdf.js            # hasil di alat/keluaran/
 ```
 
-Hasilnya `panduan-simlahan-lengkap.pdf` dan `peran/<peran>.pdf` (buku peran + Bab 1, Bab 2, dan bab yang ditautkan buku itu). Folder `keluaran/` tidak disimpan di repositori.
+Hasilnya `panduan-simlahan-lengkap.pdf` (README dan Bab 1–16) dan `peran/<peran>.pdf` (buku peran + Bab 1, Bab 2, dan bab yang ditautkan di luar sisipan, misalnya semua bab untuk Administrator). Folder `keluaran/` tidak disimpan di repositori.

@@ -2103,11 +2103,7 @@ def _ai_fallback(question: str, context: str) -> str:
         if any(word in lowered for word in words):
             return lead + context
     return (
-        _(
-            "Asisten AI belum dikonfigurasi (ANTHROPIC_API_KEY kosong). "
-            "Ringkasan data wilayah Anda:\n"
-        )
-        + context
+        _("Asisten AI belum dikonfigurasi. " "Ringkasan data wilayah Anda:\n") + context
     )
 
 

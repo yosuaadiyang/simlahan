@@ -50,6 +50,10 @@ def test_full_allocation_flow(filled_application, officer, verifier, seeded):
     invoices = {i.kind: i for i in application.invoices.all()}
     # UWT = 10.000 m² × Rp1.000 × 30 tahun
     assert invoices[enums.InvoiceKind.UWT].amount == Decimal("300000000")
+    # Uraian tagihan memakai format angka Indonesia, bukan 10000.00 / Rp1000.00.
+    assert (
+        "10.000 m² × Rp1.000 × 30 tahun" in invoices[enums.InvoiceKind.UWT].description
+    )
     assert invoices[enums.InvoiceKind.ALLOCATION_FEE].amount == Decimal("2500000")
     assert invoices[
         enums.InvoiceKind.UWT

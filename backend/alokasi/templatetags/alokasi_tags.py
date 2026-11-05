@@ -62,6 +62,19 @@ def patah(value, autoescape=True) -> str:
     return mark_safe(text.replace(".", ".<wbr>"))
 
 
+@register.filter(needs_autoescape=True)
+def kpi(value, autoescape=True) -> str:
+    """Angka kartu ringkasan: seperti ``patah``, tetapi nominal panjang
+    dikecilkan dulu agar tetap satu baris dan baru dipatah bila masih sempit."""
+    text = str(value)
+    html = patah(value, autoescape=autoescape)
+    if len(text) > 15:
+        return mark_safe(f'<span class="kpi-panjang kpi-panjang--sm">{html}</span>')
+    if len(text) > 11:
+        return mark_safe(f'<span class="kpi-panjang kpi-panjang--md">{html}</span>')
+    return html
+
+
 @register.filter
 def hektare(value) -> str:
     """Luas m² sebagai hektare, contoh 125000 → '12,5 ha'."""

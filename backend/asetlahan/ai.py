@@ -50,7 +50,7 @@ def create(**params):
     import anthropic
 
     if not enabled():
-        raise AIError("Asisten AI belum dikonfigurasi (ANTHROPIC_API_KEY kosong).")
+        raise AIError("Asisten AI belum dikonfigurasi. Hubungi Administrator.")
     name = model()
     client = _client()
     try:

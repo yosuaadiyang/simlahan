@@ -169,6 +169,14 @@ def _box(col, row, size=0.0015, gap=0.0004):
     )
 
 
+def _decision_maker():
+    """Pengambil keputusan contoh: unit pengelola kawasan, bukan pejabat negara."""
+    return (
+        DecisionMaker.objects.filter(name="Kepala Badan Pengelola Kawasan").first()
+        or DecisionMaker.objects.order_by("pk").first()
+    )
+
+
 class Command(BaseCommand):
     help = "Buat atau hapus data contoh sewa, kontak, dan tagihan (fiktif)"
 
@@ -254,7 +262,7 @@ class Command(BaseCommand):
         rent_uses = {r.name: r for r in RentIntendedUse.objects.all()}
         notice = NoticePeriod.objects.order_by("pk").first()
         topic = CommentTopic.objects.order_by("pk").first()
-        maker = DecisionMaker.objects.order_by("pk").first()
+        maker = _decision_maker()
         decision_types = list(DecisionType.objects.order_by("pk")[:2])
         condition_type = ConditionType.objects.order_by("pk").first()
         contract_type = ContractType.objects.filter(
@@ -769,7 +777,7 @@ class Command(BaseCommand):
         BasisOfRentDecision.objects.create(
             basis_of_rent=basis,
             reference_number="KEP/CONTOH/PRINSIP/01",
-            decision_maker=DecisionMaker.objects.order_by("pk").first(),
+            decision_maker=_decision_maker(),
             decision_date=datetime.date(today.year, 1, 1),
             section="5",
         )

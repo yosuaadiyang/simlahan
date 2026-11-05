@@ -868,6 +868,11 @@ def logout_view(request):
 
 
 class ApplicantPasswordResetForm(PasswordResetForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Samakan istilah dengan halaman masuk dan pendaftaran portal.
+        self.fields["email"].label = "Surel"
+
     def get_users(self, email):
         return (user for user in super().get_users(email) if hasattr(user, "pemohon"))
 

@@ -538,9 +538,7 @@ def document_report(user, name: str, data: bytes, focus: str = "") -> dict:
             "preview": document["text"].strip()[:1500],
         }
     if not ai.enabled():
-        result["message"] = _(
-            "AI belum dikonfigurasi (ANTHROPIC_API_KEY). Ditampilkan profil data saja."
-        )
+        result["message"] = _("AI belum dikonfigurasi. Ditampilkan profil data saja.")
         return result
     if (
         document["kind"] != "gambar"
@@ -641,7 +639,7 @@ def field_photo(user, name: str, data: bytes, context: str = "") -> dict:
         raise ValidationError({"berkas": [_("Pilih berkas foto (JPG/PNG/WebP).")]})
     if not ai.enabled():
         raise ValidationError(
-            {"ai": [_("AI belum dikonfigurasi (ANTHROPIC_API_KEY kosong).")]}
+            {"ai": [_("AI belum dikonfigurasi. Hubungi Administrator.")]}
         )
     block = _image_block(data)
     use_ai_quota(user)
@@ -952,7 +950,7 @@ def audit_summary(user, result: dict) -> str:
     """Ringkasan AI dari temuan audit (deterministik) — tidak menambah data baru."""
     if not ai.enabled():
         raise ValidationError(
-            {"ai": [_("AI belum dikonfigurasi (ANTHROPIC_API_KEY kosong).")]}
+            {"ai": [_("AI belum dikonfigurasi. Hubungi Administrator.")]}
         )
     use_ai_quota(user)
     lines = (

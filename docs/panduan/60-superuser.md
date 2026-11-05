@@ -6,45 +6,72 @@ Bab ini untuk **superuser** (pengelola sistem) dan petugas TI yang memasang SimL
 
 ![Panel admin superuser](gambar/peran/superuser-panel.png)
 
+Halaman awal panel admin superuser menampilkan semua modul beserta tautan **Tambah**, **Ubah**, atau **Lihat**. Ketik nama menu di kotak **Mulai mengetik untuk menyaring...** di kiri untuk menemukannya dengan cepat. Menu yang dipakai di bab ini: **Pengguna**, **Grup**, **Unit layanan**, **Kunci hidup sistem**, dan **Tugas batch**.
+
 ## 16.1 Mengelola pengguna
+
+Buka **Panel admin → Pengguna → Pengguna**.
 
 ![Daftar pengguna](gambar/peran/superuser-pengguna.png)
 
-Buka **Panel admin → Pengguna → Pengguna**. Saring dengan **status staf**, **status superuser**, **aktif**, dan **grup**.
+1. **Tambahkan pengguna** (nomor 1) membuat akun baru.
+2. Cari akun dengan nama pengguna, nama, atau surel di kotak pencarian (nomor 2), lalu klik **Cari**.
+3. **Filter** (nomor 3) menyaring menurut **status staf**, **status superuser**, **aktif**, dan **grup**.
+4. Klik **nama pengguna** (nomor 4) untuk membuka dan mengubah akunnya.
 
 **Membuat akun petugas:**
 
+Klik **Tambahkan pengguna**.
+
 ![Tambah pengguna](gambar/peran/superuser-pengguna-tambah.png)
 
-1. Klik **Tambahkan pengguna**.
-2. Isi **Nama pengguna** (misalnya `budi.santoso`) dan kata sandi awal dua kali. Kata sandi minimal 10 karakter, tidak mirip nama, tidak umum, dan tidak hanya angka.
-3. Klik **Simpan dan terus mengedit**.
-4. Di halaman berikutnya, isi **Nama depan**, **Nama belakang**, dan **Alamat surel** (dipakai untuk OTP, pemberitahuan, dan atur ulang sandi).
-5. Di **Hak akses**: centang **Aktif** dan **Status staf** (wajib untuk petugas). Jangan centang **Status superuser** kecuali untuk pengelola sistem.
-6. Pindahkan satu **grup** (peran) dari kotak kiri ke kanan, misalnya **Petugas Alokasi Lahan** atau **Koordinator Wilayah**. Peran menentukan menu dan hak akses; isinya dijelaskan di buku peran masing-masing.
-7. Pilih **Unit layanan** petugas. Petugas hanya melihat data unit layanannya (data tanpa unit layanan terlihat semua).
-8. Klik **Simpan**. Sampaikan nama pengguna dan kata sandi awal secara pribadi, lalu minta petugas segera mengganti sandi ([Bab 2.8](02-dasar-penggunaan.md#28-mengganti-kata-sandi)).
+1. Isi **Nama pengguna** (nomor 1), misalnya `budi.santoso`.
+2. Biarkan **Masuk dengan kata sandi** pada **Aktif** (nomor 2).
+3. Isi **Sandi** (nomor 3) dan ulangi di **Konfirmasi sandi** (nomor 4). Minimal 10 karakter, tidak mirip nama, tidak umum, dan tidak hanya angka.
+4. Klik **Simpan dan terus mengedit** (nomor 5). Halaman **Ubah pengguna** terbuka.
 
 ![Ubah pengguna](gambar/peran/superuser-pengguna-ubah.png)
 
+5. Isi **Nama depan** (nomor 2), **Nama belakang** (nomor 3), dan **Alamat email** (nomor 4). Surel dipakai untuk OTP, pemberitahuan, dan atur ulang sandi.
+6. Di **Hak akses**, centang **Aktif** (nomor 5) dan **Status staf** (nomor 6, wajib untuk petugas). Jangan centang **Status superuser** (nomor 7) kecuali untuk pengelola sistem.
+7. Gulir ke **Grup**:
+
+![Memilih grup pengguna](gambar/peran/superuser-pengguna-grup.png)
+
+8. Klik satu peran di kotak **grup yang tersedia** (nomor 1), misalnya **Petugas Alokasi Lahan** atau **Koordinator Wilayah**, lalu klik panah kanan (nomor 2). Peran pindah ke kotak **grup terpilih** (nomor 3). Panah kiri (nomor 4) mengeluarkannya lagi. Peran menentukan menu dan hak akses; isinya dijelaskan di buku peran masing-masing. Jangan mengisi **Hak akses pengguna** di bawahnya; hak akses cukup lewat grup.
+9. Gulir ke bawah:
+
+![Unit layanan pengguna](gambar/peran/superuser-pengguna-unit.png)
+
+10. Pilih **Unit layanan** petugas (nomor 1). Tahan Ctrl (Cmd di Mac) untuk memilih lebih dari satu. Petugas hanya melihat data unit layanannya (data tanpa unit layanan terlihat semua).
+11. Isi **Departemen** (nomor 2) bila perlu.
+12. Klik **Simpan** (nomor 3). Sampaikan nama pengguna dan kata sandi awal secara pribadi, lalu minta petugas segera mengganti sandi ([Bab 2.8](02-dasar-penggunaan.md#28-mengganti-kata-sandi)).
+
 **Tugas lain:**
 
-- **Lupa sandi petugas:** buka akunnya, klik **Setel kembali sandi**, isi sandi baru dua kali. Mengganti sandi mencabut sesi aplikasi yang sedang aktif.
+- **Lupa sandi petugas:** buka akunnya, klik **Setel kembali sandi** (nomor 1 pada gambar **Ubah pengguna**), isi sandi baru dua kali, lalu simpan. Mengganti sandi mencabut sesi aplikasi yang sedang aktif.
 - **Petugas pindah tugas:** ganti grup dan unit layanannya. Untuk petugas lapangan, pindahkan juga keanggotaannya di data Korwil ([Bab 11.1](41-panel-pusat-komando.md#111-korwil-koordinator-wilayah)) dan atasan langsungnya ([Bab 11.8](41-panel-pusat-komando.md#118-jabatan-tugas-dan-laporan-harian)).
 - **Petugas berhenti:** hapus centang **Aktif** (jangan hapus akunnya agar jejak audit tetap utuh).
 - **Akun pemohon dan investor** dibuat sendiri oleh mereka di portal. Data pemohonnya ada di **Alokasi lahan → Pemohon**.
 
 ## 16.2 Grup (peran)
 
+Buka **Panel admin → Autentikasi dan Otorisasi → Grup**.
+
 ![Daftar grup](gambar/peran/superuser-grup.png)
 
-**Panel admin → Autentikasi dan otorisasi → Grup.** Setiap grup adalah satu peran (Penelusur, Penyusun, …, Koordinator Wilayah). Hak akses tiap grup sudah diatur sistem. **Jangan mengubah hak akses grup secara manual**; bila tidak sengaja berubah, kembalikan dengan menjalankan `simlahan_bootstrap` (16.7). Daftar lengkap menu dan batas tiap peran ada di **Panduan peran** di dalam aplikasi dan di [buku peran](README.md#buku-per-peran).
+Setiap grup adalah satu peran (Administrator, Ahli Hukum Penagihan, …, Koordinator Wilayah). Klik nama grup (nomor 1) untuk melihat hak aksesnya. Hak akses tiap grup sudah diatur sistem. **Jangan mengubah hak akses grup secara manual**; bila tidak sengaja berubah, kembalikan dengan menjalankan `simlahan_bootstrap` ([16.7](#167-perintah-pemeliharaan-petugas-ti)). Daftar lengkap menu dan batas tiap peran ada di **Panduan peran** di dalam aplikasi dan di [buku peran](README.md#buku-per-peran).
 
 ## 16.3 Unit layanan
 
+Buka **Panel admin → Sewa lahan → Unit layanan**.
+
 ![Unit layanan](gambar/peran/superuser-unit-layanan.png)
 
-**Panel admin → Sewa lahan → Unit layanan** mencatat unit/kantor layanan (misalnya "Unit Layanan Utama"). Unit layanan dipakai untuk membatasi data per kantor: setiap aset, Korwil, dan data lain punya kolom **Unit layanan / lokasi**, dan setiap petugas diberi unit layanannya di akun pengguna.
+Unit layanan mencatat unit atau kantor layanan. Unit layanan dipakai untuk membatasi data per kantor: setiap aset, Korwil, dan data lain punya kolom **Unit layanan / lokasi**, dan setiap petugas diberi unit layanannya di akun pengguna ([16.1](#161-mengelola-pengguna)).
+
+1. **Tambahkan Unit layanan** (nomor 1) membuat unit baru: isi namanya lalu klik **Simpan**.
+2. Klik nama unit (nomor 2) untuk mengubahnya.
 
 ## 16.4 OTP surel untuk petugas
 
@@ -58,25 +85,29 @@ Pastikan pengiriman surel (`EMAIL_URL`) sudah berfungsi dan setiap akun petugas 
 
 ## 16.5 Kunci hidup sistem
 
-![Kunci hidup sistem](gambar/peran/superuser-kunci-sistem.png)
-
 Fitur darurat untuk menghentikan seluruh aplikasi pada waktu tertentu (misalnya bila terjadi pelanggaran keamanan atau sengketa operasional). Buka **Panel admin → Pusat komando operasi lapangan → Kunci hidup sistem**.
+
+![Kunci hidup sistem](gambar/peran/superuser-kunci-sistem.png)
 
 **Mengaktifkan:**
 
-1. Isi **Kode rahasia baru** (minimal 6 karakter) dan **Ulangi kode rahasia baru**. Simpan kode ini di tempat aman.
-2. Centang **Aktif**, isi **Sistem dimatikan pada** (tanggal dan waktu), dan **Pesan untuk pengguna**.
-3. Klik **Simpan**. Hitung mundur "KUNCI SISTEM AKTIF" tampil di pusat komando dan panel. Saat waktunya tiba, seluruh aplikasi berhenti melayani pengguna selain superuser.
+1. Isi **Kode rahasia baru** (nomor 5, minimal 6 karakter) dan ulangi di **Ulangi kode rahasia baru** (nomor 6). Simpan kode ini di tempat aman.
+2. Centang **Aktif** (nomor 1).
+3. Isi **Sistem dimatikan pada**: **Tanggal** (nomor 2) dan **Waktu** (nomor 3). **Hari ini** dan **Sekarang** di sebelahnya mengisi otomatis.
+4. Tulis **Pesan untuk pengguna** (nomor 4), yaitu pesan yang dibaca pengguna saat sistem berhenti.
+5. Klik **Simpan** (nomor 8). **Status** berubah, dan hitung mundur "KUNCI SISTEM AKTIF" tampil di pusat komando dan panel. Saat waktunya tiba, seluruh aplikasi berhenti melayani pengguna selain superuser.
 
-**Menonaktifkan:** buka halaman yang sama, isi **Kode rahasia saat ini**, hapus centang **Aktif**, lalu simpan. Di pusat komando, superuser juga bisa menekan **🛡 Nonaktifkan** pada bilah hitung mundur dan memasukkan kode rahasia. Siapa dan kapan kunci diaktifkan atau dinonaktifkan tercatat di halaman ini.
+**Mengubah atau menonaktifkan:** buka halaman yang sama, isi **Kode rahasia saat ini** (nomor 7), hapus centang **Aktif** (atau ubah waktunya), lalu klik **Simpan**. Di pusat komando, superuser juga bisa menekan **🛡 Nonaktifkan** pada bilah hitung mundur dan memasukkan kode rahasia. Bagian **Riwayat** di bawah formulir mencatat siapa dan kapan kunci diaktifkan atau dinonaktifkan.
 
 > Kunci tidak aktif secara bawaan. Hanya superuser yang dapat membuka halaman ini.
 
 ## 16.6 Tugas terjadwal
 
+Buka **Panel admin → Tugas batch**.
+
 ![Tugas terjadwal](gambar/peran/superuser-batchrun.png)
 
-**Panel admin → Tugas batch** menjalankan pekerjaan otomatis. Menu terpenting: **Tugas terjadwal** (jadwal) dan **Eksekusi tugas** (riwayat jalan). Jadwal bawaan SimLahan:
+Menu terpenting: **Tugas terjadwal** (nomor 1, jadwal) dan **Eksekusi tugas** (nomor 2, riwayat jalan). Jadwal bawaan SimLahan:
 
 | Jadwal | Pekerjaan |
 |---|---|
@@ -86,10 +117,14 @@ Fitur darurat untuk menghentikan seluruh aplikasi pada waktu tertentu (misalnya 
 | Setiap hari pukul 06.45 WIB | Pengingat dokumen & perizinan (izin hampir habis, tanda tangan tertunda). |
 | Setiap hari pukul 00.30 WIB | Rekap harian pusat komando. |
 
+**Tugas terjadwal:**
+
 ![Jadwal tugas](gambar/peran/superuser-batchrun-jadwal.png)
 
-- **Tugas terjadwal**: centang atau hapus centang **aktif** untuk menyalakan/mematikan jadwal; ubah jam/menit/hari bila perlu. Jadwal lain (pembuatan tagihan sewa, rotasi log) mati secara bawaan.
-- **Eksekusi tugas**: setiap eksekusi dengan waktu mulai, tugas, dan **kode keluar** (0 = berhasil). Buka baris untuk melihat log.
+1. Kolom **Aktif** menunjukkan jadwal yang menyala (centang hijau) dan mati (tanda merah). Jadwal lain (pembuatan tagihan sewa, rotasi log) mati secara bawaan.
+2. Klik nama tugas (nomor 1) untuk membuka jadwalnya. Centang atau hapus centang **Aktif** untuk menyalakan atau mematikan, ubah jam, menit, atau hari bila perlu, lalu klik **Simpan**.
+
+**Eksekusi tugas** mencatat setiap kali tugas berjalan: waktu mulai, tugas, dan **kode keluar** (0 = berhasil). Klik baris untuk melihat lognya. Saring dengan **Berdasarkan waktu mulai** atau **Berdasarkan tugas** di kanan. Pada sistem yang baru dipasang, daftar ini masih kosong.
 
 ![Riwayat tugas terjadwal](gambar/peran/superuser-batchrun-riwayat.png)
 

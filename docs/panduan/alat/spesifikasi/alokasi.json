@@ -7,40 +7,84 @@
    "items": [
     {
      "url": "/admin/alokasi/allocation/",
-     "name": "alokasi-daftar"
-    },
-    {
-     "url": "/admin/alokasi/allocation/",
-     "name": "alokasi-detail-full",
-     "actions": [
-      {
-       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
-      },
-      {
-       "wait": 1500
-      }
+     "name": "alokasi-daftar",
+     "mark": [
+      [
+       "#changelist-filter >> text=Berdasarkan PL diblokir",
+       "1"
+      ],
+      [
+       "#changelist-filter >> text=Berdasarkan lahan tidur",
+       "2"
+      ],
+      [
+       "#changelist-filter >> text=kepatuhan lapor",
+       "3"
+      ]
      ],
-     "full": true
+     "tinggi": 1150
     },
     {
-     "url": "/admin/alokasi/landplot/",
+     "url": "/admin/alokasi/landplot/1/change/",
      "name": "lahan-detail",
-     "actions": [
-      {
-       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
-      },
-      {
-       "wait": 1500
-      }
+     "mark": [
+      [
+       "#id_code",
+       "1"
+      ],
+      [
+       "#id_name",
+       "2"
+      ],
+      [
+       "#id_allocation_type",
+       "3"
+      ],
+      [
+       "#id_status",
+       "4"
+      ],
+      [
+       "#id_is_published",
+       "5"
+      ]
      ]
     },
     {
      "url": "/admin/alokasi/landplot/impor/",
-     "name": "lahan-impor"
+     "name": "lahan-impor",
+     "mark": [
+      [
+       "#id_file",
+       "1"
+      ],
+      [
+       "#id_allocation_type",
+       "2"
+      ],
+      [
+       "#id_is_published",
+       "3"
+      ],
+      [
+       "#content-main input[type=submit]",
+       "4"
+      ]
+     ]
     },
     {
      "url": "/admin/alokasi/applicant/",
-     "name": "pemohon-daftar"
+     "name": "pemohon-daftar",
+     "mark": [
+      [
+       "#changelist-filter >> text=Berdasarkan Akun investor",
+       "1"
+      ],
+      [
+       "select[name=action]",
+       "2"
+      ]
+     ]
     },
     {
      "url": "/admin/alokasi/developmentreport/",
@@ -91,18 +135,6 @@
      "name": "pesan-kontak"
     },
     {
-     "url": "/admin/alokasi/investmentrequest/",
-     "name": "investasi-detail",
-     "actions": [
-      {
-       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
-      },
-      {
-       "wait": 1500
-      }
-     ]
-    },
-    {
      "url": "/admin/alokasi/investmentsector/",
      "name": "sektor-investasi"
     },
@@ -136,11 +168,11 @@
        "1"
       ],
       [
-       "text=Minta perbaikan",
+       "#content-main >> text=Minta perbaikan",
        "2"
       ],
       [
-       "text=Tolak",
+       "#content-main >> text=Tolak",
        "3"
       ]
      ]
@@ -164,43 +196,62 @@
      ]
     },
     {
-     "url": "/admin/alokasi/application/5/change/",
-     "name": "permohonan-dokumen",
-     "actions": [
-      {
-       "scroll": "h2:has-text('Dokumen persyaratan')"
-      },
-      {
-       "scrollY": 0
-      },
-      {
-       "js": "document.querySelectorAll('h2').forEach(h=>{if(h.textContent.includes('Dokumen persyaratan'))window.scrollTo(0,h.getBoundingClientRect().top+scrollY-120)})"
-      }
+     "url": "/admin/alokasi/application/3/proses/verifikasi/",
+     "name": "proses-verifikasi",
+     "mark": [
+      [
+       "#id_note",
+       "1"
+      ],
+      [
+       "#content-main input[type=submit]",
+       "2"
+      ]
      ]
     },
     {
-     "url": "/admin/alokasi/application/3/proses/verifikasi/",
-     "name": "proses-verifikasi"
-    },
-    {
      "url": "/admin/alokasi/application/5/proses/setujui/",
-     "name": "proses-setujui"
+     "name": "proses-setujui",
+     "mark": [
+      [
+       "#id_note",
+       "1"
+      ],
+      [
+       "#content-main input[type=submit]",
+       "2"
+      ]
+     ]
     },
     {
      "url": "/admin/alokasi/application/5/proses/perbaikan/",
-     "name": "proses-perbaikan"
+     "name": "proses-perbaikan",
+     "mark": [
+      [
+       "#id_note",
+       "1"
+      ],
+      [
+       "#content-main input[type=submit]",
+       "2"
+      ]
+     ]
     },
     {
      "url": "/admin/alokasi/application/",
      "name": "permohonan-daftar",
      "mark": [
       [
-       "#changelist-filter",
+       ".sl-chips",
        "1"
       ],
       [
        "#searchbar",
        "2"
+      ],
+      [
+       "#changelist-filter >> text=Berdasarkan Status",
+       "3"
       ]
      ]
     },
@@ -227,8 +278,20 @@
      "name": "tagihan-daftar",
      "mark": [
       [
-       "select[name=action]",
+       "#result_list tbody tr:first-child input.action-select",
        "1"
+      ],
+      [
+       "select[name=action]",
+       "2"
+      ],
+      [
+       "button[name=index]",
+       "3"
+      ],
+      [
+       "#changelist-filter >> text=Berdasarkan Status",
+       "4"
       ]
      ]
     },
@@ -248,7 +311,17 @@
     },
     {
      "url": "/admin/alokasi/allocation/1/blokir/",
-     "name": "alokasi-blokir"
+     "name": "alokasi-blokir",
+     "mark": [
+      [
+       "#id_note",
+       "1"
+      ],
+      [
+       "#content-main input[type=submit]",
+       "2"
+      ]
+     ]
     },
     {
      "url": "/admin/alokasi/landplot/",
@@ -297,6 +370,20 @@
       {
        "js": "document.querySelectorAll('h2').forEach(h=>{if(h.textContent.includes('Pesan dengan investor'))window.scrollTo(0,h.getBoundingClientRect().top+scrollY-100)})"
       }
+     ],
+     "mark": [
+      [
+       "#id_reply_body",
+       "1"
+      ],
+      [
+       "#content-main input[type=file]",
+       "2"
+      ],
+      [
+       "button:text-is('Kirim pesan')",
+       "3"
+      ]
      ]
     },
     {
@@ -305,11 +392,64 @@
     },
     {
      "url": "/admin/alokasi/investmentrequest/3/proses/penawaran/",
-     "name": "investasi-form-penawaran"
+     "name": "investasi-form-penawaran",
+     "tinggi": 1100,
+     "mark": [
+      [
+       "#id_scheme",
+       "1"
+      ],
+      [
+       "#id_plot",
+       "2"
+      ],
+      [
+       "#id_area_m2",
+       "3"
+      ],
+      [
+       "#id_rate_per_m2_year",
+       "4"
+      ],
+      [
+       "#id_term_years",
+       "5"
+      ],
+      [
+       "#id_valid_until",
+       "6"
+      ],
+      [
+       "#id_note",
+       "7"
+      ],
+      [
+       "#content-main input[type=submit]",
+       "8"
+      ]
+     ]
     },
     {
      "url": "/admin/alokasi/investmentrequest/1/proses/konsultasi/",
-     "name": "investasi-form-konsultasi"
+     "name": "investasi-form-konsultasi",
+     "mark": [
+      [
+       "#id_meeting_at",
+       "1"
+      ],
+      [
+       "#id_place",
+       "2"
+      ],
+      [
+       "#id_note",
+       "3"
+      ],
+      [
+       "#content-main input[type=submit]",
+       "4"
+      ]
+     ]
     },
     {
      "url": "/admin/alokasi/investmentrequest/",
@@ -330,6 +470,14 @@
        "text=Berdasarkan penilaian saya",
        "1"
       ]
+     ],
+     "actions": [
+      {
+       "js": "const e=[...document.querySelectorAll(\"#changelist-filter summary, #changelist-filter h3\")].find(x=>x.textContent.includes(\"penilaian saya\")); window.scrollTo(0, e.getBoundingClientRect().top+scrollY-300)"
+      },
+      {
+       "wait": 500
+      }
      ]
     },
     {
@@ -344,12 +492,17 @@
     },
     {
      "url": "/admin/alokasi/application/5/nilai/",
-     "name": "form-nilai"
-    },
-    {
-     "url": "/admin/alokasi/application/5/nilai/",
-     "name": "form-nilai-full",
-     "full": true
+     "name": "form-nilai",
+     "mark": [
+      [
+       "#id_score_1",
+       "1"
+      ],
+      [
+       "#id_note_1",
+       "2"
+      ]
+     ]
     }
    ]
   }

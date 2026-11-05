@@ -219,7 +219,7 @@ form.inline { display: inline; }
 .field.choice-chips > div label { display: inline-flex; gap: 8px; align-items: center; margin: 0; padding: 7px 12px; border: 1px solid var(--border); border-radius: 999px; background: var(--card); font-weight: 500; cursor: pointer; }
 .field.choice-chips > div label:has(input:checked) { border-color: var(--primary); background: var(--sl-primary-soft); color: var(--sl-primary-strong); }
 .field.choice-chips > div input { margin: 0 !important; }
-.field input:not([type=checkbox]):not([type=radio]), .field select, .field textarea, .filters input, .filters select {
+.field input:not([type=checkbox]):not([type=radio]), .field select, .field textarea, .filters input, .filters select, .dk-inline-form input {
   width: 100%;
   min-height: 44px;
   padding: 10px 12px;
@@ -288,6 +288,7 @@ table.data th, table.data td { text-align: left; padding: 11px 14px; border-bott
 table.data tr:last-child td { border-bottom: 0; }
 table.data tbody tr:hover td { background: var(--sl-gray-25); }
 table.data td:first-child a { white-space: nowrap; font-weight: 600; }
+table.data td.nominal { width: 45%; }
 table.data th { background: var(--sl-gray-50); font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--sl-gray-600); white-space: nowrap; }
 /* Di HP kolom tidak diperas jadi sempit: tabel lebar menggulir di .table-wrap. */
 @media (max-width: 640px) { table.data { font-size: .875rem; } table.data th, table.data td { padding: 9px 11px; } table.data:has(th:nth-child(3)) { min-width: 32rem; } table.data:has(th:nth-child(5)) { min-width: 44rem; } }

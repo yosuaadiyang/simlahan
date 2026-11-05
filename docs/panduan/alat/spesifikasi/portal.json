@@ -6,16 +6,70 @@
    "items": [
     {
      "url": "/portal/",
-     "name": "beranda"
+     "name": "beranda",
+     "mark": [
+      [
+       ".site-nav",
+       1
+      ],
+      [
+       ".hero a.btn >> nth=0",
+       2
+      ],
+      [
+       ".hero a.btn >> nth=1",
+       3
+      ],
+      [
+       ".hero a.btn >> nth=2",
+       4
+      ],
+      [
+       ".site-nav a:text-is('Masuk')",
+       5
+      ],
+      [
+       ".site-nav a.cta",
+       6
+      ]
+     ]
     },
     {
      "url": "/portal/",
-     "name": "beranda-full",
-     "full": true
+     "name": "beranda-bawah",
+     "js": "window.scrollTo(0,560)",
+     "mark": [
+      [
+       "a:text-is('Buka peta investasi')",
+       1
+      ],
+      [
+       "a:text-is('Pelajari skema')",
+       2
+      ],
+      [
+       "h2:text-is('Jenis alokasi tanah')",
+       3
+      ],
+      [
+       "h2:text-is('Tahapan permohonan')",
+       4
+      ]
+     ]
     },
     {
      "url": "/portal/layanan/",
-     "name": "layanan"
+     "name": "layanan",
+     "mark": [
+      [
+       "h2:text-is('Layanan pertanahan')",
+       1
+      ],
+      [
+       "a:text-is('Selengkapnya') >> nth=0",
+       2
+      ]
+     ]
     },
     {
      "url": "/portal/layanan/alokasi-tanah-reguler/",
@@ -28,24 +82,170 @@
     {
      "url": "/portal/lahan/",
      "name": "peta-lahan",
-     "delay": 2500
+     "delay": 2500,
+     "mark": [
+      [
+       "#q",
+       1
+      ],
+      [
+       "#jenis",
+       2
+      ],
+      [
+       "#status",
+       3
+      ],
+      [
+       "#kecamatan",
+       4
+      ],
+      [
+       "button:text-is('Terapkan')",
+       5
+      ],
+      [
+       "table.data tbody tr:first-child td:first-child a",
+       6
+      ]
+     ]
     },
     {
      "url": "/portal/lahan/CONTOH-RMP-01/",
-     "name": "lahan-detail"
+     "name": "lahan-detail",
+     "delay": 2000,
+     "mark": [
+      [
+       "button[data-compare]",
+       1
+      ],
+      [
+       "a.btn-icon:has-text('Profil PDF')",
+       2
+      ],
+      [
+       "#sim-scheme",
+       3
+      ],
+      [
+       "#sim-years",
+       4
+      ],
+      [
+       "output[data-sim=total]",
+       5
+      ]
+     ]
     },
     {
      "url": "/portal/lahan/CONTOH-RMP-01/",
-     "name": "lahan-detail-full",
-     "full": true
+     "name": "lahan-detail-bawah",
+     "js": "window.scrollTo(0,1000)",
+     "mark": [
+      [
+       "h2:text-is('Tertarik dengan lahan ini?')",
+       1
+      ],
+      [
+       "a:text-is('Ajukan minat investasi')",
+       2
+      ],
+      [
+       "main a.btn:text-is('Masuk')",
+       3
+      ],
+      [
+       "main a.btn:text-is('Daftar')",
+       4
+      ],
+      [
+       "a:text-is('Daftar sebagai investor')",
+       5
+      ],
+      [
+       "h2:text-is('Dokumen persyaratan permohonan alokasi')",
+       6
+      ]
+     ]
     },
     {
      "url": "/portal/kalkulator-uwt/",
-     "name": "kalkulator-uwt"
+     "name": "kalkulator-uwt",
+     "actions": [
+      {
+       "js": "(()=>{const s=document.querySelector('#id_plot');s.selectedIndex=1;})()"
+      },
+      {
+       "fill": "#id_area_m2",
+       "value": "5000"
+      },
+      {
+       "fill": "#id_years",
+       "value": "30"
+      },
+      {
+       "click": "button:text-is('Hitung')"
+      },
+      {
+       "wait": 800
+      }
+     ],
+     "mark": [
+      [
+       "nav.tabs a >> nth=0",
+       1
+      ],
+      [
+       "nav.tabs a >> nth=1",
+       2
+      ],
+      [
+       "#id_plot",
+       3
+      ],
+      [
+       "#id_area_m2",
+       4
+      ],
+      [
+       "#id_years",
+       5
+      ],
+      [
+       "button:text-is('Hitung')",
+       6
+      ],
+      [
+       "tr:has(td:has-text('Total perkiraan'))",
+       7
+      ]
+     ]
     },
     {
      "url": "/portal/informasi/",
-     "name": "informasi"
+     "name": "informasi",
+     "mark": [
+      [
+       "nav.tabs a >> nth=0",
+       1
+      ],
+      [
+       "nav.tabs",
+       2
+      ],
+      [
+       "a:text-is('Formulir permohonan per layanan')",
+       3
+      ],
+      [
+       "input[name=q]",
+       4
+      ],
+      [
+       "main form button:text-is('Cari')",
+       5
+      ]
+     ]
     },
     {
      "url": "/portal/informasi/formulir/",
@@ -57,69 +257,430 @@
     },
     {
      "url": "/portal/lelang/",
-     "name": "lelang"
+     "name": "lelang",
+     "mark": [
+      [
+       "table.data tbody tr:first-child a",
+       1
+      ],
+      [
+       "table.data tbody tr:first-child .badge",
+       2
+      ]
+     ]
     },
     {
      "url": "/portal/lelang/LLG-2026-0001/",
-     "name": "lelang-detail"
+     "name": "lelang-detail",
+     "mark": [
+      [
+       "h2:text-is('Ajukan penawaran')",
+       1
+      ],
+      [
+       "main a.btn:text-is('Masuk')",
+       2
+      ],
+      [
+       "main a.btn:text-is('Daftar')",
+       3
+      ]
+     ]
     },
     {
      "url": "/portal/pengaduan/",
-     "name": "pengaduan"
+     "name": "pengaduan",
+     "tinggi": 1420,
+     "delay": 2000,
+     "mark": [
+      [
+       "#id_complainant_name",
+       1
+      ],
+      [
+       "#id_phone",
+       2
+      ],
+      [
+       "#id_email",
+       3
+      ],
+      [
+       "#id_category",
+       4
+      ],
+      [
+       "#id_subject",
+       5
+      ],
+      [
+       "#id_description",
+       6
+      ],
+      [
+       "#id_location_text",
+       7
+      ],
+      [
+       "#id_attachment",
+       8
+      ],
+      [
+       "[data-locate]",
+       9
+      ],
+      [
+       "[data-clear-location]",
+       10
+      ],
+      [
+       "button:text-is('Kirim pengaduan')",
+       11
+      ]
+     ]
     },
     {
      "url": "/portal/pengaduan/cek/",
-     "name": "pengaduan-cek"
+     "name": "pengaduan-cek",
+     "mark": [
+      [
+       "#id_number",
+       1
+      ],
+      [
+       "#id_access_code",
+       2
+      ],
+      [
+       "button:text-is('Periksa')",
+       3
+      ]
+     ]
     },
     {
      "url": "/portal/lacak/",
-     "name": "lacak"
+     "name": "lacak",
+     "mark": [
+      [
+       "#id_number",
+       1
+      ],
+      [
+       "#id_pin",
+       2
+      ],
+      [
+       "main button:text-is('Lacak')",
+       3
+      ]
+     ]
     },
     {
      "url": "/portal/verifikasi/",
-     "name": "verifikasi"
+     "name": "verifikasi",
+     "mark": [
+      [
+       "#id_code",
+       1
+      ],
+      [
+       "button:text-is('Periksa')",
+       2
+      ]
+     ]
+    },
+    {
+     "url": "{KPT}",
+     "name": "verifikasi-hasil",
+     "mark": [
+      [
+       "h2:text-is('Dokumen terdaftar dan sah')",
+       1
+      ],
+      [
+       "dd:has-text('KPT-2026')",
+       2
+      ],
+      [
+       "dd .badge",
+       3
+      ]
+     ]
     },
     {
      "url": "/portal/dokumen/verifikasi/",
-     "name": "verifikasi-dokumen"
+     "name": "verifikasi-dokumen",
+     "mark": [
+      [
+       "#kode",
+       1
+      ],
+      [
+       "button:text-is('Periksa')",
+       2
+      ]
+     ]
+    },
+    {
+     "url": "{DOK}",
+     "name": "verifikasi-dokumen-hasil",
+     "mark": [
+      [
+       ".alert-ok",
+       1
+      ],
+      [
+       "dd.dk-break",
+       2
+      ],
+      [
+       "h3:text-is('Penanda tangan')",
+       3
+      ],
+      [
+       "main input[type=file]",
+       4
+      ],
+      [
+       "button:text-is('Cocokkan')",
+       5
+      ]
+     ]
     },
     {
      "url": "/portal/bantuan/",
-     "name": "bantuan"
+     "name": "bantuan",
+     "mark": [
+      [
+       "h2:text-is('Tanya jawab')",
+       1
+      ],
+      [
+       "summary >> nth=0",
+       2
+      ],
+      [
+       "a:text-is('Kirim pesan ke petugas')",
+       3
+      ],
+      [
+       "h2:text-is('Panduan cepat')",
+       4
+      ]
+     ],
+     "tinggi": 1250
     },
     {
      "url": "/portal/bantuan/kontak/",
-     "name": "kontak"
+     "name": "kontak",
+     "mark": [
+      [
+       "#id_name",
+       1
+      ],
+      [
+       "#id_email",
+       2
+      ],
+      [
+       "#id_phone",
+       3
+      ],
+      [
+       "#id_subject",
+       4
+      ],
+      [
+       "#id_body",
+       5
+      ],
+      [
+       "button:text-is('Kirim pesan')",
+       6
+      ]
+     ]
     },
     {
      "url": "/portal/daftar/",
-     "name": "daftar"
-    },
-    {
-     "url": "/portal/daftar/",
-     "name": "daftar-full",
-     "full": true
+     "name": "daftar",
+     "tinggi": 980,
+     "mark": [
+      [
+       "#id_email",
+       1
+      ],
+      [
+       "#id_password1",
+       2
+      ],
+      [
+       "#id_password2",
+       3
+      ],
+      [
+       "#id_applicant_type",
+       4
+      ],
+      [
+       "#id_name",
+       5
+      ],
+      [
+       "#id_nib",
+       6
+      ],
+      [
+       "#id_npwp",
+       7
+      ],
+      [
+       "#id_nik",
+       8
+      ],
+      [
+       "#id_pic_name",
+       9
+      ],
+      [
+       "#id_pic_position",
+       10
+      ],
+      [
+       "#id_phone",
+       11
+      ],
+      [
+       "#id_address",
+       12
+      ],
+      [
+       "#id_city",
+       13
+      ],
+      [
+       "#id_agree",
+       14
+      ],
+      [
+       "main button:text-is('Daftar')",
+       15
+      ]
+     ]
     },
     {
      "url": "/portal/lupa-sandi/",
-     "name": "lupa-sandi"
+     "name": "lupa-sandi",
+     "mark": [
+      [
+       "#id_email",
+       1
+      ],
+      [
+       "button:text-is('Kirim tautan')",
+       2
+      ]
+     ]
     },
     {
      "url": "/portal/investasi/",
-     "name": "inv-beranda"
+     "name": "inv-beranda",
+     "mark": [
+      [
+       "#inv-q",
+       1
+      ],
+      [
+       ".inv-search button",
+       2
+      ],
+      [
+       ".quick a >> nth=0",
+       3
+      ],
+      [
+       ".quick a >> nth=1",
+       4
+      ],
+      [
+       ".quick a >> nth=2",
+       5
+      ],
+      [
+       ".quick a >> nth=3",
+       6
+      ],
+      [
+       ".quick a >> nth=4",
+       7
+      ]
+     ]
     },
     {
      "url": "/portal/investasi/peta/",
      "name": "inv-peta",
-     "delay": 2500
+     "delay": 2500,
+     "mark": [
+      [
+       "#f-q",
+       1
+      ],
+      [
+       "button[data-scheme='']",
+       2
+      ],
+      [
+       "button[data-sector=industri]",
+       3
+      ],
+      [
+       "summary:has-text('Filter lainnya')",
+       4
+      ],
+      [
+       "#f-sort",
+       5
+      ],
+      [
+       "[data-reset]",
+       6
+      ],
+      [
+       "a:has-text('Lahan belum ada')",
+       7
+      ]
+     ]
     },
     {
      "url": "/portal/investasi/kawasan/contoh-kawasan-industri-logistik-rempang/",
-     "name": "inv-kawasan"
+     "name": "inv-kawasan",
+     "mark": [
+      [
+       "a:text-is('Buka di peta investasi')",
+       1
+      ],
+      [
+       "a:text-is('Ajukan minat di kawasan ini')",
+       2
+      ]
+     ]
     },
     {
      "url": "/portal/investasi/bandingkan/?lahan=CONTOH-RMP-01&lahan=CONTOH-RMP-02",
-     "name": "inv-bandingkan"
+     "name": "inv-bandingkan",
+     "mark": [
+      [
+       "main thead th >> nth=1",
+       1
+      ],
+      [
+       "[data-compare-go]",
+       2
+      ],
+      [
+       "[data-compare-clear]",
+       3
+      ]
+     ]
     },
     {
      "url": "/portal/investasi/daftar/",
@@ -130,7 +691,21 @@
      "name": "peta-berbagi",
      "delay": 2500
     }
-   ]
+   ],
+   "tautan": {
+    "KPT": {
+     "login": "admin",
+     "user": "admin",
+     "url": "/admin/alokasi/issueddocument/?q=KPT-2026",
+     "ambil": "td.field-verify a"
+    },
+    "DOK": {
+     "login": "portal",
+     "user": "pemohon@contoh.simlahan.invalid",
+     "url": "/portal/dokumen/tanda-tangan/DOK-2026-00002/",
+     "ambil": "a:text-is('halaman verifikasi')"
+    }
+   }
   },
   {
    "login": "none",
@@ -139,7 +714,39 @@
    "items": [
     {
      "url": "/portal/",
-     "name": "beranda"
+     "name": "beranda",
+     "mark": [
+      [
+       ".nav-toggle",
+       1
+      ]
+     ]
+    },
+    {
+     "url": "/portal/",
+     "name": "menu",
+     "actions": [
+      {
+       "click": ".nav-toggle"
+      },
+      {
+       "wait": 500
+      }
+     ],
+     "mark": [
+      [
+       "#site-nav a:text-is('Peta Lahan')",
+       1
+      ],
+      [
+       "#site-nav a:text-is('Masuk')",
+       2
+      ],
+      [
+       "#site-nav a.cta",
+       3
+      ]
+     ]
     },
     {
      "url": "/portal/lahan/",
@@ -155,84 +762,612 @@
    "items": [
     {
      "url": "/portal/akun/",
-     "name": "akun"
+     "name": "akun",
+     "mark": [
+      [
+       "main a.btn:text-is('Ubah profil')",
+       1
+      ],
+      [
+       "main a.btn:text-is('Ajukan alokasi baru')",
+       2
+      ],
+      [
+       "main a.btn:text-is('Ajukan minat investasi')",
+       3
+      ],
+      [
+       "h2:text-is('Dokumen & perizinan')",
+       4
+      ],
+      [
+       "h2:text-is('Tagihan belum lunas')",
+       5
+      ],
+      [
+       "h2:text-is('Alokasi lahan saya')",
+       6
+      ]
+     ]
     },
     {
      "url": "/portal/akun/",
-     "name": "akun-full",
-     "full": true
+     "name": "akun-bawah",
+     "js": "window.scrollTo(0,800)",
+     "mark": [
+      [
+       "h2:text-is('Permohonan saya')",
+       1
+      ],
+      [
+       "h2:text-is('Permohonan saya') >> xpath=.. >> table tbody tr:first-child a >> nth=0",
+       2
+      ]
+     ]
     },
     {
      "url": "/portal/permohonan/ALK-2026-00006/",
-     "name": "permohonan-draf"
-    },
-    {
-     "url": "/portal/permohonan/ALK-2026-00006/",
-     "name": "permohonan-draf-full",
-     "full": true
+     "name": "permohonan-draf",
+     "tinggi": 1080,
+     "mark": [
+      [
+       "a.btn:text-is('Ubah data')",
+       1
+      ],
+      [
+       "h2:text-is('Dokumen persyaratan')",
+       2
+      ],
+      [
+       "p:text-is('Lengkapi dulu:')",
+       3
+      ],
+      [
+       "button:text-is('Ajukan')",
+       4
+      ],
+      [
+       "button:text-is('Batalkan permohonan')",
+       5
+      ],
+      [
+       "h2:text-is('Lacak tanpa login')",
+       6
+      ]
+     ]
     },
     {
      "url": "/portal/permohonan/ALK-2026-00005/",
-     "name": "permohonan-perbaikan"
+     "name": "permohonan-perbaikan",
+     "tinggi": 1040,
+     "mark": [
+      [
+       "div.alert:has-text('Perlu perbaikan')",
+       1
+      ],
+      [
+       "a.btn:text-is('Ubah data')",
+       2
+      ],
+      [
+       "button:text-is('Hapus') >> nth=0",
+       3
+      ],
+      [
+       "button:text-is('Ajukan ulang')",
+       4
+      ],
+      [
+       "h2:text-is('Riwayat')",
+       5
+      ]
+     ]
     },
     {
      "url": "/portal/permohonan/ALK-2026-00002/",
-     "name": "permohonan-disetujui"
+     "name": "permohonan-disetujui",
+     "mark": [
+      [
+       "h1 .badge",
+       1
+      ],
+      [
+       "div.alert:has-text('Permohonan disetujui')",
+       2
+      ],
+      [
+       "h2:text-is('Lacak tanpa login')",
+       3
+      ],
+      [
+       "h2:text-is('Riwayat')",
+       4
+      ]
+     ]
     },
     {
      "url": "/portal/permohonan/ALK-2026-00001/",
-     "name": "permohonan-terbit"
+     "name": "permohonan-terbit",
+     "js": "window.scrollTo(0,1890)",
+     "mark": [
+      [
+       "h2:text-is('Dokumen terbit')",
+       1
+      ],
+      [
+       "h2:text-is('Dokumen terbit') >> xpath=.. >> li a >> nth=0",
+       2
+      ]
+     ]
     },
     {
      "url": "/portal/alokasi/1/",
-     "name": "alokasi"
+     "name": "alokasi",
+     "tinggi": 1040,
+     "mark": [
+      [
+       "a.btn:text-is('Kelola dokumen')",
+       1
+      ],
+      [
+       "h2:text-is('Data alokasi')",
+       2
+      ],
+      [
+       "h2:text-is('Dokumen')",
+       3
+      ],
+      [
+       "h2:text-is('Layanan alokasi')",
+       4
+      ],
+      [
+       "h2:text-is('Layanan alokasi') >> xpath=.. >> li a >> nth=0",
+       5
+      ]
+     ]
     },
     {
      "url": "/portal/alokasi/1/layanan/",
-     "name": "alokasi-layanan"
+     "name": "alokasi-layanan",
+     "mark": [
+      [
+       "#id_service_type",
+       1
+      ],
+      [
+       "#id_reason",
+       2
+      ],
+      [
+       "button:text-is('Buat draf permohonan')",
+       3
+      ]
+     ]
     },
     {
      "url": "/portal/alokasi/1/peralihan/",
-     "name": "alokasi-peralihan"
+     "name": "alokasi-peralihan",
+     "mark": [
+      [
+       "#id_recipient_email",
+       1
+      ],
+      [
+       "#id_transfer_reason",
+       2
+      ],
+      [
+       "button:text-is('Buat draf permohonan')",
+       3
+      ]
+     ]
     },
     {
      "url": "/portal/akun/profil/",
-     "name": "profil"
+     "name": "profil",
+     "tinggi": 1120,
+     "mark": [
+      [
+       "#id_applicant_type",
+       1
+      ],
+      [
+       "#id_name",
+       2
+      ],
+      [
+       "#id_nib",
+       3
+      ],
+      [
+       "#id_npwp",
+       4
+      ],
+      [
+       "#id_nik",
+       5
+      ],
+      [
+       "#id_pic_name",
+       6
+      ],
+      [
+       "#id_pic_position",
+       7
+      ],
+      [
+       "#id_phone",
+       8
+      ],
+      [
+       "#id_address",
+       9
+      ],
+      [
+       "#id_city",
+       10
+      ],
+      [
+       "#id_is_investor",
+       11
+      ],
+      [
+       "#id_interest_sectors_0",
+       12
+      ],
+      [
+       "#id_capital_origin",
+       13
+      ],
+      [
+       "#id_origin_country",
+       14
+      ],
+      [
+       "#id_website",
+       15
+      ],
+      [
+       "main button:text-is('Simpan')",
+       16
+      ],
+      [
+       "a:text-is('Ubah kata sandi')",
+       17
+      ]
+     ]
     },
     {
      "url": "/portal/akun/sandi/",
-     "name": "sandi"
-    },
-    {
-     "url": "/portal/dokumen/",
-     "name": "dokumen"
-    },
-    {
-     "url": "/portal/dokumen/pemanfaatan/PML-2026-00004/",
-     "name": "dokumen-pemanfaatan"
-    },
-    {
-     "url": "/portal/dokumen/pemanfaatan/PML-2026-00004/",
-     "name": "dokumen-pemanfaatan-full",
-     "full": true
-    },
-    {
-     "url": "/portal/dokumen/tanda-tangan/DOK-2026-00002/",
-     "name": "dokumen-ttd"
-    },
-    {
-     "url": "/portal/dokumen/unduhan/",
-     "name": "dokumen-unduhan"
-    },
-    {
-     "url": "/portal/dokumen/tanda-tangan-saya/",
-     "name": "dokumen-ttd-saya"
+     "name": "sandi",
+     "mark": [
+      [
+       "#id_old_password",
+       1
+      ],
+      [
+       "#id_new_password1",
+       2
+      ],
+      [
+       "#id_new_password2",
+       3
+      ],
+      [
+       "main button:text-is('Simpan')",
+       4
+      ]
+     ]
     },
     {
      "url": "/portal/lelang/LLG-2026-0001/tawar/",
-     "name": "lelang-tawar"
+     "name": "lelang-tawar",
+     "mark": [
+      [
+       "#id_bidder_name",
+       1
+      ],
+      [
+       "#id_email",
+       2
+      ],
+      [
+       "#id_phone",
+       3
+      ],
+      [
+       "#id_amount",
+       4
+      ],
+      [
+       "#id_proposal",
+       5
+      ],
+      [
+       "button:text-is('Simpan penawaran')",
+       6
+      ]
+     ]
+    },
+    {
+     "url": "/portal/dokumen/",
+     "name": "dokumen",
+     "mark": [
+      [
+       "nav.tabs a >> nth=0",
+       1
+      ],
+      [
+       "nav.tabs a >> nth=1",
+       2
+      ],
+      [
+       "nav.tabs a >> nth=2",
+       3
+      ],
+      [
+       "nav.tabs a >> nth=3",
+       4
+      ],
+      [
+       "a.btn:text-is('Tanda tangani')",
+       5
+      ],
+      [
+       "h2:text-is('Pemanfaatan lahan') >> xpath=following-sibling::*[1] >> a >> nth=0",
+       6
+      ]
+     ]
+    },
+    {
+     "url": "/portal/dokumen/pemanfaatan/PML-2026-00004/",
+     "name": "dokumen-pemanfaatan",
+     "tinggi": 940,
+     "mark": [
+      [
+       "main div.alert >> nth=0",
+       1
+      ],
+      [
+       "h2:text-is('Kelengkapan dokumen wajib')",
+       2
+      ],
+      [
+       "h2:text-is('Nomor Induk Berusaha (NIB)')",
+       3
+      ],
+      [
+       "h2:text-is('Nomor Induk Berusaha (NIB)') >> xpath=ancestor::section[1] >> .badge >> nth=0",
+       4
+      ],
+      [
+       "main div.alert:has(strong:text-is('Catatan petugas:')) >> nth=0",
+       5
+      ],
+      [
+       "summary:text-is('Minta unduh') >> nth=0",
+       6
+      ],
+      [
+       "summary:has-text('Unggah versi baru') >> nth=0",
+       7
+      ]
+     ]
+    },
+    {
+     "url": "/portal/dokumen/pemanfaatan/PML-2026-00004/",
+     "name": "dokumen-unggah",
+     "js": "(()=>{const s=[...document.querySelectorAll('summary')].find(x=>x.textContent.includes('Unggah versi baru'));s.parentElement.open=true;window.scrollTo(0,820)})()",
+     "mark": [
+      [
+       "summary:has-text('Unggah versi baru') >> nth=0",
+       1
+      ],
+      [
+       "#id_r30-status",
+       2
+      ],
+      [
+       "#id_r30-file",
+       3
+      ],
+      [
+       "#id_r30-number",
+       4
+      ],
+      [
+       "#id_r30-issued_date",
+       5
+      ],
+      [
+       "#id_r30-expiry_date",
+       6
+      ],
+      [
+       "#id_r30-note",
+       7
+      ],
+      [
+       "#id_r30-note >> xpath=ancestor::form[1] >> button[type=submit]",
+       8
+      ]
+     ]
+    },
+    {
+     "url": "{TTD}",
+     "name": "ttd-tanda-tangan",
+     "mark": [
+      [
+       "h2:text-is('Isi dokumen')",
+       1
+      ],
+      [
+       "h2:text-is('Urutan')",
+       2
+      ],
+      [
+       "h2:text-is('Komentar')",
+       3
+      ]
+     ]
+    },
+    {
+     "url": "{TTD}",
+     "name": "ttd-tanda-tangani",
+     "tinggi": 900,
+     "js": "window.scrollTo(0,690)",
+     "mark": [
+      [
+       "h2:text-is('Tanda tangani')",
+       1
+      ],
+      [
+       "#id_name",
+       2
+      ],
+      [
+       "button[data-mode=gambar]",
+       3
+      ],
+      [
+       "button[data-mode=ketik]",
+       4
+      ],
+      [
+       "button[data-mode=tersimpan]",
+       5
+      ],
+      [
+       "button[data-clear]",
+       6
+      ],
+      [
+       "#id_agree",
+       7
+      ],
+      [
+       "#dk-sign-form button[type=submit]",
+       8
+      ],
+      [
+       "summary:has-text('Tolak dokumen')",
+       9
+      ]
+     ]
+    },
+    {
+     "url": "/portal/dokumen/tanda-tangan/DOK-2026-00002/",
+     "name": "dokumen-ttd",
+     "mark": [
+      [
+       "h2:text-is('Penanda tangan')",
+       1
+      ],
+      [
+       "h2:text-is('Dokumen final')",
+       2
+      ],
+      [
+       "a:text-is('halaman verifikasi')",
+       3
+      ],
+      [
+       "h2:text-is('Komentar')",
+       4
+      ]
+     ]
+    },
+    {
+     "url": "/portal/dokumen/tanda-tangan/DOK-2026-00002/",
+     "name": "dokumen-minta-unduh",
+     "js": "document.querySelectorAll('details').forEach(x=>{if(x.querySelector('summary').textContent.includes('Minta unduh'))x.open=true})",
+     "mark": [
+      [
+       "summary:text-is('Minta unduh')",
+       1
+      ],
+      [
+       "#id_purpose",
+       2
+      ],
+      [
+       "#id_reason",
+       3
+      ],
+      [
+       "#id_reason >> xpath=ancestor::form[1] >> button[type=submit]",
+       4
+      ]
+     ]
+    },
+    {
+     "url": "/portal/dokumen/unduhan/",
+     "name": "dokumen-unduhan",
+     "mark": [
+      [
+       "table tbody tr:first-child .badge",
+       1
+      ],
+      [
+       "table tbody tr:nth-child(2) .badge",
+       2
+      ],
+      [
+       "button:text-is('Batalkan')",
+       3
+      ]
+     ]
+    },
+    {
+     "url": "/portal/dokumen/tanda-tangan-saya/",
+     "name": "dokumen-ttd-saya",
+     "tinggi": 960,
+     "js": "document.querySelectorAll('details').forEach(x=>{if(x.querySelector('summary').textContent.includes('Hapus tanda tangan'))x.open=true})",
+     "mark": [
+      [
+       "#id_name",
+       1
+      ],
+      [
+       "button[data-mode=gambar]",
+       2
+      ],
+      [
+       "button[data-mode=ketik]",
+       3
+      ],
+      [
+       "button[data-clear]",
+       4
+      ],
+      [
+       "#id_password",
+       5
+      ],
+      [
+       "button:text-is('Simpan tanda tangan')",
+       6
+      ],
+      [
+       "summary:has-text('Hapus tanda tangan tersimpan')",
+       7
+      ],
+      [
+       "#dk-del-pass",
+       8
+      ]
+     ]
     }
-   ]
+   ],
+   "tautan": {
+    "TTD": {
+     "login": "portal",
+     "user": "pemohon@contoh.simlahan.invalid",
+     "url": "/portal/dokumen/",
+     "ambil": "a.btn:text-is('Tanda tangani')"
+    }
+   }
   },
   {
    "login": "portal",
@@ -241,50 +1376,366 @@
    "items": [
     {
      "url": "/portal/akun/",
-     "name": "akun"
+     "name": "akun",
+     "mark": [
+      [
+       "main a.btn:text-is('Ubah profil')",
+       1
+      ],
+      [
+       "main a.btn:text-is('Jelajahi peta')",
+       2
+      ],
+      [
+       "main a.btn:text-is('Ajukan minat investasi')",
+       3
+      ],
+      [
+       ".investor-kpis a >> nth=0",
+       4
+      ],
+      [
+       ".investor-kpis a >> nth=1",
+       5
+      ],
+      [
+       ".investor-kpis a >> nth=2",
+       6
+      ],
+      [
+       "h2:text-is('Permintaan investasi saya')",
+       7
+      ]
+     ]
     },
     {
      "url": "/portal/akun/",
-     "name": "akun-full",
-     "full": true
+     "name": "akun-bawah",
+     "js": "window.scrollTo(0,960)",
+     "mark": [
+      [
+       "h2:text-is('Lahan tersimpan')",
+       1
+      ],
+      [
+       "main a.btn:text-is('Bandingkan')",
+       2
+      ],
+      [
+       "main a.btn:text-is('Ajukan minat')",
+       3
+      ],
+      [
+       "button[data-save] >> nth=0",
+       4
+      ],
+      [
+       "h2:text-is('Lahan sesuai minat Anda')",
+       5
+      ]
+     ]
     },
     {
      "url": "/portal/investasi/permintaan/",
-     "name": "permintaan"
+     "name": "permintaan",
+     "mark": [
+      [
+       "main a.btn:text-is('Lahan tersimpan')",
+       1
+      ],
+      [
+       "main a.btn:text-is('Ajukan minat baru')",
+       2
+      ],
+      [
+       "table tbody tr:first-child td:first-child a",
+       3
+      ]
+     ]
     },
     {
      "url": "/portal/investasi/permintaan/INV-2026-00002/",
-     "name": "permintaan-ditawarkan"
+     "name": "permintaan-ditawarkan",
+     "tinggi": 1060,
+     "js": "document.querySelectorAll('details').forEach(x=>{if(x.textContent.includes('minta penyesuaian'))x.open=true})",
+     "mark": [
+      [
+       "h2:text-is('Penawaran dari petugas')",
+       1
+      ],
+      [
+       "button:text-is('Terima penawaran')",
+       2
+      ],
+      [
+       "summary:has-text('Tolak / minta penyesuaian')",
+       3
+      ],
+      [
+       "#id_reason",
+       4
+      ],
+      [
+       "button:text-is('Kirim')",
+       5
+      ],
+      [
+       "h2:text-is('Ringkasan')",
+       6
+      ],
+      [
+       "h2:text-is('Riwayat')",
+       7
+      ]
+     ]
     },
     {
      "url": "/portal/investasi/permintaan/INV-2026-00002/",
-     "name": "permintaan-ditawarkan-full",
-     "full": true
+     "name": "permintaan-pesan",
+     "js": "(()=>{document.querySelectorAll('details').forEach(x=>{if(x.textContent.includes('Batalkan permintaan'))x.open=true});window.scrollTo(0,830)})()",
+     "mark": [
+      [
+       "h2:text-is('Pesan dengan petugas')",
+       1
+      ],
+      [
+       "#id_body",
+       2
+      ],
+      [
+       "#id_attachment",
+       3
+      ],
+      [
+       "button:text-is('Kirim pesan')",
+       4
+      ],
+      [
+       "summary:has-text('Batalkan permintaan')",
+       5
+      ],
+      [
+       "#id_note",
+       6
+      ],
+      [
+       "button.btn-danger:text-is('Batalkan permintaan')",
+       7
+      ]
+     ]
     },
     {
      "url": "/portal/investasi/permintaan/INV-2026-00001/",
-     "name": "permintaan-konsultasi"
+     "name": "permintaan-konsultasi",
+     "mark": [
+      [
+       "div.alert:has-text('Jadwal konsultasi')",
+       1
+      ],
+      [
+       "h2:text-is('Pesan dengan petugas')",
+       2
+      ],
+      [
+       "h2:text-is('Ringkasan')",
+       3
+      ]
+     ]
     },
     {
      "url": "/portal/investasi/ajukan/",
-     "name": "ajukan"
+     "name": "ajukan",
+     "tinggi": 1300,
+     "mark": [
+      [
+       "#id_scheme_0",
+       1
+      ],
+      [
+       "#id_sector",
+       2
+      ],
+      [
+       "#id_zone",
+       3
+      ],
+      [
+       "#id_project_name",
+       4
+      ],
+      [
+       "#id_activity",
+       5
+      ],
+      [
+       "#id_investment_value",
+       6
+      ],
+      [
+       "#id_workforce",
+       7
+      ],
+      [
+       "#id_capital_origin",
+       8
+      ],
+      [
+       "#id_target_start",
+       9
+      ],
+      [
+       "#id_term_years",
+       10
+      ],
+      [
+       "#id_power_kva",
+       11
+      ],
+      [
+       "#id_water_m3_day",
+       12
+      ]
+     ]
     },
     {
      "url": "/portal/investasi/ajukan/",
-     "name": "ajukan-full",
-     "full": true
+     "name": "ajukan-lokasi",
+     "tinggi": 1180,
+     "delay": 2000,
+     "js": "window.scrollTo(0,1170)",
+     "mark": [
+      [
+       "h2:text-is('Lokasi yang diminati')",
+       1
+      ],
+      [
+       "main input[type=search]",
+       2
+      ],
+      [
+       "input[name=plots] >> nth=0",
+       3
+      ],
+      [
+       "[data-draw=start]",
+       4
+      ],
+      [
+       "[data-draw=undo]",
+       5
+      ],
+      [
+       "[data-draw=finish]",
+       6
+      ],
+      [
+       "[data-draw=clear]",
+       7
+      ],
+      [
+       "#id_requested_area_m2",
+       8
+      ]
+     ]
+    },
+    {
+     "url": "/portal/investasi/ajukan/",
+     "name": "ajukan-lampiran",
+     "js": "window.scrollTo(0,2300)",
+     "mark": [
+      [
+       "h2:text-is('Lampiran & pernyataan')",
+       1
+      ],
+      [
+       "#id_attachment",
+       2
+      ],
+      [
+       "#id_agree",
+       3
+      ],
+      [
+       "button:text-is('Kirim permintaan')",
+       4
+      ]
+     ]
     },
     {
      "url": "/portal/investasi/tersimpan/",
-     "name": "tersimpan"
+     "name": "tersimpan",
+     "mark": [
+      [
+       "main a.btn:text-is('Lihat di peta')",
+       1
+      ],
+      [
+       "button[data-compare] >> nth=0",
+       2
+      ],
+      [
+       "button[data-save] >> nth=0",
+       3
+      ]
+     ]
     },
     {
      "url": "/portal/lahan/CONTOH-RMP-01/",
-     "name": "lahan-detail"
+     "name": "lahan-detail",
+     "delay": 2000,
+     "mark": [
+      [
+       "button[data-compare]",
+       1
+      ],
+      [
+       "button[data-save]",
+       2
+      ],
+      [
+       "#sim-scheme",
+       3
+      ],
+      [
+       "#sim-years",
+       4
+      ],
+      [
+       "output[data-sim=total]",
+       5
+      ]
+     ]
     },
     {
      "url": "/portal/akun/profil/",
-     "name": "profil"
+     "name": "profil",
+     "js": "window.scrollTo(0,640)",
+     "mark": [
+      [
+       "#id_is_investor",
+       1
+      ],
+      [
+       "#id_interest_sectors_0",
+       2
+      ],
+      [
+       "#id_capital_origin",
+       3
+      ],
+      [
+       "#id_origin_country",
+       4
+      ],
+      [
+       "#id_website",
+       5
+      ],
+      [
+       "main button:text-is('Simpan')",
+       6
+      ]
+     ]
     }
    ]
   },
@@ -295,43 +1746,126 @@
    "items": [
     {
      "url": "/portal/permohonan/ALK-2026-00006/ubah/",
-     "name": "permohonan-ubah"
+     "name": "permohonan-ubah",
+     "mark": [
+      [
+       "#id_activity",
+       1
+      ],
+      [
+       "#id_investment_value",
+       2
+      ],
+      [
+       "#id_workforce",
+       3
+      ],
+      [
+       "#id_development_months",
+       4
+      ],
+      [
+       "#id_description",
+       5
+      ],
+      [
+       "main button:text-is('Simpan')",
+       6
+      ]
+     ]
     },
     {
      "url": "/portal/permohonan/ALK-2026-00006/",
      "name": "permohonan-unggah",
-     "actions": [
-      {
-       "scroll": "text=Dokumen persyaratan"
-      }
-     ],
+     "js": "window.scrollTo(0,620)",
      "mark": [
       [
-       "button:has-text('Unggah')",
-       "1"
+       "h2:text-is('Dokumen persyaratan')",
+       1
       ],
       [
-       "button:has-text('Ajukan') >> nth=0",
-       "2"
+       "#id_doc_type",
+       2
+      ],
+      [
+       "#id_file",
+       3
+      ],
+      [
+       "button:text-is('Unggah')",
+       4
       ]
      ]
     },
     {
      "url": "/portal/alokasi/1/",
      "name": "alokasi-progres-form",
-     "actions": [
-      {
-       "scroll": "h2:has-text('Progres pembangunan')"
-      }
+     "tinggi": 960,
+     "js": "(()=>{document.querySelectorAll('details').forEach(x=>{if(x.textContent.includes('Kirim laporan pembangunan'))x.open=true});window.scrollTo(0,1300)})()",
+     "mark": [
+      [
+       "summary:has-text('Kirim laporan pembangunan')",
+       1
+      ],
+      [
+       "#id_progres-report_date",
+       2
+      ],
+      [
+       "#id_progres-stage",
+       3
+      ],
+      [
+       "#id_progres-progress_percent",
+       4
+      ],
+      [
+       "#id_progres-realized_investment",
+       5
+      ],
+      [
+       "#id_progres-workforce",
+       6
+      ],
+      [
+       "#id_progres-description",
+       7
+      ],
+      [
+       "#id_progres-photo",
+       8
+      ],
+      [
+       "button:text-is('Kirim laporan')",
+       9
+      ]
      ]
     },
     {
      "url": "/portal/permohonan/ALK-2026-00002/",
      "name": "permohonan-bayar",
-     "actions": [
-      {
-       "scroll": "h2:has-text('Tagihan')"
-      }
+     "js": "window.scrollTo(0,1560)",
+     "mark": [
+      [
+       "h2:text-is('Tagihan')",
+       1
+      ],
+      [
+       "a:text-is('Unduh tagihan (PDF)')",
+       2
+      ],
+      [
+       "a:text-is('Lihat bukti bayar')",
+       3
+      ],
+      [
+       "#id_payment_proof",
+       4
+      ],
+      [
+       "button:has-text('bukti bayar')",
+       5
+      ]
      ]
     }
    ]
@@ -344,19 +1878,19 @@
     {
      "url": "/portal/lahan/CONTOH-RMP-01/",
      "name": "lahan-detail",
-     "actions": [
-      {
-       "scroll": "button:has-text('Langsung ajukan permohonan alokasi')"
-      }
-     ],
+     "js": "window.scrollTo(0,1000)",
      "mark": [
       [
-       "button:has-text('Langsung ajukan permohonan alokasi')",
-       "1"
+       "h2:text-is('Tertarik dengan lahan ini?')",
+       1
       ],
       [
-       "button:has-text('Ajukan minat investasi'), a:has-text('Ajukan minat investasi')",
-       "2"
+       "main a.btn:text-is('Ajukan minat investasi')",
+       2
+      ],
+      [
+       "button:text-is('Langsung ajukan permohonan alokasi')",
+       3
       ]
      ]
     }

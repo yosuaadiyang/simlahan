@@ -10,13 +10,71 @@
     {
      "url": "/aset/lapangan/",
      "name": "lapangan",
-     "delay": 3000
+     "delay": 3000,
+     "mark": [
+      [
+       "text=Daring",
+       "1"
+      ],
+      [
+       "text=Panduan >> nth=0",
+       "2"
+      ],
+      [
+       ".leaflet-control-layers",
+       "3"
+      ],
+      [
+       "text=GPS:",
+       "4"
+      ],
+      [
+       "#jenis",
+       "5"
+      ],
+      [
+       "#catatan",
+       "6"
+      ]
+     ]
     },
     {
      "url": "/aset/lapangan/",
-     "name": "lapangan-full",
-     "full": true,
-     "delay": 3000
+     "name": "lapangan-form",
+     "delay": 3000,
+     "actions": [
+      {
+       "wait": 2500
+      },
+      {
+       "js": "let e=document.querySelector('#jenis'); while(e && !(e.scrollHeight>e.clientHeight+5 && getComputedStyle(e).overflowY!=='visible')) e=e.parentElement; const f=document.querySelector('label[for=foto]')||document.querySelector('#foto'); if(e) e.scrollTop += f.getBoundingClientRect().top - e.getBoundingClientRect().top - 14; else f.scrollIntoView()"
+      },
+      {
+       "wait": 600
+      }
+     ],
+     "mark": [
+      [
+       "#foto",
+       "1"
+      ],
+      [
+       "label:has(#titik-manual)",
+       "2"
+      ],
+      [
+       "button:text-is('Simpan laporan')",
+       "3"
+      ],
+      [
+       "text=Antrean kirim",
+       "4"
+      ],
+      [
+       "#sinkron",
+       "5"
+      ]
+     ]
     }
    ]
   },
@@ -42,23 +100,114 @@
     },
     {
      "url": "/admin/operasi/korwil/",
-     "name": "op-korwil"
+     "name": "op-korwil",
+     "mark": [
+      [
+       "#content-main .object-tools a:text-is('Buka pusat komando')",
+       "1"
+      ],
+      [
+       "#content-main .object-tools a:text-is('Impor batas SHP/KML/KMZ/GeoJSON')",
+       "2"
+      ],
+      [
+       "#content-main .object-tools a:text-is('Tambahkan Korwil (koordinator wilayah)')",
+       "3"
+      ],
+      [
+       "#searchbar",
+       "4"
+      ]
+     ]
     },
     {
      "url": "/admin/operasi/resident/",
-     "name": "op-resident"
+     "name": "op-resident",
+     "tinggi": 1000,
+     "mark": [
+      [
+       "#content-main .object-tools a:text-is('Buka di pusat komando')",
+       "1"
+      ],
+      [
+       "#content-main .object-tools a:text-is('Impor CSV / SHP')",
+       "2"
+      ],
+      [
+       "#content-main .object-tools a:text-is('Tambahkan Warga terdata')",
+       "3"
+      ],
+      [
+       "#searchbar",
+       "4"
+      ],
+      [
+       "#changelist-filter >> text=Berdasarkan Korwil",
+       "5"
+      ]
+     ]
     },
     {
      "url": "/admin/operasi/activity/",
-     "name": "op-activity"
+     "name": "op-activity",
+     "mark": [
+      [
+       "#result_list tbody tr:first-child input.action-select",
+       "1"
+      ],
+      [
+       "select[name=action]",
+       "2"
+      ],
+      [
+       "button[name=index]",
+       "3"
+      ],
+      [
+       "#changelist-filter >> text=Berdasarkan Jenis kegiatan",
+       "4"
+      ]
+     ]
     },
     {
      "url": "/admin/operasi/attendance/",
-     "name": "op-attendance"
+     "name": "op-attendance",
+     "mark": [
+      [
+       "#result_list tbody tr:first-child input.action-select",
+       "1"
+      ],
+      [
+       "select[name=action]",
+       "2"
+      ],
+      [
+       "button[name=index]",
+       "3"
+      ],
+      [
+       "#changelist-filter >> text=Berdasarkan Status",
+       "4"
+      ]
+     ]
     },
     {
      "url": "/admin/operasi/sosalert/",
-     "name": "op-sosalert"
+     "name": "op-sosalert",
+     "mark": [
+      [
+       "#result_list tbody tr:first-child input.action-select",
+       "1"
+      ],
+      [
+       "select[name=action]",
+       "2"
+      ],
+      [
+       "button[name=index]",
+       "3"
+      ]
+     ]
     },
     {
      "url": "/admin/operasi/illegalfinding/",
@@ -70,7 +219,13 @@
     },
     {
      "url": "/admin/operasi/patrolsession/",
-     "name": "op-patrolsession"
+     "name": "op-patrolsession",
+     "mark": [
+      [
+       "#content-main .object-tools a:text-is('Impor patroli SMART (.json)')",
+       "1"
+      ]
+     ]
     },
     {
      "url": "/admin/operasi/soiltest/",
@@ -94,7 +249,35 @@
     },
     {
      "url": "/admin/operasi/officerprofile/",
-     "name": "op-officerprofile"
+     "name": "op-officerprofile",
+     "mark": [
+      [
+       "#content-main .object-tools a:text-is('Tambahkan Jabatan & atasan petugas')",
+       "1"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/operasi/officerprofile/add/",
+     "name": "op-officerprofile-tambah",
+     "mark": [
+      [
+       "#id_user + .select2-container",
+       "1"
+      ],
+      [
+       "#id_position",
+       "2"
+      ],
+      [
+       "#id_supervisor + .select2-container",
+       "3"
+      ],
+      [
+       "#content-main input[name=_save]",
+       "4"
+      ]
+     ]
     },
     {
      "url": "/admin/operasi/taskpoint/",
@@ -130,7 +313,140 @@
     },
     {
      "url": "/admin/operasi/commandsettings/",
-     "name": "op-commandsettings"
+     "name": "op-commandsettings",
+     "mark": [
+      [
+       "#id_work_start",
+       "1"
+      ],
+      [
+       "#id_late_tolerance_minutes",
+       "2"
+      ],
+      [
+       "#id_work_end",
+       "3"
+      ],
+      [
+       "#id_require_attendance_photo",
+       "4"
+      ],
+      [
+       "#id_enforce_geofence",
+       "5"
+      ],
+      [
+       "#id_geofence_tolerance_m",
+       "6"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/operasi/commandsettings/",
+     "name": "op-pengaturan-kpi",
+     "actions": [
+      {
+       "js": "const e=[...document.querySelectorAll('h2,h3,legend')].find(x=>x.textContent.trim().startsWith('Kinerja (KPI)')); window.scrollTo(0, e.getBoundingClientRect().top+scrollY-90)"
+      },
+      {
+       "wait": 400
+      }
+     ],
+     "mark": [
+      [
+       "#id_weekly_activity_target",
+       "1"
+      ],
+      [
+       "#id_weight_attendance",
+       "2"
+      ],
+      [
+       "#id_weight_activity",
+       "3"
+      ],
+      [
+       "#id_weight_task",
+       "4"
+      ],
+      [
+       "#id_scoring_mode",
+       "5"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/operasi/commandsettings/",
+     "name": "op-pengaturan-poin",
+     "tinggi": 980,
+     "actions": [
+      {
+       "js": "const e=[...document.querySelectorAll('h2,h3,legend')].find(x=>x.textContent.trim().startsWith('Poin usaha kegiatan')); window.scrollTo(0, e.getBoundingClientRect().top+scrollY-90)"
+      },
+      {
+       "wait": 400
+      }
+     ],
+     "mark": [
+      [
+       "#id_effort_target_multiplier",
+       "1"
+      ],
+      [
+       "#id_effort_base_default",
+       "2"
+      ],
+      [
+       "#id_effort_per_finding",
+       "3"
+      ],
+      [
+       "#id_effort_per_photo",
+       "4"
+      ],
+      [
+       "#id_effort_narrative_bonus",
+       "5"
+      ],
+      [
+       "#id_effort_per_km",
+       "6"
+      ],
+      [
+       "#id_effort_geotag_bonus",
+       "7"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/operasi/commandsettings/",
+     "name": "op-pengaturan-peta",
+     "actions": [
+      {
+       "js": "const e=[...document.querySelectorAll('h2,h3,legend')].find(x=>x.textContent.trim().startsWith('Peta, Live & SOS')); window.scrollTo(0, e.getBoundingClientRect().top+scrollY-90)"
+      },
+      {
+       "wait": 400
+      }
+     ],
+     "mark": [
+      [
+       "#id_online_minutes",
+       "1"
+      ],
+      [
+       "#id_sos_emails",
+       "2"
+      ],
+      [
+       "#id_satellite_tile_url",
+       "3"
+      ],
+      [
+       "#content-main input[name=_save]",
+       "4"
+      ]
+     ]
     },
     {
      "url": "/admin/operasi/korwil/",
@@ -142,12 +458,98 @@
       {
        "wait": 1500
       }
+     ],
+     "mark": [
+      [
+       "#id_code",
+       "1"
+      ],
+      [
+       "#id_name",
+       "2"
+      ],
+      [
+       "#id_color",
+       "3"
+      ],
+      [
+       "#id_is_active",
+       "4"
+      ],
+      [
+       "#id_service_unit",
+       "5"
+      ]
      ]
     },
     {
-     "url": "/admin/operasi/commandsettings/",
-     "name": "op-pengaturan-full",
-     "full": true
+     "url": "/admin/operasi/korwil/",
+     "name": "op-korwil-petugas",
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      },
+      {
+       "js": "const e=[...document.querySelectorAll('h2,h3,legend')].find(x=>x.textContent.trim().startsWith('Petugas')); window.scrollTo(0, e.getBoundingClientRect().top+scrollY-90)"
+      },
+      {
+       "wait": 500
+      }
+     ],
+     "mark": [
+      [
+       "#id_coordinator",
+       "1"
+      ],
+      [
+       "#id_members_from",
+       "2"
+      ],
+      [
+       "#id_members_add",
+       "3"
+      ],
+      [
+       "#id_members_to",
+       "4"
+      ]
+     ]
+    },
+    {
+     "url": "/admin/operasi/korwil/",
+     "name": "op-korwil-wilayah",
+     "tinggi": 1000,
+     "actions": [
+      {
+       "click": "#result_list tbody tr:first-child th a, #result_list tbody tr:first-child td a"
+      },
+      {
+       "wait": 1500
+      },
+      {
+       "js": "const e=[...document.querySelectorAll('h2,h3,legend')].find(x=>x.textContent.trim().startsWith('Wilayah')); window.scrollTo(0, e.getBoundingClientRect().top+scrollY-90)"
+      },
+      {
+       "wait": 800
+      }
+     ],
+     "mark": [
+      [
+       "#id_villages",
+       "1"
+      ],
+      [
+       "#id_target_households",
+       "2"
+      ],
+      [
+       "#id_geometry_map",
+       "3"
+      ]
+     ]
     }
    ]
   }

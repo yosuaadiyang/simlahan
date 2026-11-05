@@ -134,7 +134,7 @@ const DecisionItem: React.FC<Props> = ({
           </Authorization>
           {!!decision.conditions &&
             !!decision.conditions.length &&
-            ` (${decision.conditions.length} ${decision.conditions.length === 1 ? "ehto" : "ehtoa"})`}
+            ` (${decision.conditions.length} syarat)`}
         </>
       }
       onToggle={handleDecisionCollapseToggle}

@@ -19,14 +19,16 @@ Halaman **Sewa** adalah halaman awal peran sewa.
 
 ![Daftar sewa](gambar/sewa/daftar-sewa.png)
 
+Nomor pada gambar:
+
 1. **Buat pengenal sewa**: membuat sewa baru (lihat 3.2).
 2. **Cari dengan kata kunci**: ketik pengenal sewa, nama penyewa, alamat, atau pengenal objek, lalu tekan Enter.
-3. **Saringan**: Unit layanan, Jenis, Penyiap, dan Persiapan belum selesai. Tautan **Objek**, **Masa berlaku**, **Keputusan dan kontrak**, dan **Kontak** di atas saringan membuka kolom pencarian tambahan.
-4. **Tabel / Peta**: ganti tampilan daftar menjadi peta lokasi sewa.
+3. **Objek**, **Masa berlaku**, **Keputusan dan kontrak**, **Kontak**: klik salah satu untuk membuka kolom pencarian tambahan.
+4. **Saringan**: Unit layanan, Jenis, Penyiap, dan Persiapan belum selesai. Klik kotak lalu pilih isinya.
+5. **Peta**: mengganti tampilan daftar menjadi peta lokasi sewa. Klik **Tabel** untuk kembali.
+6. **Kosongkan pencarian**: menghapus semua kata kunci dan saringan.
 
 Klik **pengenal sewa** (misalnya `L1217108-1`) untuk membuka datanya. Tanda **˅** di awal baris menampilkan sewa lain yang terkait. Angka bulat di kolom Penyewa menunjukkan jumlah penyewa.
-
-**Kosongkan pencarian** menghapus semua kata kunci dan saringan.
 
 Tampilan peta:
 
@@ -38,12 +40,13 @@ Tampilan peta:
 
 ![Buat pengenal sewa](gambar/sewa/buat-pengenal-sewa.png)
 
-1. Di halaman Sewa, klik **Buat pengenal sewa**.
-2. Pilih **Jenis** (jenis pemanfaatan) dan **Jenis sewa** (wajib).
-3. Pilih **Kabupaten/Kota** dan **Kecamatan** (wajib). Unit layanan terisi otomatis dari unit aktif Anda.
-4. Bila perlu isi **Nomor agenda**, **Tanggal permohonan diterima**, **Catatan**, dan **Terkait dengan sewa** (untuk perpanjangan atau pemecahan dari sewa lama).
-5. Klik **Buat pengenal**. Sistem membuat pengenal sewa baru dan membuka halaman sewanya.
-6. Lengkapi tab-tab sewa (lihat 3.3), lalu klik **Simpan**.
+1. Di halaman Sewa, klik **Buat pengenal sewa**. Jendela seperti gambar di atas terbuka.
+2. Pilih **Jenis** (nomor 1), misalnya Sewa.
+3. Pilih **Jenis sewa** (nomor 2). Wajib.
+4. Pilih **Kabupaten/Kota** (nomor 3) dan **Kecamatan** (nomor 4). Wajib. **Unit layanan** terisi otomatis dari unit aktif Anda.
+5. Bila perlu isi **Nomor agenda** (nomor 5), **Catatan**, **Tanggal permohonan diterima**, dan **Terkait dengan sewa** (untuk perpanjangan atau pemecahan dari sewa lama).
+6. Klik **Buat pengenal** (nomor 6). Tombol ini baru aktif setelah semua kolom wajib terisi. Sistem membuat pengenal sewa baru dan membuka halaman sewanya.
+7. Lengkapi tab-tab sewa (lihat 3.3): klik **Ubah**, isi, lalu klik **Simpan**.
 
 ## 3.3 Halaman data sewa
 
@@ -51,17 +54,17 @@ Di bagian atas tampak ringkasan: pengenal sewa, jenis, tanggal mulai/akhir, kond
 
 ![Ringkasan sewa](gambar/sewa/sewa-tab-ringkasan.png)
 
-1. **Tab**: klik untuk berpindah bagian.
-2. **Ubah**: masuk mode ubah untuk tab yang sedang dibuka.
+1. **Tab** (nomor 1): klik untuk berpindah bagian.
+2. **Ubah** (nomor 2): masuk mode ubah untuk tab yang sedang dibuka.
 
 ### Mengubah data sewa
 
 ![Mode ubah](gambar/sewa/sewa-mode-ubah.png)
 
-1. Buka tab yang akan diubah, lalu klik **Ubah**.
+1. Buka tab yang akan diubah, lalu klik **Ubah** di kanan atas.
 2. Ubah isian. Kolom bertanda **\*** wajib diisi.
-3. Klik **Simpan** (1). Klik **Batalkan perubahan** (2) bila tidak jadi.
-4. Tombol **Hapus** menghapus seluruh sewa (hanya untuk sewa yang belum berjalan dan bila Anda berhak).
+3. Klik **Simpan** (nomor 1). Klik **Batalkan perubahan** (nomor 2) bila tidak jadi.
+4. Tombol merah **Hapus** menghapus seluruh sewa (hanya untuk sewa yang belum berjalan dan bila Anda berhak).
 
 ### Isi setiap tab
 
@@ -89,23 +92,32 @@ Di bagian atas tampak ringkasan: pengenal sewa, jenis, tanggal mulai/akhir, kond
 
 ![Tab Penagihan](gambar/sewa/sewa-tab-penagihan.png)
 
-**Melihat tagihan.** Tabel **Tagihan** menampilkan kelompok tagihan, penerima, jatuh tempo (merah = lewat), nomor, porsi, periode, jenis piutang, status, nilai ditagih, dan sisa belum dibayar. Klik baris untuk membuka rincian tagihan.
+**Melihat tagihan.** Tabel **Tagihan** menampilkan kelompok tagihan, penerima, jatuh tempo (merah = sudah lewat), nomor, porsi, periode, jenis piutang, status, nilai ditagih, dan sisa belum dibayar. Klik baris untuk membuka rincian tagihan di sebelah kanan.
 
 **Membuat tagihan manual**
 
-1. Buka tab **Penagihan**, klik **Buat tagihan**.
-2. Pilih penerima, periode, jenis piutang, dan nilai; klik **Simpan**.
+1. Buka tab **Penagihan**, lalu klik **Buat tagihan** (nomor 2) di bawah tabel.
+2. Pilih penerima, periode, jenis piutang, dan isi nilainya.
+3. Klik **Simpan**. Tagihan baru muncul di tabel.
 
-**Mencatat pembayaran**: klik baris tagihan untuk membuka panel rinciannya, klik ubah, klik **Tambah pembayaran**, isi jumlah dan tanggal bayar, lalu **Simpan**.
+**Mencatat pembayaran**
 
-**Mengkreditkan atau menghapus tagihan**: pilih tagihan (bulatan di kiri baris), lalu klik **Kreditkan tagihan** atau **Hapus tagihan** dan ikuti konfirmasinya.
+1. Klik baris tagihan. Panel rincian tagihan terbuka.
+2. Klik ikon pensil (ubah) di panel itu, lalu klik **Tambah pembayaran**.
+3. Isi jumlah dan tanggal bayar, lalu klik **Simpan**. Sisa tagihan berkurang otomatis.
 
-**Menghentikan/menjalankan penagihan otomatis**: klik **Hentikan penagihan** (tulisan **Penagihan berjalan** berubah). Klik lagi untuk menjalankan kembali.
+**Mengkreditkan atau menghapus tagihan**
 
-**Penagihan hukum** (Ahli Hukum Penagihan):
+1. Klik bulatan di awal baris tagihan yang salah.
+2. Klik **Kreditkan tagihan** (nomor 3) atau **Hapus tagihan** (nomor 4). Kedua tombol abu-abu sampai ada tagihan yang dipilih.
+3. Ikuti jendela konfirmasinya.
 
-1. Di bagian penagihan hukum, klik **Buat surat penagihan**; pilih penyewa dan jenis tuntutan pembayaran.
-2. Catat putusan dengan **Tambah putusan pengadilan**.
+**Menghentikan atau menjalankan penagihan otomatis**: klik **Hentikan penagihan** (nomor 1). Tulisan **Penagihan berjalan** di sebelahnya berubah menjadi penagihan berhenti. Klik lagi tombolnya untuk menjalankan kembali.
+
+**Penagihan hukum** (Ahli Hukum Penagihan), di bagian **Penagihan** paling bawah:
+
+1. Di **Pembuatan surat penagihan**, pilih **Penyewa** dan **Jenis tuntutan pembayaran**, tambahkan tagihan yang dituntut dengan **Tambah tagihan**, lalu klik **Buat surat penagihan** (nomor 5).
+2. Catat putusan dengan **Tambah putusan pengadilan** (nomor 6).
 3. Tambahkan catatan dengan **Tambah catatan**. Bunga denda dihitung otomatis dari tagihan yang terlambat.
 
 ## 3.5 Kontak
@@ -114,17 +126,19 @@ Kontak adalah daftar orang, badan usaha, perkumpulan, atau unit yang menjadi pen
 
 ![Daftar kontak](gambar/sewa/kontak-daftar.png)
 
-- Saring dengan **Unit layanan**, **Pengenal sewa**, **Hanya penyewa**, atau **Hanya kontak aktif**.
-- Klik nama kontak untuk melihat data dan **Sewa kontak** (daftar sewa yang melibatkan kontak itu, beserta tunggakan).
+- **Buat kontak** (nomor 1): menambah kontak baru.
+- **Cari dengan kata kunci** (nomor 2): ketik nama, NPWP, atau nomor pelanggan.
+- Saringan **Unit layanan** (nomor 3), **Pengenal sewa**, **Hanya penyewa**, atau **Hanya kontak aktif**.
+- Klik baris kontak untuk melihat datanya dan **Sewa kontak** (daftar sewa yang melibatkan kontak itu, beserta tunggakan).
 
 **Menambah kontak** (Penyusun, Operator, Penagihan, Administrator)
 
 ![Kontak baru](gambar/sewa/kontak-baru.png)
 
-1. Klik **Buat kontak**.
-2. Pilih **Jenis kontak** (perorangan, badan usaha, perkumpulan, unit). Kolom menyesuaikan jenisnya.
-3. Isi nama, NPWP/NIK, alamat, telepon, surel, dan kolom lain yang diperlukan.
-4. Klik **Simpan**.
+1. Di daftar kontak, klik **Buat kontak**.
+2. Pilih **Jenis kontak** (nomor 1): perorangan, badan usaha, perkumpulan, atau unit. Kolom nama dan NIK/NPWP muncul sesuai jenisnya.
+3. Isi nama dan NIK/NPWP, lalu **Alamat** (nomor 2), **Nomor telepon** (nomor 3), **Email** (nomor 4), dan kolom lain yang diperlukan.
+4. Klik **Simpan** (nomor 5) di kanan atas. Klik **Batalkan perubahan** (nomor 6) bila tidak jadi.
 
 ![Detail kontak](gambar/sewa/kontak-detail.png)
 
@@ -134,9 +148,11 @@ Catatan area adalah catatan yang ditandai langsung di peta, misalnya "lahan rawa
 
 ![Catatan area](gambar/sewa/catatan-area.png)
 
-1. Buka **Catatan area**.
-2. Klik **Buat catatan area**, gambar area di peta (klik titik-titik batas, klik titik pertama untuk menutup).
-3. Tulis catatannya, lalu simpan. Klik area di peta untuk membaca atau mengubah catatan.
+1. Buka **☰ → Catatan area**.
+2. Klik **Buat catatan area** (nomor 1). Panel isian terbuka di kiri peta.
+3. Gambar area di peta: klik ikon segi lima di kolom alat kanan peta, klik titik-titik batas area, lalu klik titik pertama untuk menutup bentuknya.
+4. Tulis catatannya di kotak **Tulis catatan** (nomor 2).
+5. Klik **Buat catatan area** (nomor 3) di bawah panel. Klik area di peta kapan saja untuk membaca atau mengubah catatannya.
 
 ## 3.7 Prinsip sewa (dasar sewa)
 
@@ -144,7 +160,7 @@ Prinsip sewa adalah dasar penentuan tarif untuk satu objek atau kawasan.
 
 ![Daftar prinsip sewa](gambar/sewa/prinsip-sewa-daftar.png)
 
-1. Buka **Prinsip sewa**. Klik **Buat prinsip sewa** untuk menambah, atau klik pengenal objek untuk membuka.
+1. Buka **☰ → Prinsip sewa**. Klik **Buat prinsip sewa** (nomor 1) untuk menambah, atau cari di kotak cari (nomor 2) lalu klik pengenal objek untuk membuka.
 2. Isi peruntukan utama, tanggal mulai/akhir, tarif dan keputusan terkait.
 3. Klik **Simpan**.
 
@@ -156,10 +172,10 @@ Prinsip sewa adalah dasar penentuan tarif untuk satu objek atau kawasan.
 
 ![Statistik dan laporan](gambar/sewa/laporan.png)
 
-1. Buka **Statistik dan laporan**.
-2. Pilih **Laporan**. Laporan yang tersedia: Tagihan terbuka, Tagihan dalam periode, Jaminan, Pembayaran tagihan, Tagihan yang dibayar kontak, Sewa dengan penagihan nonaktif, Sewa per jenis indeks, Sewa kontak, Persyaratan keputusan, Perbandingan sewa, Proyeksi sewa, Pencadangan, Laporan statistik sewa, Jumlah sewa, Penyesuaian sewa, Dasar sewa, dan Sewa per jenis sewa. Laporan tagihan hanya muncul untuk peran yang berhak.
-3. Isi saringan laporan (periode, unit layanan, dsb.).
-4. Klik tombol untuk menampilkan atau mengirim laporan. Laporan besar dibuat di latar belakang dan dikirim ke surel Anda.
+1. Buka **☰ → Statistik dan laporan**.
+2. Pilih jenis laporan di kotak **Laporan** (nomor 1). Pada gambar dipilih **Tagihan terbuka**. Laporan yang tersedia: Tagihan terbuka, Tagihan dalam periode, Jaminan, Pembayaran tagihan, Tagihan yang dibayar kontak, Sewa dengan penagihan nonaktif, Sewa per jenis indeks, Sewa kontak, Persyaratan keputusan, Perbandingan sewa, Proyeksi sewa, Pencadangan, Laporan statistik sewa, Jumlah sewa, Penyesuaian sewa, Dasar sewa, dan Sewa per jenis sewa. Laporan tagihan hanya muncul untuk peran yang berhak.
+3. Isi saringan laporan yang muncul (misalnya **Unit layanan**, **Tanggal mulai**, **Tanggal berakhir**).
+4. Klik **Buat laporan** (nomor 2). Laporan kecil langsung tampil dan bisa diunduh; laporan besar dibuat di latar belakang dan dikirim ke surel Anda.
 
 ## 3.9 Kompensasi pembangunan sisipan
 
@@ -167,8 +183,8 @@ Mencatat kompensasi atas pembangunan tambahan di lahan sewa (negosiasi dan keput
 
 ![Daftar kompensasi](gambar/sewa/kompensasi-daftar.png)
 
-1. Saring dengan **Berlangsung**, **Negosiasi**, atau **Keputusan**.
-2. Klik **Buat kompensasi pembangunan sisipan** untuk data baru (Penyusun, Administrator).
+1. Saring dengan kotak centang **Berlangsung** (nomor 3), **Negosiasi**, atau **Keputusan**, atau cari di kotak cari (nomor 2).
+2. Klik **Buat kompensasi pembangunan sisipan** (nomor 1) untuk data baru (Penyusun, Administrator).
 3. Klik nama proyek untuk membuka, lalu **Ubah** dan **Simpan**.
 
 ![Detail kompensasi](gambar/sewa/kompensasi-detail.png)
@@ -179,11 +195,11 @@ Menampung permohonan pemakaian area dari pemohon (misalnya untuk kegiatan sement
 
 ![Daftar permohonan area](gambar/sewa/pencarian-area-daftar.png)
 
-1. Saring per status: Diterima, Menunggu informasi tambahan, Diproses, Selesai, Dicabut, Ditolak.
+1. Cari di kotak cari (nomor 2) atau saring per status dengan kotak centang (nomor 3): Diterima, Menunggu informasi tambahan, Diproses, Selesai, Dicabut, Ditolak.
 2. Klik nomor permohonan untuk membuka: data **Permohonan**, **Dokumen yang diperiksa**, dan **Data pemrosesan**.
 3. Klik **Ubah** untuk memproses: isi petugas, status, dan keputusan, lalu **Simpan**.
 4. Centang beberapa baris lalu klik **Cetak** untuk mencetak.
-5. **Buat permohonan area** untuk memasukkan permohonan yang datang lewat loket.
+5. **Buat permohonan area** (nomor 1) untuk memasukkan permohonan yang datang lewat loket.
 
 ![Detail permohonan area](gambar/sewa/pencarian-area-detail.png)
 
@@ -193,20 +209,37 @@ Halaman **Pencarian kavling** dan **Permohonan kavling** (bila ditampilkan untuk
 
 ## 3.11 Menu "Lainnya"
 
-| Menu | Kegunaan |
-|---|---|
-| **Indeks biaya hidup** | Tabel indeks per bulan dan tahun yang dipakai untuk penyesuaian sewa berindeks. Hanya dibaca. |
-| **Tugas terjadwal** | Riwayat (**Eksekusi**) dan **Jadwal** proses otomatis, misalnya pembuatan tagihan dan pengingat. Hanya dibaca; mengubah jadwal hanya oleh superuser. |
-| **Catatan tagihan** | Pengumuman yang dicetak pada tagihan per sewa dan periode. Klik **Buat pengumuman** untuk menambah. |
-| **Kalkulator sewa** | Menghitung perkiraan sewa tanpa menyimpan ke data sewa. Klik **Tambah kalkulator sewa**, pilih jenis kalkulator, isi nilai, lihat hasilnya. |
+Klik **☰ → Lainnya** untuk membuka empat halaman berikut. Peran yang tidak memerlukannya tidak melihat menunya.
+
+> Di sistem latihan, tabel **Indeks biaya hidup**, **Tugas terjadwal**, dan **Pencarian kavling** tampak kosong karena data contoh belum berisi indeks, riwayat proses otomatis, atau seleksi kavling. Di sistem yang sudah berjalan, tabelnya terisi dengan kolom seperti pada gambar.
+
+**Indeks biaya hidup**
 
 ![Indeks biaya hidup](gambar/sewa/indeks.png)
 
+Tabel indeks per bulan dan tahun yang dipakai untuk penyesuaian sewa berindeks. Hanya dibaca.
+
+**Tugas terjadwal**
+
 ![Tugas terjadwal](gambar/sewa/tugas-terjadwal.png)
+
+Riwayat (**Eksekusi**) dan **Jadwal** proses otomatis, misalnya pembuatan tagihan dan pengingat. Hanya dibaca; mengubah jadwal hanya oleh superuser.
+
+**Catatan tagihan**
 
 ![Catatan tagihan](gambar/sewa/catatan-tagihan.png)
 
+Pengumuman yang dicetak pada tagihan per sewa dan periode. Klik **Buat pengumuman** (nomor 1) untuk menambah, isi teks dan periodenya, lalu simpan.
+
+**Kalkulator sewa**
+
 ![Kalkulator sewa](gambar/sewa/kalkulator-sewa.png)
+
+Menghitung perkiraan sewa tanpa menyimpan ke data sewa.
+
+1. Pilih **Jenis kalkulator** (nomor 1).
+2. Isi nilai yang muncul. Hasilnya langsung tampil.
+3. Klik **Tambah kalkulator sewa** (nomor 2) bila ingin menambah perhitungan kedua untuk dibandingkan.
 
 ## 3.12 Pertanyaan umum
 

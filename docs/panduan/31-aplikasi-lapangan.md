@@ -12,30 +12,38 @@ Aplikasi ringan di HP untuk mengirim **laporan lapangan** (patroli, temuan okupa
 2. Izinkan akses **lokasi** saat diminta browser. Titik biru di peta adalah posisi Anda.
 3. Klik **Pasang** (bila muncul) agar aplikasi punya ikon sendiri di layar HP. Buka aplikasi sekali saat ada sinyal agar batas bidang tersimpan untuk dipakai luring.
 
-![Aplikasi lapangan di HP](gambar/lapangan/hp-lapangan.png)
-
-Bagian layar:
-
-- **Daring** / **Luring** di kanan atas: status sinyal.
-- **Panduan**: membuka panduan peran Anda.
-- Peta dengan tombol lapisan (kanan atas peta): **Peta jalan**, **Citra satelit**, dan **Batas aset & okupasi**.
-- Formulir laporan di bawah peta (di komputer, di sebelah kanan peta).
+Di komputer, formulir tampil di sebelah kanan peta:
 
 ![Aplikasi lapangan di komputer](gambar/lapangan/aset-lapangan.png)
 
+Bagian layar di HP:
+
+![Aplikasi lapangan di HP](gambar/lapangan/hp-lapangan.png)
+
+Nomor pada gambar:
+
+1. **Daring** / **Luring**: status sinyal. Saat **Luring**, laporan disimpan di HP dulu.
+2. **Panduan**: membuka panduan peran Anda.
+3. **Tombol lapisan**: pilih **Peta jalan**, **Citra satelit**, dan **Batas aset & okupasi**. Titik biru di peta adalah posisi Anda.
+4. **GPS:** koordinat posisi Anda dan ketelitiannya (misalnya `±5 m`).
+5. **Jenis laporan**.
+6. **Catatan**.
+
 ### Mengirim laporan
 
-1. Tunggu sampai baris **GPS:** menampilkan koordinat dan ketelitian (misalnya `±5 m`). Bila GPS tidak tersedia, ketuk peta untuk menandai titik.
-2. Pilih **Jenis laporan**: Patroli rutin, Temuan okupasi / perambahan, Kondisi aset, Catatan survei, atau Patok batas.
-3. Tulis **Catatan**: uraian temuan, kondisi patok, pihak yang ditemui.
-4. Ambil atau pilih **Foto (opsional)**.
-5. Bila lokasi laporan bukan posisi Anda sekarang, ketuk titik di peta lalu centang **Pakai titik yang saya ketuk di peta**.
-6. Ketuk **Simpan laporan**.
+1. Tunggu sampai baris **GPS:** (nomor 4 pada gambar HP di atas) menampilkan koordinat dan ketelitian. Bila GPS tidak tersedia, ketuk peta untuk menandai titik.
+2. Pilih **Jenis laporan** (nomor 5 pada gambar HP di atas): Patroli rutin, Temuan okupasi / perambahan, Kondisi aset, Catatan survei, atau Patok batas.
+3. Tulis **Catatan** (nomor 6 pada gambar HP di atas): uraian temuan, kondisi patok, pihak yang ditemui.
+4. Geser formulir ke atas untuk melihat bagian bawahnya:
+
+![Bagian bawah formulir laporan](gambar/lapangan/hp-lapangan-form.png)
+
+5. Ketuk **Foto (opsional)** (nomor 1) untuk memotret atau memilih foto.
+6. Bila lokasi laporan bukan posisi Anda sekarang, ketuk titik yang benar di peta, lalu centang **Pakai titik yang saya ketuk di peta** (nomor 2).
+7. Ketuk **Simpan laporan** (nomor 3).
    - Saat daring: muncul "Laporan tersimpan, mengirim…" lalu "laporan terkirim".
    - Saat luring: muncul "Laporan tersimpan di perangkat; akan dikirim saat daring".
-7. Jumlah laporan yang belum terkirim tampil di **Antrean kirim**. Ketuk **Kirim sekarang** untuk mencoba mengirim saat sinyal sudah ada. Laporan di antrean bisa dihapus dengan tombol hapus di barisnya.
-
-![Laporan lengkap](gambar/lapangan/hp-lapangan-full.png)
+8. **Antrean kirim** (nomor 4) menunjukkan jumlah laporan yang belum terkirim. Setelah sinyal ada, ketuk **Kirim sekarang** (nomor 5). Laporan di antrean bisa dihapus dengan tombol hapus di barisnya.
 
 Laporan yang terkirim masuk ke **Panel admin → Manajemen aset lahan → Laporan lapangan** (lihat [Bab 8.12](30-aset-lahan.md#812-dokumen--arsip-tugas-tim-laporan-lapangan)). Petugas Aset dapat menjadikannya kasus okupasi.
 

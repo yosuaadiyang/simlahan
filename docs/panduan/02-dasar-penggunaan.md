@@ -18,35 +18,47 @@ Ada empat halaman masuk. Pakai yang sesuai pekerjaan Anda; semuanya memakai akun
 ![Halaman masuk aplikasi utama](gambar/dasar/masuk-aplikasi-utama.png)
 
 1. Buka alamat SimLahan, misalnya `https://simlahan.instansi-anda.go.id/`.
-2. Isi **Nama pengguna** (1) dan **Kata sandi** (2).
-3. Klik **Masuk** (3).
-4. Anda langsung dibawa ke halaman kerja peran Anda (lihat tabel "Halaman awal" di buku peran).
+2. Ketik nama pengguna Anda di kotak **Nama pengguna** (nomor 1 di gambar).
+3. Ketik kata sandi di kotak **Kata sandi** (nomor 2).
+4. Klik tombol biru **Masuk** (nomor 3).
+5. Anda langsung dibawa ke halaman kerja peran Anda (lihat bagian "Halaman awal" di buku peran Anda).
 
-Tautan di bawah kotak masuk (**⇄ Pusat Komando**, **⇄ Panel admin**, **⇄ Portal**) membawa Anda ke halaman masuk aplikasi lain.
+Tautan di bawah kotak masuk (nomor 4: **⇄ Pusat Komando**, **⇄ Panel admin**, **⇄ Portal**) membawa Anda ke halaman masuk aplikasi lain.
 
 ### B. Panel admin
 
 ![Halaman masuk panel admin](gambar/dasar/masuk-panel-admin.png)
 
-Buka `/admin/`, isi nama pengguna dan kata sandi, lalu klik **Masuk**. Bila Anda sudah masuk di aplikasi utama, panel admin langsung terbuka tanpa masuk ulang.
+1. Buka alamat SimLahan diikuti `/admin/`, misalnya `https://simlahan.instansi-anda.go.id/admin/`.
+2. Isi **Nama pengguna** (nomor 1) dan **Sandi** (nomor 2).
+3. Klik **Masuk** (nomor 3).
+
+Bila Anda sudah masuk di aplikasi utama, panel admin langsung terbuka tanpa masuk ulang.
 
 ### C. Pusat Komando (petugas lapangan)
 
 ![Halaman masuk Pusat Komando](gambar/dasar/masuk-pusat-komando.png)
 
-1. Buka `/komando/masuk/` di HP atau komputer.
-2. Isi nama pengguna dan kata sandi. Ketuk **Lihat** untuk memeriksa sandi yang Anda ketik.
-3. Ketuk **Masuk**.
+1. Buka alamat SimLahan diikuti `/komando/masuk/` di HP atau komputer.
+2. Isi **Nama pengguna** (nomor 1) dan **Kata sandi** (nomor 2).
+3. Ketuk **Lihat** (nomor 3) bila ingin memeriksa sandi yang Anda ketik.
+4. Ketuk **Masuk** (nomor 4).
 
 Di HP, halaman masuk tampil seperti ini:
 
 ![Masuk Pusat Komando di HP](gambar/dasar/masuk-pusat-komando-hp.png)
 
+Nomornya sama: **Nama pengguna** (nomor 1), **Kata sandi** (nomor 2), **Lihat** (nomor 3), dan **Masuk** (nomor 4).
+
 ### D. Portal (pemohon dan investor)
 
 ![Halaman masuk portal](gambar/dasar/masuk-portal.png)
 
-Buka `/portal/masuk/`, isi **alamat surel** dan **kata sandi**, lalu klik **Masuk**. Belum punya akun? Lihat [Bab 13 – Portal untuk pemohon](51-portal-pemohon.md).
+1. Buka alamat SimLahan diikuti `/portal/masuk/`, atau klik **Masuk** di menu atas portal.
+2. Isi **Surel** (nomor 1) dengan alamat surel akun Anda dan **Sandi** (nomor 2).
+3. Klik **Masuk** (nomor 3).
+
+Lupa sandi? Klik **Lupa kata sandi?** (nomor 4). Belum punya akun? Klik **Daftar akun baru** (nomor 5); caranya ada di [Bab 12.11](50-portal-publik.md#1211-mendaftar-akun).
 
 > **Kode OTP.** Bila instansi mengaktifkan OTP, setelah mengisi sandi Anda diminta memasukkan kode 6 angka yang dikirim ke surel Anda. Buka surel, salin kodenya, lalu klik lanjut. Kode hanya berlaku sebentar; minta kode baru bila kedaluwarsa.
 
@@ -56,8 +68,10 @@ Buka `/portal/masuk/`, isi **alamat surel** dan **kata sandi**, lalu klik **Masu
 
 ![Bilah atas aplikasi utama](gambar/dasar/bilah-atas.png)
 
+Nomor pada gambar:
+
 1. **Tombol menu (☰)**: membuka menu samping berisi semua halaman yang boleh Anda buka.
-2. **Unit layanan sendiri**: unit layanan aktif Anda. Bila Anda punya lebih dari satu unit, pilih di sini.
+2. **Unit layanan sendiri**: unit layanan aktif Anda. Data baru yang Anda buat masuk ke unit ini. Bila Anda punya lebih dari satu unit, pilih di sini.
 3. **Nama Anda**: membuka menu akun (grup pengguna, unit layanan, **Panduan peran**, **Ganti sandi**).
 4. **Keluar**: mengakhiri sesi di perangkat ini.
 
@@ -65,7 +79,7 @@ Petugas yang boleh membuka aplikasi lain juga melihat tombol pindah aplikasi di 
 
 ![Tombol pindah aplikasi](gambar/dasar/bilah-atas-admin.png)
 
-1. **Pusat Komando**, 2. **Panel admin**, 3. **Portal**. Pindah lewat tombol ini tidak perlu masuk ulang.
+Tombol **Pusat Komando** (nomor 1), **Panel admin** (nomor 2), dan **Portal** (nomor 3) membuka aplikasi itu tanpa perlu masuk ulang.
 
 ### Menu samping
 
@@ -77,23 +91,31 @@ Klik **☰** untuk membuka menu. Menu yang memiliki tanda **›** berisi submenu
 
 ![Menu nama](gambar/dasar/menu-nama.png)
 
-Di sini terlihat grup pengguna (peran) Anda, pilihan unit layanan, serta tautan **Panduan peran** dan **Ganti sandi**.
+Klik nama Anda di kanan atas. Kotak yang terbuka menampilkan grup pengguna (peran) Anda dan pilihan unit layanan, serta tautan **Panduan peran** (nomor 1) dan **Ganti sandi** (nomor 2).
 
 ## 2.4 Mengenal layar panel admin
 
 ![Beranda panel admin](gambar/dasar/panel-admin-beranda.png)
 
-- **Bilah atas**: tombol **⇄ Aplikasi utama**, **⇄ Pusat Komando**, **⇄ Aplikasi lapangan**, **⇄ Portal** (sesuai hak), lalu **Panduan peran**, **Ubah kata sandi**, **Keluar**, dan tombol tema (terang/gelap/otomatis).
-- **Kolom kiri**: daftar semua menu yang boleh Anda buka, dikelompokkan per modul. Kotak **Mulai mengetik untuk menyaring…** di atasnya membantu mencari menu dengan cepat. Tanda **« ** menyembunyikan kolom ini.
-- **Tautan "Tambah"** di samping menu: langsung membuka formulir data baru.
+Beranda panel admin berisi kotak per modul. Nomor pada gambar:
+
+1. **Judul modul** (misalnya **Alokasi lahan**). Di bawahnya ada daftar menu modul itu; klik nama menu untuk membuka daftarnya.
+2. **Tambah**: langsung membuka formulir data baru untuk menu itu.
+3. **Ubah** (atau **Lihat** bila Anda hanya boleh membaca): membuka daftar data menu itu.
+4. **Tindakan terbaru**: data yang terakhir Anda tambah atau ubah.
+5. Bilah atas: tombol **⇄ Aplikasi utama**, **⇄ Pusat Komando**, **⇄ Aplikasi lapangan**, **⇄ Portal** (sesuai hak), lalu **Panduan peran**, **Ubah kata sandi**, **Keluar**, dan tombol tema (terang/gelap/otomatis).
+
+Setelah Anda membuka salah satu menu, daftar semua menu tampil di **kolom kiri**. Kotak **Mulai mengetik untuk menyaring…** di atasnya membantu mencari menu dengan cepat; tanda **«** menyembunyikan kolom itu.
 
 ### Halaman daftar
 
 ![Halaman daftar di panel admin](gambar/dasar/panel-daftar.png)
 
+Nomor pada gambar:
+
 1. **Kotak cari**: ketik kata kunci (nomor, nama, kode) lalu klik **Cari**.
 2. **Filter** (kanan): klik pilihan untuk menyaring daftar, misalnya per status. Klik **Semua** untuk menghapus saringan.
-3. **Aksi**: centang satu atau beberapa baris, pilih aksi (misalnya "Ekspor ke Excel"), lalu klik **Jalankan**.
+3. **Aksi**: centang kotak di awal satu atau beberapa baris, pilih aksi (misalnya "Ekspor ke Excel"), lalu klik **Jalankan**.
 4. **Tombol di kanan atas**: tombol khusus halaman itu, misalnya **Peta tematik**, **Impor…**, atau **Tambahkan …**.
 
 Klik judul kolom untuk mengurutkan. Klik kode/nomor di baris untuk membuka datanya.
@@ -102,15 +124,20 @@ Klik judul kolom untuk mengurutkan. Klik kode/nomor di baris untuk membuka datan
 
 ![Formulir di panel admin](gambar/dasar/panel-formulir.png)
 
-1. Isi kolom yang diperlukan. Kolom berlabel tebal wajib diisi.
-2. Kolom peta: gambar atau ubah batas bidang langsung di peta (klik untuk menambah titik, klik titik pertama untuk menutup).
-3. Bagian tabel di bawah (misalnya "Dokumen & arsip") dipakai untuk menambah beberapa baris; klik **Tambahkan … lagi** untuk baris baru.
-4. Di bagian bawah:
-   - **Simpan**: menyimpan lalu kembali ke daftar.
-   - **Simpan dan tambahkan lagi**: menyimpan lalu membuka formulir kosong baru.
-   - **Simpan dan terus mengedit**: menyimpan dan tetap di formulir ini.
-   - **Hapus**: menghapus data (ada halaman konfirmasi; klik **Tidak, bawa saya kembali** bila batal).
-5. Tombol **Riwayat** (kanan atas) menampilkan siapa mengubah apa dan kapan.
+Contoh pada gambar adalah formulir **Kategori aset**. Semua formulir di panel admin bekerja sama:
+
+1. Isi kolom yang diperlukan (nomor 1 menunjuk kolom **Nama**). Kolom berlabel tebal wajib diisi.
+2. Tombol **Riwayat** (nomor 2, kanan atas) menampilkan siapa mengubah apa dan kapan.
+3. Pilih salah satu tombol di bagian bawah:
+   - **Simpan** (nomor 3): menyimpan lalu kembali ke daftar.
+   - **Simpan dan tambahkan lagi** (nomor 4): menyimpan lalu membuka formulir kosong baru.
+   - **Simpan dan terus mengedit** (nomor 5): menyimpan dan tetap di formulir ini.
+   - **Hapus** (nomor 6): menghapus data. Muncul halaman konfirmasi; klik **Ya, saya yakin** untuk menghapus atau **Tidak, bawa saya kembali** bila batal.
+
+Formulir yang lebih panjang punya dua bagian tambahan:
+
+- **Kolom peta**: gambar atau ubah batas bidang langsung di peta (klik untuk menambah titik, klik titik pertama untuk menutup bentuk).
+- **Tabel di bawah formulir** (misalnya "Dokumen & arsip"): untuk menambah beberapa baris sekaligus; klik **Tambahkan … lagi** untuk baris baru.
 
 > Bila ada kesalahan isian, kotak merah muncul di atas formulir dan di samping kolom yang salah. Perbaiki lalu simpan lagi.
 
@@ -158,9 +185,10 @@ Ganti sandi awal segera setelah pertama kali masuk.
 
 ![Ganti sandi](gambar/dasar/ganti-sandi.png)
 
-1. Buka **Ganti sandi** (dari menu nama Anda, tautan **Ubah kata sandi** di panel admin, **Menu → 🔑 Ganti sandi** di Pusat Komando, atau alamat `/akun/sandi/`).
-2. Isi **sandi lama**, lalu **sandi baru** dua kali.
-3. Klik **Simpan**.
+1. Buka halaman **Ganti sandi**: klik nama Anda lalu **Ganti sandi** (aplikasi utama), tautan **Ubah kata sandi** (panel admin), **Menu → 🔑 Ganti sandi** (Pusat Komando), atau buka alamat `/akun/sandi/`.
+2. Ketik sandi yang sekarang di **Sandi lama** (nomor 1).
+3. Ketik sandi baru di **Sandi baru** (nomor 2), lalu ketik sekali lagi di **Konfirmasi sandi baru** (nomor 3).
+4. Klik **Ganti sandi** (nomor 4). Pesan "Sandi berhasil diganti" muncul.
 
 Aturan sandi: minimal 10 karakter, tidak mirip nama pengguna atau nama Anda, bukan sandi yang umum dipakai, dan tidak hanya berisi angka. Setelah sandi diganti, aplikasi lain yang masih terbuka dengan sandi lama akan meminta Anda masuk ulang.
 

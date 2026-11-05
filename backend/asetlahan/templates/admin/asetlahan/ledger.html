@@ -9,9 +9,9 @@
   <button type="submit" name="format" value="csv" class="button">Ekspor CSV</button>
 </form>
 <div class="al-kpis">
-  <div class="al-card"><div class="al-kpi">{{ income|rupiah|patah }}</div><div class="al-kpi-label">Penerimaan</div></div>
-  <div class="al-card"><div class="al-kpi">{{ expense|rupiah|patah }}</div><div class="al-kpi-label">Pengeluaran</div></div>
-  <div class="al-card"><div class="al-kpi">{{ net|rupiah|patah }}</div><div class="al-kpi-label">Bersih</div></div>
+  <div class="al-card"><div class="al-kpi">{{ income|rupiah|kpi }}</div><div class="al-kpi-label">Penerimaan</div></div>
+  <div class="al-card"><div class="al-kpi">{{ expense|rupiah|kpi }}</div><div class="al-kpi-label">Pengeluaran</div></div>
+  <div class="al-card"><div class="al-kpi">{{ net|rupiah|kpi }}</div><div class="al-kpi-label">Bersih</div></div>
   {% for source, total in by_source.items %}<div class="al-card"><div class="al-kpi">{{ total.count }}</div><div class="al-kpi-label">{{ source }}: masuk {{ total.income|rupiah|patah }}, keluar {{ total.expense|rupiah|patah }}</div></div>{% endfor %}
 </div>
 <p class="al-muted">Gabungan transaksi modul aset lahan, pembayaran ganti kerugian pengadaan tanah, dan tagihan alokasi lahan yang lunas. Jangan mencatat ulang pembayaran ganti kerugian sebagai transaksi aset agar tidak tercatat ganda.</p>

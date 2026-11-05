@@ -230,6 +230,7 @@ class AreaSearchApplicationListPage extends PureComponent<
       "intended_use",
     );
     const stateOptions = getFieldOptions(areaSearchListAttributes, "state");
+    const lessorOptions = getFieldOptions(areaSearchListAttributes, "lessor");
     columns.push({
       key: "checkbox",
       text: "Cetak",
@@ -318,7 +319,7 @@ class AreaSearchApplicationListPage extends PureComponent<
           <Button
             className={ButtonColors.LINK}
             onClick={() => this.openAreaSearchEditModal(row.id)}
-            text={val || "Terbuka"}
+            text={getLabelOfOption(lessorOptions, val) || val || "Terbuka"}
           />
         </span>
       ),

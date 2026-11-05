@@ -475,6 +475,12 @@ class EntitledPartySerializer(
             "contact",
             "note",
         )
+        # Kolom terenkripsi disimpan sebagai TextField; batas panjang membuat
+        # formulir menampilkannya sebagai isian satu baris, bukan kotak teks.
+        extra_kwargs = {
+            "nik": {"max_length": 32},
+            "bank_account_number": {"max_length": 64},
+        }
 
     def validate_nik(self, value):
         if value and "*" in value and self.instance is not None:
@@ -1128,6 +1134,10 @@ class AffectedHouseholdSerializer(SensitiveDataMixin, PengadaanModelSerializer):
             "progress_percentage",
             "note",
         )
+        extra_kwargs = {
+            "nik": {"max_length": 32},
+            "family_card_number": {"max_length": 32},
+        }
 
     def validate_nik(self, value):
         if value and "*" in value and self.instance is not None:

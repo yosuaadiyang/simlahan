@@ -83,6 +83,10 @@ PARCELS = [
 MEASURED_AREA = Decimal("1000")
 
 
+def _sample_nik(index: int) -> str:
+    return f"99{index:014d}"
+
+
 def _square(col: int, row: int) -> Polygon:
     west = ORIGIN_LNG + col * (SIDE + GAP)
     north = ORIGIN_LAT - row * (SIDE + GAP)
@@ -159,7 +163,9 @@ class Command(BaseCommand):
             geometry=MultiPolygon(list(polygons.values()), srid=4326),
         )
 
-        for number, village, right, use, affected, party, *_ in PARCELS:
+        for index, (number, village, right, use, affected, party, *_) in enumerate(
+            PARCELS, start=1
+        ):
             parcel = AcquisitionParcel.objects.create(
                 project=project,
                 parcel_number=number,
@@ -179,6 +185,16 @@ class Command(BaseCommand):
                     name=name,
                     party_type=party_type,
                     share_percentage=Decimal("100"),
+                    # NIK dan rekening fiktif (kode wilayah 99 tidak ada) agar
+                    # penyamaran data pribadi terlihat di aplikasi.
+                    nik=(
+                        _sample_nik(index)
+                        if party_type == E.PartyType.INDIVIDUAL
+                        else ""
+                    ),
+                    bank_name="Bank Contoh",
+                    bank_account_number=f"99000000{index:02d}",
+                    bank_account_holder=name,
                     note=SAMPLE_NOTE,
                 )
 
