@@ -1,0 +1,41 @@
+name: Dependency audit
+
+on:
+  schedule:
+    # Senin 04:23 UTC = 11:23 WIB (menit tidak rama agar tidak bertabrakan)
+    - cron: "23 4 * * 1"
+  pull_request:
+    paths:
+      - "backend/requirements*.txt"
+      - "backend/requirements*.in"
+      - "backend/constraints.txt"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pip-audit:
+    name: pip-audit (dependensi produksi backend)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install pip-audit
+        run: pip install pip-audit
+
+      # --no-deps: hanya paket ter-pin yang dievaluasi (paket transitive
+      # dijamin oleh constraints.txt). Gagal (exit != 0) bila ada CVE.
+      - name: Audit dependensi ter-pin
+        run: |
+          pip-audit -r backend/requirements.txt --no-deps --disable-pip
+          pip-audit -r backend/requirements-prod.txt --no-deps --disable-pip

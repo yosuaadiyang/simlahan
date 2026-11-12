@@ -167,7 +167,7 @@ mypy==1.7.1
     # via django-stubs
 mypy-extensions==1.0.0
     # via mypy
-oauthlib==4.0.0
+oauthlib==4.0.1
     # via
     #   -c constraints.txt
     #   django-oauth-toolkit
@@ -206,7 +206,7 @@ pyjwt==2.15.1
     # via
     #   -c constraints.txt
     #   djangorestframework-simplejwt
-pypdf==6.21.3
+pypdf==6.21.4
     # via
     #   -c constraints.txt
     #   xhtml2pdf

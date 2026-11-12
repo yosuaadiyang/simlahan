@@ -9,9 +9,11 @@
 
 # Vulnerability in versions below 6.0.0:
 # - CVE-2025-55197 https://security.snyk.io/vuln/SNYK-PYTHON-PYPDF-11798040
-# Many parser DoS/memory-exhaustion advisories fixed up to 6.21.2
-# (pip-audit, 2026-10). PDFs come from public portal uploads.
-pypdf>=6.21.2
+# Many parser DoS/memory-exhaustion advisories fixed up to 6.21.4;
+# CVE-2026-119203/119204/119205 (infinite loop & unbounded memory on
+# crafted PDFs) were fixed in 6.21.4 (pip-audit, 2026-11).
+# PDFs come from public portal uploads.
+pypdf>=6.21.4
 
 # Vulnerability in versions below 3.1.6
 # - CVE-2025-27516 https://security.snyk.io/vuln/SNYK-PYTHON-JINJA2-9292516
@@ -36,7 +38,9 @@ sqlparse>=0.6.0
 
 # Token/crypto libraries behind login, JWT and OAuth2 (pip-audit, 2026-10)
 pyjwt>=2.15.0
-oauthlib>=4.0.0
+# CVE-2026-49272: device-flow token endpoint accepts a bogus device_code
+# with a known client_id (fixed 4.0.1; device flow is off by default).
+oauthlib>=4.0.1
 jwcrypto>=1.5.7
 certifi>=2026.10.19
 
