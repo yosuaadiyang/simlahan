@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 
 from operasi import dashboard, ranking, services
-from operasi.views import _throttled, api
+from operasi.views import api
 
 XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
@@ -26,7 +26,9 @@ def _korwil_param(request, queryset):
 
 
 def _insight_throttled(user) -> JsonResponse | None:
-    if _throttled(f"operasi:wawasan:{user.pk}", 20, 3600):
+    from asetlahan import ai
+
+    if not ai.take_budget(user, "wawasan", 20):
         return JsonResponse(
             {"error": _("Batas 20 wawasan per jam tercapai. Coba lagi nanti.")},
             status=429,

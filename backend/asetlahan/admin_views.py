@@ -1493,6 +1493,13 @@ def assistant(request):
             request.session[SESSION_KEY] = []
             return HttpResponseRedirect(reverse("asetlahan-assistant"))
         question = (request.POST.get("q") or "").strip()[:2000]
+        if question and ai.enabled() and not ai.take_budget(request.user, "asisten"):
+            messages.warning(
+                request,
+                _("Batas %(n)s pertanyaan AI per jam tercapai. Coba lagi nanti.")
+                % {"n": ai.BUDGETS["asisten"]},
+            )
+            return HttpResponseRedirect(reverse("asetlahan-assistant"))
         if question:
             result = engine.answer(request.user, question, history)
             if result.get("error"):

@@ -788,13 +788,15 @@ def _ai_stance_worker(activity_id: int) -> None:
         close_old_connections()
 
 
-def schedule_ai_stance(activity) -> None:
+def schedule_ai_stance(activity, user=None) -> None:
     """Klasifikasi sikap Komsos di latar setelah laporan tersimpan (bila AI aktif)."""
     from asetlahan import ai
 
     if not ai.enabled() or activity.activity_type != enums.ActivityType.KOMSOS:
         return
     if len((activity.description or "").strip()) < 12:
+        return
+    if user is not None and not ai.take_budget(user, "sikap-komsos"):
         return
     transaction.on_commit(
         lambda: threading.Thread(

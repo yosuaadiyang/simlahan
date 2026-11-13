@@ -248,7 +248,7 @@ def _ai_fields(name: str, data: bytes, text: str) -> dict:
     }
 
 
-def process_document(document) -> bool:
+def process_document(document, use_ai: bool = True) -> bool:
     """Baca teks & isian dokumen, simpan ke dokumen. True bila ada teks/isian."""
     try:
         with document.file.open("rb") as handle:
@@ -264,7 +264,8 @@ def process_document(document) -> bool:
         LOG.exception("OCR dokumen %s gagal", document.pk)
         text = ""
     fields = parse_fields(text)
-    for key, value in _ai_fields(document.file.name, data, text).items():
+    ai_fields = _ai_fields(document.file.name, data, text) if use_ai else {}
+    for key, value in ai_fields.items():
         fields.setdefault(key, value)
     for key in ("tanggal_terbit", "tanggal_berakhir"):
         if key in fields and not re.match(r"\d{4}-\d{2}-\d{2}$", fields[key]):

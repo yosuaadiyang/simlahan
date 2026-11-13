@@ -221,6 +221,9 @@ def compose(user, activities, reports) -> tuple[str, bool]:
     fallback = template_text(user, activities, reports)
     if not ai.enabled() or (not activities and not reports):
         return fallback, False
+    if not ai.take_budget(user, "laporan-harian"):
+        # Jatah AI jam ini habis: draf templat biasa.
+        return fallback, False
     position = hierarchy.position_of(user) or _("petugas")
     prompt = (
         f"Pelapor: {_name(user)} ({position}). "
