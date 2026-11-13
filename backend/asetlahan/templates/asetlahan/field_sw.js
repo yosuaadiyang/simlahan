@@ -1,4 +1,6 @@
-/* Service worker aplikasi lapangan: cangkang aplikasi, batas bidang, dan ubin peta tersedia luring. */
+/* Service worker aplikasi lapangan: cangkang aplikasi, batas bidang, dan ubin peta tersedia luring.
+ * Halaman aplikasi (memuat nama petugas) dan batas bidang (data sesuai unit petugas) dihapus saat
+ * sesi berakhir (dialihkan ke halaman masuk / 401 / 403) atau saat pengguna berganti (field.js). */
 "use strict";
 var VERSION = {{ version|safe }};
 var SHELL = {{ shell|safe }};
@@ -25,9 +27,30 @@ self.addEventListener("activate", function (event) {
   }).then(function () { return self.clients.claim(); }));
 });
 
+function purgePersonal() {
+  return caches.keys().then(function (keys) {
+    return Promise.all(keys.map(function (key) {
+      if (key.indexOf("lapangan-data-") === 0) { return caches.delete(key); }
+      if (key.indexOf("lapangan-shell-") === 0) {
+        return caches.open(key).then(function (cache) { return cache.delete(SHELL[0], { ignoreSearch: true }); });
+      }
+      return null;
+    }));
+  });
+}
+
+self.addEventListener("message", function (event) {
+  if (event.data && event.data.type === "purge-personal") { event.waitUntil(purgePersonal()); }
+});
+
 function networkFirst(request, cacheName) {
   return fetch(request).then(function (response) {
-    if (response.ok && !response.redirected) {
+    if (response.redirected || response.status === 401 || response.status === 403) {
+      // Sesi berakhir / pengguna lain: jangan sisakan data pengguna sebelumnya.
+      purgePersonal();
+      return response;
+    }
+    if (response.ok) {
       var copy = response.clone();
       caches.open(cacheName).then(function (cache) { cache.put(request, copy); });
     }

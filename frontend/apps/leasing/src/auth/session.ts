@@ -280,6 +280,11 @@ export const restoreFromBrowserSession = async (): Promise<AuthUser | null> => {
  * Hapus data pusat komando (/komando/) yang tersimpan di perangkat: cache
  * halaman & lapisan peta serta antrean laporan luring. Tanpa ini data warga
  * dan posisi petugas tetap tersedia luring bagi pengguna berikutnya.
+ *
+ * Cache aplikasi lapangan (/aset/lapangan/: halaman & batas bidang sesuai
+ * unit petugas) ikut dihapus. Antrean laporan lapangan yang belum terkirim
+ * tetap disimpan; setiap laporan bertanda pemilik dan hanya ditampilkan &
+ * dikirim saat pemiliknya masuk lagi.
  */
 export const clearKomandoDeviceData = async () => {
   try {
@@ -287,7 +292,12 @@ export const clearKomandoDeviceData = async () => {
       const keys = await caches.keys();
       await Promise.all(
         keys
-          .filter((key) => key.startsWith("komando-"))
+          .filter(
+            (key) =>
+              key.startsWith("komando-") ||
+              key.startsWith("lapangan-data-") ||
+              key.startsWith("lapangan-shell-"),
+          )
           .map((key) => caches.delete(key)),
       );
     }

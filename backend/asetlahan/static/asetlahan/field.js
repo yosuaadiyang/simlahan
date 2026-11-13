@@ -51,7 +51,14 @@
     });
   }
 
-  function allReports() { return tx("readonly", function (store) { return store.getAll(); }); }
+  function storedReports() { return tx("readonly", function (store) { return store.getAll(); }); }
+  // Antrean hanya milik petugas yang sedang masuk: laporan petugas lain di
+  // perangkat yang sama tidak ditampilkan dan tidak dikirim atas namanya.
+  function allReports() {
+    return storedReports().then(function (items) {
+      return items.filter(function (item) { return item.owner === config.userId; });
+    });
+  }
   function putReport(report) { return tx("readwrite", function (store) { store.put(report); }); }
   function deleteReport(id) { return tx("readwrite", function (store) { store.delete(id); }); }
 
@@ -264,7 +271,8 @@
         accuracy: useTap ? null : position.accuracy,
         captured_at: new Date().toISOString(),
         note: $("catatan").value.trim(),
-        photo: photo
+        photo: photo,
+        owner: config.userId
       };
       return putReport(report);
     }).then(function () {
@@ -277,6 +285,45 @@
     }).then(sync).catch(function (error) {
       message("Laporan gagal disimpan di perangkat: " + error, "error");
     }).then(function () { button.disabled = false; });
+  }
+
+  // ---------------------------------------------------------------- Pergantian pengguna
+
+  var USER_KEY = "simlahan-lapangan-pengguna";
+
+  function readUser() {
+    try { return window.localStorage.getItem(USER_KEY); } catch (error) { return null; }
+  }
+
+  function purgeOfflineData() {
+    // Batas bidang & halaman milik pengguna sebelumnya (lihat field_sw.js).
+    if (!window.caches) { return Promise.resolve(); }
+    return caches.keys().then(function (keys) {
+      return Promise.all(keys.map(function (key) {
+        if (key.indexOf("lapangan-data-") === 0) { return caches.delete(key); }
+        if (key.indexOf("lapangan-shell-") === 0) {
+          return caches.open(key).then(function (cache) { return cache.delete(config.scope, { ignoreSearch: true }); });
+        }
+        return null;
+      }));
+    }).catch(function () { /* Cache Storage tidak tersedia */ });
+  }
+
+  function claimLegacyReports(owner) {
+    // Laporan dari versi lama belum bertanda pemilik: milik pengguna terakhir.
+    return storedReports().then(function (items) {
+      return Promise.all(items.filter(function (item) { return item.owner === undefined; })
+        .map(function (item) { item.owner = owner; return putReport(item); }));
+    }).catch(function () { /* IndexedDB tidak tersedia */ });
+  }
+
+  function checkUser() {
+    var current = String(config.userId);
+    var previous = readUser();
+    var ready = claimLegacyReports(previous === null ? config.userId : Number(previous));
+    if (previous !== null && previous !== current) { ready = ready.then(purgeOfflineData); }
+    try { window.localStorage.setItem(USER_KEY, current); } catch (error) { /* mode privat */ }
+    return ready;
   }
 
   // ---------------------------------------------------------------- Mulai
@@ -303,8 +350,9 @@
       var id = event.target.getAttribute("data-hapus");
       if (id && window.confirm("Hapus laporan ini dari perangkat?")) { deleteReport(id).then(renderQueue); }
     });
-    if (typeof L !== "undefined") { initMap(); initGps(); }
-    renderQueue().then(sync);
+    var userChecked = checkUser();
+    if (typeof L !== "undefined") { userChecked.then(function () { initMap(); initGps(); }); }
+    userChecked.then(renderQueue).then(sync);
     setInterval(sync, 60000);
 
     if ("serviceWorker" in navigator) {

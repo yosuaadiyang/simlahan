@@ -199,7 +199,14 @@ describe("clearKomandoDeviceData", () => {
   it("menghapus cache & antrean luring pusat komando saja", async () => {
     const deleted: string[] = [];
     vi.stubGlobal("caches", {
-      keys: async () => ["komando-shell-4", "komando-data-4", "lain-1"],
+      keys: async () => [
+        "komando-shell-4",
+        "komando-data-4",
+        "lapangan-shell-2",
+        "lapangan-data-2",
+        "lapangan-ubin-2",
+        "lain-1",
+      ],
       delete: async (key: string) => {
         deleted.push(key);
         return true;
@@ -208,7 +215,12 @@ describe("clearKomandoDeviceData", () => {
     const deleteDatabase = vi.fn();
     vi.stubGlobal("indexedDB", { deleteDatabase });
     await clearKomandoDeviceData();
-    expect(deleted.sort()).toEqual(["komando-data-4", "komando-shell-4"]);
+    expect(deleted.sort()).toEqual([
+      "komando-data-4",
+      "komando-shell-4",
+      "lapangan-data-2",
+      "lapangan-shell-2",
+    ]);
     expect(deleteDatabase).toHaveBeenCalledWith("simlahan-komando");
     vi.unstubAllGlobals();
   });
