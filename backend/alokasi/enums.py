@@ -119,6 +119,16 @@ class ApplicationStatus(models.TextChoices):
 
 # Status yang masih bisa diubah pemohon.
 EDITABLE_STATUSES = (ApplicationStatus.DRAFT, ApplicationStatus.REVISION)
+# Status saat data identitas pemohon sedang/sudah diverifikasi petugas dan akan
+# dicetak pada dokumen terbit (KPT/PPT/PL/IPH): identitas tidak boleh diubah
+# pemohon. Saat PERBAIKAN pemohon boleh membetulkannya; pengajuan ulang akan
+# diverifikasi lagi.
+IDENTITY_LOCK_STATUSES = (
+    ApplicationStatus.SUBMITTED,
+    ApplicationStatus.VERIFYING,
+    ApplicationStatus.APPROVED,
+    ApplicationStatus.PAID,
+)
 # Status yang sudah selesai (tidak bisa berubah lagi).
 FINAL_STATUSES = (
     ApplicationStatus.ISSUED,

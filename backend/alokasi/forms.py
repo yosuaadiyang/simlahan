@@ -68,8 +68,27 @@ class ApplicantProfileForm(forms.ModelForm):
             ),
         }
 
-    def __init__(self, *args, **kwargs):
+    # Data identitas yang diverifikasi petugas dan dicetak pada dokumen terbit.
+    IDENTITY_FIELDS = (
+        "applicant_type",
+        "name",
+        "nib",
+        "npwp",
+        "nik",
+        "pic_name",
+        "pic_position",
+        "address",
+        "city",
+    )
+
+    def __init__(self, *args, identity_locked=False, **kwargs):
         super().__init__(*args, **kwargs)
+        self.identity_locked = identity_locked
+        if identity_locked:
+            # Field nonaktif: nilai kiriman diabaikan, nilai tersimpan dipakai.
+            for name in self.IDENTITY_FIELDS:
+                if name in self.fields:
+                    self.fields[name].disabled = True
         if "interest_sectors" in self.fields:
             self.fields["interest_sectors"].queryset = InvestmentSector.objects.filter(
                 is_active=True

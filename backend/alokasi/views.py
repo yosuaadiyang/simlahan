@@ -983,7 +983,14 @@ def dashboard(request):
 
 @applicant_required
 def profile(request):
-    form = ApplicantProfileForm(request.POST or None, instance=request.applicant)
+    applicant = request.applicant
+    identity_locked = Application.objects.filter(
+        Q(applicant=applicant) | Q(recipient=applicant),
+        status__in=enums.IDENTITY_LOCK_STATUSES,
+    ).exists()
+    form = ApplicantProfileForm(
+        request.POST or None, instance=applicant, identity_locked=identity_locked
+    )
     if request.method == "POST" and form.is_valid():
         applicant = form.save()
         user = applicant.user
