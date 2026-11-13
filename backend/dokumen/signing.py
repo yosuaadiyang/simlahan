@@ -946,9 +946,16 @@ def check_otp(recipient: DocumentRecipient, code: str, access_code: str = "") ->
         or recipient.otp_attempts >= OTP_MAX_ATTEMPTS
     ):
         return False
-    DocumentRecipient.objects.filter(pk=recipient.pk).update(
-        otp_attempts=F("otp_attempts") + 1
-    )
+    # Ambil jatah percobaan secara atomik: UPDATE hanya berhasil bila hitungan
+    # masih di bawah batas dan kodenya belum diganti. Permintaan paralel yang
+    # membaca nilai lama tidak bisa melampaui batas.
+    claimed = DocumentRecipient.objects.filter(
+        pk=recipient.pk,
+        otp_hash=recipient.otp_hash,
+        otp_attempts__lt=OTP_MAX_ATTEMPTS,
+    ).update(otp_attempts=F("otp_attempts") + 1)
+    if not claimed:
+        return False
     if not hmac.compare_digest(recipient.otp_hash, _otp_digest(recipient, code)):
         return False
     if recipient.access_code_hash and not check_password(

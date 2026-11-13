@@ -1,6 +1,7 @@
 import base64
 import io
 import re
+from unittest import mock
 
 import pytest
 from django.core import mail
@@ -422,3 +423,23 @@ def test_verify_page_and_hash_match(client, draft, officer):
 def test_recipient_tokens_are_unique(draft):
     other = add_external(draft)
     assert DocumentRecipient.objects.filter(token=other.token).count() == 1
+
+
+def test_otp_attempt_limit_holds_against_stale_parallel_reads(draft, officer):
+    """Permintaan paralel membaca otp_attempts lama; batas tetap ditegakkan
+    oleh UPDATE bersyarat di basis data."""
+    external = add_external(draft, order=1, email="luar@contoh.id")
+    draft.recipients.filter(user__isnull=False).delete()
+    signing.send(draft, officer)
+    signing.send_otp(external)
+    code = re.search(r"\b(\d{6})\b", mail.outbox[-1].body).group(1)
+    stale = DocumentRecipient.objects.get(pk=external.pk)  # otp_attempts == 0
+    DocumentRecipient.objects.filter(pk=external.pk).update(
+        otp_attempts=signing.OTP_MAX_ATTEMPTS
+    )
+    with mock.patch.object(DocumentRecipient.objects, "get", return_value=stale):
+        assert not signing.check_otp(external, code)
+    assert (
+        DocumentRecipient.objects.get(pk=external.pk).otp_attempts
+        == signing.OTP_MAX_ATTEMPTS
+    )
