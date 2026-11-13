@@ -746,6 +746,10 @@ class AnswerSerializer(serializers.ModelSerializer):
             raise ValueError
         return field
 
+    def bindable_attachments(self):
+        """Lampiran yang boleh dikaitkan ke jawaban baru."""
+        return Attachment.objects.all()
+
     def create(self, validated_data):
         entries_data = validated_data.pop("entries")
         targets = validated_data.pop("targets", [])
@@ -766,7 +770,9 @@ class AnswerSerializer(serializers.ModelSerializer):
             field = self.get_field(field_identifier, section_identifier, validated_data)
 
             if field.type == "uploadfiles":
-                Attachment.objects.filter(id__in=value["value"]).update(path=path)
+                self.bindable_attachments().filter(id__in=value["value"]).update(
+                    path=path
+                )
 
             entry_section = self.get_entry_section(
                 answer,
@@ -781,7 +787,7 @@ class AnswerSerializer(serializers.ModelSerializer):
                 path=path,
             )
         for attachent_id in attachments:
-            Attachment.objects.filter(id=attachent_id).update(answer=answer)
+            self.bindable_attachments().filter(id=attachent_id).update(answer=answer)
 
         if area_search is not None:
             AreaSearch.objects.filter(id=area_search.id).update(answer=answer.pk)
@@ -836,8 +842,59 @@ class AnswerSerializer(serializers.ModelSerializer):
 
 
 class AnswerPublicSerializer(AnswerSerializer):
-    def create(self, validated_data):
-        return super().create(validated_data)
+    """Jawaban dari API publik: pengirim hanya boleh memakai lampiran yang ia
+    unggah sendiri dan belum terikat ke jawaban lain, serta hanya boleh
+    mengaitkan pencarian area miliknya sendiri yang belum berjawaban."""
+
+    def _user(self):
+        return self.context["request"].user
+
+    def bindable_attachments(self):
+        return Attachment.objects.filter(user=self._user(), answer__isnull=True)
+
+    def _check_attachments(self, ids):
+        try:
+            ids = {int(i) for i in ids}
+        except (TypeError, ValueError):
+            raise serializers.ValidationError(_("Invalid attachment."))
+        if ids and self.bindable_attachments().filter(id__in=ids).count() != len(ids):
+            raise serializers.ValidationError(_("Invalid attachment."))
+
+    def validate_attachments(self, value):
+        self._check_attachments(value or [])
+        return value
+
+    def validate_area_search(self, value):
+        if value is not None and (
+            value.user_id != self._user().pk or value.answer_id is not None
+        ):
+            raise serializers.ValidationError(_("Invalid area search."))
+        return value
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        # Nilai kolom unggahan (daftar id lampiran) juga hanya boleh merujuk
+        # lampiran milik pengirim.
+        ids = []
+        for (
+            field_identifier,
+            section_identifier,
+            value,
+            _meta,
+            _path,
+        ) in self.entry_generator(attrs.get("entries") or {}):
+            try:
+                field = self.get_field(field_identifier, section_identifier, attrs)
+            except ValueError:
+                continue
+            raw = value.get("value") if isinstance(value, dict) else None
+            if field.type == "uploadfiles" and isinstance(raw, list):
+                ids.extend(raw)
+        try:
+            self._check_attachments(ids)
+        except serializers.ValidationError as exc:
+            raise serializers.ValidationError({"entries": exc.detail})
+        return attrs
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
@@ -935,6 +992,12 @@ class AttachmentSerializer(serializers.ModelSerializer):
 
 
 class AttachmentPublicSerializer(AttachmentSerializer):
+    def validate_answer(self, value):
+        # Lampiran publik hanya boleh dikaitkan ke jawaban milik pengunggah.
+        if value is not None and value.user_id != self.context["request"].user.pk:
+            raise serializers.ValidationError(_("Invalid answer."))
+        return value
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         for key in EXCLUDED_ATTACHMENT_FIELDS:

@@ -428,16 +428,20 @@ def forms_page(request):
 def open_winners(request):
     """Pemenang alokasi terbuka: hasil lelang/seleksi atas lahan alokasi."""
     from asetlahan.enums import BidStatus, TenderStatus
-    from asetlahan.models import Bid, Tender
+    from asetlahan.models import Bid, ModuleSettings, Tender
 
     config = AllocationSettings.load()
-    tenders = []
-    if config.publish_open_winners:
-        tenders = list(
+    tenders = Tender.objects.none()
+    # Gerbang yang sama dengan halaman publik lain: modul lelang harus aktif
+    # (seperti tender_list/tender_detail) dan lahannya harus terbit (seperti
+    # plot_detail). Lahan yang ditarik petugas tidak boleh tampil di sini.
+    if config.publish_open_winners and ModuleSettings.load().enable_tender:
+        tenders = (
             Tender.objects.filter(
                 status=TenderStatus.AWARDED,
                 winner__isnull=False,
                 alokasi_plot__isnull=False,
+                alokasi_plot__is_published=True,
             )
             .select_related("alokasi_plot", "winner")
             .prefetch_related(
@@ -451,6 +455,7 @@ def open_winners(request):
             )
             .order_by("-awarded_on", "-pk")
         )
+    # Dipaginasi di basis data: hanya tender & penawaran halaman ini yang dimuat.
     page = _paginate(request, tenders)
     return render(
         request,
@@ -814,6 +819,7 @@ def activate(request, uidb64, token):
     if (
         user is not None
         and hasattr(user, "pemohon")
+        and not user.pemohon.email_activation_closed
         and activation_token.check_token(user, token)
     ):
         user.is_active = True
@@ -833,6 +839,8 @@ def resend_activation(request):
                 email__iexact=form.cleaned_data["email"],
                 is_active=False,
                 pemohon__isnull=False,
+                # Akun yang dinonaktifkan petugas tidak dikirimi tautan aktivasi.
+                pemohon__email_activation_closed=False,
             ).first()
             if user:
                 _send_activation(request, user)

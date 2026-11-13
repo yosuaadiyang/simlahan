@@ -433,3 +433,22 @@ def test_compensation_validation_requires_validate_permission(make_user, parcel,
     assert response.status_code == 200, response.content
     compensation.refresh_from_db()
     assert compensation.validated_by == chair
+
+
+@pytest.mark.django_db
+def test_nominative_list_writes_stored_text_as_text(
+    admin_client, project, parcel, party
+):
+    parcel.village = "=1+1"
+    parcel.save()
+    party.name = "=HYPERLINK(1)"
+    party.save()
+    response = admin_client.get(
+        reverse("v1:acquisitionproject-nominative-list", kwargs={"pk": project.pk})
+    )
+    assert response.status_code == 200
+    with zipfile.ZipFile(io.BytesIO(response.content)) as workbook:
+        sheet = workbook.read("xl/worksheets/sheet1.xml").decode()
+        text = workbook.read("xl/sharedStrings.xml").decode()
+    assert "<f>" not in sheet
+    assert "=1+1" in text and "=HYPERLINK(1)" in text

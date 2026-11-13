@@ -854,12 +854,17 @@ def test_area_search_create_simple(
 
 @pytest.mark.django_db
 def test_area_search_create_simple_public(
-    django_db_setup, admin_client, area_search_test_data, area_search_attachment_factory
+    django_db_setup,
+    admin_client,
+    admin_user,
+    area_search_test_data,
+    area_search_attachment_factory,
 ):
     url = reverse("v1:pub_area_search-list")  # list == create
 
+    # Pemohon mengunggah lampirannya sendiri dulu, lalu membuat pencarian area.
     attachment = area_search_attachment_factory(
-        area_search=area_search_test_data,
+        user=admin_user,
         attachment=SimpleUploadedFile(content=b"Lorem Impsum", name="test.txt"),
         name="test.txt",
     )
@@ -939,8 +944,12 @@ def test_area_search_attachment_delete(
 
 @pytest.mark.django_db
 def test_area_search_attachment_create_public(
-    django_db_setup, admin_client, area_search_test_data
+    django_db_setup, admin_client, admin_user, area_search_factory
 ):
+    # Lampiran publik hanya untuk pencarian area milik pengunggah sendiri.
+    area_search_test_data = area_search_factory(
+        user=admin_user, description_area="Area milik sendiri"
+    )
     attachment = {
         "area_search": area_search_test_data.id,
         "attachment": SimpleUploadedFile(content=b"Lorem Impsum", name="test.txt"),

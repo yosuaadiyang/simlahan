@@ -754,6 +754,7 @@ class ApplicantAdmin(admin.ModelAdmin):
         from django.contrib.auth import get_user_model
 
         n = get_user_model().objects.filter(pemohon__in=queryset).update(is_active=True)
+        queryset.update(email_activation_closed=True)
         self.message_user(request, _("%d akun diaktifkan.") % n)
 
     @admin.action(description=_("Nonaktifkan akun"), permissions=["change"])
@@ -765,6 +766,9 @@ class ApplicantAdmin(admin.ModelAdmin):
             .objects.filter(pemohon__in=queryset)
             .update(is_active=False)
         )
+        # Pemohon tidak boleh mengaktifkan ulang akunnya lewat kirim ulang
+        # aktivasi; hanya petugas yang bisa (aksi "Aktifkan akun").
+        queryset.update(email_activation_closed=True)
         self.message_user(request, _("%d akun dinonaktifkan.") % n)
 
 

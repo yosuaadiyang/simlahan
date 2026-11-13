@@ -7026,3 +7026,10 @@ msgstr "Masuk dengan kata sandi"
 
 msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr "Setelah pengguna dibuat, Anda dapat mengubah pilihan pengguna lainnya."
+
+msgid ""
+"Static API tokens are disabled while officer OTP is required. Use an OAuth2 "
+"application instead."
+msgstr ""
+"Token API statis dinonaktifkan selama OTP petugas diwajibkan. Gunakan "
+"aplikasi OAuth2."

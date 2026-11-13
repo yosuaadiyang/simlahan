@@ -889,6 +889,16 @@ class AreaSearchAttachmentSerializer(serializers.ModelSerializer):
 
 
 class AreaSearchAttachmentPublicSerializer(AreaSearchAttachmentSerializer):
+    def validate_area_search(self, value):
+        # Lampiran publik hanya boleh dikaitkan ke pencarian area milik
+        # pengunggah yang belum berjawaban (belum diajukan).
+        user = self.context["request"].user
+        if value is not None and (
+            value.user_id != user.pk or value.answer_id is not None
+        ):
+            raise serializers.ValidationError(_("Invalid area search."))
+        return value
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         for key in EXCLUDED_AREA_SEARCH_ATTACHMENT_FIELDS:
@@ -1124,8 +1134,13 @@ class AreaSearchSerializer(EnumSupportSerializerMixin, serializers.ModelSerializ
         as_serializer = AreaSearchStatusSerializer(context=self.context)
 
         if area_search_status_qs.exists():
-            area_search_status = as_serializer.update(
-                area_search_status_qs.get(), area_search_status
+            existing_status = area_search_status_qs.get()
+            # Tanpa data status (mis. API publik, kolomnya hanya-baca), status
+            # yang ada dipertahankan apa adanya.
+            area_search_status = (
+                as_serializer.update(existing_status, area_search_status)
+                if area_search_status is not None
+                else existing_status
             )
         elif area_search_status:
             area_search_status = as_serializer.create(area_search_status)
@@ -1142,6 +1157,10 @@ class AreaSearchSerializer(EnumSupportSerializerMixin, serializers.ModelSerializ
 
 
 class AreaSearchPublicSerializer(AreaSearchSerializer):
+    """API publik: pemohon hanya mengisi data permohonannya. Kolom yang diisi
+    petugas (penangan, lessor, nomor, status, unit layanan, sewa) hanya-baca,
+    dan lampiran yang dikaitkan harus unggahan pemohon sendiri."""
+
     area_search_attachments = InstanceDictPrimaryKeyRelatedField(
         instance_class=AreaSearchAttachment,
         queryset=AreaSearchAttachment.objects.all(),
@@ -1150,6 +1169,37 @@ class AreaSearchPublicSerializer(AreaSearchSerializer):
         allow_null=True,
         many=True,
     )
+    # Diisi petugas lewat API petugas; di API publik hanya-baca.
+    OFFICER_FIELDS = (
+        "preparer",
+        "lessor",
+        "identifier",
+        "state",
+        "received_date",
+        "settled_date",
+        "area_search_status",
+        "service_unit",
+        "lease",
+    )
+
+    def get_fields(self):
+        fields = super().get_fields()
+        for name in self.OFFICER_FIELDS:
+            fields[name].read_only = True
+        return fields
+
+    def validate_area_search_attachments(self, value):
+        user = self.context["request"].user
+        for attachment in value or []:
+            if attachment.user_id != user.pk or (
+                attachment.area_search_id is not None
+                and (
+                    self.instance is None
+                    or attachment.area_search_id != self.instance.pk
+                )
+            ):
+                raise serializers.ValidationError(_("Invalid attachment."))
+        return value
 
 
 class AreaSearchDetailSerializer(AreaSearchSerializer):

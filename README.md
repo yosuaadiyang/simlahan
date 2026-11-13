@@ -252,7 +252,7 @@ pelepasan hak hanya bisa dicatat setelah ganti kerugian lunas atau dititipkan.
 | `JWT_ACCESS_TOKEN_MINUTES`, `JWT_REFRESH_TOKEN_HOURS` | Masa berlaku sesi |
 | `SECURE_HSTS_SECONDS` | HSTS (detik) bila HTTPS tidak mengaturnya sendiri; bawaan `0` (mati). Aktifkan hanya bila seluruh situs sudah lewat HTTPS |
 | `FLAG_FILE_SCAN`, `FILE_SCAN_SERVICE_URL` | Pindai virus berkas unggahan (termasuk unggahan publik portal) lewat layanan REST ClamAV; berkas terinfeksi dihapus dan unduhan ditahan sampai lolos pindai. Bawaan mati — disarankan aktif di produksi |
-| `OFFICER_OTP_REQUIRED` | `1` = petugas wajib memasukkan kode OTP surel setiap masuk |
+| `OFFICER_OTP_REQUIRED` | `1` = petugas wajib memasukkan kode OTP surel setiap masuk; token API statis (`Token ...`) ditolak, integrasi memakai OAuth2 |
 | `MAP_EXTRA_BASEMAPS` | Peta dasar tambahan (JSON), mis. citra berlisensi milik instansi |
 | `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL` | Asisten AI & pembacaan dokumen pindaian (opsional) |
 | `OCR_LANGUAGES` | Bahasa Tesseract, bawaan `ind+eng` |

@@ -86,3 +86,14 @@ def test_delete_all_samples_command_runs_on_empty_db():
     for name in ("dokumen", "operasi", "asetlahan", "sewa", "pengadaan", "alokasi"):
         assert f"{name}_contoh_rempang --hapus" in out.getvalue()
     assert "pengguna_contoh --hapus" in out.getvalue()
+
+
+@pytest.mark.django_db
+def test_initial_admin_with_placeholder_password_fails(monkeypatch):
+    User = get_user_model()
+    User.objects.create_superuser("admin", "a@pemda.go.id", "ganti-kata-sandi-admin")
+    monkeypatch.setenv("DJANGO_SUPERUSER_USERNAME", "admin")
+    monkeypatch.setenv("DJANGO_SUPERUSER_PASSWORD", "ganti-kata-sandi-admin")
+    with override_settings(**READY):
+        failed = messages(FAIL)
+    assert any("sandi contoh dari .env.example" in m for m in failed)

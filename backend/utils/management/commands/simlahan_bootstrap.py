@@ -12,9 +12,12 @@ import io
 import os
 from pathlib import Path
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from django.core.management import call_command
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
 from alokasi.setup import ensure_groups, ensure_monitoring_job
@@ -23,6 +26,7 @@ from dokumen.setup import ensure_reminder_job as ensure_document_job
 from leasing.models import Municipality, ServiceUnit
 from operasi.setup import ensure_daily_job
 from utils.group_permissions import UserGroup
+from utils.placeholders import is_placeholder
 
 FIXTURE_DIRS = ("users/fixtures", "leasing/fixtures", "plotsearch/fixtures")
 
@@ -75,9 +79,14 @@ class Command(BaseCommand):
         if username and password:
             User = get_user_model()
             if not User.objects.filter(username=username).exists():
+                email = os.environ.get("DJANGO_SUPERUSER_EMAIL", "")
+                self._check_initial_password(
+                    password,
+                    User(username=username, email=email, first_name="Administrator"),
+                )
                 admin = User.objects.create_superuser(
                     username=username,
-                    email=os.environ.get("DJANGO_SUPERUSER_EMAIL", ""),
+                    email=email,
                     password=password,
                     first_name="Administrator",
                 )
@@ -90,3 +99,22 @@ class Command(BaseCommand):
                     admin.groups.add(administrator)
                 self.stdout.write(f"Admin awal '{username}' dibuat.")
         self.stdout.write(self.style.SUCCESS("Bootstrap SimLahan selesai."))
+
+    @staticmethod
+    def _check_initial_password(password, user):
+        """Di produksi, superuser awal tidak boleh memakai sandi contoh dari
+        .env.example (diketahui publik) atau sandi yang gagal validator sandi."""
+        if settings.DEBUG:
+            return
+        if is_placeholder(password):
+            raise CommandError(
+                "DJANGO_SUPERUSER_PASSWORD masih nilai contoh dari .env.example. "
+                "Isi sandi admin yang kuat di .env lalu jalankan ulang."
+            )
+        try:
+            validate_password(password, user=user)
+        except ValidationError as exc:
+            raise CommandError(
+                "DJANGO_SUPERUSER_PASSWORD tidak memenuhi aturan sandi: "
+                + " ".join(exc.messages)
+            )
