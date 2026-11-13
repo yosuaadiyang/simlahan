@@ -315,9 +315,12 @@ def _asset_values(fields: dict) -> dict:
                 pass
     if fields.get("luas_m2"):
         try:
-            values["area_m2"] = Decimal(str(fields["luas_m2"]))
+            area = Decimal(str(fields["luas_m2"]))
         except InvalidOperation:
-            pass
+            area = None
+        # NaN/Infinity atau di luar rentang kolom membuat simpan aset gagal 500.
+        if area is not None and area.is_finite() and 0 < area < Decimal("1e12"):
+            values["area_m2"] = area
     return values
 
 

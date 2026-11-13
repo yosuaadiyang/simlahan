@@ -282,9 +282,12 @@ def field_boundaries(request):
     denied = _field_user(request)
     if denied:
         return denied
+    # Izin kirim laporan saja tidak cukup untuk melihat batas aset/kasus.
     assets = scope.scoped(
         LandAsset.objects.exclude(geometry__isnull=True), request.user
     )
+    if not request.user.has_perm("asetlahan.view_landasset"):
+        assets = assets.none()
     features = [
         geo.feature(
             asset.geometry,
@@ -305,6 +308,8 @@ def field_boundaries(request):
         EncroachmentCase.objects.filter(status__in=enums.OPEN_ENCROACHMENT_STATUSES),
         request.user,
     )
+    if not request.user.has_perm("asetlahan.view_encroachmentcase"):
+        cases = cases.none()
     features.extend(
         geo.feature(
             case.area_geometry or case.location,
@@ -336,7 +341,11 @@ def _parse_location(data):
 
 def _parse_captured_at(value):
     now = timezone.now()
-    captured_at = parse_datetime(value or "") or now
+    try:
+        captured_at = parse_datetime(value or "") or now
+    except ValueError:
+        # Format benar tetapi tanggal mustahil (mis. bulan 13).
+        captured_at = now
     if timezone.is_naive(captured_at):
         captured_at = timezone.make_aware(captured_at)
     # Jam perangkat yang terlalu maju tidak boleh menghasilkan waktu di masa depan.
@@ -393,6 +402,28 @@ def _duplicate(request, client_id):
     return JsonResponse({"id": existing.pk, "duplicate": True})
 
 
+def _place_report(report, user) -> None:
+    """Aset & unit layanan laporan. Hanya aset di unit layanan petugas (bukan
+    aset unit lain di titik yang sama)."""
+    report.asset = geo.asset_at(report.location, user)
+    if report.asset is not None:
+        return
+    report.service_unit = scope.default_unit(user)
+    if report.service_unit is None and user.service_units.exists():
+        # Tanpa unit, laporan (catatan & foto) terlihat oleh semua unit.
+        raise ValidationError(
+            {
+                "location": [
+                    _(
+                        "Titik ini di luar aset unit Anda dan akun Anda "
+                        "memiliki beberapa unit layanan. Laporkan dari "
+                        "lokasi aset atau minta Administrator mengatur unit."
+                    )
+                ]
+            }
+        )
+
+
 @require_POST
 @staff_member_required
 def field_sync(request):
@@ -414,15 +445,16 @@ def field_sync(request):
             exclude=["asset", "service_unit", "encroachment", "reported_by"],
             validate_unique=False,
         )
-        # Hanya aset di unit layanan petugas (bukan aset unit lain di titik yang sama).
-        report.asset = geo.asset_at(report.location, request.user)
-        if report.asset is None:
-            report.service_unit = scope.default_unit(request.user)
+        _place_report(report, request.user)
         with transaction.atomic():
             report.save()
     except ValidationError as error:
         return JsonResponse({"errors": error.message_dict}, status=400)
     except IntegrityError:
+        if report.photo:
+            # Berkas sudah tertulis sebelum baris gagal disimpan (kirim ulang
+            # bersamaan); hapus agar tidak menjadi berkas yatim.
+            report.photo.delete(save=False)
         return _duplicate(request, values["client_id"]) or JsonResponse(
             {"errors": {"client_id": [_("Laporan gagal disimpan.")]}}, status=400
         )

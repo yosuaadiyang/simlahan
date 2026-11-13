@@ -138,7 +138,14 @@ def _extract_shapefile(data: bytes, directory: str) -> str:
         target = os.path.realpath(os.path.join(directory, name))
         if not target.startswith(os.path.realpath(directory) + os.sep):
             raise AssetImportError("Nama berkas di dalam ZIP tidak aman.")
-    archive.extractall(directory)
+    try:
+        archive.extractall(directory)
+    except (zipfile.BadZipFile, EOFError, OSError, RuntimeError) as error:
+        # CRC salah, arsip terpotong, entri terenkripsi, atau nama berkas
+        # terlalu panjang: laporkan sebagai galat impor (400), bukan 500.
+        raise AssetImportError(
+            "Berkas ZIP rusak atau isinya tidak dapat dibaca."
+        ) from error
     return os.path.join(directory, shapefiles[0])
 
 
