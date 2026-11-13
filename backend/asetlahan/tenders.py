@@ -27,18 +27,26 @@ def eligible_bids(tender: Tender):
 
 def award(tender: Tender) -> Bid:
     """Pemenang: nilai tertinggi (lelang) atau nilai teknis tertinggi (seleksi)."""
-    closed = tender.status == enums.TenderStatus.CLOSED or (
-        tender.status == enums.TenderStatus.ANNOUNCED
-        and tender.close_at <= timezone.now()
-    )
-    if not closed:
-        raise TenderError(_("Penawaran belum ditutup."))
-    winner = eligible_bids(tender).first()
-    if winner is None:
-        raise TenderError(
-            _("Tidak ada penawaran yang memenuhi syarat (nilai limit / nilai teknis).")
-        )
     with transaction.atomic():
+        # Kunci lelang lalu semua penawarannya (urutan sama dengan portal) agar
+        # penetapan ganda atau perubahan penawaran bersamaan tidak memakai data
+        # lama; status dibaca ulang setelah dikunci.
+        tender = Tender.objects.select_for_update().get(pk=tender.pk)
+        list(tender.bids.select_for_update().values_list("pk", flat=True))
+        closed = tender.status == enums.TenderStatus.CLOSED or (
+            tender.status == enums.TenderStatus.ANNOUNCED
+            and tender.close_at <= timezone.now()
+        )
+        if not closed:
+            raise TenderError(_("Penawaran belum ditutup."))
+        winner = eligible_bids(tender).first()
+        if winner is None:
+            raise TenderError(
+                _(
+                    "Tidak ada penawaran yang memenuhi syarat (nilai limit / nilai "
+                    "teknis)."
+                )
+            )
         winner.status = enums.BidStatus.WON
         winner.save(update_fields=["status", "modified_at"])
         tender.bids.exclude(pk=winner.pk).exclude(

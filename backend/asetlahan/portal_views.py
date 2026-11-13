@@ -231,6 +231,46 @@ def tender_detail(request, number):
     )
 
 
+class _BidNotAccepted(Exception):
+    pass
+
+
+# Kolom penawaran yang boleh diubah peserta; kolom evaluasi milik petugas.
+BIDDER_FIELDS = ("bidder_name", "email", "phone", "amount", "proposal")
+
+
+def _save_bid(form, tender, applicant, new: bool, offer_changed: bool) -> Bid:
+    """Simpan penawaran dengan lelang & penawaran dikunci dan diperiksa ulang,
+    agar penutupan lelang atau evaluasi petugas yang terjadi setelah halaman
+    dimuat tidak tertimpa nilai lama."""
+    locked_tender = Tender.objects.select_for_update().get(pk=tender.pk)
+    if not locked_tender.is_accepting_bids:
+        raise _BidNotAccepted(_("Lelang ini tidak sedang menerima penawaran."))
+    if not new:
+        current = Bid.objects.select_for_update().get(pk=form.instance.pk)
+        if current.status != enums.BidStatus.SUBMITTED:
+            raise _BidNotAccepted(
+                _("Penawaran Anda sudah dievaluasi (%s) dan tidak dapat diubah lagi.")
+                % current.get_status_display()
+            )
+    bid = form.save(commit=False)
+    bid.tender = locked_tender
+    bid.applicant = applicant
+    bid.status = enums.BidStatus.SUBMITTED
+    if new:
+        bid.save()
+        return bid
+    fields = [*BIDDER_FIELDS, "status", "modified_at"]
+    if offer_changed:
+        # Nilai atau proposal berubah: penilaian petugas atas penawaran lama
+        # tidak berlaku lagi dan harus diulang.
+        bid.technical_score = None
+        bid.evaluation_note = ""
+        fields += ["technical_score", "evaluation_note"]
+    bid.save(update_fields=fields)
+    return bid
+
+
 @applicant_required
 def bid_submit(request, number):
     _require_flag("enable_tender")
@@ -266,17 +306,17 @@ def bid_submit(request, number):
     )
     if request.method == "POST" and form.is_valid():
         new = form.instance.pk is None
-        bid = form.save(commit=False)
-        bid.tender = tender
-        bid.applicant = applicant
-        bid.status = enums.BidStatus.SUBMITTED
+        offer_changed = new or bool({"amount", "proposal"} & set(form.changed_data))
         try:
             with transaction.atomic():
-                bid.save()
+                bid = _save_bid(form, tender, applicant, new, offer_changed)
         except IntegrityError:
             messages.error(
                 request, _("Anda sudah mengajukan penawaran untuk lelang ini.")
             )
+            return redirect("aset_portal:tender_detail", number=number)
+        except _BidNotAccepted as error:
+            messages.error(request, str(error))
             return redirect("aset_portal:tender_detail", number=number)
         services.notify_contact(
             email=bid.email,
