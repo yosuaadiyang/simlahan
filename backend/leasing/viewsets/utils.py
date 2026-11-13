@@ -3,7 +3,7 @@ import json
 from django.db import DataError, IntegrityError, transaction
 from django.utils.translation import gettext_lazy as _
 from rest_framework import parsers, status, viewsets
-from rest_framework.exceptions import ParseError
+from rest_framework.exceptions import ParseError, PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import exception_handler
 
@@ -71,3 +71,53 @@ def integrityerror_exception_handler(exc, context):
         )
 
     return response
+
+
+class LeaseServiceUnitWriteMixin:
+    """Tulis/hapus data turunan sewa hanya oleh anggota unit layanan sewanya.
+
+    Membaca lintas unit tetap boleh (sama dengan IsMemberOfSameServiceUnit),
+    tetapi membuat, mengubah, memindahkan, dan menghapus catatan turunan sewa
+    (komentar, keputusan, lampiran, penagihan) dibatasi ke unit sewa itu, baik
+    untuk sewa lama (objek yang ada) maupun sewa tujuan (isi permintaan).
+    """
+
+    # Jalur atribut dari objek ke Lease, mis. "lease" atau "inspection.lease".
+    lease_path = "lease"
+
+    def _lease_from(self, data=None, instance=None):
+        first, *rest = self.lease_path.split(".")
+        if data is not None and first in data:
+            obj = data[first]
+        else:
+            obj = getattr(instance, first, None) if instance is not None else None
+        for part in rest:
+            obj = getattr(obj, part, None) if obj is not None else None
+        return obj
+
+    def _require_unit(self, lease):
+        from leasing.permissions import user_in_service_unit
+
+        if lease is not None and not user_in_service_unit(
+            self.request.user, lease.service_unit
+        ):
+            raise PermissionDenied(
+                _("Cannot change data belonging to a different service unit")
+            )
+
+    def perform_create(self, serializer):
+        self._require_unit(self._lease_from(data=serializer.validated_data))
+        super().perform_create(serializer)
+
+    def perform_update(self, serializer):
+        self._require_unit(self._lease_from(instance=serializer.instance))
+        self._require_unit(
+            self._lease_from(
+                data=serializer.validated_data, instance=serializer.instance
+            )
+        )
+        super().perform_update(serializer)
+
+    def perform_destroy(self, instance):
+        self._require_unit(self._lease_from(instance=instance))
+        super().perform_destroy(instance)

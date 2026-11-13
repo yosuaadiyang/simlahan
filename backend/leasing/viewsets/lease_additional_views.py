@@ -482,6 +482,16 @@ class LeaseSetRentInfoCompletionStateView(APIView):
     def post(self, request, format=None):
         lease = get_lease_from_query_params(request.query_params)
 
+        # Sama dengan LeaseSetInvoicingStateView: hanya anggota unit layanan
+        # sewa yang boleh mengubah status kelengkapan sewa (prasyarat penagihan).
+        if not user_in_service_unit(request.user, lease.service_unit):
+            raise PermissionDenied(
+                _(
+                    "Cannot change rent info completion state belonging to a "
+                    "different service unit"
+                )
+            )
+
         if "rent_info_complete" not in request.data:
             raise ParseError(_('"rent_info_complete" key is required'))
 

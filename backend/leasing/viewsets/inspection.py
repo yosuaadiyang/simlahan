@@ -8,15 +8,21 @@ from leasing.serializers.inspection import (
     InspectionAttachmentSerializer,
 )
 
-from .utils import AtomicTransactionModelViewSet, MultiPartJsonParser
+from .utils import (
+    AtomicTransactionModelViewSet,
+    LeaseServiceUnitWriteMixin,
+    MultiPartJsonParser,
+)
 
 
 class InspectionAttachmentViewSet(
+    LeaseServiceUnitWriteMixin,
     FileMixin,
     FieldPermissionsViewsetMixin,
     AtomicTransactionModelViewSet,
 ):
     queryset = InspectionAttachment.objects.all()
+    lease_path = "inspection.lease"
     serializer_class = InspectionAttachmentSerializer
     parser_classes = (MultiPartJsonParser,)
 

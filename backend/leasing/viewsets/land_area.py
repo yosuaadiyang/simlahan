@@ -17,15 +17,21 @@ from leasing.serializers.land_area import (
 )
 from plotsearch.models import PlotSearch, PlotSearchTarget
 
-from .utils import AtomicTransactionModelViewSet, MultiPartJsonParser
+from .utils import (
+    AtomicTransactionModelViewSet,
+    LeaseServiceUnitWriteMixin,
+    MultiPartJsonParser,
+)
 
 
 class LeaseAreaAttachmentViewSet(
+    LeaseServiceUnitWriteMixin,
     FileMixin,
     FieldPermissionsViewsetMixin,
     AtomicTransactionModelViewSet,
 ):
     queryset = LeaseAreaAttachment.objects.all()
+    lease_path = "lease_area.lease"
     serializer_class = LeaseAreaAttachmentSerializer
     parser_classes = (MultiPartJsonParser,)
 
