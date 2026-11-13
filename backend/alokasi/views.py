@@ -1164,6 +1164,8 @@ def document_download(request, number, pk):
 @require_POST
 def application_submit(request, number):
     application = _own_application(request, number)
+    if _throttled(request, "ajukan-permohonan", limit=20, window=3600):
+        return _too_many(request)
     try:
         services.submit(application, request.user)
     except ValidationError as error:

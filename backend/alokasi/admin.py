@@ -230,6 +230,7 @@ class AllocationSettingsAdmin(admin.ModelAdmin):
                     "passing_score",
                     "idle_years",
                     "report_interval_months",
+                    "max_open_allocations_per_applicant",
                 )
             },
         ),

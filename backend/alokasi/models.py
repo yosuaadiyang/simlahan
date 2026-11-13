@@ -236,6 +236,17 @@ class AllocationSettings(models.Model):
         validators=[MaxValueValidator(600)],
         help_text=_("0 = tanpa batas."),
     )
+    max_open_allocations_per_applicant = models.PositiveSmallIntegerField(
+        verbose_name=_("Batas permohonan alokasi diproses per pemohon"),
+        default=5,
+        validators=[MaxValueValidator(1000)],
+        help_text=_(
+            "Jumlah permohonan alokasi lahan yang boleh sedang diproses "
+            "(diajukan s.d. lunas) sekaligus oleh satu pemohon. Setiap permohonan "
+            "mengunci lahannya, jadi batas ini mencegah satu akun mengunci banyak "
+            "lahan. 0 = tanpa batas."
+        ),
+    )
     publish_open_winners = models.BooleanField(
         verbose_name=_("Umumkan pemenang alokasi terbuka"),
         default=True,
