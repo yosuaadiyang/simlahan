@@ -67,6 +67,7 @@ from alokasi.models import (
 )
 from alokasi.monitoring import report_deadline
 from file_operations.errors import FileScanError, FileScanPendingError, FileUnsafeError
+from utils.client_ip import client_ip
 
 User = get_user_model()
 S = enums.ApplicationStatus
@@ -90,20 +91,8 @@ activation_token = ActivationTokenGenerator()
 
 
 def _client_ip(request) -> str:
-    # Di belakang reverse proxy, REMOTE_ADDR selalu alamat proxy sehingga semua
-    # pengunjung berbagi satu kuota. Setiap proxy tepercaya menambahkan satu
-    # alamat di ujung X-Forwarded-For, jadi alamat klien ada di posisi ke-N dari
-    # belakang (N = TRUSTED_PROXY_COUNT). Entri di depannya bisa dipalsukan.
-    if getattr(settings, "TRUST_PROXY_HEADERS", False):
-        hops = max(getattr(settings, "TRUSTED_PROXY_COUNT", 1), 1)
-        forwarded = [
-            part.strip()
-            for part in request.META.get("HTTP_X_FORWARDED_FOR", "").split(",")
-            if part.strip()
-        ]
-        if forwarded:
-            return forwarded[-min(hops, len(forwarded))]
-    return request.META.get("REMOTE_ADDR", "")
+    # Lihat utils.client_ip: hanya hop proxy tepercaya yang dipakai.
+    return client_ip(request)
 
 
 def _absolute_url(request, path: str) -> str:
