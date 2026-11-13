@@ -588,7 +588,11 @@ class KorwilAdmin(OperasiGISAdmin):
         ] + super().get_urls()
 
     def import_view(self, request):
-        if not self.has_add_permission(request):
+        # Impor memperbarui data yang sudah ada (dicocokkan dengan kode), jadi
+        # perlu izin ubah selain izin tambah.
+        if not (
+            self.has_add_permission(request) and self.has_change_permission(request)
+        ):
             raise PermissionDenied
         form = ImportForm(request.POST or None, request.FILES or None)
         if request.method == "POST" and form.is_valid():
