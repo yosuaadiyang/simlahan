@@ -424,18 +424,23 @@ def _other_modules(user):
     """Ringkasan modul pengadaan tanah, alokasi lahan, dan sewa."""
     result = []
     if user.has_perm("pengadaan.view_acquisitionproject"):
+        from pengadaan.access import scope_queryset
         from pengadaan.models import AcquisitionParcel, AcquisitionProject
 
         result.append(
             {
                 "label": _("Proyek pengadaan tanah aktif"),
-                "value": AcquisitionProject.objects.filter(status="active").count(),
+                "value": scope_queryset(
+                    AcquisitionProject.objects.filter(status="active"), user
+                ).count(),
             }
         )
         result.append(
             {
                 "label": _("Bidang pengadaan bersengketa"),
-                "value": AcquisitionParcel.objects.filter(is_disputed=True).count(),
+                "value": scope_queryset(
+                    AcquisitionParcel.objects.filter(is_disputed=True), user
+                ).count(),
             }
         )
     if user.has_perm("alokasi.view_application"):
@@ -761,10 +766,14 @@ def _encroachment_features(request):
 
 
 def _pengadaan_features(request):
+    from pengadaan.access import scope_queryset
     from pengadaan.models import AcquisitionParcel
 
-    queryset = AcquisitionParcel.objects.exclude(geometry__isnull=True).select_related(
-        "project"
+    queryset = scope_queryset(
+        AcquisitionParcel.objects.exclude(geometry__isnull=True).select_related(
+            "project"
+        ),
+        request.user,
     )
     if request.GET.get("proyek", "").isdigit():
         queryset = queryset.filter(project_id=request.GET["proyek"])
@@ -990,11 +999,15 @@ def _gantt_tasks(request, window_start, window_end):
 def _gantt_milestones(request, window_start, window_end):
     if not request.user.has_perm("pengadaan.view_acquisitionmilestone"):
         return []
+    from pengadaan.access import scope_queryset
     from pengadaan.models import AcquisitionMilestone
 
-    milestones = AcquisitionMilestone.objects.filter(
-        planned_date__gte=window_start, planned_date__lte=window_end
-    ).select_related("project", "responsible")
+    milestones = scope_queryset(
+        AcquisitionMilestone.objects.filter(
+            planned_date__gte=window_start, planned_date__lte=window_end
+        ).select_related("project", "responsible"),
+        request.user,
+    )
     if request.GET.get("proyek", "").isdigit():
         milestones = milestones.filter(project_id=request.GET["proyek"])
     days = (window_end - window_start).days + 1
@@ -1412,6 +1425,14 @@ def search_all(user, query: str, limit: int = 20) -> list[dict]:
             queryset = scope.scoped(queryset, user, lookup)
         if model is Document:
             queryset = scope.documents(user, queryset)
+        if model._meta.app_label == "pengadaan":
+            # Pembatasan proyek & penyaringan dokumen yang sama dengan API
+            # dan admin pengadaan.
+            from pengadaan import access as pengadaan_access
+
+            queryset = pengadaan_access.scope_queryset(queryset, user)
+            if model._meta.model_name == "acquisitiondocument":
+                queryset = pengadaan_access.visible_documents(queryset, user)
         items = list(queryset.distinct()[: limit + 1])
         if items:
             groups.append(

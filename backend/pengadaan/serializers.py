@@ -39,6 +39,7 @@ from pengadaan.models import (
     ParcelSurvey,
     RightsRelease,
     Valuation,
+    consignment_settlement_errors,
 )
 from pengadaan.status import is_parcel_settled
 from utils.money import fits, too_large_message
@@ -841,12 +842,51 @@ class ConsignmentSerializer(PengadaanModelSerializer):
         )
 
     def validate(self, attrs):
-        parcel = attrs.get("parcel", getattr(self.instance, "parcel", None))
-        party = attrs.get("party", getattr(self.instance, "party", None))
+        instance = self.instance
+        # Status ganti kerugian bidang lama tidak dihitung ulang bila
+        # konsinyasi dipindah, jadi bidang tidak boleh diganti.
+        _reject_changes(
+            instance,
+            attrs,
+            ("parcel",),
+            _("This cannot be changed after the consignment has been created."),
+        )
+        parcel = attrs.get("parcel", getattr(instance, "parcel", None))
+        party = attrs.get("party", getattr(instance, "party", None))
         if party and parcel and party.parcel_id != parcel.id:
             raise serializers.ValidationError(
                 {"party": _("Party does not belong to the selected parcel.")}
             )
+        if parcel is not None:
+            # Kunci baris ganti rugi bidang agar validasi/pembatalan serentak
+            # tidak lolos di antara pemeriksaan dan penyimpanan.
+            list(
+                Compensation.objects.select_for_update()
+                .filter(parcel=parcel)
+                .values_list("pk", flat=True)
+            )
+
+        def current(name):
+            return attrs.get(name, getattr(instance, name, None))
+
+        previous = None
+        if instance is not None:
+            previous = {
+                "parcel_id": instance.parcel_id,
+                "party_id": instance.party_id,
+                "status": instance.status,
+            }
+        errors = consignment_settlement_errors(
+            previous,
+            parcel=parcel,
+            party=party,
+            status=current("status") or enums.ConsignmentStatus.REQUESTED,
+            decree_number=current("decree_number"),
+            deposited_on=current("deposited_on"),
+            amount=current("amount"),
+        )
+        if errors:
+            raise serializers.ValidationError(errors)
         return attrs
 
 
@@ -870,6 +910,14 @@ class CompensationPaymentSerializer(PengadaanModelSerializer):
         return value
 
     def validate(self, attrs):
+        # Status ganti rugi lama tidak dihitung ulang bila pembayaran
+        # dipindah, jadi ganti rugi tujuan tidak boleh diganti.
+        _reject_changes(
+            self.instance,
+            attrs,
+            ("compensation",),
+            _("This cannot be changed after the payment has been recorded."),
+        )
         compensation = attrs.get(
             "compensation", getattr(self.instance, "compensation", None)
         )

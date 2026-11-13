@@ -17,9 +17,9 @@ from leasing.permissions import MvjDjangoModelPermissions
 from leasing.viewsets.utils import AtomicTransactionModelViewSet
 from pengadaan import enums
 from pengadaan.access import (
-    SENSITIVE_DOCUMENT_TYPES,
     is_project_scoped,
     scope_queryset,
+    visible_documents,
     visible_projects,
 )
 from pengadaan.deadlines import collect_deadlines
@@ -176,7 +176,7 @@ class AcquisitionProjectViewSet(BaseViewSet):
             ).count(),
             "milestones_total": milestones.count(),
             "deadlines": [
-                d.as_dict()
+                d.as_dict_for(user)
                 for d in collect_deadlines(
                     AcquisitionProject.objects.filter(pk=project.pk)
                 )
@@ -457,6 +457,13 @@ class CompensationViewSet(ParcelChildViewSet):
     serializer_class = CompensationSerializer
     filterset_fields = ("parcel", "party", "status", "form")
 
+    def _locked_object(self):
+        """Ganti kerugian dengan baris dikunci (transaksi permintaan), sama
+        dengan jalur pembayaran: pemeriksaan status/pembayaran lalu perubahan
+        status tidak bisa disela pembayaran atau aksi lain yang bersamaan."""
+        compensation = self.get_object()
+        return Compensation.objects.select_for_update().get(pk=compensation.pk)
+
     @action(
         methods=["post"],
         detail=True,
@@ -464,7 +471,7 @@ class CompensationViewSet(ParcelChildViewSet):
     )
     def validate(self, request, pk=None):
         """Validasi oleh Ketua Pelaksana sebelum ganti kerugian dibayarkan."""
-        compensation = self.get_object()
+        compensation = self._locked_object()
         if compensation.status not in (enums.CompensationStatus.DETERMINED,):
             raise serializers.ValidationError(
                 _("Only determined compensation can be validated.")
@@ -490,7 +497,7 @@ class CompensationViewSet(ParcelChildViewSet):
     )
     def cancel(self, request, pk=None):
         """Batalkan ganti kerugian yang belum dibayar (wewenang Ketua Pelaksana)."""
-        compensation = self.get_object()
+        compensation = self._locked_object()
         if compensation.status not in (
             enums.CompensationStatus.DETERMINED,
             enums.CompensationStatus.VALIDATED,
@@ -517,7 +524,7 @@ class CompensationViewSet(ParcelChildViewSet):
         Setara dengan pembayaran untuk bentuk uang: hanya setelah divalidasi
         Ketua Pelaksana dan oleh peran yang boleh mencatat pembayaran.
         """
-        compensation = self.get_object()
+        compensation = self._locked_object()
         if compensation.form == enums.CompensationForm.MONEY:
             raise serializers.ValidationError(
                 _("Monetary compensation is settled by recording payments.")
@@ -572,15 +579,11 @@ class AcquisitionDocumentViewSet(FileDownloadMixin, ProjectScopedViewSet):
     search_fields = ("title", "number", "note")
 
     def get_queryset(self):
-        qs = super().get_queryset()
         # Pindaian KTP, sertipikat, bukti bayar dan semua dokumen milik pihak
-        # tertentu adalah data pribadi: daftar, detail dan unduhan disembunyikan
-        # dari yang tidak berhak melihat data pribadi.
-        if not self.request.user.has_perm("pengadaan.view_sensitive_personal_data"):
-            qs = qs.exclude(document_type__in=SENSITIVE_DOCUMENT_TYPES).filter(
-                party__isnull=True
-            )
-        return qs
+        # tertentu adalah data pribadi; laporan penilaian, berita acara
+        # musyawarah, putusan, dst. mengikuti izin lihat model sumbernya.
+        # Daftar, detail dan unduhan disembunyikan dari yang tidak berhak.
+        return visible_documents(super().get_queryset(), self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(uploaded_by=self.request.user)
@@ -609,7 +612,7 @@ class DeadlinesView(APIView):
         state = request.query_params.get("state")
         if state:
             items = [i for i in items if i.state == state]
-        return Response([i.as_dict() for i in items])
+        return Response([i.as_dict_for(request.user) for i in items])
 
 
 class DashboardView(APIView):
@@ -661,7 +664,7 @@ class DashboardView(APIView):
             or Decimal("0"),
             "deadlines_overdue": sum(1 for d in deadlines if d.state == "overdue"),
             "deadlines_due_soon": sum(1 for d in deadlines if d.state == "due_soon"),
-            "upcoming_deadlines": [d.as_dict() for d in deadlines[:10]],
+            "upcoming_deadlines": [d.as_dict_for(user) for d in deadlines[:10]],
         }
         # Nilai uang dan keberatan hanya untuk peran yang boleh melihatnya.
         if user.has_perm("pengadaan.view_compensation"):

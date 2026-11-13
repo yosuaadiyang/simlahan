@@ -124,11 +124,14 @@ def _land_transactions(user, start, end):
         )
 
 
-def _compensation_payments(start, end):
+def _compensation_payments(user, start, end):
+    from pengadaan.access import scope_queryset
     from pengadaan.models import CompensationPayment
 
-    queryset = CompensationPayment.objects.select_related(
-        "compensation__parcel__project"
+    # Pembatasan proyek yang sama dengan API & admin pengadaan.
+    queryset = scope_queryset(
+        CompensationPayment.objects.select_related("compensation__parcel__project"),
+        user,
     )
     if start:
         queryset = queryset.filter(paid_on__gte=start)
@@ -178,7 +181,7 @@ def ledger(user, start=None, end=None) -> dict:
     if user.has_perm("asetlahan.view_landtransaction"):
         entries.extend(_land_transactions(user, start, end))
     if user.has_perm("pengadaan.view_compensationpayment"):
-        entries.extend(_compensation_payments(start, end))
+        entries.extend(_compensation_payments(user, start, end))
     if user.has_perm("alokasi.view_invoice"):
         entries.extend(_allocation_invoices(start, end))
     entries.sort(key=lambda e: (e.date, e.source, e.number))

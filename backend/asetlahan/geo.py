@@ -114,6 +114,10 @@ def external_overlaps(asset, user=None):
         geometry__intersects=asset.geometry
     ).select_related("project")
     plots = LandPlot.objects.filter(geometry__intersects=asset.geometry)
+    if user is not None:
+        from pengadaan.access import scope_queryset
+
+        parcels = scope_queryset(parcels, user)
     if asset.pengadaan_parcel_id:
         parcels = parcels.exclude(pk=asset.pengadaan_parcel_id)
     if asset.alokasi_plot_id:
