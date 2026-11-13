@@ -16,7 +16,6 @@ import secrets
 import uuid
 
 from django.conf import settings
-from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.db import transaction
@@ -47,6 +46,7 @@ from dokumen.services import (
     require,
     user_agent,
 )
+from utils import ratelimit
 
 S = enums.SigningStatus
 OTP_TTL = datetime.timedelta(minutes=10)
@@ -890,16 +890,13 @@ def send_otp(recipient: DocumentRecipient, request=None) -> None:
         not recipient.in_person and bool(recipient.email),
         _("Penerima ini menandatangani langsung di hadapan petugas."),
     )
-    key = f"dokumen:otp:{recipient.pk}"
-    try:
-        sent = cache.get_or_set(key, 0, 3600)
-        require(
-            sent < OTP_SENDS_PER_HOUR,
-            _("Terlalu sering meminta kode. Coba lagi dalam satu jam."),
-        )
-        cache.incr(key)
-    except ValueError:
-        cache.set(key, 1, 3600)
+    # Atomik di basis data (get+set cache bisa dilewati permintaan serentak).
+    require(
+        not ratelimit.throttled(
+            f"dokumen:otp:{recipient.pk}", OTP_SENDS_PER_HOUR, 3600
+        ),
+        _("Terlalu sering meminta kode. Coba lagi dalam satu jam."),
+    )
     code = f"{secrets.randbelow(10**6):06d}"
     recipient.otp_hash = _otp_digest(recipient, code)
     recipient.otp_expires_at = timezone.now() + OTP_TTL

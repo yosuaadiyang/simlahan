@@ -13,7 +13,6 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.core.cache import cache
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
 from django.db import transaction
@@ -67,6 +66,7 @@ from alokasi.models import (
 )
 from alokasi.monitoring import report_deadline
 from file_operations.errors import FileScanError, FileScanPendingError, FileUnsafeError
+from utils import ratelimit
 from utils.client_ip import client_ip
 
 User = get_user_model()
@@ -102,16 +102,14 @@ def _absolute_url(request, path: str) -> str:
 
 
 def _throttled(request, scope: str, limit: int = 10, window: int = 60) -> bool:
-    """Batasi percobaan per alamat IP (masuk, daftar, lupa sandi)."""
-    key = f"alokasi:throttle:{scope}:{_client_ip(request)}"
-    try:
-        count = cache.get_or_set(key, 0, window)
-        if count >= limit:
-            return True
-        cache.incr(key)
-    except ValueError:
-        cache.set(key, 1, window)
-    return False
+    """Batasi percobaan per alamat IP (masuk, daftar, lupa sandi).
+
+    Dihitung atomik di basis data (utils.ratelimit): ``incr`` DatabaseCache
+    adalah get+set, sehingga permintaan serentak bisa melewati batas.
+    """
+    return ratelimit.throttled(
+        f"alokasi:throttle:{scope}:{_client_ip(request)}", limit, window
+    )
 
 
 def _too_many(request):

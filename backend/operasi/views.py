@@ -143,15 +143,10 @@ def _errors(error: ValidationError) -> dict:
 
 
 def _throttled(key: str, limit: int, seconds: int) -> bool:
-    # get_or_set + incr agar dua request bersamaan tidak kehilangan hitungan.
-    try:
-        count = cache.get_or_set(key, 0, seconds)
-        if count >= limit:
-            return True
-        cache.incr(key)
-    except ValueError:
-        cache.set(key, 1, seconds)
-    return False
+    # Atomik di basis data (utils.ratelimit); incr DatabaseCache adalah get+set.
+    from utils import ratelimit
+
+    return ratelimit.throttled(key, limit, seconds)
 
 
 # --------------------------------------------------------------------------

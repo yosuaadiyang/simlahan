@@ -247,6 +247,23 @@ def _spend_nik_conflict(user) -> None:
         )
 
 
+def _charge_nik_conflicts(rows, user, residents) -> None:
+    """Ambil jatah NIK untuk setiap NIK yang terdata di luar wilayah kerja
+    *sebelum* transaksi impor. Penghitung jatah tersimpan di basis data; bila
+    diambil di dalam transaksi impor yang lalu dibatalkan karena jatah habis,
+    hitungannya ikut dibatalkan sehingga impor bisa diulang tanpa batas."""
+    for props, _point in rows:
+        nik = "".join(ch for ch in _prop(props, NIK) if ch.isdigit())
+        if len(nik) != 16:
+            continue
+        key = fingerprint(nik)
+        if (
+            not residents.filter(nik_fingerprint=key).exists()
+            and Resident.objects.filter(nik_fingerprint=key).exists()
+        ):
+            _spend_nik_conflict(user)
+
+
 def _resident_for_row(props: dict, user, residents):
     """Warga yang diperbarui (NIK sama di wilayah kerja) atau warga baru.
 
@@ -264,7 +281,7 @@ def _resident_for_row(props: dict, user, residents):
         key = fingerprint(nik)
         resident = residents.filter(nik_fingerprint=key).first()
         if resident is None and Resident.objects.filter(nik_fingerprint=key).exists():
-            _spend_nik_conflict(user)
+            # Jatahnya sudah diambil sebelum transaksi (_charge_nik_conflicts).
             raise RowSkipped(NIK_REJECTED)
         if (
             resident is not None
@@ -406,6 +423,7 @@ def import_residents(data: bytes, filename: str, *, user=None, korwil=None) -> d
         residents = Resident.objects.all()
     created = updated = 0
     errors = []
+    _charge_nik_conflicts(rows, user, residents)
     with transaction.atomic():
         for line, (props, point) in enumerate(rows, start=2):
             try:

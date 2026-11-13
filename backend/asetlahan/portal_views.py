@@ -5,7 +5,6 @@ import hmac
 
 from django.conf import settings
 from django.contrib import messages
-from django.core.cache import cache
 from django.db import IntegrityError, transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
@@ -17,6 +16,7 @@ from alokasi.views import _throttled, _too_many, applicant_required
 from asetlahan import enums, services
 from asetlahan.forms import BidForm, GrievanceCheckForm, GrievanceForm
 from asetlahan.models import Bid, Grievance, ModuleSettings, Tender
+from utils import ratelimit
 from utils.group_permissions import UserGroup
 
 SESSION_GRIEVANCE = "asetlahan_pengaduan_terakhir"
@@ -53,14 +53,11 @@ def _receipt_allowed(contact: str) -> bool:
     if not contact:
         return False
     digest = hashlib.sha256(contact.strip().lower().encode()).hexdigest()
-    key = f"aset:grievance-receipt:{digest}"
-    cache.add(key, 0, GRIEVANCE_RECEIPT_WINDOW)
-    try:
-        count = cache.incr(key)
-    except ValueError:
-        cache.set(key, 1, GRIEVANCE_RECEIPT_WINDOW)
-        count = 1
-    return count <= GRIEVANCE_RECEIPTS_PER_CONTACT
+    return ratelimit.consume(
+        f"aset:grievance-receipt:{digest}",
+        GRIEVANCE_RECEIPTS_PER_CONTACT,
+        GRIEVANCE_RECEIPT_WINDOW,
+    )
 
 
 def _notify_new_grievance(grievance: Grievance) -> None:

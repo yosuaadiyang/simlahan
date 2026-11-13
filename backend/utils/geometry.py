@@ -69,7 +69,11 @@ def kml_from_kmz(data: bytes) -> bytes:
         document = documents[0]
         if document.file_size > MAX_KML_BYTES:
             raise SpatialFileError("Isi KMZ terlalu besar (maksimal 100 MB).")
-        return archive.read(document)
+        try:
+            return archive.read(document)
+        except (zipfile.BadZipFile, EOFError, OSError, RuntimeError) as error:
+            # CRC salah, arsip terpotong, atau entri terenkripsi: 400, bukan 500.
+            raise SpatialFileError("Berkas KMZ rusak atau bukan arsip KMZ.") from error
 
 
 def read_kml_features(data: bytes, filename: str) -> list:

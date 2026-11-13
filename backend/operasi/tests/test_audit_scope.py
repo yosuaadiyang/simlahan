@@ -119,6 +119,12 @@ def test_resident_import_nik_oracle_shares_api_budget(coordinator, korwil, korwi
         import_residents(probe.encode(), "warga.csv", user=coordinator)
     assert not Resident.objects.filter(head_name__startswith="Uji").exists()
 
+    # Jatah yang terpakai tidak ikut dibatalkan bersama impor yang gagal:
+    # impor ulang dengan satu NIK konflik saja tetap ditolak.
+    retry = "nama,nik,korwil\n" + f"Uji ulang,{_nik(14)},A\nBaru lagi,{_nik(901)},A\n"
+    with pytest.raises(AssetImportError, match="terlalu banyak NIK"):
+        import_residents(retry.encode(), "warga.csv", user=coordinator)
+
 
 def test_performance_detail_limited_to_viewer_korwils(
     coordinator, field, korwil, korwil_b

@@ -10,8 +10,13 @@ from django.views.decorators.cache import never_cache
 
 from users import otp
 from users.models import LoginOTP
+from utils import ratelimit
 
 SESSION_TOKEN = "otp_session_token"
+# Batas tebakan per akun lintas kode (kirim ulang membuat kode baru dengan
+# jatah MAX_ATTEMPTS sendiri).
+OTP_POSTS_PER_WINDOW = 10
+OTP_WINDOW = 900
 
 
 def _next_url(request) -> str:
@@ -55,11 +60,16 @@ def officer_otp(request):
     if request.method == "POST" and request.POST.get("action") == "resend":
         error = _send(request)
     elif request.method == "POST":
-        if otp.verify(challenge, request.POST.get("code", "")):
+        if ratelimit.throttled(
+            f"users:otp-sesi:{request.user.pk}", OTP_POSTS_PER_WINDOW, OTP_WINDOW
+        ):
+            error = _("Terlalu banyak percobaan. Coba lagi beberapa menit lagi.")
+        elif otp.verify(challenge, request.POST.get("code", "")):
             request.session[otp.SESSION_KEY] = request.user.pk
             request.session.pop(SESSION_TOKEN, None)
             return redirect(next_url)
-        error = _("Kode OTP salah atau sudah kedaluwarsa.")
+        else:
+            error = _("Kode OTP salah atau sudah kedaluwarsa.")
     elif (
         challenge is None
         or challenge.used_at is not None

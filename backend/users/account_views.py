@@ -9,11 +9,11 @@ import functools
 from django.contrib import admin
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
-from django.core.cache import cache
 from django.shortcuts import redirect, render
 from django.views.decorators.cache import never_cache
 
 from users import role_guide
+from utils import ratelimit
 
 # Batas salah sandi lama per akun, agar sesi yang tertinggal terbuka tidak
 # bisa dipakai menebak sandi.
@@ -69,21 +69,27 @@ def guide(request):
 def change_password(request):
     user = request.user
     key = f"akun-sandi-gagal:{user.pk}"
-    blocked = cache.get(key, 0) >= MAX_FAILED_ATTEMPTS
+    # Setiap percobaan memesan satu jatah secara atomik di basis data sebelum
+    # sandi lama diperiksa (get+set cache bisa dilewati permintaan serentak);
+    # jatah dikembalikan bila galatnya bukan sandi lama.
+    blocked = ratelimit.failures(key) >= MAX_FAILED_ATTEMPTS
     form = PasswordChangeForm(user, request.POST or None)
     done = False
+    if request.method == "POST":
+        blocked = ratelimit.throttled(key, MAX_FAILED_ATTEMPTS, FAILED_WINDOW_SECONDS)
     if request.method == "POST" and not blocked:
         if form.is_valid():
             form.save()
             # Kredensial API lama dicabut oleh sinyal ganti sandi
             # (users.signals); sesi peramban ini dipertahankan.
             update_session_auth_hash(request, user)
-            cache.delete(key)
+            ratelimit.reset(key)
             done = True
             form = None
         elif "old_password" in form.errors:
-            cache.set(key, cache.get(key, 0) + 1, FAILED_WINDOW_SECONDS)
-            blocked = cache.get(key, 0) >= MAX_FAILED_ATTEMPTS
+            blocked = ratelimit.failures(key) >= MAX_FAILED_ATTEMPTS
+        else:
+            ratelimit.refund(key)
     return render(
         request,
         "users/sandi.html",
