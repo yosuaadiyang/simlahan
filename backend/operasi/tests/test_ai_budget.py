@@ -38,9 +38,7 @@ def test_daily_report_compose_falls_back_when_budget_spent(
     assert len(ai_enabled) == 1
 
 
-def test_komsos_stance_not_scheduled_when_budget_spent(
-    field, ai_enabled, monkeypatch
-):
+def test_komsos_stance_not_scheduled_when_budget_spent(field, ai_enabled, monkeypatch):
     scheduled = []
     monkeypatch.setattr(
         services.transaction, "on_commit", lambda fn: scheduled.append(fn)
