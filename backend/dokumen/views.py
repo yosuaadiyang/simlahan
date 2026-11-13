@@ -276,6 +276,14 @@ def template_download(request, pk):
     template = record.permit_type.template
     if template is None or not template.is_active:
         raise Http404
+    if template.confidentiality == enums.Confidentiality.SECRET:
+        # Unduhan tanpa persetujuan hanya untuk format biasa; format rahasia
+        # diminta lewat petugas.
+        messages.error(
+            request,
+            _("Format dokumen ini bersifat rahasia. Hubungi petugas untuk salinannya."),
+        )
+        return redirect("dokumen_portal:land_use", number=record.land_use.number)
     try:
         data, filename = services.render_template(template, record=record)
     except (merge.TemplateRenderError, OSError):
@@ -594,6 +602,8 @@ def _sign_check_code(request, recipient):
 
 
 def _sign_comment(request, recipient):
+    if recipient.document.status not in enums.OPEN_SIGNING_STATUSES:
+        raise ValidationError(_("Dokumen ini sudah ditutup; komentar tidak diterima."))
     form = CommentForm(request.POST)
     if not form.is_valid():
         return {"comment_form": form}

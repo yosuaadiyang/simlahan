@@ -58,8 +58,21 @@ def _is_staff_user(user) -> bool:
     return bool(user.is_staff and access.applicant_of(user) is None)
 
 
+def effective_confidentiality(dl: DownloadRequest) -> str:
+    """Sifat dokumen untuk keputusan: RAHASIA bila saat diminta atau saat ini
+    dokumennya rahasia (sifat dapat dinaikkan setelah permintaan dibuat)."""
+    current = (
+        dl.version.record.permit_type.confidentiality
+        if dl.version_id
+        else dl.signing.confidentiality
+    )
+    if enums.Confidentiality.SECRET in (dl.confidentiality, current):
+        return enums.Confidentiality.SECRET
+    return dl.confidentiality
+
+
 def can_decide(user, dl: DownloadRequest) -> bool:
-    if not user.has_perm(access.approver_permission(dl.confidentiality)):
+    if not user.has_perm(access.approver_permission(effective_confidentiality(dl))):
         return False
     return dl.requester_id != user.pk or DocumentSettings.load().allow_self_approval
 
@@ -277,6 +290,18 @@ def consume(dl: DownloadRequest, user, request=None) -> tuple[bytes, str, str, b
         require(
             access.can_request_download(user, version=version, signing=signing),
             _("Anda tidak lagi berhak atas dokumen ini."),
+        )
+        # Dokumen yang dinaikkan menjadi RAHASIA setelah permintaan disetujui
+        # pejabat biasa harus disetujui ulang oleh pejabat penyetuju rahasia.
+        current = (
+            version.record.permit_type.confidentiality
+            if version is not None
+            else signing.confidentiality
+        )
+        require(
+            current != enums.Confidentiality.SECRET
+            or dl.confidentiality == enums.Confidentiality.SECRET,
+            _("Dokumen ini kini bersifat rahasia. Ajukan permintaan unduh baru."),
         )
         fieldfile, filename = _source(dl)
         data = read_file(fieldfile)

@@ -12,6 +12,7 @@ from django.template.response import TemplateResponse
 from django.urls import path, reverse
 from django.utils import timezone
 from django.utils.html import format_html
+from django.utils.http import content_disposition_header
 from django.utils.translation import gettext_lazy as _
 
 from alokasi.templatetags.alokasi_tags import angka
@@ -459,7 +460,9 @@ class DocumentTemplateAdmin(admin.ModelAdmin):
                 filename.rsplit(".", 1)[-1], "application/octet-stream"
             ),
         )
-        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        response["Content-Disposition"] = content_disposition_header(
+            as_attachment=True, filename=filename
+        )
         response["X-Content-Type-Options"] = "nosniff"
         response["Cache-Control"] = "private, no-store"
         return response
@@ -2194,10 +2197,14 @@ class DownloadRequestAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
         user = request.user
-        if user.has_perm("dokumen.approve_downloadrequest") or user.has_perm(
-            "dokumen.approve_confidential_download"
-        ):
+        if user.has_perm("dokumen.approve_confidential_download"):
             return queryset
+        if user.has_perm("dokumen.approve_downloadrequest"):
+            # Alasan & data permintaan dokumen rahasia hanya untuk pejabat
+            # penyetuju rahasia (sama dengan downloads.pending_for).
+            return queryset.exclude(
+                Q(confidentiality=enums.Confidentiality.SECRET) & ~Q(requester=user)
+            )
         return queryset.filter(requester=user)
 
     def has_add_permission(self, request):
