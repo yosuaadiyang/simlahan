@@ -1,9 +1,11 @@
 """Halaman portal publik modul aset lahan: pengaduan masyarakat dan lelang lahan."""
 
+import hashlib
 import hmac
 
 from django.conf import settings
 from django.contrib import messages
+from django.core.cache import cache
 from django.db import IntegrityError, transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
@@ -40,20 +42,43 @@ def _check_url() -> str:
     return services.app_url(reverse("aset_portal:grievance_check"))
 
 
+# Tanda terima ke kontak pelapor: paling banyak sekian per alamat/nomor per hari.
+# Kontak diisi pengunjung anonim tanpa verifikasi, jadi tanpa batas ini formulir
+# bisa dipakai menyurati/WA nomor orang lain berulang kali atas nama instansi.
+GRIEVANCE_RECEIPTS_PER_CONTACT = 3
+GRIEVANCE_RECEIPT_WINDOW = 24 * 3600
+
+
+def _receipt_allowed(contact: str) -> bool:
+    if not contact:
+        return False
+    digest = hashlib.sha256(contact.strip().lower().encode()).hexdigest()
+    key = f"aset:grievance-receipt:{digest}"
+    cache.add(key, 0, GRIEVANCE_RECEIPT_WINDOW)
+    try:
+        count = cache.incr(key)
+    except ValueError:
+        cache.set(key, 1, GRIEVANCE_RECEIPT_WINDOW)
+        count = 1
+    return count <= GRIEVANCE_RECEIPTS_PER_CONTACT
+
+
 def _notify_new_grievance(grievance: Grievance) -> None:
+    # Tanda terima hanya memuat teks tetap: perihal yang diketik pengunjung
+    # tidak ikut dikirim agar formulir tidak bisa dipakai menitipkan pesan
+    # (mis. tautan penipuan) lewat surel/WA resmi instansi.
     body = _(
-        "Pengaduan Anda telah kami terima.\n\nNomor: %(number)s\nKode akses: %(code)s\nPerihal: %(subject)s\n"
+        "Pengaduan Anda telah kami terima.\n\nNomor: %(number)s\nKode akses: %(code)s\n"
         "Batas penyelesaian: %(due)s\n\nCek perkembangannya di %(url)s"
     ) % {
         "number": grievance.number,
         "code": grievance.access_code,
-        "subject": grievance.subject,
         "due": grievance.due_date.strftime("%d-%m-%Y") if grievance.due_date else "-",
         "url": _check_url(),
     }
     services.notify_contact(
-        email=grievance.email,
-        phone=grievance.phone,
+        email=grievance.email if _receipt_allowed(grievance.email) else "",
+        phone=grievance.phone if _receipt_allowed(grievance.phone) else "",
         subject=_("Pengaduan %s diterima") % grievance.number,
         body=body,
     )

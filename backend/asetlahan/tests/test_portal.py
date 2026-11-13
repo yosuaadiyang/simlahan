@@ -225,3 +225,48 @@ def test_awarded_tender_shows_winner(client, open_tender):
         reverse("aset_portal:tender_detail", args=[open_tender.number])
     ).content.decode()
     assert "PT Pemenang" in page
+
+
+def _submit_grievance(client, captured, _ip="203.0.113.1", **extra):
+    with captured(execute=True):
+        response = client.post(
+            reverse("aset_portal:grievance_create"),
+            _grievance_payload(**extra),
+            REMOTE_ADDR=_ip,
+        )
+    assert response.status_code == 302
+
+
+def test_grievance_receipt_does_not_carry_caller_text(
+    client, seeded, django_capture_on_commit_callbacks
+):
+    _submit_grievance(
+        client,
+        django_capture_on_commit_callbacks,
+        email="korban@example.id",
+        subject="Klik https://penipu.invalid untuk hadiah",
+    )
+    receipt = [m for m in mail.outbox if "korban@example.id" in m.to]
+    assert len(receipt) == 1
+    assert "penipu.invalid" not in receipt[0].body
+    assert "penipu.invalid" not in receipt[0].subject
+    assert Grievance.objects.get().access_code in receipt[0].body
+
+
+def test_grievance_receipts_capped_per_contact(
+    client, seeded, django_capture_on_commit_callbacks, settings
+):
+    settings.WHATSAPP_TOKEN = ""
+    for index in range(5):
+        # Alamat IP berbeda tiap kali: batas per IP tidak membantu di sini.
+        _submit_grievance(
+            client,
+            django_capture_on_commit_callbacks,
+            email="korban@example.id",
+            _ip=f"203.0.113.{index + 10}",
+        )
+    # Semua pengaduan tetap tersimpan, tetapi tanda terima ke alamat yang sama
+    # dibatasi.
+    assert Grievance.objects.count() == 5
+    receipts = [m for m in mail.outbox if "korban@example.id" in m.to]
+    assert len(receipts) == 3
