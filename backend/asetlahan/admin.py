@@ -1738,9 +1738,12 @@ class TaskAdmin(AsetModelAdmin):
         previous = previous.first()
         if (
             obj.status == enums.TaskStatus.DONE
-            and self.task_role(request) != "full"
             and task_flow.worker_id(obj) == request.user.pk
         ):
+            # Penerima tugas tidak pernah memverifikasi pekerjaannya sendiri
+            # (task_flow.can_verify) — termasuk peran "full": tanpa ini,
+            # petugas berperan penuh bisa membuat tugas poin besar untuk
+            # dirinya sendiri, menandai selesai, dan poin langsung masuk.
             obj.status = enums.TaskStatus.REPORTED
             self.message_user(
                 request,

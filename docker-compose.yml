@@ -14,6 +14,10 @@ x-backend: &backend
     DATABASE_URL: postgis://${POSTGRES_USER:-simlahan}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-simlahan}
     PRIVATE_FILES_LOCATION: /app/private_files
     MEDIA_ROOT: /app/media
+    # Hanya benar selama satu-satunya pintu masuk adalah kontainer frontend
+    # (nginx) yang menambahkan alamat klien ke X-Forwarded-For. Jangan
+    # publikasikan port backend (8080) ke luar tanpa proxy tepercaya:
+    # semua pembatasan percobaan per-IP dan is_secure() jadi bisa dipalsukan.
     TRUST_PROXY_HEADERS: "true"
   volumes:
     - private_files:/app/private_files
@@ -30,7 +34,9 @@ x-backend: &backend
 
 services:
   db:
-    image: postgis/postgis:16-3.4
+    # Digest dipin agar build server instansi selalu menarik bit yang sama
+    # (tag bisa diarahkan ulang hulu). Perbarui digest saat naik versi.
+    image: postgis/postgis:16-3.4@sha256:44126d872ac91993766c341e369c539e8196614321765d36a6f1bab0419a5fa5
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-simlahan}
       POSTGRES_USER: ${POSTGRES_USER:-simlahan}
@@ -97,6 +103,12 @@ services:
     depends_on:
       backend:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:8080/healthz || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     restart: unless-stopped
     logging:
       driver: json-file

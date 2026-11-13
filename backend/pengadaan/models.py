@@ -11,6 +11,7 @@ from decimal import Decimal
 from auditlog.registry import auditlog
 from django.conf import settings
 from django.contrib.gis.db import models as gmodels
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
@@ -1191,6 +1192,27 @@ class CompensationPayment(TimeStampedModel):
         verbose_name_plural = pgettext_lazy("Model name", "Compensation payments")
         ordering = ["compensation", "paid_on", "id"]
 
+    def clean(self):
+        # Pintu yang sama dengan API (CompensationPaymentSerializer): tanpa ini,
+        # form admin dapat mencatat pembayaran atas ganti rugi yang belum
+        # divalidasi Ketua Pelaksana lalu signal memflip statusnya jadi PAID.
+        if self.compensation_id:
+            comp_status = self.compensation.status
+            if comp_status not in (
+                enums.CompensationStatus.VALIDATED,
+                enums.CompensationStatus.PAID,
+            ):
+                raise ValidationError(
+                    _("Compensation must be validated before it can be paid.")
+                )
+            if self.amount is not None:
+                already = sum(
+                    (p.amount for p in self.compensation.payments.exclude(pk=self.pk)),
+                    Decimal(0),
+                )
+                if already + self.amount > self.compensation.amount:
+                    raise ValidationError(_("Payments exceed the compensation amount."))
+
 
 class RightsRelease(TimeStampedModel):
     """Pelepasan hak objek pengadaan tanah."""
@@ -1222,6 +1244,20 @@ class RightsRelease(TimeStampedModel):
         verbose_name = pgettext_lazy("Model name", "Rights release")
         verbose_name_plural = pgettext_lazy("Model name", "Rights releases")
         ordering = ["parcel", "-released_on"]
+
+    def clean(self):
+        # Sama seperti API: hak hanya boleh dilepas setelah seluruh ganti rugi
+        # bidang lunas atau dikonsinyasikan ke pengadilan.
+        if self.pk is None and self.parcel_id:
+            from pengadaan.status import is_parcel_settled
+
+            if not is_parcel_settled(self.parcel):
+                raise ValidationError(
+                    _(
+                        "Rights can only be released after all compensation of "
+                        "the parcel has been paid or consigned to the court."
+                    )
+                )
 
     @property
     def handover_deadline(self) -> datetime.date | None:

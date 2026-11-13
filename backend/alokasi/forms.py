@@ -434,7 +434,7 @@ class TrackApplicationForm(forms.Form):
     number = forms.CharField(label=_("Nomor permohonan"), max_length=32)
     pin = forms.CharField(
         label=_("PIN pelacakan"),
-        max_length=12,
+        max_length=20,
         help_text=_("PIN tercantum pada halaman permohonan Anda di portal."),
     )
 
@@ -546,6 +546,11 @@ class ContactForm(forms.Form):
         if digits < 8 or any(c not in "0123456789+-() " for c in phone):
             raise forms.ValidationError(_("Nomor telepon tidak valid."))
         return phone
+
+    def clean_subject(self):
+        # CRLF pada subjek ditolak Django (BadHeaderError) sehingga notifikasi
+        # petugas hilang diam-diam; normalisasikan menjadi satu baris.
+        return " ".join(self.cleaned_data["subject"].split())
 
 
 # --------------------------------------------------------------------------

@@ -1794,7 +1794,7 @@ class Grievance(TimeStampedModel):
     number = models.CharField(
         _("Nomor pengaduan"), max_length=32, unique=True, editable=False
     )
-    access_code = models.CharField(_("Kode akses"), max_length=12, editable=False)
+    access_code = models.CharField(_("Kode akses"), max_length=20, editable=False)
     channel = models.CharField(
         _("Saluran"),
         max_length=16,
@@ -1886,7 +1886,9 @@ class Grievance(TimeStampedModel):
         if not self.access_code:
             import secrets
 
-            self.access_code = secrets.token_hex(4).upper()
+            # 16 karakter acak (64 bit): nomor pengaduan sekuensial, jadi kode
+            # akses adalah satu-satunya rahasia halaman cek publik.
+            self.access_code = secrets.token_hex(8).upper()
         if self.due_date is None:
             days = (
                 self.category.sla_days

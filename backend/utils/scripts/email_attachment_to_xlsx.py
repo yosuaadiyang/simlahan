@@ -53,7 +53,8 @@ else:
 attachment_bytes = base64.b64decode(attachment_base64)
 
 # Write to xlsx
-output_path = f"./{attachment_filename}"
+# Nama berkas dari surel bisa memuat jalur relatif; ambil nama berkasnya saja.
+output_path = f"./{os.path.basename(attachment_filename)}"
 with open(output_path, "wb") as output_file:
     output_file.write(attachment_bytes)
 

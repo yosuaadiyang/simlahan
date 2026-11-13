@@ -47,7 +47,7 @@ def test_backfill_tracking_pin_for_old_applications(filled_application):
 
     module.backfill(django_apps, _Editor())
     filled_application.refresh_from_db()
-    assert len(filled_application.tracking_pin) == 8
+    assert len(filled_application.tracking_pin) == 16
 
 
 @pytest.mark.parametrize(

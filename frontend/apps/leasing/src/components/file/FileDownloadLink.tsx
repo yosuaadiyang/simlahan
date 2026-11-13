@@ -4,13 +4,8 @@ import { saveAs } from "file-saver";
 import classNames from "classnames";
 import Loader from "@/components/loader/Loader";
 import LoaderWrapper from "@/components/loader/LoaderWrapper";
-import { displayUIMessage, getFileNameFromResponse } from "@/util/helpers";
+import { displayUIMessage, escapeHtml, getFileNameFromResponse } from "@/util/helpers";
 import { getApiToken } from "@/auth/selectors";
-
-// @ts-ignore
-const pdfPolicy = window.trustedTypes?.createPolicy("pdf-policy", {
-  createHTML: (string: string) => string,
-});
 
 type Props = {
   apiToken: string;
@@ -80,14 +75,11 @@ class FileDownloadLink extends PureComponent<Props, State> {
             const fileBlob = new Blob([blob], { type: contentType });
             const fileUrl = URL.createObjectURL(fileBlob);
             const title = fileNameProp ? fileNameProp : label;
-            const htmlContent = `<html><head><meta charset="UTF-8" /><title>${title}</title></head><body style="margin:0;"><embed src="${fileUrl}" type="${contentType}" width="100%" height="100%"></body></html>`;
+            // Nama berkas bisa berasal dari unggahan pengguna: di-escape agar
+            // tidak bisa keluar dari atribut title/type pada blob HTML ini.
+            const htmlContent = `<html><head><meta charset="UTF-8" /><title>${escapeHtml(title)}</title></head><body style="margin:0;"><embed src="${fileUrl}" type="${escapeHtml(contentType)}" width="100%" height="100%"></body></html>`;
 
-            let htmlString: string | any = htmlContent;
-            if (pdfPolicy) {
-              htmlString = pdfPolicy.createHTML(htmlContent);
-            }
-
-            const htmlBlob = new Blob([htmlString], { type: "text/html" });
+            const htmlBlob = new Blob([htmlContent], { type: "text/html" });
             const htmlUrl = URL.createObjectURL(htmlBlob);
 
             window.open(htmlUrl, "_blank");

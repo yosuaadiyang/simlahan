@@ -55,8 +55,10 @@ def integrityerror_exception_handler(exc, context):
     response = exception_handler(exc, context)
 
     if isinstance(exc, IntegrityError) and not response:
+        # Detail basis data (nama constraint, nilai penabrak) tidak diikutkan:
+        # tidak boleh bocor ke klien API.
         response = Response(
-            {"detail": _("Data integrity error"), "error": str(exc)},
+            {"detail": _("Data integrity error")},
             status=status.HTTP_400_BAD_REQUEST,
         )
 

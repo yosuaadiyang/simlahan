@@ -37,7 +37,7 @@ def test_numbers_are_sequential_per_prefix(seeded):
     year = timezone.localdate().year
     assert first.number == f"ADU-{year}-0001"
     assert second.number == f"ADU-{year}-0002"
-    assert len(first.access_code) == 8 and first.access_code != second.access_code
+    assert len(first.access_code) == 16 and first.access_code != second.access_code
 
 
 def test_grievance_due_date_uses_category_sla_then_module_setting(seeded):

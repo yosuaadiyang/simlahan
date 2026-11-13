@@ -11,11 +11,14 @@ Jika kosong (hanya untuk pengembangan), kunci diturunkan dari SECRET_KEY.
 import base64
 import hashlib
 import hmac
+import logging
 from functools import lru_cache
 
 from cryptography.fernet import Fernet, InvalidToken
 from django.conf import settings
 from django.db import models
+
+LOG = logging.getLogger(__name__)
 
 PREFIX = "enc$"
 
@@ -24,6 +27,11 @@ PREFIX = "enc$"
 def _fernet() -> Fernet:
     key = getattr(settings, "FIELD_ENCRYPTION_KEY", "") or ""
     if not key:
+        LOG.warning(
+            "FIELD_ENCRYPTION_KEY kosong: kunci diturunkan dari SECRET_KEY "
+            "(mode pengembangan; di produksi settings menolak menjalankan). "
+            "Rotasi SECRET_KEY membuat data terenkripsi lama tidak terbaca."
+        )
         digest = hashlib.sha256(
             ("field-encryption:" + settings.SECRET_KEY).encode()
         ).digest()

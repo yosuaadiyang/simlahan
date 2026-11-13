@@ -17,6 +17,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 
 from asetlahan import enums, scope
+from utils.spreadsheet import neutralize_formula
 
 
 @dataclass
@@ -576,8 +577,10 @@ def table_response(title: str, headers, data, fmt: str):
 def _csv(filename, headers, data):
     buffer = io.StringIO()
     writer = csv.writer(buffer, delimiter=";")
-    writer.writerow(headers)
-    writer.writerows(data)
+    # Anti injeksi rumus: sel teks berawalan =, +, -, @ dinetralkan karena
+    # data bisa berisi masukan pihak luar (form pengaduan/lelang publik).
+    writer.writerow([neutralize_formula(h) for h in headers])
+    writer.writerows([[neutralize_formula(v) for v in row] for row in data])
     response = HttpResponse(
         "﻿" + buffer.getvalue(), content_type="text/csv; charset=utf-8"
     )
@@ -597,6 +600,11 @@ def xlsx_bytes(title, headers, data) -> bytes:
         sheet.set_column(col, col, max(12, min(40, len(header) + 4)))
     for row_index, row in enumerate(data, start=1):
         for col, value in enumerate(row):
+            if isinstance(value, str):
+                # write() polimorfik mengubah teks berawalan '=' menjadi
+                # rumus hidup; teks selalu ditulis sebagai string.
+                sheet.write_string(row_index, col, value[:32_000])
+                continue
             if isinstance(value, Decimal):
                 # Excel menyimpan angka sebagai float (15 digit); nilai lebih
                 # besar ditulis sebagai teks agar tidak berubah.

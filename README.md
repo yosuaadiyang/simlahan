@@ -61,7 +61,7 @@ integrasi khusus Kota Helsinki. Lihat [NOTICE.md](NOTICE.md).
 Prasyarat: Docker 24+ dengan Compose v2, akses internet saat build.
 
 ```bash
-./scripts/setup-env.sh          # membuat .env + rahasia acak, menampilkan sandi admin
+./scripts/setup-env.sh          # membuat .env + rahasia acak; sandi admin dibaca di .env (DJANGO_SUPERUSER_PASSWORD)
 # sesuaikan .env: ORGANIZATION_NAME, ALLOWED_HOSTS, CSRF_TRUSTED_ORIGINS, peta, SMTP
 docker compose up -d --build
 ```

@@ -75,7 +75,7 @@ class GrievanceForm(forms.ModelForm):
 
 class GrievanceCheckForm(forms.Form):
     number = forms.CharField(label=_("Nomor pengaduan"), max_length=32)
-    access_code = forms.CharField(label=_("Kode akses"), max_length=12)
+    access_code = forms.CharField(label=_("Kode akses"), max_length=20)
 
     def clean_number(self):
         return self.cleaned_data["number"].strip().upper()

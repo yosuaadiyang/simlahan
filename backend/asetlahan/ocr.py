@@ -195,9 +195,16 @@ def tesseract_available() -> bool:
 
 def _image_text(data: bytes) -> str:
     import pytesseract
-    from PIL import Image
+    from PIL import Image, ImageOps
 
     with Image.open(io.BytesIO(data)) as image:
+        # Batasi piksel dekode: PNG 25 MB bisa memuat ~179 juta piksel
+        # (~1 GB RAM + menit CPU per dokumen). 20 MP cukup untuk dokumen
+        # terpindai; yang lebih besar diperkecil dulu (pola
+        # operasi.tools.prepare_image).
+        image = ImageOps.exif_transpose(image)
+        if image.width * image.height > 20_000_000:
+            image.thumbnail((4472, 4472))
         return pytesseract.image_to_string(image, lang=settings.OCR_LANGUAGES)
 
 

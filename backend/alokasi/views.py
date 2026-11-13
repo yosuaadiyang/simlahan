@@ -3,7 +3,7 @@
 import json
 import mimetypes
 import os
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 from functools import wraps
 from urllib.parse import urlencode
 
@@ -574,7 +574,9 @@ def uwt_calculator(request):
         plot = form.cleaned_data["plot"]
         area = form.cleaned_data["area_m2"]
         years = form.cleaned_data["years"]
-        total = (area * plot.uwt_rate_per_m2_year * years).quantize(Decimal("1"))
+        total = (area * plot.uwt_rate_per_m2_year * years).quantize(
+            Decimal("1"), rounding=ROUND_HALF_UP
+        )
         result = {
             "plot": plot,
             "area_m2": area,
@@ -582,7 +584,9 @@ def uwt_calculator(request):
             "rate": plot.uwt_rate_per_m2_year,
             "uwt_total": total,
             "admin_fee": config.allocation_admin_fee,
-            "grand_total": (total + config.allocation_admin_fee).quantize(Decimal("1")),
+            "grand_total": (total + config.allocation_admin_fee).quantize(
+                Decimal("1"), rounding=ROUND_HALF_UP
+            ),
         }
     return render(
         request,

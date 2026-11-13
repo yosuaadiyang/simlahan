@@ -24,7 +24,8 @@ jobs:
 
     services:
       db:
-        image: postgis/postgis:16-3.4
+        # Digest dipin (tag bisa diarahkan ulang hulu); perbarui saat naik versi.
+        image: postgis/postgis:16-3.4@sha256:44126d872ac91993766c341e369c539e8196614321765d36a6f1bab0419a5fa5
         env:
           POSTGRES_DB: simlahan
           POSTGRES_USER: simlahan
@@ -45,14 +46,14 @@ jobs:
       FIELD_ENCRYPTION_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Install GDAL, GEOS, PROJ and gettext
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends gdal-bin libgdal-dev gettext tesseract-ocr
 
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
         with:
           python-version: "3.12"
           cache: pip
@@ -114,9 +115,9 @@ jobs:
       COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version-file: frontend/.nvmrc
           # Yarn cache is handled below, after Corepack provides yarn 4.
@@ -129,7 +130,7 @@ jobs:
         id: yarn-cache
         run: echo "dir=$(yarn config get cacheFolder)" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/cache@v6
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: ${{ steps.yarn-cache.outputs.dir }}
           key: yarn-${{ runner.os }}-${{ hashFiles('frontend/yarn.lock') }}
@@ -146,7 +147,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       # Sama seperti server produksi: DEBUG=0, cookie aman, port hanya di
       # 127.0.0.1 di belakang reverse proxy HTTPS (2 proxy di depan backend).

@@ -150,6 +150,12 @@ if env("DATABASE_PASSWORD"):
 
 
 CACHES = {"default": env.cache()}
+# Pembatas percobaan masuk/daftar/reset memakai cache default. Tanpa MAX_ENTRIES
+# yang besar, DBCache (bawaan 300 entri) dapat menghapus penghitung lockout
+# yang masih aktif saat tabel dipenuhi kunci lain (mis. semburan nama akun).
+CACHES["default"].setdefault("OPTIONS", {})
+CACHES["default"]["OPTIONS"].setdefault("MAX_ENTRIES", 100_000)
+CACHES["default"]["OPTIONS"].setdefault("CULL_FREQUENCY", 10)
 
 # Tanpa konfigurasi ini, saat DEBUG=0 Django hanya mengirim traceback galat 500
 # lewat surel ke ADMINS (biasanya kosong), sehingga galat produksi hilang tanpa

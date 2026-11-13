@@ -15,7 +15,7 @@ from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from alokasi.templatetags.alokasi_tags import angka
-from dokumen import downloads, enums, merge, services, signing
+from dokumen import downloads, enums, merge, pdf, services, signing
 from dokumen.forms import (
     BulkSendForm,
     ContentBlockForm,
@@ -2032,21 +2032,35 @@ class SigningDocumentAdmin(admin.ModelAdmin):
         if not self.has_view_permission(request, field.document) or not field.file:
             raise PermissionDenied
         data = services.read_file(field.file)
+        filename = field.file_name or "berkas"
+        # Pratinjau (bukan unduhan penuh): PDF pindaian KTP penerima diberi
+        # tanda air identitas petugas dan tercatat sebagai pratinjau, sama
+        # seperti pratinjau versi izin — selaras kebijakan modul bahwa tidak
+        # ada unduhan tanpa persetujuan.
+        extension = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+        if extension == "pdf":
+            try:
+                stamp = timezone.localtime().strftime("%d-%m-%Y %H.%M")
+                data = pdf.watermark(
+                    data,
+                    [_("PRATINJAU"), f"{request.user.get_username()} · {stamp}"],
+                )
+            except pdf.PdfReadError:
+                pass
         downloads.log_preview(
             request.user,
             signing=field.document,
-            filename=field.file_name,
+            filename=filename,
             data=data,
             request=request,
-            preview=False,
+            preview=True,
         )
         import mimetypes
 
         return file_response(
             data,
-            field.file_name or "berkas",
-            mimetypes.guess_type(field.file_name or "")[0]
-            or "application/octet-stream",
+            filename,
+            mimetypes.guess_type(filename)[0] or "application/octet-stream",
         )
 
 

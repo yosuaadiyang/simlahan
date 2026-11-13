@@ -38,6 +38,7 @@ from operasi.models import (
     SosAlert,
     ThreatZone,
 )
+from utils.spreadsheet import neutralize_formula
 
 Stance = enums.Stance
 ControlStatus = enums.ControlStatus
@@ -695,7 +696,13 @@ def overlap_csv(data: dict) -> str:
         [data["a"]["name"], data["b"]["name"], _("Luas tumpang tindih (ha)")]
     )
     for row in data["pairs"]:
-        writer.writerow([row["a"], row["b"], row["area_ha"]])
+        writer.writerow(
+            [
+                neutralize_formula(row["a"]),
+                neutralize_formula(row["b"]),
+                neutralize_formula(row["area_ha"]),
+            ]
+        )
     writer.writerow([])
     writer.writerow([_("Total tumpang tindih (ha)"), data["overlap_ha"]])
     return buffer.getvalue()
@@ -812,15 +819,15 @@ def audit_csv(data: dict) -> str:
         center = row["center"] or ["", ""]
         writer.writerow(
             [
-                row["number"],
-                row["name"],
-                row["korwil"],
-                row["recorded"],
-                row["detected"],
-                "; ".join(row["layers"]),
-                row["category_label"],
-                center[0],
-                center[1],
+                neutralize_formula(row["number"]),
+                neutralize_formula(row["name"]),
+                neutralize_formula(row["korwil"]),
+                neutralize_formula(row["recorded"]),
+                neutralize_formula(row["detected"]),
+                neutralize_formula("; ".join(row["layers"])),
+                neutralize_formula(row["category_label"]),
+                neutralize_formula(center[0]),
+                neutralize_formula(center[1]),
             ]
         )
     return buffer.getvalue()

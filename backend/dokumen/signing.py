@@ -20,6 +20,7 @@ from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.db import transaction
+from django.db.models import F
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext as _
@@ -946,7 +947,7 @@ def check_otp(recipient: DocumentRecipient, code: str, access_code: str = "") ->
     ):
         return False
     DocumentRecipient.objects.filter(pk=recipient.pk).update(
-        otp_attempts=recipient.otp_attempts + 1
+        otp_attempts=F("otp_attempts") + 1
     )
     if not hmac.compare_digest(recipient.otp_hash, _otp_digest(recipient, code)):
         return False

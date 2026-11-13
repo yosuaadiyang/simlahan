@@ -79,7 +79,8 @@ def send_whatsapp(phone: str, text: str) -> bool:
             timeout=15,
         )
     except requests.RequestException:
-        LOG.exception("Gagal mengirim WhatsApp ke %s", number)
+        # Nomor telepon adalah data pribadi; cukup 4 digit terakhir di log.
+        LOG.exception("Gagal mengirim WhatsApp ke ****%s", number[-4:])
         return False
     if response.status_code >= 400:
         LOG.warning(

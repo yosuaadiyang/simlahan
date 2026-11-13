@@ -2,7 +2,9 @@
 # ==============================================================
 # SimLahan backend (Django + GeoDjango) – image produksi
 # ==============================================================
-FROM python:3.12-slim-bookworm AS base
+# Base image dipin digest agar build selalu menarik bit yang sama (tag bisa
+# diarahkan ulang hulu). Perbarui digest saat naik versi/rilis keamanan.
+FROM python:3.12-slim-bookworm@sha256:935c3c5b12357a7e10caa9c1e6ca5692344d97cf229832ef584be2cec9fc03df AS base
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \

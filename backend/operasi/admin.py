@@ -61,6 +61,7 @@ from operasi.models import (
     ThreatZone,
     Ticket,
 )
+from utils.spreadsheet import neutralize_formula
 
 
 def badge(color: str, label) -> str:
@@ -81,9 +82,9 @@ def csv_response(filename: str, header: list, rows) -> HttpResponse:
     # BOM agar Excel membaca huruf non-ASCII dengan benar.
     response.write("﻿")
     writer = csv.writer(response)
-    writer.writerow([str(h) for h in header])
+    writer.writerow([neutralize_formula(str(h)) for h in header])
     for row in rows:
-        writer.writerow(["" if v is None else v for v in row])
+        writer.writerow(["" if v is None else neutralize_formula(v) for v in row])
     return response
 
 

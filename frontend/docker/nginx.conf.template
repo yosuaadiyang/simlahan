@@ -11,7 +11,9 @@ server {
     # Non-root: port >= 1024 (lihat Dockerfile & docker-compose.yml).
     listen 8080;
     server_name _;
-    client_max_body_size 100m;
+    # Batas aplikasi terbesar 25 MB (unggahan aset lahan); 30 m memberi ruang
+    # tanpa membuka penyanggaan 100 MB per request di uWSGI.
+    client_max_body_size 30m;
 
     root /usr/share/nginx/html;
     index index.html;
@@ -75,6 +77,11 @@ server {
         add_header X-Content-Type-Options nosniff always;
         add_header X-Frame-Options SAMEORIGIN always;
         add_header Referrer-Policy strict-origin-when-cross-origin always;
+        # CSP untuk SPA (skrip hanya dari aset build sendiri, tanpa skrip
+        # inline): menutup kelas injeksi script-src termasuk URI javascript:
+        # pada href. Halaman panel/portal yang dirender Django tidak kena
+        # header ini (butuh skrip inline admin) dan dilayani lokasi lain.
+        add_header Content-Security-Policy "default-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'; img-src 'self' data: blob: https:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; connect-src 'self' https:" always;
         try_files $uri /index.html;
     }
 }

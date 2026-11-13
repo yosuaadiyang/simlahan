@@ -143,10 +143,14 @@ def _errors(error: ValidationError) -> dict:
 
 
 def _throttled(key: str, limit: int, seconds: int) -> bool:
-    count = cache.get(key, 0)
-    if count >= limit:
-        return True
-    cache.set(key, count + 1, seconds)
+    # get_or_set + incr agar dua request bersamaan tidak kehilangan hitungan.
+    try:
+        count = cache.get_or_set(key, 0, seconds)
+        if count >= limit:
+            return True
+        cache.incr(key)
+    except ValueError:
+        cache.set(key, 1, seconds)
     return False
 
 
@@ -1148,6 +1152,14 @@ def _duplicate(obj) -> JsonResponse:
     return JsonResponse({"id": obj.pk, "number": obj.number, "duplicate": True})
 
 
+def _duplicate_or_raise(model, client_id):
+    """Ambil catatan duplikat antrean luring; galat integrity lain diteruskan."""
+    try:
+        return model.objects.get(client_id=client_id)
+    except model.DoesNotExist:
+        raise  # bukan duplikasi client_id: biarkan galat integrity asli naik
+
+
 @api(permission="operasi.view_activity", methods=("GET", "POST"))
 def activities(request):
     if request.method == "GET":
@@ -1271,7 +1283,7 @@ def _create_activity(request):
     try:
         _save_activity(activity, residents, photo_objects, stance_updates, user, parts)
     except IntegrityError:
-        return _duplicate(Activity.objects.get(client_id=client_id))
+        return _duplicate(_duplicate_or_raise(Activity, client_id))
     return JsonResponse(
         {
             "id": activity.pk,
@@ -1453,7 +1465,7 @@ def _create_soil_test(request):
         with transaction.atomic():
             test.save()
     except IntegrityError:
-        return _duplicate(SoilTest.objects.get(client_id=client_id))
+        return _duplicate(_duplicate_or_raise(SoilTest, client_id))
     return JsonResponse(
         {"id": test.pk, "number": test.number, "duplicate": False}, status=201
     )
@@ -1752,25 +1764,49 @@ def _sos_json(alert) -> dict:
     }
 
 
+def _sos_duplicate_response(alert, user) -> JsonResponse:
+    return JsonResponse(
+        {**_sos_json(alert), "mine": alert.raised_by_id == user.pk, "duplicate": True}
+    )
+
+
+def _sos_list(user) -> JsonResponse:
+    if not user.has_perm("operasi.view_sosalert"):
+        return JsonResponse({"results": []})
+    alerts = geo.scoped(
+        SosAlert.objects.filter(status__in=enums.OPEN_SOS_STATUSES), user
+    ).select_related("raised_by", "acknowledged_by", "korwil")
+    results = []
+    for alert in alerts:
+        item = _sos_json(alert)
+        item["mine"] = alert.raised_by_id == user.pk
+        results.append(item)
+    return JsonResponse({"results": results})
+
+
 @api(permission=None, methods=("GET", "POST"))
 def sos(request):
     user = request.user
     if request.method == "POST":
         if not user.has_perm("operasi.add_sosalert"):
             raise PermissionDenied
+        # Tiap SOS mengirim surel ke seluruh grup admin: batasi per petugas.
+        if _throttled(f"operasi:sos:{user.pk}", 10, 3600):
+            return JsonResponse(
+                {
+                    "error": _(
+                        "Terlalu banyak laporan SOS. Hubungi koordinator bila darurat."
+                    )
+                },
+                status=429,
+            )
         data = request.POST
         client_id = _uuid(data.get("client_id"))
         if client_id is None:
             raise ValidationError({"client_id": [_("ID perangkat tidak sah.")]})
         existing = SosAlert.objects.filter(client_id=client_id).first()
         if existing is not None:
-            return JsonResponse(
-                {
-                    **_sos_json(existing),
-                    "mine": existing.raised_by_id == user.pk,
-                    "duplicate": True,
-                }
-            )
+            return _sos_duplicate_response(existing, user)
         alert = SosAlert(
             client_id=client_id,
             raised_by=user,
@@ -1783,29 +1819,14 @@ def sos(request):
             with transaction.atomic():
                 alert.save()
         except IntegrityError:
-            existing = SosAlert.objects.get(client_id=client_id)
-            return JsonResponse(
-                {
-                    **_sos_json(existing),
-                    "mine": existing.raised_by_id == user.pk,
-                    "duplicate": True,
-                }
+            return _sos_duplicate_response(
+                _duplicate_or_raise(SosAlert, client_id), user
             )
         services.raise_sos(alert)
         return JsonResponse(
             {**_sos_json(alert), "mine": True, "duplicate": False}, status=201
         )
-    if not user.has_perm("operasi.view_sosalert"):
-        return JsonResponse({"results": []})
-    alerts = geo.scoped(
-        SosAlert.objects.filter(status__in=enums.OPEN_SOS_STATUSES), user
-    ).select_related("raised_by", "acknowledged_by", "korwil")
-    results = []
-    for alert in alerts:
-        item = _sos_json(alert)
-        item["mine"] = alert.raised_by_id == user.pk
-        results.append(item)
-    return JsonResponse({"results": results})
+    return _sos_list(user)
 
 
 @api(permission=None, methods=("POST",))

@@ -265,6 +265,11 @@ def compare(request):
 
 
 def plot_profile_pdf(request, code):
+    from alokasi.views import _throttled, _too_many
+
+    # Render PDF per request cukup mahal; batasi per alamat IP.
+    if _throttled(request, "profil-pdf", limit=10, window=60):
+        return _too_many(request)
     plot = get_object_or_404(
         LandPlot.objects.select_related("sector", "zone"),
         code=code,

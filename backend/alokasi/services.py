@@ -6,7 +6,7 @@ Setiap perubahan status lewat fungsi di modul ini supaya aturan, riwayat
 
 import datetime
 import logging
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -546,7 +546,7 @@ def _create_invoices(  # noqa: C901
         area = application.source_allocation.area_m2
         amount = (
             config.transfer_admin_fee + config.transfer_fee_per_m2 * area
-        ).quantize(Decimal("1"))
+        ).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
         if amount > 0:
             items.append(
                 (
@@ -561,7 +561,7 @@ def _create_invoices(  # noqa: C901
         plot = allocation.plot
         years = plot.effective_term_years
         uwt = (allocation.area_m2 * plot.uwt_rate_per_m2_year * years).quantize(
-            Decimal("1")
+            Decimal("1"), rounding=ROUND_HALF_UP
         )
         if uwt > 0:
             items.append(
@@ -1013,7 +1013,7 @@ def uwt_simulation(
     config = config or AllocationSettings.load()
     today = today or timezone.localdate()
     total = (area_m2 * tariff.rate_per_m2_year * tariff.term_years).quantize(
-        Decimal("1")
+        Decimal("1"), rounding=ROUND_HALF_UP
     )
     late = 0
     if tariff.kind != tariff.Kind.NEW:
@@ -1021,7 +1021,9 @@ def uwt_simulation(
         if config.uwt_penalty_max_months:
             late = min(late, config.uwt_penalty_max_months)
     percent = config.uwt_penalty_percent
-    penalty = (total * percent / Decimal("100") * late).quantize(Decimal("1"))
+    penalty = (total * percent / Decimal("100") * late).quantize(
+        Decimal("1"), rounding=ROUND_HALF_UP
+    )
     return {
         "tariff": tariff,
         "area_m2": area_m2,

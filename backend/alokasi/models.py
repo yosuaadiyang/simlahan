@@ -1129,7 +1129,7 @@ class Application(TimeStampedModel):
     # selain kepada pemilik permohonan.
     tracking_pin = models.CharField(
         verbose_name=_("PIN pelacakan"),
-        max_length=12,
+        max_length=20,
         blank=True,
         default="",
         editable=False,
@@ -1271,7 +1271,9 @@ class Application(TimeStampedModel):
                 self.NUMBER_PREFIXES.get(self.service_type, "PRM")
             )
         if not self.tracking_pin:
-            self.tracking_pin = secrets.token_hex(4).upper()
+            # 16 karakter acak (64 bit): nomor permohonan sekuensial, jadi PIN
+            # adalah satu-satunya rahasia halaman pelacakan publik.
+            self.tracking_pin = secrets.token_hex(8).upper()
         super().save(*args, **kwargs)
 
     @property

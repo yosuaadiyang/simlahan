@@ -875,6 +875,11 @@ class CompensationPaymentSerializer(PengadaanModelSerializer):
         )
         amount = attrs.get("amount", getattr(self.instance, "amount", None))
         if compensation and amount is not None:
+            # Kunci baris ganti rugi: tanpa kunci, dua pembayaran serentak
+            # membaca sisa yang sama lalu keduanya lolos batas (TOCTOU).
+            compensation = Compensation.objects.select_for_update().get(
+                pk=compensation.pk
+            )
             if compensation.status not in (
                 enums.CompensationStatus.VALIDATED,
                 enums.CompensationStatus.PAID,
@@ -1254,4 +1259,9 @@ class AcquisitionDocumentSerializer(PengadaanModelSerializer):
             raise serializers.ValidationError(_("File type is not allowed."))
         if value.size > MAX_FILE_SIZE_BYTES:
             raise serializers.ValidationError(_("File is too large."))
+        # Ekstensi saja bisa dipalsukan; periksa juga tanda tangan isi berkas
+        # (byte ajaib) seperti pada modul dokumen.
+        from file_operations.validators import validate_file_signature
+
+        validate_file_signature(value)
         return value

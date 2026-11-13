@@ -121,6 +121,14 @@ export const clearSession = () => {
   writeRefreshToken(null);
   store.dispatch(clearApiToken());
   store.dispatch(clearUser());
+  // Hapus draf formulir (PIB warga, permohonan) yang tersimpan di sesi tab:
+  // tanpa ini, pengguna berikutnya di tab yang sama bisa membuka "pulihkan
+  // perubahan yang belum disimpan" milik petugas sebelumnya.
+  try {
+    sessionStorage.clear();
+  } catch {
+    // Abaikan: sessionStorage tidak tersedia (mis. mode privat).
+  }
 };
 
 /**

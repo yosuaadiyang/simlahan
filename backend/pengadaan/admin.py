@@ -1,6 +1,8 @@
+from django import forms
 from django.contrib import admin
+from django.utils.translation import gettext_lazy as _
 
-from pengadaan import access
+from pengadaan import access, enums
 from pengadaan import models as m
 
 SENSITIVE_PERMISSION = "pengadaan.view_sensitive_personal_data"
@@ -121,6 +123,17 @@ class CompensationAdmin(ProjectScopedAdmin):
         "court_decision",
     )
 
+    def save_model(self, request, obj, form, change):
+        # Sama seperti API: perubahan apa pun selain catatan setelah validasi
+        # mengembalikan status ke DETERMINED agar divalidasi ulang oleh Ketua
+        # Pelaksana. Tanpa ini admin bisa diam-diam mengubah nilai tervalidasi.
+        if change and obj.status == enums.CompensationStatus.VALIDATED:
+            if [f for f in form.changed_data if f != "note"]:
+                obj.status = enums.CompensationStatus.DETERMINED
+                obj.validated_on = None
+                obj.validated_by = None
+        super().save_model(request, obj, form, change)
+
 
 @admin.register(m.AffectedHousehold)
 class AffectedHouseholdAdmin(SensitiveFieldsAdminMixin, ProjectScopedAdmin):
@@ -142,9 +155,36 @@ for model in (
     m.Consignment,
     m.CompensationPayment,
     m.RightsRelease,
-    m.Handover,
 ):
     admin.site.register(model, ProjectScopedAdmin)
+
+
+class HandoverAdminForm(forms.ModelForm):
+    """Pintu yang sama dengan API: hanya bidang yang sudah dilepas haknya.
+
+    Pemeriksaan dipasang di form (bukan model) karena relasi banyak-ke-banyak
+    belum tersambung ke instance saat ``full_clean`` dijalankan.
+    """
+
+    def clean(self):
+        cleaned_data = super().clean()
+        project = cleaned_data.get("project")
+        for parcel in cleaned_data.get("parcels") or []:
+            if project and parcel.project_id != project.id:
+                raise forms.ValidationError(
+                    _("All parcels must belong to the selected project.")
+                )
+            if not parcel.rights_releases.exists():
+                raise forms.ValidationError(
+                    _("Parcel %(parcel)s has no rights release yet.")
+                    % {"parcel": parcel.parcel_number}
+                )
+        return cleaned_data
+
+
+@admin.register(m.Handover)
+class HandoverAdmin(ProjectScopedAdmin):
+    form = HandoverAdminForm
 
 
 @admin.register(m.AcquisitionDocument)

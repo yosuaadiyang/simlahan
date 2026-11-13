@@ -15,7 +15,7 @@ def backfill(apps, schema_editor):
     rows = Application.objects.using(alias).filter(tracking_pin="").only("pk")
     for application in rows.iterator():
         Application.objects.using(alias).filter(pk=application.pk).update(
-            tracking_pin=secrets.token_hex(4).upper()
+            tracking_pin=secrets.token_hex(8).upper()
         )
 
 

@@ -3,7 +3,9 @@
 # SimLahan frontend – build Vite lalu disajikan oleh nginx yang
 # juga meneruskan /v1, /admin, /static dst. ke backend.
 # ==============================================================
-FROM node:24-alpine AS build
+# Base image dipin digest agar build selalu menarik bit yang sama (tag bisa
+# diarahkan ulang hulu). Perbarui digest saat naik versi/rilis keamanan.
+FROM node:24-alpine@sha256:116b800c3754b440ee0aa3ed2f20f5bf3d99a554bfd9adeea09ea8017f6e85f5 AS build
 
 WORKDIR /app
 RUN corepack enable
@@ -43,7 +45,7 @@ RUN yarn build
 # Nginx non-root: kontainer tidak berjalan sebagai root. Template & envsubst
 # tetap didukung; port internal 8080 (non-root tak boleh memakai port < 1024),
 # dipetakan compose ke HTTP_PORT.
-FROM nginxinc/nginx-unprivileged:1.30-alpine AS production
+FROM nginxinc/nginx-unprivileged:1.30-alpine@sha256:f5116ed4606f3eb015dd4a8e28cb9b351476dc0ad4bc6e9f93b19cec130cdf03 AS production
 USER nginx
 COPY --chown=nginx:nginx docker/nginx.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=build --chown=nginx:nginx /app/dist /usr/share/nginx/html
