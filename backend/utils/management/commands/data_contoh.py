@@ -87,6 +87,7 @@ NOT_SAMPLED = {
     "batchrun.JobRunLog": "log tugas terjadwal",
     "batchrun.JobRunLogEntry": "log tugas terjadwal",
     "users.LoginOTP": "kode masuk sekali pakai, berlaku beberapa menit",
+    "utils.RateCounter": "penghitung jatah AI per jam, terisi saat fitur AI dipakai",
     "file_operations.FileScanStatus": "pemindaian virus nonaktif (FLAG_FILE_SCAN)",
     "file_operations.GenericAttachmentTestModel": "model khusus pengujian",
     "file_operations.GenericSafeDeleteAttachmentTestModel": "model khusus pengujian",
