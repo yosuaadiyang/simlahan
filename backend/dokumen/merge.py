@@ -10,6 +10,7 @@ dokumen; ``{{ kolom.<kunci> }}`` diisi penerima saat menandatangani
 
 import io
 import re
+import zipfile
 from html import escape
 
 from django.utils import timezone
@@ -23,6 +24,10 @@ FIELD_RE = re.compile(r"\{\{\s*([a-z_]+)\.([a-z0-9_]+)\s*\}\}")
 RECIPIENT_FIELD_GROUP = "kolom"
 CUSTOM_KEY_RE = re.compile(r"^[a-z0-9_]{1,40}$")
 MAX_DOCX_BYTES = 20 * 1024 * 1024
+# Batas isi DOCX setelah diekstrak (bom ZIP): python-docx/docxtpl membaca
+# setiap bagian ke memori, jadi ukuran terkompresi saja tidak cukup.
+MAX_DOCX_UNCOMPRESSED = 100 * 1024 * 1024
+MAX_DOCX_PARTS = 5000
 
 # Katalog isian untuk editor, dokumentasi, dan pratinjau.
 FIELD_GROUPS = (
@@ -364,6 +369,7 @@ def render_docx(data: bytes, context: dict) -> bytes:
 
     if len(data) > MAX_DOCX_BYTES:
         raise TemplateRenderError(_("Berkas templat terlalu besar."))
+    _check_docx_archive(data)
     try:
         template = DocxTemplate(io.BytesIO(data))
         template.render(
@@ -440,11 +446,31 @@ def _table_html(table) -> str:
     )
 
 
+def _check_docx_archive(data: bytes) -> None:
+    """Tolak DOCX yang isinya setelah diekstrak terlalu besar.
+
+    Ukuran yang dinyatakan di direktori ZIP mengikat: zipfile tidak
+    mengekstrak lebih dari ``file_size`` tiap entri.
+    """
+    try:
+        with zipfile.ZipFile(io.BytesIO(data)) as archive:
+            entries = archive.infolist()
+    except (zipfile.BadZipFile, ValueError) as error:
+        raise TemplateRenderError(
+            _("Berkas Word tidak dapat dibaca. Pastikan formatnya .docx yang sah.")
+        ) from error
+    if len(entries) > MAX_DOCX_PARTS or (
+        sum(entry.file_size for entry in entries) > MAX_DOCX_UNCOMPRESSED
+    ):
+        raise TemplateRenderError(_("Isi berkas Word terlalu besar."))
+
+
 def _open_docx(data: bytes):
     import docx
 
     if len(data) > MAX_DOCX_BYTES:
         raise TemplateRenderError(_("Berkas terlalu besar."))
+    _check_docx_archive(data)
     try:
         return docx.Document(io.BytesIO(data))
     except Exception as error:  # noqa: BLE001

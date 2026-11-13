@@ -65,6 +65,15 @@ def can_request_download(user, *, version=None, signing=None) -> bool:
     return False
 
 
+def can_preview_confidential(user, confidentiality: str) -> bool:
+    """Pratinjau tanpa permintaan unduh: dokumen rahasia hanya untuk pejabat
+    yang berwenang menyetujui unduhan rahasia. Pengguna lain mengajukan
+    permintaan unduh (persetujuan, batas waktu & jumlah, tercatat)."""
+    if confidentiality != enums.Confidentiality.SECRET:
+        return True
+    return user.has_perm(approver_permission(confidentiality))
+
+
 def approver_permission(confidentiality: str) -> str:
     if confidentiality == enums.Confidentiality.SECRET:
         return "dokumen.approve_confidential_download"
