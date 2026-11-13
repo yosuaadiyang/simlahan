@@ -11,7 +11,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django_filters.views import FilterView
 from rest_framework import mixins, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import MethodNotAllowed, NotFound
+from rest_framework.exceptions import MethodNotAllowed, NotFound, PermissionDenied
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -177,8 +177,19 @@ class PlotSearchViewSet(FieldPermissionsViewsetMixin, AtomicTransactionModelView
         return PlotSearchRetrieveSerializer
 
     @action(methods=["get"], detail=True)
-    def get_answers_xlsx(self, *args, **kwargs):
+    def get_answers_xlsx(self, request, *args, **kwargs):
         plotsearch = self.get_object()
+        # Isi jawaban pemohon mengikuti aturan API jawaban (AnswerPermissions):
+        # izin lihat jawaban atau penyiap plot search ini, dan jawaban yang
+        # wajib dibuka dengan berita acara belum ikut sebelum dibuka.
+        if not (
+            request.user.has_perm("forms.view_answer")
+            or plotsearch.preparers.filter(pk=request.user.pk).exists()
+        ):
+            raise PermissionDenied
+        requires_opening = bool(
+            plotsearch.subtype and plotsearch.subtype.require_opening_record
+        )
         plot_search_targets = plotsearch.plot_search_targets.all()
 
         output = io.BytesIO()
@@ -189,7 +200,10 @@ class PlotSearchViewSet(FieldPermissionsViewsetMixin, AtomicTransactionModelView
         row = 0
 
         for plot_search_target in plot_search_targets:
-            for target_status in plot_search_target.statuses.all():
+            statuses = plot_search_target.statuses.all()
+            if requires_opening:
+                statuses = statuses.filter(answer__opening_record__isnull=False)
+            for target_status in statuses:
                 worksheet, row = target_status.target_status_get_xlsx_page(
                     worksheet, row
                 )
@@ -342,7 +356,10 @@ class AreaSearchViewSet(viewsets.ModelViewSet):
         return super().get_serializer_class()
 
     @action(methods=["get"], detail=False)
-    def get_answers_xlsx(self, *args, **kwargs):
+    def get_answers_xlsx(self, request, *args, **kwargs):
+        # Isi jawaban pemohon hanya untuk pemegang izin lihat jawaban.
+        if not request.user.has_perm("forms.view_answer"):
+            raise PermissionDenied
         area_search_qs = self.filter_queryset(self.get_queryset())
 
         output = io.BytesIO()

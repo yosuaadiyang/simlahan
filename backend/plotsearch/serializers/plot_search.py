@@ -1206,6 +1206,16 @@ class AreaSearchDetailSerializer(AreaSearchSerializer):
     answer = AnswerSerializer(read_only=True, required=False)
     plot = serializers.ListField(child=serializers.CharField(), read_only=True)
 
+    def get_fields(self):
+        fields = super().get_fields()
+        # Isi jawaban pemohon hanya untuk pemegang izin lihat jawaban (sama
+        # dengan API jawaban); peran peramban hanya melihat data area search.
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        if user is not None and not user.has_perm("forms.view_answer"):
+            fields.pop("answer", None)
+        return fields
+
     class Meta:
         model = AreaSearch
         fields = (

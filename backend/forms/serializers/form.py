@@ -488,18 +488,25 @@ class AnswerOpeningRecordSerializer(serializers.ModelSerializer):
         model = AnswerOpeningRecord
         fields = ("openers", "note", "answer", "id", "possible_preparers", "time_stamp")
 
+    def validate_answer(self, value):
+        # Berita acara pembukaan melekat pada satu jawaban. Memindahkannya
+        # akan "membuka" jawaban plot search lain tanpa pemeriksaan
+        # penyiap/izin yang dijalankan saat membuat (lihat create()).
+        if self.instance is not None and value != self.instance.answer:
+            raise serializers.ValidationError(
+                _("The answer of an opening record cannot be changed.")
+            )
+        return value
+
     def create(self, validated_data):
         if "openers" not in validated_data:
             validated_data["openers"] = list()
-        if not PlotSearch.objects.filter(
-            plot_search_targets__answers=validated_data.get("answer")
-        ).first().preparers.filter(
-            pk=self.context["request"].user.pk
-        ).exists() and not self.context[
-            "request"
-        ].user.has_perm(
-            "forms.add_answeropeningrecord"
-        ):
+        user = self.context["request"].user
+        is_preparer = PlotSearch.objects.filter(
+            plot_search_targets__answers=validated_data.get("answer"),
+            preparers=user,
+        ).exists()
+        if not is_preparer and not user.has_perm("forms.add_answeropeningrecord"):
             raise PermissionDenied
         validated_data["openers"].append(self.context["request"].user)
         return super().create(validated_data)
