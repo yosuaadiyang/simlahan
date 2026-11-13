@@ -6,13 +6,20 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('alokasi', '0014_seed_layanan_lms'),
+        ("alokasi", "0014_seed_layanan_lms"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='application',
-            name='tracking_pin',
-            field=models.CharField(blank=True, default='', editable=False, help_text='Nomor + PIN ini dapat dipakai melacak status tanpa login.', max_length=20, verbose_name='PIN pelacakan'),
+            model_name="application",
+            name="tracking_pin",
+            field=models.CharField(
+                blank=True,
+                default="",
+                editable=False,
+                help_text="Nomor + PIN ini dapat dipakai melacak status tanpa login.",
+                max_length=20,
+                verbose_name="PIN pelacakan",
+            ),
         ),
     ]
