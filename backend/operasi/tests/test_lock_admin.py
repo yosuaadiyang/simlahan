@@ -380,3 +380,51 @@ def test_korwil_import_from_kmz(admin_user, make_kmz):
     assert response.status_code == 302
     korwil = Korwil.objects.get()
     assert (korwil.code, korwil.name, korwil.color) == ("C", "Rempang Cate", "#123456")
+
+
+def _lock_form(when, **extra):
+    when = timezone.localtime(when)
+    return {
+        "is_armed": "on",
+        "shutdown_at_0": when.strftime("%Y-%m-%d"),
+        "shutdown_at_1": when.strftime("%H:%M:%S"),
+        "message": "Pemeliharaan",
+        **extra,
+    }
+
+
+def test_admin_cannot_postpone_tripped_lock_without_passcode(admin_user):
+    """NV-26: menunda waktu kunci yang sudah aktif setara menonaktifkannya."""
+    lock = arm(-1)  # sudah berlaku
+    url = reverse("admin:operasi_systemlock_change", args=[lock.pk])
+    client = login(admin_user)
+    later = timezone.now() + datetime.timedelta(days=30)
+    response = client.post(url, _lock_form(later))
+    assert response.status_code == 200
+    assert "menunda waktu kunci" in response.content.decode()
+    assert SystemLock.is_locked_state(SystemLock.state())
+
+    response = client.post(url, _lock_form(later, current_passcode="rahasia123"))
+    assert response.status_code == 302
+    assert not SystemLock.is_locked_state(SystemLock.state())
+
+
+def test_admin_can_bring_lock_forward_without_passcode(admin_user):
+    lock = arm(120)
+    url = reverse("admin:operasi_systemlock_change", args=[lock.pk])
+    sooner = timezone.now() + datetime.timedelta(minutes=30)
+    response = login(admin_user).post(url, _lock_form(sooner))
+    assert response.status_code == 302
+    assert SystemLock.load().shutdown_at < lock.shutdown_at
+
+
+def test_admin_lock_passcode_attempts_throttled(admin_user):
+    lock = arm(60)
+    url = reverse("admin:operasi_systemlock_change", args=[lock.pk])
+    client = login(admin_user)
+    later = timezone.now() + datetime.timedelta(days=1)
+    for _i in range(5):
+        client.post(url, _lock_form(later, current_passcode="salah"))
+    response = client.post(url, _lock_form(later, current_passcode="rahasia123"))
+    assert "Terlalu banyak percobaan" in response.content.decode()
+    assert SystemLock.load().shutdown_at == lock.shutdown_at

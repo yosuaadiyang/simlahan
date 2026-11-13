@@ -129,9 +129,7 @@ class OperasiAdminMixin:
     # koordinator Korwil-nya, atau pengawas (Administrator / Petugas Aset Lahan).
     owner_field: str | None = None
 
-    def has_change_permission(self, request, obj=None):
-        if not super().has_change_permission(request, obj):
-            return False
+    def _owner_or_lead(self, request, obj) -> bool:
         if obj is None or self.owner_field is None or geo.is_supervisor(request.user):
             return True
         user = request.user
@@ -139,16 +137,60 @@ class OperasiAdminMixin:
             return True
         return bool(obj.korwil_id and obj.korwil.coordinator_id == user.pk)
 
+    def has_change_permission(self, request, obj=None):
+        if not super().has_change_permission(request, obj):
+            return False
+        return self._owner_or_lead(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        # Hapus mengikuti aturan yang sama dengan ubah (dan API pusat komando):
+        # pembuat, koordinator Korwil-nya, atau pengawas.
+        if not super().has_delete_permission(request, obj):
+            return False
+        return self._owner_or_lead(request, obj)
+
+    def delete_queryset(self, request, queryset):
+        # Aksi massal "hapus terpilih" hanya memeriksa izin umum; periksa
+        # setiap baris agar aturan pemilik tidak terlewati.
+        if self.owner_field is not None and not all(
+            self._owner_or_lead(request, obj) for obj in queryset
+        ):
+            raise PermissionDenied
+        super().delete_queryset(request, queryset)
+
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
         if self.scope_prefix is not None:
             queryset = geo.scoped(queryset, request.user, self.scope_prefix)
         return queryset
 
+    @staticmethod
+    def _scoped_choices(model, user):
+        """Pilihan relasi dibatasi seperti di API pusat komando: warga & uji
+        tanah per Korwil, tugas per unit layanan. Tanpa ini, ID di luar
+        lingkup bisa dikirim lewat formulir admin dan tetap diterima."""
+        from asetlahan.models import Task
+
+        if model in (Resident, SoilTest):
+            return geo.scoped(model.objects.all(), user)
+        if model is Task:
+            return aset_scope.scoped(Task.objects.all(), user)
+        return None
+
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.related_model is Korwil:
             kwargs["queryset"] = services.visible_korwils(request.user)
+        else:
+            choices = self._scoped_choices(db_field.related_model, request.user)
+            if choices is not None:
+                kwargs["queryset"] = choices
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        choices = self._scoped_choices(db_field.related_model, request.user)
+        if choices is not None:
+            kwargs["queryset"] = choices
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
 
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         if isinstance(db_field, PrivateFileField) and db_field.name in self.file_kinds:
@@ -301,13 +343,31 @@ class SystemLockForm(forms.ModelForm):
         model = SystemLock
         fields = ("is_armed", "shutdown_at", "message")
 
+    # Diisi SystemLockAdmin.get_form: pengguna yang mengirim formulir.
+    request_user = None
+
+    def _check_current(self, passcode: str) -> bool:
+        if not passcode:
+            return False
+        # Jatah percobaan yang sama dengan API /komando/api/kunci/ (5 per 15 menit).
+        from operasi.views import _throttled
+
+        user = self.request_user
+        if user is not None and _throttled(f"operasi:lock:{user.pk}", 5, 900):
+            self.add_error(
+                "current_passcode",
+                _("Terlalu banyak percobaan. Coba lagi 15 menit lagi."),
+            )
+            return False
+        return self.instance.check_passcode(passcode)
+
     def clean(self):
         data = super().clean()
         lock = self.instance
         new = data.get("new_passcode") or ""
         if new != (data.get("confirm_passcode") or ""):
             self.add_error("confirm_passcode", _("Kode rahasia tidak sama."))
-        current_ok = lock.check_passcode(data.get("current_passcode") or "")
+        current_ok = self._check_current(data.get("current_passcode") or "")
         if lock.passcode_hash and new and not current_ok:
             self.add_error(
                 "current_passcode",
@@ -329,6 +389,18 @@ class SystemLockForm(forms.ModelForm):
                 self.add_error("shutdown_at", _("Tentukan waktu sistem dimatikan."))
             elif not lock.is_armed and shutdown <= timezone.now():
                 self.add_error("shutdown_at", _("Waktu harus di masa depan."))
+            elif (
+                lock.is_armed
+                and lock.shutdown_at is not None
+                and shutdown > lock.shutdown_at
+                and not current_ok
+            ):
+                # Menunda waktu kunci (termasuk membuka kunci yang sudah
+                # berlaku) setara menonaktifkannya: wajib kode rahasia.
+                self.add_error(
+                    "current_passcode",
+                    _("Masukkan kode rahasia untuk menunda waktu kunci sistem."),
+                )
         return data
 
 
@@ -359,6 +431,12 @@ class SystemLockAdmin(SingletonAdmin):
             {"fields": ("armed_by", "armed_at", "defused_by", "defused_at")},
         ),
     )
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        # Kelas formulir dibuat baru setiap permintaan, jadi aman diisi di sini.
+        form.request_user = request.user
+        return form
 
     def has_module_permission(self, request):
         return request.user.is_active and request.user.is_superuser
