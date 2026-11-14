@@ -203,9 +203,8 @@ def data_summary(polygon: Polygon, user) -> dict:
         labels = dict(enums.SoilSuitability.choices)
         summary["uji_tanah"] = {str(labels[r["suitability"]]): r["n"] for r in rows}
     if user.has_perm("pengadaan.view_acquisitionparcel"):
-        from pengadaan.models import AcquisitionParcel
-
         from pengadaan.access import scope_queryset
+        from pengadaan.models import AcquisitionParcel
 
         parcels = scope_queryset(
             AcquisitionParcel.objects.filter(geometry__intersects=polygon), user

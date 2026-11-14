@@ -1119,9 +1119,8 @@ def _search_assets(user, query, limit):
 
 
 def _search_parcels(user, query, limit):
-    from pengadaan.models import AcquisitionParcel
-
     from pengadaan.access import scope_queryset
+    from pengadaan.models import AcquisitionParcel
 
     parcels = scope_queryset(
         AcquisitionParcel.objects.select_related("project"), user
