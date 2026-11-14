@@ -1,9 +1,11 @@
 """Halaman portal publik modul aset lahan: pengaduan masyarakat dan lelang lahan."""
 
+import hashlib
 import hmac
 
 from django.conf import settings
 from django.contrib import messages
+from django.core.cache import cache
 from django.db import IntegrityError, transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
@@ -40,20 +42,43 @@ def _check_url() -> str:
     return services.app_url(reverse("aset_portal:grievance_check"))
 
 
+# Tanda terima ke kontak pelapor: paling banyak sekian per alamat/nomor per hari.
+# Kontak diisi pengunjung anonim tanpa verifikasi, jadi tanpa batas ini formulir
+# bisa dipakai menyurati/WA nomor orang lain berulang kali atas nama instansi.
+GRIEVANCE_RECEIPTS_PER_CONTACT = 3
+GRIEVANCE_RECEIPT_WINDOW = 24 * 3600
+
+
+def _receipt_allowed(contact: str) -> bool:
+    if not contact:
+        return False
+    digest = hashlib.sha256(contact.strip().lower().encode()).hexdigest()
+    key = f"aset:grievance-receipt:{digest}"
+    cache.add(key, 0, GRIEVANCE_RECEIPT_WINDOW)
+    try:
+        count = cache.incr(key)
+    except ValueError:
+        cache.set(key, 1, GRIEVANCE_RECEIPT_WINDOW)
+        count = 1
+    return count <= GRIEVANCE_RECEIPTS_PER_CONTACT
+
+
 def _notify_new_grievance(grievance: Grievance) -> None:
+    # Tanda terima hanya memuat teks tetap: perihal yang diketik pengunjung
+    # tidak ikut dikirim agar formulir tidak bisa dipakai menitipkan pesan
+    # (mis. tautan penipuan) lewat surel/WA resmi instansi.
     body = _(
-        "Pengaduan Anda telah kami terima.\n\nNomor: %(number)s\nKode akses: %(code)s\nPerihal: %(subject)s\n"
+        "Pengaduan Anda telah kami terima.\n\nNomor: %(number)s\nKode akses: %(code)s\n"
         "Batas penyelesaian: %(due)s\n\nCek perkembangannya di %(url)s"
     ) % {
         "number": grievance.number,
         "code": grievance.access_code,
-        "subject": grievance.subject,
         "due": grievance.due_date.strftime("%d-%m-%Y") if grievance.due_date else "-",
         "url": _check_url(),
     }
     services.notify_contact(
-        email=grievance.email,
-        phone=grievance.phone,
+        email=grievance.email if _receipt_allowed(grievance.email) else "",
+        phone=grievance.phone if _receipt_allowed(grievance.phone) else "",
         subject=_("Pengaduan %s diterima") % grievance.number,
         body=body,
     )
@@ -206,6 +231,46 @@ def tender_detail(request, number):
     )
 
 
+class _BidNotAccepted(Exception):
+    pass
+
+
+# Kolom penawaran yang boleh diubah peserta; kolom evaluasi milik petugas.
+BIDDER_FIELDS = ("bidder_name", "email", "phone", "amount", "proposal")
+
+
+def _save_bid(form, tender, applicant, new: bool, offer_changed: bool) -> Bid:
+    """Simpan penawaran dengan lelang & penawaran dikunci dan diperiksa ulang,
+    agar penutupan lelang atau evaluasi petugas yang terjadi setelah halaman
+    dimuat tidak tertimpa nilai lama."""
+    locked_tender = Tender.objects.select_for_update().get(pk=tender.pk)
+    if not locked_tender.is_accepting_bids:
+        raise _BidNotAccepted(_("Lelang ini tidak sedang menerima penawaran."))
+    if not new:
+        current = Bid.objects.select_for_update().get(pk=form.instance.pk)
+        if current.status != enums.BidStatus.SUBMITTED:
+            raise _BidNotAccepted(
+                _("Penawaran Anda sudah dievaluasi (%s) dan tidak dapat diubah lagi.")
+                % current.get_status_display()
+            )
+    bid = form.save(commit=False)
+    bid.tender = locked_tender
+    bid.applicant = applicant
+    bid.status = enums.BidStatus.SUBMITTED
+    if new:
+        bid.save()
+        return bid
+    fields = [*BIDDER_FIELDS, "status", "modified_at"]
+    if offer_changed:
+        # Nilai atau proposal berubah: penilaian petugas atas penawaran lama
+        # tidak berlaku lagi dan harus diulang.
+        bid.technical_score = None
+        bid.evaluation_note = ""
+        fields += ["technical_score", "evaluation_note"]
+    bid.save(update_fields=fields)
+    return bid
+
+
 @applicant_required
 def bid_submit(request, number):
     _require_flag("enable_tender")
@@ -241,17 +306,17 @@ def bid_submit(request, number):
     )
     if request.method == "POST" and form.is_valid():
         new = form.instance.pk is None
-        bid = form.save(commit=False)
-        bid.tender = tender
-        bid.applicant = applicant
-        bid.status = enums.BidStatus.SUBMITTED
+        offer_changed = new or bool({"amount", "proposal"} & set(form.changed_data))
         try:
             with transaction.atomic():
-                bid.save()
+                bid = _save_bid(form, tender, applicant, new, offer_changed)
         except IntegrityError:
             messages.error(
                 request, _("Anda sudah mengajukan penawaran untuk lelang ini.")
             )
+            return redirect("aset_portal:tender_detail", number=number)
+        except _BidNotAccepted as error:
+            messages.error(request, str(error))
             return redirect("aset_portal:tender_detail", number=number)
         services.notify_contact(
             email=bid.email,

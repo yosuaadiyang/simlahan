@@ -12,6 +12,8 @@ from urllib.parse import urlsplit
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
+from utils.placeholders import is_placeholder
+
 FAIL = "GAGAL"
 WARN = "PERINGATAN"
 INFO = "INFO"
@@ -205,6 +207,17 @@ def _initial_admin() -> list[Finding]:
         return []
     user = get_user_model().objects.filter(username=username).first()
     if user is not None and user.is_active and user.check_password(password):
+        if is_placeholder(password):
+            # Sandi contoh dari .env.example diketahui publik: siapa pun bisa
+            # masuk sebagai superuser.
+            return [
+                Finding(
+                    FAIL,
+                    f"Akun '{username}' memakai sandi contoh dari .env.example. "
+                    "Segera ganti di /akun/sandi/ lalu kosongkan "
+                    "DJANGO_SUPERUSER_PASSWORD.",
+                )
+            ]
         return [
             Finding(
                 WARN,

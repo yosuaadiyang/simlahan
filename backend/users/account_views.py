@@ -12,10 +12,6 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.core.cache import cache
 from django.shortcuts import redirect, render
 from django.views.decorators.cache import never_cache
-from rest_framework_simplejwt.token_blacklist.models import (
-    BlacklistedToken,
-    OutstandingToken,
-)
 
 from users import role_guide
 
@@ -79,12 +75,8 @@ def change_password(request):
     if request.method == "POST" and not blocked:
         if form.is_valid():
             form.save()
-            # Sama dengan API ganti sandi: token aplikasi yang lama tidak
-            # berlaku lagi, sesi peramban ini dipertahankan.
-            for token in OutstandingToken.objects.filter(
-                user=user, blacklistedtoken__isnull=True
-            ):
-                BlacklistedToken.objects.get_or_create(token=token)
+            # Kredensial API lama dicabut oleh sinyal ganti sandi
+            # (users.signals); sesi peramban ini dipertahankan.
             update_session_auth_hash(request, user)
             cache.delete(key)
             done = True

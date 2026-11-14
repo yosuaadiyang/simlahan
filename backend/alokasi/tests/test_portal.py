@@ -616,3 +616,62 @@ def test_login_redirect_keeps_full_query(client):
     assert response.url == (
         "/portal/masuk/?next=%2Fportal%2Finvestasi%2Fajukan%2F%3Flahan%3DA-1%26skema%3Dsewa"
     )
+
+
+def _profile_data(**extra):
+    data = {
+        "applicant_type": "badan_usaha",
+        "name": "PT Nama Diganti",
+        "nib": "999",
+        "npwp": "",
+        "nik": "",
+        "pic_name": "Siti",
+        "pic_position": "",
+        "phone": "0778-111",
+        "address": "Alamat Diganti",
+        "city": "Batam",
+    }
+    data.update(extra)
+    return data
+
+
+@pytest.mark.parametrize("status", [S.SUBMITTED, S.VERIFYING, S.APPROVED, S.PAID])
+def test_profile_identity_locked_while_application_in_process(
+    client, applicant, filled_application, status
+):
+    Application.objects.filter(pk=filled_application.pk).update(status=status)
+    original_name, original_address = applicant.name, applicant.address
+    login(client, applicant)
+    page = client.get(reverse("portal:profile")).content.decode()
+    assert "dikunci" in page
+    assert client.post(reverse("portal:profile"), _profile_data()).status_code == 302
+    applicant.refresh_from_db()
+    assert applicant.name == original_name
+    assert applicant.address == original_address
+    # Kontak tetap boleh diperbarui.
+    assert applicant.phone == "0778-111"
+
+
+@pytest.mark.parametrize("status", [S.DRAFT, S.REVISION, S.ISSUED, S.REJECTED])
+def test_profile_identity_editable_otherwise(
+    client, applicant, filled_application, status
+):
+    Application.objects.filter(pk=filled_application.pk).update(status=status)
+    login(client, applicant)
+    assert client.post(reverse("portal:profile"), _profile_data()).status_code == 302
+    applicant.refresh_from_db()
+    assert applicant.name == "PT Nama Diganti"
+
+
+def test_profile_identity_locked_for_transfer_recipient(
+    client, applicant, filled_application, make_applicant
+):
+    recipient = make_applicant(active=True)
+    Application.objects.filter(pk=filled_application.pk).update(
+        status=S.APPROVED, recipient=recipient
+    )
+    name = recipient.name
+    login(client, recipient)
+    client.post(reverse("portal:profile"), _profile_data())
+    recipient.refresh_from_db()
+    assert recipient.name == name

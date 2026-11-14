@@ -1,5 +1,6 @@
 import datetime
 from decimal import Decimal
+from unittest import mock
 
 import pytest
 from django.core import mail
@@ -225,3 +226,105 @@ def test_awarded_tender_shows_winner(client, open_tender):
         reverse("aset_portal:tender_detail", args=[open_tender.number])
     ).content.decode()
     assert "PT Pemenang" in page
+
+
+def _submit_grievance(client, captured, _ip="203.0.113.1", **extra):
+    with captured(execute=True):
+        response = client.post(
+            reverse("aset_portal:grievance_create"),
+            _grievance_payload(**extra),
+            REMOTE_ADDR=_ip,
+        )
+    assert response.status_code == 302
+
+
+def test_grievance_receipt_does_not_carry_caller_text(
+    client, seeded, django_capture_on_commit_callbacks
+):
+    _submit_grievance(
+        client,
+        django_capture_on_commit_callbacks,
+        email="korban@example.id",
+        subject="Klik https://penipu.invalid untuk hadiah",
+    )
+    receipt = [m for m in mail.outbox if "korban@example.id" in m.to]
+    assert len(receipt) == 1
+    assert "penipu.invalid" not in receipt[0].body
+    assert "penipu.invalid" not in receipt[0].subject
+    assert Grievance.objects.get().access_code in receipt[0].body
+
+
+def test_grievance_receipts_capped_per_contact(
+    client, seeded, django_capture_on_commit_callbacks, settings
+):
+    settings.WHATSAPP_TOKEN = ""
+    for index in range(5):
+        # Alamat IP berbeda tiap kali: batas per IP tidak membantu di sini.
+        _submit_grievance(
+            client,
+            django_capture_on_commit_callbacks,
+            email="korban@example.id",
+            _ip=f"203.0.113.{index + 10}",
+        )
+    # Semua pengaduan tetap tersimpan, tetapi tanda terima ke alamat yang sama
+    # dibatasi.
+    assert Grievance.objects.count() == 5
+    receipts = [m for m in mail.outbox if "korban@example.id" in m.to]
+    assert len(receipts) == 3
+
+
+def _bid_payload(**extra):
+    payload = {
+        "bidder_name": "PT Contoh",
+        "email": "pemohon@example.id",
+        "phone": "0812",
+        "amount": "1500000",
+    }
+    payload.update(extra)
+    return payload
+
+
+def test_bid_offer_change_resets_staff_evaluation(applicant_client, open_tender):
+    url = reverse("aset_portal:bid_submit", args=[open_tender.number])
+    assert applicant_client.post(url, _bid_payload()).status_code == 302
+    Bid.objects.update(technical_score=Decimal("85"), evaluation_note="Baik")
+
+    # Ganti kontak saja: penilaian tetap.
+    assert applicant_client.post(url, _bid_payload(phone="0813")).status_code == 302
+    bid = Bid.objects.get()
+    assert bid.technical_score == Decimal("85") and bid.evaluation_note == "Baik"
+
+    # Ganti nilai penawaran: penilaian atas penawaran lama gugur.
+    assert applicant_client.post(url, _bid_payload(amount="1900000")).status_code == 302
+    bid.refresh_from_db()
+    assert bid.amount == Decimal("1900000")
+    assert bid.technical_score is None and bid.evaluation_note == ""
+
+
+def test_bid_edit_does_not_overwrite_evaluation_made_meanwhile(
+    applicant_client, open_tender
+):
+    url = reverse("aset_portal:bid_submit", args=[open_tender.number])
+    assert applicant_client.post(url, _bid_payload()).status_code == 302
+    stale = Bid.objects.get()  # dibaca peserta saat status masih SUBMITTED
+    Bid.objects.update(status=enums.BidStatus.QUALIFIED, technical_score=Decimal("70"))
+    lookup = mock.MagicMock()
+    lookup.first.return_value = stale
+    with mock.patch.object(Bid.objects, "filter", return_value=lookup):
+        response = applicant_client.post(url, _bid_payload(amount="1900000"))
+    assert response.status_code == 302
+    bid = Bid.objects.get()
+    assert bid.status == enums.BidStatus.QUALIFIED
+    assert bid.amount == Decimal("1500000")
+    assert bid.technical_score == Decimal("70")
+
+
+def test_bid_edit_rejected_when_tender_closed_meanwhile(applicant_client, open_tender):
+    url = reverse("aset_portal:bid_submit", args=[open_tender.number])
+    assert applicant_client.post(url, _bid_payload()).status_code == 302
+    stale_tender = Tender.objects.get(pk=open_tender.pk)  # masih menerima penawaran
+    Tender.objects.filter(pk=open_tender.pk).update(status=enums.TenderStatus.CLOSED)
+    with mock.patch("asetlahan.portal_views._public_tender", return_value=stale_tender):
+        response = applicant_client.post(url, _bid_payload(amount="1900000"))
+    assert response.status_code == 302
+    assert Bid.objects.get().amount == Decimal("1500000")

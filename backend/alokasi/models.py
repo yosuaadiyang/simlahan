@@ -236,6 +236,17 @@ class AllocationSettings(models.Model):
         validators=[MaxValueValidator(600)],
         help_text=_("0 = tanpa batas."),
     )
+    max_open_allocations_per_applicant = models.PositiveSmallIntegerField(
+        verbose_name=_("Batas permohonan alokasi diproses per pemohon"),
+        default=5,
+        validators=[MaxValueValidator(1000)],
+        help_text=_(
+            "Jumlah permohonan alokasi lahan yang boleh sedang diproses "
+            "(diajukan s.d. lunas) sekaligus oleh satu pemohon. Setiap permohonan "
+            "mengunci lahannya, jadi batas ini mencegah satu akun mengunci banyak "
+            "lahan. 0 = tanpa batas."
+        ),
+    )
     publish_open_winners = models.BooleanField(
         verbose_name=_("Umumkan pemenang alokasi terbuka"),
         default=True,
@@ -906,6 +917,14 @@ class Applicant(TimeStampedModel):
     city = models.CharField(
         verbose_name=_("Kota"), max_length=128, blank=True, default=""
     )
+    # Tautan aktivasi surel hanya untuk akun yang belum pernah aktif. Begitu akun
+    # aktif (lewat tautan atau petugas) atau dinonaktifkan petugas, kirim ulang
+    # aktivasi tidak boleh lagi mengaktifkannya; hanya petugas yang bisa.
+    email_activation_closed = models.BooleanField(
+        verbose_name=_("Aktivasi lewat surel ditutup"),
+        default=False,
+        editable=False,
+    )
     # Profil investor: dasbor portal mendahulukan peluang & permintaan investasi.
     is_investor = models.BooleanField(
         verbose_name=_("Akun investor"),
@@ -941,6 +960,13 @@ class Applicant(TimeStampedModel):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        # Akun yang dibuat langsung aktif (petugas, data contoh) tidak memakai
+        # tautan aktivasi surel.
+        if self._state.adding and self.user_id and self.user.is_active:
+            self.email_activation_closed = True
+        super().save(*args, **kwargs)
 
     @property
     def email(self) -> str:

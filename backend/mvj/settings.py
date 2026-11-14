@@ -10,6 +10,8 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
 from sentry_sdk.integrations.django import DjangoIntegration
 
+from utils.placeholders import is_placeholder
+
 django_stubs_ext.monkeypatch()
 
 # Presisi bawaan Python (28 digit) tidak cukup untuk perkalian nilai uang x
@@ -118,13 +120,11 @@ def _reject_placeholder(name: str, value: str) -> None:
     dipalsukan siapa pun yang membaca repositori."""
     if DEBUG or not value:
         return
-    lowered = value.lower()
-    for marker in ("ganti-", "ganti ", "dev-only", "changeme", "change-me", "example"):
-        if marker in lowered:
-            raise ImproperlyConfigured(
-                f"{name} masih memuat nilai contoh/placeholder. Isi nilai rahasia "
-                "yang sebenarnya (lihat .env.example untuk cara membuatnya)."
-            )
+    if is_placeholder(value):
+        raise ImproperlyConfigured(
+            f"{name} masih memuat nilai contoh/placeholder. Isi nilai rahasia "
+            "yang sebenarnya (lihat .env.example untuk cara membuatnya)."
+        )
 
 
 _reject_placeholder("SECRET_KEY", SECRET_KEY)
@@ -322,7 +322,7 @@ REST_FRAMEWORK = {
         "users.oauth.OAuth2ServiceAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
-        "rest_framework.authentication.TokenAuthentication",
+        "users.authentication.OfficerTokenAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",

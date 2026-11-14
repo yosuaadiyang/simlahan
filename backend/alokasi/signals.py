@@ -6,7 +6,7 @@ status staf sehingga tidak dapat lagi masuk ke /admin/ dengan sisa izinnya.
 """
 
 from django.contrib.auth import get_user_model
-from django.db.models.signals import m2m_changed
+from django.db.models.signals import m2m_changed, post_save
 from django.dispatch import receiver
 
 from utils.group_permissions import ADMIN_PANEL_GROUPS
@@ -79,3 +79,20 @@ def grant_staff_to_allocation_officers(
         _after_remove(instance, reverse, pk_set)
     elif action == "post_add" and pk_set:
         _after_add(instance, reverse, pk_set)
+
+
+@receiver(post_save, sender=get_user_model())
+def close_email_activation_once_active(sender, instance, created, **kwargs):
+    """Akun pemohon yang pernah aktif tidak bisa diaktifkan ulang lewat surel
+    setelah dinonaktifkan petugas (jalur mana pun: admin pengguna, aksi admin,
+    tautan aktivasi)."""
+    if kwargs.get("raw") or not instance.is_active:
+        return
+    update_fields = kwargs.get("update_fields")
+    if update_fields is not None and "is_active" not in update_fields:
+        return  # mis. last_login saat masuk: status aktif tidak berubah
+    from alokasi.models import Applicant
+
+    Applicant.objects.filter(user_id=instance.pk, email_activation_closed=False).update(
+        email_activation_closed=True
+    )

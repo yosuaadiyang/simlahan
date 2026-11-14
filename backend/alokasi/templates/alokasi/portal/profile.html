@@ -4,6 +4,9 @@
 <h1>{% if request.applicant.is_investor %}Profil investor{% else %}Profil pemohon{% endif %}</h1>
 <form method="post" class="card">{% csrf_token %}
   <p class="muted small">Surel akun: {{ request.user.email }}</p>
+  {% if form.identity_locked %}
+  <p class="alert alert-warn small">Data identitas (jenis pemohon, nama, NIB, NPWP, NIK, penanggung jawab, alamat) dikunci selama permohonan Anda sedang diproses atau menunggu penerbitan dokumen, karena data ini sudah diverifikasi petugas dan akan dicetak pada dokumen. Bila perlu diubah, hubungi petugas.</p>
+  {% endif %}
   {% include "alokasi/portal/_form.html" %}
   <div class="actions-row">
     <button class="btn" type="submit">Simpan</button>

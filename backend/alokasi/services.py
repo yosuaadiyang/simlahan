@@ -288,6 +288,38 @@ def validate_for_submission(application: Application) -> list[str]:
     return errors
 
 
+# Status permohonan alokasi yang mengunci lahannya.
+RESERVING_STATUSES = (S.SUBMITTED, S.VERIFYING, S.REVISION, S.APPROVED, S.PAID)
+
+
+def _require_open_allocation_quota(application: Application) -> None:
+    """Satu pemohon tidak boleh mengunci lahan tanpa batas lewat banyak
+    permohonan sekaligus (batas diatur di Pengaturan layanan)."""
+    limit = AllocationSettings.load().max_open_allocations_per_applicant
+    if not limit:
+        return
+    # Kunci baris pemohon agar dua pengajuan bersamaan tidak sama-sama lolos.
+    Applicant.objects.select_for_update().filter(pk=application.applicant_id).first()
+    open_count = (
+        Application.objects.filter(
+            applicant_id=application.applicant_id,
+            service_type=enums.ServiceType.ALLOCATION,
+            status__in=RESERVING_STATUSES,
+        )
+        .exclude(pk=application.pk)
+        .count()
+    )
+    _require(
+        open_count < limit,
+        _(
+            "Anda sudah memiliki %(count)d permohonan alokasi yang sedang diproses "
+            "(batas %(limit)d). Selesaikan atau batalkan salah satunya sebelum "
+            "mengajukan yang baru."
+        )
+        % {"count": open_count, "limit": limit},
+    )
+
+
 @transaction.atomic
 def submit(application: Application, user) -> Application:
     application = Application.objects.select_for_update().get(pk=application.pk)
@@ -296,9 +328,10 @@ def submit(application: Application, user) -> Application:
     if errors:
         raise ValidationError(errors)
     if application.is_allocation:
+        _require_open_allocation_quota(application)
         plot = LandPlot.objects.select_for_update().get(pk=application.plot_id)
         reserved_by_other = plot.applications.exclude(pk=application.pk).filter(
-            status__in=(S.SUBMITTED, S.VERIFYING, S.REVISION, S.APPROVED, S.PAID)
+            status__in=RESERVING_STATUSES
         )
         _require(
             not reserved_by_other.exists()

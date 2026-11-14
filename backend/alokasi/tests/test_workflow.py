@@ -309,3 +309,63 @@ def test_numbers_are_sequential(applicant, make_plot):
     year = datetime.date.today().year
     assert first.number == f"ALK-{year}-00001"
     assert second.number == f"ALK-{year}-00002"
+
+
+def _filled(applicant, plot, upload_required_docs):
+    application = services.create_allocation_application(applicant, plot)
+    application.activity = "Gudang"
+    application.investment_value = Decimal("1000000000")
+    application.workforce = 10
+    application.development_months = 12
+    application.description = "Uji batas permohonan."
+    application.save()
+    upload_required_docs(application)
+    return application
+
+
+@pytest.mark.parametrize("limit", [1, 2])
+def test_open_allocation_applications_are_capped_per_applicant(
+    applicant, make_plot, upload_required_docs, seeded, limit
+):
+    from alokasi.models import AllocationSettings
+
+    config = AllocationSettings.load()
+    config.max_open_allocations_per_applicant = limit
+    config.save()
+    applications = [
+        _filled(applicant, make_plot(code=f"LHN-BATAS-{i}"), upload_required_docs)
+        for i in range(limit + 1)
+    ]
+    for application in applications[:limit]:
+        services.submit(application, applicant.user)
+    extra = applications[limit]
+    with pytest.raises(ValidationError, match="sedang diproses"):
+        services.submit(extra, applicant.user)
+    extra.refresh_from_db()
+    extra.plot.refresh_from_db()
+    assert extra.status == S.DRAFT
+    assert extra.plot.status == enums.PlotStatus.AVAILABLE
+
+    # Setelah satu permohonan selesai/dibatalkan petugas, kuota kembali.
+    Application.objects.filter(pk=applications[0].pk).update(status=S.REJECTED)
+    services.submit(extra, applicant.user)
+    extra.refresh_from_db()
+    assert extra.status == S.SUBMITTED
+
+
+def test_open_allocation_cap_zero_means_unlimited(
+    applicant, make_plot, upload_required_docs, seeded
+):
+    from alokasi.models import AllocationSettings
+
+    config = AllocationSettings.load()
+    config.max_open_allocations_per_applicant = 0
+    config.save()
+    for i in range(7):
+        application = _filled(
+            applicant, make_plot(code=f"LHN-BEBAS-{i}"), upload_required_docs
+        )
+        services.submit(application, applicant.user)
+    assert (
+        Application.objects.filter(applicant=applicant, status=S.SUBMITTED).count() == 7
+    )

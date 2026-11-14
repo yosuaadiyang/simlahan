@@ -3,11 +3,11 @@
 import io
 from decimal import Decimal
 
-import xlsxwriter
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
 from pengadaan import enums
+from utils.spreadsheet import safe_workbook
 
 
 def _latest_final_valuation(parcel):
@@ -19,7 +19,7 @@ def _latest_final_valuation(parcel):
 
 def nominative_list_xlsx(project) -> bytes:
     output = io.BytesIO()
-    workbook = xlsxwriter.Workbook(output, {"in_memory": True})
+    workbook = safe_workbook(output, {"in_memory": True})
     sheet = workbook.add_worksheet(_("Nominative list")[:31])
 
     title = workbook.add_format({"bold": True, "font_size": 13})

@@ -83,6 +83,8 @@ OFFICER_OTP_REQUIRED=True
 
 Pastikan pengiriman surel (`EMAIL_URL`) sudah berfungsi dan setiap akun petugas punya **Alamat surel** sebelum menyalakannya.
 
+Selama OTP diwajibkan, token API statis (`Authorization: Token ...`) ditolak karena tidak melewati OTP. Integrasi aplikasi lain memakai aplikasi OAuth2 dengan akun layanan. Setiap kali sandi pengguna diganti (dari jalur mana pun), token API lamanya (JWT, token statis, OAuth) otomatis dicabut.
+
 ## 16.5 Kunci hidup sistem
 
 Fitur darurat untuk menghentikan seluruh aplikasi pada waktu tertentu (misalnya bila terjadi pelanggaran keamanan atau sengketa operasional). Buka **Panel admin → Pusat komando operasi lapangan → Kunci hidup sistem**.

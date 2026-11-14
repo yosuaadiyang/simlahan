@@ -3,7 +3,6 @@ import zipfile
 from typing import Any, Dict
 from zipfile import ZipInfo
 
-import xlsxwriter
 from django import http
 from django.http import HttpResponse, QueryDict
 from django.utils import timezone
@@ -95,6 +94,7 @@ from plotsearch.serializers.plot_search import (
 )
 from plotsearch.utils import build_pdf_context
 from utils.pdf import PdfMixin
+from utils.spreadsheet import safe_workbook
 
 
 class PlotSearchSubtypeViewSet(
@@ -183,7 +183,7 @@ class PlotSearchViewSet(FieldPermissionsViewsetMixin, AtomicTransactionModelView
 
         output = io.BytesIO()
 
-        workbook = xlsxwriter.Workbook(output)
+        workbook = safe_workbook(output)
         worksheet = workbook.add_worksheet()
 
         row = 0
@@ -347,7 +347,7 @@ class AreaSearchViewSet(viewsets.ModelViewSet):
 
         output = io.BytesIO()
 
-        workbook = xlsxwriter.Workbook(output)
+        workbook = safe_workbook(output)
         worksheet = workbook.add_worksheet()
 
         row = 0
