@@ -97,9 +97,15 @@ def project():
 
 
 def _share_post(**extra):
+    import datetime
+
+    from django.utils import timezone
+
+    # Tautan publik berlaku paling lama 90 hari.
+    expires = timezone.localtime() + datetime.timedelta(days=30)
     data = {
         "title": "Peta warga",
-        "expires_at_0": "2030-01-01",
+        "expires_at_0": expires.strftime("%Y-%m-%d"),
         "expires_at_1": "00:00:00",
         "is_active": "on",
     }
