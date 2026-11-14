@@ -316,3 +316,14 @@ class DayMonthField(serializers.Field):
 
     def to_representation(self, instance):
         return instance.asdict()
+
+
+class InstanceLeaseMixin:
+    """Sewa dari data permintaan, atau dari objek yang diubah untuk
+    pembaruan sebagian (PATCH tanpa ``lease``)."""
+
+    def _lease(self, attrs):
+        lease = attrs.get("lease") or getattr(self.instance, "lease", None)
+        if lease is None:
+            raise ValidationError({"lease": "This field is required."})
+        return lease

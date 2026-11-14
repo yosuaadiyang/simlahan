@@ -149,3 +149,54 @@ def test_rent_info_completion_bound_to_lease_unit(client, officer_a, leases):
     )
     assert own.status_code == 200, own.content
     assert Lease.objects.get(pk=leases[0].pk).rent_info_completed_at is None
+
+
+def test_invoice_note_write_bound_to_lease_unit(
+    client, officer_a, leases, django_user_model
+):
+    from leasing.models import InvoiceNote
+
+    officer_a.user_permissions.add(
+        *Permission.objects.filter(
+            content_type__app_label="leasing", content_type__model="invoicenote"
+        )
+    )
+    url = reverse("v1:invoicenote-list")
+    other = client.post(
+        url,
+        _json({"lease": leases[1].id, "notes": "Catatan"}),
+        content_type="application/json",
+    )
+    assert other.status_code == 403, other.content
+    assert not InvoiceNote.objects.filter(lease=leases[1]).exists()
+    own = client.post(
+        url,
+        _json({"lease": leases[0].id, "notes": "Catatan"}),
+        content_type="application/json",
+    )
+    assert own.status_code == 201, own.content
+
+
+def test_collection_letter_partial_update_without_lease_is_not_a_crash(
+    client, officer_a, leases
+):
+    from leasing.models import CollectionLetter
+
+    officer_a.user_permissions.add(
+        *Permission.objects.filter(
+            content_type__app_label="leasing", content_type__model="collectionletter"
+        )
+    )
+    letter = CollectionLetter.objects.create(
+        lease=leases[0],
+        file=SimpleUploadedFile("surat.pdf", b"%PDF-1.4"),
+        uploader=officer_a,
+    )
+    from django.test.client import BOUNDARY, MULTIPART_CONTENT, encode_multipart
+
+    response = client.patch(
+        reverse("v1:collectionletter-detail", kwargs={"pk": letter.id}),
+        encode_multipart(BOUNDARY, {"data": json.dumps({"id": letter.id})}),
+        content_type=MULTIPART_CONTENT,
+    )
+    assert response.status_code == 200, response.content

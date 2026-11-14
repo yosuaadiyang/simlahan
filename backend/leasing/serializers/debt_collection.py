@@ -16,7 +16,7 @@ from ..models.debt_collection import (
     CollectionLetterTemplate,
     CollectionNote,
 )
-from .utils import InstanceDictPrimaryKeyRelatedField
+from .utils import InstanceDictPrimaryKeyRelatedField, InstanceLeaseMixin
 
 
 class CollectionCourtDecisionSerializer(
@@ -49,7 +49,7 @@ class CollectionCourtDecisionSerializer(
 
 
 class CollectionCourtDecisionCreateUpdateSerializer(
-    FieldPermissionsSerializerMixin, serializers.ModelSerializer
+    InstanceLeaseMixin, FieldPermissionsSerializerMixin, serializers.ModelSerializer
 ):
     id = serializers.IntegerField(required=False)
     uploader = serializers.HiddenField(default=serializers.CurrentUserDefault())
@@ -70,7 +70,7 @@ class CollectionCourtDecisionCreateUpdateSerializer(
     def validate(self, data):
         request = self.context.get("request")
         if (
-            data.get("lease").service_unit not in request.user.service_units.all()
+            self._lease(data).service_unit not in request.user.service_units.all()
             and not request.user.is_superuser
         ):
             raise ValidationError(
@@ -102,7 +102,7 @@ class CollectionLetterSerializer(
 
 
 class CollectionLetterCreateUpdateSerializer(
-    FieldPermissionsSerializerMixin, serializers.ModelSerializer
+    InstanceLeaseMixin, FieldPermissionsSerializerMixin, serializers.ModelSerializer
 ):
     id = serializers.IntegerField(required=False)
     uploader = serializers.HiddenField(default=serializers.CurrentUserDefault())
@@ -115,7 +115,7 @@ class CollectionLetterCreateUpdateSerializer(
     def validate(self, data):
         request = self.context.get("request")
         if (
-            data.get("lease").service_unit not in request.user.service_units.all()
+            self._lease(data).service_unit not in request.user.service_units.all()
             and not request.user.is_superuser
         ):
             raise PermissionDenied(
