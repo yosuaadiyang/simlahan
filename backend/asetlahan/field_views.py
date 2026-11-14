@@ -53,8 +53,17 @@ SHELL_STATIC = (
 
 
 def _valid_share(token) -> MapShare:
-    share = get_object_or_404(MapShare, token=token)
+    from asetlahan.admin import share_allowed_for
+
+    share = get_object_or_404(
+        MapShare.objects.select_related("created_by"), token=token
+    )
     if not share.is_valid:
+        raise Http404
+    # Tautan tanpa pembuat (data lama/impor) tetap mengikuti masa berlakunya.
+    if share.created_by_id is not None and not share_allowed_for(
+        share, share.created_by
+    ):
         raise Http404
     return share
 

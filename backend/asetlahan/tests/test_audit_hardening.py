@@ -143,3 +143,63 @@ def test_assistant_tool_coerces_non_text_filters(officer):
 
     result = run_tool(officer, "aset", {"kelurahan": 5, "status": ["x"]})
     assert isinstance(result, dict)
+
+
+def test_shared_map_dies_with_creator_access(client, officer, make_asset, units):
+    import datetime
+
+    from django.utils import timezone
+
+    from asetlahan.models import MapShare
+
+    asset = make_asset(service_unit=units[0])
+    share = MapShare.objects.create(
+        title="Peta publik", created_by=officer, service_unit=units[0]
+    )
+    share.assets.add(asset)
+    url = reverse("asetlahan-share", args=[share.token])
+    assert client.get(url).status_code == 200
+    officer.is_active = False
+    officer.save(update_fields=["is_active"])
+    assert client.get(url).status_code == 404
+
+    # Masa berlaku maksimal 90 hari saat dibuat/diubah lewat admin.
+    from asetlahan.admin import MapShareForm
+
+    officer.is_active = True
+    officer.save(update_fields=["is_active"])
+    form_class = type("F", (MapShareForm,), {"user": officer})
+    form = form_class(
+        data={
+            "title": "Terlalu lama",
+            "expires_at": (timezone.now() + datetime.timedelta(days=365)).strftime(
+                "%Y-%m-%d %H:%M:%S"
+            ),
+            "is_active": "on",
+            "service_unit": units[0].pk,
+            "assets": [asset.pk],
+        }
+    )
+    assert not form.is_valid()
+    assert "expires_at" in form.errors
+
+
+def test_shared_map_project_must_be_in_creator_scope(seeded, units):
+    from asetlahan.admin import MapShareForm
+    from asetlahan.tests.conftest import make_user
+    from pengadaan.models import AcquisitionProject
+
+    project = AcquisitionProject.objects.create(name="Proyek di luar penugasan")
+    valuer = make_user("penilai-peta", UserGroup.PENILAI, UserGroup.PETUGAS_ASET)
+    valuer.user_permissions.add(Permission.objects.get(codename="add_mapshare"))
+    form_class = type("F", (MapShareForm,), {"user": valuer})
+    form = form_class(
+        data={
+            "title": "Bocor",
+            "is_active": "on",
+            "pengadaan_project": project.pk,
+            "expires_at": "2030-01-01 00:00:00",
+        }
+    )
+    form.is_valid()
+    assert "pengadaan_project" in form.errors
