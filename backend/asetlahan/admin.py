@@ -2160,15 +2160,29 @@ class DocumentAdmin(AsetModelAdmin):
 
     @admin.action(description=_("Baca teks dokumen (OCR)"), permissions=["change"])
     def run_ocr(self, request, queryset):
+        from asetlahan import ai
         from asetlahan.ocr import process_document
 
-        done = sum(
-            1
-            for doc in queryset[:50]
-            if scope.document_allows(request.user, doc, "change")
-            and process_document(doc)
-        )
+        done = 0
+        without_ai = 0
+        for doc in queryset[:50]:
+            if not scope.document_allows(request.user, doc, "change"):
+                continue
+            # Ekstraksi AI per dokumen mengambil jatah AI pengguna; bila habis,
+            # dokumen tetap dibaca (OCR) tanpa ekstraksi AI.
+            use_ai = ai.enabled() and ai.take_budget(request.user, "ocr-admin")
+            if ai.enabled() and not use_ai:
+                without_ai += 1
+            if process_document(doc, use_ai=use_ai):
+                done += 1
         self.message_user(request, _("%d dokumen berhasil dibaca.") % done)
+        if without_ai:
+            self.message_user(
+                request,
+                _("Batas ekstraksi AI per jam tercapai; %d dokumen dibaca tanpa AI.")
+                % without_ai,
+                level=messages.WARNING,
+            )
 
     def get_urls(self):
         return [

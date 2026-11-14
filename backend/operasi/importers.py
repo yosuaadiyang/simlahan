@@ -228,6 +228,25 @@ def _spatial_rows(data: bytes, filename: str) -> list[tuple[dict, Point | None]]
     return rows
 
 
+def _spend_nik_conflict(user) -> None:
+    """NIK yang terdata di luar wilayah kerja memakai jatah yang sama dengan
+    API pusat komando (per pengguna per jam). Tanpa ini, satu unggahan bisa
+    menguji ribuan NIK sekaligus untuk mengetahui mana yang terdata di Korwil
+    lain. Bila jatah habis, seluruh impor dibatalkan."""
+    from asetlahan import scope as aset_scope
+    from operasi.views import NIK_CONFLICT_LIMIT, _throttled
+
+    if user is None or (
+        user.has_perm("operasi.view_resident_nik") and aset_scope.sees_all(user)
+    ):
+        return
+    if _throttled(f"operasi:nik:{user.pk}", NIK_CONFLICT_LIMIT, 3600):
+        raise AssetImportError(
+            "terlalu banyak NIK yang tidak dapat dipakai. Impor dibatalkan; "
+            "coba lagi satu jam lagi atau hubungi Administrator."
+        )
+
+
 def _resident_for_row(props: dict, user, residents):
     """Warga yang diperbarui (NIK sama di wilayah kerja) atau warga baru.
 
@@ -245,6 +264,7 @@ def _resident_for_row(props: dict, user, residents):
         key = fingerprint(nik)
         resident = residents.filter(nik_fingerprint=key).first()
         if resident is None and Resident.objects.filter(nik_fingerprint=key).exists():
+            _spend_nik_conflict(user)
             raise RowSkipped(NIK_REJECTED)
         if (
             resident is not None

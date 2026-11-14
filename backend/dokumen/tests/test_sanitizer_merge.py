@@ -101,3 +101,36 @@ def test_render_docx_fills_fields(land_use):
     data = merge.render_docx(buffer.getvalue(), merge.build_context(land_use=land_use))
     text = "\n".join(p.text for p in docx.Document(io.BytesIO(data)).paragraphs)
     assert land_use.holder.name in text and land_use.number in text
+
+
+def _docx_with_padding(padding_bytes: int) -> bytes:
+    """DOCX sah ditambah satu bagian yang sangat mudah dikompresi (bom ZIP)."""
+    import io
+    import zipfile
+
+    import docx
+
+    document = docx.Document()
+    document.add_paragraph("Nama: {{ pemohon.nama }}")
+    buffer = io.BytesIO()
+    document.save(buffer)
+    with zipfile.ZipFile(buffer, "a", zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr("word/media/padding.bin", b"\0" * padding_bytes)
+    return buffer.getvalue()
+
+
+def test_docx_uncompressed_size_is_bounded(land_use, monkeypatch):
+    monkeypatch.setattr(merge, "MAX_DOCX_UNCOMPRESSED", 1024 * 1024)
+    bomb = _docx_with_padding(2 * 1024 * 1024)
+    assert len(bomb) < 64 * 1024  # kecil saat diunggah
+    with pytest.raises(merge.TemplateRenderError, match="terlalu besar"):
+        merge.docx_to_html(bomb)
+    with pytest.raises(merge.TemplateRenderError, match="terlalu besar"):
+        merge.render_docx(bomb, merge.build_context(land_use=land_use))
+    # DOCX biasa di bawah batas tetap terbaca.
+    assert "pemohon.nama" in merge.docx_to_html(_docx_with_padding(1024))
+
+
+def test_docx_that_is_not_a_zip_is_rejected_cleanly():
+    with pytest.raises(merge.TemplateRenderError):
+        merge.docx_to_html(b"bukan docx")

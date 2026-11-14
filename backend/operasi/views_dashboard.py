@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 
 from operasi import dashboard, ranking, services
-from operasi.views import _throttled, api
+from operasi.views import api
 
 XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
@@ -26,7 +26,9 @@ def _korwil_param(request, queryset):
 
 
 def _insight_throttled(user) -> JsonResponse | None:
-    if _throttled(f"operasi:wawasan:{user.pk}", 20, 3600):
+    from asetlahan import ai
+
+    if not ai.take_budget(user, "wawasan", 20):
         return JsonResponse(
             {"error": _("Batas 20 wawasan per jam tercapai. Coba lagi nanti.")},
             status=429,
@@ -115,7 +117,7 @@ def performance(request):
     me = services.performance(target, start, end)
     data = {"me": me}
     if request.GET.get("rinci") == "1":
-        data["detail"] = ranking.personal(target, start, end, me)
+        data["detail"] = ranking.personal(target, start, end, me, viewer=request.user)
     if team.exclude(pk=request.user.pk).exists():
         data["team"] = services.leaderboard(request.user, start, end, trend=False)
     return JsonResponse(data)
@@ -129,5 +131,7 @@ def performance_insight(request):
     start, end = services.period_bounds(_period(request))
     target = _target(request)
     me = services.performance(target, start, end)
-    text, by_ai = ranking.personal_insight(me, ranking.personal(target, start, end, me))
+    text, by_ai = ranking.personal_insight(
+        me, ranking.personal(target, start, end, me, viewer=request.user)
+    )
     return JsonResponse({"text": text, "ai": by_ai})

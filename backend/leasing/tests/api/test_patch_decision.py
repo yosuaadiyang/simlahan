@@ -28,6 +28,8 @@ def test_patch_decision_condition_cannot_change_fields(
         user.user_permissions.add(Permission.objects.get(codename=permission_name))
 
     lease = lease_test_data["lease"]
+    # Penulisan data turunan sewa terbatas pada anggota unit layanan sewa.
+    user.service_units.add(lease.service_unit)
 
     decision = decision_factory(lease=lease)
     condition = condition_factory(
@@ -93,6 +95,8 @@ def test_patch_decision_condition_can_change_some_fields(
         user.user_permissions.add(Permission.objects.get(codename=permission_name))
 
     lease = lease_test_data["lease"]
+    # Penulisan data turunan sewa terbatas pada anggota unit layanan sewa.
+    user.service_units.add(lease.service_unit)
 
     decision = decision_factory(lease=lease)
     condition = condition_factory(
@@ -154,6 +158,8 @@ def test_patch_decision_add_decision(
         user.user_permissions.add(Permission.objects.get(codename=permission_name))
 
     lease = lease_test_data["lease"]
+    # Penulisan data turunan sewa terbatas pada anggota unit layanan sewa.
+    user.service_units.add(lease.service_unit)
 
     decision = decision_factory(lease=lease)
     condition = condition_factory(
@@ -224,6 +230,8 @@ def test_patch_decision_remove_decision(
         user.user_permissions.add(Permission.objects.get(codename=permission_name))
 
     lease = lease_test_data["lease"]
+    # Penulisan data turunan sewa terbatas pada anggota unit layanan sewa.
+    user.service_units.add(lease.service_unit)
 
     decision = decision_factory(lease=lease)
     condition = condition_factory(

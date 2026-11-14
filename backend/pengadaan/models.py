@@ -1069,6 +1069,80 @@ class Consignment(TimeStampedModel):
     def acceptance_deadline(self) -> datetime.date | None:
         return apply_rule("consignment_acceptance", self.application_date)
 
+    def clean(self):
+        # Pintu yang sama dengan API (ConsignmentSerializer).
+        previous = None
+        if self.pk:
+            previous = (
+                Consignment.objects.filter(pk=self.pk)
+                .values("parcel_id", "party_id", "status")
+                .first()
+            )
+        errors = consignment_settlement_errors(
+            previous,
+            parcel=self.parcel if self.parcel_id else None,
+            party=self.party if self.party_id else None,
+            status=self.status,
+            decree_number=self.decree_number,
+            deposited_on=self.deposited_on,
+            amount=self.amount,
+        )
+        if errors:
+            raise ValidationError(errors)
+
+
+def consignment_settlement_errors(
+    previous, *, parcel, party, status, decree_number, deposited_on, amount
+) -> dict:
+    """Syarat konsinyasi berstatus dititipkan/diambil.
+
+    Konsinyasi yang dititipkan membuat ganti kerugian yang dicakupnya berstatus
+    "dikonsinyasi" (signal) dan membuka pelepasan hak, jadi harus didukung
+    penetapan pengadilan, tanggal penitipan dan nilai yang dititipkan, dan
+    hanya boleh mencakup ganti kerugian yang sudah divalidasi Ketua Pelaksana.
+
+    ``previous`` berisi ``parcel_id``, ``party_id`` dan ``status`` tersimpan
+    (``None`` untuk data baru). Pemeriksaan validasi ganti kerugian dijalankan
+    saat konsinyasi baru menjadi dititipkan atau cakupannya berubah, karena
+    setelah itu statusnya memang sudah "dikonsinyasi".
+    """
+    settled = (enums.ConsignmentStatus.DEPOSITED, enums.ConsignmentStatus.COLLECTED)
+    if status not in settled:
+        return {}
+    errors = {}
+    if not (decree_number or "").strip():
+        errors["decree_number"] = _(
+            "A deposited consignment requires the court decree number."
+        )
+    if not deposited_on:
+        errors["deposited_on"] = _("A deposited consignment requires the deposit date.")
+    if amount is None or amount <= 0:
+        errors["amount"] = _("A deposited consignment requires the deposited amount.")
+    coverage_changed = (
+        previous is None
+        or previous["status"] not in settled
+        or previous["parcel_id"] != getattr(parcel, "pk", None)
+        or previous["party_id"] != getattr(party, "pk", None)
+    )
+    if parcel is not None and coverage_changed:
+        covered = Compensation.objects.filter(parcel=parcel).exclude(
+            status=enums.CompensationStatus.CANCELLED
+        )
+        if party is not None:
+            covered = covered.filter(party=party)
+        statuses = list(covered.values_list("status", flat=True))
+        allowed = (
+            enums.CompensationStatus.VALIDATED,
+            enums.CompensationStatus.CONSIGNED,
+            enums.CompensationStatus.PAID,
+        )
+        if not statuses or any(s not in allowed for s in statuses):
+            errors["status"] = _(
+                "Compensation covered by the consignment must be validated "
+                "by the executing chair before it is deposited."
+            )
+    return errors
+
 
 class Compensation(TimeStampedModel):
     """Ganti kerugian yang ditetapkan untuk pihak yang berhak."""

@@ -15,7 +15,7 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 
 from asetlahan.admin_views import bars
-from dokumen import downloads, enums, pdf, services
+from dokumen import access, downloads, enums, pdf, services
 from dokumen.forms import DownloadRequestForm
 from dokumen.models import (
     Activity,
@@ -281,6 +281,19 @@ def version_preview(request, pk):
         pk=pk,
     )
     back = reverse("admin:dokumen_permitrecord_change", args=[version.record_id])
+    if not access.can_view_record(request.user, version.record):
+        raise PermissionDenied
+    if not access.can_preview_confidential(
+        request.user, version.record.permit_type.confidentiality
+    ):
+        messages.error(
+            request,
+            _(
+                "Dokumen rahasia hanya dapat dibuka lewat permintaan unduh yang "
+                "disetujui pejabat berwenang."
+            ),
+        )
+        return redirect(back)
     extension = version.extension
     if extension not in ("pdf", "png", "jpg", "jpeg"):
         messages.error(

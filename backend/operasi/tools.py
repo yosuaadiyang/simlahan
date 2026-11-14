@@ -16,7 +16,6 @@ from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.contrib.gis.db.models import Extent
 from django.contrib.gis.geos import Polygon
-from django.core.cache import cache
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Count, Q, Sum
 from django.utils import timezone
@@ -59,15 +58,11 @@ def extension(name: str) -> str:
 
 def use_ai_quota(user):
     """Satu pemakaian AI; galat bila kuota jam ini habis."""
-    hour = timezone.now().strftime("%Y%m%d%H")
-    key = f"operasi:alat-ai:{user.pk}:{hour}"
-    cache.add(key, 0, 3700)
-    try:
-        used = cache.incr(key)
-    except ValueError:
-        cache.set(key, 1, 3700)
-        used = 1
-    if used > AI_LIMIT_PER_HOUR:
+    from asetlahan import ai
+
+    # Atomik di basis data: incr DatabaseCache adalah get+set, sehingga
+    # permintaan serentak bisa melewati batas.
+    if not ai.take_budget(user, "alat-ai", AI_LIMIT_PER_HOUR):
         raise ValidationError(
             {
                 "ai": [

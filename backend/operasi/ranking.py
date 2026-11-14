@@ -290,10 +290,19 @@ def _week_key(day) -> str:
     return f"{year}-W{week:02d}"
 
 
-def personal(target, start, end, me: dict) -> dict:
+def personal(target, start, end, me: dict, viewer=None) -> dict:
     """Pelengkap :func:`services.performance`: tren harian/mingguan, radar,
-    kalender 90 hari, sebaran titik kerja, riwayat, dan tugas terbuka."""
+    kalender 90 hari, sebaran titik kerja, riwayat, dan tugas terbuka.
+
+    Bila dilihat orang lain (``viewer``, mis. koordinator), rincian per baris
+    (kegiatan, titik GPS, absen, tugas) dibatasi ke data yang boleh dilihat
+    ``viewer`` di API lain; anggota tim bisa juga bertugas di Korwil lain."""
+    scoped_view = viewer is not None and viewer.pk != target.pk
     activities = Activity.objects.filter(reported_by=target)
+    attendance = Attendance.objects.filter(user=target)
+    if scoped_view:
+        activities = geo.scoped(activities, viewer)
+        attendance = geo.scoped(attendance, viewer)
     in_period = activities.filter(
         started_at__date__gte=start, started_at__date__lte=end
     )
@@ -363,9 +372,7 @@ def personal(target, start, end, me: dict) -> dict:
         .annotate(n=Count("pk"))
     )
     statuses = dict(
-        Attendance.objects.filter(user=target, date__gte=heat_start).values_list(
-            "date", "status"
-        )
+        attendance.filter(date__gte=heat_start).values_list("date", "status")
     )
     heat = [
         {
@@ -386,12 +393,12 @@ def personal(target, start, end, me: dict) -> dict:
     ]
     points += [
         {"lat": p.y, "lng": p.x, "kind": "absen", "label": _("Absen masuk")}
-        for p in Attendance.objects.filter(user=target, date__gte=start, date__lte=end)
+        for p in attendance.filter(date__gte=start, date__lte=end)
         .exclude(check_in_location=None)
         .values_list("check_in_location", flat=True)[:MAX_POINTS]
     ]
     tasks = (
-        task_flow.visible_tasks(target)
+        task_flow.visible_tasks(viewer if scoped_view else target)
         .filter(assignee=target, status__in=aset_enums.OPEN_TASK_STATUSES)
         .order_by("due_date", "pk")[:20]
     )

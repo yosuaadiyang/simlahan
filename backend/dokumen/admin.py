@@ -15,7 +15,7 @@ from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from alokasi.templatetags.alokasi_tags import angka
-from dokumen import downloads, enums, merge, pdf, services, signing
+from dokumen import access, downloads, enums, merge, pdf, services, signing
 from dokumen.forms import (
     BulkSendForm,
     ContentBlockForm,
@@ -90,6 +90,12 @@ def size_label(size) -> str:
     if size >= 1024 * 1024:
         return f"{angka(size / (1024 * 1024), 1)} MB"
     return f"{angka(max(size, 1) / 1024, 0)} KB"
+
+
+SECRET_PREVIEW_DENIED = _(
+    "Dokumen rahasia hanya dapat dibuka lewat permintaan unduh yang disetujui "
+    "pejabat berwenang."
+)
 
 
 def _redirect(request, url, error=None, success=None):
@@ -1885,6 +1891,13 @@ class SigningDocumentAdmin(admin.ModelAdmin):
             return _redirect(request, back, error=_errors(error))
         return _redirect(request, back, success=_("Isian diterapkan ke isi dokumen."))
 
+    def _may_preview_content(self, request, document) -> bool:
+        """Isi dokumen rahasia: penyusun (izin ubah) dan pejabat penyetuju
+        unduhan rahasia; peran yang hanya melihat mengajukan permintaan unduh."""
+        return self.has_change_permission(
+            request, document
+        ) or access.can_preview_confidential(request.user, document.confidentiality)
+
     def preview_view(self, request, pk):
         from django.http import HttpResponse
 
@@ -1894,6 +1907,8 @@ class SigningDocumentAdmin(admin.ModelAdmin):
         if not self.has_view_permission(request, document):
             raise PermissionDenied
         back = reverse("admin:dokumen_signingdocument_change", args=[pk])
+        if not self._may_preview_content(request, document):
+            return _redirect(request, back, error=SECRET_PREVIEW_DENIED)
         try:
             if document.source == enums.SigningSource.PDF:
                 data = services.read_file(document.source_file)
@@ -2031,6 +2046,11 @@ class SigningDocumentAdmin(admin.ModelAdmin):
         )
         if not self.has_view_permission(request, field.document) or not field.file:
             raise PermissionDenied
+        if not self._may_preview_content(request, field.document):
+            back = reverse(
+                "admin:dokumen_signingdocument_change", args=[field.document_id]
+            )
+            return _redirect(request, back, error=SECRET_PREVIEW_DENIED)
         data = services.read_file(field.file)
         filename = field.file_name or "berkas"
         # Pratinjau (bukan unduhan penuh): PDF pindaian KTP penerima diberi

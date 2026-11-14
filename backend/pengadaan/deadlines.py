@@ -44,6 +44,30 @@ class Deadline:
         data["due_date"] = self.due_date.isoformat()
         return data
 
+    def as_dict_for(self, user):
+        """``as_dict`` untuk pengguna API: nomor rujukan (laporan penilaian,
+        berita acara, perkara, penetapan) hanya untuk peran yang boleh melihat
+        data sumbernya. Tenggatnya sendiri tetap tampil bagi pemantau proyek."""
+        data = self.as_dict()
+        model = SOURCE_MODEL_BY_KIND.get(self.kind)
+        if model is None or not user.has_perm(f"pengadaan.view_{model}"):
+            data["reference"] = ""
+        return data
+
+
+# Model sumber nomor rujukan tiap jenis tenggat.
+SOURCE_MODEL_BY_KIND = {
+    "penlok_expiry": "acquisitionproject",
+    "inventory_objection": "announcement",
+    "deliberation": "valuation",
+    "compensation_objection": "deliberationresult",
+    "court_decision": "objection",
+    "cassation_filing": "objection",
+    "consignment_acceptance": "consignment",
+    "handover": "rightsrelease",
+    "registration": "handover",
+}
+
 
 def _make(project, kind, title, due, reference, parcel=None) -> Deadline | None:
     if due is None:

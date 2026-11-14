@@ -1227,7 +1227,7 @@ def _save_activity(
                 resident.save()
         activity.touch_residents()
         activity.refresh_effort()
-        services.schedule_ai_stance(activity)
+        services.schedule_ai_stance(activity, user)
 
 
 def _create_activity(request):
@@ -1898,7 +1898,9 @@ def satellite_analysis(request):
         raise ValidationError(_("Permintaan tidak sah."))
     if not isinstance(payload, dict):
         raise ValidationError(_("Permintaan tidak sah."))
-    if _throttled(f"operasi:ai:{request.user.pk}", 20, 3600):
+    from asetlahan import ai as ai_client
+
+    if not ai_client.take_budget(request.user, "analisis-satelit", 20):
         return JsonResponse(
             {"error": _("Batas 20 analisis per jam tercapai. Coba lagi nanti.")},
             status=429,
@@ -2054,7 +2056,7 @@ def ai_chat(request):
     question = (request.POST.get("tanya") or "").strip()[:1000]
     if not question:
         raise ValidationError({"tanya": [_("Pertanyaan kosong.")]})
-    if _throttled(f"operasi:aichat:{user.pk}", 20, 3600):
+    if not ai_client.take_budget(user, "tanya-ai", 20):
         return JsonResponse(
             {"error": _("Batas 20 pertanyaan per jam tercapai. Coba lagi nanti.")},
             status=429,

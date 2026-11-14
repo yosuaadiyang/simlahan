@@ -424,8 +424,14 @@ def save_session(parsed: dict, user, activity=None, source_name: str = ""):
         source_name=source_name[:255],
         uploaded_by=user,
     )
-    if activity is not None:
-        session._korwil_resolved = True
+    if activity is None:
+        # Tanpa kegiatan: Korwil dari titik awal jejak, tetapi tidak pernah
+        # Korwil di luar wilayah kerja pengunggah (sama dengan jalur API).
+        from operasi import geo
+
+        start = Point(*coords[0], srid=4326) if coords else None
+        session.korwil = geo.korwil_for_write(user, start) if start else None
+    session._korwil_resolved = True
     session.save()
     for seq, obs in enumerate(parsed["observations"]):
         observation = PatrolObservation.objects.create(

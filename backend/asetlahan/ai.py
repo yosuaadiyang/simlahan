@@ -33,6 +33,31 @@ def enabled() -> bool:
     return bool(getattr(settings, "ANTHROPIC_API_KEY", ""))
 
 
+# Jatah panggilan AI per pengguna per jam untuk tiap fitur. Setiap jalur yang
+# memanggil Claude atas nama pengguna mengambil jatah lewat ``take_budget``
+# sebelum memanggil API berbayar.
+BUDGET_WINDOW_SECONDS = 3600
+BUDGETS = {
+    "asisten": 30,  # asisten AI aset lahan (hingga 6 panggilan per pertanyaan)
+    "ocr-admin": 100,  # aksi admin "Baca teks dokumen (OCR)" per dokumen
+    "laporan-harian": 20,  # draf laporan harian komando
+    "sikap-komsos": 100,  # klasifikasi sikap Komsos di latar
+}
+
+
+def take_budget(user, bucket: str, limit: int | None = None) -> bool:
+    """Ambil satu jatah AI ``bucket`` milik ``user``; ``False`` bila habis.
+
+    Dihitung atomik di basis data (bukan cache), jadi permintaan serentak
+    tidak bisa melewati batas.
+    """
+    from utils.ratelimit import consume
+
+    if limit is None:
+        limit = BUDGETS[bucket]
+    return consume(f"ai:{bucket}:{user.pk}", limit, BUDGET_WINDOW_SECONDS)
+
+
 def model() -> str:
     return getattr(settings, "ANTHROPIC_MODEL", "") or DEFAULT_MODEL
 

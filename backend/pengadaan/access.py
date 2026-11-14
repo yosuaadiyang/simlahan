@@ -52,6 +52,42 @@ REQUESTING_AGENCY_DOCUMENT_TYPES = (
 )
 
 
+# Jenis dokumen yang isinya adalah data model tertentu (laporan penilaian,
+# berita acara musyawarah, putusan, penetapan konsinyasi, dst.). Dokumen ini
+# hanya terlihat oleh peran yang boleh melihat model sumbernya, agar tempat
+# penyimpanan dokumen tidak menjadi jalur baca kedua yang lebih longgar.
+DOCUMENT_TYPE_SOURCE_MODEL = {
+    enums.DocumentType.NOMINATIVE_LIST: "entitledparty",
+    enums.DocumentType.VALUATION_REPORT: "valuation",
+    enums.DocumentType.DELIBERATION_MINUTES: "deliberationresult",
+    enums.DocumentType.COURT_DECISION: "objection",
+    enums.DocumentType.CONSIGNMENT_DECREE: "consignment",
+    enums.DocumentType.RELEASE_MINUTES: "rightsrelease",
+}
+
+
+def visible_documents(queryset: QuerySet, user) -> QuerySet:
+    """Saring dokumen pengadaan (``AcquisitionDocument``) untuk ``user``.
+
+    Pembatasan proyek, data pribadi pihak (jenis sensitif & dokumen milik
+    pihak tertentu) dan jenis dokumen yang model sumbernya tidak boleh
+    dilihat. Dipakai API dokumen dan alat admin lain yang membaca dokumen.
+    """
+    queryset = scope_queryset(queryset, user, "project")
+    if not user.has_perm("pengadaan.view_sensitive_personal_data"):
+        queryset = queryset.exclude(document_type__in=SENSITIVE_DOCUMENT_TYPES).filter(
+            party__isnull=True
+        )
+    hidden = [
+        doc_type
+        for doc_type, model in DOCUMENT_TYPE_SOURCE_MODEL.items()
+        if not user.has_perm(f"pengadaan.view_{model}")
+    ]
+    if hidden:
+        queryset = queryset.exclude(document_type__in=hidden)
+    return queryset
+
+
 def _group_ids(user) -> frozenset[int]:
     cached = getattr(user, "_pengadaan_group_ids", None)
     if cached is None:

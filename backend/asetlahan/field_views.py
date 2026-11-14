@@ -212,6 +212,7 @@ def field_app(request):
             for value, label in enums.FieldReportType.choices
         ],
         "user": request.user.get_full_name() or request.user.get_username(),
+        "userId": request.user.pk,
     }
     return render(request, "asetlahan/field_app.html", {"field_config": config})
 

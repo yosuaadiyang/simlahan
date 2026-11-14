@@ -80,6 +80,12 @@ class Dataset:
             queryset = queryset.select_related(*self.select_related)
         if self.scope_lookup:
             queryset = scope.scoped(queryset, user, self.scope_lookup)
+        if self.model._meta.app_label == "pengadaan":
+            # Penilai & Instansi Pemohon hanya proyek yang ditugaskan (sama
+            # dengan API dan admin pengadaan).
+            from pengadaan.access import scope_queryset
+
+            queryset = scope_queryset(queryset, user)
         return queryset
 
 

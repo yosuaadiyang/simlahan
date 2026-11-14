@@ -1,9 +1,11 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
+from rest_framework.permissions import IsAuthenticated
 
 from field_permissions.viewsets import FieldPermissionsViewsetMixin
 from leasing.filters import CoalesceOrderingFilter, ContactFilter
 from leasing.models import Contact
+from leasing.permissions import IsMemberOfSameServiceUnit, MvjDjangoModelPermissions
 from leasing.serializers.contact import (
     ContactCreateUpdateSerializer,
     ContactSerializerWithActiveLeases,
@@ -14,6 +16,12 @@ from .utils import AtomicTransactionModelViewSet
 
 class ContactViewSet(FieldPermissionsViewsetMixin, AtomicTransactionModelViewSet):
     queryset = Contact.objects.all()
+    # Baca lintas unit boleh; ubah/hapus hanya oleh anggota unit layanan kontak.
+    permission_classes = [
+        IsAuthenticated,
+        MvjDjangoModelPermissions,
+        IsMemberOfSameServiceUnit,
+    ]
     serializer_class = ContactSerializerWithActiveLeases
     filterset_class = ContactFilter
     filter_backends = (

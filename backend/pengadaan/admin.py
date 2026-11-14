@@ -152,11 +152,33 @@ for model in (
     m.Deliberation,
     m.DeliberationResult,
     m.Objection,
-    m.Consignment,
-    m.CompensationPayment,
     m.RightsRelease,
 ):
     admin.site.register(model, ProjectScopedAdmin)
+
+
+class ImmutableParentAdmin(ProjectScopedAdmin):
+    """Induk catatan tidak boleh dipindah setelah dibuat (sama dengan API):
+    signal status hanya menghitung ulang induk yang baru, sehingga induk lama
+    tertinggal berstatus lunas/dikonsinyasi tanpa catatan pendukung."""
+
+    immutable_fields: tuple[str, ...] = ()
+
+    def get_readonly_fields(self, request, obj=None):
+        fields = tuple(super().get_readonly_fields(request, obj))
+        if obj is not None:
+            fields += tuple(f for f in self.immutable_fields if f not in fields)
+        return fields
+
+
+@admin.register(m.Consignment)
+class ConsignmentAdmin(ImmutableParentAdmin):
+    immutable_fields = ("parcel",)
+
+
+@admin.register(m.CompensationPayment)
+class CompensationPaymentAdmin(ImmutableParentAdmin):
+    immutable_fields = ("compensation",)
 
 
 class HandoverAdminForm(forms.ModelForm):
@@ -195,11 +217,6 @@ class AcquisitionDocumentAdmin(ProjectScopedAdmin):
     raw_id_fields = ("project", "parcel", "party")
 
     def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        # Sama seperti API: pindaian KTP, sertipikat, bukti bayar dan dokumen
-        # milik pihak tertentu hanya untuk pemegang izin data pribadi.
-        if not request.user.has_perm(SENSITIVE_PERMISSION):
-            qs = qs.exclude(document_type__in=access.SENSITIVE_DOCUMENT_TYPES).filter(
-                party__isnull=True
-            )
-        return qs
+        # Sama seperti API: data pribadi pihak dan jenis dokumen yang model
+        # sumbernya tidak boleh dilihat disembunyikan.
+        return access.visible_documents(super().get_queryset(request), request.user)

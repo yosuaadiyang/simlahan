@@ -116,3 +116,34 @@ def test_expired_or_inactive_share_is_gone(client, make_asset):
         client.get(reverse("asetlahan-share-data", args=[share.token])).status_code
         == 404
     )
+
+
+def test_field_app_purges_offline_data_between_users(client, field_officer):
+    """Batas bidang & halaman tidak tersisa untuk pengguna berikutnya, dan
+    antrean laporan hanya milik petugas yang sedang masuk."""
+    import json
+    import subprocess
+
+    from django.contrib.staticfiles import finders
+
+    client.force_login(field_officer)
+    page = client.get(reverse("asetlahan-field")).content.decode()
+    config = json.loads(
+        page.split('id="field-config" type="application/json">')[1].split("</script>")[
+            0
+        ]
+    )
+    assert config["userId"] == field_officer.pk
+    worker = client.get(reverse("asetlahan-field-sw")).content.decode()
+    assert "purgePersonal" in worker and "response.redirected" in worker
+    assert "response.status === 401" in worker
+    script = open(finders.find("asetlahan/field.js"), encoding="utf-8").read()
+    assert "owner: config.userId" in script and "purgeOfflineData" in script
+    assert "item.owner === config.userId" in script
+    try:
+        result = subprocess.run(
+            ["node", "--check", "-"], input=worker, text=True, capture_output=True
+        )
+    except FileNotFoundError:  # pragma: no cover - Node tidak terpasang
+        return
+    assert result.returncode == 0, result.stderr

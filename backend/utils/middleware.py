@@ -7,8 +7,19 @@ from django.utils.functional import SimpleLazyObject
 from django.utils.translation import gettext as _
 from rest_framework.views import APIView
 
+from utils.client_ip import client_ip
+
 
 class CustomAuditlogMiddleware(AuditlogMiddleware):
+    @staticmethod
+    def _get_remote_addr(request):
+        # Upstream memakai entri X-Forwarded-For paling kiri, yang dikirim
+        # klien sendiri; catatan audit memakai hop proxy tepercaya yang sama
+        # dengan kuota & catatan unduhan (utils.client_ip).
+        if settings.AUDITLOG_DISABLE_REMOTE_ADDR:
+            return None
+        return client_ip(request) or None
+
     def __call__(self, request):
         remote_addr = self._get_remote_addr(request)
 
