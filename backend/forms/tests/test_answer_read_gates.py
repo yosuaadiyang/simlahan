@@ -165,3 +165,45 @@ def test_opening_record_cannot_be_moved_to_another_answer(
         content_type="application/json",
     )
     assert response.status_code == 200, response.content
+
+
+def test_answer_exports_tolerate_missing_optional_fields(
+    admin_client, plot_search_target, basic_form, area_search_test_data
+):
+    """Plan unit tanpa tanggal/relasi pembagian dan area search tanpa kolom
+    opsional tidak membuat seluruh ekspor gagal 500."""
+    plot_search = plot_search_target.plot_search
+    plot_search.form = basic_form
+    plot_search.save()
+    _submit(admin_client, basic_form, plot_search_target)
+    response = admin_client.get(
+        reverse("v1:plotsearch-get-answers-xlsx", kwargs={"pk": plot_search.pk})
+    )
+    assert response.status_code == 200
+    assert SECRET in _xlsx_strings(response)
+    response = admin_client.get(reverse("v1:areasearch-get-answers-xlsx"))
+    assert response.status_code == 200
+
+
+def test_preparer_answer_attachments_follow_answer_visibility(
+    client,
+    user_factory,
+    answer_factory,
+    plot_search_target,
+    basic_template_form,
+):
+    preparer = plot_search_target.plot_search.preparers.first()
+    assert not preparer.has_perm("forms.view_answer")
+    preparer.user_permissions.add(
+        *Permission.objects.filter(codename__in=("view_attachment", "view_plotsearch"))
+    )
+    own = answer_factory(form=basic_template_form, user=user_factory())
+    from plotsearch.models import TargetStatus
+
+    TargetStatus.objects.create(plot_search_target=plot_search_target, answer=own)
+    foreign = answer_factory(form=basic_template_form, user=user_factory())
+    client.force_login(preparer)
+    response = client.get(reverse("v1:answer-attachments", kwargs={"pk": own.pk}))
+    assert response.status_code == 200, response.content
+    response = client.get(reverse("v1:answer-attachments", kwargs={"pk": foreign.pk}))
+    assert response.status_code in (403, 404)
