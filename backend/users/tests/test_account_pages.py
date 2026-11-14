@@ -135,3 +135,29 @@ def test_wrong_old_password_is_limited(client):
 def test_admin_header_links_to_the_guide(client):
     client.force_login(make_user("aset", UserGroup.PETUGAS_ASET))
     assert "/akun/panduan/" in client.get("/admin/").content.decode()
+
+
+@pytest.mark.django_db
+def test_password_attempt_limit_is_counted_in_database(client):
+    """Batas sandi lama dihitung atomik di basis data, bukan get+set cache."""
+    from django.core.cache import cache
+
+    from utils.models import RateCounter
+
+    user = make_user("operator-db", UserGroup.SYOTTAJA)
+    client.force_login(user)
+    data = {
+        "old_password": "salah",
+        "new_password1": "Sandi-Baru-2026!y",
+        "new_password2": "Sandi-Baru-2026!y",
+    }
+    for _attempt in range(3):
+        client.post("/akun/sandi/", data)
+        cache.clear()  # cache yang hilang/terbagi tidak menghapus hitungan
+    counter = RateCounter.objects.get(key=f"akun-sandi-gagal:{user.pk}")
+    assert counter.count == 3
+    # Galat selain sandi lama (sandi baru tidak cocok) tidak memakai jatah.
+    data.update(old_password=PASSWORD, new_password2="beda")
+    client.post("/akun/sandi/", data)
+    counter.refresh_from_db()
+    assert counter.count == 3

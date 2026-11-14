@@ -84,6 +84,12 @@ def officer_file(request, kind, pk):
     model, field, lookup = FILE_KINDS[kind]
     if not request.user.has_perm(f"asetlahan.view_{model._meta.model_name}"):
         raise PermissionDenied
+    # Saklar modul (pengaduan, lelang, dst.) berlaku juga untuk berkasnya,
+    # sama dengan panel admin dan API.
+    model_admin = admin.site._registry.get(model)
+    if model_admin is not None and hasattr(model_admin, "module_enabled"):
+        if not model_admin.module_enabled(request):
+            raise Http404
     queryset = (
         scope.scoped(model.objects.all(), request.user, lookup)
         if lookup
@@ -1164,12 +1170,19 @@ def imagery_compare(request):
         )
     focus = None
     if case is not None:
+        # Aset kasus ditampilkan hanya bila aset itu sendiri dalam lingkup unit.
+        asset_visible = bool(
+            case.asset_id
+            and scope.scoped(
+                LandAsset.objects.filter(pk=case.asset_id), request.user
+            ).exists()
+        )
         focus = geo.collection(
             [
                 geo.feature(case.area_geometry or case.location, {"title": str(case)}),
                 geo.feature(
-                    case.asset.geometry if case.asset_id else None,
-                    {"title": str(case.asset)},
+                    case.asset.geometry if asset_visible else None,
+                    {"title": str(case.asset) if asset_visible else ""},
                 ),
             ]
         )

@@ -86,7 +86,7 @@ def test_sensitive_data_masked_without_permission(make_user, party):
 
     data = _client(viewer).get(url).json()
     assert data["nik"] != "2171010101900001"
-    assert data["nik"].startswith("2171") and "*" in data["nik"]
+    assert data["nik"] == "*" * 12 + "0001"
     assert "*" in data["bank_account_number"]
 
     officer = make_user(

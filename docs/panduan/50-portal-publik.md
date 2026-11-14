@@ -289,7 +289,7 @@ Klik **Daftar** di menu atas. Calon investor sebaiknya memakai **Daftar sebagai 
 7. Isi **Alamat** (nomor 12) dan **Kota** (nomor 13).
 8. Centang pernyataan **Saya menyatakan data yang saya isi benar dan menyetujui ketentuan layanan** (nomor 14).
 9. Klik **Daftar** (nomor 15).
-10. Buka kotak surel Anda dan klik tautan aktivasi (berlaku 3 hari). Tidak menerima surel? Periksa folder spam, atau klik **Kirim ulang** di bawah tombol Daftar.
+10. Buka kotak surel Anda dan klik tautan aktivasi (berlaku 3 hari), lalu tekan tombol **Aktifkan akun** di halaman yang terbuka. Tidak menerima surel? Periksa folder spam, atau klik **Kirim ulang** di bawah tombol Daftar.
 11. Setelah aktif, klik **Masuk** dan isi surel serta kata sandi.
 
 **Lupa kata sandi:** di halaman **Masuk**, klik **Lupa kata sandi?**.

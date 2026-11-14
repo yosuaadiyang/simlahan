@@ -1,4 +1,5 @@
 from django.db.models import Prefetch
+from django.shortcuts import get_object_or_404
 from django.utils.translation import get_language_from_request
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, viewsets
@@ -98,17 +99,25 @@ class AnswerViewSet(viewsets.ModelViewSet):
         filterset_class=None,
     )
     def attachments(self, request, pk=None):
-        queryset = self.get_queryset()
-        queryset = queryset.filter(answer_id=pk)
+        # Jawaban dicek dulu lewat aturan lihat jawaban (izin model atau
+        # penyiap); queryset aksi ini Attachment, jadi filter jawaban di
+        # get_queryset tidak berlaku untuknya.
+        answer = get_object_or_404(self._visible_answers(), pk=pk)
+        queryset = Attachment.objects.filter(answer=answer)
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
     def get_queryset(self):
+        if self.action == "attachments":
+            return Attachment.objects.all()
+        return self._visible_answers()
+
+    def _visible_answers(self):
         queryset = (
             Answer.objects.all()
-            if self.action == "retrieve"
-            else super().get_queryset()
+            if self.action in ("retrieve", "attachments")
+            else AnswerViewSet.queryset.all()
         )
         user = self.request.user
         if user.has_perm("forms.view_answer"):

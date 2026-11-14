@@ -88,12 +88,37 @@ def choose_zoom(polygon: Polygon) -> int:
     return MIN_ZOOM
 
 
+def _public_host(url: str) -> bool:
+    """Ubin hanya diambil dari alamat publik: URL ubin diatur Administrator,
+    tetapi server tidak boleh dipakai menjangkau layanan internal (SSRF)."""
+    import ipaddress
+    import socket
+    from urllib.parse import urlsplit
+
+    parts = urlsplit(url)
+    if parts.scheme != "https" or not parts.hostname:
+        return False
+    try:
+        infos = socket.getaddrinfo(parts.hostname, parts.port or 443)
+    except (socket.gaierror, UnicodeError, ValueError):
+        return False
+    for info in infos:
+        address = ipaddress.ip_address(info[4][0])
+        if not address.is_global or address.is_multicast:
+            return False
+    return bool(infos)
+
+
 def _fetch_tile(url: str) -> bytes | None:
+    if not _public_host(url):
+        return None
     try:
         response = requests.get(
             url,
             timeout=15,
             headers={"User-Agent": f"{settings.APP_NAME} (AI Satelit)"},
+            # Pengalihan tidak diikuti: tujuan barunya tidak diperiksa.
+            allow_redirects=False,
         )
     except requests.RequestException:
         return None
@@ -178,9 +203,12 @@ def data_summary(polygon: Polygon, user) -> dict:
         labels = dict(enums.SoilSuitability.choices)
         summary["uji_tanah"] = {str(labels[r["suitability"]]): r["n"] for r in rows}
     if user.has_perm("pengadaan.view_acquisitionparcel"):
+        from pengadaan.access import scope_queryset
         from pengadaan.models import AcquisitionParcel
 
-        parcels = AcquisitionParcel.objects.filter(geometry__intersects=polygon)
+        parcels = scope_queryset(
+            AcquisitionParcel.objects.filter(geometry__intersects=polygon), user
+        )
         summary["bidang_pengadaan"] = parcels.aggregate(
             total=Count("pk"),
             lepas=Count("pk", filter=Q(status__in=RELEASED_PARCEL_STATUSES)),

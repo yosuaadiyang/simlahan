@@ -4,6 +4,8 @@ Login JWT aplikasi petugas memeriksa OTP di ``users.auth_views``; middleware
 ini menangani sesi Django. Aktif hanya bila ``OFFICER_OTP_REQUIRED=True``.
 """
 
+import unicodedata
+
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
@@ -12,6 +14,7 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext as _
 
 from users import otp
+from utils import ratelimit
 
 EXEMPT_PREFIXES = (
     "/admin/otp/",
@@ -21,9 +24,10 @@ EXEMPT_PREFIXES = (
     # sesi lama yang belum lolos OTP.
     "/v1/auth/login/",
     "/v1/auth/logout/",
-    "/healthz",
-    "/readiness",
 )
+# Dicocokkan persis (bukan awalan) agar rute baru berawalan sama tidak ikut
+# lolos dari OTP.
+EXEMPT_PATHS = frozenset({"/healthz", "/readiness"})
 
 
 class OfficerOTPMiddleware:
@@ -50,8 +54,10 @@ class OfficerOTPMiddleware:
         if user is None or not otp.required_for(user):
             return False
         path = request.path
-        if path.startswith(EXEMPT_PREFIXES) or path.startswith(
-            (settings.STATIC_URL, settings.MEDIA_URL)
+        if (
+            path in EXEMPT_PATHS
+            or path.startswith(EXEMPT_PREFIXES)
+            or path.startswith((settings.STATIC_URL, settings.MEDIA_URL))
         ):
             return False
         return request.session.get(otp.SESSION_KEY) != user.pk
@@ -87,8 +93,6 @@ class LoginThrottleMiddleware:
 
     def __call__(self, request):
         if request.method == "POST" and request.path in SESSION_LOGIN_PATHS:
-            from django.core.cache import cache
-
             from alokasi.views import _throttled
 
             if _throttled(request, "login-sesi", limit=10, window=60):
@@ -97,20 +101,22 @@ class LoginThrottleMiddleware:
                     status=429,
                     content_type="text/plain; charset=utf-8",
                 )
-            username = (request.POST.get("username") or "").strip().lower()[:150]
-            if username:
-                key = f"users:login-throttle:{username}"
-                try:
-                    count = cache.get_or_set(key, 0, self.ACCOUNT_WINDOW)
-                    if count >= self.ACCOUNT_ATTEMPTS:
-                        return HttpResponse(
-                            _(
-                                "Terlalu banyak percobaan masuk. Coba lagi dalam satu menit."
-                            ),
-                            status=429,
-                            content_type="text/plain; charset=utf-8",
-                        )
-                    cache.incr(key)
-                except ValueError:
-                    cache.set(key, 1, self.ACCOUNT_WINDOW)
+            username = throttle_username(request.POST.get("username"))
+            if username and ratelimit.throttled(
+                f"users:login-throttle:{username}",
+                self.ACCOUNT_ATTEMPTS,
+                self.ACCOUNT_WINDOW,
+            ):
+                return HttpResponse(
+                    _("Terlalu banyak percobaan masuk. Coba lagi dalam satu menit."),
+                    status=429,
+                    content_type="text/plain; charset=utf-8",
+                )
         return self.get_response(request)
+
+
+def throttle_username(value) -> str:
+    """Kunci per akun: dinormalisasi NFKC seperti UsernameField Django, agar
+    varian Unicode (mis. huruf lebar penuh) tidak mendapat penghitung sendiri
+    padahal tetap masuk sebagai akun yang sama."""
+    return unicodedata.normalize("NFKC", (value or "").strip()).casefold()[:150]

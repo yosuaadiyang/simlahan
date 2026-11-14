@@ -928,6 +928,12 @@ class CompensationPaymentSerializer(PengadaanModelSerializer):
             compensation = Compensation.objects.select_for_update().get(
                 pk=compensation.pk
             )
+            if AcquisitionParcel.all_objects.filter(
+                pk=compensation.parcel_id, deleted__isnull=False
+            ).exists():
+                raise serializers.ValidationError(
+                    _("The parcel of this compensation has been deleted.")
+                )
             if compensation.status not in (
                 enums.CompensationStatus.VALIDATED,
                 enums.CompensationStatus.PAID,
@@ -1054,6 +1060,11 @@ class CompensationSerializer(NoticeMixin, PengadaanModelSerializer):
         if form == enums.CompensationForm.MONEY and (amount is None or amount <= 0):
             raise serializers.ValidationError(
                 {"amount": _("Monetary compensation must be greater than zero.")}
+            )
+        if amount is not None and amount < 0:
+            # Nilai negatif ikut dijumlahkan status bidang (derive_parcel_status).
+            raise serializers.ValidationError(
+                {"amount": _("Amount cannot be negative.")}
             )
         if instance is not None and amount is not None:
             if amount < instance.paid_amount:

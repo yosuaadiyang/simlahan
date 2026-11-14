@@ -406,6 +406,8 @@ OAUTH2_PROVIDER = {
     "REFRESH_TOKEN_EXPIRE_SECONDS": 30 * 24 * 3600,
     "ROTATE_REFRESH_TOKEN": True,
     "PKCE_REQUIRED": True,
+    # Tolak grant password & implicit (melewati OTP petugas / token di URL).
+    "OAUTH2_VALIDATOR_CLASS": "users.oauth_validator.OfficerOAuth2Validator",
     "ALLOWED_REDIRECT_URI_SCHEMES": ["https", "http"] if DEBUG else ["https"],
 }
 

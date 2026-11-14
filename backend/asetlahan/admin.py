@@ -4,6 +4,7 @@ Halaman alat (dasbor, peta tematik, Gantt, laporan, asisten, pencarian)
 ada di asetlahan.admin_views dan ditautkan dari halaman indeks modul.
 """
 
+import datetime
 from decimal import Decimal
 
 from django import forms
@@ -2240,6 +2241,37 @@ SHARE_SOURCES = (
 )
 
 
+MAX_SHARE_DAYS = 90
+
+
+def share_allowed_for(share, user) -> bool:
+    """Apakah ``user`` (pembuat) masih boleh membagikan isi tautan ini.
+
+    Diperiksa ulang setiap tautan dibuka: menonaktifkan akun, mencabut izin,
+    atau memindahkan pembuat dari proyek pengadaan ikut mematikan tautannya.
+    """
+    if user is None or not user.is_active:
+        return False
+    for name, share_perms, owner_perms in SHARE_SOURCES:
+        value = getattr(share, name)
+        present = value.exists() if name == "assets" else value is not None
+        if not present:
+            continue
+        if not user.has_perms(share_perms):
+            return False
+        if share.show_owner_names and not user.has_perms(owner_perms):
+            return False
+    if share.pengadaan_project_id:
+        from pengadaan.access import scope_queryset
+        from pengadaan.models import AcquisitionProject
+
+        if not scope_queryset(
+            AcquisitionProject.objects.filter(pk=share.pengadaan_project_id), user
+        ).exists():
+            return False
+    return True
+
+
 class MapShareForm(forms.ModelForm):
     """Tautan publik hanya boleh memuat data yang boleh dilihat pembuatnya."""
 
@@ -2260,6 +2292,29 @@ class MapShareForm(forms.ModelForm):
     def _changed(self, name) -> bool:
         return not self.instance.pk or name in self.changed_data
 
+    def _clean_project_and_expiry(self, user):
+        project = self._value("pengadaan_project")
+        if project is not None and self._changed("pengadaan_project"):
+            from pengadaan.access import scope_queryset
+            from pengadaan.models import AcquisitionProject
+
+            # Proyek di luar penugasan pembuat (Penilai/Instansi) tidak boleh
+            # dibagikan, walaupun izin lihat modelnya ada.
+            if not scope_queryset(
+                AcquisitionProject.objects.filter(pk=project.pk), user
+            ).exists():
+                self.add_error(
+                    "pengadaan_project" if "pengadaan_project" in self.fields else None,
+                    _("Anda tidak berhak membagikan data ini."),
+                )
+        expires_at = self._value("expires_at")
+        limit = timezone.now() + datetime.timedelta(days=MAX_SHARE_DAYS)
+        if expires_at and self._changed("expires_at") and expires_at > limit:
+            self.add_error(
+                "expires_at" if "expires_at" in self.fields else None,
+                _("Tautan publik berlaku paling lama %d hari.") % MAX_SHARE_DAYS,
+            )
+
     def clean(self):
         cleaned = super().clean()
         user = self.user
@@ -2267,6 +2322,7 @@ class MapShareForm(forms.ModelForm):
             return cleaned
         owners_changed = self._changed("show_owner_names")
         show_owners = self._value("show_owner_names")
+        self._clean_project_and_expiry(user)
         missing_owner_perm = []
         for name, share_perms, owner_perms in SHARE_SOURCES:
             value = self._value(name)

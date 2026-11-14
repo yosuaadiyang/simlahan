@@ -182,10 +182,38 @@ RESOURCES = (
 )
 
 
+# Data master lintas modul yang boleh tampil sebagai label bagi semua petugas
+# (sama dengan ForeignFieldsMixin di admin).
+SHARED_MODELS = {"users.user", "leasing.serviceunit", "leasing.municipality"}
+
+
+class ApiSerializer(serializers.ModelSerializer):
+    """Tautan ke modul lain (pengadaan, alokasi, sewa, operasi) hanya dikirim
+    bila pengguna boleh melihat model tujuannya, sama dengan panel admin."""
+
+    def get_fields(self):
+        fields = super().get_fields()
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        if user is None:
+            return fields
+        for field in self.Meta.model._meta.get_fields():
+            if field.name not in fields or not field.concrete:
+                continue
+            if not (field.many_to_one or field.many_to_many):
+                continue
+            meta = field.related_model._meta
+            if meta.app_label == "asetlahan" or meta.label_lower in SHARED_MODELS:
+                continue
+            if not user.has_perm(f"{meta.app_label}.view_{meta.model_name}"):
+                fields.pop(field.name)
+        return fields
+
+
 def _viewset(model, fields, search, filterset, lookup, flag):
     serializer = type(
         f"{model.__name__}ApiSerializer",
-        (serializers.ModelSerializer,),
+        (ApiSerializer,),
         {
             "Meta": type("Meta", (), {"model": model, "fields": fields}),
         },
@@ -202,7 +230,19 @@ def _viewset(model, fields, search, filterset, lookup, flag):
         )
         search_fields = search
         filterset_fields = filterset
-        ordering_fields = "__all__"
+
+        @property
+        def ordering_fields(self):
+            # Hanya kolom yang memang dikirim ke pengguna ini; "__all__" juga
+            # mengizinkan urut berdasarkan kolom tersembunyi (mis. kode akses
+            # dan data pelapor pengaduan) sehingga nilainya bisa ditebak.
+            return [
+                name
+                for name, field in self.get_serializer().fields.items()
+                if getattr(field, "source", name) != "*"
+                and name != "geometry"
+                and "." not in (field.source or name)
+            ]
 
         def get_queryset(self):
             if flag and not getattr(ModuleSettings.load(), flag):

@@ -1,0 +1,11 @@
+{% extends "alokasi/portal/base.html" %}
+{% block title %}Aktifkan Akun{% endblock %}
+{% block content %}
+<div class="card" style="max-width:640px">
+  <h1>Aktifkan akun</h1>
+  <p>Tekan tombol di bawah untuk mengaktifkan akun Anda. Setelah aktif, Anda dapat masuk dengan surel dan kata sandi yang didaftarkan.</p>
+  <form method="post">{% csrf_token %}
+    <button class="btn" type="submit">Aktifkan akun</button>
+  </form>
+</div>
+{% endblock %}

@@ -111,14 +111,14 @@ def _get_plot_search_target_attributes(plot_search_target):
             ("Plot division identifier", plan_unit.plot_division_identifier),
             (
                 "Plot division date of approval",
-                plan_unit.plot_division_date_of_approval.isoformat(),
+                _date(plan_unit.plot_division_date_of_approval),
             ),
             (
                 "Plot division effective date",
-                plan_unit.plot_division_effective_date.isoformat(),
+                _date(plan_unit.plot_division_effective_date),
             ),
             ("Reservation identifier", reservation_identifier),
-            ("Plot division state", plan_unit.plot_division_state.name),
+            ("Plot division state", _name(plan_unit.plot_division_state)),
             ("Detailed plan identifier", plan_unit.detailed_plan_identifier),
             (
                 "Detailed plan latest processing date",
@@ -128,10 +128,10 @@ def _get_plot_search_target_attributes(plot_search_target):
                 "Detailed plan latest processing date note",
                 plan_unit.detailed_plan_latest_processing_date_note,
             ),
-            ("Plan unit type", plan_unit.plan_unit_type.name),
-            ("Plan unit state", plan_unit.plan_unit_state.name),
-            ("Plan unit intended use", plan_unit.plan_unit_intended_use.name),
-            ("Plan unit status", plan_unit.plan_unit_status.name),
+            ("Plan unit type", _name(plan_unit.plan_unit_type)),
+            ("Plan unit state", _name(plan_unit.plan_unit_state)),
+            ("Plan unit intended use", _name(plan_unit.plan_unit_intended_use)),
+            ("Plan unit status", _name(plan_unit.plan_unit_status)),
         ]
     elif custom_detailed_plan is not None:
         return [
@@ -152,9 +152,9 @@ def _get_plot_search_target_attributes(plot_search_target):
                 "Detailed plan latest processing date note",
                 custom_detailed_plan.detailed_plan_latest_processing_date_note,
             ),
-            ("Plan unit type", custom_detailed_plan.type.name),
-            ("Plan unit state", custom_detailed_plan.state.name),
-            ("Plan unit intended use", custom_detailed_plan.intended_use.name),
+            ("Plan unit type", _name(custom_detailed_plan.type)),
+            ("Plan unit state", _name(custom_detailed_plan.state)),
+            ("Plan unit intended use", _name(custom_detailed_plan.intended_use)),
             ("Plan unit status", "-"),
         ]
 
@@ -296,12 +296,12 @@ def get_answer_worksheet(
 
     excel_fields = [
         ("Name", plot_search.name),
-        ("Type", plot_search.subtype.plot_search_type.name),
-        ("Subtype", plot_search.subtype.name),
-        ("Begin at", plot_search.begin_at.isoformat("T")),
-        ("End at", plot_search.end_at.isoformat("T")),
+        ("Type", _name(getattr(plot_search.subtype, "plot_search_type", None))),
+        ("Subtype", _name(plot_search.subtype)),
+        ("Begin at", _iso(plot_search.begin_at)),
+        ("End at", _iso(plot_search.end_at)),
         ("Search class", plot_search.search_class),
-        ("Stage", plot_search.stage.name),
+        ("Stage", _name(plot_search.stage)),
     ]
 
     for excel_field in excel_fields:
@@ -318,7 +318,7 @@ def get_answer_worksheet(
         worksheet.write(master_row + 1, col, excel_field[1])
         col += 1
 
-    worksheet.write(master_row + 1, col, plot_search_target.target_type.name)
+    worksheet.write(master_row + 1, col, _name(plot_search_target.target_type))
 
     from forms.models import Section
 
@@ -368,9 +368,9 @@ def get_answer_worksheet(
             ", ".join(
                 [
                     "{} {} {}".format(
-                        management.proposed_financing.name,
-                        management.proposed_management.name,
-                        management.hitas.name,
+                        _name(management.proposed_financing),
+                        _name(management.proposed_management),
+                        _name(management.hitas),
                     )
                     for management in target_status.proposed_managements.all()
                 ]
@@ -433,10 +433,29 @@ def _get_answer_search_subsection_field_entries(  # noqa: C901
     return worksheet, col, entry_rows - master_row
 
 
+def _name(value):
+    """Nama relasi/enum opsional; kosong bila tidak diisi (ekspor tidak 500)."""
+    return value.name if value is not None else ""
+
+
+def _date(value):
+    return value.isoformat() if value is not None else ""
+
+
+def _enum_value(value):
+    return getattr(value, "value", value) if value is not None else ""
+
+
+def _iso(value):
+    return value.isoformat("T") if value is not None else ""
+
+
 def get_area_search_answer_worksheet(area_search, worksheet, master_row):
     col = 0
 
-    form = area_search.answer.form
+    # Kolom opsional (pemberi sewa, peruntukan, tanggal, status, jawaban) bisa
+    # kosong; sebelumnya ekspor seluruh daftar gagal 500 karena satu baris.
+    form = area_search.answer.form if area_search.answer_id else None
 
     preparer = "-"
     if area_search.preparer is not None:
@@ -447,17 +466,20 @@ def get_area_search_answer_worksheet(area_search, worksheet, master_row):
     area_search_status = area_search.area_search_status
 
     excel_fields = [
-        (_("Lessor"), area_search.lessor.value),
+        (_("Lessor"), _enum_value(area_search.lessor)),
         (_("Description area"), area_search.description_area),
         (_("Address"), area_search.address),
         (_("District"), area_search.district),
-        (_("Intended use"), area_search.intended_use.name),
+        (
+            _("Intended use"),
+            area_search.intended_use.name if area_search.intended_use_id else "",
+        ),
         (_("Description intended use"), area_search.description_intended_use),
-        (_("Start date"), area_search.start_date.isoformat("T")),
-        (_("End date"), area_search.end_date.isoformat("T")),
-        (_("Received date"), area_search.received_date.isoformat("T")),
+        (_("Start date"), _iso(area_search.start_date)),
+        (_("End date"), _iso(area_search.end_date)),
+        (_("Received date"), _iso(area_search.received_date)),
         (_("Identifier"), area_search.identifier),
-        (_("State"), area_search.state.value),
+        (_("State"), _enum_value(area_search.state)),
         (_("Preparer"), preparer),
     ]
 
@@ -481,6 +503,9 @@ def get_area_search_answer_worksheet(area_search, worksheet, master_row):
             worksheet.write(master_row, col, excel_field[0])
         worksheet.write(master_row + 1, col, excel_field[1])
         col += 1
+
+    if form is None:
+        return worksheet, master_row + 1
 
     from forms.models import Section
 

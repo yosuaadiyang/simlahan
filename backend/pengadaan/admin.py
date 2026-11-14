@@ -1,9 +1,10 @@
 from django import forms
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.utils.translation import gettext_lazy as _
 
 from pengadaan import access, enums
 from pengadaan import models as m
+from pengadaan.status import settlement_blockers
 
 SENSITIVE_PERMISSION = "pengadaan.view_sensitive_personal_data"
 
@@ -25,6 +26,54 @@ class ProjectScopedAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         return access.scope_queryset(super().get_queryset(request), request.user)
+
+
+class SettlementGuardAdminMixin:
+    """Sama dengan API: bidang/proyek yang masih memiliki ganti kerugian,
+    pembayaran, konsinyasi atau pelepasan hak tidak dapat dihapus (soft delete
+    tidak meneruskan ke data tersebut)."""
+
+    def _parcels_of(self, obj):
+        raise NotImplementedError
+
+    def _blockers(self, obj):
+        return settlement_blockers(self._parcels_of(obj))
+
+    def has_delete_permission(self, request, obj=None):
+        if obj is not None and self._blockers(obj):
+            return False
+        return super().has_delete_permission(request, obj)
+
+    def delete_queryset(self, request, queryset):
+        blocked = [obj.pk for obj in queryset if self._blockers(obj)]
+        if blocked:
+            self.message_user(
+                request,
+                _("%d data tidak dihapus karena masih memiliki ganti kerugian.")
+                % len(blocked),
+                level=messages.WARNING,
+            )
+            queryset = queryset.exclude(pk__in=blocked)
+        super().delete_queryset(request, queryset)
+
+
+class PartyInlineFormSet(forms.BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        for form in self.forms:
+            if (
+                self.can_delete
+                and self._should_delete_form(form)
+                and form.instance.pk
+                and settlement_blockers(parties=[form.instance.pk])
+            ):
+                raise forms.ValidationError(
+                    _(
+                        "Pihak %(name)s masih memiliki ganti kerugian; batalkan "
+                        "atau hapus datanya lebih dahulu."
+                    )
+                    % {"name": form.instance.name}
+                )
 
 
 @admin.register(m.Holiday)
@@ -56,7 +105,7 @@ class MilestoneInline(admin.TabularInline):
 
 
 @admin.register(m.AcquisitionProject)
-class AcquisitionProjectAdmin(ProjectScopedAdmin):
+class AcquisitionProjectAdmin(SettlementGuardAdminMixin, ProjectScopedAdmin):
     list_display = ("identifier", "name", "acquisition_type", "stage", "status")
     list_filter = ("acquisition_type", "stage", "status", "priority")
     search_fields = ("identifier", "name", "requiring_agency")
@@ -65,9 +114,13 @@ class AcquisitionProjectAdmin(ProjectScopedAdmin):
     filter_horizontal = ("assigned_users",)
     inlines = [MilestoneInline]
 
+    def _parcels_of(self, obj):
+        return m.AcquisitionParcel.all_objects.filter(project=obj).values("pk")
+
 
 class PartyInline(SensitiveFieldsAdminMixin, admin.StackedInline):
     model = m.EntitledParty
+    formset = PartyInlineFormSet
     extra = 0
     exclude = ("deleted", "deleted_by_cascade")
     sensitive_fields = ("nik", "bank_account_number")
@@ -100,13 +153,16 @@ class InventoryItemInline(admin.TabularInline):
 
 
 @admin.register(m.AcquisitionParcel)
-class AcquisitionParcelAdmin(ProjectScopedAdmin):
+class AcquisitionParcelAdmin(SettlementGuardAdminMixin, ProjectScopedAdmin):
     list_display = ("parcel_number", "project", "right_type", "status", "is_disputed")
     list_filter = ("status", "right_type", "is_disputed", "project")
     search_fields = ("parcel_number", "nib", "village", "certificate_number")
     readonly_fields = ("status",)
     raw_id_fields = ("project", "district")
     inlines = [PartyInline, InventoryItemInline]
+
+    def _parcels_of(self, obj):
+        return [obj.pk]
 
 
 @admin.register(m.Compensation)

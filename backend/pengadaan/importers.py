@@ -160,13 +160,20 @@ def _extract_zip(path: str, target_dir: str) -> list[str]:
             raise ImportError_(_("Archive is too large."))
         for info in archive.infolist():
             name = os.path.basename(info.filename)
-            if not name or info.is_dir():
+            if not name or name in (".", "..") or info.is_dir():
                 continue
             # Cegah path traversal: hanya nama berkas yang diekstrak.
-            with archive.open(info) as src, open(
-                os.path.join(target_dir, name), "wb"
-            ) as dst:
-                shutil.copyfileobj(src, dst)
+            try:
+                with archive.open(info) as src, open(
+                    os.path.join(target_dir, name), "wb"
+                ) as dst:
+                    shutil.copyfileobj(src, dst)
+            except (OSError, zipfile.BadZipFile, EOFError) as error:
+                # Nama terlalu panjang, CRC rusak, arsip terpotong: 400, bukan 500.
+                raise ImportError_(
+                    _("The archive contains an unreadable file: %(name)s")
+                    % {"name": name[:80]}
+                ) from error
     return os.listdir(target_dir)
 
 
@@ -214,7 +221,10 @@ def import_parcels(
     number_field: str = "parcel_number",
     area_field: str | None = None,
     update_existing: bool = True,
+    can_update: bool = True,
 ) -> ImportResult:
+    """``can_update`` = pengimpor punya izin ubah bidang; tanpa itu bidang yang
+    sudah ada tidak diperbarui (izin tambah saja tidak cukup)."""
     name = uploaded_file.name.lower()
 
     if name.endswith(".zip"):
@@ -229,6 +239,7 @@ def import_parcels(
                 number_field,
                 area_field,
                 update_existing,
+                can_update,
             )
         finally:
             os.unlink(tmp_path)
@@ -250,7 +261,9 @@ def import_parcels(
             )
             for props, geom in rows
         ]
-        return _import_rows(project, rows, number_field, area_field, update_existing)
+        return _import_rows(
+            project, rows, number_field, area_field, update_existing, can_update
+        )
     if name.endswith((".geojson", ".json")):
         return _import_rows(
             project,
@@ -258,6 +271,7 @@ def import_parcels(
             number_field,
             area_field,
             update_existing,
+            can_update,
         )
     raise ImportError_(
         _(
@@ -268,7 +282,7 @@ def import_parcels(
 
 
 def _import_rows(  # noqa: C901
-    project, rows, number_field, area_field, update_existing
+    project, rows, number_field, area_field, update_existing, can_update=True
 ) -> ImportResult:
     result = ImportResult()
     with transaction.atomic():
@@ -341,6 +355,12 @@ def _import_rows(  # noqa: C901
             if parcel is not None and not update_existing:
                 result.skipped += 1
                 continue
+            if parcel is not None and not can_update:
+                result.errors.append(
+                    _("Row %(row)s: parcel %(number)s already exists.")
+                    % {"row": index, "number": number}
+                )
+                continue
             if parcel is None:
                 parcel = AcquisitionParcel(project=project, parcel_number=number)
                 result.created += 1
@@ -349,7 +369,20 @@ def _import_rows(  # noqa: C901
             if multipolygon is not None:
                 parcel.geometry = multipolygon
             if area is not None:
-                parcel.measured_area_m2 = area
+                if (
+                    parcel.affected_area_m2 is not None
+                    and area < parcel.affected_area_m2
+                ):
+                    # Sama dengan API (AcquisitionParcelSerializer.validate).
+                    result.errors.append(
+                        _(
+                            "Row %(row)s: the measured area is smaller than the "
+                            "affected area."
+                        )
+                        % {"row": index}
+                    )
+                else:
+                    parcel.measured_area_m2 = area
             for attr, keys in {
                 "nib": ("nib", "NIB"),
                 "village": ("desa", "kelurahan", "village", "DESA"),

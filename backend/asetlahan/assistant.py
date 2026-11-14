@@ -569,6 +569,13 @@ def _int(value, default, low=1, high=3650):
         return default
 
 
+def _text(value, limit: int = 200) -> str:
+    """Argumen alat dari model bisa berupa angka/daftar; pencarian ORM butuh teks."""
+    if value is None or isinstance(value, (dict, list, tuple, set)):
+        return ""
+    return str(value)[:limit]
+
+
 def run_tool(user, name: str, args: dict) -> dict:
     args = args if isinstance(args, dict) else {}
     handlers = {
@@ -598,11 +605,11 @@ def run_tool(user, name: str, args: dict) -> dict:
         "aset": lambda: assets(
             user,
             _int(args.get("hak_berakhir_hari"), 0, 0),
-            status=args.get("status") or "",
-            village=args.get("kelurahan") or "",
-            district=args.get("kecamatan") or "",
-            category=args.get("kategori") or "",
-            owner=args.get("pemegang_hak") or "",
+            status=_text(args.get("status")),
+            village=_text(args.get("kelurahan")),
+            district=_text(args.get("kecamatan")),
+            category=_text(args.get("kategori")),
+            owner=_text(args.get("pemegang_hak")),
         ),
         "ringkasan_portofolio": lambda: portfolio(user),
         "keuangan": lambda: finance(user, _int(args.get("tahun"), None, 2000, 2100)),

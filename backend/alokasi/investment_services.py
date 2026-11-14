@@ -15,6 +15,7 @@ from django.utils.translation import gettext as _
 from alokasi import enums, services
 from alokasi.models import (
     Applicant,
+    Application,
     InvestmentEvent,
     InvestmentMessage,
     InvestmentRequest,
@@ -216,12 +217,23 @@ def post_message(
 
 
 @transaction.atomic
-def accept_offer(investment: InvestmentRequest, user) -> InvestmentRequest:
+def accept_offer(
+    investment: InvestmentRequest, user, offered_at: str | None = None
+) -> InvestmentRequest:
+    """Terima penawaran. ``offered_at`` = versi penawaran yang dilihat investor
+    (dari formulir); bila petugas mengubah penawaran sesudahnya, penerimaan
+    ditolak agar investor tidak menyetujui syarat yang belum dibacanya."""
     investment = _lock(investment)
     _require(
         investment.status == S.OFFERED,
         _("Tidak ada penawaran yang menunggu jawaban."),
     )
+    if offered_at is not None:
+        _require(
+            investment.offered_at is not None
+            and offered_at == investment.offered_at.isoformat(),
+            _("Penawaran telah diperbarui petugas. Periksa kembali sebelum menerima."),
+        )
     _require(
         not investment.offer_expired,
         _("Masa berlaku penawaran sudah lewat. Minta penawaran baru lewat pesan."),
@@ -439,12 +451,16 @@ def complete(
     plot = investment.offer_plot
     if investment.offer_scheme == Scheme.ALLOCATION:
         application = services.create_allocation_application(investment.applicant, plot)
+        application = Application.objects.select_for_update().get(pk=application.pk)
         # Isi rencana usaha dari permintaan; investor tinggal melengkapi dokumen.
-        application.activity = investment.project_name[:255] or application.activity
-        application.investment_value = investment.investment_value
-        application.workforce = investment.workforce
-        application.description = investment.activity
-        application.save()
+        # Permohonan yang sudah diajukan/diverifikasi tidak ditimpa: isinya
+        # sudah dinilai petugas.
+        if application.is_editable:
+            application.activity = investment.project_name[:255] or application.activity
+            application.investment_value = investment.investment_value
+            application.workforce = investment.workforce
+            application.description = investment.activity
+            application.save()
         investment.application = application
         closing = _(
             "Diteruskan menjadi draf permohonan alokasi %(number)s. Lengkapi dokumen "

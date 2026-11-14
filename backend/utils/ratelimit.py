@@ -11,6 +11,7 @@ terima bahwa jatah dikembalikan bila transaksi dibatalkan.
 """
 
 import datetime
+import hashlib
 import random
 
 from django.db import IntegrityError, transaction
@@ -22,10 +23,27 @@ from utils.models import RateCounter
 _CLEANUP_PROBABILITY = 0.01
 
 
+MAX_KEY_LENGTH = 200
+
+
+def _key(key: str) -> str:
+    if len(key) <= MAX_KEY_LENGTH:
+        return key
+    digest = hashlib.sha256(key.encode()).hexdigest()
+    return f"{key[: MAX_KEY_LENGTH - 65]}:{digest}"
+
+
+def throttled(key: str, limit: int, seconds: int) -> bool:
+    """``True`` bila batas percobaan ``key`` di jendela ini sudah tercapai;
+    bila belum, satu percobaan dicatat (atomik)."""
+    return not consume(key, limit, seconds)
+
+
 def consume(key: str, limit: int, seconds: int) -> bool:
     """Ambil satu jatah; ``False`` bila jatah jendela ini sudah habis."""
     if limit <= 0:
         return False
+    key = _key(key)
     now = timezone.now()
     expires = now + datetime.timedelta(seconds=seconds)
     with transaction.atomic():
@@ -43,6 +61,25 @@ def consume(key: str, limit: int, seconds: int) -> bool:
             expires_at__lt=now - datetime.timedelta(days=1)
         ).delete()
     return taken == 1
+
+
+def failures(key: str) -> int:
+    """Jumlah jatah terpakai di jendela yang masih berlaku (tanpa mencatat)."""
+    counter = RateCounter.objects.filter(
+        key=_key(key), expires_at__gt=timezone.now()
+    ).first()
+    return counter.count if counter else 0
+
+
+def refund(key: str) -> None:
+    """Kembalikan satu jatah yang dipesan tetapi tidak dipakai."""
+    RateCounter.objects.filter(
+        key=_key(key), count__gt=0, expires_at__gt=timezone.now()
+    ).update(count=F("count") - 1)
+
+
+def reset(key: str) -> None:
+    RateCounter.objects.filter(key=_key(key)).delete()
 
 
 def _get_or_create(key: str, expires) -> RateCounter:

@@ -118,3 +118,40 @@ def is_parcel_settled(parcel) -> bool:
         or (c.party_id is not None and c.party_id in party_ids)
         for c in compensations
     )
+
+
+def settlement_blockers(parcels=None, parties=None) -> list[str]:
+    """Catatan penyelesaian ganti kerugian yang menghalangi penghapusan.
+
+    Bidang, pihak dan proyek memakai soft delete yang tidak meneruskan ke ganti
+    kerugian, pembayaran, konsinyasi dan pelepasan hak; tanpa pemeriksaan ini
+    data tersebut tetap hidup (dan dapat dibayar) di bawah induk yang dihapus.
+    ``parcels``/``parties`` berupa queryset atau daftar id.
+    """
+    from django.utils.translation import gettext as _
+
+    from pengadaan.models import (
+        Compensation,
+        CompensationPayment,
+        Consignment,
+        RightsRelease,
+    )
+
+    if parcels is not None:
+        lookup = {"parcel__in": parcels}
+        payment_lookup = {"compensation__parcel__in": parcels}
+    else:
+        lookup = {"party__in": parties}
+        payment_lookup = {"compensation__party__in": parties}
+    checks = (
+        (
+            Compensation.objects.filter(**lookup).exclude(
+                status=enums.CompensationStatus.CANCELLED
+            ),
+            _("compensation"),
+        ),
+        (CompensationPayment.objects.filter(**payment_lookup), _("payments")),
+        (Consignment.objects.filter(**lookup), _("consignments")),
+        (RightsRelease.objects.filter(**lookup), _("rights releases")),
+    )
+    return [label for queryset, label in checks if queryset.exists()]

@@ -13,6 +13,7 @@ import secrets
 
 from django.conf import settings
 from django.core.mail import send_mail
+from django.db.models import F
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
@@ -100,18 +101,22 @@ def issue(user, purpose: str) -> LoginOTP:
 
 
 def verify(otp: LoginOTP | None, code: str) -> bool:
-    """Periksa kode; kode benar dipakai sekali."""
-    if (
-        otp is None
-        or otp.used_at is not None
-        or otp.expires_at <= timezone.now()
-        or otp.attempts >= MAX_ATTEMPTS
-    ):
+    """Periksa kode; kode benar dipakai sekali.
+
+    Setiap percobaan mengambil jatah lewat ``UPDATE ... WHERE attempts < MAX``
+    yang atomik, sehingga tebakan paralel tidak bisa melewati MAX_ATTEMPTS, dan
+    kode benar hanya bisa dipakai oleh satu permintaan.
+    """
+    if otp is None:
         return False
-    if hmac.compare_digest(otp.code_hash, _hash((code or "").strip())):
-        otp.used_at = timezone.now()
-        otp.save(update_fields=["used_at"])
-        return True
-    otp.attempts += 1
-    otp.save(update_fields=["attempts"])
-    return False
+    now = timezone.now()
+    live = LoginOTP.objects.filter(pk=otp.pk, used_at__isnull=True, expires_at__gt=now)
+    if not live.filter(attempts__lt=MAX_ATTEMPTS).update(attempts=F("attempts") + 1):
+        return False
+    otp.refresh_from_db(fields=["attempts"])
+    if not hmac.compare_digest(otp.code_hash, _hash((code or "").strip())):
+        return False
+    if not live.update(used_at=now):
+        return False
+    otp.used_at = now
+    return True

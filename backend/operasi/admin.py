@@ -588,7 +588,11 @@ class KorwilAdmin(OperasiGISAdmin):
         ] + super().get_urls()
 
     def import_view(self, request):
-        if not self.has_add_permission(request):
+        # Impor memperbarui data yang sudah ada (dicocokkan dengan kode), jadi
+        # perlu izin ubah selain izin tambah.
+        if not (
+            self.has_add_permission(request) and self.has_change_permission(request)
+        ):
             raise PermissionDenied
         form = ImportForm(request.POST or None, request.FILES or None)
         if request.method == "POST" and form.is_valid():
@@ -1168,11 +1172,40 @@ class ActivityAdmin(OperasiGISAdmin):
         # Verifikasi oleh koordinator lewat tindakan/pusat komando, bukan kotak centang.
         return (*fields, "verified")
 
+    # Pelapor yang mengubah klaimnya sendiri setelah diverifikasi/dikonfirmasi
+    # harus diverifikasi ulang (poin KPI mengikuti jenis & dampak).
+    REVERIFY_FIELDS = frozenset(
+        {
+            "activity_type",
+            "title",
+            "description",
+            "started_at",
+            "duration_minutes",
+            "korwil",
+            "location",
+            "participants_count",
+            "residents",
+            "outcome",
+        }
+    )
+    IMPACT_FIELDS = frozenset(
+        {"activity_type", "impact_scope", "impact_risk", "impact_result"}
+    )
+
     def save_model(self, request, obj, form, change):
         if not change and obj.reported_by_id is None:
             obj.reported_by = request.user
         if "verified" in form.changed_data:
             obj.verified_by = request.user if obj.verified else None
+        if change and obj.reported_by_id == request.user.pk:
+            changed = set(form.changed_data)
+            if obj.verified and changed & self.REVERIFY_FIELDS:
+                obj.verified = False
+                obj.verified_by = None
+            if obj.impact_confirmed and changed & self.IMPACT_FIELDS:
+                obj.impact_confirmed = False
+                obj.impact_confirmed_by = None
+                obj.impact_confirmed_at = None
         geo.assign_korwil(obj, request.user, strict=False)
         super().save_model(request, obj, form, change)
 
@@ -2034,6 +2067,13 @@ class SosAlertAdmin(OperasiGISAdmin):
         "client_id",
     )
     actions = ("acknowledge", "resolve", "false_alarm")
+
+    def get_readonly_fields(self, request, obj=None):
+        fields = tuple(super().get_readonly_fields(request, obj))
+        if obj is not None and obj.status not in enums.OPEN_SOS_STATUSES:
+            # Sama dengan update_sos: alarm yang sudah ditutup tidak diubah lagi.
+            fields += ("resolution_note",)
+        return fields
 
     def has_add_permission(self, request):
         return False

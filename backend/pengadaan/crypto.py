@@ -70,7 +70,9 @@ def fingerprint(value: str | None) -> str | None:
     return hmac.new(key, normalized.encode(), hashlib.sha256).hexdigest()
 
 
-def mask(value: str | None, visible_start: int = 4, visible_end: int = 4) -> str:
+def mask(value: str | None, visible_start: int = 0, visible_end: int = 4) -> str:
+    """Samarkan; bawaan hanya 4 karakter terakhir yang tampil (NIK 16 digit
+    dan rekening 10–12 digit sebelumnya menampakkan 8 digit)."""
     if not value:
         return ""
     if len(value) <= visible_start + visible_end:

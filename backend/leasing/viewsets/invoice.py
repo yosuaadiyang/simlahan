@@ -34,7 +34,7 @@ from leasing.serializers.invoice import (
 )
 
 from ..permissions import IsMemberOfSameServiceUnit, MvjDjangoModelPermissions
-from .utils import AtomicTransactionModelViewSet
+from .utils import AtomicTransactionModelViewSet, LeaseServiceUnitWriteMixin
 
 
 class InvoiceViewSet(FieldPermissionsViewsetMixin, AtomicTransactionModelViewSet):
@@ -146,7 +146,11 @@ class InvoiceViewSet(FieldPermissionsViewsetMixin, AtomicTransactionModelViewSet
         return super().destroy(request, *args, **kwargs)
 
 
-class InvoiceNoteViewSet(FieldPermissionsViewsetMixin, AtomicTransactionModelViewSet):
+class InvoiceNoteViewSet(
+    LeaseServiceUnitWriteMixin,
+    FieldPermissionsViewsetMixin,
+    AtomicTransactionModelViewSet,
+):
     queryset = InvoiceNote.objects.all()
     serializer_class = InvoiceNoteSerializer
     filterset_class = InvoiceNoteFilter

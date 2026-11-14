@@ -69,6 +69,7 @@ from pengadaan.serializers import (
     RightsReleaseSerializer,
     ValuationSerializer,
 )
+from pengadaan.status import settlement_blockers
 from pengadaan.workdays import add_workdays, workdays_between
 
 
@@ -131,6 +132,13 @@ class AcquisitionProjectViewSet(BaseViewSet):
     ).annotate(parcel_count=Count("parcels", filter=Q(parcels__deleted__isnull=True)))
     serializer_class = AcquisitionProjectSerializer
     project_scope_lookup = "pk"
+
+    def perform_destroy(self, instance):
+        _reject_if_settlement_records(
+            AcquisitionParcel.all_objects.filter(project=instance).values("pk")
+        )
+        super().perform_destroy(instance)
+
     filterset_fields = (
         "stage",
         "status",
@@ -309,6 +317,7 @@ class AcquisitionProjectViewSet(BaseViewSet):
                 area_field=request.data.get("area_field") or None,
                 update_existing=str(request.data.get("update_existing", "true")).lower()
                 in ("1", "true", "yes"),
+                can_update=request.user.has_perm("pengadaan.change_acquisitionparcel"),
             )
         except ImportError_ as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -333,6 +342,11 @@ class AcquisitionParcelViewSet(ProjectScopedViewSet):
         "project", "district"
     ).prefetch_related("parties")
     serializer_class = AcquisitionParcelSerializer
+
+    def perform_destroy(self, instance):
+        _reject_if_settlement_records([instance.pk])
+        super().perform_destroy(instance)
+
     filterset_fields = (
         "project",
         "status",
@@ -364,10 +378,40 @@ class AcquisitionParcelViewSet(ProjectScopedViewSet):
 class ParcelChildViewSet(ProjectScopedViewSet):
     project_lookup = "parcel__project"
 
+    def get_queryset(self):
+        # Data turunan bidang yang sudah dihapus (soft delete) tidak ikut
+        # tampil/dapat diubah, sama dengan bidangnya.
+        return super().get_queryset().filter(parcel__deleted__isnull=True)
+
+
+def _reject_if_settlement_records(parcels):
+    blockers = settlement_blockers(parcels)
+    if blockers:
+        raise serializers.ValidationError(
+            _(
+                "This cannot be deleted while it has %(records)s. Cancel or "
+                "remove them first."
+            )
+            % {"records": ", ".join(blockers)}
+        )
+
 
 class EntitledPartyViewSet(ParcelChildViewSet):
     queryset = EntitledParty.objects.select_related("parcel")
     serializer_class = EntitledPartySerializer
+
+    def perform_destroy(self, instance):
+        blockers = settlement_blockers(parties=[instance.pk])
+        if blockers:
+            raise serializers.ValidationError(
+                _(
+                    "This cannot be deleted while it has %(records)s. Cancel or "
+                    "remove them first."
+                )
+                % {"records": ", ".join(blockers)}
+            )
+        super().perform_destroy(instance)
+
     filterset_fields = ("parcel", "party_type", "role")
     search_fields = ("name", "npwp", "address", "parcel__parcel_number")
 
@@ -476,14 +520,17 @@ class CompensationViewSet(ParcelChildViewSet):
             raise serializers.ValidationError(
                 _("Only determined compensation can be validated.")
             )
-        if (
-            compensation.form == enums.CompensationForm.MONEY
-            and compensation.party is not None
-            and not compensation.party.bank_account_number
-        ):
-            raise serializers.ValidationError(
-                _("The entitled party has no bank account number.")
-            )
+        if compensation.form == enums.CompensationForm.MONEY:
+            # Uang hanya dibayarkan ke pihak yang berhak yang tercatat beserta
+            # rekeningnya; pihak tak diketahui diselesaikan lewat konsinyasi.
+            if compensation.party is None:
+                raise serializers.ValidationError(
+                    _("Monetary compensation must name the entitled party.")
+                )
+            if not compensation.party.bank_account_number:
+                raise serializers.ValidationError(
+                    _("The entitled party has no bank account number.")
+                )
         compensation.status = enums.CompensationStatus.VALIDATED
         compensation.validated_on = timezone.localdate()
         compensation.validated_by = request.user
@@ -545,7 +592,7 @@ class CompensationPaymentViewSet(BaseViewSet):
     project_scope_lookup = "compensation__parcel__project"
 
     def get_queryset(self):
-        qs = super().get_queryset()
+        qs = super().get_queryset().filter(compensation__parcel__deleted__isnull=True)
         project = self.request.query_params.get("project")
         if project and project.isdigit():
             qs = qs.filter(compensation__parcel__project_id=int(project))

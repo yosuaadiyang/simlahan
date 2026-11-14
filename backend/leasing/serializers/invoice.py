@@ -30,6 +30,7 @@ from leasing.serializers.tenant import TenantSerializer
 from leasing.serializers.types import CreateChargeData, CreateChargeInvoiceRowData
 from leasing.serializers.utils import (
     InstanceDictPrimaryKeyRelatedField,
+    InstanceLeaseMixin,
     UpdateNestedMixin,
 )
 
@@ -242,6 +243,7 @@ class InvoiceSerializerWithExplanations(
 
 
 class InvoiceCreateSerializer(
+    InstanceLeaseMixin,
     UpdateNestedMixin,
     EnumSupportSerializerMixin,
     FieldPermissionsSerializerMixin,
@@ -283,7 +285,7 @@ class InvoiceCreateSerializer(
     def validate(self, attrs):
         request = self.context.get("request")
         if (
-            attrs.get("lease").service_unit not in request.user.service_units.all()
+            self._lease(attrs).service_unit not in request.user.service_units.all()
             and not request.user.is_superuser
         ):
             raise ValidationError(

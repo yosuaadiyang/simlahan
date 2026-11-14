@@ -760,11 +760,15 @@ def classify_stance(narrative: str) -> str:
     return ""
 
 
-def apply_ai_stance(activity_id: int) -> str:
+def apply_ai_stance(activity_id: int, user_id: int | None = None) -> str:
     """Simpan sikap AI pada kegiatan dan pada warga terkait yang sikapnya belum diketahui.
 
-    Sikap yang sudah dipilih petugas tidak pernah ditimpa AI.
+    Sikap yang sudah dipilih petugas tidak pernah ditimpa AI. Sikap warga hanya
+    diisi bila pelapor (``user_id``) boleh mengubah data warga, sama dengan
+    jalur stance_updates di API.
     """
+    from django.contrib.auth import get_user_model
+
     activity = Activity.objects.filter(pk=activity_id).first()
     if activity is None:
         return ""
@@ -772,6 +776,10 @@ def apply_ai_stance(activity_id: int) -> str:
     if not stance:
         return ""
     Activity.objects.filter(pk=activity.pk).update(ai_stance=stance)
+    if user_id is not None:
+        reporter = get_user_model().objects.filter(pk=user_id).first()
+        if reporter is None or not reporter.has_perm("operasi.change_resident"):
+            return stance
     for resident in activity.residents.filter(stance=enums.Stance.UNKNOWN):
         resident.stance = stance
         resident._activity = activity
@@ -779,9 +787,9 @@ def apply_ai_stance(activity_id: int) -> str:
     return stance
 
 
-def _ai_stance_worker(activity_id: int) -> None:
+def _ai_stance_worker(activity_id: int, user_id: int | None = None) -> None:
     try:
-        apply_ai_stance(activity_id)
+        apply_ai_stance(activity_id, user_id)
     except Exception:  # noqa: BLE001 - utas latar tidak boleh menjatuhkan aplikasi
         LOG.exception("Klasifikasi sikap AI kegiatan %s gagal", activity_id)
     finally:
@@ -800,7 +808,9 @@ def schedule_ai_stance(activity, user=None) -> None:
         return
     transaction.on_commit(
         lambda: threading.Thread(
-            target=_ai_stance_worker, args=(activity.pk,), daemon=True
+            target=_ai_stance_worker,
+            args=(activity.pk, getattr(user, "pk", None)),
+            daemon=True,
         ).start()
     )
 
@@ -1074,9 +1084,10 @@ def _search_soil_tests(user, query, limit):
 
 
 def _search_tasks(user, query, limit):
-    from asetlahan.models import Task
+    from operasi.task_flow import visible_tasks
 
-    tasks = aset_scope.scoped(Task.objects.all(), user).filter(
+    # Sama dengan daftar tugas pusat komando (hierarki), bukan hanya unit.
+    tasks = visible_tasks(user).filter(
         Q(number__icontains=query) | Q(title__icontains=query)
     )
     return [
@@ -1108,11 +1119,12 @@ def _search_assets(user, query, limit):
 
 
 def _search_parcels(user, query, limit):
+    from pengadaan.access import scope_queryset
     from pengadaan.models import AcquisitionParcel
 
-    parcels = AcquisitionParcel.objects.select_related("project").filter(
-        Q(parcel_number__icontains=query) | Q(nib__icontains=query)
-    )
+    parcels = scope_queryset(
+        AcquisitionParcel.objects.select_related("project"), user
+    ).filter(Q(parcel_number__icontains=query) | Q(nib__icontains=query))
     return [
         {
             "kind": "bidang",
