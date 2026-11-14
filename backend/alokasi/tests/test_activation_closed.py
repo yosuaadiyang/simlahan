@@ -48,7 +48,7 @@ def test_pending_account_can_still_resend_and_activate(client, make_applicant):
     applicant = make_applicant(active=False)
     assert not applicant.email_activation_closed
     assert _resend(client, applicant) == 1
-    assert client.get(_activation_path()).status_code == 302
+    assert client.post(_activation_path()).status_code == 302
     applicant.refresh_from_db()
     applicant.user.refresh_from_db()
     assert applicant.user.is_active and applicant.email_activation_closed
@@ -60,7 +60,7 @@ def test_officer_deactivated_account_cannot_reactivate_by_email(
     applicant = make_applicant(active=False)
     _resend(client, applicant)
     old_link = _activation_path()
-    assert client.get(old_link).status_code == 302  # pemohon mengaktifkan
+    assert client.post(old_link).status_code == 302  # pemohon mengaktifkan
 
     _admin_action("deactivate_accounts", applicant, admin_user)
     applicant.user.refresh_from_db()

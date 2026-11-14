@@ -71,6 +71,8 @@ from utils.client_ip import client_ip
 
 User = get_user_model()
 S = enums.ApplicationStatus
+# Batas unggahan dokumen per permohonan (tiap berkas maks. 10 MB).
+MAX_DOCUMENTS_PER_APPLICATION = 30
 
 
 # --------------------------------------------------------------------------
@@ -809,6 +811,10 @@ def activate(request, uidb64, token):
         and not user.pemohon.email_activation_closed
         and activation_token.check_token(user, token)
     ):
+        if request.method != "POST":
+            # GET hanya menampilkan konfirmasi: pemindai tautan surel yang
+            # membuka tautan otomatis tidak boleh mengaktifkan akun.
+            return render(request, "alokasi/portal/activation_confirm.html")
         user.is_active = True
         user.save(update_fields=["is_active"])
         messages.success(request, _("Akun berhasil diaktifkan. Silakan masuk."))
@@ -1076,9 +1082,18 @@ def application_detail(request, number):
     return render(request, "alokasi/portal/application_detail.html", context)
 
 
+def _lock_application(application) -> Application:
+    """Kunci baris permohonan (dalam transaksi) dan muat ulang statusnya, agar
+    simpan/unggah tidak menimpa pengajuan yang berjalan bersamaan."""
+    return Application.objects.select_for_update().get(pk=application.pk)
+
+
 @applicant_required
+@transaction.atomic
 def application_edit(request, number):
     application = _own_application(request, number)
+    if request.method == "POST":
+        application = _lock_application(application)
     if not application.is_editable:
         messages.error(request, _("Permohonan ini tidak dapat diubah lagi."))
         return redirect("portal:application_detail", number=number)
@@ -1108,13 +1123,23 @@ def application_edit(request, number):
 
 @applicant_required
 @require_POST
+@transaction.atomic
 def document_upload(request, number):
-    application = _own_application(request, number)
+    application = _lock_application(_own_application(request, number))
     if not application.is_editable:
         messages.error(
             request, _("Dokumen hanya dapat diunggah pada draf atau saat perbaikan.")
         )
         return redirect("portal:application_detail", number=number)
+    if application.documents.count() >= MAX_DOCUMENTS_PER_APPLICATION:
+        messages.error(
+            request,
+            _("Maksimal %d dokumen per permohonan. Hapus dokumen yang tidak perlu.")
+            % MAX_DOCUMENTS_PER_APPLICATION,
+        )
+        return redirect(
+            f"{reverse('portal:application_detail', args=[number])}#dokumen"
+        )
     form = DocumentUploadForm(request.POST, request.FILES, application=application)
     if form.is_valid():
         form.save()
@@ -1128,8 +1153,9 @@ def document_upload(request, number):
 
 @applicant_required
 @require_POST
+@transaction.atomic
 def document_delete(request, number, pk):
-    application = _own_application(request, number)
+    application = _lock_application(_own_application(request, number))
     document = get_object_or_404(ApplicationDocument, pk=pk, application=application)
     if not application.is_editable:
         messages.error(request, _("Dokumen tidak dapat dihapus pada tahap ini."))

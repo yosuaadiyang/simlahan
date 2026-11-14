@@ -158,11 +158,16 @@ def test_register_activate_login(client, seeded):
         0
     )
     path = urlparse(link).path
-    assert client.get(path).status_code == 302
+    # Membuka tautan (mis. oleh pemindai surel) belum mengaktifkan akun.
+    assert client.get(path).status_code == 200
+    user.refresh_from_db()
+    assert not user.is_active
+    assert client.post(path).status_code == 302
     user.refresh_from_db()
     assert user.is_active
     # Tautan sekali pakai.
     assert client.get(path).status_code == 400
+    assert client.post(path).status_code == 400
 
     response = client.post(
         reverse("portal:login"),
@@ -675,3 +680,20 @@ def test_profile_identity_locked_for_transfer_recipient(
     client.post(reverse("portal:profile"), _profile_data())
     recipient.refresh_from_db()
     assert recipient.name == name
+
+
+def test_document_upload_is_capped_per_application(
+    client, applicant, plot, monkeypatch
+):
+    from alokasi import views
+    from alokasi.models import ApplicationDocument, RequirementDocType
+
+    monkeypatch.setattr(views, "MAX_DOCUMENTS_PER_APPLICATION", 2)
+    login(client, applicant)
+    client.post(reverse("portal:application_create", args=[plot.code]))
+    application = Application.objects.get(applicant=applicant)
+    doc_type = RequirementDocType.for_application(application).first()
+    url = reverse("portal:document_upload", args=[application.number])
+    for _attempt in range(4):
+        client.post(url, {"doc_type": doc_type.pk, "file": pdf_file("syarat.pdf")})
+    assert ApplicationDocument.objects.filter(application=application).count() == 2

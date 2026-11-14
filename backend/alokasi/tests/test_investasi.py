@@ -464,8 +464,16 @@ def test_lease_flow_marks_plot_leased(client, applicant, officer, lease_plot):
     login(client, applicant)
     detail = client.get(reverse("portal:investment_request", args=[investment.number]))
     assert b"Terima penawaran" in detail.content
+    accept_url = reverse("portal:investment_request_accept", args=[investment.number])
+    # Formulir membawa versi penawaran yang dilihat investor.
+    assert investment.offered_at.isoformat() in detail.content.decode()
+    # Penawaran yang diubah petugas setelah dilihat tidak bisa langsung diterima.
+    response = client.post(accept_url, {"offered_at": "2000-01-01T00:00:00+00:00"})
+    assert response.status_code == 302
+    investment.refresh_from_db()
+    assert investment.status == IS.OFFERED
     response = client.post(
-        reverse("portal:investment_request_accept", args=[investment.number])
+        accept_url, {"offered_at": investment.offered_at.isoformat()}
     )
     assert response.status_code == 302
     investment.refresh_from_db()

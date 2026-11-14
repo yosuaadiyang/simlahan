@@ -468,7 +468,9 @@ def request_accept(request, number):
     investment = _own_request(request, number)
     _run(
         request,
-        lambda: inv.accept_offer(investment, request.user),
+        lambda: inv.accept_offer(
+            investment, request.user, request.POST.get("offered_at", "")
+        ),
         _("Penawaran diterima. Petugas akan meneruskan ke tahap berikutnya."),
     )
     return redirect("portal:investment_request", number=number)

@@ -107,7 +107,8 @@ def test_demo_investor_works_end_to_end_and_stays_private(investor):
     assert len(page.context["pending_offers"]) == 1
     offered = investor.investment_requests.get(status=IS.OFFERED)
     response = client.post(
-        reverse("portal:investment_request_accept", args=[offered.number])
+        reverse("portal:investment_request_accept", args=[offered.number]),
+        {"offered_at": offered.offered_at.isoformat()},
     )
     assert response.status_code == 302
     offered.refresh_from_db()

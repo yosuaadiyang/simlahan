@@ -41,7 +41,7 @@
       {% if investment.offer_note %}<h3>Ketentuan</h3><p class="prose">{{ investment.offer_note }}</p>{% endif %}
       {% if investment.can_accept_offer %}
       <div class="actions-row" style="margin-top:12px">
-        <form method="post" action="{% url 'portal:investment_request_accept' investment.number %}" data-confirm="Terima penawaran ini? Petugas akan meneruskan ke tahap kontrak atau permohonan.">{% csrf_token %}<button class="btn btn-accent" type="submit">Terima penawaran</button></form>
+        <form method="post" action="{% url 'portal:investment_request_accept' investment.number %}" data-confirm="Terima penawaran ini? Petugas akan meneruskan ke tahap kontrak atau permohonan.">{% csrf_token %}<input type="hidden" name="offered_at" value="{{ investment.offered_at.isoformat }}"><button class="btn btn-accent" type="submit">Terima penawaran</button></form>
       </div>
       {% else %}<p class="alert alert-warn" style="margin-top:12px">Masa berlaku penawaran sudah lewat. Kirim pesan untuk meminta penawaran baru.</p>{% endif %}
       <details class="panel" style="margin-top:12px">
